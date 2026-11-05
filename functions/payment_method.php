@@ -187,7 +187,7 @@ function paymentMethodDefaults() {
 }
 
 /* Which defaults a method is - ['in', 'out'], one of them, or none. */
-function paymentMethodDefaultFor($name, array $defaults = null) {
+function paymentMethodDefaultFor($name, ?array $defaults = null) {
     $defaults = $defaults ?? paymentMethodDefaults();
     $is = [];
     foreach ($defaults as $way => $default) {

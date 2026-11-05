@@ -972,7 +972,7 @@ function reportExporting($table = null) {
 }
 
 /** Send rows as a CSV file and stop. Numbers go out bare; text is guarded against formulas. */
-function reportCsv($name, array $columns, array $rows, array $totals = null) {
+function reportCsv($name, array $columns, array $rows, ?array $totals = null) {
     global $session_name;
 
     $columns = array_filter($columns, function ($column) {

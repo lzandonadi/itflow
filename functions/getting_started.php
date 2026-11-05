@@ -182,7 +182,7 @@ function gettingStartedSteps() {
 }
 
 /** How far it has got - done (or skipped), of how many, the next step to do ('' when none is left) and whether it is finished. */
-function gettingStartedProgress(array $steps = null) {
+function gettingStartedProgress(?array $steps = null) {
     $steps = $steps ?? gettingStartedSteps();
     $done = 0;
     $next = '';
@@ -197,7 +197,7 @@ function gettingStartedProgress(array $steps = null) {
 }
 
 /** The step after this one, in order - 'done' (the summary) after the last. */
-function gettingStartedAfter($key, array $steps = null) {
+function gettingStartedAfter($key, ?array $steps = null) {
     $keys = array_keys($steps ?? gettingStartedSteps());
     $at = array_search($key, $keys, true);
     return $at === false || !isset($keys[$at + 1]) ? 'done' : $keys[$at + 1];
