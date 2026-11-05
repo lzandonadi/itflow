@@ -87,12 +87,12 @@ function initOnePhoneInput(el) {
 
     var initial = stored ? isoForDialCode(stored, context) : context;
 
-    var iti = window.intlTelInput(el, {
+    var iti = window.intlTelInput(el, Object.assign({
         initialCountry: initial.toLowerCase(),
         separateDialCode: true,
         countrySearch: true,
         formatAsYouType: true
-    });
+    }, window.itflowI18n ? itflowI18n.phoneInput() : {}));
 
     var sync = function () {
         var country = iti.getSelectedCountry();

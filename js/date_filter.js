@@ -137,6 +137,9 @@
         // first click starts a fresh selection.
         var allTimeActive = initialKey === ALL_TIME_START + '|' + ALL_TIME_END;
 
+        if (window.itflowI18n) {
+            itflowI18n.localizeFlatpickr();
+        }
         flatpickr(input, {
             mode: 'range',
             dateFormat: 'Y-m-d',

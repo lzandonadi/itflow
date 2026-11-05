@@ -393,6 +393,14 @@ function itflowAiDraft(editor, ticketId, say) {
  * Both the oxide-dark UI skin and the dark content stylesheet are already
  * vendored under libs/tinymce/skins, so this only has to point at them.
  */
+/*
+ * A widget's options for the interface language (js/i18n.js) - nothing where
+ * i18n.js isn't loaded (setup/index.php loads this file on its own).
+ */
+function itflowI18nOptions(widget) {
+    return (window.itflowI18n && typeof window.itflowI18n[widget] === 'function') ? (window.itflowI18n[widget]() || {}) : {};
+}
+
 function itflowTinyMceSkin() {
     var dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
     var root = getComputedStyle(document.documentElement);
@@ -538,6 +546,7 @@ function itflowInit() {
     // Initialize TinyMCE
     itflowTinyMce.init({
         ...itflowTinyMceSkin(),
+        ...itflowI18nOptions('tinyMce'),
         selector: '.tinymce-simple',
         browser_spellcheck: true,
         contextmenu: false,
@@ -583,6 +592,7 @@ function itflowInit() {
     // Initialize TinyMCE with AI
     itflowTinyMce.init({
         ...itflowTinyMceSkin(),
+        ...itflowI18nOptions('tinyMce'),
         selector: '.tinymce',
         browser_spellcheck: true,
         contextmenu: false,
@@ -635,6 +645,7 @@ function itflowInit() {
     // Initialize TinyMCE AI for Tickets
     itflowTinyMce.init({
         ...itflowTinyMceSkin(),
+        ...itflowI18nOptions('tinyMce'),
         selector: '.tinymceTicket',
         browser_spellcheck: true,
         contextmenu: false,
@@ -708,6 +719,7 @@ function itflowInit() {
     // Initialize TinyMCE Redact-only
     itflowTinyMce.init({
         ...itflowTinyMceSkin(),
+        ...itflowI18nOptions('tinyMce'),
         selector: '.tinymceRedact',
         browser_spellcheck: true,
         contextmenu: false,
@@ -762,6 +774,9 @@ function itflowInit() {
     });
 
     // DateTime
+    if (window.itflowI18n) {
+        itflowI18n.localizeFlatpickr();
+    }
     document.querySelectorAll('.datetimepicker').forEach(function (el) {
         if (el._flatpickr) {
             return;
@@ -920,7 +935,7 @@ function itflowInit() {
     // setup and Get started load this file without it
     itflowStep('datatables', function () {
         if (typeof DataTable !== 'undefined') {
-            new DataTable('.dataTables');
+            new DataTable('.dataTables', itflowI18nOptions('dataTables'));
         }
     });
 

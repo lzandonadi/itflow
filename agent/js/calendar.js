@@ -171,6 +171,7 @@
     // ---------- the calendar ----------
 
     const calendar = new FullCalendar.Calendar(el, {
+        ...(window.itflowI18n ? itflowI18n.fullCalendar() : {}),
         initialView: state.view || (mobile ? 'listWeek' : 'dayGridMonth'),
         initialDate: root.dataset.initialDate || undefined,
         headerToolbar: mobile

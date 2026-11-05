@@ -51,7 +51,7 @@
 
     if (window.tinymce && document.querySelector('textarea.tinymce')) {
         var skin = editorSkin();
-        tinymce.init({
+        tinymce.init(Object.assign({
             selector: 'textarea.tinymce',
             browser_spellcheck: true,
             resize: true,
@@ -106,7 +106,7 @@
                     }
                 });
             }
-        });
+        }, window.itflowI18n ? itflowI18n.tinyMce() : {}));
     }
 
     // ---------- Attachments ----------
