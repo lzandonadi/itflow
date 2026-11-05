@@ -290,10 +290,10 @@ function validateCSRFToken(?string $token = null) {
     }
 
     echo '<!DOCTYPE html><html lang="' . i18nHtmlLang() . '"><head><meta charset="UTF-8">'
-        . '<title>403 Forbidden</title></head><body>'
-        . '<h1>403 Forbidden</h1>'
-        . '<p>CSRF token verification failed. Your session may have expired.</p>'
-        . '<p><a href="/">Return to ITFlow</a> and try again.</p>'
+        . '<title>' . __('403 Forbidden') . '</title></head><body>'
+        . '<h1>' . __('403 Forbidden') . '</h1>'
+        . '<p>' . __('CSRF token verification failed. Your session may have expired.') . '</p>'
+        . '<p>' . __('<a href="/">Return to ITFlow</a> and try again.') . '</p>'
         . '</body></html>';
 
     exit();

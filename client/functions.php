@@ -80,7 +80,7 @@ function contactCan($capability) {
  */
 function enforceContactCan($capability) {
     if (!contactCan($capability)) {
-        flashAlert("That part of the portal isn't open to you", 'error');
+        flashAlert(__("That part of the portal isn't open to you"), 'error');
         redirect("/client/index.php");
     }
 }

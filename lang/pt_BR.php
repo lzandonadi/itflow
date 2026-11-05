@@ -102,4 +102,33 @@ return [
     // Ticket emails (functions/ticket.php)
     'Ticket closed - [%1$s] - %2$s | (do not reply)' => 'Chamado fechado - [%1$s] - %2$s | (não responda)',
 
+    // Permission and access refusals (functions/auth.php, functions/security.php, client/functions.php, agent/ajax.php)
+    'Not for your role' => 'Não disponível para o seu perfil de acesso',
+    'Back' => 'Voltar',
+    "Only an admin can do that - your role, %s, isn't an admin role." => 'Só um administrador pode fazer isso - o seu perfil de acesso, %s, não é de administrador.',
+    "Only an admin can do that - your role isn't an admin role." => 'Só um administrador pode fazer isso - o seu perfil de acesso não é de administrador.',
+    "Your role, %1\$s, can't open %2\$s." => 'O seu perfil de acesso, %1$s, não pode abrir %2$s.',
+    "Your role can't open %s." => 'O seu perfil de acesso não pode abrir %s.',
+    'Your role, %1$s, can only view %2$s, not change it.' => 'O seu perfil de acesso, %1$s, só pode ver %2$s, sem alterar.',
+    'Your role can only view %s, not change it.' => 'O seu perfil de acesso só pode ver %s, sem alterar.',
+    "Your role, %1\$s, can't delete in %2\$s - that takes Full access." => 'O seu perfil de acesso, %1$s, não pode excluir em %2$s - isso exige acesso Total.',
+    "Your role can't delete in %s - that takes Full access." => 'O seu perfil de acesso não pode excluir em %s - isso exige acesso Total.',
+    'An admin can change what your role allows in Admin > Roles.' => 'Um administrador pode mudar o que o seu perfil permite em Administração > Perfis de acesso.',
+    'Access Denied.' => 'Acesso negado.',
+    'Access Denied - You do not have permission to access that client!' => 'Acesso negado - você não tem permissão para acessar esse cliente!',
+    "You don't have access to %s's tickets." => 'Você não tem acesso aos chamados de %s.',
+    "You don't have access to that client's tickets." => 'Você não tem acesso aos chamados desse cliente.',
+    "You don't have access to %s." => 'Você não tem acesso a %s.',
+    "You don't have access to that client's documents." => 'Você não tem acesso aos documentos desse cliente.',
+    "That part of the portal isn't open to you" => 'Essa parte do portal não está liberada para você',
+    '403 Forbidden' => '403 Acesso negado',
+    'CSRF token verification failed. Your session may have expired.' => 'Falha na verificação do token CSRF. Sua sessão pode ter expirado.',
+    '<a href="/">Return to ITFlow</a> and try again.' => '<a href="/">Volte ao ITFlow</a> e tente de novo.',
+
+    // Role modules, as named in the refusals above and in Admin > Roles (functions/roles.php roleModuleInfo())
+    'Support' => 'Suporte',
+    'Sales' => 'Vendas',
+    'Financial' => 'Financeiro',
+    'AI' => 'IA',
+
 ];

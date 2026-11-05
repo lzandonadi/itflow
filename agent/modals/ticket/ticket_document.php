@@ -27,7 +27,7 @@ if (!$client_id) {
     exit;
 }
 if (!hasClientAccess($client_id)) {
-    permissionRefuse("You don't have access to that client's documents.");
+    permissionRefuse(__("You don't have access to that client's documents."));
 }
 $client_name = (string) getFieldById('clients', $client_id, 'client_name');
 $asset_id = intval($ticket['ticket_asset_id']) && intval(getFieldById('assets', intval($ticket['ticket_asset_id']), 'asset_client_id')) === $client_id ? intval($ticket['ticket_asset_id']) : 0;

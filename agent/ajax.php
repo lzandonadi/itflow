@@ -2084,7 +2084,7 @@ $aiTicket = function ($ticket_id, $level) use ($aiRefuse) {
         exit;
     }
     if (intval($row['ticket_client_id']) && !hasClientAccess(intval($row['ticket_client_id']))) {
-        permissionRefuse("You don't have access to " . ($row['client_name'] ?: 'that client') . "'s tickets.");
+        permissionRefuse($row['client_name'] ? __("You don't have access to %s's tickets.", $row['client_name']) : __("You don't have access to that client's tickets."));
     }
     return $row;
 };
@@ -2137,7 +2137,7 @@ $aiClient = function ($client_id, $module, $level) use ($aiRefuse) {
         exit;
     }
     if (!hasClientAccess($client_id)) {
-        permissionRefuse("You don't have access to $name.");
+        permissionRefuse(__("You don't have access to %s.", $name));
     }
     return $client_id;
 };
@@ -2205,7 +2205,7 @@ if (isset($_GET['ai_billing_draft'])) {
         exit;
     }
     if (!hasClientAccess(intval($row['client_id']))) {
-        permissionRefuse("You don't have access to {$row['client_name']}.");
+        permissionRefuse(__("You don't have access to %s.", $row['client_name']));
     }
     if (!billingCanEditItems($type, $row)) {
         echo json_encode(['error' => billingNumber($type, $row) . " can't be changed now - " . ($type === 'quote' ? 'it has been answered or invoiced.' : 'it is paid, cancelled or non-billable.')]);
