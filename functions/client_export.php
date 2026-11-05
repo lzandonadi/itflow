@@ -1564,7 +1564,7 @@ const CLIENT_EXPORT_STORED_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic',
 
 /** A web page of the export - a document, a ticket, the README - with its own styles, readable offline. */
 function clientExportHtmlPage($title, $body, $up = '') {
-    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+    return '<!DOCTYPE html><html lang="' . i18nHtmlLang() . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<title>' . escapeHtml($title) . '</title><style>'
         . 'html{background:#f6f7f9}body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#212529;background:#f6f7f9;margin:0;line-height:1.5;font-size:15px}'
         . 'main{max-width:960px;margin:0 auto;padding:32px 20px 64px}'

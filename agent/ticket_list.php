@@ -161,7 +161,7 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                                     <?php } ?>
                                     <?php if ($schedule && $is_open) { ?>
                                         <span class="text-nowrap <?= $scheduled_today ? 'text-warning-emphasis fw-semibold' : '' ?>" title="Scheduled<?= intval($row['ticket_onsite']) ? ' on site' : '' ?>">
-                                            <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= $scheduled_today ? 'Today ' . date($config_time_format, strtotime($schedule)) : date('M j, ' . $config_time_format, strtotime($schedule)) ?>
+                                            <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= escapeHtml($scheduled_today ? __('Today') . ' ' . formatDate($schedule, 'time') : formatDate($schedule, 'datetime_short')) ?>
                                         </span>
                                     <?php } ?>
                                     <?= ticketTasksHtml($task_counts[$ticket_id] ?? null) ?>

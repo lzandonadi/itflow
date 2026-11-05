@@ -19,7 +19,7 @@ $mfa_secret = $_SESSION['mfa_token'];
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html <?= i18nHtmlAttributes() ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -45,6 +45,7 @@ $mfa_secret = $_SESSION['mfa_token'];
 
     <!-- jQuery -->
 
+<script src="/js/i18n.js"></script>
 </head>
 <body class="hold-transition login-page">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>

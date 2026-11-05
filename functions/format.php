@@ -253,6 +253,70 @@ function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigne
 }
 
 
+/*
+ * A date as people read it, in the interface language (functions/i18n.php) - for
+ * showing only. Dates that are stored, posted, exported or compared keep date()
+ * with a numeric format (Y-m-d, H:i).
+ *
+ * $value is a timestamp, a DateTimeInterface or a MySQL date / datetime string,
+ * shown in ITFlow's timezone; null, '', a zero date or anything that isn't a
+ * date gives ''. Each style is an ICU skeleton, so every language gets its own
+ * order and punctuation:
+ *
+ *   style        en_US                   pt_BR                     replaces
+ *   date         Nov 5, 2026             5 de nov. de 2026         date('M j, Y')
+ *   date_short   Nov 5                   5 de nov.                 date('M j')
+ *   datetime     Nov 5, 2026, 3:04 PM    5 de nov. de 2026, 15:04  date('M j, Y g:i A')
+ *   datetime_short Nov 5, 3:04 PM        5 de nov., 15:04          date('M j, g:i A')
+ *   time         3:04 PM                 15:04                     date('g:i A')
+ *   month        Nov                     nov.                      date('M')
+ *   month_year   November 2026           novembro de 2026          date('F Y')
+ *   date_long    November 5, 2026        5 de novembro de 2026     date('F j, Y')
+ *
+ * An unknown style is shown as date.
+ */
+function formatDate($value, string $style = 'date'): string {
+    static $skeletons = [
+        'date' => 'yMMMd',
+        'date_short' => 'MMMd',
+        'datetime' => 'yMMMdjmm',
+        'datetime_short' => 'MMMdjmm',
+        'time' => 'jmm',
+        'month' => 'MMM',
+        'month_year' => 'yMMMM',
+        'date_long' => 'yMMMMd',
+    ];
+    static $formatters = [];
+
+    if ($value instanceof DateTimeInterface) {
+        $timestamp = $value->getTimestamp();
+    } elseif (is_int($value)) {
+        $timestamp = $value;
+    } else {
+        $value = trim((string) $value);
+        if ($value === '' || str_starts_with($value, '0000-00-00')) {
+            return '';
+        }
+        $timestamp = ctype_digit($value) ? intval($value) : strtotime($value);
+        if ($timestamp === false) {
+            return '';
+        }
+    }
+
+    $skeleton = $skeletons[$style] ?? $skeletons['date'];
+    $locale = i18nLocale();
+    $timezone = date_default_timezone_get();
+    $key = "$locale|$skeleton|$timezone";
+    if (!isset($formatters[$key])) {
+        $pattern = (new IntlDatePatternGenerator($locale))->getBestPattern($skeleton);
+        $formatters[$key] = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $timezone, IntlDateFormatter::GREGORIAN, $pattern);
+    }
+    $formatted = $formatters[$key]->format($timestamp);
+
+    return $formatted === false ? '' : $formatted;
+}
+
+
 function timeAgo($datetime) {
     if (is_null($datetime)) {
         return "-";

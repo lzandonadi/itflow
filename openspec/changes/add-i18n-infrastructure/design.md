@@ -73,6 +73,8 @@ O idioma não fica em `inc_set_timezone.php`, porque um erro de coluna inexisten
 | `date` | `M j, Y` | `yMMMd` | Nov 5, 2026 | 5 de nov. de 2026 |
 | `date_short` | `M j` | `MMMd` | Nov 5 | 5 de nov. |
 | `datetime` | `M j, Y g:i A` | `yMMMdjmm` | Nov 5, 2026, 3:04 PM | 5 de nov. de 2026, 15:04 |
+| `datetime_short` | `M j, g:i A` | `MMMdjmm` | Nov 5, 3:04 PM | 5 de nov., 15:04 |
+| `time` | `g:i A` | `jmm` | 3:04 PM | 15:04 |
 | `month` | `M` | `MMM` | Nov | nov. |
 | `month_year` | `F Y` | `yMMMM` | November 2026 | novembro de 2026 |
 | `date_long` | `F j, Y` | `yMMMMd` | November 5, 2026 | 5 de novembro de 2026 |
@@ -83,8 +85,8 @@ Saídas conferidas no ICU do ambiente DDEV (PHP 8.4). O fuso é o `date_default_
 
 ### D8. Ponte JS
 - `lang/js/pt_BR.php` é um subconjunto, só com os textos usados por JS. Ele **não** inclui o dicionário inteiro, para não colocar centenas de KB em cada página.
-- Os headers emitem `<script>window.itflowI18n = <?= json_encode(i18nJsDictionary(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;</script>` antes dos scripts do projeto. Em en_US o objeto fica vazio.
-- `js/i18n.js` expõe `__(text, ...args)` com substituição `%s`/`%1$s` e fallback para o texto original, carregado logo depois do dicionário.
+- O dicionário vai num atributo `data-itflow-i18n` do `<html>` (JSON passado por `escapeHtml`), e **não** num `<script>` inline. O login e o portal do cliente servem `Content-Security-Policy: default-src 'self'`, que bloqueia scripts inline, e a área do técnico trata os inline existentes como dívida a não aumentar. Os headers já usam esse padrão para passar o país ao intl-tel-input. Em en_US o atributo vale `{}`.
+- `js/i18n.js` lê o atributo, expõe `__(text, ...args)` com substituição `%s`/`%1$s` e fallback para o texto original e é carregado no `<head>`, antes de todos os scripts do projeto.
 
 ### D9. `scripts/i18n_check.php`
 Um script CLI (a pasta `scripts/` já nega acesso web) que:

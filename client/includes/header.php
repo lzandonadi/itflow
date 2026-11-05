@@ -53,7 +53,7 @@ $portal_contact_name = (string) ($contact['contact_name'] ?? '');
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= $portal_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off" data-lte-print="plain">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="<?= $portal_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off" data-lte-print="plain">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -96,6 +96,7 @@ $portal_contact_name = (string) ($contact['contact_name'] ?? '');
         <link rel="stylesheet" href="/libs/DataTables/datatables.min.css">
     <?php } ?>
 
+<script src="/js/i18n.js"></script>
 </head>
 
 <?php /* Same country bridge as the agent header: intl-tel-input wants an ISO2

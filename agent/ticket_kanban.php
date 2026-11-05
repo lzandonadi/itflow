@@ -137,7 +137,7 @@ $tickets_tags = tagsForRecords('ticket', $board_ids);
                                 <?= $flags ?>
                                 <?php if ($schedule) { ?>
                                     <span class="text-nowrap <?= $scheduled_today ? 'text-warning-emphasis fw-semibold' : '' ?>" title="Scheduled<?= intval($row['ticket_onsite']) ? ' on site' : '' ?>">
-                                        <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= $scheduled_today ? 'Today ' . date($config_time_format, strtotime($schedule)) : date('M j', strtotime($schedule)) ?>
+                                        <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= escapeHtml($scheduled_today ? __('Today') . ' ' . formatDate($schedule, 'time') : formatDate($schedule, 'date_short')) ?>
                                     </span>
                                 <?php } ?>
                                 <?php if (!empty($row['asset_name'])) { ?>

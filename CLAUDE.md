@@ -40,6 +40,16 @@ Root-level `includes/`, `post/`, `modals/`, `js/`, `css/` are **shared** across 
 
 **`custom/` hooks** — core calls `triggerCustomAction($trigger, $entity_id)` at meaningful events; core must never depend on anything in `custom/`.
 
+## Interface language (i18n)
+
+The interface is translatable (`functions/i18n.php`); en_US is the default and the source language, pt_BR is the first translation (`lang/pt_BR.php`, terms and style in `lang/GLOSSARY.md`). The language is global — `settings.config_language`, Admin > Settings > Localization — and separate from `companies.company_locale`, which only formats numbers and money. Most screens are still hardcoded English while the strings are being converted (OpenSpec change `translate-ui-pt-br`).
+
+- **PHP:** `__('Add Ticket')`, `__('Ticket %s resolved', $ref)` (vsprintf; use `%1$s` where order may change), `_x('Open', 'ticket status')` (entry `'ticket status::Open'`), `_n('%d ticket', '%d tickets', $n)` (entry `[one, other]`). The key is the English text; a missing entry falls back to English. Return values are plain text — arguments still get `escapeHtml()`/`escapeSql()` at the call site as usual.
+- **JS:** `__('Are you sure?')` from `js/i18n.js`, reading the dictionary in `<html data-itflow-i18n>` (from `lang/js/<locale>.php`, only strings scripts use). No inline `<script>` — the sign-in pages and client portal send `default-src 'self'`. A page with its own `<html>` that loads project JS uses `<html <?= i18nHtmlAttributes() ?>>` and `<script src="/js/i18n.js">` in `<head>`.
+- **Never translate stored or compared values** (`invoice_status = 'Sent'`, `<option value>`, ticket status names from the DB) — translate only where shown, with `_x()` and a context. Audit log, app log, API responses and CLI/cron output stay English; text written to the DB for people (system ticket replies, notifications, emails) is generated in the language of the moment.
+- **Check:** `ddev exec php scripts/i18n_check.php pt_BR` lists missing translations (file:line), placeholder mismatches, unused entries and non-literal calls; exits 1 on missing/mismatch. Mark a reviewed dynamic call (`__($label)`) with an `i18n-dynamic` comment on its line.
+- **Dates for display go through `formatDate($value, $style)`** (`date`, `date_short`, `datetime`, `datetime_short`, `time`, `month`, `month_year`, `date_long`) so month and day names follow the interface language. Keep `date()` only for numeric formats that are stored, posted, exported or compared (`Y-m-d`, `H:i`) — `formatDate()` output is not stable text (ICU punctuation, U+202F before AM/PM).
+
 ## Non-negotiable rules
 
 1. **SQL:** every interpolated value is `intval()` (unquoted) or `escapeSql()` (inside quotes) — including values read back from the DB and arguments to `logAudit()`, `appNotify()`, `logHistory()`, `logTicketHistory()`, which build INSERTs internally. Fetch helpers like `getFieldById()` return raw values; the caller escapes.
@@ -57,5 +67,5 @@ Root-level `includes/`, `post/`, `modals/`, `js/`, `css/` are **shared** across 
 - When changing a single action, check for a parallel `bulk_*` implementation and update it too.
 - Old helper names were removed in 2026 and fatal if called (`sanitizeInput` → `escapeSql`, `nullable_htmlentities` → `escapeHtml`, `logAction` → `logAudit`, `flash_alert` → `flashAlert`, `customAction` → `triggerCustomAction`; full list in CONTRIBUTING.md).
 - 4-space indent, LF line endings (enforced by `.editorconfig`/`.gitattributes`). Match surrounding code; don't reformat untouched code.
-- UI strings are hardcoded English in the PHP files — there is no i18n/translation layer. Locale only affects number/currency formatting (`companies.company_locale`, `includes/settings_localization_array.php`).
+
 - User-facing changes are described in `CHANGELOG.md` under the release heading (Upgrading / Security / New Features & Updates / Bug Fixes), written in plain language for MSP admins.

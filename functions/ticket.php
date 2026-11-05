@@ -1269,7 +1269,8 @@ function ticketMailClosed($ticket_id) {
     if (!$row) {
         return 0;
     }
-    return ticketMailSend($row['ticket_id'], "Ticket closed - [" . ticketReference($row) . "] - " . $row['ticket_subject'] . " | (do not reply)",
+    // The [reference] is what the email parser knows a reply by - every translation keeps it
+    return ticketMailSend($row['ticket_id'], __('Ticket closed - [%1$s] - %2$s | (do not reply)', ticketReference($row), $row['ticket_subject']),
         ticketEmailContent($row, 'closed'), ['kind' => 'closed']);
 }
 

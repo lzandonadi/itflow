@@ -2,6 +2,24 @@
 
 This file documents all notable changes made to ITFlow.
 
+## [Unreleased]
+
+### Upgrading
+
+This release has one database change (3.5.5 to 3.5.6), which adds the interface language setting. Until it has run, ITFlow stays in English.
+
+### New Features & Updates
+
+- Interface language: Admin > Settings > Localization has a new Interface language setting, English (US) or Português (Brasil). It changes the language for everyone - agents, the client portal and guest pages. English stays the default. Only a few screens are translated so far: the Localization page, the confirmation box and the ticket closed email. The rest follow in later releases. What used to be called Locale on that page is now Number and currency format. It still only changes how numbers and money look.
+- Ticket list and board: scheduled dates now show month names in the interface language, for example "Today 6:30 PM" or "Nov 7, 5:40 PM".
+
+### Developer Updates
+
+- `functions/i18n.php` adds `__()`, `_x()` and `_n()`. The key is the English text, and a missing entry falls back to the English. Translations are PHP arrays in `lang/<locale>.php`, and the strings scripts use are in `lang/js/<locale>.php`. `js/i18n.js` defines `__()` for the front end. It reads its dictionary from `<html data-itflow-i18n>`, which `i18nHtmlAttributes()` writes, so no inline script is needed under the sign-in and client portal CSP.
+- `formatDate($value, $style)` in `functions/format.php` formats dates for display through ICU skeletons. The styles are `date`, `date_short`, `datetime`, `datetime_short`, `time`, `month`, `month_year` and `date_long`.
+- `scripts/i18n_check.php <locale>` lists missing translations with file:line, placeholder mismatches, unused entries and non-literal calls. It exits 1 when a translation is missing or a placeholder doesn't match.
+- Database 3.5.6 adds `settings.config_language` (`varchar(10)`, default `en_US`). It is safe to run again, and `db.sql` has the column.
+
 ## [26.11.3]
 
 ### Upgrading

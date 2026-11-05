@@ -579,7 +579,7 @@ if (isset($_POST['ir_reset_user_password'])) {
     header('Cache-Control: no-store');
     ?>
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="<?= i18nHtmlLang() ?>">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -97,7 +97,7 @@ $state = $link['state'];
 $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
     <title><?= escapeHtml($company_name !== '' ? $company_name : $app) ?> | <?= escapeHtml($title) ?></title>
@@ -109,6 +109,7 @@ $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
     <?php } ?>
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
+<script src="/js/i18n.js"></script>
 </head>
 <body class="hold-transition login-page">
 

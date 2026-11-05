@@ -3162,6 +3162,7 @@ CREATE TABLE `settings` (
   `config_theme` varchar(200) DEFAULT 'blue',
   `config_telemetry` tinyint(1) DEFAULT 0,
   `config_timezone` varchar(200) NOT NULL DEFAULT 'America/New_York',
+  `config_language` varchar(10) NOT NULL DEFAULT 'en_US',
   `config_business_days` varchar(20) NOT NULL DEFAULT '1,2,3,4,5',
   `config_business_hours_start` time NOT NULL DEFAULT '09:00:00',
   `config_business_hours_end` time NOT NULL DEFAULT '17:00:00',

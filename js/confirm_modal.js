@@ -40,12 +40,12 @@ document.addEventListener('click', function (e) {
         // palette off the `theme` option and defaults to 'light', so the dialog
         // stayed white on a dark page. Read at fire time, not at load.
         theme: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light',
-        title: link.dataset.confirmTitle || 'Are you sure?',
+        title: link.dataset.confirmTitle || __('Are you sure?'),
         text: link.dataset.confirmText || '',
         icon: link.dataset.confirmIcon || (destructive ? 'warning' : 'question'),
         showCancelButton: true,
-        confirmButtonText: link.dataset.confirmButton || 'Yes',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: link.dataset.confirmButton || __('Yes'),
+        cancelButtonText: __('Cancel'),
         reverseButtons: true,
         focusCancel: destructive,
         buttonsStyling: false,

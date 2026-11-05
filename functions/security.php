@@ -289,7 +289,7 @@ function validateCSRFToken(?string $token = null) {
         header("Cache-Control: no-store");
     }
 
-    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+    echo '<!DOCTYPE html><html lang="' . i18nHtmlLang() . '"><head><meta charset="UTF-8">'
         . '<title>403 Forbidden</title></head><body>'
         . '<h1>403 Forbidden</h1>'
         . '<p>CSRF token verification failed. Your session may have expired.</p>'

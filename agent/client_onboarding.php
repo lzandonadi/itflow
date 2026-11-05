@@ -82,7 +82,7 @@ define('FROM_CLIENT_ONBOARDING', true);
 
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= $user_config_theme_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="<?= $user_config_theme_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off">
 
 <head>
     <meta charset="utf-8">
@@ -98,6 +98,7 @@ define('FROM_CLIENT_ONBOARDING', true);
     <link rel="stylesheet" href="/libs/sweetalert2/css/sweetalert2.min.css">
     <link rel="stylesheet" href="/libs/intl-tel-input/css/intlTelInput.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
+<script src="/js/i18n.js"></script>
 </head>
 
 <body class="itflow-setup itflow-gs itflow-co bg-body-tertiary" data-itflow-phone-country="<?= escapeHtml($country_iso2_array[$session_company_country] ?? '') ?>">

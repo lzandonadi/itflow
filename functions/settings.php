@@ -38,7 +38,7 @@ function settingsPages() {
         'company' => ['group' => 'company', 'title' => 'Company details', 'icon' => 'fa-briefcase', 'url' => 'settings_company.php',
             'about' => 'Your company as it shows on invoices, quotes and emails - its name, address, contact details and logo.'],
         'localization' => ['group' => 'company', 'title' => 'Localization', 'icon' => 'fa-globe', 'url' => 'settings_localization.php',
-            'about' => 'The language dates and numbers are written in, the currency you bill in, and your timezone.'],
+            'about' => 'The language ITFlow is shown in, how numbers and money are written, the currency you bill in, and your timezone.'],
         'theme' => ['group' => 'company', 'title' => 'Theme', 'icon' => 'fa-paint-brush', 'url' => 'settings_theme.php',
             'about' => 'The colour of the top bar, links, buttons and highlights, and the icon on the browser tab.'],
         'default' => ['group' => 'work', 'title' => 'Defaults', 'icon' => 'fa-cogs', 'url' => 'settings_default.php',
@@ -122,8 +122,10 @@ function settingsFields() {
             'words' => 'internal client own company msp internal tickets'],
 
         // Localization
-        'company_locale' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Language', 'kind' => 'select', 'options' => 'locales',
-            'words' => 'locale language number date format'],
+        'config_language' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Interface language', 'kind' => 'select', 'options' => 'interface_languages',
+            'words' => 'language idioma translation portuguese english interface'],
+        'company_locale' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Number and currency format', 'kind' => 'select', 'options' => 'locales',
+            'words' => 'locale number money currency format region'],
         'company_currency' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Currency', 'kind' => 'select', 'options' => 'currencies',
             'words' => 'currency money usd eur gbp'],
         'config_timezone' => ['page' => 'localization', 'section' => 'Timezone', 'label' => 'Timezone', 'words' => 'time zone clock utc'],
@@ -380,9 +382,9 @@ function settingsPageStart($page_key, $actions_html = '') {
     <div class="itflow-settings-head" data-settings-page="<?= escapeHtml($page_key) ?>">
         <div class="itflow-settings-head-icon"><i class="fas fa-fw <?= escapeHtml($page['icon']) ?>"></i></div>
         <div class="flex-grow-1 min-w-0">
-            <a href="settings.php" class="small text-body-secondary text-decoration-none"><i class="fas fa-sliders-h me-1"></i>Settings</a>
-            <h1 class="h4 mb-1"><?= escapeHtml($page['title']) ?></h1>
-            <p class="text-body-secondary mb-0"><?= escapeHtml($page['about']) ?></p>
+            <a href="settings.php" class="small text-body-secondary text-decoration-none"><i class="fas fa-sliders-h me-1"></i><?= escapeHtml(__('Settings')) ?></a>
+            <h1 class="h4 mb-1"><?= escapeHtml(__($page['title'])) /* i18n-dynamic: settingsPages() */ ?></h1>
+            <p class="text-body-secondary mb-0"><?= escapeHtml(__($page['about'])) /* i18n-dynamic: settingsPages() */ ?></p>
         </div>
         <?php if ($actions_html !== '') { ?>
             <div class="flex-shrink-0"><?= $actions_html ?></div>
@@ -434,9 +436,9 @@ function settingsError($name) {
     return (string) ($settings_kept['errors'][$name] ?? '');
 }
 
-/* A field's label - from settingsFields(), unless given. */
+/* A field's label as shown - from settingsFields(), unless given - in the interface language. The audit log names fields by the registry's English (settingsChangeLines()). */
 function settingsLabel($name, $label = null) {
-    return $label ?? (settingsFields()[$name]['label'] ?? $name);
+    return __($label ?? (settingsFields()[$name]['label'] ?? $name)); // i18n-dynamic: settingsFields() or the page's own label
 }
 
 /*
@@ -550,10 +552,10 @@ function settingsSwitch($name, $saved, array $options = []) {
 function settingsSaveBar($button_name, $label = 'Save', $extra_html = '') {
     ob_start(); ?>
     <div class="itflow-settings-savebar" data-settings-savebar>
-        <span class="itflow-settings-savebar-note text-body-secondary small me-auto" data-settings-dirty-note><i class="fas fa-circle text-warning me-2"></i>Unsaved changes</span>
+        <span class="itflow-settings-savebar-note text-body-secondary small me-auto" data-settings-dirty-note><i class="fas fa-circle text-warning me-2"></i><?= escapeHtml(__('Unsaved changes')) ?></span>
         <?= $extra_html ?>
-        <button type="reset" class="btn btn-link text-decoration-none" data-settings-undo>Undo changes</button>
-        <button type="submit" name="<?= escapeHtml($button_name) ?>" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= escapeHtml($label) ?></button>
+        <button type="reset" class="btn btn-link text-decoration-none" data-settings-undo><?= escapeHtml(__('Undo changes')) ?></button>
+        <button type="submit" name="<?= escapeHtml($button_name) ?>" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= escapeHtml(__($label)) /* i18n-dynamic: 'Save' or the page's own */ ?></button>
     </div>
     <?php return ob_get_clean();
 }
@@ -645,6 +647,8 @@ function settingsLogValue($name, $value) {
             $options = settingsMailProviders();
         } elseif ($options === 'mail_encryption') {
             $options = settingsMailEncryption();
+        } elseif ($options === 'interface_languages') {
+            $options = i18nLanguages();
         } elseif ($options === 'ai_triage') {
             $options = [0 => 'off', 1 => 'suggest', 2 => 'fill in'];
         } elseif (is_string($options)) {
@@ -729,11 +733,12 @@ function settingsSaid($page_key, array $lines) {
     global $session_name;
     $title = settingsPages()[$page_key]['title'] ?? 'Settings';
     if (!$lines) {
-        flashAlert("Nothing changed on " . escapeHtml($title), 'info');
+        flashAlert(escapeHtml(__('Nothing changed on %s', __($title))), 'info'); // i18n-dynamic: settingsPages()
         return;
     }
     logAudit("Settings", "Edit", escapeSql("$session_name changed $title: " . implode('; ', $lines)));
-    flashAlert("<strong>" . escapeHtml($title) . "</strong> saved - " . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes'));
+    // The audit log stays in English; the note on screen is in the interface language, bar the change itself
+    flashAlert(__('%1$s saved - %2$s', "<strong>" . escapeHtml(__($title)) . "</strong>", escapeHtml(count($lines) === 1 ? $lines[0] : _n('%d change', '%d changes', count($lines))))); // i18n-dynamic: settingsPages()
 }
 
 /*
@@ -751,7 +756,7 @@ function settingsRefuse($page_key, array $errors, $url = null) {
         $values[$name] = (string) $value;
     }
     $_SESSION['settings_kept'] = ['page' => $page_key, 'values' => $values, 'errors' => $errors, 'at' => time()];
-    flashAlert('Not saved - ' . (count($errors) === 1 ? 'one thing' : count($errors) . ' things') . ' to put right', 'error');
+    flashAlert(escapeHtml(_n('Not saved - one thing to put right', 'Not saved - %d things to put right', count($errors))), 'error');
     redirect($url);
 }
 

@@ -755,7 +755,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -771,6 +771,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
     <link rel="stylesheet" href="css/itflow_custom.css">
+<script src="/js/i18n.js"></script>
 </head>
 <body class="hold-transition login-page">
 
