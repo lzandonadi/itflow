@@ -9,7 +9,11 @@
  *   '%d ticket' => ['%d chamado', '%d chamados'],   // _n('%d ticket', '%d tickets', $n)
  *
  * Keep the placeholders of the English (%s, %d, %1$s) - reorder them with the
- * numbered form. php scripts/i18n_check.php pt_BR lists what is missing here.
+ * numbered form - and its HTML tags. php scripts/i18n_check.php pt_BR lists what
+ * is missing.
+ *
+ * This file holds what is shared by every area; each area has its own file in
+ * lang/pt_BR/ (tickets.php, billing.php...), loaded after this one and merged.
  */
 
 return [

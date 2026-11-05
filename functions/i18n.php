@@ -95,18 +95,35 @@ function i18nHtmlAttributes(): string {
     return 'lang="' . escapeHtml(i18nHtmlLang()) . '" data-itflow-i18n="' . escapeHtml($json === false ? '{}' : $json) . '"';
 }
 
-/** Loads lang/<locale>.php or lang/js/<locale>.php - an array, or nothing for en_US or a file that isn't there. */
-function i18nLoadFile(string $dir, string $locale): array {
+/** The dictionary files of a language: lang/<dir><locale>.php, then lang/<dir><locale>/*.php by name. */
+function i18nFiles(string $dir, string $locale): array {
     if ($locale === 'en_US' || !isset(i18nLanguages()[$locale])) {
         return [];
     }
-    $file = dirname(__DIR__) . "/lang/$dir$locale.php";
-    if (!is_file($file)) {
-        return [];
-    }
-    $dictionary = include $file;
+    $base = dirname(__DIR__) . "/lang/$dir$locale";
+    $files = is_file("$base.php") ? ["$base.php"] : [];
+    $parts = is_dir($base) ? (glob("$base/*.php") ?: []) : [];
+    sort($parts);
 
-    return is_array($dictionary) ? $dictionary : [];
+    return array_merge($files, $parts);
+}
+
+/**
+ * Loads a language's dictionary - lang/<locale>.php plus any area files in
+ * lang/<locale>/ (lang/js/ for the front end) - as one array. Nothing for en_US
+ * or a language with no files. An entry in two files: the later file wins, and
+ * scripts/i18n_check.php reports it.
+ */
+function i18nLoadFile(string $dir, string $locale): array {
+    $dictionary = [];
+    foreach (i18nFiles($dir, $locale) as $file) {
+        $entries = include $file;
+        if (is_array($entries)) {
+            $dictionary = array_replace($dictionary, $entries);
+        }
+    }
+
+    return $dictionary;
 }
 
 /** The translations for the current language, keyed by the English. */

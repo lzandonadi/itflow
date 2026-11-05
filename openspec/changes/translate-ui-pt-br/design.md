@@ -103,6 +103,12 @@ Os handlers costumam ter duas mensagens, uma para o audit log e outra para o `fl
 
 Antes de traduzir uma área, os termos dela são decididos e registrados em `lang/GLOSSARY.md`, por exemplo: Invoice = Fatura, Recurring = Recorrente, Credential = Credencial, Vendor = Fornecedor, Rack = Rack, Trip = Deslocamento, Reconcile = Conciliar, Statement = Extrato. Termos já fixados não mudam sem decisão explícita.
 
+### D10. Dicionário dividido por área
+
+`lang/pt_BR.php` continua existindo, com o que é comum a todas as áreas. Cada lote grava suas entradas em `lang/pt_BR/<área>.php` (`tickets.php`, `billing.php`...). `i18nLoadFile()` junta o arquivo principal e os de área em ordem de nome, com o posterior prevalecendo. `i18n_check.php` avisa quando o mesmo texto em inglês tem traduções diferentes em dois arquivos. Assim cada lote revisa um arquivo próprio e não há um único arquivo com milhares de linhas.
+
+- **Alternativa: um arquivo só.** Fica pesado para revisar e gera conflito entre lotes paralelos. Descartada.
+
 ## Risks / Trade-offs
 
 - **[Texto em inglês alterado sem querer durante a conversão]** → Em cada lote, renderizar as telas da área na master e na branch, em `en_US`, e comparar o texto visível (a mesma técnica da change anterior). Diferenças fora do esperado bloqueiam o lote.
