@@ -182,42 +182,42 @@ function portalNav() {
     global $mysqli, $config_module_enable_accounting, $config_module_enable_itdoc;
 
     $nav = [
-        'home' => ['label' => 'Home', 'icon' => 'fa-home', 'href' => '/client/index.php', 'pages' => ['index.php']],
-        'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'href' => '/client/tickets.php', 'pages' => ['tickets.php', 'ticket.php', 'ticket_add.php', 'ticket_view_all.php']],
+        'home' => ['label' => __('Home'), 'icon' => 'fa-home', 'href' => '/client/index.php', 'pages' => ['index.php']],
+        'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'href' => '/client/tickets.php', 'pages' => ['tickets.php', 'ticket.php', 'ticket_add.php', 'ticket_view_all.php']],
     ];
 
     if (contactCan('accounting') && $config_module_enable_accounting == 1) {
         $cards = billingStripeProvider() !== null;
         $children = [
-            ['label' => 'Invoices', 'icon' => 'fa-file-invoice-dollar', 'href' => '/client/invoices.php', 'pages' => ['invoices.php', 'invoice.php']],
+            ['label' => __('Invoices'), 'icon' => 'fa-file-invoice-dollar', 'href' => '/client/invoices.php', 'pages' => ['invoices.php', 'invoice.php']],
         ];
         if ($cards) {
-            $children[] = ['label' => 'Pay invoices', 'icon' => 'fa-hand-holding-usd', 'href' => '/client/unpaid_invoices.php', 'pages' => ['unpaid_invoices.php', 'pay.php']];
+            $children[] = ['label' => __('Pay invoices'), 'icon' => 'fa-hand-holding-usd', 'href' => '/client/unpaid_invoices.php', 'pages' => ['unpaid_invoices.php', 'pay.php']];
         }
-        $children[] = ['label' => 'Quotes', 'icon' => 'fa-comment-dollar', 'href' => '/client/quotes.php', 'pages' => ['quotes.php', 'quote.php']];
-        $children[] = ['label' => 'Recurring invoices', 'icon' => 'fa-redo-alt', 'href' => '/client/recurring_invoices.php', 'pages' => ['recurring_invoices.php', 'recurring_invoice.php']];
+        $children[] = ['label' => __('Quotes'), 'icon' => 'fa-comment-dollar', 'href' => '/client/quotes.php', 'pages' => ['quotes.php', 'quote.php']];
+        $children[] = ['label' => __('Recurring invoices'), 'icon' => 'fa-redo-alt', 'href' => '/client/recurring_invoices.php', 'pages' => ['recurring_invoices.php', 'recurring_invoice.php']];
         if (contractsReady() && intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM contracts WHERE " . portalContractScopeSql()))[0] ?? 0)) {
-            $children[] = ['label' => 'Contracts', 'icon' => 'fa-file-contract', 'href' => '/client/contracts.php', 'pages' => ['contracts.php', 'contract.php']];
+            $children[] = ['label' => __('Contracts'), 'icon' => 'fa-file-contract', 'href' => '/client/contracts.php', 'pages' => ['contracts.php', 'contract.php']];
         }
-        $children[] = ['label' => 'Payments', 'icon' => 'fa-receipt', 'href' => '/client/payments.php', 'pages' => ['payments.php', 'receipt.php']];
-        $children[] = ['label' => 'Statement', 'icon' => 'fa-file-alt', 'href' => '/client/statement.php', 'pages' => ['statement.php']];
+        $children[] = ['label' => __('Payments'), 'icon' => 'fa-receipt', 'href' => '/client/payments.php', 'pages' => ['payments.php', 'receipt.php']];
+        $children[] = ['label' => __('Statement'), 'icon' => 'fa-file-alt', 'href' => '/client/statement.php', 'pages' => ['statement.php']];
         if ($cards) {
-            $children[] = ['label' => 'Cards & autopay', 'icon' => 'fa-credit-card', 'href' => '/client/saved_payment_methods.php', 'pages' => ['saved_payment_methods.php']];
+            $children[] = ['label' => __('Cards & autopay'), 'icon' => 'fa-credit-card', 'href' => '/client/saved_payment_methods.php', 'pages' => ['saved_payment_methods.php']];
         }
-        $nav['billing'] = ['label' => 'Billing', 'icon' => 'fa-file-invoice-dollar', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
+        $nav['billing'] = ['label' => __('Billing'), 'icon' => 'fa-file-invoice-dollar', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
     }
 
     if ($config_module_enable_itdoc && contactCan('itdoc')) {
         $children = [
-            ['label' => 'Devices', 'icon' => 'fa-desktop', 'href' => '/client/assets.php', 'pages' => ['assets.php', 'asset.php']],
-            ['label' => 'Licenses', 'icon' => 'fa-cube', 'href' => '/client/licenses.php', 'pages' => ['licenses.php']],
-            ['label' => 'Domains & certificates', 'icon' => 'fa-globe', 'href' => '/client/domains.php', 'pages' => ['domains.php', 'certificates.php']],
-            ['label' => 'Documents', 'icon' => 'fa-folder-open', 'href' => '/client/documents.php', 'pages' => ['documents.php', 'document.php', 'document_add.php', 'file.php']],
+            ['label' => __('Devices'), 'icon' => 'fa-desktop', 'href' => '/client/assets.php', 'pages' => ['assets.php', 'asset.php']],
+            ['label' => __('Licenses'), 'icon' => 'fa-cube', 'href' => '/client/licenses.php', 'pages' => ['licenses.php']],
+            ['label' => __('Domains & certificates'), 'icon' => 'fa-globe', 'href' => '/client/domains.php', 'pages' => ['domains.php', 'certificates.php']],
+            ['label' => __('Documents'), 'icon' => 'fa-folder-open', 'href' => '/client/documents.php', 'pages' => ['documents.php', 'document.php', 'document_add.php', 'file.php']],
         ];
         if (contactCan('contacts')) {
-            $children[] = ['label' => 'Contacts', 'icon' => 'fa-address-book', 'href' => '/client/contacts.php', 'pages' => ['contacts.php', 'contact.php', 'contact_add.php', 'contact_edit.php']];
+            $children[] = ['label' => __('Contacts'), 'icon' => 'fa-address-book', 'href' => '/client/contacts.php', 'pages' => ['contacts.php', 'contact.php', 'contact_add.php', 'contact_edit.php']];
         }
-        $nav['it'] = ['label' => 'Your IT', 'icon' => 'fa-laptop', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
+        $nav['it'] = ['label' => __('Your IT'), 'icon' => 'fa-laptop', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
     }
 
     // The links an admin set to show in the portal (Admin > Custom Links)

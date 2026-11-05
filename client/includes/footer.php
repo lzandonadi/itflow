@@ -15,7 +15,7 @@
     <div class="container d-flex flex-wrap justify-content-between gap-2">
         <span><?= escapeHtml($session_company_name) ?></span>
         <?php if (!$config_whitelabel_enabled) { ?>
-            <span>Powered by ITFlow</span>
+            <span><?= __('Powered by ITFlow') ?></span>
         <?php } ?>
     </div>
 </footer>

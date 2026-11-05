@@ -222,12 +222,12 @@ function starterPickHtml($pack, array $items, $form = '') {
     $kind = $pack === 'tags' ? ' is-pills' : '';
     ob_start(); ?>
     <details class="itflow-starter-pick mt-1" data-starter-pick-list>
-        <summary class="small">Pick which</summary>
+        <summary class="small"><?= __('Pick which') ?></summary>
         <input type="hidden" name="picked[<?= escapeHtml($pack) ?>]" value="1"<?= $form_attr ?>>
         <div class="itflow-starter-pick-tools small mt-2">
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-all>All</button>
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-all><?= __('All') ?></button>
             <span class="text-body-secondary" aria-hidden="true">·</span>
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-none>None</button>
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-none><?= __('None') ?></button>
         </div>
         <div class="itflow-starter-pick-box mt-2">
             <div class="itflow-starter-pick-items<?= $kind ?>">
@@ -249,7 +249,7 @@ function starterPickHtml($pack, array $items, $form = '') {
                         </label>
                         <?php if ($previews) { ?>
                             <button type="button" class="btn btn-link btn-sm text-decoration-none flex-shrink-0 ms-auto py-0" data-starter-preview="<?= escapeHtml($pack) ?>" data-starter-key="<?= escapeHtml($item['key']) ?>"
-                                title="See all of <?= escapeHtml($item['name']) ?>"><i class="far fa-eye me-1"></i>Preview</button>
+                                title="See all of <?= escapeHtml($item['name']) ?>"><i class="far fa-eye me-1"></i><?= __('Preview') ?></button>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -266,13 +266,13 @@ function starterPreviewModalHtml() {
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title h5" id="starterPreviewTitle">Preview</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title h5" id="starterPreviewTitle"><?= __('Preview') ?></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
                 </div>
                 <div class="modal-body itflow-starter-preview" data-starter-preview-body></div>
                 <div class="modal-footer">
-                    <span class="small text-body-secondary me-auto">As it comes in - yours to change once it is here.</span>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <span class="small text-body-secondary me-auto"><?= __('As it comes in - yours to change once it is here.') ?></span>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><?= __('Close') ?></button>
                 </div>
             </div>
         </div>
