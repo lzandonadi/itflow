@@ -197,4 +197,8 @@ return [
     'Copied!' => 'Copiado!',
     'Failed!' => 'Falhou!',
 
+    // Your account > Security (agent/user/user_security.php)
+    'The two new passwords are not the same' => 'As duas novas senhas não são iguais',
+    'Not the same as the new password above.' => 'Diferente da nova senha acima.',
+
 ];

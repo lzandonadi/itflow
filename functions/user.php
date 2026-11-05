@@ -48,12 +48,12 @@ function userStatusPill($status, $archived = false) {
  */
 function userMfaPill($token, $forced) {
     if (trim((string) $token) !== '') {
-        return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="Signs in with a code from an authenticator app' . (intval($forced) ? ' - required' : '') . '"><i class="fas fa-lock me-1"></i>MFA' . (intval($forced) ? ' · required' : '') . '</span>';
+        return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="' . escapeHtml(intval($forced) ? __('Signs in with a code from an authenticator app - required') : __('Signs in with a code from an authenticator app')) . '"><i class="fas fa-lock me-1"></i>' . (intval($forced) ? __('MFA · required') : 'MFA') . '</span>';
     }
     if (intval($forced)) {
-        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="Required - they set it up at their next sign in"><i class="fas fa-hourglass-half me-1"></i>MFA pending</span>';
+        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="' . escapeHtml(__('Required - they set it up at their next sign in')) . '"><i class="fas fa-hourglass-half me-1"></i>' . __('MFA pending') . '</span>';
     }
-    return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal" title="Password only"><i class="fas fa-unlock me-1"></i>No MFA</span>';
+    return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal" title="' . escapeHtml(__('Password only')) . '"><i class="fas fa-unlock me-1"></i>' . __('No MFA') . '</span>';
 }
 
 /** One agent by id, with their settings and role - raw, or null. */
@@ -269,11 +269,11 @@ function userAvatarStore($file, $dir, &$error = '') {
     $new_name = checkFileUpload($file, ['jpg', 'jpeg', 'gif', 'png', 'webp']);
     $image = $new_name ? @getimagesize($file['tmp_name']) : false;
     if (!$new_name || !$image || !in_array($image[2], [IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
-        $error = 'The avatar has to be a JPG, PNG, GIF or WebP picture.';
+        $error = __('The avatar has to be a JPG, PNG, GIF or WebP picture.');
         return '';
     }
     if ($file['size'] > 5 * 1024 * 1024) {
-        $error = 'The avatar can be up to 5 MB.';
+        $error = __('The avatar can be up to 5 MB.');
         return '';
     }
     if (!is_dir($dir)) {
@@ -456,13 +456,13 @@ function userDeviceHtml($user_agent) {
     $parts = array_filter([getOS((string) $user_agent), getWebBrowser((string) $user_agent)], function ($part) {
         return $part !== '-';
     });
-    return $parts ? implode(' ', $parts) : 'Unknown device';
+    return $parts ? implode(' ', $parts) : __('Unknown device');
 }
 
 /** A sign in, in words: when, and from what - "2 hours ago · Windows · Chrome · 203.0.113.9". Raw values in, HTML out. */
 function userLoginHtml($log, $with_ip = true) {
     if (!$log) {
-        return '<span class="text-body-secondary">Never signed in</span>';
+        return '<span class="text-body-secondary">' . __('Never signed in') . '</span>';
     }
     return '<span title="' . escapeHtml($log['log_created_at']) . '">' . escapeHtml(timeAgo($log['log_created_at'])) . '</span>'
         . '<div class="small text-body-secondary text-nowrap">' . userDeviceHtml($log['log_user_agent'])

@@ -30,8 +30,8 @@ if (!isset($sortable_columns[$sort])) {
 
 $views = auditLogViews();
 unset($views['security']);
-$views['signins']['title'] = 'Signing in and out, and wrong MFA codes';
-$views['data']['title'] = 'Passwords you looked at, and what you exported, downloaded and shared';
+$views['signins']['title'] = __('Signing in and out, and wrong MFA codes');
+$views['data']['title'] = __('Passwords you looked at, and what you exported, downloaded and shared');
 
 $view = isset($_GET['view']) && is_string($_GET['view']) && isset($views[$_GET['view']]) ? $_GET['view'] : '';
 $scope = "log_user_id = " . intval($session_user_id);
@@ -84,21 +84,21 @@ $view_url = function ($key) {
     }));
 };
 $view_empty = [
-    'changes' => 'No changes yet',
-    'deletions' => 'Nothing deleted yet',
-    'signins' => 'No sign ins yet',
-    'data' => 'Nothing looked at or taken out yet',
+    'changes' => __('No changes yet'),
+    'deletions' => __('Nothing deleted yet'),
+    'signins' => __('No sign ins yet'),
+    'data' => __('Nothing looked at or taken out yet'),
 ];
 
 ?>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-history me-2"></i>Your activity</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-history me-2"></i><?= __('Your activity') ?></h3>
         <?php if ($session_is_admin) { ?>
             <div class="card-tools">
-                <a class="btn btn-outline-light" href="/admin/audit_logs.php?user=<?= intval($session_user_id) ?>" title="The same in Admin > Audit Logs, with each entry's quick look and export">
-                    <i class="fas fa-fw fa-user-shield"></i><span class="d-none d-lg-inline ms-2">Admin &gt; Audit Logs</span>
+                <a class="btn btn-outline-light" href="/admin/audit_logs.php?user=<?= intval($session_user_id) ?>" title="<?= escapeHtml(__("The same in Admin > Audit Logs, with each entry's quick look and export")) ?>">
+                    <i class="fas fa-fw fa-user-shield"></i><span class="d-none d-lg-inline ms-2"><?= __('Admin &gt; Audit Logs') ?></span>
                 </a>
             </div>
         <?php } ?>
@@ -109,12 +109,12 @@ $view_empty = [
             <div class="row g-2 align-items-center">
                 <div class="col-lg-6 col-md-7">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search what you did" title="What you did, the client, the IP address or the browser">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search what you did')) ?>" title="<?= escapeHtml(__('What you did, the client, the IP address or the browser')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-5">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="When" aria-label="When">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('When')) ?>" aria-label="<?= escapeHtml(__('When')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml(is_string($_GET['canned_date'] ?? null) ? $_GET['canned_date'] : '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
@@ -134,11 +134,11 @@ $view_empty = [
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('log_created_at', 'When') ?></th>
-                <th><?= $sort_link('log_type', 'What') ?></th>
-                <th>Description</th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('client_name', 'Client') ?></th>
-                <th class="d-none d-xl-table-cell pe-3"><?= $sort_link('log_ip', 'From') ?></th>
+                <th class="ps-3"><?= $sort_link('log_created_at', __('When')) ?></th>
+                <th><?= $sort_link('log_type', __('What')) ?></th>
+                <th><?= __('Description') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('client_name', __('Client')) ?></th>
+                <th class="d-none d-xl-table-cell pe-3"><?= $sort_link('log_ip', __('From')) ?></th>
             </tr>
             </thead>
             <tbody>
@@ -151,7 +151,7 @@ $view_empty = [
                 ?>
                 <tr data-log-id="<?= intval($row['log_id']) ?>">
                     <td class="ps-3 text-nowrap small" title="<?= escapeHtml($row['log_created_at']) ?>">
-                        <div><?= escapeHtml(date('M j, Y g:i A', strtotime($row['log_created_at']))) ?></div>
+                        <div><?= escapeHtml(formatDate($row['log_created_at'], 'datetime')) ?></div>
                         <div class="text-body-secondary"><?= escapeHtml(timeAgo($row['log_created_at'])) ?></div>
                     </td>
                     <td class="text-nowrap">
@@ -163,7 +163,7 @@ $view_empty = [
                         <?php if ($link !== '') { ?>
                             <div class="mt-1" data-audit-record><i class="fas fa-fw fa-external-link-alt text-secondary me-1"></i><?= $link ?></div>
                         <?php } elseif ($gone) { ?>
-                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="The <?= escapeHtml(strtolower($type)) ?> this is about has been deleted"><i class="fas fa-fw fa-ghost me-1"></i>No longer here</div>
+                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="<?= escapeHtml(__('What this is about has been deleted')) ?>"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
                         <?php } ?>
                         <?php if ($from !== '') { ?>
                             <div class="d-xl-none text-body-secondary mt-1"><?= escapeHtml($from) ?></div>
@@ -171,7 +171,7 @@ $view_empty = [
                     </td>
                     <td class="d-none d-md-table-cell small">
                         <?php if ($row['hidden']) { ?>
-                            <span class="text-body-secondary">A client you cannot open</span>
+                            <span class="text-body-secondary"><?= __('A client you cannot open') ?></span>
                         <?php } elseif ($row['client_name'] !== null) { ?>
                             <a class="text-reset" href="/agent/client_overview.php?client_id=<?= intval($row['log_client_id']) ?>"><?= escapeHtml($row['client_name']) ?></a>
                         <?php } else { ?>
@@ -188,17 +188,17 @@ $view_empty = [
         </table>
     </div>
     <?php if ($view === 'signins' && $num_rows[0] > 0) { ?>
-        <div class="card-footer small text-body-secondary" data-not-you><i class="fas fa-fw fa-info-circle me-1"></i>A sign in that wasn't you? <a href="user_security.php">Change your password</a>, and tell an administrator.</div>
+        <div class="card-footer small text-body-secondary" data-not-you><i class="fas fa-fw fa-info-circle me-1"></i><?= __("A sign in that wasn't you? <a href=\"user_security.php\">Change your password</a>, and tell an administrator.") ?></div>
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'entries',
+        'thing' => __('entries'),
         'icon' => 'fa-history',
         'filtered' => $any_filter,
         'views' => ['view'],
-        'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => $view_empty[$view], 'text' => escapeHtml($views[$view]['title']) . ' show here.'] : null,
-        'title' => 'Nothing yet',
-        'text' => 'What you change, your sign ins, the passwords you look at and what you export show here.',
+        'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => $view_empty[$view], 'text' => __('%s show here.', escapeHtml($views[$view]['title']))] : null,
+        'title' => __('Nothing yet'),
+        'text' => __('What you change, your sign ins, the passwords you look at and what you export show here.'),
     ];
     require_once "../../includes/filter_footer.php";
     ?>

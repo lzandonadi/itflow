@@ -1,0 +1,106 @@
+<?php
+
+/*
+ * Portuguese (Brazil) - an agent's own account (agent/user/): profile,
+ * security, preferences and activity. Merged with lang/pt_BR.php - see there.
+ */
+
+return [
+
+    // Menu (agent/user/includes/user_side_nav.php)
+    'Back | <strong>Account</strong>' => 'Voltar | <strong>Conta</strong>',
+    'Profile' => 'Perfil',
+    'Preferences' => 'Preferências',
+    'ADMINISTRATION' => 'ADMINISTRAÇÃO',
+
+    // Profile (agent/user/user_details.php)
+    'Picture' => 'Foto',
+    'JPG, PNG, GIF or WebP, up to 5 MB.' => 'JPG, PNG, GIF ou WebP, até 5 MB.',
+    'Remove it - show my initials' => 'Remover - mostrar minhas iniciais',
+    'First and last name' => 'Nome e sobrenome',
+    'You sign in with this' => 'Você entra com este',
+    'To change the email you sign in with' => 'Para alterar o e-mail com que você entra',
+    'You\'ll sign in with the new email from now on - your old address gets a notice that it changed.' => 'A partir de agora você entra com o novo e-mail - o endereço antigo recebe um aviso da alteração.',
+    'No role' => 'Sem perfil de acesso',
+    'Set by an administrator.' => 'Definido por um administrador.',
+    'Password and MFA' => 'Senha e MFA',
+    'Signature' => 'Assinatura',
+    'Added to the end of your ticket replies' => 'Incluída no fim das suas respostas nos chamados',
+    'Added to the end of your ticket replies and the emails they send.' => 'Incluída no fim das suas respostas nos chamados e dos e-mails que elas enviam.',
+
+    // Preferences (agent/user/user_preferences.php)
+    'Light' => 'Claro',
+    'Dark' => 'Escuro',
+    'Calendars start on' => 'Os calendários começam no(a)',
+    'Sunday' => 'Domingo',
+    'Monday' => 'Segunda-feira',
+    'Rows on a list' => 'Linhas por lista',
+    'Also changed from the bottom of any list.' => 'Também pode ser alterado no rodapé de qualquer lista.',
+
+    // Security (agent/user/user_security.php, modals/user_mfa_modal.php)
+    'Current password' => 'Senha atual',
+    'New password, again' => 'Nova senha, de novo',
+    'You\'re signed out once it\'s changed, to sign in with the new one.' => 'Depois da alteração, você sai da conta para entrar com a nova senha.',
+    'Multi-factor authentication' => 'Autenticação multifator',
+    'Turn on multi-factor authentication' => 'Ativar a autenticação multifator',
+    'Required by your administrator' => 'Exigida pelo seu administrador',
+    'Signing in takes your password and a code from your authenticator app.' => 'Para entrar, são pedidos sua senha e um código do seu aplicativo autenticador.',
+    'Signing in takes only your password. With MFA it also takes a code from an app on your phone - so a stolen password alone doesn\'t get anyone in.' => 'Para entrar, é pedida só a sua senha. Com MFA, também é pedido um código de um aplicativo no seu celular - assim, uma senha roubada sozinha não deixa ninguém entrar.',
+    'Your password' => 'Sua senha',
+    'To turn MFA off' => 'Para desativar o MFA',
+    'Turn MFA off' => 'Desativar o MFA',
+    'New phone? Turn it off, then on again with the new one.' => 'Celular novo? Desative e ative de novo com o novo aparelho.',
+    'New phone? Ask an administrator to reset your MFA - you set it up again at your next sign in.' => 'Celular novo? Peça a um administrador para redefinir seu MFA - você o configura de novo no próximo login.',
+    'Remembered browsers' => 'Navegadores lembrados',
+    'Forget all' => 'Esquecer todos',
+    'A browser' => 'Um navegador',
+    'This browser' => 'Este navegador',
+    'Remembered %1$s from %2$s · skips the code until %3$s' => 'Lembrado %1$s a partir de %2$s · dispensa o código até %3$s',
+    'Remembered %1$s · skips the code until %2$s' => 'Lembrado %1$s · dispensa o código até %2$s',
+    'It asks for your code at the next sign in' => 'O código é pedido no próximo login',
+    'Forget' => 'Esquecer',
+    'None. Tick <strong>Remember me</strong> when you enter your code at sign in, and that browser skips the code for %d day.' => ['Nenhum. Marque <strong>Lembrar de mim</strong> ao digitar seu código no login, e esse navegador dispensa o código por %d dia.', 'Nenhum. Marque <strong>Lembrar de mim</strong> ao digitar seu código no login, e esse navegador dispensa o código por %d dias.'],
+    'None - browsers are remembered once MFA is on, so you\'re not asked for a code every time.' => 'Nenhum - os navegadores são lembrados quando o MFA está ativado, para que o código não seja pedido toda vez.',
+
+    // Activity (agent/user/user_activity.php)
+    'Signing in and out, and wrong MFA codes' => 'Entradas e saídas, e códigos MFA errados',
+    'Passwords you looked at, and what you exported, downloaded and shared' => 'Senhas que você consultou, e o que você exportou, baixou e compartilhou',
+    'No changes yet' => 'Nenhuma alteração ainda',
+    'Nothing deleted yet' => 'Nada excluído ainda',
+    'No sign ins yet' => 'Nenhum login ainda',
+    'Nothing looked at or taken out yet' => 'Nada consultado ou retirado ainda',
+    'Your activity' => 'Sua atividade',
+    'The same in Admin > Audit Logs, with each entry\'s quick look and export' => 'O mesmo em Admin > Logs de auditoria, com a visualização rápida e a exportação de cada registro',
+    'Admin &gt; Audit Logs' => 'Admin &gt; Logs de auditoria',
+    'Search what you did' => 'Pesquisar o que você fez',
+    'What you did, the client, the IP address or the browser' => 'O que você fez, o cliente, o endereço IP ou o navegador',
+    'What' => 'O quê',
+    'What this is about has been deleted' => 'O registro de que se trata foi excluído',
+    'No longer here' => 'Não existe mais',
+    'A client you cannot open' => 'Um cliente que você não pode abrir',
+    'A sign in that wasn\'t you? <a href="user_security.php">Change your password</a>, and tell an administrator.' => 'Um login que não foi você? <a href="user_security.php">Altere sua senha</a> e avise um administrador.',
+    'entries' => 'registros',
+    '%s show here.' => '%s aparecem aqui.',
+    'Nothing yet' => 'Nada ainda',
+    'What you change, your sign ins, the passwords you look at and what you export show here.' => 'O que você altera, seus logins, as senhas que você consulta e o que você exporta aparecem aqui.',
+
+    // Saving (agent/user/post/profile.php)
+    'Your email signs you in - enter your current password to change it.' => 'Você entra com seu e-mail - informe sua senha atual para alterá-lo.',
+    'its email address is now %s' => 'o endereço de e-mail agora é %s',
+    'Your details are saved' => 'Seus dados foram salvos',
+    'Picture removed' => 'Foto removida',
+    'That is not your current password - nothing was changed.' => 'Essa não é sua senha atual - nada foi alterado.',
+    'The new password and its confirmation are not the same.' => 'A nova senha e a confirmação não são iguais.',
+    'its password was changed' => 'a senha foi trocada',
+    'Your password was changed - sign in with the new one' => 'Sua senha foi alterada - entre com a nova',
+    'Your preferences are saved' => 'Suas preferências foram salvas',
+    'multi-factor authentication was turned on' => 'a autenticação multifator foi ativada',
+    'Multi-factor authentication is on - you will be asked for a code when you sign in' => 'A autenticação multifator está ativada - um código será pedido quando você entrar',
+    'That code did not match - check the time on your phone, and try the newest code.' => 'Esse código não confere - verifique a hora do seu celular e tente o código mais recente.',
+    'Your administrator requires multi-factor authentication on your account - it cannot be turned off.' => 'Seu administrador exige a autenticação multifator na sua conta - ela não pode ser desativada.',
+    'That is not your current password - MFA is still on.' => 'Essa não é sua senha atual - o MFA continua ativado.',
+    'multi-factor authentication was turned off' => 'a autenticação multifator foi desativada',
+    'Multi-factor authentication is off' => 'A autenticação multifator está desativada',
+    'Every remembered browser is forgotten - each asks for your code at the next sign in' => 'Todos os navegadores lembrados foram esquecidos - cada um pede seu código no próximo login',
+    'That browser is forgotten - it asks for your code at the next sign in' => 'Esse navegador foi esquecido - ele pede seu código no próximo login',
+];

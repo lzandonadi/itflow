@@ -47,7 +47,7 @@ $gs_limit = agentUserLimitReached();
             <span class="itflow-gs-person-initials opacity-50" aria-hidden="true"><?= escapeHtml(personInitials($gs_invite['invite_name'])) ?></span>
             <div class="min-w-0 flex-grow-1">
                 <div class="fw-semibold text-truncate"><?= escapeHtml($gs_invite['invite_name']) ?>
-                    <span class="badge rounded-pill bg-<?= $gs_invite_state['tone'] ?>-subtle text-<?= $gs_invite_state['tone'] ?>-emphasis fw-normal ms-1" title="<?= escapeHtml($gs_invite_state['title']) ?>"><i class="fas fa-paper-plane me-1"></i><?= $gs_invite_state['label'] === 'Waiting' ? 'Invited' : 'Invite ran out' ?></span>
+                    <span class="badge rounded-pill bg-<?= $gs_invite_state['tone'] ?>-subtle text-<?= $gs_invite_state['tone'] ?>-emphasis fw-normal ms-1" title="<?= escapeHtml($gs_invite_state['title']) ?>"><i class="fas fa-paper-plane me-1"></i><?= userInviteState($gs_invite) === 'expired' ? __('Invite ran out') : __('Invited') ?></span>
                 </div>
                 <div class="small text-body-secondary text-truncate"><?= escapeHtml($gs_invite['invite_email']) ?></div>
             </div>

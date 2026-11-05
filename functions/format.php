@@ -328,7 +328,7 @@ function timeAgo($datetime) {
     $difference = $time - time(); // Changed to handle future dates
 
     if ($difference == 0) {
-        return 'right now';
+        return __('right now');
     }
 
     $isFuture = $difference > 0; // Check if the date is in the future
@@ -347,9 +347,24 @@ function timeAgo($datetime) {
     foreach ($timeRules as $secs => $str) {
         $div = $difference / $secs;
         if ($div >= 1) {
-            $t = round($div);
-            $timeStr = $t . ' ' . $str . ($t > 1 ? 's' : '');
-            return $isFuture ? 'in ' . $timeStr : $timeStr . ' ago';
+            $t = intval(round($div));
+            // Whole phrases, so a language can put the number and the word where it goes
+            return match ($str . ($isFuture ? '+' : '-')) {
+                'year+' => _n('in %d year', 'in %d years', $t),
+                'year-' => _n('%d year ago', '%d years ago', $t),
+                'month+' => _n('in %d month', 'in %d months', $t),
+                'month-' => _n('%d month ago', '%d months ago', $t),
+                'week+' => _n('in %d week', 'in %d weeks', $t),
+                'week-' => _n('%d week ago', '%d weeks ago', $t),
+                'day+' => _n('in %d day', 'in %d days', $t),
+                'day-' => _n('%d day ago', '%d days ago', $t),
+                'hour+' => _n('in %d hour', 'in %d hours', $t),
+                'hour-' => _n('%d hour ago', '%d hours ago', $t),
+                'minute+' => _n('in %d minute', 'in %d minutes', $t),
+                'minute-' => _n('%d minute ago', '%d minutes ago', $t),
+                'second+' => _n('in %d second', 'in %d seconds', $t),
+                default => _n('%d second ago', '%d seconds ago', $t),
+            };
         }
     }
 }

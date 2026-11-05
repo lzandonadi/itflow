@@ -84,7 +84,7 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
         </div>
 
         <fieldset class="mb-3">
-            <legend class="form-label fs-6"><?= __('Roles') ?></legend>
+            <legend class="form-label fs-6"><?= _x('Roles', 'contact') ?></legend>
             <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="contactBilling" name="contact_billing" value="1"<?= intval($value('contact_billing', '0')) ? ' checked' : '' ?>>
                 <label class="form-check-label" for="contactBilling"><?= __('Billing') ?> <span class="d-block small text-body-secondary"><?= __('Sees and pays invoices, quotes and statements, and gets the billing emails') ?></span></label>

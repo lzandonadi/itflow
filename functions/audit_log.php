@@ -176,13 +176,13 @@ function auditLogViews() {
     $signins = "log_type IN ('Login', 'Login 2FA', 'Logout', 'Client Login')";
     $data_out = "(log_action IN ('View', 'View TOTP', 'Export', 'Download', 'Share') OR log_type IN ('Share', 'Sharing'))";
     return [
-        '' => ['label' => 'All', 'icon' => 'fa-list', 'title' => 'Everything', 'where' => ''],
-        'changes' => ['label' => 'Changes', 'icon' => 'fa-pen', 'title' => 'Records made, changed, archived, restored and deleted', 'where' => "NOT $signins AND NOT $data_out"],
-        'deletions' => ['label' => 'Deletions', 'icon' => 'fa-trash-alt', 'title' => 'Records deleted for good', 'where' => "log_action IN ('Delete', 'Bulk Delete')"],
-        'signins' => ['label' => 'Sign-ins', 'icon' => 'fa-sign-in-alt', 'title' => 'Agents and portal contacts signing in and out', 'where' => $signins],
-        'security' => ['label' => 'Security', 'icon' => 'fa-shield-alt', 'title' => 'Failed and turned away sign-ins and the alerts about them, API calls turned away, access denied, the portal viewed as a contact, app logs cleared, and changes to users, roles, API keys, the master key, settings and backups',
+        '' => ['label' => __('All'), 'icon' => 'fa-list', 'title' => __('Everything'), 'where' => ''],
+        'changes' => ['label' => __('Changes'), 'icon' => 'fa-pen', 'title' => __('Records made, changed, archived, restored and deleted'), 'where' => "NOT $signins AND NOT $data_out"],
+        'deletions' => ['label' => __('Deletions'), 'icon' => 'fa-trash-alt', 'title' => __('Records deleted for good'), 'where' => "log_action IN ('Delete', 'Bulk Delete')"],
+        'signins' => ['label' => __('Sign-ins'), 'icon' => 'fa-sign-in-alt', 'title' => __('Agents and portal contacts signing in and out'), 'where' => $signins],
+        'security' => ['label' => __('Security'), 'icon' => 'fa-shield-alt', 'title' => __('Failed and turned away sign-ins and the alerts about them, API calls turned away, access denied, the portal viewed as a contact, app logs cleared, and changes to users, roles, API keys, the master key, settings and backups'),
             'where' => "(($signins AND log_action IN ('Failed', 'MFA Failed', 'Blocked', 'Alert')) OR (log_type = 'API' AND log_action = 'Failed') OR log_action IN ('Denied', 'View As') OR (log_type = 'App Log' AND log_action = 'Delete') OR log_type IN ('User', 'User Account', 'User Role', 'API Key', 'Master Key', 'Settings', 'Backup', 'Identity Provider'))"],
-        'data' => ['label' => 'Data out', 'icon' => 'fa-file-export', 'title' => 'Passwords looked at, exports, downloads and shared links', 'where' => $data_out],
+        'data' => ['label' => __('Data out'), 'icon' => 'fa-file-export', 'title' => __('Passwords looked at, exports, downloads and shared links'), 'where' => $data_out],
     ];
 }
 

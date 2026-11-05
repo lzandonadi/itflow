@@ -242,4 +242,60 @@ return [
     '%d left out with no email address, or the same one' => ['%d deixado de fora sem e-mail, ou com o mesmo e-mail', '%d deixados de fora sem e-mail, ou com o mesmo e-mail'],
     '%1$s at %2$s' => '%1$s às %2$s',
 
+    // Used across portals - account pages
+    'Turn on' => 'Ativar',
+    'Turn off' => 'Desativar',
+    'MFA::On' => 'Ativada',
+    'MFA::Off' => 'Desativada',
+    'Change' => 'Alterar',
+    'Change password' => 'Alterar senha',
+    'Your current password' => 'Sua senha atual',
+    'At least %d characters' => 'Pelo menos %d caracteres',
+    'Search' => 'Pesquisar',
+    'Client' => 'Cliente',
+    'Company' => 'Empresa',
+    'Location' => 'Local',
+
+    // Audit log views (functions/audit_log.php auditLogViews())
+    'Everything' => 'Tudo',
+    'Changes' => 'Alterações',
+    'Records made, changed, archived, restored and deleted' => 'Registros criados, alterados, arquivados, restaurados e excluídos',
+    'Deletions' => 'Exclusões',
+    'Records deleted for good' => 'Registros excluídos definitivamente',
+    'Agents and portal contacts signing in and out' => 'Técnicos e contatos do portal entrando e saindo',
+    'Failed and turned away sign-ins and the alerts about them, API calls turned away, access denied, the portal viewed as a contact, app logs cleared, and changes to users, roles, API keys, the master key, settings and backups' => 'Logins com falha e recusados e os alertas sobre eles, chamadas de API recusadas, acesso negado, o portal visto como contato, logs do app limpos, e alterações em usuários, perfis de acesso, chaves de API, na chave mestra, nas configurações e nos backups',
+    'Data out' => 'Dados retirados',
+    'Passwords looked at, exports, downloads and shared links' => 'Senhas consultadas, exportações, downloads e links compartilhados',
+
+    // How long ago (functions/format.php timeAgo())
+    'right now' => 'agora mesmo',
+    'in %d year' => ['em %d ano', 'em %d anos'],
+    '%d year ago' => ['há %d ano', 'há %d anos'],
+    'in %d month' => ['em %d mês', 'em %d meses'],
+    '%d month ago' => ['há %d mês', 'há %d meses'],
+    'in %d week' => ['em %d semana', 'em %d semanas'],
+    '%d week ago' => ['há %d semana', 'há %d semanas'],
+    'in %d day' => ['em %d dia', 'em %d dias'],
+    '%d day ago' => ['há %d dia', 'há %d dias'],
+    'in %d hour' => ['em %d hora', 'em %d horas'],
+    '%d hour ago' => ['há %d hora', 'há %d horas'],
+    'in %d minute' => ['em %d minuto', 'em %d minutos'],
+    '%d minute ago' => ['há %d minuto', 'há %d minutos'],
+    'in %d second' => ['em %d segundo', 'em %d segundos'],
+    '%d second ago' => ['há %d segundo', 'há %d segundos'],
+
+    // Agents' MFA and pictures (functions/user.php)
+    'Signs in with a code from an authenticator app - required' => 'Entra com um código de um aplicativo autenticador - obrigatório',
+    'Signs in with a code from an authenticator app' => 'Entra com um código de um aplicativo autenticador',
+    'MFA · required' => 'MFA · obrigatório',
+    'Required - they set it up at their next sign in' => 'Obrigatório - a pessoa configura no próximo login',
+    'MFA pending' => 'MFA pendente',
+    'Password only' => 'Só senha',
+    'No MFA' => 'Sem MFA',
+    'The avatar has to be a JPG, PNG, GIF or WebP picture.' => 'A foto precisa ser uma imagem JPG, PNG, GIF ou WebP.',
+    'The avatar can be up to 5 MB.' => 'A foto pode ter até 5 MB.',
+
+    // Sign ins (functions/user.php)
+    'Never signed in' => 'Nunca entrou',
+
 ];

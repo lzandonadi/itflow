@@ -66,4 +66,8 @@ return [
     'All' => 'Todos',
     'Preview' => 'Pré-visualizar',
     'As it comes in - yours to change once it is here.' => 'Como vem - depois de importado, você pode alterar.',
+
+    // Getting started > Team (admin/getting_started/team.php)
+    'Invite ran out' => 'Convite expirado',
+
 ];

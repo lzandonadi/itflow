@@ -259,7 +259,7 @@ if (isset($_POST['set_contact_phone'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name updated their phone numbers in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Phone numbers updated");
+    flashAlert(__("Phone numbers updated"));
 
     redirect('profile.php');
 
@@ -282,7 +282,7 @@ if (isset($_POST['set_contact_pin'])) {
     // re-authenticated for password logins. SSO contacts are exempt: they have
     // no local password to check, and the identity provider already did this.
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That password was not right - your PIN has not been changed", 'error');
+        flashAlert(__("That password was not right - your PIN has not been changed"), 'error');
         redirect('profile.php');
     }
 
@@ -296,7 +296,7 @@ if (isset($_POST['set_contact_pin'])) {
     $pin = escapeSql(substr(trim($_POST['pin'] ?? ''), 0, 255));
 
     if (strlen($pin) < 4) {
-        flashAlert("Your PIN needs to be at least 4 characters, and cannot contain < or >", 'error');
+        flashAlert(__("Your PIN needs to be at least 4 characters, and cannot contain < or >"), 'error');
         redirect('profile.php');
     }
 
@@ -306,7 +306,7 @@ if (isset($_POST['set_contact_pin'])) {
     // an audit trail an agent can read would defeat the point of having one
     logAudit("Contact", "Edit", "Client contact $session_contact_name set their phone PIN in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Phone PIN updated");
+    flashAlert(__("Phone PIN updated"));
 
     redirect('profile.php');
 
@@ -548,15 +548,15 @@ if (isset($_POST['portal_password_change'])) {
     }
     $new_password = (string) ($_POST['new_password'] ?? '');
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That is not your current password - your password has not been changed", 'error');
+        flashAlert(__("That is not your current password - your password has not been changed"), 'error');
         redirect('profile.php#security');
     }
     if (($problem = userPasswordProblem($new_password)) !== '') {
-        flashAlert(escapeHtml($problem) . ' Your password has not been changed.', 'error');
+        flashAlert(escapeHtml($problem) . ' ' . __('Your password has not been changed.'), 'error');
         redirect('profile.php#security');
     }
     if ($new_password !== (string) ($_POST['confirm_password'] ?? '')) {
-        flashAlert('The two new passwords are not the same - your password has not been changed', 'error');
+        flashAlert(__('The two new passwords are not the same - your password has not been changed'), 'error');
         redirect('profile.php#security');
     }
 
@@ -569,7 +569,7 @@ if (isset($_POST['portal_password_change'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name changed their password in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'password');
 
-    flashAlert("Your password is changed");
+    flashAlert(__("Your password is changed"));
     redirect('profile.php');
 
 }
@@ -588,7 +588,7 @@ if (isset($_POST['portal_mfa_enable'])) {
         redirect('profile.php');
     }
     if (!preg_match('/^[0-9]{6}$/', $code) || !TokenAuth6238::verify($secret, $code, 1)) {
-        flashAlert("That code did not match - check the time on your phone is right, and enter the newest code", 'error');
+        flashAlert(__("That code did not match - check the time on your phone is right, and enter the newest code"), 'error');
         redirect('profile.php?mfa=setup#security');
     }
 
@@ -599,7 +599,7 @@ if (isset($_POST['portal_mfa_enable'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name turned on two-step sign-in in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'mfa_on');
 
-    flashAlert("Two-step sign-in is on - signing in will ask for a code from your app");
+    flashAlert(__("Two-step sign-in is on - signing in will ask for a code from your app"));
     redirect('profile.php');
 
 }
@@ -612,11 +612,11 @@ if (isset($_POST['portal_mfa_disable'])) {
         redirect('profile.php');
     }
     if (intval($config_client_portal_require_mfa) === 1) {
-        flashAlert(escapeHtml($session_company_name) . " asks everyone to use two-step sign-in, so it stays on", 'error');
+        flashAlert(__("%s asks everyone to use two-step sign-in, so it stays on", escapeHtml($session_company_name)), 'error');
         redirect('profile.php#security');
     }
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That is not your current password - two-step sign-in is still on", 'error');
+        flashAlert(__("That is not your current password - two-step sign-in is still on"), 'error');
         redirect('profile.php#security');
     }
 
@@ -625,7 +625,7 @@ if (isset($_POST['portal_mfa_disable'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name turned off two-step sign-in in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'mfa_off');
 
-    flashAlert("Two-step sign-in is off");
+    flashAlert(__("Two-step sign-in is off"));
     redirect('profile.php');
 
 }
@@ -640,7 +640,7 @@ if (isset($_POST['portal_forget_browsers'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name made their remembered browsers ask for a code again", $session_client_id, $session_contact_id);
 
-    flashAlert("Done - every browser asks for a code next time");
+    flashAlert(__("Done - every browser asks for a code next time"));
     redirect('profile.php#security');
 
 }
@@ -665,7 +665,7 @@ if (isset($_POST['portal_email_prefs'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name changed the ticket emails they get in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Saved - those are the emails you will get");
+    flashAlert(__("Saved - those are the emails you will get"));
     redirect('profile.php#emails');
 
 }

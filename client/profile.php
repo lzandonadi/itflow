@@ -59,22 +59,22 @@ if (!empty($me['location_name'])) {
 }
 
 $facts = [
-    'Name' => escapeHtml($me['contact_name'] ?? ''),
-    'Email' => escapeHtml($me['contact_email'] ?? '') . ($password_account || $microsoft_account ? '<div class="small text-body-secondary">You sign in with it</div>' : ''),
+    __('Name') => escapeHtml($me['contact_name'] ?? ''),
+    __('Email') => escapeHtml($me['contact_email'] ?? '') . ($password_account || $microsoft_account ? '<div class="small text-body-secondary">' . __('You sign in with it') . '</div>' : ''),
 ];
 if (trim((string) ($me['contact_title'] ?? '')) !== '') {
-    $facts['Job title'] = escapeHtml($me['contact_title']);
+    $facts[__('Job title')] = escapeHtml($me['contact_title']);
 }
 if (trim((string) ($me['contact_department'] ?? '')) !== '') {
-    $facts['Department'] = escapeHtml($me['contact_department']);
+    $facts[__('Department')] = escapeHtml($me['contact_department']);
 }
-$facts['Company'] = escapeHtml($session_client_name);
+$facts[__('Company')] = escapeHtml($session_client_name);
 if ($location !== '') {
-    $facts['Location'] = $location;
+    $facts[__('Location')] = $location;
 }
-$facts['Roles'] = $roles
+$facts[_x('Roles', 'contact')] = $roles
     ? '<span class="itflow-portal-roles">' . implode('', array_map(function ($role) { return '<span>' . escapeHtml($role) . '</span>'; }, $roles)) . '</span>'
-    : '<span class="text-body-secondary">None - you see your own tickets</span>';
+    : '<span class="text-body-secondary">' . __('None - you see your own tickets') . '</span>';
 
 $sql_logins = mysqli_query($mysqli, "SELECT log_created_at, log_ip, log_user_agent FROM logs
     WHERE log_type = 'Client Login' AND log_action = 'Success' AND log_user_id = $session_user_id AND log_client_id = $session_client_id AND $session_user_id > 0
@@ -91,8 +91,8 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
     <div class="d-flex align-items-center gap-3 min-w-0">
         <?= portalAvatarHtml((string) ($me['contact_name'] ?? ''), $session_contact_photo ? "/uploads/clients/$session_client_id/$session_contact_photo" : '', 'lg') ?>
         <div class="min-w-0">
-            <h1>Your account</h1>
-            <p>Your details, the emails you get from us and how you sign in</p>
+            <h1><?= __('Your account') ?></h1>
+            <p><?= __('Your details, the emails you get from us and how you sign in') ?></p>
         </div>
     </div>
 </div>
@@ -100,7 +100,7 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
 <?php if ($portal_mfa_setup_needed) { ?>
     <div class="alert alert-warning d-flex gap-2 align-items-start">
         <i class="fas fa-shield-alt mt-1"></i>
-        <div><strong><?= escapeHtml($session_company_name) ?> asks everyone to use two-step sign-in.</strong> Set it up below to carry on - it takes a minute with an authenticator app on your phone.</div>
+        <div><?= __('<strong>%s asks everyone to use two-step sign-in.</strong> Set it up below to carry on - it takes a minute with an authenticator app on your phone.', escapeHtml($session_company_name)) ?></div>
     </div>
 <?php } ?>
 
@@ -109,8 +109,8 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
 
         <section class="itflow-portal-panel mb-4">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-id-card"></i>Your details</h2>
-                <a href="<?= escapeHtml(portalAskUrl('Please update my details')) ?>">Ask us to change them</a>
+                <h2><i class="fas fa-id-card"></i><?= __('Your details') ?></h2>
+                <a href="<?= escapeHtml(portalAskUrl(__('Please update my details'))) ?>"><?= __('Ask us to change them') ?></a>
             </div>
             <div class="itflow-portal-panel-body">
                 <dl class="itflow-portal-facts mb-0">
@@ -124,13 +124,13 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
         <form class="itflow-portal-panel mb-4" action="post.php" method="post" autocomplete="off" data-portal-once>
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-phone"></i>Your phone numbers</h2>
+                <h2><i class="fas fa-phone"></i><?= __('Your phone numbers') ?></h2>
             </div>
             <div class="itflow-portal-panel-body">
-                <p class="small text-body-secondary">So we can reach you about a ticket without hunting for a number. Clear one to remove it.</p>
+                <p class="small text-body-secondary"><?= __('So we can reach you about a ticket without hunting for a number. Clear one to remove it.') ?></p>
                 <div class="row">
                     <div class="col-sm-8 mb-3">
-                        <label class="form-label" for="contactPhone">Phone</label>
+                        <label class="form-label" for="contactPhone"><?= __('Phone') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-phone"></i></span>
                             <input type="hidden" name="phone_country_code" value="<?= escapeHtml($me['contact_phone_country_code'] ?? '') ?>">
@@ -138,7 +138,7 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                         </div>
                     </div>
                     <div class="col-sm-4 mb-3">
-                        <label class="form-label" for="contactExtension">Extension</label>
+                        <label class="form-label" for="contactExtension"><?= __('Extension') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
                             <input type="text" class="form-control" id="contactExtension" name="extension" inputmode="numeric" maxlength="20" value="<?= escapeHtml($me['contact_extension'] ?? '') ?>">
@@ -146,47 +146,47 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="contactMobile">Mobile</label>
+                    <label class="form-label" for="contactMobile"><?= __('Mobile') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-mobile-alt"></i></span>
                         <input type="hidden" name="mobile_country_code" value="<?= escapeHtml($me['contact_mobile_country_code'] ?? '') ?>">
                         <input type="tel" class="form-control" id="contactMobile" name="mobile" maxlength="200" value="<?= escapeHtml($mobile_input) ?>" data-itflow-phone="mobile_country_code">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" name="set_contact_phone"><i class="fas fa-check me-2"></i>Save numbers</button>
+                <button type="submit" class="btn btn-primary" name="set_contact_phone"><i class="fas fa-check me-2"></i><?= __('Save numbers') ?></button>
             </div>
         </form>
 
         <form class="itflow-portal-panel mb-4" action="post.php" method="post" autocomplete="off" data-portal-once id="emails">
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-envelope"></i>Emails from us</h2>
+                <h2><i class="fas fa-envelope"></i><?= __('Emails from us') ?></h2>
             </div>
             <div class="itflow-portal-panel-body">
                 <fieldset class="mb-3">
-                    <legend class="form-label fs-6 fw-semibold">About your tickets</legend>
+                    <legend class="form-label fs-6 fw-semibold"><?= __('About your tickets') ?></legend>
                     <?php foreach (PORTAL_TICKET_EMAILS as $key => $option) { ?>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" name="ticket_emails" id="ticketEmails-<?= $key ?>" value="<?= $key ?>"<?= $ticket_pref === $key ? ' checked' : '' ?>>
-                            <label class="form-check-label" for="ticketEmails-<?= $key ?>"><?= escapeHtml($option['label']) ?> <span class="d-block small text-body-secondary"><?= escapeHtml($option['text']) ?></span></label>
+                            <label class="form-check-label" for="ticketEmails-<?= $key ?>"><?= escapeHtml(__($option['label'])) /* i18n-dynamic: PORTAL_TICKET_EMAILS */ ?> <span class="d-block small text-body-secondary"><?= escapeHtml(__($option['text'])) ?></span></label>
                         </div>
                     <?php } ?>
                 </fieldset>
                 <?php if ($sees_company) { ?>
                     <fieldset class="mb-3">
-                        <legend class="form-label fs-6 fw-semibold">About other tickets at <?= escapeHtml($session_client_name) ?></legend>
+                        <legend class="form-label fs-6 fw-semibold"><?= __('About other tickets at %s', escapeHtml($session_client_name)) ?></legend>
                         <?php foreach (PORTAL_COMPANY_TICKET_EMAILS as $key => $option) { ?>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="company_ticket_emails" id="companyEmails-<?= $key ?>" value="<?= $key ?>"<?= $company_pref === $key ? ' checked' : '' ?>>
-                                <label class="form-check-label" for="companyEmails-<?= $key ?>"><?= escapeHtml($option['label']) ?> <span class="d-block small text-body-secondary"><?= escapeHtml($option['text']) ?></span></label>
+                                <label class="form-check-label" for="companyEmails-<?= $key ?>"><?= escapeHtml(__($option['label'])) /* i18n-dynamic: PORTAL_TICKET_EMAILS */ ?> <span class="d-block small text-body-secondary"><?= escapeHtml(__($option['text'])) ?></span></label>
                             </div>
                         <?php } ?>
                     </fieldset>
                 <?php } ?>
                 <?php if ($session_contact_is_billing_contact || $session_contact_primary) { ?>
-                    <p class="small text-body-secondary">Invoices, quotes, receipts and statements go to <?= escapeHtml($session_client_name) ?>'s billing contacts - ask us if they should go somewhere else.</p>
+                    <p class="small text-body-secondary"><?= __("Invoices, quotes, receipts and statements go to %s's billing contacts - ask us if they should go somewhere else.", escapeHtml($session_client_name)) ?></p>
                 <?php } ?>
-                <button type="submit" class="btn btn-primary" name="portal_email_prefs"><i class="fas fa-check me-2"></i>Save</button>
+                <button type="submit" class="btn btn-primary" name="portal_email_prefs"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
             </div>
         </form>
 
@@ -195,16 +195,16 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
 
         <section class="itflow-portal-panel mb-4" id="security">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-shield-alt"></i>Signing in</h2>
+                <h2><i class="fas fa-shield-alt"></i><?= __('Signing in') ?></h2>
             </div>
 
             <?php if ($microsoft_account) { ?>
                 <div class="itflow-portal-panel-body">
-                    <p class="mb-0">You sign in with your Microsoft 365 account - Microsoft looks after your password and its own sign-in checks.</p>
+                    <p class="mb-0"><?= __('You sign in with your Microsoft 365 account - Microsoft looks after your password and its own sign-in checks.') ?></p>
                 </div>
             <?php } elseif (!$password_account) { ?>
                 <div class="itflow-portal-panel-body">
-                    <p class="mb-0 text-body-secondary">There is no client portal sign-in for this contact.</p>
+                    <p class="mb-0 text-body-secondary"><?= __('There is no client portal sign-in for this contact.') ?></p>
                 </div>
             <?php } else { ?>
 
@@ -212,52 +212,52 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                     <li class="itflow-portal-ticket">
                         <?= portalTile('fa-key') ?>
                         <span class="itflow-portal-ticket-main">
-                            <span class="itflow-portal-ticket-subject d-block">Password</span>
-                            <span class="itflow-portal-ticket-meta"><span>At least <?= USER_PASSWORD_MIN ?> characters</span></span>
+                            <span class="itflow-portal-ticket-subject d-block"><?= __('Password') ?></span>
+                            <span class="itflow-portal-ticket-meta"><span><?= __('At least %d characters', USER_PASSWORD_MIN) ?></span></span>
                         </span>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#passwordForm" aria-expanded="false" aria-controls="passwordForm">Change</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#passwordForm" aria-expanded="false" aria-controls="passwordForm"><?= __('Change') ?></button>
                     </li>
                 </ul>
                 <form class="collapse itflow-portal-panel-body border-top" id="passwordForm" action="post.php" method="post" autocomplete="off" data-portal-once>
                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                     <input type="text" class="d-none" name="username" value="<?= escapeHtml($me['contact_email'] ?? '') ?>" autocomplete="username" aria-hidden="true" tabindex="-1">
                     <div class="mb-3">
-                        <label class="form-label" for="currentPassword">Your current password</label>
+                        <label class="form-label" for="currentPassword"><?= __('Your current password') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
                             <input type="password" class="form-control" id="currentPassword" name="current_password" autocomplete="current-password" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="newPassword">New password</label>
+                        <label class="form-label" for="newPassword"><?= __('New password') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
                             <input type="password" class="form-control" id="newPassword" name="new_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="confirmPassword">The same again</label>
+                        <label class="form-label" for="confirmPassword"><?= __('The same again') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-check-double"></i></span>
                             <input type="password" class="form-control" id="confirmPassword" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" name="portal_password_change"><i class="fas fa-check me-2"></i>Change password</button>
+                    <button type="submit" class="btn btn-primary" name="portal_password_change"><i class="fas fa-check me-2"></i><?= __('Change password') ?></button>
                 </form>
 
                 <ul class="itflow-portal-list border-top">
                     <li class="itflow-portal-ticket">
                         <?= portalTile('fa-mobile-alt') ?>
                         <span class="itflow-portal-ticket-main">
-                            <span class="itflow-portal-ticket-subject d-block">Two-step sign-in
-                                <span class="itflow-portal-state <?= $session_mfa_on ? 'itflow-portal-state-resolved' : 'itflow-portal-state-hold' ?> ms-1"><i class="fas fa-fw fa-<?= $session_mfa_on ? 'check' : 'minus' ?>"></i><?= $session_mfa_on ? 'On' : 'Off' ?></span>
+                            <span class="itflow-portal-ticket-subject d-block"><?= __('Two-step sign-in') ?>
+                                <span class="itflow-portal-state <?= $session_mfa_on ? 'itflow-portal-state-resolved' : 'itflow-portal-state-hold' ?> ms-1"><i class="fas fa-fw fa-<?= $session_mfa_on ? 'check' : 'minus' ?>"></i><?= $session_mfa_on ? _x('On', 'MFA') : _x('Off', 'MFA') ?></span>
                             </span>
-                            <span class="itflow-portal-ticket-meta"><span><?= $session_mfa_on ? 'Signing in asks for a code from your authenticator app' : 'A code from an app on your phone, as well as your password' ?></span></span>
+                            <span class="itflow-portal-ticket-meta"><span><?= $session_mfa_on ? __('Signing in asks for a code from your authenticator app') : __('A code from an app on your phone, as well as your password') ?></span></span>
                         </span>
                         <?php if (!$session_mfa_on && !$mfa_setup) { ?>
-                            <a class="btn btn-sm btn-primary text-nowrap" href="profile.php?mfa=setup#security">Turn on</a>
+                            <a class="btn btn-sm btn-primary text-nowrap" href="profile.php?mfa=setup#security"><?= __('Turn on') ?></a>
                         <?php } elseif ($session_mfa_on && !$mfa_required) { ?>
-                            <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" data-bs-toggle="collapse" data-bs-target="#mfaOffForm" aria-expanded="false" aria-controls="mfaOffForm">Turn off</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" data-bs-toggle="collapse" data-bs-target="#mfaOffForm" aria-expanded="false" aria-controls="mfaOffForm"><?= __('Turn off') ?></button>
                         <?php } ?>
                     </li>
                 </ul>
@@ -266,27 +266,27 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                     <form class="itflow-portal-panel-body border-top" action="post.php" method="post" autocomplete="off" data-portal-once>
                         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                         <ol class="small ps-3 mb-3">
-                            <li>Open an authenticator app on your phone - Microsoft or Google Authenticator, 1Password, Authy, Bitwarden - and add an account.</li>
-                            <li>Scan this code<?= $mfa_qr ? '' : ' - or, as it can\'t be shown here, type the key in' ?>:</li>
+                            <li><?= __('Open an authenticator app on your phone - Microsoft or Google Authenticator, 1Password, Authy, Bitwarden - and add an account.') ?></li>
+                            <li><?= $mfa_qr ? __('Scan this code:') : __("Scan this code - or, as it can't be shown here, type the key in:") ?></li>
                         </ol>
                         <div class="text-center mb-3">
                             <?php if ($mfa_qr) { ?>
                                 <div class="itflow-mfa-qr-box"><?= $mfa_qr ?></div>
                             <?php } ?>
-                            <div class="small text-body-secondary mt-2">Can't scan it? Type this key in:</div>
+                            <div class="small text-body-secondary mt-2"><?= __('Can\'t scan it? Type this key in:') ?></div>
                             <div class="font-monospace fw-semibold user-select-all"><?= escapeHtml(trim(chunk_split($mfa_secret, 4, ' '))) ?></div>
                         </div>
                         <ol class="small ps-3 mb-2" start="3">
-                            <li>Enter the 6-digit code it shows:</li>
+                            <li><?= __('Enter the 6-digit code it shows:') ?></li>
                         </ol>
                         <div class="input-group mb-3">
                             <span class="input-group-text"><i class="fas fa-fw fa-mobile-alt"></i></span>
-                            <input type="text" class="form-control form-control-lg font-monospace text-center itflow-mfa-code" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" name="verify_code" placeholder="000000" autocomplete="one-time-code" aria-label="6-digit code" required autofocus>
+                            <input type="text" class="form-control form-control-lg font-monospace text-center itflow-mfa-code" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" name="verify_code" placeholder="000000" autocomplete="one-time-code" aria-label="<?= escapeHtml(__('6-digit code')) ?>" required autofocus>
                         </div>
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="submit" class="btn btn-primary" name="portal_mfa_enable"><i class="fas fa-check me-2"></i>Turn on</button>
+                            <button type="submit" class="btn btn-primary" name="portal_mfa_enable"><i class="fas fa-check me-2"></i><?= __('Turn on') ?></button>
                             <?php if (!$portal_mfa_setup_needed) { ?>
-                                <a class="btn btn-light" href="profile.php">Not now</a>
+                                <a class="btn btn-light" href="profile.php"><?= __('Not now') ?></a>
                             <?php } ?>
                         </div>
                     </form>
@@ -295,25 +295,25 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                 <?php if ($session_mfa_on && !$mfa_required) { ?>
                     <form class="collapse itflow-portal-panel-body border-top" id="mfaOffForm" action="post.php" method="post" autocomplete="off" data-portal-once>
                         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
-                        <p class="small text-body-secondary">Signing in will ask for your password alone.</p>
+                        <p class="small text-body-secondary"><?= __('Signing in will ask for your password alone.') ?></p>
                         <div class="mb-3">
-                            <label class="form-label" for="mfaOffPassword">Your current password</label>
+                            <label class="form-label" for="mfaOffPassword"><?= __('Your current password') ?></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
                                 <input type="password" class="form-control" id="mfaOffPassword" name="current_password" autocomplete="current-password" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-outline-danger" name="portal_mfa_disable"><i class="fas fa-times me-2"></i>Turn off two-step sign-in</button>
+                        <button type="submit" class="btn btn-outline-danger" name="portal_mfa_disable"><i class="fas fa-times me-2"></i><?= __('Turn off two-step sign-in') ?></button>
                     </form>
                 <?php } elseif ($session_mfa_on) { ?>
-                    <div class="itflow-portal-panel-body border-top small text-body-secondary py-2"><?= escapeHtml($session_company_name) ?> asks everyone to use it, so it stays on. Lost your phone? Ask us to reset it.</div>
+                    <div class="itflow-portal-panel-body border-top small text-body-secondary py-2"><?= __('%s asks everyone to use it, so it stays on. Lost your phone? Ask us to reset it.', escapeHtml($session_company_name)) ?></div>
                 <?php } ?>
 
                 <?php if ($session_mfa_on && $remembered) { ?>
                     <form class="itflow-portal-panel-body border-top d-flex align-items-center justify-content-between gap-2" action="post.php" method="post" data-portal-once>
                         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
-                        <span class="small text-body-secondary"><?= $remembered ?> browser<?= $remembered === 1 ? ' skips' : 's skip' ?> the code for <?= intval($config_login_remember_me_expire) ?> day<?= intval($config_login_remember_me_expire) === 1 ? '' : 's' ?> after signing in</span>
-                        <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap" name="portal_forget_browsers">Forget them</button>
+                        <span class="small text-body-secondary"><?= _n('%d browser skips the code', '%d browsers skip the code', $remembered) ?> <?= _n('for %d day after signing in', 'for %d days after signing in', intval($config_login_remember_me_expire)) ?></span>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap" name="portal_forget_browsers"><?= __('Forget them') ?></button>
                     </form>
                 <?php } ?>
 
@@ -322,18 +322,18 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
 
         <section class="itflow-portal-panel mb-4">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-hashtag"></i>Phone PIN</h2>
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#pinForm" aria-expanded="false" aria-controls="pinForm"><?= empty($me['contact_pin']) ? 'Set' : 'Change' ?></button>
+                <h2><i class="fas fa-hashtag"></i><?= __('Phone PIN') ?></h2>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#pinForm" aria-expanded="false" aria-controls="pinForm"><?= empty($me['contact_pin']) ? __('Set') : __('Change') ?></button>
             </div>
             <div class="itflow-portal-panel-body">
-                <p class="small text-body-secondary mb-0">We ask for it to make sure it is really you when you call.
-                    <?= empty($me['contact_pin']) ? 'You have not set one.' : 'Yours is <span class="font-monospace fw-semibold">' . escapeHtml($me['contact_pin']) . '</span>.' ?></p>
+                <p class="small text-body-secondary mb-0"><?= __('We ask for it to make sure it is really you when you call.') ?>
+                    <?= empty($me['contact_pin']) ? __('You have not set one.') : __('Yours is %s.', '<span class="font-monospace fw-semibold">' . escapeHtml($me['contact_pin']) . '</span>') ?></p>
             </div>
             <form class="collapse itflow-portal-panel-body border-top" id="pinForm" action="post.php" method="post" autocomplete="off" data-portal-once>
                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                 <?php if ($password_account) { ?>
                     <div class="mb-3">
-                        <label class="form-label" for="pinCurrentPassword">Your current password</label>
+                        <label class="form-label" for="pinCurrentPassword"><?= __('Your current password') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
                             <input type="password" class="form-control" id="pinCurrentPassword" name="current_password" autocomplete="current-password" required>
@@ -341,23 +341,23 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                     </div>
                 <?php } ?>
                 <div class="mb-3">
-                    <label class="form-label" for="contactPin"><?= empty($me['contact_pin']) ? 'New PIN' : 'Replace it with' ?></label>
+                    <label class="form-label" for="contactPin"><?= empty($me['contact_pin']) ? __('New PIN') : __('Replace it with') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-                        <input type="text" class="form-control" id="contactPin" name="pin" minlength="4" maxlength="255" placeholder="At least 4 characters" autocomplete="off" required>
+                        <input type="text" class="form-control" id="contactPin" name="pin" minlength="4" maxlength="255" placeholder="<?= escapeHtml(__('At least 4 characters')) ?>" autocomplete="off" required>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" name="set_contact_pin"><i class="fas fa-check me-2"></i>Save PIN</button>
+                <button type="submit" class="btn btn-primary" name="set_contact_pin"><i class="fas fa-check me-2"></i><?= __('Save PIN') ?></button>
             </form>
         </section>
 
         <section class="itflow-portal-panel mb-4">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-history"></i>Recent sign-ins</h2>
-                <a href="activity.php">All your activity</a>
+                <h2><i class="fas fa-history"></i><?= __('Recent sign-ins') ?></h2>
+                <a href="activity.php"><?= __('All your activity') ?></a>
             </div>
             <?php if (!mysqli_num_rows($sql_logins)) { ?>
-                <div class="itflow-portal-panel-body small text-body-secondary">No sign-ins yet.</div>
+                <div class="itflow-portal-panel-body small text-body-secondary"><?= __('No sign-ins yet.') ?></div>
             <?php } else { ?>
                 <ul class="itflow-portal-list">
                     <?php while ($row = mysqli_fetch_assoc($sql_logins)) { ?>
@@ -369,7 +369,7 @@ $csrf = escapeHtml($_SESSION['csrf_token']);
                         </li>
                     <?php } ?>
                 </ul>
-                <div class="itflow-portal-panel-body border-top small text-body-secondary py-2">Somewhere you don't recognise? Change your password and let us know.</div>
+                <div class="itflow-portal-panel-body border-top small text-body-secondary py-2"><?= __('Somewhere you don\'t recognise? Change your password and let us know.') ?></div>
             <?php } ?>
         </section>
 

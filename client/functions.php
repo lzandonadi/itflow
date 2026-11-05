@@ -148,14 +148,14 @@ function portalDateTime($datetime) {
     $day = date('Y-m-d', $timestamp);
 
     if ($day === date('Y-m-d')) {
-        return escapeHtml("Today at $time");
+        return escapeHtml(__("Today at %s", $time));
     }
 
     if ($day === date('Y-m-d', strtotime('-1 day'))) {
-        return escapeHtml("Yesterday at $time");
+        return escapeHtml(__("Yesterday at %s", $time));
     }
 
-    return escapeHtml(date($config_date_format, $timestamp) . " at $time");
+    return escapeHtml(__('%1$s at %2$s', date($config_date_format, $timestamp), $time));
 }
 
 /*
@@ -575,14 +575,14 @@ function portalRenewalState($renewal, $active_label = '') {
 /** A contact's roles in words - Primary contact, Billing, Technical - or [] for none. */
 function portalContactRoles(array $row) {
     if (intval($row['contact_primary'] ?? 0)) {
-        return ['Primary contact'];
+        return [__('Primary contact')];
     }
     $roles = [];
     if (intval($row['contact_billing'] ?? 0)) {
-        $roles[] = 'Billing';
+        $roles[] = __('Billing');
     }
     if (intval($row['contact_technical'] ?? 0)) {
-        $roles[] = 'Technical';
+        $roles[] = __('Technical');
     }
     return $roles;
 }
