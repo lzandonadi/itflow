@@ -226,12 +226,26 @@ function ticketChangeBillable($ticket_id, $billable) {
  */
 function ticketPriorityHtml($priority, $style = 'list') {
     $priority = in_array($priority, TICKET_PRIORITIES, true) ? $priority : 'Low';
-    return '<span class="badge rounded-pill text-bg-' . ticketPriorityColor($priority) . ($style === 'list' ? ' p-2' : '') . '">' . $priority . '</span>';
+    return '<span class="badge rounded-pill text-bg-' . ticketPriorityColor($priority) . ($style === 'list' ? ' p-2' : '') . '">' . escapeHtml(ticketPriorityLabel($priority)) . '</span>';
+}
+
+/*
+ * A priority as people read it, in the interface language - the stored value
+ * (High) stays what is saved, compared and posted.
+ */
+function ticketPriorityLabel($priority) {
+    $priority = (string) $priority;
+    return [
+        'Low' => _x('Low', 'ticket priority'),
+        'Medium' => _x('Medium', 'ticket priority'),
+        'High' => _x('High', 'ticket priority'),
+        'Urgent' => _x('Urgent', 'ticket priority'),
+    ][$priority] ?? $priority;
 }
 
 function ticketBillableHtml($billable, $style = 'list') {
     if ($style === 'detail') {
-        return $billable ? '<span>Billable</span>' : "<span class='text-muted'>Not billable</span>";
+        return $billable ? '<span>' . __('Billable') . '</span>' : "<span class='text-muted'>" . __('Not billable') . "</span>";
     }
     return $billable
         ? '<span class="badge rounded-pill bg-success p-2"><i class="fas fa-fw fa-dollar-sign"></i></span>'
@@ -241,13 +255,15 @@ function ticketBillableHtml($billable, $style = 'list') {
 /* A status as its badge - text that reads on its colour, and what it is for on hover (functions/ticket_status.php). */
 function ticketStatusHtml($status_name, $status_color, $style = 'list') {
     $about = '';
+    $label = (string) $status_name;
     foreach (ticketStatusesAll() as $status) {
         if ($status['ticket_status_name'] === (string) $status_name) {
             $about = ticketStatusAbout($status);
+            $label = ticketStatusLabel($status['ticket_status_id'], $status['ticket_status_name']);
             break;
         }
     }
-    return ticketStatusBadgeHtml((string) $status_name, $status_color, $style, $about);
+    return ticketStatusBadgeHtml($label, $status_color, $style, $about);
 }
 
 /*

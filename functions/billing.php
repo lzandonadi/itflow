@@ -740,12 +740,31 @@ function invoiceState($row, $paid) {
     return ['state' => $state, 'balance' => $balance, 'paid' => round(floatval($paid), 2), 'days' => $days];
 }
 
+/*
+ * An invoice status as people read it, in the interface language - the stored
+ * value (Sent) stays what is saved, compared and posted. One that isn't
+ * ITFlow's own comes back as it is.
+ */
+function invoiceStatusLabel($status) {
+    $status = (string) $status;
+    return [
+        'Draft' => _x('Draft', 'invoice status'),
+        'Sent' => _x('Sent', 'invoice status'),
+        'Viewed' => _x('Viewed', 'invoice status'),
+        'Partial' => _x('Partial', 'invoice status'),
+        'Paid' => _x('Paid', 'invoice status'),
+        'Overdue' => _x('Overdue', 'invoice status'),
+        'Cancelled' => _x('Cancelled', 'invoice status'),
+        'Non-Billable' => _x('Non-Billable', 'invoice status'),
+    ][$status] ?? $status;
+}
+
 /** An invoice's status as a badge - its stored status, and Overdue when it is late. */
 function invoiceStatusBadge($status, $overdue = false) {
     $status = (string) $status;
-    $html = '<span class="badge rounded-pill text-bg-' . getInvoiceBadgeColor($status) . '">' . escapeHtml($status) . '</span>';
+    $html = '<span class="badge rounded-pill text-bg-' . getInvoiceBadgeColor($status) . '">' . escapeHtml(invoiceStatusLabel($status)) . '</span>';
     if ($overdue) {
-        $html .= ' <span class="badge rounded-pill text-bg-danger">Overdue</span>';
+        $html .= ' <span class="badge rounded-pill text-bg-danger">' . _x('Overdue', 'invoice status') . '</span>';
     }
     return $html;
 }
@@ -758,13 +777,13 @@ function invoiceDuePill($state) {
     $days = $state['days'];
     if ($days < 0) {
         $late = -$days;
-        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="Past its due date"><i class="fas fa-exclamation-circle me-1"></i>' . $late . ' ' . ($late === 1 ? 'day' : 'days') . ' overdue</span>';
+        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . __('Past its due date') . '"><i class="fas fa-exclamation-circle me-1"></i>' . _n('%d day overdue', '%d days overdue', $late) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-warning fw-normal"><i class="fas fa-clock me-1"></i>Due today</span>';
+        return '<span class="badge rounded-pill text-bg-warning fw-normal"><i class="fas fa-clock me-1"></i>' . __('Due today') . '</span>';
     }
     $class = $days <= 7 ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary-emphasis';
-    return '<span class="badge rounded-pill ' . $class . ' fw-normal"><i class="far fa-clock me-1"></i>Due in ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill ' . $class . ' fw-normal"><i class="far fa-clock me-1"></i>' . _n('Due in %d day', 'Due in %d days', $days) . '</span>';
 }
 
 /** May a payment be recorded against this invoice? */
@@ -1355,11 +1374,29 @@ function quoteExpired($row) {
         && !empty($row['quote_expire']) && strtotime((string) $row['quote_expire']) < strtotime(date('Y-m-d'));
 }
 
+/*
+ * A quote status as people read it, in the interface language - the stored
+ * value stays what is saved, compared and posted. One that isn't ITFlow's own
+ * comes back as it is.
+ */
+function quoteStatusLabel($status) {
+    $status = (string) $status;
+    return [
+        'Draft' => _x('Draft', 'quote status'),
+        'Sent' => _x('Sent', 'quote status'),
+        'Viewed' => _x('Viewed', 'quote status'),
+        'Accepted' => _x('Accepted', 'quote status'),
+        'Declined' => _x('Declined', 'quote status'),
+        'Invoiced' => _x('Invoiced', 'quote status'),
+        'Expired' => _x('Expired', 'quote status'),
+    ][$status] ?? $status;
+}
+
 /** A quote's status as a badge, and Expired when it ran out unanswered. */
 function quoteStatusBadge($row) {
-    $html = '<span class="badge rounded-pill text-bg-' . getQuoteBadgeColor($row['quote_status']) . '">' . escapeHtml($row['quote_status']) . '</span>';
+    $html = '<span class="badge rounded-pill text-bg-' . getQuoteBadgeColor($row['quote_status']) . '">' . escapeHtml(quoteStatusLabel($row['quote_status'])) . '</span>';
     if (quoteExpired($row)) {
-        $html .= ' <span class="badge rounded-pill text-bg-dark">Expired</span>';
+        $html .= ' <span class="badge rounded-pill text-bg-dark">' . _x('Expired', 'quote status') . '</span>';
     }
     return $html;
 }
@@ -1371,13 +1408,13 @@ function quoteExpiryPill($row) {
     }
     $days = intval(round((strtotime((string) $row['quote_expire']) - strtotime(date('Y-m-d'))) / 86400));
     if ($days < 0) {
-        return '<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis fw-normal">Expired ' . (-$days) . ' ' . (-$days === 1 ? 'day' : 'days') . ' ago</span>';
+        return '<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis fw-normal">' . _n('Expired %d day ago', 'Expired %d days ago', -$days) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-warning fw-normal">Expires today</span>';
+        return '<span class="badge rounded-pill text-bg-warning fw-normal">' . __('Expires today') . '</span>';
     }
     $class = $days <= 7 ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary-emphasis';
-    return '<span class="badge rounded-pill ' . $class . ' fw-normal">Expires in ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill ' . $class . ' fw-normal">' . _n('Expires in %d day', 'Expires in %d days', $days) . '</span>';
 }
 
 /*

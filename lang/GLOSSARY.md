@@ -58,9 +58,15 @@ Status e prioridades gravados no banco **nunca** são traduzidos na gravação; 
 |---|---|---|
 | `ticket priority` | Low / Medium / High / Urgent | Baixa / Média / Alta / Urgente |
 | `invoice status` | Draft / Sent / Viewed / Partial / Paid / Overdue / Cancelled | Rascunho / Enviada / Visualizada / Parcial / Paga / Vencida / Cancelada |
-| `quote status` | Draft / Sent / Viewed / Accepted / Declined / Invoiced | Rascunho / Enviado / Visualizado / Aceito / Recusado / Faturado |
+| `invoice status` | Non-Billable | Não faturável |
+| `quote status` | Draft / Sent / Viewed / Accepted / Declined / Invoiced / Expired | Rascunho / Enviado / Visualizado / Aceito / Recusado / Faturado / Expirado |
+| `ticket status` | New / Open / On Hold / Resolved / Closed | Novo / Aberto / Em espera / Resolvido / Fechado |
 
-Os nomes de status de chamado (New, Open, On Hold, Resolved, Closed) são **dados** do banco, editáveis em Admin, e não textos do código.
+Na exibição, use sempre os helpers, e não `_x()` solto: `invoiceStatusLabel()`, `quoteStatusLabel()`, `ticketPriorityLabel()` e `ticketStatusLabel($id, $name)`.
+
+Os nomes de status de chamado são **dados** do banco, editáveis em Admin. `ticketStatusLabel()` só traduz um dos cinco status de sistema enquanto ele mantiver o nome original. Um status renomeado, ou criado pelo administrador (mesmo que se chame "Open"), aparece como foi digitado. A descrição segue a mesma regra.
+
+Outros contextos em uso: `button` (ação curta que coincide com outro sentido, como "Open" = "Abrir") e `column` (cabeçalho de tabela que coincide com outro sentido).
 
 ## Estilo
 

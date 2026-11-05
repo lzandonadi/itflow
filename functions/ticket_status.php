@@ -84,13 +84,56 @@ function ticketStatusesAll($fresh = false) {
     return $statuses;
 }
 
-/** What a status is for - its description, or a built-in's meaning when it has none. */
-function ticketStatusAbout(array $row) {
-    $description = trim((string) ($row['ticket_status_description'] ?? ''));
-    if ($description !== '') {
-        return $description;
+/*
+ * A status's name as people read it. A built-in that still has the name ITFlow
+ * gave it is shown in the interface language; one renamed in Admin, or one of
+ * your own, is shown as it was typed - even one called Open. The stored name
+ * is what is saved, compared and filtered on.
+ */
+function ticketStatusLabel($ticket_status_id, $name) {
+    $ticket_status_id = intval($ticket_status_id);
+    $name = (string) $name;
+    $built_in = ticketStatusBuiltIns()[$ticket_status_id] ?? null;
+    if (!$built_in || $built_in['name'] !== $name) {
+        return $name;
     }
-    return ticketStatusBuiltIns()[intval($row['ticket_status_id'] ?? 0)]['about'] ?? '';
+    return [
+        TICKET_STATUS_NEW => _x('New', 'ticket status'),
+        TICKET_STATUS_OPEN => _x('Open', 'ticket status'),
+        TICKET_STATUS_ON_HOLD => _x('On Hold', 'ticket status'),
+        TICKET_STATUS_RESOLVED => _x('Resolved', 'ticket status'),
+        TICKET_STATUS_CLOSED => _x('Closed', 'ticket status'),
+    ][$ticket_status_id];
+}
+
+/*
+ * A built-in's meaning and how it is set (ticketStatusBuiltIns() 'about' and
+ * 'set_by'), in the interface language.
+ */
+function ticketStatusBuiltInText($ticket_status_id, $field) {
+    $texts = [
+        TICKET_STATUS_NEW => ['about' => __('Just come in - nobody has picked it up yet.'), 'set_by' => __('Set when a ticket comes in. Assigning it or replying opens it.')],
+        TICKET_STATUS_OPEN => ['about' => __('Being worked on.'), 'set_by' => __('Where a ticket goes when it is picked up, and when a client replies.')],
+        TICKET_STATUS_ON_HOLD => ['about' => __('Waiting on someone else - the client, a vendor or a part.'), 'set_by' => __('Set by hand. The SLA\'s resolution clock is paused here.')],
+        TICKET_STATUS_RESOLVED => ['about' => __('Fixed, and waiting to be closed - a reply from the client reopens it.'), 'set_by' => __('Set by Resolve, which tells the client. Closes by itself after the days set in Admin > Settings > Tickets.')],
+        TICKET_STATUS_CLOSED => ['about' => __('Finished - it can\'t be replied to.'), 'set_by' => __('Set by Close, or when a resolved ticket closes by itself.')],
+    ];
+    return $texts[intval($ticket_status_id)][$field] ?? '';
+}
+
+/*
+ * What a status is for - its description, or a built-in's meaning when it has
+ * none. A built-in's description left as ITFlow wrote it is shown in the
+ * interface language, like its name.
+ */
+function ticketStatusAbout(array $row) {
+    $id = intval($row['ticket_status_id'] ?? 0);
+    $description = trim((string) ($row['ticket_status_description'] ?? ''));
+    $built_in = ticketStatusBuiltIns()[$id] ?? null;
+    if ($built_in && ($description === '' || $description === $built_in['about'])) {
+        return ticketStatusBuiltInText($id, 'about');
+    }
+    return $description;
 }
 
 /** A status's colour as #rrggbb - grey when it hasn't a usable one. */
