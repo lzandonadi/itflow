@@ -26,7 +26,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-comment-dots me-2"></i>Save your reply as a canned response</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-comment-dots me-2"></i><?= __('Save your reply as a canned response') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="/agent/user/post.php" method="post" enctype="multipart/form-data" autocomplete="off" data-canned-save
@@ -40,12 +40,12 @@ ob_start();
         <div class="alert alert-danger small py-2" role="alert" data-canned-save-error hidden></div>
 
         <div class="d-flex flex-wrap align-items-center gap-2 small mb-3 p-2 rounded border bg-body-tertiary">
-            <span><i class="fas fa-fw fa-reply text-secondary me-1"></i>From your reply on <strong><?= escapeHtml(ticketReference($ticket)) ?></strong></span>
+            <span><i class="fas fa-fw fa-reply text-secondary me-1"></i><?= __('From your reply on %s', '<strong>' . escapeHtml(ticketReference($ticket)) . '</strong>') ?></span>
             <div class="form-check form-switch mb-0 ms-sm-auto">
                 <input class="form-check-input" type="checkbox" role="switch" id="cannedSaveUnfill" data-canned-save-unfill checked>
-                <label class="form-check-label" for="cannedSaveUnfill">Swap this ticket's details for placeholders</label>
+                <label class="form-check-label" for="cannedSaveUnfill"><?= __("Swap this ticket's details for placeholders") ?></label>
             </div>
-            <div class="w-100 text-body-secondary" data-canned-save-swapped><i class="fas fa-spinner fa-spin me-1"></i>Reading your reply...</div>
+            <div class="w-100 text-body-secondary" data-canned-save-swapped><i class="fas fa-spinner fa-spin me-1"></i><?= __('Reading your reply...') ?></div>
         </div>
 
         <?php require __DIR__ . '/../../../includes/canned_response_form.php'; ?>
@@ -53,13 +53,13 @@ ob_start();
         <?php if ($session_is_admin) { ?>
             <div class="form-check mt-3">
                 <input class="form-check-input" type="checkbox" name="share" value="1" id="cannedSaveShare">
-                <label class="form-check-label" for="cannedSaveShare">Share with everyone <span class="small text-body-secondary">- every agent is offered it; it is kept in Admin > Canned Responses</span></label>
+                <label class="form-check-label" for="cannedSaveShare"><?= __('Share with everyone') ?> <span class="small text-body-secondary"><?= escapeHtml(__('- every agent is offered it; it is kept in Admin > Canned Responses')) ?></span></label>
             </div>
         <?php } ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save Canned Response</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save Canned Response') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 <script src="/agent/js/canned_response_save.js"></script>

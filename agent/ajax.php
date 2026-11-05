@@ -1129,9 +1129,9 @@ if (isset($_GET['get_canned_response'])) {
             'name' => $canned_row['canned_response_name'],
             'body' => cannedResponseFill($canned_row['canned_response_body'], $canned_ticket_id, stripslashes($session_name)),
             'reply_type' => $actions['reply_type'],
-            'reply_type_name' => $actions['reply_type'] === null ? '' : CANNED_RESPONSE_REPLY_TYPES[$actions['reply_type']][0],
+            'reply_type_name' => $actions['reply_type'] === null ? '' : cannedResponseReplyTypeLabel($actions['reply_type']),
             'ticket_status' => $actions['ticket_status'],
-            'status_name' => $actions['status_name'],
+            'status_name' => $actions['ticket_status'] === null ? '' : ticketStatusLabel($actions['ticket_status'], $actions['status_name']),
             'minutes' => $actions['minutes'],
             'minutes_text' => $actions['minutes'] ? cannedResponseMinutesText($actions['minutes']) : '',
             // The files that go with it - copied onto the ticket when the reply is sent

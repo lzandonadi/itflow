@@ -573,10 +573,10 @@ function formatSlaMinutes($minutes)
     $day_start = $sla_settings['business_hours_start'];
     $day_end = $sla_settings['business_hours_end'];
 
-    $qualifier = '';
+    $business = false;
     $day_minutes = 1440;
     if (!empty($sla_settings['business_days']) && !empty($day_start) && !empty($day_end) && $day_start < $day_end) {
-        $qualifier = 'business ';
+        $business = true;
         $working_minutes = intval((strtotime($day_end) - strtotime($day_start)) / 60);
         if ($working_minutes > 0) {
             $day_minutes = $working_minutes;
@@ -584,16 +584,16 @@ function formatSlaMinutes($minutes)
     }
 
     if ($minutes < 60) {
-        return $minutes . ' minute' . ($minutes == 1 ? '' : 's');
+        return _n('%d minute', '%d minutes', $minutes);
     }
 
     if ($minutes < $day_minutes) {
         $hours = intdiv($minutes, 60);
         $remainder = $minutes % 60;
 
-        $text = $hours . ' ' . $qualifier . 'hour' . ($hours == 1 ? '' : 's');
+        $text = $business ? _n('%d business hour', '%d business hours', $hours) : _n('%d hour', '%d hours', $hours);
         if ($remainder >= 5) {
-            $text .= ' ' . $remainder . ' minutes';
+            $text = _x('%1$s %2$s', 'duration', $text, _n('%d minute', '%d minutes', $remainder));
         }
 
         return $text;
@@ -602,9 +602,9 @@ function formatSlaMinutes($minutes)
     $days = intdiv($minutes, $day_minutes);
     $hours = intdiv($minutes % $day_minutes, 60);
 
-    $text = $days . ' ' . $qualifier . 'day' . ($days == 1 ? '' : 's');
+    $text = $business ? _n('%d business day', '%d business days', $days) : _n('%d day', '%d days', $days);
     if ($hours > 0) {
-        $text .= ' ' . $hours . ' hour' . ($hours == 1 ? '' : 's');
+        $text = _x('%1$s %2$s', 'duration', $text, _n('%d hour', '%d hours', $hours));
     }
 
     return $text;

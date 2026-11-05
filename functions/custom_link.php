@@ -255,7 +255,7 @@ function customLinkNavItemHtml(array $row) {
         . ($new_tab ? ' target="_blank" rel="noopener noreferrer"' : '') . ($about !== '' ? ' title="' . escapeHtml($about) . '"' : '') . '>'
         . '<i class="nav-icon fas fa-' . escapeHtml($row['icon']) . '"></i>'
         . '<p>' . escapeHtml($row['custom_link_name']) . '</p>'
-        . ($new_tab ? '<i class="fas fa-external-link-alt ms-auto ps-2 small opacity-50" title="Opens in a new tab" aria-hidden="true"></i>' : '')
+        . ($new_tab ? '<i class="fas fa-external-link-alt ms-auto ps-2 small opacity-50" title="' . escapeHtml(__('Opens in a new tab')) . '" aria-hidden="true"></i>' : '')
         . '</a></li>';
 }
 

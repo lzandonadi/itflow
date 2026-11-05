@@ -111,10 +111,9 @@ function ticketTemplateDueText($hours) {
         return '';
     }
     if ($hours % 24 === 0) {
-        $days = intdiv($hours, 24);
-        return $days === 1 ? '1 day' : "$days days";
+        return _n('%d day', '%d days', intdiv($hours, 24));
     }
-    return $hours === 1 ? '1 hour' : "$hours hours";
+    return _n('%d hour', '%d hours', $hours);
 }
 
 /** Tasks' time in words - "45m", "2h 30m". */
@@ -313,13 +312,13 @@ function ticketTemplateDefaultsHtml(array $row) {
         $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal">' . categoryChip(['category_name' => $row['category_name'], 'category_type' => 'Ticket', 'category_color' => $row['category_color'] ?? '', 'category_icon' => $row['category_icon'] ?? '']) . '</span>';
     }
     if ($row['ticket_template_billable'] !== null) {
-        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-' . (intval($row['ticket_template_billable']) ? 'dollar-sign text-success' : 'ban text-secondary') . ' me-1"></i>' . (intval($row['ticket_template_billable']) ? 'Billable' : 'Not billable') . '</span>';
+        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-' . (intval($row['ticket_template_billable']) ? 'dollar-sign text-success' : 'ban text-secondary') . ' me-1"></i>' . (intval($row['ticket_template_billable']) ? __('Billable') : __('Not billable')) . '</span>';
     }
     if (intval($row['ticket_template_assigned_to']) && !empty($row['assignee_name'])) {
         $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-user-check text-secondary me-1"></i>' . escapeHtml($row['assignee_name']) . '</span>';
     }
     if (intval($row['ticket_template_due_hours'])) {
-        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-calendar-check text-secondary me-1"></i>Due in ' . ticketTemplateDueText($row['ticket_template_due_hours']) . '</span>';
+        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-calendar-check text-secondary me-1"></i>' . __('Due in %s', ticketTemplateDueText($row['ticket_template_due_hours'])) . '</span>';
     }
     return $chips ? '<span class="d-inline-flex flex-wrap gap-1 align-items-center">' . implode('', $chips) . '</span>' : '';
 }
@@ -470,7 +469,7 @@ function ticketFillInAnswers(array $fill_ins, $posted, &$error = '', $required =
                 case 'date':
                     $date = DateTime::createFromFormat('!Y-m-d', $raw);
                     if (!$date || $date->format('Y-m-d') !== $raw) {
-                        $error = escapeHtml($fill_in['name']) . ' needs a date.';
+                        $error = __('%s needs a date.', escapeHtml($fill_in['name']));
                         return null;
                     }
                     $value = $raw;
@@ -482,7 +481,7 @@ function ticketFillInAnswers(array $fill_ins, $posted, &$error = '', $required =
                         }
                     }
                     if ($value === '') {
-                        $error = 'Pick one of the choices for ' . escapeHtml($fill_in['name']) . '.';
+                        $error = __('Pick one of the choices for %s.', escapeHtml($fill_in['name']));
                         return null;
                     }
                     break;
@@ -494,7 +493,7 @@ function ticketFillInAnswers(array $fill_ins, $posted, &$error = '', $required =
             }
         }
         if ($value === '' && $required && !empty($fill_in['required'])) {
-            $error = 'Fill in ' . escapeHtml($fill_in['name']) . ' - it is needed for this template.';
+            $error = __('Fill in %s - it is needed for this template.', escapeHtml($fill_in['name']));
             return null;
         }
         $answers[] = ['name' => $fill_in['name'], 'type' => $fill_in['type'], 'options' => $fill_in['options'], 'required' => !empty($fill_in['required']), 'client' => $fill_in['client'] ?? true, 'value' => $value];
@@ -502,13 +501,24 @@ function ticketFillInAnswers(array $fill_ins, $posted, &$error = '', $required =
     return $answers;
 }
 
-/** An answer as it reads - a date as Oct 20, 2026, the rest as given; '' when not given. */
+/** An answer as it reads, in the interface language - a date as Oct 20, 2026, Yes or No, the rest as given; '' when not given. */
 function ticketFillInText(array $answer) {
     $value = (string) ($answer['value'] ?? '');
     if ($value !== '' && ($answer['type'] ?? '') === 'date' && strtotime($value)) {
-        return date('M j, Y', strtotime($value));
+        return formatDate($value, 'date');
+    }
+    if (($answer['type'] ?? '') === 'yesno' && ($value === 'Yes' || $value === 'No')) {
+        return ticketFillInChoiceLabel($value, 'yesno');
     }
     return $value;
+}
+
+/** A fill-in choice as shown - Yes and No (what is stored) in the interface language, a list's own choices as they are. Raw. */
+function ticketFillInChoiceLabel($choice, $type) {
+    if ($type === 'yesno') {
+        return ['Yes' => _x('Yes', 'fill-in answer'), 'No' => _x('No', 'fill-in answer')][$choice] ?? (string) $choice;
+    }
+    return (string) $choice;
 }
 
 /* The answers a ticket or recurring ticket keeps - which table, and its columns' prefix. */
@@ -559,9 +569,9 @@ function ticketFillInFieldHtml(array $fill_in, $value, $required = true) {
     $value = (string) $value;
     if ($fill_in['type'] === 'list' || $fill_in['type'] === 'yesno') {
         $choices = $fill_in['type'] === 'yesno' ? ['Yes', 'No'] : $fill_in['options'];
-        $control = '<select class="form-select' . ($fill_in['type'] === 'list' ? ' select2' : '') . '" ' . $attributes . '><option value="">- Choose -</option>';
+        $control = '<select class="form-select' . ($fill_in['type'] === 'list' ? ' select2' : '') . '" ' . $attributes . '><option value="">' . __('- Choose -') . '</option>';
         foreach ($choices as $choice) {
-            $control .= '<option value="' . escapeHtml($choice) . '"' . (mb_strtolower($choice) === mb_strtolower($value) ? ' selected' : '') . '>' . escapeHtml($choice) . '</option>';
+            $control .= '<option value="' . escapeHtml($choice) . '"' . (mb_strtolower($choice) === mb_strtolower($value) ? ' selected' : '') . '>' . escapeHtml(ticketFillInChoiceLabel($choice, $fill_in['type'])) . '</option>';
         }
         $control .= '</select>';
     } else {
@@ -650,7 +660,7 @@ function ticketTemplateWhenSelectHtml(array $fill_ins, $current = null) {
     if (!$choices && !$current) {
         return '';
     }
-    $html = '<select class="form-select select2" name="when"><option value="">Always</option>';
+    $html = '<select class="form-select select2" name="when"><option value="">' . __('Always') . '</option>';
     $groups = [];
     foreach ($choices as $choice) {
         $groups[$choice['fill_in']][] = $choice;
@@ -661,12 +671,12 @@ function ticketTemplateWhenSelectHtml(array $fill_ins, $current = null) {
         foreach ($group as $choice) {
             $selected = $choice['value'] === $current_value;
             $found = $found || $selected;
-            $html .= '<option value="' . escapeHtml($choice['value']) . '"' . ($selected ? ' selected' : '') . '>Only when ' . escapeHtml($fill_in) . ' is ' . escapeHtml($choice['choice']) . '</option>';
+            $html .= '<option value="' . escapeHtml($choice['value']) . '"' . ($selected ? ' selected' : '') . '>' . __('Only when %1$s is %2$s', escapeHtml($fill_in), escapeHtml($choice['choice'])) . '</option>';
         }
         $html .= '</optgroup>';
     }
     if ($current && !$found) {
-        $html .= '<option value="' . escapeHtml($current_value) . '" selected>Only when ' . escapeHtml($current['fill_in']) . ' is ' . escapeHtml($current['value']) . ' (no longer offered)</option>';
+        $html .= '<option value="' . escapeHtml($current_value) . '" selected>' . __('Only when %1$s is %2$s (no longer offered)', escapeHtml($current['fill_in']), escapeHtml($current['value'])) . '</option>';
     }
     return $html . '</select>';
 }
@@ -676,7 +686,7 @@ function ticketTemplateTaskWhenText(array $task) {
     if (empty($task['when'])) {
         return '';
     }
-    return 'Only when ' . escapeHtml($task['when']['fill_in']) . ' is ' . escapeHtml($task['when']['value']);
+    return __('Only when %1$s is %2$s', escapeHtml($task['when']['fill_in']), escapeHtml($task['when']['value']));
 }
 
 /** Copy a template's tasks onto a ticket - the ones for these answers (ticketTemplateTaskApplies()). How many. */

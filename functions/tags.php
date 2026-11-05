@@ -180,8 +180,8 @@ function tagPills($entity, $record_id, array $tags, $filter = '', $can_edit = nu
     }
 
     if ($can_edit) {
-        $html .= '<button type="button" class="itflow-tag itflow-tag-add" data-tag-picker data-tag-entity="' . $entity . '" data-tag-ids="' . $record_id . '" data-csrf="' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" title="' . ($tags ? 'Change tags' : 'Add tags') . '">'
-            . '<i class="fas fa-fw fa-plus" aria-hidden="true"></i>' . ($tags ? '<span class="visually-hidden">Change tags</span>' : 'Tag') . '</button>';
+        $html .= '<button type="button" class="itflow-tag itflow-tag-add" data-tag-picker data-tag-entity="' . $entity . '" data-tag-ids="' . $record_id . '" data-csrf="' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" title="' . ($tags ? __('Change tags') : __('Add tags')) . '">'
+            . '<i class="fas fa-fw fa-plus" aria-hidden="true"></i>' . ($tags ? '<span class="visually-hidden">' . __('Change tags') . '</span>' : __('Tag')) . '</button>';
     }
 
     return $html . '</span>';

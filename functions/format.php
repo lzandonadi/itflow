@@ -270,6 +270,7 @@ function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigne
  *   datetime     Nov 5, 2026, 3:04 PM    5 de nov. de 2026, 15:04  date('M j, Y g:i A')
  *   datetime_short Nov 5, 3:04 PM        5 de nov., 15:04          date('M j, g:i A')
  *   datetime_weekday Thu, Nov 5, 2026, 3:04 PM  qui., 5 de nov. de 2026, 15:04  date('D j M Y, g:i A')
+ *   date_weekday Thu, Nov 5, 2026         qui., 5 de nov. de 2026   date('D M j, Y')
  *   time         3:04 PM                 15:04                     date('g:i A')
  *   month        Nov                     nov.                      date('M')
  *   month_year   November 2026           novembro de 2026          date('F Y')
@@ -284,6 +285,7 @@ function formatDate($value, string $style = 'date'): string {
         'datetime' => 'yMMMdjmm',
         'datetime_short' => 'MMMdjmm',
         'datetime_weekday' => 'yMMMEdjmm',
+        'date_weekday' => 'yMMMEd',
         'time' => 'jmm',
         'month' => 'MMM',
         'month_year' => 'yMMMM',
@@ -319,6 +321,12 @@ function formatDate($value, string $style = 'date'): string {
     return $formatted === false ? '' : $formatted;
 }
 
+
+/** $text with its first letter a capital, multibyte-safe - "às segundas" -> "Às segundas". */
+function mbUcfirst($text) {
+    $text = (string) $text;
+    return mb_strtoupper(mb_substr($text, 0, 1)) . mb_substr($text, 1);
+}
 
 function timeAgo($datetime) {
     if (is_null($datetime)) {
@@ -708,7 +716,9 @@ function emptyStatePill(array $pills, $key, $default = '', array $good = []) {
 
 /**
  * A list's empty state. $o:
- *   thing   - what the list holds, plural ('vendors')
+ *   thing   - what the list holds, plural and in the interface language
+ *             (__('vendors')) - the titles built from it are worded to take
+ *             any plural, so a page needs its own only for a better sentence
  *   icon    - the list's icon ('fa-building', or full classes 'fab fa-...')
  *   title   - HTML; "No {thing} yet" when left out
  *   text    - HTML; a line on what goes there
@@ -737,17 +747,17 @@ function emptyStateHtml(array $o) {
 
     if ($filtered) {
         $icon = 'fas fa-filter';
-        $title = $o['match_title'] ?? 'No ' . escapeHtml($thing) . ' match';
-        $text = $o['match_text'] ?? 'Try a different search, or clear the filters to see everything.';
-        $buttons = '<a class="btn btn-outline-secondary" href="' . escapeHtml($o['clear_url'] ?? emptyStateClearUrl($views)) . '"><i class="fas fa-times me-2"></i>Clear filters</a>';
+        $title = $o['match_title'] ?? __('No %s match', escapeHtml($thing));
+        $text = $o['match_text'] ?? __('Try a different search, or clear the filters to see everything.');
+        $buttons = '<a class="btn btn-outline-secondary" href="' . escapeHtml($o['clear_url'] ?? emptyStateClearUrl($views)) . '"><i class="fas fa-times me-2"></i>' . __('Clear filters') . '</a>';
     } elseif (!empty($o['archived'])) {
         $icon = 'fas fa-archive';
-        $title = $o['archived_title'] ?? 'No archived ' . escapeHtml($thing);
+        $title = $o['archived_title'] ?? __('No archived %s', escapeHtml($thing));
         $text = '';
     } else {
         $icon = (string) ($o['icon'] ?? 'fa-inbox');
         $icon = strpos($icon, ' ') === false ? "fas $icon" : $icon;
-        $title = $o['title'] ?? 'No ' . escapeHtml($thing) . ' yet';
+        $title = $o['title'] ?? __('No %s yet', escapeHtml($thing));
         $text = (string) ($o['text'] ?? '');
         foreach (array_values((array) ($o['actions'] ?? [])) as $i => $action) {
             $class = 'btn ' . ($i ? 'btn-outline-primary' : 'btn-primary');

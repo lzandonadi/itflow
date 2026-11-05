@@ -35,7 +35,7 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
         <a class="nav-link" data-bs-toggle="pill" href="#cannedResponseFormSetsUp"><i class="fas fa-fw fa-sliders-h me-2 d-none d-sm-inline"></i><?= __('Sets up') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#cannedResponseFormFiles"><i class="fas fa-fw fa-paperclip me-2 d-none d-sm-inline"></i>Files<?= $files ? ' <span class="badge rounded-pill text-bg-secondary ms-1">' . count($files) . '</span>' : '' ?></a>
+        <a class="nav-link" data-bs-toggle="pill" href="#cannedResponseFormFiles"><i class="fas fa-fw fa-paperclip me-2 d-none d-sm-inline"></i><?= __('Files') ?><?= $files ? ' <span class="badge rounded-pill text-bg-secondary ms-1">' . count($files) . '</span>' : '' ?></a>
     </li>
 </ul>
 
@@ -72,7 +72,7 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
     <div class="small text-secondary mb-1"><?= __('Filled in from the ticket as it goes in - click one to put it where the cursor is:') ?></div>
     <div class="d-flex flex-wrap gap-1 mb-2" data-canned-placeholders>
         <?php foreach (CANNED_RESPONSE_PLACEHOLDERS as $placeholder => $means) { ?>
-            <button type="button" class="btn btn-sm btn-light border font-monospace" data-canned-placeholder="<?= escapeHtml($placeholder) ?>" title="<?= escapeHtml(ucfirst($means)) ?>">[<?= escapeHtml($placeholder) ?>]</button>
+            <button type="button" class="btn btn-sm btn-light border font-monospace" data-canned-placeholder="<?= escapeHtml($placeholder) ?>" title="<?= escapeHtml(mbUcfirst(cannedResponsePlaceholderMeaning($placeholder))) ?>">[<?= escapeHtml($placeholder) ?>]</button>
         <?php } ?>
     </div>
     <div class="small text-secondary"><?= __('Anything else in square brackets - [Date of visit] - stays as it is, and the agent is asked about it before sending.') ?></div>
@@ -86,9 +86,9 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-reply"></i></span>
             <select class="form-select select2" name="reply_type">
-                <option value=""<?= $reply_type === '' ? ' selected' : '' ?>>- Leave as it is -</option>
+                <option value=""<?= $reply_type === '' ? ' selected' : '' ?>><?= __('- Leave as it is -') ?></option>
                 <?php foreach (CANNED_RESPONSE_REPLY_TYPES as $type => [$label, $icon]) { ?>
-                    <option value="<?= $type ?>"<?= $reply_type === (string) $type ? ' selected' : '' ?><?= selectOptionData(['icon' => "fas $icon"]) ?>><?= $label ?></option>
+                    <option value="<?= $type ?>"<?= $reply_type === (string) $type ? ' selected' : '' ?><?= selectOptionData(['icon' => "fas $icon"]) ?>><?= escapeHtml(cannedResponseReplyTypeLabel($type)) ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -102,7 +102,7 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
             <select class="form-select select2" name="ticket_status">
                 <option value=""><?= __('- Leave as it is -') ?></option>
                 <?php foreach (cannedResponseStatuses() as $status_id => $status) { ?>
-                    <option value="<?= $status_id ?>"<?= $ticket_status === $status_id ? ' selected' : '' ?><?= selectOptionColor($status['color']) ?>><?= escapeHtml($status['name']) ?></option>
+                    <option value="<?= $status_id ?>"<?= $ticket_status === $status_id ? ' selected' : '' ?><?= selectOptionColor($status['color']) ?>><?= escapeHtml(ticketStatusLabel($status_id, $status['name'])) ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -114,14 +114,14 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-stopwatch"></i></span>
             <input type="number" class="form-control" name="minutes" min="0" max="<?= CANNED_RESPONSE_MAX_MINUTES ?>" step="1" placeholder="<?= escapeHtml(__('None')) ?>" value="<?= $minutes ?: '' ?>">
-            <span class="input-group-text">minutes</span>
+            <span class="input-group-text"><?= __('minutes') ?></span>
         </div>
         <small class="text-secondary"><?= __('Added to the reply\'s time worked.') ?></small>
     </div>
 </div>
 
 <div class="tab-pane fade" id="cannedResponseFormFiles">
-    <p class="small text-secondary">Copied onto the ticket with the reply it goes into, and sent with its email - a how-to, a form to fill in. Up to <?= CANNED_RESPONSE_MAX_FILES ?>; the agent can leave any of them off.</p>
+    <p class="small text-secondary"><?= __('Copied onto the ticket with the reply it goes into, and sent with its email - a how-to, a form to fill in. Up to %d; the agent can leave any of them off.', CANNED_RESPONSE_MAX_FILES) ?></p>
 
     <?php if ($files) { ?>
         <ul class="list-group mb-3">
@@ -133,7 +133,7 @@ $files = !empty($r['canned_response_id']) ? cannedResponseFiles($r['canned_respo
                     <span class="small text-secondary text-nowrap"><?= cannedResponseFileSizeText($file['canned_response_file_size']) ?></span>
                     <div class="form-check ms-auto mb-0">
                         <input class="form-check-input" type="checkbox" name="remove_file_ids[]" value="<?= $file_id ?>" id="cannedResponseRemoveFile<?= $file_id ?>">
-                        <label class="form-check-label small" for="cannedResponseRemoveFile<?= $file_id ?>">Remove</label>
+                        <label class="form-check-label small" for="cannedResponseRemoveFile<?= $file_id ?>"><?= __('Remove') ?></label>
                     </div>
                 </li>
             <?php } ?>

@@ -18,7 +18,7 @@ function cannedResponseYoursForRequest($canned_response_id) {
     global $session_user_id;
     $row = cannedResponseRow($canned_response_id);
     if (!$row || intval($row['canned_response_user_id']) !== intval($session_user_id)) {
-        flashAlert("That canned response isn't one of yours now - it may have been deleted or shared with everyone.", 'error');
+        flashAlert(__("That canned response isn't one of yours now - it may have been deleted or shared with everyone."), 'error');
         redirect('user_canned_responses.php');
     }
     return $row;
@@ -72,14 +72,15 @@ if (isset($_POST['add_your_canned_response']) || isset($_POST['edit_your_canned_
     logAudit("Canned Response", $editing ? "Edit" : "Create", "$session_name " . ($editing ? 'edited' : 'created') . ($shared ? ' shared' : ' their own') . " canned response $name"
         . ($from_ticket ? ' from a reply on ' . escapeSql(ticketReference($from_ticket)) : ''), 0, $canned_response_id);
 
-    $refused_text = $refused ? " - but not " . implode(', ', $refused) . ", a kind a ticket doesn't take or more than " . CANNED_RESPONSE_MAX_FILES . " files" : '';
+    $refused_text = $refused ? __(' - but not %1$s, a kind a ticket doesn\'t take or more than %2$d files', implode(', ', $refused), CANNED_RESPONSE_MAX_FILES) : '';
 
     if ($json) {
         // Where the picker on that ticket offers it now, if it does: Yours, or for a shared one its category's group or Every ticket
         $group = '';
         $ticket_category_id = intval($from_ticket['ticket_category'] ?? 0);
         if (!$fields['category_ids'] || in_array($ticket_category_id, $fields['category_ids'], true)) {
-            $group = $shared ? ($fields['category_ids'] ? (string) getFieldById('categories', $ticket_category_id, 'category_name') : 'Every ticket') : 'Yours';
+            // The picker's own labels (cannedResponsePickerGroups()), in the interface language
+            $group = $shared ? ($fields['category_ids'] ? (string) getFieldById('categories', $ticket_category_id, 'category_name') : __('Every ticket')) : __('Yours');
         }
         $row = cannedResponseRow($canned_response_id);
         $answer([
@@ -90,13 +91,14 @@ if (isset($_POST['add_your_canned_response']) || isset($_POST['edit_your_canned_
             'sets_up' => cannedResponseSetsUpHtml($row),
             'group' => $group,
             'shared' => $shared,
-            'message' => $fields['name'] . ' saved as ' . ($shared ? 'a canned response shared with everyone' : 'one of your canned responses') . $refused_text
-                . ($group === '' ? ". It isn't offered on this ticket's category." : '.'),
+            'message' => ($shared ? __('%s saved as a canned response shared with everyone', $fields['name']) : __('%s saved as one of your canned responses', $fields['name'])) . $refused_text
+                . ($group === '' ? __(". It isn't offered on this ticket's category.") : '.'),
             'refused' => $refused,
         ]);
     }
 
-    flashAlert("Canned response <strong>" . escapeHtml($fields['name']) . "</strong> " . ($editing ? 'saved' : 'created') . escapeHtml($refused_text), $refused ? 'error' : 'success');
+    $name_html = '<strong>' . escapeHtml($fields['name']) . '</strong>';
+    flashAlert(($editing ? __('Canned response %s saved', $name_html) : __('Canned response %s created', $name_html)) . escapeHtml($refused_text), $refused ? 'error' : 'success');
 
     redirect();
 
@@ -113,7 +115,7 @@ if (isset($_GET['copy_your_canned_response']) || isset($_GET['copy_canned_respon
     } else {
         $row = cannedResponseRow($_GET['copy_canned_response_to_yours']);
         if (!$row || intval($row['canned_response_user_id']) !== 0 || $row['canned_response_archived_at']) {
-            flashAlert("That canned response isn't shared now - it may have been archived or deleted.", 'error');
+            flashAlert(__("That canned response isn't shared now - it may have been archived or deleted."), 'error');
             redirect('user_canned_responses.php?show=shared');
         }
     }
@@ -122,7 +124,7 @@ if (isset($_GET['copy_your_canned_response']) || isset($_GET['copy_canned_respon
 
     logAudit("Canned Response", "Create", "$session_name copied canned response " . escapeSql($row['canned_response_name']) . " as their own " . escapeSql($new_name), 0, $new_id);
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>, one of yours");
+    flashAlert(__('Canned response %1$s copied as %2$s, one of yours', '<strong>' . escapeHtml($row['canned_response_name']) . '</strong>', '<strong>' . escapeHtml($new_name) . '</strong>'));
 
     redirect('user_canned_responses.php');
 
@@ -142,7 +144,8 @@ if (isset($_GET['archive_your_canned_response']) || isset($_GET['restore_your_ca
 
     logAudit("Canned Response", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " their own canned response " . escapeSql($row['canned_response_name']), 0, $canned_response_id);
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    $name_html = '<strong>' . escapeHtml($row['canned_response_name']) . '</strong>';
+    flashAlert($archive ? __('Canned response %s archived', $name_html) : __('Canned response %s restored', $name_html), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -162,7 +165,7 @@ if (isset($_GET['delete_your_canned_response'])) {
 
     logAudit("Canned Response", "Delete", "$session_name deleted their own canned response " . escapeSql($row['canned_response_name']));
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Canned response %s deleted', '<strong>' . escapeHtml($row['canned_response_name']) . '</strong>'), 'error');
 
     redirect();
 

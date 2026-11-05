@@ -62,13 +62,13 @@ $filters = "(recurring_ticket_subject LIKE '%$q%' OR category_name LIKE '%$q%' O
 // Which ones - the pills along the top
 $running_sql = 'recurring_ticket_paused_at IS NULL';
 $shows = [
-    '' => ['label' => 'All', 'where' => ''],
-    'week' => ['label' => 'Due this week', 'icon' => 'fa-calendar-week', 'where' => "$running_sql AND recurring_ticket_next_run BETWEEN CURDATE() AND CURDATE() + INTERVAL 7 DAY",
-        'title' => 'Raising a ticket in the next seven days'],
-    'missed' => ['label' => 'Missed', 'icon' => 'fa-exclamation-triangle', 'where' => "$running_sql AND recurring_ticket_next_run < CURDATE()",
-        'title' => 'Due before today and not raised - the nightly cron raises them on its next run', 'alarm' => 'danger'],
-    'paused' => ['label' => 'Paused', 'icon' => 'fa-pause', 'where' => 'recurring_ticket_paused_at IS NOT NULL', 'title' => 'Kept, raising nothing until resumed'],
-    'unassigned' => ['label' => 'Unassigned', 'icon' => 'fa-user-slash', 'where' => 'recurring_ticket_assigned_to = 0', 'title' => 'Raises tickets nobody has', 'alarm' => 'warning'],
+    '' => ['label' => __('All'), 'where' => ''],
+    'week' => ['label' => __('Due this week'), 'icon' => 'fa-calendar-week', 'where' => "$running_sql AND recurring_ticket_next_run BETWEEN CURDATE() AND CURDATE() + INTERVAL 7 DAY",
+        'title' => __('Raising a ticket in the next seven days')],
+    'missed' => ['label' => __('Missed'), 'icon' => 'fa-exclamation-triangle', 'where' => "$running_sql AND recurring_ticket_next_run < CURDATE()",
+        'title' => __('Due before today and not raised - the nightly cron raises them on its next run'), 'alarm' => 'danger'],
+    'paused' => ['label' => _x('Paused', 'recurring tickets view'), 'icon' => 'fa-pause', 'where' => 'recurring_ticket_paused_at IS NOT NULL', 'title' => __('Kept, raising nothing until resumed')],
+    'unassigned' => ['label' => __('Unassigned'), 'icon' => 'fa-user-slash', 'where' => 'recurring_ticket_assigned_to = 0', 'title' => __('Raises tickets nobody has'), 'alarm' => 'warning'],
 ];
 $show = isset($shows[$_GET['show'] ?? '']) ? ($_GET['show'] ?? '') : '';
 $show_query = $shows[$show]['where'] ? 'AND ' . $shows[$show]['where'] : '';
@@ -137,18 +137,18 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-redo-alt me-2"></i>Recurring Tickets</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-redo-alt me-2"></i><?= __('Recurring Tickets') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/recurring_ticket/recurring_ticket_add.php?<?= $client_url ?>" data-modal-size="lg">
-                        <i class="fas fa-plus me-2"></i>New Recurring Ticket
+                        <i class="fas fa-plus me-2"></i><?= __('New Recurring Ticket') ?>
                     </button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" href="tickets.php<?= $client_url ? '?' . rtrim($client_url, '&') : '' ?>">
-                        <i class="fa fa-fw fa-life-ring me-2"></i>Tickets
+                        <i class="fa fa-fw fa-life-ring me-2"></i><?= __('Tickets') ?>
                     </a>
                 </div>
             </div>
@@ -164,13 +164,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-4' : 'col-lg-3' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search recurring tickets...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search recurring tickets...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select class="form-select select2" name="assigned_agent" onchange="this.form.submit()">
-                        <option value="">- Any agent -</option>
+                        <option value=""><?= __('- Any agent -') ?></option>
                         <?php
                         $sql_agents_filter = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE user_type = 1
                             AND (EXISTS (SELECT 1 FROM recurring_tickets WHERE recurring_ticket_assigned_to = user_id) OR user_id = $agent_filter) ORDER BY user_name ASC");
@@ -182,14 +182,14 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select class="form-select select2" name="category" onchange="this.form.submit()">
-                        <option value="">- Any category -</option>
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?= categoryFilterOptionsHtml('Ticket', $category_filter, "SELECT DISTINCT recurring_ticket_category FROM recurring_tickets WHERE recurring_ticket_category <> ''") ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                     <div class="col-lg-3 col-md-6">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "SELECT DISTINCT client_id, client_name, client_abbreviation FROM clients
                                 JOIN recurring_tickets ON recurring_ticket_client_id = client_id
@@ -206,42 +206,42 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                         <?php if ($can_edit) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                    <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <button class="dropdown-item confirm-link" type="submit" form="bulkActions" name="bulk_force_recurring_tickets"
-                                        data-confirm-text="A ticket is raised now from each one, and its next run moves on.">
-                                        <i class="fas fa-fw fa-paper-plane me-2"></i>Raise now
+                                        data-confirm-text="<?= escapeHtml(__('A ticket is raised now from each one, and its next run moves on.')) ?>">
+                                        <i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Raise now') ?>
                                     </button>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_pause_recurring_tickets">
-                                        <i class="fas fa-fw fa-pause me-2"></i>Pause
+                                        <i class="fas fa-fw fa-pause me-2"></i><?= __('Pause') ?>
                                     </button>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_resume_recurring_tickets">
-                                        <i class="fas fa-fw fa-play me-2"></i>Resume
+                                        <i class="fas fa-fw fa-play me-2"></i><?= __('Resume') ?>
                                     </button>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_bulk_agent_edit.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-user-check me-2"></i>Assign
+                                        <i class="fas fa-fw fa-user-check me-2"></i><?= __('Assign') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_bulk_priority_edit.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-thermometer-half me-2"></i>Set priority
+                                        <i class="fas fa-fw fa-thermometer-half me-2"></i><?= __('Set priority') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_bulk_category_edit.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-tag me-2"></i>Set category
+                                        <i class="fas fa-fw fa-tag me-2"></i><?= __('Set category') ?>
                                     </a>
                                     <?php if ($config_module_enable_accounting && lookupUserPermission('module_sales') >= 2) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_bulk_billable_edit.php" data-bulk="true">
-                                            <i class="fas fa-fw fa-dollar-sign me-2"></i>Set billing
+                                            <i class="fas fa-fw fa-dollar-sign me-2"></i><?= __('Set billing') ?>
                                         </a>
                                     <?php } ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_bulk_next_run_edit.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-calendar-day me-2"></i>Set next run
+                                        <i class="fas fa-fw fa-calendar-day me-2"></i><?= __('Set next run') ?>
                                     </a>
                                     <?php if ($can_delete) { ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_recurring_tickets"
-                                            data-confirm-text="The schedules go for good. Tickets they already raised stay.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The schedules go for good. Tickets they already raised stay.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 </div>
@@ -273,16 +273,16 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                     <?php if ($can_edit) { ?>
                         <th class="checkbox-column border-end">
                             <div class="form-check">
-                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                             </div>
                         </th>
                     <?php } ?>
-                    <th><?= $sort_link('recurring_ticket_subject', 'Recurring ticket') ?></th>
-                    <th><?= $client_url ? 'For' : $sort_link('client_name', 'Client') ?></th>
-                    <th><?= $sort_link('recurring_ticket_frequency', 'How often') ?></th>
-                    <th><?= $sort_link('recurring_ticket_next_run', 'Next run') ?></th>
-                    <th>Last ticket</th>
-                    <th><?= $sort_link('user_name', 'Agent') ?></th>
+                    <th><?= $sort_link('recurring_ticket_subject', __('Recurring ticket')) ?></th>
+                    <th><?= $client_url ? __('For') : $sort_link('client_name', __('Client')) ?></th>
+                    <th><?= $sort_link('recurring_ticket_frequency', __('How often')) ?></th>
+                    <th><?= $sort_link('recurring_ticket_next_run', __('Next run')) ?></th>
+                    <th><?= __('Last ticket') ?></th>
+                    <th><?= $sort_link('user_name', __('Agent')) ?></th>
                     <th></th>
                 </tr>
                 </thead>
@@ -299,7 +299,7 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                         <?php if ($can_edit) { ?>
                             <td class="checkbox-column bg-light border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input bulk-select" type="checkbox" name="recurring_ticket_ids[]" value="<?= $recurring_ticket_id ?>" aria-label="Select <?= escapeHtml($row['recurring_ticket_subject']) ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="recurring_ticket_ids[]" value="<?= $recurring_ticket_id ?>" aria-label="<?= escapeHtml(__('Select %s', $row['recurring_ticket_subject'])) ?>">
                                 </div>
                             </td>
                         <?php } ?>
@@ -318,13 +318,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                                     <span class="text-nowrap text-truncate itflow-ticket-asset"><i class="fas fa-desktop me-1"></i><?= escapeHtml($row['asset_name']) ?></span>
                                 <?php } ?>
                                 <?php if ($task_count) { ?>
-                                    <span class="text-nowrap" title="Adds <?= $task_count ?> task<?= $task_count === 1 ? '' : 's' ?>"><i class="fas fa-tasks me-1"></i><?= $task_count ?></span>
+                                    <span class="text-nowrap" title="<?= escapeHtml(_n('Adds %d task', 'Adds %d tasks', $task_count)) ?>"><i class="fas fa-tasks me-1"></i><?= $task_count ?></span>
                                 <?php } ?>
                                 <?php if ($row['ticket_template_name']) { ?>
-                                    <span class="text-nowrap" title="Template"><i class="fas fa-cube me-1"></i><?= escapeHtml($row['ticket_template_name']) ?></span>
+                                    <span class="text-nowrap" title="<?= escapeHtml(__('Template')) ?>"><i class="fas fa-cube me-1"></i><?= escapeHtml($row['ticket_template_name']) ?></span>
                                 <?php } ?>
                                 <?php if (intval($row['recurring_ticket_billable'])) { ?>
-                                    <span class="text-nowrap" title="Raises billable tickets"><i class="fas fa-dollar-sign"></i></span>
+                                    <span class="text-nowrap" title="<?= escapeHtml(__('Raises billable tickets')) ?>"><i class="fas fa-dollar-sign"></i></span>
                                 <?php } ?>
                             </div>
                         </td>
@@ -339,13 +339,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                             <?php } ?>
                         </td>
                         <td class="text-nowrap">
-                            <div><i class="fas fa-redo-alt text-body-secondary small me-1"></i><?= escapeHtml($row['recurring_ticket_frequency']) ?></div>
+                            <div><i class="fas fa-redo-alt text-body-secondary small me-1"></i><?= recurringTicketFrequencyLabel($row['recurring_ticket_frequency']) ?></div>
                             <div class="small text-body-secondary"><?= escapeHtml(recurringTicketCadenceText($row)) ?></div>
                         </td>
                         <td class="text-nowrap">
                             <?= recurringTicketNextRunPill($row) ?>
                             <?php if (!$paused) { ?>
-                                <div class="small text-body-secondary mt-1"><?= escapeHtml(date('D M j, Y', strtotime($row['recurring_ticket_next_run']))) ?></div>
+                                <div class="small text-body-secondary mt-1"><?= escapeHtml(formatDate($row['recurring_ticket_next_run'], 'date_weekday')) ?></div>
                             <?php } ?>
                         </td>
                         <td class="small">
@@ -354,7 +354,7 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                                     <?= ticketStatusHtml($last['ticket_status_name'], $last['ticket_status_color'], 'detail') ?></div>
                                 <div class="text-body-secondary" title="<?= escapeHtml($last['ticket_created_at']) ?>"><?= timeAgo($last['ticket_created_at']) ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">None yet</span>
+                                <span class="text-body-secondary"><?= __('None yet') ?></span>
                             <?php } ?>
                         </td>
                         <td class="text-nowrap">
@@ -363,29 +363,29 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                         <td class="text-end">
                             <?php if ($can_edit) { ?>
                                 <div class="dropdown dropstart">
-                                    <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                    <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <a class="dropdown-item confirm-link" href="post.php?force_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                            data-confirm-text="A ticket is raised now, and the next run moves on a step - this takes its place.">
-                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i>Raise now
+                                            data-confirm-text="<?= escapeHtml(__('A ticket is raised now, and the next run moves on a step - this takes its place.')) ?>">
+                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i><?= __('Raise now') ?>
                                         </a>
                                         <?php if ($paused) { ?>
                                             <a class="dropdown-item" href="post.php?resume_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-play text-secondary me-2"></i>Resume
+                                                <i class="fas fa-fw fa-play text-secondary me-2"></i><?= __('Resume') ?>
                                             </a>
                                         <?php } else { ?>
                                             <a class="dropdown-item" href="post.php?pause_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-pause text-secondary me-2"></i>Pause
+                                                <i class="fas fa-fw fa-pause text-secondary me-2"></i><?= __('Pause') ?>
                                             </a>
                                         <?php } ?>
                                         <?php if ($can_delete) { ?>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                data-confirm-text="The schedule goes for good. Tickets it already raised stay.">
-                                                <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                data-confirm-text="<?= escapeHtml(__('The schedule goes for good. Tickets it already raised stay.')) ?>">
+                                                <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                             </a>
                                         <?php } ?>
                                     </div>
@@ -400,13 +400,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
     </form>
     <?php
     $empty_state = [
-        'thing' => 'recurring tickets',
+        'thing' => __('recurring tickets'),
         'icon' => 'fa-redo-alt',
         'filtered' => $q !== '' || $category_filter || $agent_filter || $client || $billable_filter !== null,
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['missed', 'unassigned']),
-        'text' => 'A monthly maintenance visit or a quarterly backup test is a good first one.',
-        'actions' => $can_edit ? [['label' => 'New Recurring Ticket', 'modal' => "modals/recurring_ticket/recurring_ticket_add.php?$client_url", 'size' => 'lg']] : [],
+        'text' => __('A monthly maintenance visit or a quarterly backup test is a good first one.'),
+        'actions' => $can_edit ? [['label' => __('New Recurring Ticket'), 'modal' => "modals/recurring_ticket/recurring_ticket_add.php?$client_url", 'size' => 'lg']] : [],
     ];
     require_once '../includes/filter_footer.php';
     ?>

@@ -34,7 +34,7 @@ if (!empty($canned_picker_groups) || intval($canned_picker_ticket_id) > 0) { ?>
         <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" data-canned-toggle>
             <i class="fas fa-fw fa-comment-dots me-1"></i><?= __('Canned response') ?>
         </button>
-        <span class="small text-body-secondary ms-2 d-none d-md-inline">or type <kbd>/</kbd> in the reply</span>
+        <span class="small text-body-secondary ms-2 d-none d-md-inline"><?= __('or type %s in the reply', '<kbd>/</kbd>') ?></span>
         <div class="dropdown-menu p-0 itflow-canned-menu">
             <div class="p-2 border-bottom d-flex align-items-center gap-1">
                 <input type="search" class="form-control form-control-sm" placeholder="<?= escapeHtml(__('Search canned responses...')) ?>" aria-label="<?= escapeHtml(__('Search canned responses')) ?>" autocomplete="off" data-canned-search>

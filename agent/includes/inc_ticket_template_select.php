@@ -26,7 +26,7 @@
 $selected_ticket_template_id = intval($selected_ticket_template_id ?? 0);
 $ticket_template_field = $ticket_template_field ?? 'ticket_template_id';
 $ticket_template_apply_on_load = !empty($ticket_template_apply_on_load);
-$ticket_template_hint = $ticket_template_hint ?? 'Picking one fills in the ticket - change anything before it is made. <span class="font-monospace">[Client]</span>, <span class="font-monospace">[Month]</span> and the like are filled in when it is saved.';
+$ticket_template_hint = $ticket_template_hint ?? __('Picking one fills in the ticket - change anything before it is made. %1$s, %2$s and the like are filled in when it is saved.', '<span class="font-monospace">[Client]</span>', '<span class="font-monospace">[Month]</span>');
 
 $ticket_template_fill_in_values = $ticket_template_fill_in_values ?? [];
 
@@ -62,23 +62,23 @@ while ($row = mysqli_fetch_row($sql_ticket_template_tags)) {
                 $tasks = $ticket_template_tasks[$id] ?? [];
                 $fill_ins = ticketTemplateFillIns($row, $tasks, $ticket_template_fill_in_rows[$id] ?? []);
                 // A second line saying what it sets up, and what it is for
-                $about = [count($tasks) . ' task' . (count($tasks) === 1 ? '' : 's')];
+                $about = [_n('%d task', '%d tasks', count($tasks))];
                 if ($fill_ins) {
-                    $about[] = count($fill_ins) . ' fill-in' . (count($fill_ins) === 1 ? '' : 's');
+                    $about[] = _n('%d fill-in', '%d fill-ins', count($fill_ins));
                 }
                 if (!empty($row['ticket_template_priority'])) {
-                    $about[] = $row['ticket_template_priority'];
+                    $about[] = ticketPriorityLabel($row['ticket_template_priority']);
                 }
                 if (!empty($row['category_name'])) {
                     $about[] = $row['category_name'];
                 }
                 if (intval($row['ticket_template_due_hours'])) {
-                    $about[] = 'due in ' . ticketTemplateDueText($row['ticket_template_due_hours']);
+                    $about[] = __('due in %s', ticketTemplateDueText($row['ticket_template_due_hours']));
                 }
                 $description = trim((string) $row['ticket_template_description']);
                 $data = ticketTemplatePickerData($row, $tasks, $ticket_template_tags[$id] ?? [], $fill_ins);
                 ?>
-                <option value="<?= $id ?>" <?= $selected_ticket_template_id === $id ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cube', 'description' => implode(' · ', $about) . ($description !== '' ? " - $description" : ''), 'keywords' => $description]) ?><?php foreach ($data as $key => $value) { ?> data-template-<?= $key ?>="<?= escapeHtml($value) ?>"<?php } ?>><?= escapeHtml($row['ticket_template_name']) ?><?= $row['ticket_template_archived_at'] ? ' (archived)' : '' ?></option>
+                <option value="<?= $id ?>" <?= $selected_ticket_template_id === $id ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cube', 'description' => implode(' · ', $about) . ($description !== '' ? " - $description" : ''), 'keywords' => $description]) ?><?php foreach ($data as $key => $value) { ?> data-template-<?= $key ?>="<?= escapeHtml($value) ?>"<?php } ?>><?= escapeHtml($row['ticket_template_archived_at'] ? __('%s (archived)', $row['ticket_template_name']) : $row['ticket_template_name']) ?></option>
             <?php } ?>
         </select>
     </div>

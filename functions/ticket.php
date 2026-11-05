@@ -1633,6 +1633,21 @@ function recurringTicketFrequency($frequency) {
     return '';
 }
 
+/** A stored frequency ('Weekly') as shown, in the interface language - escaped. */
+function recurringTicketFrequencyLabel($frequency) {
+    $labels = [
+        'Three Days' => _x('Three Days', 'recurring frequency'),
+        'Weekly' => _x('Weekly', 'recurring frequency'),
+        'Biweekly' => _x('Biweekly', 'recurring frequency'),
+        'Monthly' => _x('Monthly', 'recurring frequency'),
+        'Quarterly' => _x('Quarterly', 'recurring frequency'),
+        'Biannually' => _x('Biannually', 'recurring frequency'),
+        'Annually' => _x('Annually', 'recurring frequency'),
+    ];
+    $known = recurringTicketFrequency($frequency);
+    return escapeHtml($known !== '' ? $labels[$known] : (string) $frequency);
+}
+
 /**
  * The next run after $after (today by default), stepping from the run that
  * was due. Month-based schedules keep to the day of the month the run that
@@ -1676,7 +1691,14 @@ function recurringTicketCadenceText($row) {
     }
     $step = RECURRING_TICKET_FREQUENCIES[$frequency];
     if (isset($step['days'])) {
-        return $step['days'] === 7 ? 'on ' . $next->format('l') . 's' : ($step['days'] === 14 ? 'every other ' . $next->format('l') : 'every three days');
+        $weekday = intval($next->format('N'));
+        if ($step['days'] === 7) {
+            return [1 => __('on Mondays'), __('on Tuesdays'), __('on Wednesdays'), __('on Thursdays'), __('on Fridays'), __('on Saturdays'), __('on Sundays')][$weekday];
+        }
+        if ($step['days'] === 14) {
+            return [1 => __('every other Monday'), __('every other Tuesday'), __('every other Wednesday'), __('every other Thursday'), __('every other Friday'), __('every other Saturday'), __('every other Sunday')][$weekday];
+        }
+        return __('every three days');
     }
     $day = intval($next->format('j'));
     $start = DateTime::createFromFormat('!Y-m-d', substr((string) ($row['recurring_ticket_start_date'] ?? ''), 0, 10));
@@ -1684,10 +1706,21 @@ function recurringTicketCadenceText($row) {
         $day = intval($start->format('j'));
     }
     if ($day >= 31 || ($day >= 29 && $day === intval($next->format('t')) && (!$start || intval($start->format('j')) >= 31))) {
-        return 'on the last day of the month';
+        return __('on the last day of the month');
     }
-    $suffix = ($day % 100 >= 11 && $day % 100 <= 13) ? 'th' : (['th', 'st', 'nd', 'rd'][$day % 10] ?? 'th');
-    return "on the $day$suffix";
+    // One entry per English ordinal ending, so each language words it its own way
+    if ($day % 100 >= 11 && $day % 100 <= 13) {
+        return _x('on the %dth', 'day of the month', $day);
+    }
+    switch ($day % 10) {
+        case 1:
+            return _x('on the %dst', 'day of the month', $day);
+        case 2:
+            return _x('on the %dnd', 'day of the month', $day);
+        case 3:
+            return _x('on the %drd', 'day of the month', $day);
+    }
+    return _x('on the %dth', 'day of the month', $day);
 }
 
 /** Is a recurring ticket paused? */
@@ -1698,23 +1731,23 @@ function recurringTicketPaused($row) {
 /** When it runs next, in words - "Today", "Tomorrow", "In 3 days", "Missed - was due 2 days ago", or "Paused". */
 function recurringTicketNextRunText($row) {
     if (recurringTicketPaused($row)) {
-        return ['text' => 'Paused', 'tone' => 'secondary', 'icon' => 'fa-pause'];
+        return ['text' => __('Paused'), 'tone' => 'secondary', 'icon' => 'fa-pause'];
     }
     $next = DateTime::createFromFormat('!Y-m-d', substr((string) $row['recurring_ticket_next_run'], 0, 10));
     if (!$next) {
-        return ['text' => 'Not scheduled', 'tone' => 'secondary', 'icon' => 'fa-question'];
+        return ['text' => __('Not scheduled'), 'tone' => 'secondary', 'icon' => 'fa-question'];
     }
     $days = intval((new DateTime('today'))->diff($next)->format('%r%a'));
     if ($days < 0) {
-        return ['text' => 'Missed - was due ' . ($days === -1 ? 'yesterday' : abs($days) . ' days ago'), 'tone' => 'danger', 'icon' => 'fa-exclamation-triangle'];
+        return ['text' => $days === -1 ? __('Missed - was due yesterday') : __('Missed - was due %d days ago', abs($days)), 'tone' => 'danger', 'icon' => 'fa-exclamation-triangle'];
     }
     if ($days === 0) {
-        return ['text' => 'Today', 'tone' => 'warning', 'icon' => 'fa-clock'];
+        return ['text' => __('Today'), 'tone' => 'warning', 'icon' => 'fa-clock'];
     }
     if ($days === 1) {
-        return ['text' => 'Tomorrow', 'tone' => 'info', 'icon' => 'fa-clock'];
+        return ['text' => __('Tomorrow'), 'tone' => 'info', 'icon' => 'fa-clock'];
     }
-    return ['text' => $days <= 14 ? "In $days days" : timeAgo($next->format('Y-m-d')), 'tone' => $days <= 7 ? 'info' : 'success', 'icon' => 'fa-calendar-alt'];
+    return ['text' => $days <= 14 ? __('In %d days', $days) : timeAgo($next->format('Y-m-d')), 'tone' => $days <= 7 ? 'info' : 'success', 'icon' => 'fa-calendar-alt'];
 }
 
 /** The next run as a soft pill. */
