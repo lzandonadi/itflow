@@ -985,7 +985,7 @@ function ticketTemplatePortalRaise(array $template, $client_id, $contact_id, $us
     $details = (string) $template['ticket_template_details'];
     $notes = trim((string) $notes);
     if ($notes !== '') {
-        $details = '<p><strong>' . escapeHtml($contact_name) . ' added:</strong><br>' . nl2br(escapeHtml($notes)) . '</p>' . $details;
+        $details = '<p><strong>' . __('%s added:', escapeHtml($contact_name)) . '</strong><br>' . nl2br(escapeHtml($notes)) . '</p>' . $details;
     }
     $priority = escapeSql(ticketPriority($template['ticket_template_priority'] ?? ''));
     $category_id = ticketCategoryId($template['ticket_template_category_id']);
@@ -1012,7 +1012,7 @@ function ticketTemplatePortalRaise(array $template, $client_id, $contact_id, $us
     // The agent it goes to hears about it
     if ($assigned_to) {
         $row = ticketRow($ticket_id);
-        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . escapeSql("Ticket " . ticketReference($row) . " - " . $row['ticket_subject'] . " has been assigned to you from the client portal") . "',
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . escapeSql(__('Ticket %1$s - %2$s has been assigned to you from the client portal', ticketReference($row), $row['ticket_subject'])) . "',
             notification_action = '" . escapeSql('/agent/' . ticketUrl($ticket_id, $client_id)) . "', notification_client_id = $client_id, notification_user_id = $assigned_to");
         ticketMailAssigned($assigned_to, [$ticket_id], $contact_name);
     }

@@ -110,7 +110,7 @@ if (isset($_POST['close_ticket']) || isset($_POST['reopen_ticket']) || isset($_P
     $row = ticketByGuestKey($_POST['ticket_id'] ?? 0, $_POST['url_key'] ?? '');
     if (!$row) {
         http_response_code(404);
-        exit("This ticket link isn't working - open it again from the email.");
+        exit(__("This ticket link isn't working - open it again from the email."));
     }
 
     $ticket_id = intval($row['ticket_id']);
@@ -124,10 +124,10 @@ if (isset($_POST['close_ticket']) || isset($_POST['reopen_ticket']) || isset($_P
         if (mysqli_affected_rows($mysqli) === 1) {
             syncTicketSlaClock($ticket_id);
             logTicketHistory($ticket_id, "The client closed the ticket from the guest link");
-            mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket closed by client (guest URL).', ticket_reply_type = 'Internal', ticket_reply_by = 0, ticket_reply_ticket_id = $ticket_id");
+            mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(__('Ticket closed by client (guest URL).')) . "', ticket_reply_type = 'Internal', ticket_reply_by = 0, ticket_reply_ticket_id = $ticket_id");
             logAudit("Ticket", "Edit", "Ticket $reference closed from its guest link", $client_id, $ticket_id);
             triggerCustomAction('ticket_close', $ticket_id);
-            flashAlert("Ticket closed - thank you");
+            flashAlert(__('Ticket closed - thank you'));
         }
 
     } elseif (isset($_POST['reopen_ticket'])) {
@@ -138,12 +138,12 @@ if (isset($_POST['close_ticket']) || isset($_POST['reopen_ticket']) || isset($_P
             resetTicketResolutionSla($ticket_id);
             syncTicketSlaClock($ticket_id);
             logTicketHistory($ticket_id, "The client reopened the ticket from the guest link");
-            mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket reopened by client (guest URL).', ticket_reply_type = 'Internal', ticket_reply_by = 0, ticket_reply_ticket_id = $ticket_id");
+            mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(__('Ticket reopened by client (guest URL).')) . "', ticket_reply_type = 'Internal', ticket_reply_by = 0, ticket_reply_ticket_id = $ticket_id");
             logAudit("Ticket", "Edit", "Ticket $reference reopened from its guest link", $client_id, $ticket_id);
             // Nothing else tells you - no reply came with it
-            appNotify("Ticket", "Ticket $reference was reopened from its guest link - " . escapeSql($row['ticket_subject']), "/agent/ticket.php?ticket_id=$ticket_id" . ($client_id ? "&client_id=$client_id" : ''), $client_id, $ticket_id);
+            appNotify("Ticket", vsprintf(escapeSql(__('Ticket %1$s was reopened from its guest link - %2$s')), [$reference, escapeSql($row['ticket_subject'])]), "/agent/ticket.php?ticket_id=$ticket_id" . ($client_id ? "&client_id=$client_id" : ''), $client_id, $ticket_id);
             triggerCustomAction('ticket_update', $ticket_id);
-            flashAlert("Ticket reopened - now tell us what is still wrong: reply to our email, or give us a call");
+            flashAlert(__('Ticket reopened - now tell us what is still wrong: reply to our email, or give us a call'));
         }
 
     } else {
@@ -154,10 +154,10 @@ if (isset($_POST['close_ticket']) || isset($_POST['reopen_ticket']) || isset($_P
         if (mysqli_affected_rows($mysqli) === 1) {
             logTicketHistory($ticket_id, "The client rated the ticket " . ($feedback === 'Bad' ? 'not good' : 'good') . " from the guest link");
             if ($feedback === 'Bad') {
-                appNotify("Feedback", "Guest rated ticket number $reference (ID: $ticket_id) as bad", "/agent/ticket.php?ticket_id=$ticket_id" . ($client_id ? "&client_id=$client_id" : ''), $client_id, $ticket_id);
+                appNotify("Feedback", vsprintf(escapeSql(__('Guest rated ticket number %1$s (ID: %2$d) as bad')), [$reference, $ticket_id]), "/agent/ticket.php?ticket_id=$ticket_id" . ($client_id ? "&client_id=$client_id" : ''), $client_id, $ticket_id);
             }
             triggerCustomAction('ticket_feedback', $ticket_id);
-            flashAlert("Feedback recorded - thank you");
+            flashAlert(__('Feedback recorded - thank you'));
         }
 
     }
@@ -176,7 +176,7 @@ if (isset($_GET['ticket_calendar'])) {
     $row = ticketByGuestKey($_GET['ticket_calendar'], $_GET['url_key'] ?? '');
     if (!$row || empty($row['ticket_schedule']) || !ticketIsOpen($row)) {
         http_response_code(404);
-        exit('Nothing is booked on this ticket.');
+        exit(__('Nothing is booked on this ticket.'));
     }
 
     $ics = ticketScheduleIcs(ticketScheduleRow($row['ticket_id']), $row['ticket_schedule']);
@@ -205,19 +205,19 @@ if (isset($_GET['approve_ticket_task'])) {
     $ticket_id = intval($approval_row['task_ticket_id']);
 
     if (!$approval_row) {
-        exit("Cannot find/approve that task");
+        exit(__('Cannot find/approve that task'));
     }
 
     // Approve
     mysqli_query($mysqli, "UPDATE task_approvals SET approval_status = 'approved', approval_approved_by = $required_user WHERE approval_id = $approval_id AND approval_task_id = $task_id AND approval_url_key = '$url_key' AND approval_status = 'pending'");
 
     // Notify tech
-    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = 'Guest approved ticket task $task_name', notification_action = 'ticket.php?ticket_id=$ticket_id', notification_user_id = $created_by");
+    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . vsprintf(escapeSql(__('Guest approved ticket task %s')), [$task_name]) . "', notification_action = 'ticket.php?ticket_id=$ticket_id', notification_user_id = $created_by");
 
     // Logging
     logAudit("Task", "Edit", "Guest user approved task $task_name via link (approval $approval_id)", 0, $task_id);
 
-    flashAlert("Task Approved");
+    flashAlert(__('Task Approved'));
     redirect();
 
 }

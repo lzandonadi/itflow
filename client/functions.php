@@ -278,21 +278,21 @@ function portalTicketScopeSql($mine_only = false) {
  */
 function portalTicketState($row) {
     if (!empty($row['ticket_closed_at'])) {
-        return ['key' => 'closed', 'label' => 'Closed', 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'closed', 'label' => _x('Closed', 'portal ticket state'), 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-closed'];
     }
     if (!empty($row['ticket_resolved_at'])) {
-        return ['key' => 'resolved', 'label' => 'Resolved', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+        return ['key' => 'resolved', 'label' => _x('Resolved', 'portal ticket state'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
     }
     if (($row['ticket_last_spoke'] ?? null) === 'Public') {
-        return ['key' => 'you', 'label' => 'Waiting on you', 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
+        return ['key' => 'you', 'label' => _x('Waiting on you', 'portal ticket state'), 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
     }
     if (intval($row['ticket_status_pauses_sla'] ?? 0) === 1) {
-        return ['key' => 'hold', 'label' => $row['ticket_status_name'] ?: 'On hold', 'icon' => 'fa-pause', 'class' => 'itflow-portal-state-hold'];
+        return ['key' => 'hold', 'label' => !empty($row['ticket_status_name']) ? ticketStatusLabel(intval($row['ticket_status'] ?? 0), $row['ticket_status_name']) : _x('On hold', 'portal ticket state'), 'icon' => 'fa-pause', 'class' => 'itflow-portal-state-hold'];
     }
     if (intval($row['ticket_status'] ?? 0) === 1 && empty($row['ticket_last_spoke'])) {
-        return ['key' => 'new', 'label' => 'Received', 'icon' => 'fa-inbox', 'class' => 'itflow-portal-state-new'];
+        return ['key' => 'new', 'label' => _x('Received', 'portal ticket state'), 'icon' => 'fa-inbox', 'class' => 'itflow-portal-state-new'];
     }
-    return ['key' => 'progress', 'label' => 'In progress', 'icon' => 'fa-tools', 'class' => 'itflow-portal-state-progress'];
+    return ['key' => 'progress', 'label' => _x('In progress', 'portal ticket state'), 'icon' => 'fa-tools', 'class' => 'itflow-portal-state-progress'];
 }
 
 /** The state as a badge. */
@@ -305,11 +305,11 @@ function portalTicketStateHtml($row) {
 function portalTicketTabs() {
     $spoke = ticketLastSpokeSql();
     return [
-        'open' => ['label' => 'Open', 'icon' => 'fa-folder-open', 'where' => TICKET_OPEN_SQL],
-        'you' => ['label' => 'Waiting on you', 'icon' => 'fa-reply', 'where' => TICKET_OPEN_SQL . " AND $spoke = 'Public'"],
-        'resolved' => ['label' => 'Resolved', 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL AND tickets.ticket_closed_at IS NULL'],
-        'closed' => ['label' => 'Closed', 'icon' => 'fa-check-circle', 'where' => 'tickets.ticket_closed_at IS NOT NULL'],
-        'all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1'],
+        'open' => ['label' => _x('Open', 'portal tickets tab'), 'icon' => 'fa-folder-open', 'where' => TICKET_OPEN_SQL],
+        'you' => ['label' => _x('Waiting on you', 'portal ticket state'), 'icon' => 'fa-reply', 'where' => TICKET_OPEN_SQL . " AND $spoke = 'Public'"],
+        'resolved' => ['label' => _x('Resolved', 'portal tickets tab'), 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL AND tickets.ticket_closed_at IS NULL'],
+        'closed' => ['label' => _x('Closed', 'portal tickets tab'), 'icon' => 'fa-check-circle', 'where' => 'tickets.ticket_closed_at IS NOT NULL'],
+        'all' => ['label' => _x('All', 'portal tickets tab'), 'icon' => 'fa-list', 'where' => '1 = 1'],
     ];
 }
 
@@ -332,7 +332,7 @@ function portalHtmlIsEmpty($html) {
 /** The reply lines the portal writes itself when a contact resolves, reopens or closes - shown as a line in the conversation, not a message. */
 function portalTicketEventText($html) {
     $text = trim(html_entity_decode(strip_tags((string) $html), ENT_QUOTES, 'UTF-8'));
-    return preg_match('/^Ticket (resolved|reopened|closed) by .{1,200}\.$/', $text) ? $text : '';
+    return ticketIsClientEventLine($text) ? $text : '';
 }
 
 /*

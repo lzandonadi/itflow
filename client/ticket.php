@@ -36,10 +36,10 @@ $ticket = $ticket_id ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT " . port
 
 if (!$ticket) {
     ?>
-    <a class="itflow-portal-back" href="tickets.php"><i class="fas fa-chevron-left"></i>Tickets</a>
+    <a class="itflow-portal-back" href="tickets.php"><i class="fas fa-chevron-left"></i><?= __('Tickets') ?></a>
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => "That ticket isn't here", 'text' => 'It may belong to someone else at your company, or the link is out of date.', 'icon' => 'fa-life-ring', 'filtered' => false,
-            'actions' => [['label' => 'Your tickets', 'href' => 'tickets.php', 'icon' => 'fa-list']]]) ?>
+        <?= emptyStateHtml(['title' => __("That ticket isn't here"), 'text' => __('It may belong to someone else at your company, or the link is out of date.'), 'icon' => 'fa-life-ring', 'filtered' => false,
+            'actions' => [['label' => __('Your tickets'), 'href' => 'tickets.php', 'icon' => 'fa-list']]]) ?>
     </section>
     <?php
     require_once "includes/footer.php";
@@ -92,7 +92,7 @@ function portalMessageHtml($name, $avatar_url, $when, $body_html, array $files, 
     $html = '<div class="itflow-portal-msg' . ($mine ? ' itflow-portal-msg-mine' : '') . '">'
         . portalAvatarHtml($name, $avatar_url, 'lg')
         . '<div class="itflow-portal-msg-body">'
-        . '<div class="itflow-portal-msg-head"><strong>' . escapeHtml($mine ? 'You' : $name) . '</strong>'
+        . '<div class="itflow-portal-msg-head"><strong>' . escapeHtml($mine ? __('You') : $name) . '</strong>'
         . ($agent ? '<span>' . escapeHtml($GLOBALS['session_company_name']) . '</span>' : '')
         . '<span title="' . escapeHtml($when) . '">' . portalDateTime($when) . '</span></div>'
         . '<div class="itflow-portal-msg-bubble prettyContent">' . $body_html;
@@ -100,9 +100,9 @@ function portalMessageHtml($name, $avatar_url, $when, $body_html, array $files, 
         $html .= '<div class="itflow-portal-files">';
         foreach ($files as $file) {
             $id = intval($file['ticket_attachment_id']);
-            $html .= '<a class="itflow-portal-file-chip" href="ticket_attachment.php?attachment_id=' . $id . '&amp;action=view" target="_blank" rel="noopener" title="Open">'
+            $html .= '<a class="itflow-portal-file-chip" href="ticket_attachment.php?attachment_id=' . $id . '&amp;action=view" target="_blank" rel="noopener" title="' . escapeHtml(__('Open')) . '">'
                 . '<i class="fas fa-paperclip"></i><span class="text-truncate">' . escapeHtml($file['ticket_attachment_name']) . '</span></a>'
-                . '<a class="itflow-portal-file-chip" href="ticket_attachment.php?attachment_id=' . $id . '" title="Download ' . escapeHtml($file['ticket_attachment_name']) . '" aria-label="Download"><i class="fas fa-download"></i></a>';
+                . '<a class="itflow-portal-file-chip" href="ticket_attachment.php?attachment_id=' . $id . '" title="' . escapeHtml(__('Download %s', $file['ticket_attachment_name'])) . '" aria-label="' . escapeHtml(__('Download')) . '"><i class="fas fa-download"></i></a>';
         }
         $html .= '</div>';
     }
@@ -110,7 +110,7 @@ function portalMessageHtml($name, $avatar_url, $when, $body_html, array $files, 
 }
 
 // Where it has got to: received, in progress, resolved, closed
-$steps = ['Received', 'In progress', 'Resolved', 'Closed'];
+$steps = [_x('Received', 'portal ticket state'), _x('In progress', 'portal ticket state'), _x('Resolved', 'portal ticket state'), _x('Closed', 'portal ticket state')];
 $at = $closed ? 3 : ($resolved ? 2 : ($state['key'] === 'new' ? 0 : 1));
 
 $requester = (string) ($ticket['contact_name'] ?? '');
@@ -118,20 +118,20 @@ $requester_photo = $ticket['contact_photo'] ? "/uploads/clients/$session_client_
 $agent_name = (string) ($ticket['user_name'] ?? '');
 ?>
 
-<a class="itflow-portal-back" href="tickets.php"><i class="fas fa-chevron-left"></i>Tickets</a>
+<a class="itflow-portal-back" href="tickets.php"><i class="fas fa-chevron-left"></i><?= __('Tickets') ?></a>
 
 <div class="itflow-portal-page-head">
     <div class="min-w-0">
         <h1><?= escapeHtml($ticket['ticket_subject']) ?></h1>
         <p>
-            <?= escapeHtml($number) ?> · opened <?= portalDateTime($ticket['ticket_created_at']) ?>
-            <?php if ($requester !== '') { ?>by <?= intval($ticket['ticket_contact_id']) === $session_contact_id ? 'you' : escapeHtml($requester) ?><?php } ?>
+            <?= escapeHtml($number) ?> ·
+            <?php if ($requester === '') { ?><?= __('opened %s', portalDateTime($ticket['ticket_created_at'])) ?><?php } elseif (intval($ticket['ticket_contact_id']) === $session_contact_id) { ?><?= __('opened %s by you', portalDateTime($ticket['ticket_created_at'])) ?><?php } else { ?><?= __('opened %1$s by %2$s', portalDateTime($ticket['ticket_created_at']), escapeHtml($requester)) ?><?php } ?>
         </p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
         <?= portalTicketStateHtml($ticket) ?>
         <?php if (!$resolved && !$closed && $task_count === $task_done) { ?>
-            <a href="post.php?resolve_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-outline-success confirm-link" data-confirm-title="Is it fixed?" data-confirm-text="We will mark it resolved - you can reopen it if it comes back." data-confirm-button="Yes, it is fixed" data-confirm-icon="question"><i class="fas fa-check me-2"></i>It's fixed</a>
+            <a href="post.php?resolve_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-outline-success confirm-link" data-confirm-title="<?= escapeHtml(__('Is it fixed?')) ?>" data-confirm-text="<?= escapeHtml(__('We will mark it resolved - you can reopen it if it comes back.')) ?>" data-confirm-button="<?= escapeHtml(__('Yes, it is fixed')) ?>" data-confirm-icon="question"><i class="fas fa-check me-2"></i><?= __('It\'s fixed') ?></a>
         <?php } ?>
     </div>
 </div>
@@ -142,7 +142,7 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
         <section class="itflow-portal-panel itflow-portal-panel-body mb-4">
             <ol class="itflow-portal-steps">
                 <?php foreach ($steps as $i => $step) { ?>
-                    <li class="<?= $i < $at ? 'done' : ($i === $at ? 'current' : '') ?>"><?= $i === 1 && $state['key'] === 'you' ? 'Waiting on you' : ($i === 1 && $state['key'] === 'hold' ? escapeHtml($state['label']) : $step) ?></li>
+                    <li class="<?= $i < $at ? 'done' : ($i === $at ? 'current' : '') ?>"><?= escapeHtml($i === 1 && ($state['key'] === 'you' || $state['key'] === 'hold') ? $state['label'] : $step) ?></li>
                 <?php } ?>
             </ol>
         </section>
@@ -150,7 +150,7 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
         <?php if ($approvals) { ?>
             <section class="itflow-portal-panel mb-4">
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-clipboard-check"></i>Waiting for your approval</h2>
+                    <h2><i class="fas fa-clipboard-check"></i><?= __('Waiting for your approval') ?></h2>
                 </div>
                 <ul class="itflow-portal-list">
                     <?php foreach ($approvals as $approval) { ?>
@@ -158,10 +158,10 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
                             <span class="itflow-portal-todo-icon"><i class="fas fa-clipboard-check"></i></span>
                             <span class="itflow-portal-todo-main">
                                 <div><?= escapeHtml($approval['task_name']) ?></div>
-                                <div><?= $approval['can_approve'] ? 'We need your go-ahead before we do this' : 'Your ' . escapeHtml($approval['approval_type']) . ' contact needs to approve this' ?></div>
+                                <div><?= $approval['can_approve'] ? __('We need your go-ahead before we do this') : escapeHtml(['technical' => __('Your technical contact needs to approve this'), 'billing' => __('Your billing contact needs to approve this')][$approval['approval_type']] ?? __('Your %s contact needs to approve this', $approval['approval_type'])) ?></div>
                             </span>
                             <?php if ($approval['can_approve']) { ?>
-                                <a class="btn btn-sm btn-success confirm-link" href="post.php?approve_ticket_task=<?= intval($approval['task_id']) ?>&approval_id=<?= intval($approval['approval_id']) ?>&approval_url_key=<?= escapeHtml(urlencode($approval['approval_url_key'])) ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-check me-1"></i>Approve</a>
+                                <a class="btn btn-sm btn-success confirm-link" href="post.php?approve_ticket_task=<?= intval($approval['task_id']) ?>&approval_id=<?= intval($approval['approval_id']) ?>&approval_url_key=<?= escapeHtml(urlencode($approval['approval_url_key'])) ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-check me-1"></i><?= __('Approve') ?></a>
                             <?php } ?>
                         </li>
                     <?php } ?>
@@ -170,7 +170,7 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
         <?php } ?>
 
         <div class="itflow-portal-thread mb-4">
-            <?= portalMessageHtml($requester ?: 'Request', $requester_photo, $ticket['ticket_created_at'], $purifier->purify($ticket['ticket_details']),
+            <?= portalMessageHtml($requester ?: __('Request'), $requester_photo, $ticket['ticket_created_at'], $purifier->purify($ticket['ticket_details']),
                 $attachments[0] ?? [], intval($ticket['ticket_contact_id']) === $session_contact_id, false) ?>
 
             <?php while ($reply = mysqli_fetch_assoc($replies)) {
@@ -181,7 +181,7 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
                     <?php continue;
                 }
                 if ($client_reply) {
-                    $name = (string) ($reply['contact_name'] ?: 'You');
+                    $name = (string) ($reply['contact_name'] ?: __('You'));
                     $photo = $reply['contact_photo'] ? "/uploads/clients/$session_client_id/" . $reply['contact_photo'] : '';
                     $mine = intval($reply['ticket_reply_by']) === $session_contact_id;
                 } else {
@@ -198,51 +198,51 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
 
             <section class="itflow-portal-panel" id="reply">
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-reply"></i><?= $state['key'] === 'you' ? 'Reply - we are waiting on you' : 'Add a reply' ?></h2>
+                    <h2><i class="fas fa-reply"></i><?= $state['key'] === 'you' ? __('Reply - we are waiting on you') : __('Add a reply') ?></h2>
                 </div>
                 <form class="itflow-portal-panel-body" action="post.php" enctype="multipart/form-data" method="post" data-portal-once>
                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                     <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
                     <div class="mb-3">
-                        <textarea class="form-control tinymce" name="comment" placeholder="Write your reply" data-required></textarea>
-                        <div class="invalid-feedback d-block" data-editor-required-note hidden>Write a reply first.</div>
+                        <textarea class="form-control tinymce" name="comment" placeholder="<?= escapeHtml(__('Write your reply')) ?>" data-required></textarea>
+                        <div class="invalid-feedback d-block" data-editor-required-note hidden><?= __('Write a reply first.') ?></div>
                     </div>
                     <div class="itflow-portal-drop mb-3" data-portal-drop>
                         <input type="file" name="file[]" multiple id="replyFiles" accept=".jpg, .jpeg, .gif, .png, .webp, .pdf, .txt, .md, .doc, .docx, .odt, .csv, .xls, .xlsx, .ods, .pptx, .odp, .zip, .tar, .gz, .xml, .msg, .json, .wav, .mp3, .ogg, .mov, .mp4, .av1, .ovpn">
-                        <i class="fas fa-paperclip me-2"></i>Drop files here, or <label for="replyFiles">choose files</label> - screenshots, documents, error logs
+                        <i class="fas fa-paperclip me-2"></i><?= __('Drop files here, or %s - screenshots, documents, error logs', '<label for="replyFiles">' . __('choose files') . '</label>') ?>
                         <div class="itflow-portal-files" data-portal-files hidden></div>
                     </div>
-                    <button type="submit" class="btn btn-primary" name="add_ticket_comment"><i class="fas fa-paper-plane me-2"></i>Send reply</button>
+                    <button type="submit" class="btn btn-primary" name="add_ticket_comment"><i class="fas fa-paper-plane me-2"></i><?= __('Send reply') ?></button>
                 </form>
             </section>
 
         <?php } elseif (!$closed) { ?>
 
             <section class="itflow-portal-panel">
-                <?= emptyStateHtml(['title' => 'We think this is fixed', 'text' => 'Close it if everything is working - or reopen it if it is not, and tell us what is still wrong.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+                <?= emptyStateHtml(['title' => __('We think this is fixed'), 'text' => __('Close it if everything is working - or reopen it if it is not, and tell us what is still wrong.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
                 <div class="d-flex flex-wrap justify-content-center gap-2 pb-4 px-3">
-                    <a href="post.php?close_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-success confirm-link" data-confirm-title="Close this ticket?" data-confirm-text="Glad it is sorted. You can raise a new ticket any time." data-confirm-button="Close it" data-confirm-icon="question"><i class="fas fa-check-circle me-2"></i>Yes, close it</a>
-                    <a href="post.php?reopen_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-outline-secondary"><i class="fas fa-redo me-2"></i>No, reopen it</a>
+                    <a href="post.php?close_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-success confirm-link" data-confirm-title="<?= escapeHtml(__('Close this ticket?')) ?>" data-confirm-text="<?= escapeHtml(__('Glad it is sorted. You can raise a new ticket any time.')) ?>" data-confirm-button="<?= escapeHtml(__('Close it')) ?>" data-confirm-icon="question"><i class="fas fa-check-circle me-2"></i><?= __('Yes, close it') ?></a>
+                    <a href="post.php?reopen_ticket=<?= $ticket_id ?>&csrf_token=<?= $csrf ?>" class="btn btn-outline-secondary"><i class="fas fa-redo me-2"></i><?= __('No, reopen it') ?></a>
                 </div>
             </section>
 
         <?php } elseif (empty($ticket['ticket_feedback'])) { ?>
 
             <section class="itflow-portal-panel">
-                <?= emptyStateHtml(['title' => 'How did we do?', 'text' => 'One click tells us how this one went.', 'icon' => 'fa-star', 'filtered' => false]) ?>
+                <?= emptyStateHtml(['title' => __('How did we do?'), 'text' => __('One click tells us how this one went.'), 'icon' => 'fa-star', 'filtered' => false]) ?>
                 <form action="post.php" method="post" class="d-flex flex-wrap justify-content-center gap-2 pb-4 px-3">
                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                     <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
-                    <button type="submit" class="btn btn-outline-success" name="add_ticket_feedback" value="Good"><i class="far fa-smile me-2"></i>Good</button>
-                    <button type="submit" class="btn btn-outline-danger" name="add_ticket_feedback" value="Bad"><i class="far fa-frown me-2"></i>Not good</button>
+                    <button type="submit" class="btn btn-outline-success" name="add_ticket_feedback" value="Good"><i class="far fa-smile me-2"></i><?= __('Good') ?></button>
+                    <button type="submit" class="btn btn-outline-danger" name="add_ticket_feedback" value="Bad"><i class="far fa-frown me-2"></i><?= __('Not good') ?></button>
                 </form>
             </section>
 
         <?php } else { ?>
 
-            <div class="itflow-portal-event"><span>Closed and rated <?= $ticket['ticket_feedback'] === 'Good' ? 'good' : 'not good' ?> - thank you for the feedback.</span></div>
+            <div class="itflow-portal-event"><span><?= $ticket['ticket_feedback'] === 'Good' ? __('Closed and rated good - thank you for the feedback.') : __('Closed and rated not good - thank you for the feedback.') ?></span></div>
             <div class="text-center mt-3">
-                <a class="btn btn-outline-primary" href="ticket_add.php"><i class="fas fa-plus me-2"></i>Raise a new ticket</a>
+                <a class="btn btn-outline-primary" href="ticket_add.php"><i class="fas fa-plus me-2"></i><?= __('Raise a new ticket') ?></a>
             </div>
 
         <?php } ?>
@@ -251,21 +251,21 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
     <div class="col-lg-4">
         <section class="itflow-portal-panel">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-info-circle"></i>Details</h2>
+                <h2><i class="fas fa-info-circle"></i><?= __('Details') ?></h2>
             </div>
             <dl class="itflow-portal-facts itflow-portal-panel-body py-1">
-                <div><dt>Ticket</dt><dd><?= escapeHtml($number) ?></dd></div>
-                <div><dt>Status</dt><dd><?= escapeHtml($state['label']) ?></dd></div>
-                <div><dt>Priority</dt><dd><?= escapeHtml($ticket['ticket_priority']) ?></dd></div>
+                <div><dt><?= __('Ticket') ?></dt><dd><?= escapeHtml($number) ?></dd></div>
+                <div><dt><?= __('Status') ?></dt><dd><?= escapeHtml($state['label']) ?></dd></div>
+                <div><dt><?= __('Priority') ?></dt><dd><?= escapeHtml(ticketPriorityLabel($ticket['ticket_priority'])) ?></dd></div>
                 <?php if (!empty($ticket['category_name'])) { ?>
-                    <div><dt>Category</dt><dd><?= escapeHtml($ticket['category_name']) ?></dd></div>
+                    <div><dt><?= __('Category') ?></dt><dd><?= escapeHtml($ticket['category_name']) ?></dd></div>
                 <?php } ?>
                 <?php if ($requester !== '') { ?>
-                    <div><dt>Raised by</dt><dd><?= escapeHtml($requester) ?></dd></div>
+                    <div><dt><?= __('Raised by') ?></dt><dd><?= escapeHtml($requester) ?></dd></div>
                 <?php } ?>
                 <?php if ($agent_name !== '' && !$closed) { ?>
                     <div>
-                        <dt>Working on it</dt>
+                        <dt><?= __('Working on it') ?></dt>
                         <dd class="d-flex align-items-center justify-content-end gap-2">
                             <?= portalAvatarHtml($agent_name, $ticket['user_avatar'] ? '/uploads/users/' . intval($ticket['ticket_assigned_to']) . '/' . $ticket['user_avatar'] : '', 'sm') ?>
                             <?= escapeHtml($agent_name) ?>
@@ -273,18 +273,18 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
                     </div>
                 <?php } ?>
                 <?php if (!empty($ticket['asset_name'])) { ?>
-                    <div><dt>Device</dt><dd><i class="fas fa-<?= getAssetIcon($ticket['asset_type']) ?> me-1 text-body-secondary"></i><?= escapeHtml($ticket['asset_name']) ?></dd></div>
+                    <div><dt><?= __('Device') ?></dt><dd><i class="fas fa-<?= getAssetIcon($ticket['asset_type']) ?> me-1 text-body-secondary"></i><?= escapeHtml($ticket['asset_name']) ?></dd></div>
                 <?php } ?>
                 <?php if ($task_count && !$closed) { ?>
-                    <div><dt>Tasks</dt><dd><?= $task_done ?> of <?= $task_count ?> done</dd></div>
+                    <div><dt><?= __('Tasks') ?></dt><dd><?= __('%1$d of %2$d done', $task_done, $task_count) ?></dd></div>
                 <?php } ?>
-                <div><dt>Opened</dt><dd><?= portalDateTime($ticket['ticket_created_at']) ?></dd></div>
+                <div><dt><?= __('Opened') ?></dt><dd><?= portalDateTime($ticket['ticket_created_at']) ?></dd></div>
                 <?php if ($closed) { ?>
-                    <div><dt>Closed</dt><dd><?= portalDateTime($ticket['ticket_closed_at']) ?></dd></div>
+                    <div><dt><?= __('Closed') ?></dt><dd><?= portalDateTime($ticket['ticket_closed_at']) ?></dd></div>
                 <?php } elseif ($resolved) { ?>
-                    <div><dt>Resolved</dt><dd><?= portalDateTime($ticket['ticket_resolved_at']) ?></dd></div>
+                    <div><dt><?= __('Resolved') ?></dt><dd><?= portalDateTime($ticket['ticket_resolved_at']) ?></dd></div>
                 <?php } elseif (!empty($ticket['ticket_updated_at'])) { ?>
-                    <div><dt>Last update</dt><dd><?= portalDateTime($ticket['ticket_updated_at']) ?></dd></div>
+                    <div><dt><?= __('Last update') ?></dt><dd><?= portalDateTime($ticket['ticket_updated_at']) ?></dd></div>
                 <?php } ?>
             </dl>
         </section>
@@ -297,12 +297,12 @@ $agent_name = (string) ($ticket['user_name'] ?? '');
         if ($request_answers) { ?>
             <section class="itflow-portal-panel mt-4">
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-clipboard-list"></i>Request details</h2>
+                    <h2><i class="fas fa-clipboard-list"></i><?= __('Request details') ?></h2>
                 </div>
                 <dl class="itflow-portal-facts itflow-portal-panel-body py-1">
                     <?php foreach ($request_answers as $answer) {
                         $answer_text = ticketFillInText($answer); ?>
-                        <div><dt><?= escapeHtml($answer['name']) ?></dt><dd><?= $answer_text !== '' ? escapeHtml($answer_text) : '<span class="text-body-secondary">Not given</span>' ?></dd></div>
+                        <div><dt><?= escapeHtml($answer['name']) ?></dt><dd><?= $answer_text !== '' ? escapeHtml($answer_text) : '<span class="text-body-secondary">' . __('Not given') . '</span>' ?></dd></div>
                     <?php } ?>
                 </dl>
             </section>

@@ -21,7 +21,7 @@ if (!empty($_SESSION['portal_view_as']) && (isset($_GET['exit_view_as']) || isse
     redirect($back);
 }
 if (portalViewingAs() && !isset($_GET['export_statement_pdf'])) {
-    flashAlert("You're viewing the portal as " . escapeHtml($portal_view_as['contact_name']) . " - nothing can be changed", 'error');
+    flashAlert(__("You're viewing the portal as %s - nothing can be changed", escapeHtml($portal_view_as['contact_name'])), 'error');
     redirect();
 }
 
@@ -36,7 +36,7 @@ if (isset($_POST['add_ticket'])) {
     // a page that never loaded it would send them blank
     $raw_details = (string) ($_POST['details'] ?? '');
     if (trim((string) ($_POST['subject'] ?? '')) === '' || portalHtmlIsEmpty($raw_details)) {
-        flashAlert("Give the ticket a subject and tell us what is happening", 'error');
+        flashAlert(__('Give the ticket a subject and tell us what is happening'), 'error');
         redirect('ticket_add.php');
     }
 
@@ -115,7 +115,7 @@ if (isset($_POST['add_ticket_from_form'])) {
     $sees_all = portalSeesAllTickets();
     $template = ticketTemplatePortalForm(intval($_POST['form'] ?? 0), $session_client_id, $sees_all);
     if (!$template) {
-        flashAlert("That request form isn't available any more - tell us what you need here", 'error');
+        flashAlert(__("That request form isn't available any more - tell us what you need here"), 'error');
         redirect('ticket_add.php');
     }
     $template_id = intval($template['ticket_template_id']);
@@ -165,7 +165,7 @@ if (isset($_POST['add_ticket_comment'])) {
     // Nothing but empty paragraphs from the editor is no reply - a picture on
     // its own is
     if (portalHtmlIsEmpty($raw_comment)) {
-        flashAlert("Write a reply first", 'error');
+        flashAlert(__('Write a reply first'), 'error');
         redirect();
     }
 
@@ -331,7 +331,7 @@ if (isset($_GET['approve_ticket_task'])) {
     $ticket_id = intval($approval_row['task_ticket_id']);
 
     if (!$approval_row) {
-        flashAlert("Cannot find/approve that task", 'warning');
+        flashAlert(__('Cannot find/approve that task'), 'warning');
         redirect();
         exit;
     }
@@ -341,13 +341,13 @@ if (isset($_GET['approve_ticket_task'])) {
 
 
     // Notify tech
-    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '$session_contact_email approved ticket task $task_name', notification_action = 'ticket.php?ticket_id=$ticket_id&client_id=$session_client_id', notification_client_id = $session_client_id, notification_user_id = $created_by");
+    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . vsprintf(escapeSql(__('%1$s approved ticket task %2$s')), [$session_contact_email, $task_name]) . "', notification_action = 'ticket.php?ticket_id=$ticket_id&client_id=$session_client_id', notification_client_id = $session_client_id, notification_user_id = $created_by");
     // TODO: Email agent
 
     // Logging
     logAudit("Task", "Edit", "Contact $session_contact_email approved task $task_name (approval $approval_id)", $session_client_id, $task_id);
 
-    flashAlert("Task Approved");
+    flashAlert(__('Task Approved'));
     redirect();
 
 }
@@ -370,7 +370,7 @@ if (isset($_POST['add_ticket_feedback'])) {
         if ($feedback == "Bad") {
             $ticket_details = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_number FROM tickets WHERE ticket_id = $ticket_id LIMIT 1"));
             $ticket_number = intval($ticket_details['ticket_number']);
-            appNotify("Feedback", "$session_contact_name rated ticket $config_ticket_prefix$ticket_number as bad (ID: $ticket_id)", "/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id", $session_client_id, $ticket_id);
+            appNotify("Feedback", vsprintf(escapeSql(__('%1$s rated ticket %2$s as bad (ID: %3$d)')), [$session_contact_name, "$config_ticket_prefix$ticket_number", $ticket_id]), "/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id", $session_client_id, $ticket_id);
         }
 
         // Custom action/notif handler
@@ -407,7 +407,7 @@ if (isset($_GET['resolve_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name resolved the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket resolved by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('resolved', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name marked ticket $ticket_prefix$ticket_number as resolved in the client portal", $session_client_id, $ticket_id);
 
@@ -445,7 +445,7 @@ if (isset($_GET['reopen_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name reopened the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket reopened by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('reopened', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name reopend ticket $ticket_prefix$ticket_number in the client portal", $session_client_id, $ticket_id);
 
@@ -482,7 +482,7 @@ if (isset($_GET['close_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name closed the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket closed by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('closed', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name closed ticket $ticket_prefix$ticket_number in the client portal", $session_client_id, $ticket_id);
 

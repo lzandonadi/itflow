@@ -357,6 +357,41 @@ function ticketEmailSla($ticket_id) {
     ];
 }
 
+/**
+ * The line the portal adds to a ticket when its contact resolves, reopens or
+ * closes it ($action: resolved, reopened, closed), in the interface language -
+ * raw; $name is the contact's, raw. It is kept as written, so
+ * ticketIsClientEventLine() knows it in any language.
+ */
+function ticketClientEventLine($action, $name) {
+    switch ($action) {
+        case 'resolved':
+            return __('Ticket resolved by %s.', $name);
+        case 'reopened':
+            return __('Ticket reopened by %s.', $name);
+    }
+    return __('Ticket closed by %s.', $name);
+}
+
+/** Is this text (no tags) one of ticketClientEventLine()'s lines - in English or any language ITFlow offers, whatever it is in now? */
+function ticketIsClientEventLine($text) {
+    static $pattern = null;
+    if ($pattern === null) {
+        $name = '{{name}}';
+        $lines = [];
+        $was = i18nLocale();
+        foreach (array_keys(i18nLanguages()) as $locale) {
+            i18nSetLocale($locale);
+            foreach (['resolved', 'reopened', 'closed'] as $action) {
+                $lines[] = str_replace(preg_quote($name, '/'), '.{1,200}', preg_quote(ticketClientEventLine($action, $name), '/'));
+            }
+        }
+        i18nSetLocale($was);
+        $pattern = '/^(?:' . implode('|', array_unique($lines)) . ')$/u';
+    }
+    return preg_match($pattern, trim((string) $text)) === 1;
+}
+
 /*
  * The conversation on a ticket, for the end of an email about it
  * (emailHtml()'s history): its public replies newest first, and at the end
@@ -398,7 +433,7 @@ function ticketEmailHistory(array $row, array $opts = []) {
         foreach ($replies as $reply) {
             $text = ticketEmailExcerpt($reply['ticket_reply']);
             $client = $reply['ticket_reply_type'] === 'Client';
-            if ($text === '' || ($client && preg_match('/^Ticket (resolved|reopened|closed) by .{1,200}\.$/', $text))) {
+            if ($text === '' || ($client && ticketIsClientEventLine($text))) {
                 continue;
             }
             if (count($items) >= $limit) {
