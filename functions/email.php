@@ -72,7 +72,7 @@ function emailHtml(array $email) {
 
     $body = '';
     if (array_key_exists('name', $email) && $email['name'] !== null) {
-        $body .= $paragraph(trim((string) $email['name']) !== '' ? 'Hello ' . $email['name'] . ',' : 'Hello,');
+        $body .= $paragraph(trim((string) $email['name']) !== '' ? __('Hello %s,', $email['name']) : __('Hello,'));
     }
     foreach ((array) ($email['intro'] ?? []) as $text_value) {
         $body .= $paragraph($text_value);
@@ -139,7 +139,7 @@ function emailHtml(array $email) {
             . '<a href="' . $e($email['button']['url']) . '" style="display:inline-block;padding:12px 26px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;' . $font . '">' . $e($email['button']['label']) . '</a>'
             . '</td></tr></table>';
         if (!empty($email['button']['show_url'])) {
-            $body .= '<p style="margin:-10px 0 18px;font-size:12px;line-height:1.5;color:' . $muted . ';word-break:break-all;">Or copy this into your browser: ' . $e($email['button']['url']) . '</p>';
+            $body .= '<p style="margin:-10px 0 18px;font-size:12px;line-height:1.5;color:' . $muted . ';word-break:break-all;">' . __('Or copy this into your browser: %s', $e($email['button']['url'])) . '</p>';
         }
     }
     foreach ((array) ($email['after'] ?? []) as $text_value) {
@@ -167,7 +167,7 @@ function emailHtml(array $email) {
                 . '</td></tr></table>';
         }
         $body .= '<div style="margin:8px 0 0;padding-top:16px;border-top:1px solid ' . $line . ';">'
-            . '<div style="margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:' . $muted . ';">' . $e($email['history']['label'] ?? 'Earlier messages') . '</div>'
+            . '<div style="margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:' . $muted . ';">' . $e($email['history']['label'] ?? __('Earlier messages')) . '</div>'
             . $items . '</div>';
     }
 
@@ -391,12 +391,12 @@ function emailQueue(array $recipients, $subject, array $email, array $opts = [])
 /** The test email in Admin > Mail, from one of the mailboxes - system, ticket, invoice or quote. Who it went to - [] when it didn't. */
 function emailTestSend($to, $mailbox) {
     $box = ['ticket' => emailFrom('ticket'), 'invoice' => billingEmailFrom('invoice'), 'quote' => billingEmailFrom('quote')][$mailbox] ?? emailFrom();
-    $which = ['system' => 'the system mailbox', 'ticket' => 'the ticket mailbox', 'invoice' => 'the invoice mailbox', 'quote' => 'the quote mailbox'][$mailbox] ?? 'the system mailbox';
-    return emailQueue([['email' => trim((string) $to), 'greet' => '', 'footnote' => 'You get this because someone sent a test from Admin > Mail in ITFlow.']], 'Test email from ITFlow', [
-        'kind' => 'Test', 'tone' => 'success', 'preview' => "A test from $which",
-        'title' => 'Mail is working',
-        'intro' => ["This is a test email from ITFlow, sent from $which. If you are reading this, it worked."],
-        'summary' => ['From' => trim($box['name'] . ' <' . $box['email'] . '>'), 'To' => trim((string) $to), 'Sent' => date('D j M Y, g:i A')],
+    $which = ['system' => __('the system mailbox'), 'ticket' => __('the ticket mailbox'), 'invoice' => __('the invoice mailbox'), 'quote' => __('the quote mailbox')][$mailbox] ?? __('the system mailbox');
+    return emailQueue([['email' => trim((string) $to), 'greet' => '', 'footnote' => __('You get this because someone sent a test from Admin > Mail in ITFlow.')]], __('Test email from ITFlow'), [
+        'kind' => __('Test'), 'tone' => 'success', 'preview' => __('A test from %s', $which),
+        'title' => __('Mail is working'),
+        'intro' => [__('This is a test email from ITFlow, sent from %s. If you are reading this, it worked.', $which)],
+        'summary' => [__('From') => trim($box['name'] . ' <' . $box['email'] . '>'), __('To') => trim((string) $to), __('Sent') => formatDate(time(), 'datetime_weekday')],
     ], ['from' => ['email' => $box['email'], 'name' => $box['name']]]);
 }
 
@@ -414,27 +414,31 @@ function emailBulkPost(array $recipients, $picked) {
     $at = trim((string) ($_POST['queued_at'] ?? ''));
     $queued_at = $at !== '' && strtotime($at) ? date('Y-m-d H:i:s', strtotime($at)) : '';
     if (!emailReady()) {
-        flashAlert('Outgoing mail is not set up, so nothing was sent', 'error');
+        flashAlert(__('Outgoing mail is not set up, so nothing was sent'), 'error');
         redirect();
     }
     if (!isset(emailMailboxes()[$mailbox])) {
-        flashAlert('Pick the mailbox it comes from', 'error');
+        flashAlert(__('Pick the mailbox it comes from'), 'error');
         redirect();
     }
     if ($subject === '' || trim(strip_tags($body, '<img>')) === '') {
-        flashAlert('Give it a subject and a message - nothing was sent', 'error');
+        flashAlert(__('Give it a subject and a message - nothing was sent'), 'error');
         redirect();
     }
     $sent = emailBulkSend($recipients, $mailbox, $_POST['mail_from_name'] ?? '', $subject, $body, !empty($_POST['greet']), $queued_at);
     $count = count($sent);
     if (!$count) {
-        flashAlert('None of them has an email address, so nothing was sent', 'error');
+        flashAlert(__('None of them has an email address, so nothing was sent'), 'error');
         redirect();
     }
-    $later = $queued_at !== '' && strtotime($queued_at) > time() ? ' to go ' . date('M j \a\t g:i A', strtotime($queued_at)) : '';
+    $later_at = $queued_at !== '' && strtotime($queued_at) > time() ? strtotime($queued_at) : 0;
+    $later = $later_at ? ' to go ' . date('M j \a\t g:i A', $later_at) : '';
     logAudit("Bulk Mail", "Send", "$session_name sent " . escapeSql($subject) . " to $count " . ($count === 1 ? 'contact' : 'contacts') . " via bulk mail" . ($later !== '' ? escapeSql($later) : ''));
     $left_out = max(0, intval($picked) - $count);
-    flashAlert("<strong>$count</strong> email" . ($count === 1 ? '' : 's') . " queued$later" . ($left_out ? " - $left_out left out with no email address, or the same one" : ''));
+    $queued = $later_at
+        ? _n('<strong>%1$d</strong> email queued to go %2$s', '<strong>%1$d</strong> emails queued to go %2$s', $count, $count, __('%1$s at %2$s', formatDate($later_at, 'date_short'), formatDate($later_at, 'time')))
+        : _n('<strong>%d</strong> email queued', '<strong>%d</strong> emails queued', $count);
+    flashAlert($queued . ($left_out ? ' - ' . _n('%d left out with no email address, or the same one', '%d left out with no email address, or the same one', $left_out) : ''));
     redirect();
 }
 

@@ -61,9 +61,9 @@ if ($invite && $link['state'] === 'pending') {
         ], $error);
         if ($contact_id) {
             $first = strtok(trim(preg_replace('/\s+/', ' ', $in['name'])), ' ');
-            $_SESSION['login_message'] = "Welcome, $first - your account is ready. " . (isset($methods[$method]) && $method === 'azure'
-                ? 'Sign in with your Microsoft 365 account below.'
-                : 'Sign in with ' . $invite['invite_email'] . ' and your new password.');
+            $_SESSION['login_message'] = isset($methods[$method]) && $method === 'azure'
+                ? __('Welcome, %s - your account is ready. Sign in with your Microsoft 365 account below.', $first)
+                : __('Welcome, %1$s - your account is ready. Sign in with %2$s and your new password.', $first, $invite['invite_email']);
             $_SESSION['login_message_type'] = 'success';
             header("Location: /login.php");
             exit();
@@ -76,15 +76,15 @@ if ($invite && $link['state'] === 'pending') {
 
 $signup = $invite && $invite['invite_kind'] === 'signup';
 $by = $invite ? portalInviteBy($invite) : '';
-$ask = $by !== '' ? "Ask $by to send it again." : 'Ask your company\'s primary contact or us to invite you.';
+$ask = $by !== '' ? __('Ask %s to send it again.', $by) : __("Ask your company's primary contact or us to invite you.");
 $notes = [
-    'gone' => ["That link doesn't work", 'It may have been copied only in part - or a newer email replaced it, so use the link in the latest one.'],
-    'expired' => ['That link has run out', $signup ? 'Links to finish signing up work for ' . PORTAL_SIGNUP_LINK_HOURS . ' hours - ask for a new one.' : 'Invites work for ' . PORTAL_INVITE_LINK_DAYS . " days. $ask"],
-    'accepted' => ["You've joined already", 'Sign in with ' . ($invite['invite_email'] ?? 'your email address') . '. Forgot your password? Choose Forgot password on the sign-in page.'],
-    'cancelled' => ['That invite was cancelled', $ask],
+    'gone' => [__("That link doesn't work"), __('It may have been copied only in part - or a newer email replaced it, so use the link in the latest one.')],
+    'expired' => [__('That link has run out'), $signup ? _n('Links to finish signing up work for %d hour - ask for a new one.', 'Links to finish signing up work for %d hours - ask for a new one.', PORTAL_SIGNUP_LINK_HOURS) : _n('Invites work for %d day.', 'Invites work for %d days.', PORTAL_INVITE_LINK_DAYS) . " $ask"],
+    'accepted' => [__("You've joined already"), (isset($invite['invite_email']) ? __('Sign in with %s.', $invite['invite_email']) : __('Sign in with your email address.')) . ' ' . __('Forgot your password? Choose Forgot password on the sign-in page.')],
+    'cancelled' => [__('That invite was cancelled'), $ask],
 ];
 $state = $link['state'];
-$title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invite['client_name']) : $notes[$state][0];
+$title = $state === 'pending' ? ($signup ? __('Finish signing up') : __('Join %s', $invite['client_name'])) : $notes[$state][0];
 ?>
 <!DOCTYPE html>
 <html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
@@ -106,7 +106,7 @@ $title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invi
 <div class="login-box itflow-join-box">
     <div class="login-logo">
         <?php if (!empty($company['company_logo'])) { ?>
-            <img alt="<?= escapeHtml($company_name) ?> logo" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
+            <img alt="<?= escapeHtml(__('%s logo', $company_name)) ?>" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
         <?php } else { ?>
             <span class="fw-semibold"><?= escapeHtml($company_name) ?></span>
         <?php } ?>
@@ -120,9 +120,11 @@ $title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invi
                 <h1 class="h5 mb-1" data-join="<?= $signup ? 'signup' : 'invite' ?>"><?= escapeHtml($title) ?></h1>
                 <p class="text-body-secondary small mb-3">
                     <?php if ($signup) { ?>
-                        Your client portal account for <?= escapeHtml($invite['client_name']) ?>, as <strong><?= escapeHtml($invite['invite_email']) ?></strong>.
+                        <?= __('Your client portal account for %1$s, as <strong>%2$s</strong>.', escapeHtml($invite['client_name']), escapeHtml($invite['invite_email'])) ?>
                     <?php } else { ?>
-                        <?= $by !== '' ? escapeHtml($by) . ' invited' : 'You are invited as' ?> <strong><?= escapeHtml($invite['invite_email']) ?></strong> to the <?= escapeHtml($company_name) ?> client portal - where you raise and follow support tickets.
+                        <?= $by !== ''
+                            ? __('%1$s invited <strong>%2$s</strong> to the %3$s client portal - where you raise and follow support tickets.', escapeHtml($by), escapeHtml($invite['invite_email']), escapeHtml($company_name))
+                            : __('You are invited as <strong>%1$s</strong> to the %2$s client portal - where you raise and follow support tickets.', escapeHtml($invite['invite_email']), escapeHtml($company_name)) ?>
                     <?php } ?>
                 </p>
 
@@ -137,21 +139,21 @@ $title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invi
                     <input type="hidden" name="method" value="local">
                     <input type="text" class="d-none" name="username" value="<?= escapeHtml($invite['invite_email']) ?>" autocomplete="username" aria-hidden="true" tabindex="-1">
 
-                    <label class="form-label small mb-1" for="joinName">Your name <strong class="text-danger">*</strong></label>
+                    <label class="form-label small mb-1" for="joinName"><?= __('Your name') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
                         <input type="text" class="form-control" id="joinName" name="name" value="<?= escapeHtml($in['name']) ?>" maxlength="200" autocomplete="name" required<?= $in['name'] === '' ? ' autofocus' : '' ?>>
                     </div>
                     <div class="row g-2">
                         <div class="col-sm-6">
-                            <label class="form-label small mb-1" for="joinTitle">Job title</label>
+                            <label class="form-label small mb-1" for="joinTitle"><?= __('Job title') ?></label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fas fa-fw fa-id-badge"></i></span>
                                 <input type="text" class="form-control" id="joinTitle" name="title" value="<?= escapeHtml($in['title']) ?>" maxlength="200" autocomplete="organization-title">
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <label class="form-label small mb-1" for="joinPhone">Phone</label>
+                            <label class="form-label small mb-1" for="joinPhone"><?= __('Phone') ?></label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text"><i class="fas fa-fw fa-phone"></i></span>
                                 <input type="tel" class="form-control" id="joinPhone" name="phone" value="<?= escapeHtml($in['phone']) ?>" maxlength="40" autocomplete="tel">
@@ -159,20 +161,20 @@ $title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invi
                         </div>
                     </div>
 
-                    <label class="form-label small mb-1" for="joinPassword">Choose a password <span class="text-body-secondary">- at least <?= USER_PASSWORD_MIN ?> characters</span></label>
+                    <label class="form-label small mb-1" for="joinPassword"><?= __('Choose a password') ?> <span class="text-body-secondary"><?= __('- at least %d characters', USER_PASSWORD_MIN) ?></span></label>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-lock"></i></span>
                         <input type="password" class="form-control" id="joinPassword" name="new_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required<?= $in['name'] !== '' ? ' autofocus' : '' ?>>
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-check-double"></i></span>
-                        <input type="password" class="form-control" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" placeholder="The same again" aria-label="The password again" required>
+                        <input type="password" class="form-control" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" placeholder="<?= escapeHtml(__('The same again')) ?>" aria-label="<?= escapeHtml(__('The password again')) ?>" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="fas fa-check me-2"></i><?= $signup ? 'Create my account' : 'Join' ?></button>
+                    <button type="submit" class="btn btn-primary w-100 mb-2"><i class="fas fa-check me-2"></i><?= $signup ? __('Create my account') : __('Join') ?></button>
                     <?php if (isset($methods['azure'])) { ?>
-                        <div class="text-center small text-body-secondary my-2">or, with no password here</div>
-                        <button type="submit" class="btn btn-outline-secondary w-100 mb-3" name="method" value="azure" formnovalidate data-join-microsoft><i class="fab fa-microsoft me-2"></i>Use my Microsoft 365 account</button>
+                        <div class="text-center small text-body-secondary my-2"><?= __('or, with no password here') ?></div>
+                        <button type="submit" class="btn btn-outline-secondary w-100 mb-3" name="method" value="azure" formnovalidate data-join-microsoft><i class="fab fa-microsoft me-2"></i><?= __('Use my Microsoft 365 account') ?></button>
                     <?php } ?>
                 </form>
 
@@ -181,14 +183,14 @@ $title = $state === 'pending' ? ($signup ? 'Finish signing up' : 'Join ' . $invi
                 <h1 class="h5 mb-1" data-join-state="<?= escapeHtml($state) ?>"><?= escapeHtml($title) ?></h1>
                 <p class="text-body-secondary small mb-3"><?= escapeHtml($notes[$state][1]) ?></p>
                 <?php if ($state === 'accepted') { ?>
-                    <a class="btn btn-primary w-100 mb-3" href="/login.php"><i class="fas fa-sign-in-alt me-2"></i>Sign in</a>
+                    <a class="btn btn-primary w-100 mb-3" href="/login.php"><i class="fas fa-sign-in-alt me-2"></i><?= __('Sign in') ?></a>
                 <?php } elseif ($signup && portalSignupOpen()) { ?>
-                    <a class="btn btn-primary w-100 mb-3" href="/client/signup.php"><i class="fas fa-paper-plane me-2"></i>Ask for a new link</a>
+                    <a class="btn btn-primary w-100 mb-3" href="/client/signup.php"><i class="fas fa-paper-plane me-2"></i><?= __('Ask for a new link') ?></a>
                 <?php } ?>
 
             <?php } ?>
 
-            <a href="/login.php"><i class="fas fa-arrow-left me-1"></i>Back to sign in</a>
+            <a href="/login.php"><i class="fas fa-arrow-left me-1"></i><?= __('Back to sign in') ?></a>
 
         </div>
     </div>

@@ -76,6 +76,21 @@ function i18nLocale(): string {
     return $state['locale'];
 }
 
+/*
+ * What $build returns, built in English - for a text that is both shown to
+ * people, in the interface language, and written to a log, which stays in
+ * English.
+ */
+function i18nEnglish(callable $build) {
+    $was = i18nLocale();
+    i18nSetLocale('en_US');
+    try {
+        return $build();
+    } finally {
+        i18nSetLocale($was);
+    }
+}
+
 /** The language as HTML wants it in <html lang> (pt-BR). */
 function i18nHtmlLang(): string {
     return str_replace('_', '-', i18nLocale());

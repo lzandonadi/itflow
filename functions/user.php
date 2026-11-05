@@ -190,7 +190,7 @@ function userCheckRole($role_id, $current_role_id, &$error = '') {
 /** Is this a password ITFlow takes? '' when it is, the reason when not. */
 function userPasswordProblem($password) {
     if (strlen((string) $password) < USER_PASSWORD_MIN) {
-        return 'A password is at least ' . USER_PASSWORD_MIN . ' characters.';
+        return __('A password is at least %d characters.', USER_PASSWORD_MIN);
     }
     return '';
 }
@@ -487,7 +487,7 @@ function userMfaQrSvg($secret, $email) {
     $svg = $generator->render_svg('qr', $uri, ['w' => 200, 'h' => 200, 'p' => 0]);
     // Shown inline in the page, not as an image - the XML prolog has to go, and it scales with its box
     $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', (string) $svg);
-    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="QR code for your authenticator app" ', $svg, 1);
+    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="' . escapeHtml(__('QR code for your authenticator app')) . '" ', $svg, 1);
 }
 
 /** An agent's work not finished - [tickets not closed, recurring tickets] assigned to them. */
@@ -540,12 +540,12 @@ function userMailAppName() {
 /** An agent's own email, sent from the system - their account was changed ($what, raw). Queued; nothing when mail is not set up. */
 function userNotifyChange($name, $email, $what) {
     $app = userMailAppName();
-    emailQueue([['email' => $email, 'name' => $name, 'footnote' => "You get this about your own $app account."]], "$app account update for $name", [
-        'kind' => 'Your account', 'tone' => 'warning', 'preview' => "Your $app account was changed",
-        'title' => 'Your account was changed',
-        'intro' => ["Your $app account was changed: " . $what . '.'],
-        'callout' => "If this was not you, tell your $app administrator straight away.",
-        'button' => ['label' => "Sign in to $app", 'url' => userSignInUrl()],
+    emailQueue([['email' => $email, 'name' => $name, 'footnote' => __('You get this about your own %s account.', $app)]], __('%1$s account update for %2$s', $app, $name), [
+        'kind' => __('Your account'), 'tone' => 'warning', 'preview' => __('Your %s account was changed', $app),
+        'title' => __('Your account was changed'),
+        'intro' => [__('Your %1$s account was changed: %2$s.', $app, $what)],
+        'callout' => __('If this was not you, tell your %s administrator straight away.', $app),
+        'button' => ['label' => __('Sign in to %s', $app), 'url' => userSignInUrl()],
     ]);
 }
 
@@ -559,16 +559,16 @@ function userMailSignInAlert($name, $email, $kind, $ip, $user_agent) {
     $app = userMailAppName();
     $mfa = $kind === 'mfa';
     $device = trim(strip_tags(userDeviceHtml((string) $user_agent)));
-    emailQueue([['email' => $email, 'name' => $name, 'footnote' => "You get this about your own $app account."]],
-        $mfa ? "Important: $app failed 2FA login attempt for $name" : "$app new login for $name", [
-            'kind' => 'Security', 'tone' => $mfa ? 'danger' : 'warning',
-            'preview' => $mfa ? 'Your password was used, but the 2FA code was wrong' : 'A sign in from a new device',
-            'title' => $mfa ? 'Someone used your password' : 'A new sign in to your account',
+    emailQueue([['email' => $email, 'name' => $name, 'footnote' => __('You get this about your own %s account.', $app)]],
+        $mfa ? __('Important: %1$s failed 2FA login attempt for %2$s', $app, $name) : __('%1$s new login for %2$s', $app, $name), [
+            'kind' => __('Security'), 'tone' => $mfa ? 'danger' : 'warning',
+            'preview' => $mfa ? __('Your password was used, but the 2FA code was wrong') : __('A sign in from a new device'),
+            'title' => $mfa ? __('Someone used your password') : __('A new sign in to your account'),
             'intro' => [$mfa
-                ? "Someone signed in to your $app account with your password, but the multi-factor code was wrong, so they were stopped."
-                : "Someone signed in to your $app account from a device and address it hasn't seen before. If that was you, there is nothing to do."],
-            'summary' => ['When' => date('D j M Y, g:i A'), 'Device' => $device !== '' ? $device : 'Unknown device', 'IP address' => (string) $ip],
-            'callout' => $mfa ? 'If that was not you, your password is known to someone else - change it now.' : 'If that was not you, change your password now and tell your administrator.',
-            'button' => ['label' => 'Review your sign in security', 'url' => "https://$config_base_url/agent/user/user_security.php"],
+                ? __('Someone signed in to your %s account with your password, but the multi-factor code was wrong, so they were stopped.', $app)
+                : __("Someone signed in to your %s account from a device and address it hasn't seen before. If that was you, there is nothing to do.", $app)],
+            'summary' => [__('When') => formatDate(time(), 'datetime_weekday'), __('Device') => $device !== '' ? $device : __('Unknown device'), __('IP address') => (string) $ip],
+            'callout' => $mfa ? __('If that was not you, your password is known to someone else - change it now.') : __('If that was not you, change your password now and tell your administrator.'),
+            'button' => ['label' => __('Review your sign in security'), 'url' => "https://$config_base_url/agent/user/user_security.php"],
         ]);
 }

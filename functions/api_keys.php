@@ -282,11 +282,10 @@ function apiKeyWatch() {
     $count = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM logs WHERE log_type = 'API' AND log_action = 'Failed' AND log_ip = '$ip'
         AND log_created_at > NOW() - INTERVAL " . SIGN_IN_WINDOW_MINUTES . " MINUTE"))[0]);
     if ($count === $limit) {
-        signInAlertAdmins(
-            "$limit API calls turned away from $session_ip",
-            "$limit API calls in " . SIGN_IN_WINDOW_MINUTES . " minutes from $session_ip were turned away - with a key that is wrong or has expired.",
-            ['IP address' => (string) $session_ip],
-            '/admin/audit_logs.php?view=security&q=' . rawurlencode((string) $session_ip)
-        );
+        signInAlertAdmins(fn () => [
+            __('%1$d API calls turned away from %2$s', $limit, $session_ip),
+            __('%1$d API calls in %2$d minutes from %3$s were turned away - with a key that is wrong or has expired.', $limit, SIGN_IN_WINDOW_MINUTES, $session_ip),
+            [__('IP address') => (string) $session_ip],
+        ], '/admin/audit_logs.php?view=security&q=' . rawurlencode((string) $session_ip));
     }
 }

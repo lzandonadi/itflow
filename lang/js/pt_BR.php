@@ -192,4 +192,9 @@ return [
     'Could not draft it.' => 'Não foi possível rascunhar.',
     'Drafted - read it through before it goes. Undo puts back what was there.' => 'Rascunho pronto - leia antes de enviar. Desfazer devolve o que havia antes.',
     'Could not reach ITFlow to draft it - try again.' => 'Não foi possível falar com o ITFlow para rascunhar - tente novamente.',
+
+    // Copy tooltips (agent/user/mfa_enforcement.php)
+    'Copied!' => 'Copiado!',
+    'Failed!' => 'Falhou!',
+
 ];

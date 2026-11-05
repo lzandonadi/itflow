@@ -268,6 +268,7 @@ function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigne
  *   date_short   Nov 5                   5 de nov.                 date('M j')
  *   datetime     Nov 5, 2026, 3:04 PM    5 de nov. de 2026, 15:04  date('M j, Y g:i A')
  *   datetime_short Nov 5, 3:04 PM        5 de nov., 15:04          date('M j, g:i A')
+ *   datetime_weekday Thu, Nov 5, 2026, 3:04 PM  qui., 5 de nov. de 2026, 15:04  date('D j M Y, g:i A')
  *   time         3:04 PM                 15:04                     date('g:i A')
  *   month        Nov                     nov.                      date('M')
  *   month_year   November 2026           novembro de 2026          date('F Y')
@@ -281,6 +282,7 @@ function formatDate($value, string $style = 'date'): string {
         'date_short' => 'MMMd',
         'datetime' => 'yMMMdjmm',
         'datetime_short' => 'MMMdjmm',
+        'datetime_weekday' => 'yMMMEdjmm',
         'time' => 'jmm',
         'month' => 'MMM',
         'month_year' => 'yMMMM',

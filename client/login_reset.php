@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
         }
     }
 
-    $message = "If there is a client portal account for that address, a link to reset its password is on its way. It works for " . PORTAL_RESET_LINK_MINUTES . " minutes.";
+    $message = __('If there is a client portal account for that address, a link to reset its password is on its way.') . ' ' . _n('It works for %d minute.', 'It works for %d minutes.', PORTAL_RESET_LINK_MINUTES);
     $message_type = 'success';
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_set_password'])) {
@@ -85,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
     $password = (string) ($_POST['new_password'] ?? '');
 
     if (!$link_user) {
-        $message = 'That link has run out or has been used already. Ask for a new one below.';
+        $message = __('That link has run out or has been used already.') . ' ' . __('Ask for a new one below.');
     } elseif (($problem = userPasswordProblem($password)) !== '') {
         $message = $problem;
     } elseif ($password !== (string) ($_POST['confirm_password'] ?? '')) {
-        $message = 'The two passwords are not the same - type it again in both.';
+        $message = __('The two passwords are not the same - type it again in both.');
     } else {
         $user_id = intval($link_user['user_id']);
         $hash = escapeSql(password_hash($password, PASSWORD_DEFAULT));
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
         portalPasswordLinkClear($user_id);
         $reset_log('Password Reset', 'Set a new portal password from an emailed link', $user_id, $link['client']);
         portalMailAccountChange($link_user['user_email'], $link_user['contact_name'], 'password_link');
-        $_SESSION['login_message'] = 'Your password is set - sign in with it below.';
+        $_SESSION['login_message'] = __('Your password is set - sign in with it below.');
         $_SESSION['login_message_type'] = 'success';
         header("Location: /login.php");
         exit();
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
     $link = ['email' => (string) ($_GET['email'] ?? ''), 'token' => (string) $_GET['token'], 'client' => intval($_GET['client'] ?? 0)];
     $link_user = portalPasswordLinkUser($link['email'], $link['token'], $link['client']);
     if (!$link_user) {
-        $message = 'That link has run out or has been used already.' . ($can_email ? ' Ask for a new one below.' : ' Ask us for a new one.');
+        $message = __('That link has run out or has been used already.') . ' ' . ($can_email ? __('Ask for a new one below.') : __('Ask us for a new one.'));
     }
 }
 
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
 <html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
-    <title><?= escapeHtml($company_name) ?> | <?= $link_user ? 'Set your password' : 'Reset your password' ?></title>
+    <title><?= escapeHtml($company_name) ?> | <?= $link_user ? __('Set your password') : __('Reset your password') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css">
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
 <div class="login-box">
     <div class="login-logo">
         <?php if (!empty($company['company_logo'])) { ?>
-            <img alt="<?= escapeHtml($company_name) ?> logo" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
+            <img alt="<?= escapeHtml(__('%s logo', $company_name)) ?>" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
         <?php } else { ?>
             <span class="fw-semibold"><?= escapeHtml($company_name) ?></span>
         <?php } ?>
@@ -144,8 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
 
             <?php if ($link_user) { ?>
 
-                <h1 class="h5 mb-1">Set your password</h1>
-                <p class="text-body-secondary small mb-3">For <?= escapeHtml($link_user['user_email']) ?> - at least <?= USER_PASSWORD_MIN ?> characters.</p>
+                <h1 class="h5 mb-1"><?= __('Set your password') ?></h1>
+                <p class="text-body-secondary small mb-3"><?= __('For %1$s - at least %2$d characters.', escapeHtml($link_user['user_email']), USER_PASSWORD_MIN) ?></p>
 
                 <?php if ($message !== '') { ?>
                     <div class="alert alert-<?= $message_type ?> small"><?= escapeHtml($message) ?></div>
@@ -159,20 +159,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
 
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-lock"></i></span>
-                        <input type="password" class="form-control" placeholder="New password" name="new_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" aria-label="New password" required autofocus>
+                        <input type="password" class="form-control" placeholder="<?= escapeHtml(__('New password')) ?>" name="new_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" aria-label="<?= escapeHtml(__('New password')) ?>" required autofocus>
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-check-double"></i></span>
-                        <input type="password" class="form-control" placeholder="The same again" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" aria-label="New password again" required>
+                        <input type="password" class="form-control" placeholder="<?= escapeHtml(__('The same again')) ?>" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" aria-label="<?= escapeHtml(__('New password again')) ?>" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-3" name="password_reset_set_password">Set password</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3" name="password_reset_set_password"><?= __('Set password') ?></button>
                 </form>
 
             <?php } else { ?>
 
-                <h1 class="h5 mb-1">Reset your password</h1>
-                <p class="text-body-secondary small mb-3">For the client portal. Enter the email address you sign in with and we will email you a link.</p>
+                <h1 class="h5 mb-1"><?= __('Reset your password') ?></h1>
+                <p class="text-body-secondary small mb-3"><?= __('For the client portal. Enter the email address you sign in with and we will email you a link.') ?></p>
 
                 <?php if ($message !== '') { ?>
                     <div class="alert alert-<?= $message_type ?> small"><?= escapeHtml($message) ?></div>
@@ -182,17 +182,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
                     <form method="post" autocomplete="off">
                         <div class="input-group mb-3">
                             <span class="input-group-text"><i class="fas fa-fw fa-envelope"></i></span>
-                            <input type="email" class="form-control" placeholder="Email address" name="email" maxlength="200" autocomplete="email" aria-label="Email address" required<?= $message_type === 'success' ? '' : ' autofocus' ?>>
+                            <input type="email" class="form-control" placeholder="<?= escapeHtml(__('Email address')) ?>" name="email" maxlength="200" autocomplete="email" aria-label="<?= escapeHtml(__('Email address')) ?>" required<?= $message_type === 'success' ? '' : ' autofocus' ?>>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 mb-3" name="password_reset_email_request">Email me a link</button>
+                        <button type="submit" class="btn btn-primary w-100 mb-3" name="password_reset_email_request"><?= __('Email me a link') ?></button>
                     </form>
                 <?php } else { ?>
-                    <div class="alert alert-secondary small">Email is not set up here, so a link can't be sent - ask us to reset it for you.</div>
+                    <div class="alert alert-secondary small"><?= __('Email is not set up here, so a link can\'t be sent - ask us to reset it for you.') ?></div>
                 <?php } ?>
 
             <?php } ?>
 
-            <a href="/login.php"><i class="fas fa-arrow-left me-1"></i>Back to sign in</a>
+            <a href="/login.php"><i class="fas fa-arrow-left me-1"></i><?= __('Back to sign in') ?></a>
 
         </div>
     </div>

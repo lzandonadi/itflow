@@ -10,13 +10,15 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 
 ### New Features & Updates
 
-- Interface language: Admin > Settings > Localization has a new Interface language setting, English (US) or Português (Brasil). It changes the language for everyone - agents, the client portal and guest pages. English stays the default. Only a few screens are translated so far: the Localization page, the confirmation box and the ticket closed email. The rest follow in later releases. What used to be called Locale on that page is now Number and currency format. It still only changes how numbers and money look.
+- Interface language: Admin > Settings > Localization has a new Interface language setting, English (US) or Português (Brasil). It changes the language for everyone - agents, the client portal and guest pages. English stays the default. Translated so far: the menus and page frames of every area, signing in, setting up MFA, resetting a portal password, signing up, invites and the emails that go with them, the messages for something your role can't do, the Localization page, the confirmation box and the ticket closed email. The rest follow in later releases. What used to be called Locale on that page is now Number and currency format. It still only changes how numbers and money look.
 - Ticket list and board: scheduled dates now show month names in the interface language, for example "Today 6:30 PM" or "Nov 7, 5:40 PM".
+- Emails: the date in the sign-in alert, failed sign-ins and test emails now follows the interface language, and in English reads "Thu, Nov 5, 2026, 6:44 PM" instead of "Thu 5 Nov 2026, 6:44 PM".
 
 ### Developer Updates
 
 - `functions/i18n.php` adds `__()`, `_x()` and `_n()`. The key is the English text, and a missing entry falls back to the English. Translations are PHP arrays in `lang/<locale>.php`, and the strings scripts use are in `lang/js/<locale>.php`. `js/i18n.js` defines `__()` for the front end. It reads its dictionary from `<html data-itflow-i18n>`, which `i18nHtmlAttributes()` writes, so no inline script is needed under the sign-in and client portal CSP.
-- `formatDate($value, $style)` in `functions/format.php` formats dates for display through ICU skeletons. The styles are `date`, `date_short`, `datetime`, `datetime_short`, `time`, `month`, `month_year` and `date_long`.
+- `formatDate($value, $style)` in `functions/format.php` formats dates for display through ICU skeletons. The styles are `date`, `date_short`, `datetime`, `datetime_short`, `datetime_weekday`, `time`, `month`, `month_year` and `date_long`.
+- `i18nEnglish(callable $build)` returns what `$build` returns, built in English - for a text that is both shown to people and written to a log. `signInAlertAdmins()` now takes a callable that returns `[title, text, summary]` and the URL; it calls it once for the interface language and once, through `i18nEnglish()`, for the audit log.
 - `scripts/i18n_check.php <locale>` lists missing translations with file:line, placeholder mismatches, unused entries and non-literal calls. It exits 1 when a translation is missing or a placeholder doesn't match.
 - Database 3.5.6 adds `settings.config_language` (`varchar(10)`, default `en_US`). It is safe to run again, and `db.sql` has the column.
 

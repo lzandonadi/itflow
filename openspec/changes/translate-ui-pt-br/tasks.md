@@ -25,7 +25,7 @@ Cada lote é um commit revisável e só fecha quando passa em todos os itens aba
 
 ## 2. Acesso e conta
 
-- [ ] 2.1 Converter login, MFA, redefinição de senha, convite e cadastro: `login.php`, `join.php`, `agent/user/mfa_enforcement.php`, `client/login_reset.php`, `client/join.php`, `client/signup.php`, `functions/sign_in.php`, `functions/user_invite.php`, `functions/portal_invite.php` e os e-mails de cada um. Verificar: login com senha errada, configuração de MFA, redefinição de senha pelo portal e convite de técnico em pt-BR; os e-mails no Mailpit (`ddev mailpit`) em pt-BR.
+- [x] 2.1 Converter login, MFA, redefinição de senha, convite e cadastro: `login.php`, `join.php`, `agent/user/mfa_enforcement.php`, `client/login_reset.php`, `client/join.php`, `client/signup.php`, `functions/sign_in.php`, `functions/user_invite.php`, `functions/portal_invite.php` e os e-mails de cada um. Verificar: login com senha errada, configuração de MFA, redefinição de senha pelo portal e convite de técnico em pt-BR; os e-mails no Mailpit (`ddev mailpit`) em pt-BR.
 - [ ] 2.2 Converter o perfil e as preferências do técnico (`agent/user/`) e o perfil do contato no portal (`client/profile.php`). Verificar: troca de senha, tema e MFA do técnico e do contato em pt-BR.
 
 ## 3. Chamados

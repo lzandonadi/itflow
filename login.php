@@ -25,7 +25,7 @@ if (
     && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on')
     && (!isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || $_SERVER['HTTP_X_FORWARDED_PROTO'] !== 'https')
 ) {
-    echo "Login is restricted as ITFlow defaults to HTTPS-only for enhanced security. To login using HTTP, modify the config.php file by setting config_https_only to false. However, this is strongly discouraged, especially when accessing from potentially unsafe networks like the internet.";
+    echo __('Login is restricted as ITFlow defaults to HTTPS-only for enhanced security. To login using HTTP, modify the config.php file by setting config_https_only to false. However, this is strongly discouraged, especially when accessing from potentially unsafe networks like the internet.');
     exit;
 }
 
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
             header("HTTP/1.1 401 Unauthorized");
             $response = "
               <div class='alert alert-danger'>
-                Your login session expired. Please sign in again.
+                " . __('Your login session expired. Please sign in again.') . "
               </div>";
         } else {
             $email = escapeSql($sess['email'] ?? '');
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
             header("HTTP/1.1 401 Unauthorized");
             $response = "
               <div class='alert alert-danger'>
-                Your MFA session expired. Please sign in again.
+                " . __('Your MFA session expired. Please sign in again.') . "
               </div>";
         } else {
             $email = escapeSql($sess['email'] ?? '');
@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
             header("HTTP/1.1 401 Unauthorized");
             $response = "
               <div class='alert alert-danger'>
-                Incorrect username or password.
+                " . __('Incorrect username or password.') . "
               </div>";
         }
     }
@@ -271,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
             $response = "
               <div class='alert alert-danger'>
-                Incorrect username or password.
+                " . __('Incorrect username or password.') . "
               </div>";
         } else {
 
@@ -580,7 +580,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
                             $response = "
                                   <div class='alert alert-danger'>
-                                    Too many incorrect 2FA codes. Please wait 10 minutes and sign in again.
+                                    " . __('Too many incorrect 2FA codes. Please wait 10 minutes and sign in again.') . "
                                   </div>";
 
                         } elseif ($current_code !== 0) {
@@ -591,7 +591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
                             $response = "
                                   <div class='alert alert-danger'>
-                                    Please enter a valid 2FA code.
+                                    " . __('Please enter a valid 2FA code.') . "
                                   </div>";
                         }
                     }
@@ -609,7 +609,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
                         $response = "
                           <div class='alert alert-danger'>
-                            Incorrect username or password.
+                            " . __('Incorrect username or password.') . "
                           </div>";
                     } else {
 
@@ -676,7 +676,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                             unset($_SESSION['pending_dual_login']);
 
                             $token_field = "
-                                <p class='small text-body-secondary mb-2'>Enter the 6-digit code from your authenticator app.</p>
+                                <p class='small text-body-secondary mb-2'>" . __('Enter the 6-digit code from your authenticator app.') . "</p>
                                 <div class='input-group mb-3'>
                                     <span class='input-group-text'><span class='fas fa-fw fa-mobile-alt'></span></span>
                                     <input type='text' inputmode='numeric' pattern='[0-9]{6}' maxlength='6' minlength='6'
@@ -687,10 +687,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                             if ($client_mfa_locked) {
                                 // As for agents: no log row while locked, so the window can run out
                                 header("HTTP/1.1 429 Too Many Requests");
-                                $response = "<div class='alert alert-danger'>Too many wrong codes. Wait 10 minutes and sign in again.</div>";
+                                $response = "<div class='alert alert-danger'>" . __('Too many wrong codes. Wait 10 minutes and sign in again.') . "</div>";
                             } elseif ($client_code !== '' || isset($_POST['current_code'])) {
                                 signInLogFailure('Client Login', 'MFA Failed', "Client contact $user_email entered a wrong two-step sign-in code - the password was right", $user_id, $client_id);
-                                $response = "<div class='alert alert-danger'>That code is not right - try the newest one in your app.</div>";
+                                $response = "<div class='alert alert-danger'>" . __('That code is not right - try the newest one in your app.') . "</div>";
                             }
 
                         } elseif ($client_id && $contact_id && $user_auth_method === 'local') {
@@ -739,7 +739,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                             header("HTTP/1.1 401 Unauthorized");
                             $response = "
                               <div class='alert alert-danger'>
-                                Incorrect username or password.
+                                " . __('Incorrect username or password.') . "
                               </div>";
                         }
                     }
@@ -778,9 +778,9 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 <div class="login-box">
     <div class="login-logo">
         <?php if (!empty($company_logo)) { ?>
-            <img alt="<?=escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "uploads/settings/$company_logo" ?>">
+            <img alt="<?= escapeHtml(__('%s logo', $company_name)) ?>" height="110" width="380" class="img-fluid" src="<?= "uploads/settings/$company_logo" ?>">
         <?php } else { ?>
-            <span class="text-primary text-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow
+            <?php /* i18n-ignore: the product name */ ?><span class="text-primary text-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow
         <?php } ?>
     </div>
 
@@ -806,7 +806,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                     <!-- STEP 1: Email + Password -->
                     <div class="input-group mb-3">
                         <input type="email" class="form-control"
-                            placeholder="<?php if ($config_login_key_required) { if (!isset($_GET['key']) || $_GET['key'] !== $config_login_key_secret) { echo "Client "; } } echo "Email"; ?>"
+                            placeholder="<?= escapeHtml($config_login_key_required && (!isset($_GET['key']) || $_GET['key'] !== $config_login_key_secret) ? __('Client Email') : __('Email')) ?>"
                             name="email"
                             value="<?= htmlspecialchars($email ?? '', ENT_QUOTES) ?>"
                             required autofocus
@@ -817,13 +817,13 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                     </div>
 
                     <div class="input-group mb-3">
-                        <input type="password" class="form-control" placeholder="Password" name="password" required>
+                        <input type="password" class="form-control" placeholder="<?= escapeHtml(__('Password')) ?>" name="password" required>
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
                             </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-3" name="login">Sign In</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3" name="login"><?= __('Sign In') ?></button>
                 <?php endif; ?>
 
                 <?php if ($show_role_choice): ?>
@@ -833,10 +833,10 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
                     <div class="mb-2 text-center">
                         <button type="submit" class="btn btn-dark w-100 mb-2" name="role_choice" value="agent">
-                            Log in as Agent
+                            <?= __('Log in as Agent') ?>
                         </button>
                         <button type="submit" class="btn btn-light w-100" name="role_choice" value="client">
-                            Log in as Client
+                            <?= __('Log in as Client') ?>
                         </button>
                     </div>
                 <?php endif; ?>
@@ -851,11 +851,11 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                     <div class="mb-3 mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
-                            <label class="form-check-label" for="remember_me">Remember this browser for <?= $config_login_remember_me_expire ?> day<?= $config_login_remember_me_expire === 1 ? '' : 's' ?></label>
+                            <label class="form-check-label" for="remember_me"><?= _n('Remember this browser for %d day', 'Remember this browser for %d days', intval($config_login_remember_me_expire)) ?></label>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-dark w-100 mb-3" name="mfa_login">Verify & Sign In</button>
+                    <button type="submit" class="btn btn-dark w-100 mb-3" name="mfa_login"><?= __('Verify & Sign In') ?></button>
                 <?php endif; ?>
 
             </form>
@@ -864,17 +864,17 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                 <hr>
                 <div class="d-flex flex-wrap justify-content-between gap-2">
                     <?php if (!empty($config_smtp_provider)) { ?>
-                        <a href="client/login_reset.php">Forgot password?</a>
+                        <a href="client/login_reset.php"><?= __('Forgot password?') ?></a>
                     <?php } ?>
                     <?php if (portalSignupOpen()) { ?>
                         <!-- People at a client that lets them can make their own portal account (functions/portal_invite.php) -->
-                        <a href="client/signup.php" data-login-signup><i class="fas fa-user-plus me-1"></i>Create an account</a>
+                        <a href="client/signup.php" data-login-signup><i class="fas fa-user-plus me-1"></i><?= __('Create an account') ?></a>
                     <?php } ?>
                 </div>
                 <?php if (!empty($azure_client_id)) { ?>
                     <div class="col text-center mt-2">
                         <a href="client/login_microsoft.php">
-                            <button type="button" class="btn btn-secondary">Login with Microsoft Entra</button>
+                            <button type="button" class="btn btn-secondary"><?= __('Login with Microsoft Entra') ?></button>
                         </a>
                     </div>
                 <?php } ?>
@@ -886,7 +886,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
 <?php
 if (!$config_whitelabel_enabled) {
-    echo '<small class="text-muted">Powered by ITFlow</small>';
+    echo '<small class="text-muted">' . __('Powered by ITFlow') . '</small>';
 }
 ?>
 

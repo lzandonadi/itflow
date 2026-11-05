@@ -21,7 +21,7 @@ const SIGN_IN_FAILED = ['Failed', 'MFA Failed'];
 
 /** The choices for when admins are told - failures in SIGN_IN_WINDOW_MINUTES => label. */
 function signInAlertOptions() {
-    return [0 => 'Never', 5 => 'After 5 failed sign-ins', 10 => 'After 10 failed sign-ins', 20 => 'After 20 failed sign-ins', 50 => 'After 50 failed sign-ins'];
+    return [0 => __('Never'), 5 => __('After %d failed sign-ins', 5), 10 => __('After %d failed sign-ins', 10), 20 => __('After %d failed sign-ins', 20), 50 => __('After %d failed sign-ins', 50)];
 }
 
 /** How many failed sign-ins in a row tell the admins - 0 for never. Read once a request; 0 before the setting exists. */
@@ -113,30 +113,34 @@ function signInWatch($user_id = 0) {
         AND log_created_at > NOW() - INTERVAL " . SIGN_IN_WINDOW_MINUTES . " MINUTE";
 
     if ($ip !== '' && intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM logs WHERE $window AND log_ip = '$ip'"))[0]) === $limit) {
-        $accounts = signInAccountsTried("$window AND log_ip = '$ip'");
-        signInAlertAdmins(
-            "$limit failed sign-ins from $session_ip",
-            "$limit failed sign-ins in " . SIGN_IN_WINDOW_MINUTES . " minutes from $session_ip, " . $accounts . '.',
-            ['IP address' => (string) $session_ip, 'Accounts tried' => ucfirst($accounts)],
-            '/admin/sign_ins.php?view=ips&q=' . rawurlencode((string) $session_ip)
-        );
+        $where = "$window AND log_ip = '$ip'";
+        signInAlertAdmins(function () use ($limit, $session_ip, $where) {
+            $accounts = signInAccountsTried($where);
+            return [
+                __('%1$d failed sign-ins from %2$s', $limit, $session_ip),
+                __('%1$d failed sign-ins in %2$d minutes from %3$s, %4$s.', $limit, SIGN_IN_WINDOW_MINUTES, $session_ip, $accounts),
+                [__('IP address') => (string) $session_ip, __('Accounts tried') => ucfirst($accounts)],
+            ];
+        }, '/admin/sign_ins.php?view=ips&q=' . rawurlencode((string) $session_ip));
     }
 
     $user_id = intval($user_id);
     if ($user_id && intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM logs WHERE $window AND log_user_id = $user_id"))[0]) === $limit) {
         $user = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_name, user_email FROM users WHERE user_id = $user_id"));
         $ips = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(DISTINCT log_ip) FROM logs WHERE $window AND log_user_id = $user_id"))[0]);
-        $name = (string) ($user['user_name'] ?? 'an account');
-        signInAlertAdmins(
-            "$limit failed sign-ins for $name",
-            "$limit failed sign-ins in " . SIGN_IN_WINDOW_MINUTES . " minutes for $name's account" . ($user ? ' (' . $user['user_email'] . ')' : '') . ", from " . ($ips === 1 ? 'one IP address' : "$ips IP addresses") . '.',
-            ['Account' => $name . ($user ? ' - ' . $user['user_email'] : ''), 'IP addresses' => (string) $ips],
-            '/admin/audit_logs.php?view=signins&user=' . $user_id
-        );
+        signInAlertAdmins(function () use ($limit, $user, $ips) {
+            $name = isset($user['user_name']) ? (string) $user['user_name'] : __('an account');
+            $account = $user ? __("%1\$s's account (%2\$s)", $name, $user['user_email']) : __("%s's account", $name);
+            return [
+                __('%1$d failed sign-ins for %2$s', $limit, $name),
+                _n('%1$d failed sign-ins in %2$d minutes for %3$s, from one IP address.', '%1$d failed sign-ins in %2$d minutes for %3$s, from %4$d IP addresses.', $ips, $limit, SIGN_IN_WINDOW_MINUTES, $account, $ips),
+                [__('Account') => $name . ($user ? ' - ' . $user['user_email'] : ''), __('IP addresses') => (string) $ips],
+            ];
+        }, '/admin/audit_logs.php?view=signins&user=' . $user_id);
     }
 }
 
-/* The accounts a run of failures tried, in words - "trying Tess Tech, Johnny Test and 2 addresses with no account". Raw. */
+/* The accounts a run of failures tried, in words - "trying Tess Tech, Johnny Test and 2 emails with no account". Raw. */
 function signInAccountsTried($where) {
     global $mysqli;
     $names = [];
@@ -146,13 +150,13 @@ function signInAccountsTried($where) {
     }
     $unknown = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(DISTINCT log_description) FROM logs WHERE $where AND log_user_id = 0"))[0]);
     if ($unknown) {
-        $names[] = $unknown === 1 ? 'an email with no account' : "$unknown emails with no account";
+        $names[] = _n('an email with no account', '%d emails with no account', $unknown);
     }
     if (!$names) {
-        return 'trying no account in particular';
+        return __('trying no account in particular');
     }
     $last = array_pop($names);
-    return 'trying ' . ($names ? implode(', ', $names) . ' and ' : '') . $last;
+    return __('trying %s', $names ? __('%1$s and %2$s', implode(', ', $names), $last) : $last);
 }
 
 /* The active admins - [user_id => ['name', 'email']]. */
@@ -171,10 +175,14 @@ function signInAdmins() {
 /*
  * Tell the admins about a run of failures - a notification each, an email
  * each, and an entry in the audit log (Login Alert, from the address it is
- * about). Raw values in; $url is where to look.
+ * about). $words gives [title, text, summary], raw - it is called once for
+ * the interface language and once for the log's English; $url is where to look.
  */
-function signInAlertAdmins($title, $text, array $summary, $url) {
+function signInAlertAdmins(callable $words, $url) {
     global $mysqli;
+    // [title, text, summary] in the interface language; the audit log gets the text in English
+    [$title, $text, $summary] = $words();
+    $log_text = i18nEnglish(fn () => $words()[1]);
     $type = escapeSql('Failed Sign-ins');
     $notice = escapeSql(mb_substr($text, 0, 1000));
     $action = escapeSql($url);
@@ -182,21 +190,21 @@ function signInAlertAdmins($title, $text, array $summary, $url) {
         mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = '$type', notification = '$notice', notification_action = '$action', notification_user_id = $admin_id");
         signInMailAlert($admin['name'], $admin['email'], $title, $text, $summary, $url);
     }
-    signInLog('Login', 'Alert', escapeSql("Admins were told: $text"));
+    signInLog('Login', 'Alert', escapeSql("Admins were told: $log_text"));
 }
 
 /* The email to an admin about a run of failed sign-ins. Raw values in. */
 function signInMailAlert($name, $email, $title, $text, array $summary, $url) {
     global $config_base_url;
     $app = userMailAppName();
-    emailQueue([['email' => $email, 'name' => $name, 'footnote' => "You get this as an $app administrator. Admin > Settings > Security says when."]],
+    emailQueue([['email' => $email, 'name' => $name, 'footnote' => __('You get this as an %s administrator. Admin > Settings > Security says when.', $app)]],
         "$app: $title", [
-            'kind' => 'Security', 'tone' => 'danger', 'preview' => $text,
-            'title' => 'Failed sign-ins',
+            'kind' => __('Security'), 'tone' => 'danger', 'preview' => $text,
+            'title' => __('Failed sign-ins'),
             'intro' => [$text],
-            'summary' => ['When' => date('D j M Y, g:i A')] + $summary,
-            'callout' => "$app turns an IP address away after " . SIGN_IN_LOCKOUT . " failed sign-ins in " . SIGN_IN_WINDOW_MINUTES . " minutes. If an account is being guessed at, make sure it has a strong password and multi-factor authentication.",
-            'button' => ['label' => 'See the sign-ins', 'url' => "https://$config_base_url$url"],
+            'summary' => [__('When') => formatDate(time(), 'datetime_weekday')] + $summary,
+            'callout' => __('%1$s turns an IP address away after %2$d failed sign-ins in %3$d minutes. If an account is being guessed at, make sure it has a strong password and multi-factor authentication.', $app, SIGN_IN_LOCKOUT, SIGN_IN_WINDOW_MINUTES),
+            'button' => ['label' => __('See the sign-ins'), 'url' => "https://$config_base_url$url"],
         ]);
 }
 
@@ -229,5 +237,5 @@ function signInNewIpIds(array $rows) {
 
 /** The New IP badge on a sign in that was the first from its address. */
 function signInNewIpBadge() {
-    return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal text-nowrap" title="The first time this account signed in from this IP address" data-new-ip><i class="fas fa-map-marker-alt me-1"></i>New IP</span>';
+    return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal text-nowrap" title="' . escapeHtml(__('The first time this account signed in from this IP address')) . '" data-new-ip><i class="fas fa-map-marker-alt me-1"></i>' . __('New IP') . '</span>';
 }
