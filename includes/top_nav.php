@@ -12,15 +12,15 @@
          search palette (also on Ctrl+K). Without the script it is still
          a plain form posting to the full results page. -->
     <form class="navbar-search ms-auto" role="search" action="/agent/global_search.php">
-        <label for="navbar-search-input" class="visually-hidden">Search everywhere</label>
+        <label for="navbar-search-input" class="visually-hidden"><?= __('Search everywhere') ?></label>
         <div class="navbar-search-field">
             <input class="form-control" type="search" id="navbar-search-input" name="query"
-                placeholder="Search everywhere" autocomplete="off" aria-keyshortcuts="Control+K Meta+K"
+                placeholder="<?= escapeHtml(__('Search everywhere')) ?>" autocomplete="off" aria-keyshortcuts="Control+K Meta+K"
                 value="<?php if (isset($_GET['query'])) { echo escapeHtml($_GET['query']); } ?>">
-            <button class="navbar-search-submit" type="submit" aria-label="Submit search">
+            <button class="navbar-search-submit" type="submit" aria-label="<?= escapeHtml(__('Submit search')) ?>">
                 <i class="fas fa-search" aria-hidden="true"></i>
             </button>
-            <kbd class="navbar-search-kbd d-none d-lg-inline" aria-hidden="true">Ctrl K</kbd>
+            <kbd class="navbar-search-kbd d-none d-lg-inline" aria-hidden="true"><?= __('Ctrl K') ?></kbd>
         </div>
     </form>
 
@@ -45,7 +45,7 @@
 
         <li class="nav-item dropdown" id="itflowNotify" data-csrf="<?= $_SESSION['csrf_token'] ?>">
             <a class="nav-link" href="/agent/notifications.php" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                aria-expanded="false" title="Notifications"
+                aria-expanded="false" title="<?= escapeHtml(__('Notifications')) ?>"
                 aria-label="Notifications<?= $num_notifications ? ", $num_notifications unread" : '' ?>">
                 <i class="fas fa-bell" aria-hidden="true"></i>
                 <span class="badge bg-light text-dark rounded-pill navbar-badge" data-notify-badge <?= $num_notifications ? '' : 'hidden' ?>><?= $num_notifications > 99 ? '99+' : $num_notifications ?></span>
@@ -70,10 +70,10 @@
                 <!-- Menu Footer-->
                 <li class="user-footer bg-light">
                     <?php if ($session_is_admin) { ?>
-                        <a href="/admin" class="btn btn-default w-100 btn-flat mb-2"><i class="fas fa-user-shield me-2"></i>Administration</a>
+                        <a href="/admin" class="btn btn-default w-100 btn-flat mb-2"><i class="fas fa-user-shield me-2"></i><?= __('Administration') ?></a>
                     <?php } ?>
-                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog me-2"></i>Account</a>
-                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-end"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog me-2"></i><?= __('Account') ?></a>
+                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-end"><i class="fas fa-sign-out-alt me-2"></i><?= __('Logout') ?></a>
                 </li>
             </ul>
         </li>

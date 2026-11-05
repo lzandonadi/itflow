@@ -13,7 +13,7 @@ $client_website_label = preg_replace('#^https?://#i', '', rtrim($client_website,
 $location_map_query = rawurlencode(html_entity_decode(trim("$location_address $location_city $location_state $location_zip"), ENT_QUOTES));
 ?>
 <div class="col-md-4">
-    <div class="itflow-ov-label">Primary contact</div>
+    <div class="itflow-ov-label"><?= __('Primary contact') ?></div>
     <?php if ($contact_id) { ?>
         <?= contactLink($client_id, $contact_id, $contact_name, $contact_photo, ['class' => 'fw-semibold']) ?>
         <?php if ($contact_title) { ?><span class="text-body-secondary small ms-1"><?= $contact_title ?></span><?php } ?>
@@ -27,22 +27,22 @@ $location_map_query = rawurlencode(html_entity_decode(trim("$location_address $l
             <?php if ($contact_email) { ?>
                 <span class="d-flex align-items-center">
                     <a class="text-reset text-decoration-none text-truncate" href="mailto:<?= $contact_email ?>"><i class="far fa-fw fa-envelope text-body-secondary me-2" aria-hidden="true"></i><?= $contact_email ?></a>
-                    <button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button>
+                    <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button>
                 </span>
             <?php } ?>
         </div>
     <?php } elseif ($client_details_edit) { ?>
-        <a class="ajax-modal small" href="#" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&primary=1"><i class="fas fa-fw fa-plus me-1"></i>Add primary contact</a>
+        <a class="ajax-modal small" href="#" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&primary=1"><i class="fas fa-fw fa-plus me-1"></i><?= __('Add primary contact') ?></a>
     <?php } else { ?>
-        <span class="text-body-tertiary">None</span>
+        <span class="text-body-tertiary"><?= __('None') ?></span>
     <?php } ?>
 </div>
 
 <div class="col-md-4">
-    <div class="itflow-ov-label">Primary location<?php if ($location_id) { ?> &middot; <a class="text-reset" href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>" title="Open the location"><?= $location_name ?></a><?php } ?></div>
+    <div class="itflow-ov-label"><?= __('Primary location') ?><?php if ($location_id) { ?> &middot; <a class="text-reset" href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>" title="<?= escapeHtml(__('Open the location')) ?>"><?= $location_name ?></a><?php } ?></div>
     <?php if ($location_id) { ?>
         <?php if ($location_address || $location_city) { ?>
-            <a class="text-reset text-decoration-none" href="//maps.<?= $session_map_source ?>.com/?q=<?= $location_map_query ?>" target="_blank" rel="noopener" title="Open in maps">
+            <a class="text-reset text-decoration-none" href="//maps.<?= $session_map_source ?>.com/?q=<?= $location_map_query ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open in maps')) ?>">
                 <?php if ($location_address) { ?><div><?= $location_address ?></div><?php } ?>
                 <div class="<?= $location_address ? 'small text-body-secondary' : '' ?>"><?= formatAddress('', $location_city, $location_state, $location_zip, $location_country, ', ') ?></div>
             </a>
@@ -53,14 +53,14 @@ $location_map_query = rawurlencode(html_entity_decode(trim("$location_address $l
             <a class="small text-reset text-decoration-none d-block mt-1" href="tel:<?= escapeHtml(preg_replace('/[^0-9+]/', '', html_entity_decode($location_phone))) ?>"><i class="fas fa-fw fa-phone text-body-secondary me-2" aria-hidden="true"></i><?= $location_phone ?></a>
         <?php } ?>
     <?php } elseif ($client_details_edit) { ?>
-        <a class="ajax-modal small" href="#" data-modal-url="modals/location/location_add.php?client_id=<?= $client_id ?>&primary=1"><i class="fas fa-fw fa-plus me-1"></i>Add primary location</a>
+        <a class="ajax-modal small" href="#" data-modal-url="modals/location/location_add.php?client_id=<?= $client_id ?>&primary=1"><i class="fas fa-fw fa-plus me-1"></i><?= __('Add primary location') ?></a>
     <?php } else { ?>
-        <span class="text-body-tertiary">None</span>
+        <span class="text-body-tertiary"><?= __('None') ?></span>
     <?php } ?>
 </div>
 
 <div class="col-md-4">
-    <div class="itflow-ov-label">Details</div>
+    <div class="itflow-ov-label"><?= __('Details') ?></div>
     <div class="small d-flex flex-column gap-1">
         <?php if ($client_website) { ?>
             <a class="text-truncate" href="<?= $client_website_url ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-globe text-body-secondary me-2" aria-hidden="true"></i><?= $client_website_label ?></a>
@@ -69,8 +69,8 @@ $location_map_query = rawurlencode(html_entity_decode(trim("$location_address $l
             <span><i class="far fa-fw fa-calendar text-body-secondary me-2" aria-hidden="true"></i><?= $client_is_lead ? 'Lead' : 'Client' ?> since <?= $client_since ?></span>
         <?php } ?>
         <?php if ($client_referral) { ?>
-            <span><i class="fas fa-fw fa-handshake text-body-secondary me-2" aria-hidden="true"></i>Referred by <?= $client_referral ?></span>
+            <span><i class="fas fa-fw fa-handshake text-body-secondary me-2" aria-hidden="true"></i><?= __('Referred by %s', $client_referral) ?></span>
         <?php } ?>
-        <span class="text-body-secondary"><i class="fas fa-fw fa-hashtag me-2" aria-hidden="true"></i>Client ID <?= $client_id ?></span>
+        <span class="text-body-secondary"><i class="fas fa-fw fa-hashtag me-2" aria-hidden="true"></i><?= __('Client ID %d', $client_id) ?></span>
     </div>
 </div>

@@ -115,7 +115,7 @@ $elevation_rail = $elevation_descending ? range(1, $elevation_rack_units) : rang
                             <span class="itflow-rack-item-pos"><?= $block['position'] ?></span>
                         <?= $block_close ?>
                         <?php if ($elevation_can_edit && $block['asset_id']) { ?>
-                            <button type="button" class="itflow-rack-item-edit ajax-modal" title="Move or edit"
+                            <button type="button" class="itflow-rack-item-edit ajax-modal" title="<?= escapeHtml(__('Move or edit')) ?>"
                                 data-modal-url="modals/rack/rack_device_edit.php?id=<?= $block['id'] ?>">
                                 <i class="fas fa-pen"></i>
                             </button>

@@ -4,7 +4,7 @@
     <div class="sidebar-brand">
         <a class="brand-link" href="/agent/clients.php<?= $client_is_lead ? '?leads=1' : '' ?>">
             <i class="fas fa-arrow-left me-2"></i>
-            <span class="brand-text fs-6 text-body-secondary"><?= $client_is_lead ? 'All leads' : 'All clients' ?></span>
+            <span class="brand-text fs-6 text-body-secondary"><?= $client_is_lead ? __('All leads') : __('All clients') ?></span>
         </a>
     </div>
 
@@ -49,11 +49,11 @@
                     <span class="d-block itflow-client-nav-identity-name"><?= $client_name ?></span>
                 </span>
                 <i class="fas fa-fw fa-sort itflow-client-switcher-caret" aria-hidden="true"></i>
-                <span class="visually-hidden">Switch client</span>
+                <span class="visually-hidden"><?= __('Switch client') ?></span>
             </button>
             <div class="dropdown-menu itflow-client-switcher-menu">
                 <div class="px-2 pb-2">
-                    <input type="search" class="form-control form-control-sm" placeholder="Switch to client" aria-label="Find a client" autocomplete="off" data-client-switcher-search>
+                    <input type="search" class="form-control form-control-sm" placeholder="<?= escapeHtml(__('Switch to client')) ?>" aria-label="<?= escapeHtml(__('Find a client')) ?>" autocomplete="off" data-client-switcher-search>
                 </div>
                 <div class="itflow-client-switcher-list" data-client-switcher-list></div>
             </div>
@@ -68,7 +68,7 @@
                 <li class="nav-item">
                     <a href="/agent/client_overview.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "client_overview.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Overview</p>
+                        <p><?= __('Overview') ?></p>
                     </a>
                 </li>
 
@@ -76,7 +76,7 @@
                     <a href="/agent/contacts.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "contacts.php" || basename($_SERVER["PHP_SELF"]) == "contact.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-address-book"></i>
                         <p>
-                            Contacts
+                            <?= __('Contacts') ?>
                             <?php
                             if ($num_contacts > 0) { ?>
                                 <span class="right badge text-light"><?= $num_contacts ?></span>
@@ -89,7 +89,7 @@
                     <a href="/agent/locations.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "locations.php" || basename($_SERVER["PHP_SELF"]) == "location.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-map-marker-alt"></i>
                         <p>
-                            Locations
+                            <?= __('Locations') ?>
                             <?php
                             if ($num_locations > 0) { ?>
                                 <span class="right badge text-light"><?= $num_locations ?></span>
@@ -102,7 +102,7 @@
                     <a href="/agent/vendors.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "vendors.php" || basename($_SERVER["PHP_SELF"]) == "vendor.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-building"></i>
                         <p>
-                            Vendors
+                            <?= __('Vendors') ?>
                             <?php
                             if ($num_vendors > 0) { ?>
                                 <span class="right badge text-light"><?= $num_vendors ?></span>
@@ -115,7 +115,7 @@
                     <a href="/agent/calendar.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "calendar.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>
-                            Calendar
+                            <?= __('Calendar') ?>
                             <?php
                             if ($num_calendar_events > 0) { ?>
                                 <span class="right badge text-light"><?= $num_calendar_events ?></span>
@@ -127,18 +127,18 @@
                 <li class="nav-item">
                     <a href="/agent/audit_log.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "audit_log.php") { echo "active"; } ?>">
                         <i class="nav-icon fas fa-history"></i>
-                        <p>Audit Log</p>
+                        <p><?= __('Audit Log') ?></p>
                     </a>
                 </li>
 
                 <?php if ($config_module_enable_ticketing == 1 && lookupUserPermission("module_support") >= 1) { ?>
-                    <li class="nav-header mt-3">SUPPORT</li>
+                    <li class="nav-header mt-3"><?= __('SUPPORT') ?></li>
 
                     <li class="nav-item">
                         <a href="/agent/tickets.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "tickets.php" || basename($_SERVER["PHP_SELF"]) == "ticket.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-life-ring"></i>
                             <p>
-                                Tickets
+                                <?= __('Tickets') ?>
                                 <?php
                                 if ($num_active_tickets > 0) { ?>
                                     <span class="right badge <?php if ($num_active_tickets > 0) { ?> bg-danger <?php } ?> text-light"><?= $num_active_tickets ?></span>
@@ -152,7 +152,7 @@
                         <a href="/agent/recurring_tickets.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "recurring_tickets.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-redo-alt"></i>
                             <p>
-                                Recurring Tickets
+                                <?= __('Recurring Tickets') ?>
                                 <?php
                                 if ($num_recurring_tickets) { ?>
                                     <span class="right badge"><?= $num_recurring_tickets ?></span>
@@ -166,9 +166,9 @@
                         <a href="/agent/projects.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "projects.php" || basename($_SERVER["PHP_SELF"]) == "project.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-project-diagram"></i>
                             <p>
-                                Projects
+                                <?= __('Projects') ?>
                                 <?php if ($num_active_projects) { ?>
-                                    <span class="right badge text-light" data-bs-toggle="tooltip" title="Open Projects"><?= $num_active_projects ?></span>
+                                    <span class="right badge text-light" data-bs-toggle="tooltip" title="<?= escapeHtml(__('Open Projects')) ?>"><?= $num_active_projects ?></span>
                                 <?php } ?>
                             </p>
                         </a>
@@ -178,14 +178,14 @@
 
                 <?php if ($config_module_enable_itdoc == 1) { ?>
 
-                    <li class="nav-header mt-3">INFRASTRUCTURE</li>
+                    <li class="nav-header mt-3"><?= __('INFRASTRUCTURE') ?></li>
 
                     <?php if (lookupUserPermission("module_support") >= 1) { ?>
                         <li class="nav-item">
                             <a href="/agent/assets.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "assets.php" || basename($_SERVER["PHP_SELF"]) == "asset.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-desktop"></i>
                                 <p>
-                                    Assets
+                                    <?= __('Assets') ?>
                                     <?php
                                     if ($num_assets > 0) { ?>
                                         <span class="right badge text-light"><?= $num_assets ?></span>
@@ -198,7 +198,7 @@
                             <a href="/agent/networks.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "networks.php" || basename($_SERVER["PHP_SELF"]) == "network.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-network-wired"></i>
                                 <p>
-                                    Networks
+                                    <?= __('Networks') ?>
                                     <?php
                                     if ($num_networks > 0) { ?>
                                         <span class="right badge text-light"><?= $num_networks ?></span>
@@ -211,7 +211,7 @@
                             <a href="/agent/racks.php?client_id=<?= $client_id ?>" class="nav-link <?php if (in_array(basename($_SERVER["PHP_SELF"]), ["racks.php", "rack.php"])) { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-server"></i>
                                 <p>
-                                    Racks
+                                    <?= __('Racks') ?>
                                     <?php
                                     if ($num_racks > 0) { ?>
                                         <span class="right badge text-light"><?= $num_racks ?></span>
@@ -220,14 +220,14 @@
                             </a>
                         </li>
 
-                        <li class="nav-header mt-3">WEB & SECURITY</li>
+                        <li class="nav-header mt-3"><?= __('WEB & SECURITY') ?></li>
 
                         <?php if (lookupUserPermission("module_credential") >= 1) { ?>
                             <li class="nav-item">
                                 <a href="/agent/credentials.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "credentials.php") { echo "active"; } ?>">
                                     <i class="nav-icon fas fa-key"></i>
                                     <p>
-                                        Credentials
+                                        <?= __('Credentials') ?>
                                         <?php
                                         if ($num_credentials > 0) { ?>
                                             <span class="right badge text-light"><?= $num_credentials ?></span>
@@ -241,7 +241,7 @@
                             <a href="/agent/certificates.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "certificates.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-lock"></i>
                                 <p>
-                                    Certificates
+                                    <?= __('Certificates') ?>
                                     <?php
                                     if ($num_certificates > 0) { ?>
                                         <span class="right badge <?php if ($num_certificates_expiring > 0) { ?> bg-warning text-dark <?php } ?> <?php if ($num_certificates_expired > 0) { ?> bg-danger <?php } ?> text-white"><?= $num_certificates ?></span>
@@ -254,7 +254,7 @@
                             <a href="/agent/domains.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "domains.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-globe"></i>
                                 <p>
-                                    Domains
+                                    <?= __('Domains') ?>
                                     <?php
                                     if ($num_domains > 0) { ?>
                                         <span class="right badge <?php if (isset($num_domains_expiring)) { ?> bg-warning text-dark<?php } ?> <?php if (isset($num_domains_expired)) { ?> bg-danger <?php } ?> text-white"><?= $num_domains ?></span>
@@ -267,21 +267,21 @@
                             <a href="/agent/shares.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "shares.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-share-alt"></i>
                                 <p>
-                                    Shared Links
+                                    <?= __('Shared Links') ?>
                                     <?php if (!empty($num_shares)) { ?>
-                                        <span class="right badge <?= !empty($num_shares_received) ? 'bg-warning text-dark' : 'text-light' ?>" <?= !empty($num_shares_received) ? 'title="A login was sent back - save it"' : '' ?>><?= $num_shares ?></span>
+                                        <span class="right badge <?= !empty($num_shares_received) ? 'bg-warning text-dark' : 'text-light' ?>" <?= !empty($num_shares_received) ? 'title="' . escapeHtml(__('A login was sent back - save it')) . '"' : '' ?>><?= $num_shares ?></span>
                                     <?php } ?>
                                 </p>
                             </a>
                         </li>
 
-                        <li class="nav-header mt-3">DOCUMENTATION</li>
+                        <li class="nav-header mt-3"><?= __('DOCUMENTATION') ?></li>
 
                         <li class="nav-item">
                             <a href="/agent/software.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "software.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
-                                    Licenses
+                                    <?= __('Licenses') ?>
                                     <?php
                                     if ($num_software > 0) { ?>
                                         <span class="right badge <?php if ($num_software_expiring > 0) { ?> bg-warning text-dark <?php } ?> <?php if ($num_software_expired > 0) { ?> bg-danger <?php } ?> text-white"><?= $num_software ?></span>
@@ -294,7 +294,7 @@
                             <a href="/agent/services.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "services.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-stream"></i>
                                 <p>
-                                    Services
+                                    <?= __('Services') ?>
                                     <?php
                                     if ($num_services > 0) { ?>
                                         <span class="right badge text-light"><?= $num_services ?></span>
@@ -310,7 +310,7 @@
                         <a href="/agent/files.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "files.php" || basename($_SERVER["PHP_SELF"]) == "document.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-folder"></i>
                             <p>
-                                Files
+                                <?= __('Files') ?>
                                 <?php
                                 if ($num_files > 0) { ?>
                                     <span class="right badge text-light"><?= $num_files ?></span>
@@ -323,7 +323,7 @@
 
                 <?php if ($config_module_enable_accounting == 1) { ?>
 
-                    <li class="nav-header mt-3">BILLING</li>
+                    <li class="nav-header mt-3"><?= __('BILLING') ?></li>
 
                     <?php if (lookupUserPermission("module_sales") >= 1) { ?>
 
@@ -331,7 +331,7 @@
                             <a href="/agent/quotes.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "quotes.php" || basename($_SERVER["PHP_SELF"]) == "quote.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-comment-dollar"></i>
                                 <p>
-                                    Quotes
+                                    <?= __('Quotes') ?>
                                     <?php
                                     if ($num_quotes > 0) { ?>
                                         <span class="right badge text-light"><?= $num_quotes ?></span>
@@ -344,7 +344,7 @@
                             <a href="/agent/invoices.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "invoices.php" || basename($_SERVER["PHP_SELF"]) == "invoice.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-file-invoice"></i>
                                 <p>
-                                    Invoices
+                                    <?= __('Invoices') ?>
                                     <?php
                                     if ($num_invoices > 0) { ?>
                                         <span class="right badge <?php if ($num_invoices_open > 0) { ?> bg-danger <?php } ?> text-light"><?= $num_invoices ?></span>
@@ -358,7 +358,7 @@
                                 <a href="/agent/unbilled_time.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "unbilled_time.php") { echo "active"; } ?>">
                                     <i class="nav-icon fas fa-user-clock"></i>
                                     <p>
-                                        Unbilled Time
+                                        <?= __('Unbilled Time') ?>
                                         <?php if ($num_unbilled_tickets || !empty($num_unbilled_expenses) || !empty($num_unbilled_trips)) { ?>
                                             <span class="right badge text-light"><?= $num_unbilled_tickets + intval($num_unbilled_expenses ?? 0) + intval($num_unbilled_trips ?? 0) ?></span>
                                         <?php } ?>
@@ -371,7 +371,7 @@
                             <a href="/agent/recurring_invoices.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "recurring_invoices.php" || basename($_SERVER["PHP_SELF"]) == "recurring_invoice.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-redo-alt"></i>
                                 <p>
-                                    Recurring Invoices
+                                    <?= __('Recurring Invoices') ?>
                                     <?php
                                     if ($num_recurring_invoices) { ?>
                                         <span class="right badge"><?= $num_recurring_invoices ?></span>
@@ -384,9 +384,9 @@
                             <a href="/agent/contracts.php?client_id=<?= $client_id ?>" class="nav-link <?php if (in_array(basename($_SERVER["PHP_SELF"]), ['contracts.php', 'contract.php', 'contract_document.php'], true)) { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-file-contract"></i>
                                 <p>
-                                    Contracts
+                                    <?= __('Contracts') ?>
                                     <?php if (!empty($num_contracts)) { ?>
-                                        <span class="right badge" title="In force"><?= intval($num_contracts) ?></span>
+                                        <span class="right badge" title="<?= escapeHtml(__('In force')) ?>"><?= intval($num_contracts) ?></span>
                                     <?php } ?>
                                 </p>
                             </a>
@@ -399,7 +399,7 @@
                             <a href="/agent/income.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "income.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-hand-holding-usd"></i>
                                 <p>
-                                    Income
+                                    <?= __('Income') ?>
                                     <?php
                                     if ($num_income > 0) { ?>
                                         <span class="right badge text-light"><?= $num_income ?></span>
@@ -413,7 +413,7 @@
                         <a href="/agent/trips.php?client_id=<?= $client_id ?>" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "trips.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-route"></i>
                             <p>
-                                Trips
+                                <?= __('Trips') ?>
                                 <?php
                                 if ($num_trips > 0) { ?>
                                     <span class="right badge text-light"><?= $num_trips ?></span>

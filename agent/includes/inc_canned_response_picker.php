@@ -32,13 +32,13 @@ isset($mysqli) || die("Direct file access is not allowed");
 if (!empty($canned_picker_groups) || intval($canned_picker_ticket_id) > 0) { ?>
     <div class="dropdown itflow-canned-picker mb-2" id="<?= escapeHtml($canned_picker_id) ?>" data-canned-picker data-editor="<?= escapeHtml($canned_picker_editor) ?>" data-ticket-id="<?= intval($canned_picker_ticket_id) ?>" data-canned-filled="<?= escapeHtml(implode('|', array_keys(CANNED_RESPONSE_PLACEHOLDERS))) ?>">
         <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" data-canned-toggle>
-            <i class="fas fa-fw fa-comment-dots me-1"></i>Canned response
+            <i class="fas fa-fw fa-comment-dots me-1"></i><?= __('Canned response') ?>
         </button>
         <span class="small text-body-secondary ms-2 d-none d-md-inline">or type <kbd>/</kbd> in the reply</span>
         <div class="dropdown-menu p-0 itflow-canned-menu">
             <div class="p-2 border-bottom d-flex align-items-center gap-1">
-                <input type="search" class="form-control form-control-sm" placeholder="Search canned responses..." aria-label="Search canned responses" autocomplete="off" data-canned-search>
-                <button type="button" class="btn btn-sm btn-link text-decoration-none flex-shrink-0" title="Close the list and go back to the reply (Esc)" data-canned-close>Cancel</button>
+                <input type="search" class="form-control form-control-sm" placeholder="<?= escapeHtml(__('Search canned responses...')) ?>" aria-label="<?= escapeHtml(__('Search canned responses')) ?>" autocomplete="off" data-canned-search>
+                <button type="button" class="btn btn-sm btn-link text-decoration-none flex-shrink-0" title="<?= escapeHtml(__('Close the list and go back to the reply (Esc)')) ?>" data-canned-close><?= __('Cancel') ?></button>
             </div>
             <div class="itflow-canned-list" data-canned-list>
                 <?php foreach ($canned_picker_groups as $canned_group_label => $canned_group_rows) { ?>
@@ -57,25 +57,25 @@ if (!empty($canned_picker_groups) || intval($canned_picker_ticket_id) > 0) { ?>
                     </div>
                 <?php } ?>
                 <?php if (empty($canned_picker_groups)) { ?>
-                    <div class="px-3 py-3 small text-body-secondary" data-canned-empty>No canned responses on offer here yet.</div>
+                    <div class="px-3 py-3 small text-body-secondary" data-canned-empty><?= __('No canned responses on offer here yet.') ?></div>
                 <?php } ?>
-                <div class="px-3 py-3 small text-body-secondary" data-canned-none hidden>No canned response matches.</div>
+                <div class="px-3 py-3 small text-body-secondary" data-canned-none hidden><?= __('No canned response matches.') ?></div>
             </div>
             <div class="border-top py-1">
                 <?php if (intval($canned_picker_ticket_id) > 0) { ?>
                     <a class="dropdown-item small ajax-modal" href="#" data-modal-size="lg" data-canned-save-open
                         data-modal-url="/agent/user/modals/canned_response_save.php?<?= escapeHtml(http_build_query(['ticket_id' => intval($canned_picker_ticket_id), 'editor' => $canned_picker_editor, 'picker' => $canned_picker_id])) ?>">
-                        <i class="fas fa-fw fa-save text-secondary me-2"></i>Save your reply as a canned response
+                        <i class="fas fa-fw fa-save text-secondary me-2"></i><?= __('Save your reply as a canned response') ?>
                     </a>
                 <?php } ?>
-                <a class="dropdown-item small" href="/agent/user/user_canned_responses.php" target="_blank" title="Opens in a new tab - your reply stays here">
-                    <i class="fas fa-fw fa-user text-secondary me-2"></i>Your canned responses
+                <a class="dropdown-item small" href="/agent/user/user_canned_responses.php" target="_blank" title="<?= escapeHtml(__('Opens in a new tab - your reply stays here')) ?>">
+                    <i class="fas fa-fw fa-user text-secondary me-2"></i><?= __('Your canned responses') ?>
                 </a>
             </div>
         </div>
         <div class="small text-body-secondary mt-1" data-canned-applied hidden></div>
         <div class="d-flex flex-wrap align-items-center gap-1 mt-1 small" data-canned-files hidden>
-            <span class="text-body-secondary me-1"><i class="fas fa-fw fa-paperclip me-1"></i>Goes with it:</span>
+            <span class="text-body-secondary me-1"><i class="fas fa-fw fa-paperclip me-1"></i><?= __('Goes with it:') ?></span>
         </div>
     </div>
     <script src="/agent/js/canned_response_picker.js"></script>

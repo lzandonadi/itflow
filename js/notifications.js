@@ -69,7 +69,7 @@
         const now = new Date();
         const minutes = Math.round((now - date) / 60000);
         if (minutes < 1) {
-            return 'now';
+            return __('now');
         }
         if (minutes < 60) {
             return minutes + 'm';
@@ -80,12 +80,12 @@
         const yesterday = new Date(now);
         yesterday.setDate(now.getDate() - 1);
         if (sameDay(date, yesterday)) {
-            return 'Yesterday';
+            return __('Yesterday');
         }
         if (minutes < 6 * 24 * 60) {
-            return date.toLocaleDateString(undefined, { weekday: 'short' });
+            return date.toLocaleDateString(window.itflowI18n ? itflowI18n.lang : undefined, { weekday: 'short' });
         }
-        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric' });
+        return date.toLocaleDateString(window.itflowI18n ? itflowI18n.lang : undefined, { month: 'short', day: 'numeric', year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric' });
     }
 
     function dayGroup(date) {
@@ -93,12 +93,12 @@
         const yesterday = new Date(now);
         yesterday.setDate(now.getDate() - 1);
         if (sameDay(date, now)) {
-            return 'Today';
+            return __('Today');
         }
         if (sameDay(date, yesterday)) {
-            return 'Yesterday';
+            return __('Yesterday');
         }
-        return 'Earlier';
+        return __('Earlier');
     }
 
     function refreshTimes(scope) {
@@ -261,7 +261,7 @@
     }
 
     function setToggle(button, unread) {
-        const label = unread ? 'Mark as read' : 'Mark as unread';
+        const label = unread ? __('Mark as read') : __('Mark as unread');
         button.title = label;
         button.setAttribute('aria-label', label);
         const i = button.querySelector('i');
@@ -289,17 +289,17 @@
         // Static skeleton only - no data goes through this string
         panel.innerHTML =
             '<div class="itflow-notify-head">' +
-                '<span class="fw-semibold">Notifications</span>' +
+                '<span class="fw-semibold">' + __('Notifications') + '</span>' +
                 '<button type="button" class="btn btn-link btn-sm p-0 ms-auto text-decoration-none" data-notify-all>' +
-                    '<i class="fas fa-check-double me-1" aria-hidden="true"></i>Mark all as read</button>' +
+                    '<i class="fas fa-check-double me-1" aria-hidden="true"></i>' + __('Mark all as read') + '</button>' +
             '</div>' +
             '<div class="nav nav-underline itflow-notify-tabs" role="tablist">' +
                 '<button type="button" class="nav-link active" role="tab" aria-selected="true" data-notify-view="unread">' +
-                    'Unread <span class="badge rounded-pill text-bg-secondary ms-1" data-notify-count></span></button>' +
-                '<button type="button" class="nav-link" role="tab" aria-selected="false" data-notify-view="all">All</button>' +
+                    __('Unread') + ' <span class="badge rounded-pill text-bg-secondary ms-1" data-notify-count></span></button>' +
+                '<button type="button" class="nav-link" role="tab" aria-selected="false" data-notify-view="all">' + __('All') + '</button>' +
             '</div>' +
-            '<div class="itflow-notify-list" role="list" aria-label="Notifications"></div>' +
-            '<a class="itflow-notify-foot" href="/agent/notifications.php">View all notifications</a>';
+            '<div class="itflow-notify-list" role="list" aria-label="' + __('Notifications') + '"></div>' +
+            '<a class="itflow-notify-foot" href="/agent/notifications.php">' + __('View all notifications') + '</a>';
 
         list = panel.querySelector('.itflow-notify-list');
 
@@ -330,7 +330,7 @@
             box.append(el('div', 'small', text));
         }
         if (retry) {
-            const button = el('button', 'btn btn-sm btn-outline-secondary mt-2', 'Try again');
+            const button = el('button', 'btn btn-sm btn-outline-secondary mt-2', __('Try again'));
             button.type = 'button';
             button.addEventListener('click', load);
             box.append(button);
@@ -362,8 +362,8 @@
                     return;
                 }
                 list.replaceChildren(err.message === 'session'
-                    ? message('lock', 'Your session has ended', 'Reload the page to sign in again.')
-                    : message('exclamation-triangle', 'Couldn’t load notifications', null, true));
+                    ? message('lock', __('Your session has ended'), __('Reload the page to sign in again.'))
+                    : message('exclamation-triangle', __('Couldn’t load notifications'), null, true));
             })
             .finally(function () {
                 clearTimeout(spinner);
@@ -375,14 +375,14 @@
 
         if (!items.length) {
             list.append(view === 'unread'
-                ? message('check-circle', 'You’re all caught up', 'New notifications will show up here.')
-                : message('bell-slash', 'No notifications yet'));
+                ? message('check-circle', __('You’re all caught up'), __('New notifications will show up here.'))
+                : message('bell-slash', __('No notifications yet')));
             return;
         }
 
         let group = null;
         items.forEach(function (item) {
-            const label = item.time ? dayGroup(new Date(item.time)) : 'Earlier';
+            const label = item.time ? dayGroup(new Date(item.time)) : __('Earlier');
             if (label !== group) {
                 group = label;
                 const heading = el('div', 'itflow-notify-group', label);
@@ -405,7 +405,7 @@
             postMark([row.dataset.id], makeRead ? 'read' : 'unread').catch(function () {
                 setRowRead(row, !makeRead);
                 if (typeof itflowToast === 'function') {
-                    itflowToast('Couldn’t update the notification', 'danger');
+                    itflowToast(__('Couldn’t update the notification'), 'danger');
                 }
             });
             return;
@@ -485,7 +485,7 @@
             .catch(function () {
                 button.disabled = false;
                 if (typeof itflowToast === 'function') {
-                    itflowToast('Couldn’t mark notifications as read', 'danger');
+                    itflowToast(__('Couldn’t mark notifications as read'), 'danger');
                 }
             });
     });

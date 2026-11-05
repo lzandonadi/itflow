@@ -62,7 +62,7 @@
 
     function render() {
         if (clients === null) {
-            message('Loading clients...');
+            message(__('Loading clients...'));
             return;
         }
 
@@ -73,7 +73,7 @@
         });
 
         if (!matches.length) {
-            message(term ? 'No clients match "' + typed + '"' : 'No clients');
+            message(term ? __('No clients match "%s"', typed) : __('No clients'));
             return;
         }
 
@@ -84,7 +84,7 @@
         if (matches.length > limit) {
             const more = document.createElement('div');
             more.className = 'itflow-client-switcher-empty';
-            more.textContent = 'Keep typing to narrow down ' + (matches.length - limit) + ' more';
+            more.textContent = __('Keep typing to narrow down %d more', matches.length - limit);
             list.appendChild(more);
         }
     }
@@ -106,7 +106,7 @@
             })
             .catch(function () {
                 loading = null;
-                message('Could not load clients - close and try again');
+                message(__('Could not load clients - close and try again'));
             });
     }
 

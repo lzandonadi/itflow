@@ -222,13 +222,13 @@ function itflowAiReword(editor, ticket) {
         editor.notificationManager.open({ text: text, type: type, timeout: type === 'success' ? 4000 : 8000 });
     };
     var done = {
-        reword: 'Reworded', shorter: 'Shortened', formal: 'Made more formal', friendly: 'Made friendlier', plain: 'Put in plain English',
-        structure: 'Organized', proofread: 'Spelling and grammar fixed', translate: 'Translated'
+        reword: __('Reworded'), shorter: __('Shortened'), formal: __('Made more formal'), friendly: __('Made friendlier'), plain: __('Put in plain English'),
+        structure: __('Organized'), proofread: __('Spelling and grammar fixed'), translate: __('Translated')
     };
 
     function run(tone, language) {
         if (editor.getContent({ format: 'text' }).trim() === '') {
-            say('Write something first - Reword works on what is there.', 'info');
+            say(__('Write something first - Reword works on what is there.'), 'info');
             return;
         }
         var element = editor.getElement();
@@ -249,17 +249,17 @@ function itflowAiReword(editor, ticket) {
             .then(function (data) {
                 // Leave the user's text alone if it failed
                 if (data.error || !data.rewordedText) {
-                    say(data.error || 'Could not reword the text.', 'error');
+                    say(data.error || __('Could not reword the text.'), 'error');
                     return;
                 }
                 editor.undoManager.add();
                 editor.undoManager.transact(function () {
                     editor.setContent(data.rewordedText);
                 });
-                say((done[tone] || 'Reworded') + (tone === 'translate' ? ' into ' + language : '') + ' - Undo puts your words back.', 'success');
+                say(tone === 'translate' ? __('Translated into %s - Undo puts your words back.', language) : __('%s - Undo puts your words back.', done[tone] || __('Reworded')), 'success');
             })
             .catch(function () {
-                say('Could not reach ITFlow to reword it - try again.', 'error');
+                say(__('Could not reach ITFlow to reword it - try again.'), 'error');
             })
             .finally(function () {
                 editor.setProgressState(false);
@@ -276,13 +276,13 @@ function itflowAiReword(editor, ticket) {
             last = '';
         }
         editor.windowManager.open({
-            title: 'Translate with AI',
+            title: __('Translate with AI'),
             body: {
                 type: 'panel',
-                items: [{ type: 'selectbox', name: 'language', label: 'Into', items: languages.map(function (language) { return { text: language, value: language }; }) }]
+                items: [{ type: 'selectbox', name: 'language', label: __('Into'), items: languages.map(function (language) { return { text: language, value: language }; }) }]
             },
             initialData: { language: languages.indexOf(last) >= 0 ? last : languages[0] },
-            buttons: [{ type: 'cancel', text: 'Cancel' }, { type: 'submit', text: 'Translate', primary: true }],
+            buttons: [{ type: 'cancel', text: __('Cancel') }, { type: 'submit', text: __('Translate'), primary: true }],
             onSubmit: function (dialog) {
                 var language = dialog.getData().language;
                 dialog.close();
@@ -298,7 +298,7 @@ function itflowAiReword(editor, ticket) {
 
     editor.ui.registry.addSplitButton('reword', {
         icon: 'ai',
-        tooltip: 'Reword with AI',
+        tooltip: __('Reword with AI'),
         onAction: function () {
             run('reword');
         },
@@ -340,8 +340,8 @@ function itflowAiDraft(editor, ticketId, say) {
     var types = { '0': 'internal', '1': 'public', '2': 'email' };
     editor.ui.registry.addButton('aidraft', {
         icon: 'ai-prompt',
-        text: 'Draft',
-        tooltip: 'Draft the reply with AI - from your notes, if you have typed some',
+        text: __('Draft'),
+        tooltip: __('Draft the reply with AI - from your notes, if you have typed some'),
         onAction: function () {
             var form = editor.getElement().closest('form');
             var picked = form ? form.querySelector('input[name="public_reply_type"]:checked') : null;
@@ -361,17 +361,17 @@ function itflowAiDraft(editor, ticketId, say) {
                 })
                 .then(function (data) {
                     if (data.error || !data.html) {
-                        say(data.error || 'Could not draft it.', 'error');
+                        say(data.error || __('Could not draft it.'), 'error');
                         return;
                     }
                     editor.undoManager.add();
                     editor.undoManager.transact(function () {
                         editor.setContent(data.html);
                     });
-                    say('Drafted - read it through before it goes. Undo puts back what was there.', 'success');
+                    say(__('Drafted - read it through before it goes. Undo puts back what was there.'), 'success');
                 })
                 .catch(function () {
-                    say('Could not reach ITFlow to draft it - try again.', 'error');
+                    say(__('Could not reach ITFlow to draft it - try again.'), 'error');
                 })
                 .finally(function () {
                     editor.setProgressState(false);
@@ -702,14 +702,14 @@ function itflowInit() {
 
             editor.ui.registry.addButton('redactButton', {
                 icon: 'permanent-pen',
-                tooltip: 'Redact Text',
+                tooltip: __('Redact Text'),
                 onAction: function() {
                     var selectedText = editor.selection.getContent({ format: 'text' });
                     if (selectedText) {
                         var newContent = '<span style="font-weight: bold; color: red;">[REDACTED]</span>';
                         editor.selection.setContent(newContent);
                     } else {
-                        alert('Please select a word to redact');
+                        alert(__('Please select a word to redact'));
                     }
                 }
             });
@@ -766,7 +766,7 @@ function itflowInit() {
                         var newContent = '<span style="font-weight: bold; color: red;">[REDACTED]</span>';
                         editor.selection.setContent(newContent);
                     } else {
-                        alert('Please select a word to redact');
+                        alert(__('Please select a word to redact'));
                     }
                 }
             });
@@ -854,7 +854,7 @@ function itflowInit() {
             toggle.setAttribute('role', 'button');
             toggle.setAttribute('tabindex', '0');
             toggle.setAttribute('aria-pressed', 'false');
-            toggle.setAttribute('aria-label', 'Show password');
+            toggle.setAttribute('aria-label', __('Show password'));
 
             function toggleReveal() {
                 var hidden = input.type === 'password';
@@ -862,7 +862,7 @@ function itflowInit() {
                 icon.classList.toggle('fa-eye', !hidden);
                 icon.classList.toggle('fa-eye-slash', hidden);
                 toggle.setAttribute('aria-pressed', hidden ? 'true' : 'false');
-                toggle.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+                toggle.setAttribute('aria-label', hidden ? __('Hide password') : __('Show password'));
             }
 
             toggle.addEventListener('click', toggleReveal);
@@ -913,7 +913,7 @@ function itflowInit() {
 
             // An empty field would otherwise wipe whatever is on the clipboard
             if (text === '') {
-                flashTooltip(target, 'Nothing to copy');
+                flashTooltip(target, __('Nothing to copy'));
                 return;
             }
 
@@ -1225,7 +1225,7 @@ function itflowCopyText(text, trigger) {
     }
     return itflowCopyTextLegacy(text, trigger)
         ? Promise.resolve()
-        : Promise.reject(new Error('Copy failed'));
+        : Promise.reject(new Error(__('Copy failed')));
 }
 
 function itflowCopyTextLegacy(text, trigger) {

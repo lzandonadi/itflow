@@ -42,7 +42,7 @@ $num_vendors = $row['num'];
     <div class="sidebar-brand">
         <a class="brand-link" href="clients.php">
             <i class="fas fa-arrow-left me-2"></i>
-            <span class="brand-text h6 mb-0">Back | <strong>All Client Docs</strong></span>
+            <span class="brand-text h6 mb-0"><?= __('Back | <strong>All Client Docs</strong>') ?></span>
         </a>
     </div>
 
@@ -59,7 +59,7 @@ $num_vendors = $row['num'];
                         <a href="contacts.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "contacts.php" || basename($_SERVER["PHP_SELF"]) == "contact.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-address-book"></i>
                             <p>
-                                Contacts
+                                <?= __('Contacts') ?>
                                 <?php
                                 if ($num_contacts > 0) { ?>
                                     <span class="right badge text-light"><?= $num_contacts ?></span>
@@ -71,7 +71,7 @@ $num_vendors = $row['num'];
                         <a href="locations.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "locations.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-map-marker-alt"></i>
                             <p>
-                                Locations
+                                <?= __('Locations') ?>
                                 <?php
                                 if ($num_locations > 0) { ?>
                                     <span class="right badge text-light"><?= $num_locations ?></span>
@@ -80,13 +80,13 @@ $num_vendors = $row['num'];
                         </a>
                     </li>
 
-                    <li class="nav-header mt-3">INFRASTRUCTURE</li>
+                    <li class="nav-header mt-3"><?= __('INFRASTRUCTURE') ?></li>
 
                     <li class="nav-item">
                         <a href="assets.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "assets.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-desktop"></i>
                             <p>
-                                Assets
+                                <?= __('Assets') ?>
                                 <?php
                                 if ($num_assets > 0) { ?>
                                     <span class="right badge text-light"><?= $num_assets ?></span>
@@ -99,7 +99,7 @@ $num_vendors = $row['num'];
                         <a href="networks.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "networks.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-network-wired"></i>
                             <p>
-                                Networks
+                                <?= __('Networks') ?>
                                 <?php
                                 if ($num_networks > 0) { ?>
                                     <span class="right badge text-light"><?= $num_networks ?></span>
@@ -112,7 +112,7 @@ $num_vendors = $row['num'];
                         <a href="racks.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "racks.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-server"></i>
                             <p>
-                                Racks
+                                <?= __('Racks') ?>
                                 <?php
                                 if ($num_racks > 0) { ?>
                                     <span class="right badge text-light"><?= $num_racks ?></span>
@@ -121,14 +121,14 @@ $num_vendors = $row['num'];
                         </a>
                     </li>
 
-                    <li class="nav-header mt-3">WEB & SECURITY</li>
+                    <li class="nav-header mt-3"><?= __('WEB & SECURITY') ?></li>
 
                     <?php if (lookupUserPermission("module_credential") >= 1) { ?>
                     <li class="nav-item">
                         <a href="credentials.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "credentials.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-key"></i>
                             <p>
-                                Credentials
+                                <?= __('Credentials') ?>
                                 <?php
                                 if ($num_credentials > 0) { ?>
                                     <span class="right badge text-light"><?= $num_credentials ?></span>
@@ -142,7 +142,7 @@ $num_vendors = $row['num'];
                         <a href="certificates.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "certificates.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-lock"></i>
                             <p>
-                                Certificates
+                                <?= __('Certificates') ?>
                                 <?php
                                 if ($num_certificates > 0) { ?>
                                     <span class="right badge text-light"><?= $num_certificates ?></span>
@@ -154,7 +154,7 @@ $num_vendors = $row['num'];
                         <a href="domains.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "domains.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-globe"></i>
                             <p>
-                                Domains
+                                <?= __('Domains') ?>
                                 <?php
                                 if ($num_domains > 0) { ?>
                                     <span class="right badge text-light"><?= $num_domains ?></span>
@@ -166,17 +166,17 @@ $num_vendors = $row['num'];
                     <li class="nav-item">
                         <a href="shares.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "shares.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-share-alt"></i>
-                            <p>Shared Links</p>
+                            <p><?= __('Shared Links') ?></p>
                         </a>
                     </li>
 
-                    <li class="nav-header mt-3">DOCUMENTATION</li>
+                    <li class="nav-header mt-3"><?= __('DOCUMENTATION') ?></li>
 
                     <li class="nav-item">
                         <a href="software.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "software.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-cube"></i>
                             <p>
-                                Licenses
+                                <?= __('Licenses') ?>
                                 <?php
                                 if ($num_software > 0) { ?>
                                     <span class="right badge text-light"><?= $num_software ?></span>
@@ -189,7 +189,7 @@ $num_vendors = $row['num'];
                         <a href="vendors.php?view=clients" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "vendors.php" || basename($_SERVER["PHP_SELF"]) == "vendor.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-building"></i>
                             <p>
-                                Vendors
+                                <?= __('Vendors') ?>
                                 <?php
                                 if ($num_vendors > 0) { ?>
                                     <span class="right badge text-light"><?= $num_vendors ?></span>
@@ -202,7 +202,7 @@ $num_vendors = $row['num'];
                         <a href="services.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "services.php") { echo "active"; } ?>">
                             <i class="nav-icon fas fa-stream"></i>
                             <p>
-                                Services
+                                <?= __('Services') ?>
                                 <?php
                                 if ($num_services > 0) { ?>
                                     <span class="right badge text-light"><?= $num_services ?></span>

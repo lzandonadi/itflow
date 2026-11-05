@@ -42,10 +42,10 @@ if (empty($client_top_head_skip)) {
                     <?php if ($client_type) { ?><span class="itflow-client-head-type"><?= $client_type ?></span><?php } ?>
                 </span>
             </a>
-            <?php if ($client_is_lead) { ?><span class="badge rounded-pill text-bg-info fw-normal">Lead</span><?php } ?>
-            <?php if ($client_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal">Archived</span><?php } ?>
+            <?php if ($client_is_lead) { ?><span class="badge rounded-pill text-bg-info fw-normal"><?= __('Lead') ?></span><?php } ?>
+            <?php if ($client_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal"><?= __('Archived') ?></span><?php } ?>
             <?php if (!empty($config_module_enable_accounting) && ($client_head_tax = taxClient($client_id))['exempt']) { ?>
-                <span class="badge rounded-pill fw-normal <?= $client_head_tax['expired'] ? 'bg-warning-subtle text-warning-emphasis' : 'bg-success-subtle text-success-emphasis' ?>" title="<?= escapeHtml(taxExemptText($client_head_tax)) ?>"><?= $client_head_tax['expired'] ? 'Tax exempt - certificate expired' : 'Tax exempt' ?></span>
+                <span class="badge rounded-pill fw-normal <?= $client_head_tax['expired'] ? 'bg-warning-subtle text-warning-emphasis' : 'bg-success-subtle text-success-emphasis' ?>" title="<?= escapeHtml(taxExemptText($client_head_tax)) ?>"><?= $client_head_tax['expired'] ? __('Tax exempt - certificate expired') : __('Tax exempt') ?></span>
             <?php } ?>
             <?= tagPills('client', $client_id, $client_tags) ?>
 
@@ -68,7 +68,7 @@ if (empty($client_top_head_skip)) {
 
         <?php if ($client_head_edit) { ?>
             <div class="dropdown dropstart flex-shrink-0">
-                <button class="btn btn-outline-secondary btn-sm" title="More actions" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-outline-secondary btn-sm" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                     <i class="fas fa-fw fa-ellipsis-v"></i>
                 </button>
                 <?php require 'includes/client_actions_menu.php'; ?>

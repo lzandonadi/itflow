@@ -30,7 +30,7 @@ if ($total_found_rows > 5) {
             <form action="post.php" method="post">
                 <input type="hidden" name="csrf_token" value="<?= escapeHtml($_SESSION['csrf_token'] ?? '') ?>">
                 <div class="d-flex align-items-center">
-                    <select onchange="this.form.submit()" class="form-select form-select-sm w-auto" name="change_records_per_page" aria-label="Records per page">
+                    <select onchange="this.form.submit()" class="form-select form-select-sm w-auto" name="change_records_per_page" aria-label="<?= escapeHtml(__('Records per page')) ?>">
                         <option <?php if ($user_config_records_per_page == 5) { echo "selected"; } ?> >5</option>
                         <option <?php if ($user_config_records_per_page == 10) { echo "selected"; } ?> >10</option>
                         <option <?php if ($user_config_records_per_page == 20) { echo "selected"; } ?> >20</option>
@@ -38,7 +38,7 @@ if ($total_found_rows > 5) {
                         <option <?php if ($user_config_records_per_page == 100) { echo "selected"; } ?> >100</option>
                         <option <?php if ($user_config_records_per_page == 500) { echo "selected"; } ?> >500</option>
                     </select>
-                    <span class="text-muted small ms-2 d-none d-sm-inline">per page</span>
+                    <span class="text-muted small ms-2 d-none d-sm-inline"><?= __('per page') ?></span>
                 </div>
             </form>
         </div>
@@ -64,7 +64,7 @@ if ($total_found_rows > 5) {
 
         <div class="col col-sm">
             <p class="text-center mb-0">
-              Showing <strong><?= $start ?></strong> to <strong><?= $end ?></strong> of <strong><?= $total_found_rows ?></strong> records
+              <?= __('Showing <strong>%1$s</strong> to <strong>%2$s</strong> of <strong>%3$s</strong> records', $start, $end, $total_found_rows) ?>
             </p>
         </div>
         <div class="col-12 col-sm">
@@ -99,7 +99,7 @@ if ($total_found_rows > 5) {
                 $next_page  = $page + 1;
 
                 if ($page > 1) {
-                    echo "<li class='page-item $prev_class'><a class='page-link' href='?$url_query_strings_page&page=$prev_page'>Prev</a></li>";
+                    echo "<li class='page-item $prev_class'><a class='page-link' href='?$url_query_strings_page&page=$prev_page'>" . __('Prev') . "</a></li>";
                 }
 
                 while ($i < $total_pages) {
@@ -115,7 +115,7 @@ if ($total_found_rows > 5) {
                 }
 
                 if ($page <> $total_pages) {
-                    echo "<li class='page-item $next_class'><a class='page-link' href='?$url_query_strings_page&page=$next_page'>Next</a></li>";
+                    echo "<li class='page-item $next_class'><a class='page-link' href='?$url_query_strings_page&page=$next_page'>" . __('Next') . "</a></li>";
                 }
 
                 ?>

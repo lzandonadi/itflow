@@ -55,7 +55,7 @@ if (($argv[2] ?? '') === '--hardcoded') {
 }
 
 $root = realpath(__DIR__ . '/..');
-$skip_dirs = ['libs', '.git', '.ddev', '.claude', 'node_modules', 'openspec', 'uploads', 'lang', 'setup'];
+$skip_dirs = ['libs', '.git', '.ddev', '.claude', 'node_modules', 'openspec', 'uploads', 'lang', 'setup'];  // and js/vendor-lang, third-party language packs
 $skip_files = ['scripts/i18n_check.php'];
 
 $calls = ['php' => [], 'js' => [], 'php_plural' => []];  // key => [file:line, ...]
@@ -345,7 +345,7 @@ function i18nCheckFiles(string $root, string $path, array $skip_dirs, array $ski
         new RecursiveDirectoryIterator($full, FilesystemIterator::SKIP_DOTS),
         function ($item) use ($root, $skip_dirs) {
             $relative = substr($item->getPathname(), strlen($root) + 1);
-            return !($item->isDir() && in_array(explode('/', $relative)[0], $skip_dirs, true));
+            return !($item->isDir() && (in_array(explode('/', $relative)[0], $skip_dirs, true) || $relative === 'js/vendor-lang'));
         }
     ));
     foreach ($iterator as $item) {

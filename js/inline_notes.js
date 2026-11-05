@@ -57,7 +57,7 @@ function itflowInlineNotes(textarea) {
                 }
             }, 2000);
         }, function () {
-            setStatus('Not saved - check your connection', 'text-danger');
+            setStatus(__('Not saved - check your connection'), 'text-danger');
         });
     }
 

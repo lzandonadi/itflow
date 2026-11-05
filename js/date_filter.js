@@ -50,24 +50,24 @@
         var lastWeekStart = addDays(startOfWeek(now), -7);
 
         return [
-            { label: 'Today', canned: 'today', start: now, end: now },
-            { label: 'Yesterday', canned: 'yesterday',
+            { label: __('Today'), canned: 'today', start: now, end: now },
+            { label: __('Yesterday'), canned: 'yesterday',
               start: addDays(now, -1), end: addDays(now, -1) },
-            { label: 'This Week', canned: 'thisweek',
+            { label: __('This Week'), canned: 'thisweek',
               start: startOfWeek(now), end: now },
-            { label: 'Last Week', canned: 'lastweek',
+            { label: __('Last Week'), canned: 'lastweek',
               start: lastWeekStart, end: addDays(lastWeekStart, 6) },
-            { label: 'This Month', canned: 'thismonth',
+            { label: __('This Month'), canned: 'thismonth',
               start: new Date(now.getFullYear(), now.getMonth(), 1), end: now },
-            { label: 'Last Month', canned: 'lastmonth',
+            { label: __('Last Month'), canned: 'lastmonth',
               start: new Date(now.getFullYear(), now.getMonth() - 1, 1),
               end: new Date(now.getFullYear(), now.getMonth(), 0) },
-            { label: 'This Year', canned: 'thisyear',
+            { label: __('This Year'), canned: 'thisyear',
               start: new Date(now.getFullYear(), 0, 1), end: now },
-            { label: 'Last Year', canned: 'lastyear',
+            { label: __('Last Year'), canned: 'lastyear',
               start: new Date(now.getFullYear() - 1, 0, 1),
               end: new Date(now.getFullYear() - 1, 11, 31) },
-            { label: 'All Time', canned: 'alltime',
+            { label: __('All Time'), canned: 'alltime',
               start: parseYmd(ALL_TIME_START), end: parseYmd(ALL_TIME_END) }
         ];
     }
@@ -97,9 +97,9 @@
         var presetClicked = false;
 
         function setDisplay(start, end, label) {
-            if (label === 'All Time' ||
+            if (label === __('All Time') ||
                 (ymd(start) === ALL_TIME_START && ymd(end) === ALL_TIME_END)) {
-                input.value = 'All Time';
+                input.value = __('All Time');
             } else {
                 input.value = ymd(start) + ' \u2014 ' + ymd(end);
             }
