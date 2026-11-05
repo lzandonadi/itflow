@@ -14,7 +14,7 @@ $sql = mysqli_query($mysqli, "SELECT task_name, ticket_client_id FROM tasks
 
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    echo json_encode(['error' => 'That task no longer exists.']);
+    echo json_encode(['error' => __('That task no longer exists.')]);
     exit;
 }
 $task_name = escapeHtml($row['task_name']);
@@ -29,7 +29,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-shield-alt me-2"></i>Require approval <small class="ms-1 opacity-75"><?= $task_name ?></small></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-shield-alt me-2"></i><?= __('Require approval') ?> <small class="ms-1 opacity-75"><?= $task_name ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -39,20 +39,20 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Approval comes from <strong class="text-danger">*</strong></label>
+            <label><?= __('Approval comes from') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                 <select class="form-select" name="approval_scope" id="approval_scope" required>
-                    <option value="">- Pick one -</option>
-                    <option value="internal">Our team</option>
-                    <option value="client">The client</option>
+                    <option value=""><?= __('- Pick one -') ?></option>
+                    <option value="internal"><?= __('Our team') ?></option>
+                    <option value="client"><?= __('The client') ?></option>
                 </select>
             </div>
         </div>
 
 
         <div class="mb-3 d-none" id="approval_type_wrapper">
-            <label>Who can approve? <strong class="text-danger">*</strong></label>
+            <label><?= __('Who can approve?') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                 <select class="form-select" name="approval_type" id="approval_type" required>
@@ -63,11 +63,11 @@ ob_start();
 
 
         <div class="mb-3 d-none" id="specific_user_wrapper">
-            <label>Technician <strong class="text-danger">*</strong></label>
+            <label><?= __('Technician') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user-circle"></i></span>
                 <select class="form-select select2" name="approval_required_user_id" id="specific_user_select">
-                    <option value="">Select user...</option>
+                    <option value=""><?= __('Select user...') ?></option>
                 </select>
             </div>
         </div>
@@ -76,8 +76,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="add_ticket_task_approver" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Require approval</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_ticket_task_approver" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Require approval') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>
@@ -119,18 +119,18 @@ ob_start();
 
             if (scope === 'internal') {
                 setOptions(typeSelect, [
-                    ['', 'Select...'],
-                    ['any', 'Any other technician'],
-                    ['specific', 'A specific technician']
+                    ['', __('Select...')],
+                    ['any', __('Any other technician')],
+                    ['specific', __('A specific technician')]
                 ]);
             }
 
             if (scope === 'client') {
                 setOptions(typeSelect, [
-                    ['', 'Select...'],
-                    ['any', 'Ticket contact'],
-                    ['technical', 'Technical contacts'],
-                    ['billing', 'Billing contacts']
+                    ['', __('Select...')],
+                    ['any', __('Ticket contact')],
+                    ['technical', __('Technical contacts')],
+                    ['billing', __('Billing contacts')]
                 ]);
             }
         });
@@ -159,14 +159,14 @@ ob_start();
                     return res.json();
                 })
                 .then(function (data) {
-                    var pairs = [['', 'Select user...']];
+                    var pairs = [['', __('Select user...')]];
                     data.users.forEach(function (u) {
                         pairs.push([u.user_id, u.user_name]);
                     });
                     setOptions(userSelect, pairs);
                 })
                 .catch(function () {
-                    setOptions(userSelect, [['', 'Failed to load users']]);
+                    setOptions(userSelect, [['', __('Failed to load users')]]);
                 });
         });
     })();

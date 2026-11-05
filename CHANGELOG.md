@@ -10,10 +10,15 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 
 ### New Features & Updates
 
-- Interface language: Admin > Settings > Localization has a new Interface language setting, English (US) or Português (Brasil). It changes the language for everyone - agents, the client portal and guest pages. English stays the default. Translated so far: the menus and page frames of every area, signing in, setting up MFA, resetting a portal password, signing up, invites and the emails that go with them, Your account for agents (profile, security, preferences, activity) and for portal contacts, the ticket list and board with their filters, bulk actions and quick pickers, the messages for something your role can't do, the Localization page, the confirmation box and the ticket closed email. The rest follow in later releases. What used to be called Locale on that page is now Number and currency format. It still only changes how numbers and money look.
+- Interface language: Admin > Settings > Localization has a new Interface language setting, English (US) or Português (Brasil). It changes the language for everyone - agents, the client portal and guest pages. English stays the default. Translated so far: the menus and page frames of every area, signing in, setting up MFA, resetting a portal password, signing up, invites and the emails that go with them, Your account for agents (profile, security, preferences, activity) and for portal contacts, the ticket list and board with their filters, bulk actions and quick pickers, the open ticket with its replies, tasks and approvals, merging, scheduling, the windows that open from it and the notes ITFlow adds to it, the messages for something your role can't do, the Localization page, the confirmation box and the ticket closed email. The rest follow in later releases. What used to be called Locale on that page is now Number and currency format. It still only changes how numbers and money look.
 - Ticket list and board: scheduled dates now show month names in the interface language, for example "Today 6:30 PM" or "Nov 7, 5:40 PM".
+- Ticket page: its dates (opened, first response, due, resolved, closed, scheduled) follow the interface language, and in English read "Nov 5, 2026, 6:30 PM" instead of "Nov 05, 2026 • 6:30 PM". Scheduled work in the ticket note, the confirmation and the email reads "Thu, Nov 10, 2026, 2:30 PM" instead of "Tuesday, November 10, 2026 at 2:30pm".
 - Your account > Activity: the date of each entry now follows the interface language, and in English reads "Nov 5, 2026, 6:44 PM" instead of "Nov 5, 2026 6:44 PM". "2 hours ago" and the like are translated too.
 - Emails: the date in the sign-in alert, failed sign-ins and test emails now follows the interface language, and in English reads "Thu, Nov 5, 2026, 6:44 PM" instead of "Thu 5 Nov 2026, 6:44 PM".
+
+### Bug Fixes
+
+- Editing a client's reply on a ticket no longer fills Time worked with the current time of day - a reply with no time worked shows 00:00:00.
 
 ### Developer Updates
 

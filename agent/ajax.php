@@ -1464,7 +1464,7 @@ if (isset($_POST['update_kanban_status_position'])) {
 
     if (lookupUserPermission('module_support') < 2 || intval($config_ticket_moving_columns) !== 1) {
         http_response_code(403);
-        echo json_encode(['error' => 'Columns cannot be moved here.']);
+        echo json_encode(['error' => __('Columns cannot be moved here.')]);
         exit;
     }
 
@@ -1491,17 +1491,17 @@ if (isset($_POST['update_kanban_ticket'])) {
     };
 
     if (lookupUserPermission('module_support') < 2) {
-        $kanban_error('You cannot change tickets.', 403);
+        $kanban_error(__('You cannot change tickets.'), 403);
     }
 
     $row = ticketRow($_POST['ticket_id'] ?? 0);
     if (!$row || (intval($row['ticket_client_id']) && !hasClientAccess($row['ticket_client_id']))) {
-        $kanban_error('That ticket is not there any more - reload the board.', 404);
+        $kanban_error(__('That ticket is not there any more - reload the board.'), 404);
     }
     $ticket_id = intval($row['ticket_id']);
     $reference = ticketReference($row);
     if (!empty($row['ticket_closed_at'])) {
-        $kanban_error("$reference is closed.");
+        $kanban_error(__('%s is closed.', $reference));
     }
 
     $status_id = intval($_POST['status_id'] ?? 0);
@@ -1513,28 +1513,28 @@ if (isset($_POST['update_kanban_ticket'])) {
         if ($status_id === TICKET_STATUS_RESOLVED) {
             $open_tasks = ticketOpenTaskCount($ticket_id);
             if ($open_tasks) {
-                $kanban_error("Finish the $open_tasks open task" . ($open_tasks === 1 ? '' : 's') . " on $reference before resolving it.");
+                $kanban_error(_n('Finish the %1$d open task on %2$s before resolving it.', 'Finish the %1$d open tasks on %2$s before resolving it.', intval($open_tasks), intval($open_tasks), $reference));
             }
             ticketResolve($row, ' from the board');
             if (intval($config_ticket_client_general_notifications) === 1) {
                 ticketMailResolved($ticket_id);
             }
-            $message = "$reference resolved";
+            $message = __('%s resolved', $reference);
         } elseif (isset($pickable[$status_id])) {
             if (!empty($row['ticket_resolved_at'])) {
                 ticketReopen($row, $status_id, ' from the board');
-                $message = "$reference reopened";
+                $message = __('%s reopened', $reference);
             } else {
                 [$ok, $message] = ticketChangeStatus($ticket_id, $status_id);
                 if (!$ok) {
                     $kanban_error(strip_tags($message));
                 }
-                $message = "$reference: " . strip_tags($message);
+                $message = __('%1$s: %2$s', $reference, strip_tags($message));
             }
         } elseif ($status_id === TICKET_STATUS_NEW) {
-            $kanban_error('New is for tickets nobody has picked up yet - a ticket can only move on from there.');
+            $kanban_error(__('New is for tickets nobody has picked up yet - a ticket can only move on from there.'));
         } else {
-            $kanban_error('A ticket cannot be moved to that status.');
+            $kanban_error(__('A ticket cannot be moved to that status.'));
         }
     }
 

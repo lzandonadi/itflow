@@ -60,7 +60,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i>New Ticket</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i><?= __('New Ticket') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -76,13 +76,13 @@ ob_start();
         <!-- Nav -->
         <ul class="nav nav-pills nav-justified mb-3">
             <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="pill" href="#pills-add-details"><i class="fa fa-fw fa-life-ring me-2"></i>Details</a>
+                <a class="nav-link active" data-bs-toggle="pill" href="#pills-add-details"><i class="fa fa-fw fa-life-ring me-2"></i><?= __('Details') ?></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#pills-add-relationships"><i class="fa fa-fw fa-link me-2"></i>Related</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#pills-add-relationships"><i class="fa fa-fw fa-link me-2"></i><?= __('Related') ?></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#pills-add-tasks"><i class="fa fa-fw fa-tasks me-2"></i>Tasks</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#pills-add-tasks"><i class="fa fa-fw fa-tasks me-2"></i><?= __('Tasks') ?></a>
             </li>
         </ul>
 
@@ -98,7 +98,7 @@ ob_start();
                         <input type="hidden" name="service_ids[]" value="<?= intval($service['service_id']) ?>">
                         <?= serviceTile($service['service_category'], 'sm') ?>
                         <div class="min-w-0 flex-grow-1">
-                            <div class="small text-body-secondary">About the service</div>
+                            <div class="small text-body-secondary"><?= __('About the service') ?></div>
                             <div class="fw-semibold text-truncate"><?= escapeHtml($service['service_name']) ?></div>
                         </div>
                         <?= serviceImportancePill($service['service_importance'], true) ?>
@@ -109,11 +109,11 @@ ob_start();
                 <div class="row">
                     <div class="col">
                         <div class="mb-3">
-                            <label>Client <strong class="text-danger">*</strong></label>
+                            <label><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                                 <select class="form-select select2" name="client_id" id="changeClientSelect" required <?php if ($client_id) { echo "disabled"; } ?>>
-                                    <option value="">- Select a Client -</option>
+                                    <option value=""><?= __('- Select a Client -') ?></option>
                                     <?php
 
                                     // Hide leads from the general list, but include the current client when opening a ticket from a lead page.
@@ -132,11 +132,11 @@ ob_start();
                     </div>
                     <div class="col">
                         <div class="mb-3">
-                            <label>Contact </label>
+                            <label><?= __('Contact') ?> </label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                                 <select class="form-select select2" name="contact_id" id="contactSelect" data-selected="<?= $contact_id ?>">
-                                    <option value="0">- No One -</option>
+                                    <option value="0"><?= __('- No One -') ?></option>
                                 </select>
                             </div>
                         </div>
@@ -149,10 +149,10 @@ ob_start();
                 <?php require_once '../../includes/inc_ticket_template_select.php'; ?>
 
                 <div class="mb-3">
-                    <label>Subject <strong class="text-danger">*</strong></label>
+                    <label><?= __('Subject') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                        <input type="text" class="form-control" id="subjectInput" name="subject" placeholder="Subject" maxlength="500" value="<?= escapeHtml($prefill_subject) ?>" data-template-field="subject" required>
+                        <input type="text" class="form-control" id="subjectInput" name="subject" placeholder="<?= escapeHtml(__('Subject')) ?>" maxlength="500" value="<?= escapeHtml($prefill_subject) ?>" data-template-field="subject" required>
                     </div>
                 </div>
 
@@ -164,14 +164,14 @@ ob_start();
 
                     <div class="col">
                         <div class="mb-3">
-                            <label>Priority <strong class="text-danger">*</strong></label>
+                            <label><?= __('Priority') ?> <strong class="text-danger">*</strong></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-thermometer-half"></i></span>
                                 <select class="form-select select2" name="priority" data-template-field="priority" required>
-                                    <option data-color="var(--bs-info)">Low</option>
-                                    <option selected data-color="var(--bs-warning)">Medium</option>
-                                    <option data-color="var(--bs-danger)">High</option>
-                                    <option data-color="var(--bs-emphasis-color)">Urgent</option>
+                                    <option value="Low" data-color="var(--bs-info)"><?= escapeHtml(ticketPriorityLabel('Low')) ?></option>
+                                    <option value="Medium" selected data-color="var(--bs-warning)"><?= escapeHtml(ticketPriorityLabel('Medium')) ?></option>
+                                    <option value="High" data-color="var(--bs-danger)"><?= escapeHtml(ticketPriorityLabel('High')) ?></option>
+                                    <option value="Urgent" data-color="var(--bs-emphasis-color)"><?= escapeHtml(ticketPriorityLabel('Urgent')) ?></option>
                                 </select>
                             </div>
                         </div>
@@ -179,11 +179,11 @@ ob_start();
 
                     <div class="col">
                         <div class="mb-3">
-                            <label>Category</label>
+                            <label><?= __('Category') ?></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                                 <select class="form-select select2" name="category_id" data-template-field="category">
-                                    <option value="0">- Not Categorized -</option>
+                                    <option value="0"><?= __('- Not Categorized -') ?></option>
                                     <?= categoryOptionsHtml('Ticket') ?>
                                 </select>
                                 <?= categoryAddButtonHtml('Ticket', 'btn btn-secondary') ?>
@@ -196,11 +196,11 @@ ob_start();
                 <div class="row">
                     <div class="col">
                         <div class="mb-3">
-                            <label>Assign to</label>
+                            <label><?= __('Assign to') ?></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                                 <select class="form-select select2" name="assigned_to" data-template-field="assigned">
-                                    <option value="0">- Unassigned -</option>
+                                    <option value="0"><?= __('- Unassigned -') ?></option>
                                     <?php
 
                                     $sql = mysqli_query(
@@ -219,7 +219,7 @@ ob_start();
                     </div>
                     <div class="col">
                         <div class="mb-3">
-                            <label>Due</label>
+                            <label><?= __('Due') ?></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-calendar-check"></i></span>
                                 <input type="datetime-local" class="form-control" name="due" data-template-field="due">
@@ -229,14 +229,14 @@ ob_start();
                 </div>
 
                 <div class="mb-3">
-                    <?= tagFormFieldHtml('ticket', [], 'Onboarding, Hardware, Escalated', 'Tags', 'data-template-field="tags"') ?>
+                    <?= tagFormFieldHtml('ticket', [], __('Onboarding, Hardware, Escalated'), __('Tags'), 'data-template-field="tags"') ?>
                 </div>
 
                 <?php if ($config_module_enable_accounting) { ?>
                 <div class="mb-3">
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="billable" <?php if ($config_ticket_default_billable == 1) { echo "checked"; } ?> value="1" id="billable" data-template-field="billable">
-                        <label class="form-check-label" for="billable">Mark Billable</label>
+                        <label class="form-check-label" for="billable"><?= __('Mark Billable') ?></label>
                     </div>
                 </div>
                 <?php } ?>
@@ -252,7 +252,7 @@ ob_start();
             <div class="tab-pane fade" id="pills-add-relationships">
 
                 <div class="mb-3">
-                    <label>Project</label>
+                    <label><?= __('Project') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-project-diagram"></i></span>
                         <select class="form-select select2" name="project_id" id="projectSelect" data-selected="<?= $project_id ?>">
@@ -261,7 +261,7 @@ ob_start();
                 </div>
 
                 <div class="mb-3">
-                    <label>Asset</label>
+                    <label><?= __('Asset') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
                         <select class="form-select select2" name="asset_id" id="assetSelect" data-selected="<?= $asset_id ?>">
@@ -270,16 +270,16 @@ ob_start();
                 </div>
 
                 <div class="mb-3">
-                    <label>Other assets</label>
+                    <label><?= __('Other assets') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
-                        <select class="form-select select2" name="additional_assets[]" id="additionalAssetsSelect" data-placeholder="- Select Additional Assets -" multiple>
+                        <select class="form-select select2" name="additional_assets[]" id="additionalAssetsSelect" data-placeholder="<?= escapeHtml(__('- Select Additional Assets -')) ?>" multiple>
                         </select>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label>Site</label>
+                    <label><?= __('Site') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-map-marker-alt"></i></span>
                         <select class="form-select select2" name="location_id" id="locationSelect" data-selected="<?= $location_id ?>">
@@ -291,7 +291,7 @@ ob_start();
 
                     <div class="col">
                         <div class="mb-3">
-                            <label>Vendor</label>
+                            <label><?= __('Vendor') ?></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                                 <select class="form-select select2" name="vendor_id" id="vendorSelect" data-selected="<?= $vendor_id ?>">
@@ -302,10 +302,10 @@ ob_start();
 
                     <div class="col">
                         <div class="mb-3">
-                            <label>Their reference</label>
+                            <label><?= __('Their reference') ?></label>
                             <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-                                <input type="text" class="form-control" name="vendor_ticket_number" placeholder="The vendor's case number" maxlength="255">
+                                <input type="text" class="form-control" name="vendor_ticket_number" placeholder="<?= escapeHtml(__('The vendor\'s case number')) ?>" maxlength="255">
                             </div>
                         </div>
                     </div>
@@ -313,16 +313,16 @@ ob_start();
                 </div>
 
                 <div class="mb-3">
-                    <label>Watchers</label>
+                    <label><?= __('Watchers') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-envelope"></i></span>
-                        <select class="form-select select2" name="watchers[]" id="watchersSelect" data-tags="true" data-placeholder="Enter or select email address" multiple>
+                        <select class="form-select select2" name="watchers[]" id="watchersSelect" data-tags="true" data-placeholder="<?= escapeHtml(__('Enter or select email address')) ?>" multiple>
                         </select>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label><i class="fa fa-fw fa-paperclip me-1"></i>Attachments</label>
+                    <label><i class="fa fa-fw fa-paperclip me-1"></i><?= __('Attachments') ?></label>
                     <input type="file" class="form-control" name="attachments[]" multiple accept=".jpg, .jpeg, .gif, .png, .webp, .pdf, .txt, .md, .doc, .docx, .odt, .csv, .xls, .xlsx, .ods, .pptx, .odp, .zip, .tar, .gz, .xml, .msg, .json, .wav, .mp3, .ogg, .mov, .mp4, .av1, .ovpn">
                 </div>
 
@@ -333,8 +333,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="add_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create Ticket</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create Ticket') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

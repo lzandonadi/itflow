@@ -27,7 +27,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-magic me-2"></i>Summary of <?= escapeHtml(ticketReference($ticket)) ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-magic me-2"></i><?= __('Summary of %s', escapeHtml(ticketReference($ticket))) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-ai-summary-form data-ticket-id="<?= $ticket_id ?>">
@@ -36,19 +36,19 @@ ob_start();
     <input type="hidden" name="note" value="" data-ai-summary-note>
     <div class="modal-body">
         <div class="itflow-ai-summary" data-ai-summary aria-live="polite">
-            <div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>Reading the ticket...</div>
+            <div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i><?= __('Reading the ticket...') ?></div>
         </div>
-        <div class="small text-body-secondary mt-3 d-none" data-ai-summary-said><i class="fas fa-fw fa-robot me-1"></i>Written by AI from the ticket - check it before relying on it.</div>
+        <div class="small text-body-secondary mt-3 d-none" data-ai-summary-said><i class="fas fa-fw fa-robot me-1"></i><?= __('Written by AI from the ticket - check it before relying on it.') ?></div>
     </div>
     <div class="modal-footer">
         <?php if ($can_note) { ?>
-            <button type="submit" name="add_ticket_ai_note" class="btn btn-primary text-bold" data-ai-summary-save disabled title="Put it on the ticket as an internal note">
-                <i class="fas fa-fw fa-sticky-note me-2"></i>Save as a note
+            <button type="submit" name="add_ticket_ai_note" class="btn btn-primary text-bold" data-ai-summary-save disabled title="<?= escapeHtml(__('Put it on the ticket as an internal note')) ?>">
+                <i class="fas fa-fw fa-sticky-note me-2"></i><?= __('Save as a note') ?>
             </button>
         <?php } ?>
-        <button type="button" class="btn btn-light border" data-ai-summary-copy disabled><i class="fas fa-fw fa-copy me-2"></i>Copy</button>
-        <button type="button" class="btn btn-light border" data-ai-summary-again disabled><i class="fas fa-fw fa-redo me-2"></i>Again</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+        <button type="button" class="btn btn-light border" data-ai-summary-copy disabled><i class="fas fa-fw fa-copy me-2"></i><?= __('Copy') ?></button>
+        <button type="button" class="btn btn-light border" data-ai-summary-again disabled><i class="fas fa-fw fa-redo me-2"></i><?= __('Again') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
     </div>
 </form>
 
@@ -78,7 +78,7 @@ ob_start();
         ready(false);
         note.value = '';
         said.classList.add('d-none');
-        target.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>Reading the ticket...</div>';
+        target.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>' + __('Reading the ticket...') + '</div>';
         fetch('/agent/ajax.php?ai_ticket_summary', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -105,7 +105,7 @@ ob_start();
                 var p = document.createElement('p');
                 p.className = 'text-danger-emphasis mb-0';
                 p.setAttribute('data-ai-summary-error', '');
-                p.textContent = error && error.message ? error.message : 'Could not summarize it - try again.';
+                p.textContent = error && error.message ? error.message : __('Could not summarize it - try again.');
                 target.appendChild(p);
                 again.disabled = false;
             });
@@ -119,13 +119,13 @@ ob_start();
                 'text/html': new Blob([note.value], { type: 'text/html' }),
                 'text/plain': new Blob([text], { type: 'text/plain' })
             })]).then(function () {
-                itflowToast('Summary copied', 'success');
+                itflowToast(__('Summary copied'), 'success');
             }, function () {
                 navigator.clipboard.writeText(text);
             });
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(function () {
-                itflowToast('Summary copied', 'success');
+                itflowToast(__('Summary copied'), 'success');
             });
         }
     });

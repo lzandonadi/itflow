@@ -27,7 +27,8 @@
  *   php i18n_check.php pt_BR --hardcoded agent/modals/ticket agent/ticket.php
  *
  * lists instead what still looks like fixed English under those paths, file:line:
- * text between tags, title / placeholder / aria-label / alt attributes, and
+ * text between tags, title / placeholder / aria-label / alt / data-placeholder /
+ * data-confirm-* attributes, and
  * sentences in PHP and JS strings. A guess, to find what a batch missed - a line
  * marked i18n-ignore is left out. Always exits 0.
  */
@@ -120,7 +121,7 @@ function i18nCheckHardcodedHtml(string $html, array $lines, int $lines_first, st
             }
         }
     }
-    if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-bs-title|data-original-title)\s*=\s*"([^"<]*)"/i', $html, $m, PREG_OFFSET_CAPTURE)) {
+    if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-bs-title|data-original-title|data-placeholder|data-empty|data-confirm-title|data-confirm-text|data-confirm-button)\s*=\s*"([^"<]*)"/i', $html, $m, PREG_OFFSET_CAPTURE)) {
         foreach ($m[1] as [$text, $offset]) {
             if (i18nCheckIsProse($text, true)) {
                 i18nCheckHardcoded($hardcoded, $lines, $lines_first, $file, $at($offset), $text);

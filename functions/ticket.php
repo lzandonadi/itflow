@@ -1973,22 +1973,24 @@ function ticketSetSchedule(array $row, $schedule, $onsite) {
             WHERE ticket_schedule BETWEEN '$start' AND '$end' AND ticket_id <> $ticket_id AND ticket_assigned_to = $assigned_to
             AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL ORDER BY ticket_schedule");
         while ($conflict = mysqli_fetch_assoc($sql)) {
-            $conflicts[] = ticketReference($conflict) . ' - ' . $conflict['ticket_subject'] . ' @ ' . date('g:ia', strtotime($conflict['ticket_schedule']));
+            $conflicts[] = ticketReference($conflict) . ' - ' . $conflict['ticket_subject'] . ' @ ' . formatDate($conflict['ticket_schedule'], 'time');
         }
     }
 
     // Who to tell, with the calendar file
     $mail_row = ticketScheduleRow($ticket_id);
     $cal_str = ticketScheduleIcs($mail_row, $schedule);
-    $when_text = date('l, F j, Y \a\t g:ia', strtotime($schedule));
+    // Shown and emailed in the interface language; the history and the audit log keep English
+    $when_text = formatDate($schedule, 'datetime_weekday');
+    $when_text_log = escapeSql(date('l, F j, Y \a\t g:ia', strtotime($schedule)));
     ticketMailSchedule($mail_row, $cal_str, false, $when_text);
 
     // Note it on the ticket
-    $note = escapeSql("Ticket scheduled for $when_text " . ($onsite ? '(onsite).' : '(remote).'));
+    $note = escapeSql($onsite ? __('Ticket scheduled for %s (onsite).', $when_text) : __('Ticket scheduled for %s (remote).', $when_text));
     mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '$note', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
 
-    logTicketHistory($ticket_id, "$session_name scheduled the work for " . escapeSql($when_text) . ($onsite ? ' (onsite)' : ' (remote)'));
-    logAudit("Ticket", "Edit", "$session_name scheduled ticket " . escapeSql(ticketReference($row)) . " for " . escapeSql($when_text), $client_id, $ticket_id);
+    logTicketHistory($ticket_id, "$session_name scheduled the work for $when_text_log" . ($onsite ? ' (onsite)' : ' (remote)'));
+    logAudit("Ticket", "Edit", "$session_name scheduled ticket " . escapeSql(ticketReference($row)) . " for $when_text_log", $client_id, $ticket_id);
     triggerCustomAction('ticket_schedule', $ticket_id);
 
     return ['when_text' => $when_text, 'conflicts' => $conflicts];
@@ -2014,7 +2016,7 @@ function ticketCancelSchedule(array $row) {
     $cal_str = createiCalStrCancel($old_schedule, $cal_subject, getTicketCalendarUid($ticket_id));
     ticketMailSchedule($mail_row, $cal_str, true, '');
 
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket schedule cancelled.', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(__('Ticket schedule cancelled.')) . "', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
 
     logTicketHistory($ticket_id, "$session_name cancelled the scheduled work");
     logAudit("Ticket", "Edit", "$session_name cancelled the schedule of ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
