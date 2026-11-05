@@ -46,7 +46,7 @@
         <li class="nav-item dropdown" id="itflowNotify" data-csrf="<?= $_SESSION['csrf_token'] ?>">
             <a class="nav-link" href="/agent/notifications.php" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                 aria-expanded="false" title="<?= escapeHtml(__('Notifications')) ?>"
-                aria-label="Notifications<?= $num_notifications ? ", $num_notifications unread" : '' ?>">
+                aria-label="<?= escapeHtml($num_notifications ? _n('Notifications, %d unread', 'Notifications, %d unread', intval($num_notifications)) : __('Notifications')) ?>">
                 <i class="fas fa-bell" aria-hidden="true"></i>
                 <span class="badge bg-light text-dark rounded-pill navbar-badge" data-notify-badge <?= $num_notifications ? '' : 'hidden' ?>><?= $num_notifications > 99 ? '99+' : $num_notifications ?></span>
             </a>

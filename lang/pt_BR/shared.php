@@ -298,4 +298,7 @@ return [
     // Sign ins (functions/user.php)
     'Never signed in' => 'Nunca entrou',
 
+    // Top bar (includes/top_nav.php)
+    'Notifications, %d unread' => ['Notificações, %d não lida', 'Notificações, %d não lidas'],
+
 ];
