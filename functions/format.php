@@ -232,7 +232,8 @@ function formatAddress($address, $city, $state, $zip, $country = '', $separator 
  * doesn't. Takes the RAW user columns and escapes them itself.
  * Bootstrap 5.3 utilities and Font Awesome only - no custom CSS.
  */
-function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigned = true, $none_label = 'Unassigned') {
+function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigned = true, $none_label = null) {
+    $none_label = $none_label ?? __('Unassigned');
     $pill = "badge rounded-pill d-inline-flex align-items-center align-middle gap-1 p-1 pe-2";
     $user_id = intval($user_id);
 
@@ -698,7 +699,7 @@ function emptyStatePill(array $pills, $key, $default = '', array $good = []) {
         return null;
     }
     $pill = $pills[$key];
-    $view = ['title' => 'Nothing in ' . escapeHtml($pill['label'] ?? $key), 'text' => escapeHtml($pill['title'] ?? '')];
+    $view = ['title' => __('Nothing in %s', escapeHtml($pill['label'] ?? $key)), 'text' => escapeHtml($pill['title'] ?? '')];
     if (!empty($pill['alarm']) || in_array($key, array_map('strval', $good), true)) {
         return $view + ['icon' => 'fa-check'];
     }

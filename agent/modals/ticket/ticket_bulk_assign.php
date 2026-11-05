@@ -13,7 +13,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i>Assign Agent to <strong><?= $count ?></strong> ticket<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i><?= _n('Assign Agent to <strong>%d</strong> ticket', 'Assign Agent to <strong>%d</strong> tickets', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -24,11 +24,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Assign to</label>
+            <label><?= __('Assign to') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                 <select class="form-select select2" name="assign_to">
-                    <option value="0">Not Assigned</option>
+                    <option value="0"><?= __('Not Assigned') ?></option>
                     <?php
                     $sql_users_select = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users
                         WHERE user_type = 1
@@ -49,8 +49,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_assign_ticket" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Assign</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_assign_ticket" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Assign') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

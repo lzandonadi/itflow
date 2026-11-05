@@ -13,7 +13,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i>Assign Project to <strong><?= $count ?></strong> ticket<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i><?= _n('Assign Project to <strong>%d</strong> ticket', 'Assign Project to <strong>%d</strong> tickets', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -24,11 +24,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Project</label>
+            <label><?= __('Project') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-project-diagram"></i></span>
                 <select class="form-select select2" name="project_id">
-                    <option value="0">No Project</option>
+                    <option value="0"><?= __('No Project') ?></option>
                     <?php
                     // Internal projects, and those of the ticked tickets' clients - the only ones they can go on
                     $bulk_ticket_ids = implode(',', array_merge([0], array_map('intval', (array) ($_GET['ticket_ids'] ?? []))));
@@ -47,7 +47,7 @@ ob_start();
                         $project_name_select = escapeHtml($row['project_name']);
 
                         ?>
-                        <option value="<?= $project_id_select ?>" data-icon="fas fa-project-diagram" data-description="<?= $project_prefix_select . $project_number_select . ' - ' . ($row['client_name'] !== null ? escapeHtml($row['client_name']) : 'internal') ?>"><?= $project_name_select ?></option>
+                        <option value="<?= $project_id_select ?>" data-icon="fas fa-project-diagram" data-description="<?= $project_prefix_select . $project_number_select . ' - ' . ($row['client_name'] !== null ? escapeHtml($row['client_name']) : escapeHtml(__('internal'))) ?>"><?= $project_name_select ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -55,8 +55,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_add_ticket_project" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Assign</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_add_ticket_project" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Assign') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

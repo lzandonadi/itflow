@@ -251,7 +251,7 @@ return [
     'Change password' => 'Alterar senha',
     'Your current password' => 'Sua senha atual',
     'At least %d characters' => 'Pelo menos %d caracteres',
-    'Search' => 'Pesquisar',
+    'Search' => 'Buscar',
     'Client' => 'Cliente',
     'Company' => 'Empresa',
     'Location' => 'Local',
@@ -300,5 +300,8 @@ return [
 
     // Top bar (includes/top_nav.php)
     'Notifications, %d unread' => ['Notificações, %d não lida', 'Notificações, %d não lidas'],
+
+    // Empty lists (functions/format.php emptyStatePill())
+    'Nothing in %s' => 'Nada em %s',
 
 ];

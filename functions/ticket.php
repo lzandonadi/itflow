@@ -1425,7 +1425,7 @@ function ticketSlaState($row) {
     $responded = !empty($row['ticket_first_response_at']);
     $state = [
         'due' => $responded ? ($row['ticket_resolution_due_at'] ?? null) : ($row['ticket_response_due_at'] ?? null),
-        'what' => $responded ? 'Resolution due' : 'First response due',
+        'what' => $responded ? __('Resolution due') : __('First response due'),
     ];
     if ($stage === 2) {
         return ['key' => 'breached'] + $state;
@@ -1444,17 +1444,17 @@ function ticketSlaPill($sla) {
     $due = !empty($sla['due']) ? ' title="' . escapeHtml($sla['what'] . ' ' . $sla['due']) . '"' : '';
     switch ($sla['key']) {
         case 'breached':
-            return '<span class="badge rounded-pill text-bg-danger"' . $due . '><i class="fas fa-stopwatch me-1"></i>Breached</span>';
+            return '<span class="badge rounded-pill text-bg-danger"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . __('Breached') . '</span>';
         case 'at_risk':
-            return '<span class="badge rounded-pill text-bg-warning"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . (!empty($sla['due']) ? timeAgo($sla['due']) : 'At risk') . '</span>';
+            return '<span class="badge rounded-pill text-bg-warning"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . (!empty($sla['due']) ? timeAgo($sla['due']) : __('At risk')) . '</span>';
         case 'paused':
-            return '<span class="badge rounded-pill text-bg-secondary" title="The SLA clock is paused in this status"><i class="fas fa-pause me-1"></i>Paused</span>';
+            return '<span class="badge rounded-pill text-bg-secondary" title="' . escapeHtml(__('The SLA clock is paused in this status')) . '"><i class="fas fa-pause me-1"></i>' . __('Paused') . '</span>';
         case 'running':
             return '<span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . timeAgo($sla['due']) . '</span>';
         case 'met':
-            return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><i class="fas fa-check me-1"></i>SLA met</span>';
+            return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><i class="fas fa-check me-1"></i>' . __('SLA met') . '</span>';
         case 'missed':
-            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal"><i class="fas fa-stopwatch me-1"></i>SLA missed</span>';
+            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal"><i class="fas fa-stopwatch me-1"></i>' . __('SLA missed') . '</span>';
     }
     return '';
 }
@@ -1472,11 +1472,11 @@ function ticketDuePill($due) {
     if (!$due) {
         return '';
     }
-    $title = ' title="Due ' . escapeHtml(date('M j, Y g:i A', strtotime($due['at']))) . '"';
+    $title = ' title="' . escapeHtml(__('Due %s', formatDate($due['at'], 'datetime'))) . '"';
     if ($due['key'] === 'overdue') {
-        return '<span class="badge rounded-pill text-bg-danger"' . $title . '><i class="far fa-calendar-times me-1"></i>Due ' . timeAgo($due['at']) . '</span>';
+        return '<span class="badge rounded-pill text-bg-danger"' . $title . '><i class="far fa-calendar-times me-1"></i>' . escapeHtml(_x('Due %s', 'past', timeAgo($due['at']))) . '</span>';
     }
-    return '<span class="badge rounded-pill ' . ($due['key'] === 'soon' ? 'text-bg-warning' : 'bg-body-secondary text-body-secondary fw-normal') . '"' . $title . '><i class="far fa-calendar me-1"></i>Due ' . timeAgo($due['at']) . '</span>';
+    return '<span class="badge rounded-pill ' . ($due['key'] === 'soon' ? 'text-bg-warning' : 'bg-body-secondary text-body-secondary fw-normal') . '"' . $title . '><i class="far fa-calendar me-1"></i>' . escapeHtml(_x('Due %s', 'future', timeAgo($due['at']))) . '</span>';
 }
 
 /** The edge a row or card gets: danger (late), warning (close to it) or ''. */
@@ -1534,7 +1534,7 @@ function ticketTasksHtml($counts) {
     }
     [$done, $all] = $counts;
     $percent = round($done / $all * 100);
-    return '<span class="itflow-ticket-tasks" title="' . "$done of $all tasks done" . '">'
+    return '<span class="itflow-ticket-tasks" title="' . escapeHtml(_n('%1$d of %2$d task done', '%1$d of %2$d tasks done', $all, $done, $all)) . '">'
         . '<span class="progress" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100"><span class="progress-bar ' . ($done === $all ? 'bg-success' : 'bg-secondary') . '" style="width: ' . $percent . '%"></span></span>'
         . "$done/$all</span>";
 }
@@ -1547,14 +1547,14 @@ function ticketTasksHtml($counts) {
 function ticketActivityHtml($reply, $row) {
     if (!$reply) {
         $created = $row['ticket_created_at'];
-        return '<span class="text-body-secondary" title="Opened ' . escapeHtml($created) . '"><i class="far fa-fw fa-clock me-1"></i>No replies</span>';
+        return '<span class="text-body-secondary" title="' . escapeHtml(__('Opened %s', $created)) . '"><i class="far fa-fw fa-clock me-1"></i>' . __('No replies') . '</span>';
     }
     $type = $reply['ticket_reply_type'];
     $who = $type === 'Client' ? ($reply['contact_name'] ?? '') : ($reply['user_name'] ?? '');
     $icons = [
-        'Client' => ['fa-reply text-warning', 'The client replied'],
-        'Public' => ['fa-paper-plane text-body-secondary', 'We replied'],
-        'Internal' => ['fa-sticky-note text-body-secondary', 'Internal note'],
+        'Client' => ['fa-reply text-warning', __('The client replied')],
+        'Public' => ['fa-paper-plane text-body-secondary', __('We replied')],
+        'Internal' => ['fa-sticky-note text-body-secondary', __('Internal note')],
     ];
     [$icon, $label] = $icons[$type] ?? $icons['Internal'];
     return '<span title="' . escapeHtml($label . ($who !== '' ? " - $who" : '') . ', ' . $reply['ticket_reply_created_at']) . '">'
@@ -1564,12 +1564,12 @@ function ticketActivityHtml($reply, $row) {
 
 /** Where it came in from, as an icon - '' for one an agent raised. */
 function ticketSourceIcon($source) {
-    $icons = ['Email' => ['fa-envelope', 'Came in by email'], 'Portal' => ['fa-globe', 'Raised in the client portal'],
-        'Recurring' => ['fa-redo-alt', 'Raised by a recurring ticket'], 'API' => ['fa-plug', 'Raised through the API'],
-        'Project' => ['fa-project-diagram', 'From a project template']];
+    $icons = ['Email' => ['fa-envelope', __('Came in by email')], 'Portal' => ['fa-globe', __('Raised in the client portal')],
+        'Recurring' => ['fa-redo-alt', __('Raised by a recurring ticket')], 'API' => ['fa-plug', __('Raised through the API')],
+        'Project' => ['fa-project-diagram', __('From a project template')]];
     foreach ($icons as $match => [$icon, $title]) {
         if (stripos((string) $source, $match) !== false) {
-            return '<i class="fas fa-fw ' . $icon . '" title="' . $title . '"></i>';
+            return '<i class="fas fa-fw ' . $icon . '" title="' . escapeHtml($title) . '"></i>';
         }
     }
     return '';

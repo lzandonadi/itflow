@@ -205,4 +205,10 @@ return [
     'Saving...' => 'Salvando...',
     'Saved' => 'Salvo',
 
+    // Tickets board and quick pickers (agent/js/tickets_kanban.js, js/quick_pick.js)
+    'Could not save that - reload and try again.' => 'Não foi possível salvar - recarregue e tente de novo.',
+    'Could not save that - check your connection and try again.' => 'Não foi possível salvar - verifique sua conexão e tente de novo.',
+    'Change' => 'Alterar',
+    'Choices' => 'Opções',
+
 ];

@@ -129,11 +129,11 @@
 
         var panel = this.panel = make('div', 'itflow-select-panel itflow-quick-panel');
         panel.setAttribute('role', 'dialog');
-        panel.setAttribute('aria-label', titles[this.field] || 'Change');
+        panel.setAttribute('aria-label', titles[this.field] || __('Change'));
 
         var head = make('div', 'itflow-select-sheet-head');
-        head.appendChild(make('span', 'itflow-select-sheet-title', titles[this.field] || 'Change'));
-        var done = make('button', 'btn btn-sm btn-link itflow-select-done', 'Cancel');
+        head.appendChild(make('span', 'itflow-select-sheet-title', titles[this.field] || __('Change')));
+        var done = make('button', 'btn btn-sm btn-link itflow-select-done', __('Cancel'));
         done.type = 'button';
         done.title = __('Close without changing it (Esc)');
         done.addEventListener('click', function () {
@@ -149,8 +149,8 @@
         input.type = 'text';
         input.autocomplete = 'off';
         input.spellcheck = false;
-        input.placeholder = 'Search';
-        input.setAttribute('aria-label', 'Search');
+        input.placeholder = __('Search');
+        input.setAttribute('aria-label', __('Search'));
         input.addEventListener('input', function () {
             self.query = input.value;
             self.draw();
@@ -163,8 +163,8 @@
 
         var list = this.list = make('div', 'itflow-select-list');
         list.setAttribute('role', 'listbox');
-        list.setAttribute('aria-label', titles[this.field] || 'Choices');
-        list.appendChild(make('div', 'itflow-select-empty', 'Loading...'));
+        list.setAttribute('aria-label', titles[this.field] || __('Choices'));
+        list.appendChild(make('div', 'itflow-select-empty', __('Loading...')));
         list.addEventListener('click', function (e) {
             var node = e.target.closest('[data-row]');
             if (node) {

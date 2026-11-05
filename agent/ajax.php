@@ -258,17 +258,17 @@ if (isset($_GET['quick_pick_options'])) {
     if ($field === 'priority') {
         $colors = ['Urgent' => 'var(--bs-emphasis-color)', 'High' => 'var(--bs-danger)', 'Medium' => 'var(--bs-warning)', 'Low' => 'var(--bs-info)'];
         foreach (TICKET_PRIORITIES as $priority) {
-            $options[] = ['value' => $priority, 'label' => $priority, 'color' => $colors[$priority]];
+            $options[] = ['value' => $priority, 'label' => ticketPriorityLabel($priority), 'color' => $colors[$priority]];
         }
     } elseif ($field === 'status') {
         $all_statuses = ticketStatusesAll();
         foreach (ticketPickableStatuses() as $status_id => $status) {
-            $options[] = ['value' => (string) $status_id, 'label' => $status['ticket_status_name'], 'color' => ticketStatusColor($status['ticket_status_color']),
+            $options[] = ['value' => (string) $status_id, 'label' => ticketStatusLabel($status_id, $status['ticket_status_name']), 'color' => ticketStatusColor($status['ticket_status_color']),
                 'title' => isset($all_statuses[$status_id]) ? ticketStatusAbout($all_statuses[$status_id]) : ''];
         }
     } elseif ($field === 'billable') {
-        $options[] = ['value' => '1', 'label' => 'Billable', 'icon' => 'fas fa-dollar-sign', 'description' => 'Shows under Unbilled Time once done, until invoiced'];
-        $options[] = ['value' => '0', 'label' => 'Not billable', 'icon' => 'fas fa-minus'];
+        $options[] = ['value' => '1', 'label' => __('Billable'), 'icon' => 'fas fa-dollar-sign', 'description' => __('Shows under Unbilled Time once done, until invoiced')];
+        $options[] = ['value' => '0', 'label' => __('Not billable'), 'icon' => 'fas fa-minus'];
     } elseif ($field === 'assignee' || $field === 'recurring_assignee') {
         $options = quickPickAgents();
     } elseif ($field === 'project_manager') {
@@ -504,7 +504,7 @@ if (isset($_POST['quick_pick_set'])) {
     }
     if (!$allowed) {
         http_response_code(403);
-        echo json_encode(['error' => 'You cannot change that on these tickets.']);
+        echo json_encode(['error' => __('You cannot change that on these tickets.')]);
         exit();
     }
 
@@ -558,7 +558,7 @@ if (isset($_POST['quick_pick_set'])) {
         ];
     }
 
-    $response['message'] = count($ticket_ids) === 1 ? strip_tags($message) : 'Updated ' . count($ticket_ids) . ' tickets';
+    $response['message'] = count($ticket_ids) === 1 ? strip_tags($message) : _n('Updated %d ticket', 'Updated %d tickets', count($ticket_ids));
     echo json_encode($response);
     exit();
 }

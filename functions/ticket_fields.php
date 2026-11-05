@@ -45,15 +45,15 @@ function ticketChangePriority($ticket_id, $priority) {
     $ticket_id = intval($ticket_id);
     $row = ticketFieldsRow($ticket_id);
     if (!$row) {
-        return [false, 'That ticket no longer exists.'];
+        return [false, __('That ticket no longer exists.')];
     }
     if (!in_array($priority, TICKET_PRIORITIES, true)) {
-        return [false, 'That is not a priority.'];
+        return [false, __('That is not a priority.')];
     }
 
     $original_priority = escapeSql($row['ticket_priority']);
     if ($row['ticket_priority'] === $priority) {
-        return [true, "Priority is already <strong>$priority</strong>"];
+        return [true, __('Priority is already <strong>%s</strong>', escapeHtml(ticketPriorityLabel($priority)))];
     }
 
     $ticket_prefix = escapeSql($row['ticket_prefix']);
@@ -71,7 +71,7 @@ function ticketChangePriority($ticket_id, $priority) {
 
     triggerCustomAction('ticket_update', $ticket_id);
 
-    return [true, "Priority updated from <strong>$original_priority</strong> to <strong>$priority_sql</strong>"];
+    return [true, __('Priority updated from <strong>%1$s</strong> to <strong>%2$s</strong>', escapeHtml(ticketPriorityLabel($row['ticket_priority'])), escapeHtml(ticketPriorityLabel($priority)))];
 }
 
 /*
@@ -86,7 +86,7 @@ function ticketChangeAssignee($ticket_id, $assigned_to) {
 
     $row = ticketFieldsRow($ticket_id);
     if (!$row || intval($row['ticket_status']) == 5) {
-        return [false, 'Invalid ticket!'];
+        return [false, __('Invalid ticket!')];
     }
 
     // New > Open as assigned
@@ -97,15 +97,17 @@ function ticketChangeAssignee($ticket_id, $assigned_to) {
 
     // Allow for un-assigning tickets
     if ($assigned_to == 0) {
-        $ticket_reply = "Ticket unassigned.";
-        $agent_name = "No One";
+        $ticket_reply = escapeSql(__('Ticket unassigned.'));
+        $agent_name = "No One"; // i18n-ignore: history and audit log
+        $agent_label = __('No One');
     } else {
         $agent_details = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_name, user_email FROM users WHERE user_id = $assigned_to AND user_type = 1 AND user_archived_at IS NULL"));
         if (!$agent_details) {
-            return [false, 'Invalid agent!'];
+            return [false, __('Invalid agent!')];
         }
         $agent_name = escapeSql($agent_details['user_name']);
-        $ticket_reply = "Ticket re-assigned to $agent_name.";
+        $agent_label = $agent_details['user_name'];
+        $ticket_reply = escapeSql(__('Ticket re-assigned to %s.', $agent_details['user_name']));
     }
 
     $ticket_prefix = escapeSql($row['ticket_prefix']);
@@ -128,7 +130,7 @@ function ticketChangeAssignee($ticket_id, $assigned_to) {
     if ($session_user_id != $assigned_to && $assigned_to != 0) {
 
         // App Notification
-        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = 'Ticket $ticket_prefix$ticket_number - Subject: $ticket_subject has been assigned to you by $session_name', notification_action = '/agent/ticket.php?ticket_id=$ticket_id$client_uri', notification_client_id = $client_id, notification_user_id = $assigned_to");
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . escapeSql(__('Ticket %1$s - Subject: %2$s has been assigned to you by %3$s', $row['ticket_prefix'] . intval($row['ticket_number']), $row['ticket_subject'], stripslashes($session_name))) . "', notification_action = '/agent/ticket.php?ticket_id=$ticket_id$client_uri', notification_client_id = $client_id, notification_user_id = $assigned_to");
 
         // Email Notification
         ticketMailAssigned($assigned_to, [$ticket_id], stripslashes($session_name));
@@ -136,7 +138,7 @@ function ticketChangeAssignee($ticket_id, $assigned_to) {
 
     triggerCustomAction('ticket_assign', $ticket_id);
 
-    return [true, "Ticket <strong>$ticket_prefix$ticket_number</strong> assigned to <strong>$agent_name</strong>"];
+    return [true, __('Ticket <strong>%1$s</strong> assigned to <strong>%2$s</strong>', escapeHtml($row['ticket_prefix'] . intval($row['ticket_number'])), escapeHtml($agent_label))];
 }
 
 /*
@@ -169,14 +171,14 @@ function ticketChangeStatus($ticket_id, $status_id) {
 
     $row = ticketFieldsRow($ticket_id);
     if (!$row || $row['ticket_closed_at'] || $row['ticket_resolved_at']) {
-        return [false, 'Invalid ticket!'];
+        return [false, __('Invalid ticket!')];
     }
     $statuses = ticketPickableStatuses();
     if (!isset($statuses[$status_id])) {
-        return [false, 'That status cannot be set here.'];
+        return [false, __('That status cannot be set here.')];
     }
     if (intval($row['ticket_status']) === $status_id) {
-        return [true, "Status is already <strong>" . escapeHtml($statuses[$status_id]['ticket_status_name']) . "</strong>"];
+        return [true, __('Status is already <strong>%s</strong>', escapeHtml(ticketStatusLabel($status_id, $statuses[$status_id]['ticket_status_name'])))];
     }
 
     $ticket_prefix = escapeSql($row['ticket_prefix']);
@@ -193,7 +195,7 @@ function ticketChangeStatus($ticket_id, $status_id) {
 
     triggerCustomAction('ticket_update', $ticket_id);
 
-    return [true, "Status set to <strong>$status_name</strong>"];
+    return [true, __('Status set to <strong>%s</strong>', escapeHtml(ticketStatusLabel($status_id, $statuses[$status_id]['ticket_status_name'])))];
 }
 
 /* Mark billable (1) or not (0). Returns [ok, message]. */
@@ -205,7 +207,7 @@ function ticketChangeBillable($ticket_id, $billable) {
 
     $row = ticketFieldsRow($ticket_id);
     if (!$row) {
-        return [false, 'That ticket no longer exists.'];
+        return [false, __('That ticket no longer exists.')];
     }
 
     $billable_wording = $billable ? '' : 'Not';
@@ -217,7 +219,7 @@ function ticketChangeBillable($ticket_id, $billable) {
 
     logAudit("Ticket", "Edit", "$session_name marked ticket $ticket_prefix$ticket_number as $billable_wording Billable", $client_id, $ticket_id);
 
-    return [true, "Ticket marked <strong>$billable_wording Billable</strong>"];
+    return [true, $billable ? __('Ticket marked <strong>Billable</strong>') : __('Ticket marked <strong>Not Billable</strong>')];
 }
 
 /*
@@ -275,30 +277,31 @@ function ticketStatusHtml($status_name, $status_color, $style = 'list') {
  */
 function quickPick($field, $id, $current, $inner, $style = 'list', $status_id = 0, $scope = 0) {
     $labels = [
-        'priority' => 'Change priority', 'assignee' => 'Change who it is assigned to', 'billable' => 'Change billing', 'status' => 'Change status',
-        'project_manager' => 'Change the project manager', 'recurring_assignee' => 'Change who it is assigned to',
-        'asset_status' => 'Change status', 'asset_location' => 'Change location', 'asset_contact' => 'Change who it is assigned to',
-        'contact_location' => 'Change location', 'service_importance' => 'Change importance', 'network_type' => 'Change type'
+        'priority' => __('Change priority'), 'assignee' => __('Change who it is assigned to'), 'billable' => __('Change billing'), 'status' => __('Change status'),
+        'project_manager' => __('Change the project manager'), 'recurring_assignee' => __('Change who it is assigned to'),
+        'asset_status' => __('Change status'), 'asset_location' => __('Change location'), 'asset_contact' => __('Change who it is assigned to'),
+        'contact_location' => __('Change location'), 'service_importance' => __('Change importance'), 'network_type' => __('Change type')
     ];
     // On the ticket page it looks like the other editable properties there (agent/css/ticket.css)
     $class = 'itflow-quick-pick itflow-quick-pick-' . $style . ($style === 'detail' ? ' ticket-prop-edit' : '');
     return '<button type="button" class="' . $class . '" data-quick-pick="' . $field . '" data-quick-id="' . intval($id) . '"'
         . ' data-quick-current="' . escapeHtml($current) . '" data-quick-style="' . $style . '"' . ($status_id ? ' data-status-id="' . intval($status_id) . '"' : '') . ($scope ? ' data-quick-scope="' . intval($scope) . '"' : '') . ' data-csrf="' . escapeHtml($_SESSION['csrf_token'] ?? '') . '"'
-        . ' title="' . $labels[$field] . '" aria-haspopup="listbox" aria-expanded="false">'
+        . ' title="' . escapeHtml($labels[$field]) . '" aria-haspopup="listbox" aria-expanded="false">'
         . '<span class="itflow-quick-pick-value">' . $inner . '</span>'
         . ($style === 'detail' ? '<i class="fas fa-chevron-down ticket-prop-edit-icon" aria-hidden="true"></i>' : '')
         . '</button>';
 }
 
 /* The agents a picker offers: none first, then me, then everyone else by name. */
-function quickPickAgents($none_label = 'Unassigned') {
+function quickPickAgents($none_label = null) {
     global $mysqli, $session_user_id;
+    $none_label = $none_label ?? __('Unassigned');
 
     $options = [['value' => '0', 'label' => $none_label, 'icon' => 'fas fa-user-slash', 'none' => true]];
     $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE user_type = 1 AND user_archived_at IS NULL ORDER BY user_name ASC");
     while ($row = mysqli_fetch_assoc($sql)) {
         $user_id = intval($row['user_id']);
-        $option = ['value' => (string) $user_id, 'label' => $row['user_name'] . ($user_id == $session_user_id ? ' (me)' : '')];
+        $option = ['value' => (string) $user_id, 'label' => $row['user_name'] . ($user_id == $session_user_id ? ' ' . __('(me)') : '')];
         if ($row['user_avatar']) {
             $option['image'] = "/uploads/users/$user_id/" . rawurlencode($row['user_avatar']);
         } else {

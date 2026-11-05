@@ -121,32 +121,32 @@ if ($status_filter) {
     $status_ids = implode(',', $status_filter);
     $filter_sql[] = "AND ticket_status IN ($status_ids)";
     $status_names = [];
-    $sql_status_names = mysqli_query($mysqli, "SELECT ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_order");
+    $sql_status_names = mysqli_query($mysqli, "SELECT ticket_status_id, ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_order");
     while ($row = mysqli_fetch_assoc($sql_status_names)) {
-        $status_names[] = escapeHtml($row['ticket_status_name']);
+        $status_names[] = escapeHtml(ticketStatusLabel($row['ticket_status_id'], $row['ticket_status_name']));
     }
-    $active_filters[] = ['label' => 'Status', 'value' => implode(', ', $status_names), 'drop' => ['status' => null]];
+    $active_filters[] = ['label' => __('Status'), 'value' => implode(', ', $status_names), 'drop' => ['status' => null]];
 }
 
 // Priority
 $priority_filter = in_array($_GET['priority'] ?? '', TICKET_PRIORITIES, true) ? $_GET['priority'] : '';
 if ($priority_filter) {
     $filter_sql[] = "AND ticket_priority = '$priority_filter'";
-    $active_filters[] = ['label' => 'Priority', 'value' => $priority_filter, 'drop' => ['priority' => null]];
+    $active_filters[] = ['label' => __('Priority'), 'value' => escapeHtml(ticketPriorityLabel($priority_filter)), 'drop' => ['priority' => null]];
 }
 
 // Category
 $category_filter = intval($_GET['category'] ?? 0);
 if ($category_filter) {
     $filter_sql[] = "AND ticket_category = $category_filter";
-    $active_filters[] = ['label' => 'Category', 'value' => escapeHtml(getFieldById('categories', $category_filter, 'category_name')), 'drop' => ['category' => null]];
+    $active_filters[] = ['label' => __('Category'), 'value' => escapeHtml(getFieldById('categories', $category_filter, 'category_name')), 'drop' => ['category' => null]];
 }
 
 // Project
 $project_filter = intval($_GET['project'] ?? 0);
 if ($project_filter) {
     $filter_sql[] = "AND ticket_project_id = $project_filter";
-    $active_filters[] = ['label' => 'Project', 'value' => escapeHtml(getFieldById('projects', $project_filter, 'project_name')), 'drop' => ['project' => null]];
+    $active_filters[] = ['label' => __('Project'), 'value' => escapeHtml(getFieldById('projects', $project_filter, 'project_name')), 'drop' => ['project' => null]];
 }
 
 // Tags - a ticket with any of them
@@ -158,16 +158,16 @@ if ($tag_filter_ids) {
     while ($row = mysqli_fetch_row($sql_tag_names)) {
         $tag_filter_names[] = escapeHtml($row[0]);
     }
-    $active_filters[] = ['label' => 'Tags', 'value' => implode(', ', $tag_filter_names), 'drop' => ['tags' => null]];
+    $active_filters[] = ['label' => __('Tags'), 'value' => implode(', ', $tag_filter_names), 'drop' => ['tags' => null]];
 }
 
 // SLA state - the dashboard's "SLA breached" links here
 $sla_filters = [
-    'breached' => ['SLA breached', 'ticket_sla_id > 0 AND (ticket_response_sla_alert_stage = 2 OR ticket_resolution_sla_alert_stage = 2 OR ticket_response_sla_met = 0 OR ticket_resolution_sla_met = 0)'],
-    'at_risk' => ['SLA at risk', 'ticket_sla_id > 0 AND COALESCE(ticket_status_pauses_sla, 0) = 0 AND (ticket_response_sla_alert_stage = 1 OR ticket_resolution_sla_alert_stage = 1)'],
-    'paused' => ['SLA paused', 'ticket_sla_id > 0 AND ticket_status_pauses_sla = 1 AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL'],
-    'met' => ['SLA met', 'ticket_sla_id > 0 AND ticket_response_sla_met = 1 AND (ticket_resolution_sla_met = 1 OR ticket_resolution_due_at IS NULL)'],
-    'none' => ['No SLA', 'ticket_sla_id = 0'],
+    'breached' => [__('SLA breached'), 'ticket_sla_id > 0 AND (ticket_response_sla_alert_stage = 2 OR ticket_resolution_sla_alert_stage = 2 OR ticket_response_sla_met = 0 OR ticket_resolution_sla_met = 0)'],
+    'at_risk' => [__('SLA at risk'), 'ticket_sla_id > 0 AND COALESCE(ticket_status_pauses_sla, 0) = 0 AND (ticket_response_sla_alert_stage = 1 OR ticket_resolution_sla_alert_stage = 1)'],
+    'paused' => [__('SLA paused'), 'ticket_sla_id > 0 AND ticket_status_pauses_sla = 1 AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL'],
+    'met' => [__('SLA met'), 'ticket_sla_id > 0 AND ticket_response_sla_met = 1 AND (ticket_resolution_sla_met = 1 OR ticket_resolution_due_at IS NULL)'],
+    'none' => [__('No SLA'), 'ticket_sla_id = 0'],
 ];
 $sla_filter = isset($sla_filters[$_GET['sla'] ?? '']) ? $_GET['sla'] : '';
 if ($sla_filter) {
@@ -177,14 +177,14 @@ if ($sla_filter) {
 
 // Billing
 $billing_filters = [
-    'unbilled' => ['Billable, not invoiced', 'ticket_billable = 1 AND ticket_invoice_id = 0'],
-    'invoiced' => ['Invoiced', 'ticket_invoice_id > 0'],
-    'nonbillable' => ['Not billable', 'ticket_billable = 0'],
+    'unbilled' => [__('Billable, not invoiced'), 'ticket_billable = 1 AND ticket_invoice_id = 0'],
+    'invoiced' => [__('Invoiced'), 'ticket_invoice_id > 0'],
+    'nonbillable' => [__('Not billable'), 'ticket_billable = 0'],
 ];
 $billing_filter = isset($billing_filters[$_GET['billing'] ?? '']) ? $_GET['billing'] : '';
 if ($billing_filter) {
     $filter_sql[] = "AND ({$billing_filters[$billing_filter][1]})";
-    $active_filters[] = ['label' => 'Billing', 'value' => $billing_filters[$billing_filter][0], 'drop' => ['billing' => null]];
+    $active_filters[] = ['label' => __('Billing'), 'value' => $billing_filters[$billing_filter][0], 'drop' => ['billing' => null]];
 }
 
 // Created - filter_header.php resolves the canned ranges into $dtf / $dtt
@@ -192,7 +192,7 @@ $date_filter_active = (isset($_GET['canned_date']) && !in_array($_GET['canned_da
     || (!empty($_GET['dtf']) && $_GET['dtf'] !== '1970-01-01');
 if ($date_filter_active) {
     $filter_sql[] = "AND DATE(ticket_created_at) BETWEEN '$dtf' AND '$dtt'";
-    $active_filters[] = ['label' => 'Created', 'value' => escapeHtml("$dtf to $dtt"), 'drop' => ['canned_date' => null, 'dtf' => null, 'dtt' => null]];
+    $active_filters[] = ['label' => __('Created'), 'value' => escapeHtml(__('%1$s to %2$s', $dtf, $dtt)), 'drop' => ['canned_date' => null, 'dtf' => null, 'dtt' => null]];
 }
 
 // Search
@@ -212,29 +212,29 @@ $filters = clientScopeSql('ticket_client_id') . " $client_query " . implode(' ',
 $open_sql = TICKET_OPEN_SQL;
 $base_sql = $view === 'kanban' ? 'tickets.ticket_closed_at IS NULL' : $open_sql;
 $shows = [
-    'open' => ['label' => $view === 'kanban' ? 'On the board' : 'Open', 'where' => $base_sql,
-        'title' => $view === 'kanban' ? 'Everything not closed yet' : 'Neither resolved nor closed'],
-    'mine' => ['label' => 'Mine', 'icon' => 'fa-user-check', 'where' => "$base_sql AND ticket_assigned_to = " . intval($session_user_id)],
-    'unassigned' => ['label' => 'Unassigned', 'icon' => 'fa-user-slash', 'where' => "$base_sql AND ticket_assigned_to = 0", 'alarm' => 'warning'],
-    'reply' => ['label' => 'Needs reply', 'icon' => 'fa-reply', 'where' => ticketNeedsReplySql(), 'alarm' => 'warning',
-        'title' => 'The client spoke last, or nobody has replied yet'],
-    'waiting' => ['label' => 'Waiting', 'icon' => 'fa-hourglass-half', 'where' => ticketWaitingSql(),
-        'title' => 'We replied last and it is with the client - or it is parked in a status that pauses the clock, like On Hold'],
-    'overdue' => ['label' => 'Overdue', 'icon' => 'fa-stopwatch', 'where' => ticketOverdueSql(), 'alarm' => 'danger',
-        'title' => 'Past its due date, or its SLA is breached'],
-    'scheduled' => ['label' => 'Scheduled', 'icon' => 'fa-calendar-check', 'where' => "$open_sql AND ticket_schedule IS NOT NULL",
-        'title' => 'A visit or call is booked'],
+    'open' => ['label' => $view === 'kanban' ? __('On the board') : _x('Open', 'tickets view'), 'where' => $base_sql,
+        'title' => $view === 'kanban' ? __('Everything not closed yet') : __('Neither resolved nor closed')],
+    'mine' => ['label' => __('Mine'), 'icon' => 'fa-user-check', 'where' => "$base_sql AND ticket_assigned_to = " . intval($session_user_id)],
+    'unassigned' => ['label' => __('Unassigned'), 'icon' => 'fa-user-slash', 'where' => "$base_sql AND ticket_assigned_to = 0", 'alarm' => 'warning'],
+    'reply' => ['label' => __('Needs reply'), 'icon' => 'fa-reply', 'where' => ticketNeedsReplySql(), 'alarm' => 'warning',
+        'title' => __('The client spoke last, or nobody has replied yet')],
+    'waiting' => ['label' => _x('Waiting', 'tickets view'), 'icon' => 'fa-hourglass-half', 'where' => ticketWaitingSql(),
+        'title' => __('We replied last and it is with the client - or it is parked in a status that pauses the clock, like On Hold')],
+    'overdue' => ['label' => __('Overdue'), 'icon' => 'fa-stopwatch', 'where' => ticketOverdueSql(), 'alarm' => 'danger',
+        'title' => __('Past its due date, or its SLA is breached')],
+    'scheduled' => ['label' => __('Scheduled'), 'icon' => 'fa-calendar-check', 'where' => "$open_sql AND ticket_schedule IS NOT NULL",
+        'title' => __('A visit or call is booked')],
 ];
 // Mentioned me - open tickets with an internal note that @mentions you (functions/ticket_mention.php), after Mine
 if (ticketMentionsReady()) {
     $shows = array_slice($shows, 0, 2, true)
-        + ['mentioned' => ['label' => 'Mentioned me', 'icon' => 'fa-at', 'where' => "$base_sql AND " . ticketMentionedSql($session_user_id),
-            'title' => 'Open tickets with an internal note that mentions you']]
+        + ['mentioned' => ['label' => __('Mentioned me'), 'icon' => 'fa-at', 'where' => "$base_sql AND " . ticketMentionedSql($session_user_id),
+            'title' => __('Open tickets with an internal note that mentions you')]]
         + array_slice($shows, 2, null, true);
 }
 if ($view === 'list') {
-    $shows['closed'] = ['label' => 'Closed', 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL', 'title' => 'Resolved or closed', 'divider' => true];
-    $shows['all'] = ['label' => 'All', 'where' => '1 = 1'];
+    $shows['closed'] = ['label' => _x('Closed', 'tickets view'), 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL', 'title' => __('Resolved or closed'), 'divider' => true];
+    $shows['all'] = ['label' => _x('All', 'tickets view'), 'where' => '1 = 1'];
 }
 
 // A status or billing filter asked for on its own looks at every ticket - unbilled work is nearly all done already
@@ -296,22 +296,22 @@ $export_extra = [
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-life-ring me-2"></i>Tickets</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-life-ring me-2"></i><?= __('Tickets') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/ticket/ticket_add.php?<?= $client_url ?>" data-modal-size="lg">
-                        <i class="fas fa-plus me-2"></i>New Ticket
+                        <i class="fas fa-plus me-2"></i><?= __('New Ticket') ?>
                     </button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" href="recurring_tickets.php<?= $client_url ? '?' . rtrim($client_url, '&') : '' ?>">
-                        <i class="fa fa-fw fa-redo-alt me-2"></i>Recurring tickets
+                        <i class="fa fa-fw fa-redo-alt me-2"></i><?= __('Recurring tickets') ?>
                     </a>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="<?= buildExportModalUrl('modals/ticket/ticket_export.php', ['client_id', 'client', 'status', 'billing', 'category', 'priority', 'assigned', 'sla', 'project', 'tags', 'q'], $export_extra) ?>">
-                        <i class="fa fa-fw fa-download me-2"></i>Export
+                        <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                     </a>
                 </div>
             </div>
@@ -335,29 +335,29 @@ $export_extra = [
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-5' : 'col-lg-4' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search tickets..." title="Number, subject, client, contact, asset, vendor reference...">
-                        <button class="btn <?= $hidden_filter_count ? 'btn-warning' : 'btn-outline-secondary' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" title="More filters" aria-expanded="<?= $hidden_filter_count ? 'true' : 'false' ?>">
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search tickets...')) ?>" title="<?= escapeHtml(__('Number, subject, client, contact, asset, vendor reference...')) ?>">
+                        <button class="btn <?= $hidden_filter_count ? 'btn-warning' : 'btn-outline-secondary' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" title="<?= escapeHtml(__('More filters')) ?>" aria-expanded="<?= $hidden_filter_count ? 'true' : 'false' ?>">
                             <i class="fas fa-sliders-h"></i><?php if ($hidden_filter_count) { ?><span class="ms-1"><?= $hidden_filter_count ?></span><?php } ?>
                         </button>
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="<?= $client_url ? 'col-lg-3' : 'col-lg-2' ?> col-md-6">
                     <select class="form-select select2" name="assigned" onchange="this.form.submit()">
-                        <option value="">- Anyone -</option>
-                        <option value="unassigned" <?= $assigned_filter === 'unassigned' ? 'selected' : '' ?> data-icon="fas fa-user-slash">Unassigned</option>
+                        <option value=""><?= __('- Anyone -') ?></option>
+                        <option value="unassigned" <?= $assigned_filter === 'unassigned' ? 'selected' : '' ?> data-icon="fas fa-user-slash"><?= __('Unassigned') ?></option>
                         <?php
                         $sql_agents_filter = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE user_type = 1 AND user_archived_at IS NULL ORDER BY user_id = " . intval($session_user_id) . " DESC, user_name ASC");
                         while ($row = mysqli_fetch_assoc($sql_agents_filter)) {
                             $filter_user_id = intval($row['user_id']); ?>
-                            <option value="<?= $filter_user_id ?>" <?= $assigned_filter === $filter_user_id ? 'selected' : '' ?><?= selectOptionUser($row['user_id'], $row['user_name'], $row['user_avatar'] ?? '') ?>><?= escapeHtml($row['user_name']) ?><?= $filter_user_id === intval($session_user_id) ? ' (me)' : '' ?></option>
+                            <option value="<?= $filter_user_id ?>" <?= $assigned_filter === $filter_user_id ? 'selected' : '' ?><?= selectOptionUser($row['user_id'], $row['user_name'], $row['user_avatar'] ?? '') ?>><?= escapeHtml($row['user_name']) ?><?= $filter_user_id === intval($session_user_id) ? ' ' . __('(me)') : '' ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                     <div class="col-lg-3 col-md-6">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                                 WHERE client_archived_at IS NULL " . clientScopeSql('clients.client_id') . "
@@ -375,50 +375,51 @@ $export_extra = [
                         <?php if ($view === 'list' && $can_edit) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                    <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
+
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_assign.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-user-check me-2"></i>Assign
+                                        <i class="fas fa-fw fa-user-check me-2"></i><?= __('Assign') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_edit_priority.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-thermometer-half me-2"></i>Set priority
+                                        <i class="fas fa-fw fa-thermometer-half me-2"></i><?= __('Set priority') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_edit_category.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-tag me-2"></i>Set category
+                                        <i class="fas fa-fw fa-tag me-2"></i><?= __('Set category') ?>
                                     </a>
                                     <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="ticket" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                        <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_add_project.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-project-diagram me-2"></i>Add to a project
+                                        <i class="fas fa-fw fa-project-diagram me-2"></i><?= __('Add to a project') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_reply.php" data-modal-size="lg" data-bulk="true">
-                                        <i class="fas fa-fw fa-paper-plane me-2"></i>Reply or add a note
+                                        <i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Reply or add a note') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_merge.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-clone me-2"></i>Merge into a ticket
+                                        <i class="fas fa-fw fa-clone me-2"></i><?= __('Merge into a ticket') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_resolve.php" data-modal-size="lg" data-bulk="true">
-                                        <i class="fas fa-fw fa-check me-2"></i>Resolve
+                                        <i class="fas fa-fw fa-check me-2"></i><?= __('Resolve') ?>
                                     </a>
                                     <?php if ($can_delete) { ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_tickets"
-                                            data-confirm-text="The tickets go for good, with their replies, tasks and attachments. Closed tickets are kept.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The tickets go for good, with their replies, tasks and attachments. Closed tickets are kept.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 </div>
                             </div>
                         <?php } ?>
-                        <div class="btn-group" role="group" aria-label="View">
-                            <a href="<?= escapeHtml($filter_url(['view' => 'list'])) ?>" class="btn <?= $view === 'list' ? 'btn-dark' : 'btn-outline-dark' ?>" title="List">
-                                <i class="fas fa-fw fa-list"></i><span class="d-none d-xl-inline ms-1">List</span>
+                        <div class="btn-group" role="group" aria-label="<?= escapeHtml(__('View')) ?>">
+                            <a href="<?= escapeHtml($filter_url(['view' => 'list'])) ?>" class="btn <?= $view === 'list' ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= escapeHtml(__('List')) ?>">
+                                <i class="fas fa-fw fa-list"></i><span class="d-none d-xl-inline ms-1"><?= __('List') ?></span>
                             </a>
-                            <a href="<?= escapeHtml($filter_url(['view' => 'kanban', 'show' => in_array($show, ['closed', 'all'], true) ? '' : $show])) ?>" class="btn <?= $view === 'kanban' ? 'btn-dark' : 'btn-outline-dark' ?>" title="Board">
-                                <i class="fas fa-fw fa-columns"></i><span class="d-none d-xl-inline ms-1">Board</span>
+                            <a href="<?= escapeHtml($filter_url(['view' => 'kanban', 'show' => in_array($show, ['closed', 'all'], true) ? '' : $show])) ?>" class="btn <?= $view === 'kanban' ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= escapeHtml(__('Board')) ?>">
+                                <i class="fas fa-fw fa-columns"></i><span class="d-none d-xl-inline ms-1"><?= __('Board') ?></span>
                             </a>
                         </div>
                     </div>
@@ -428,35 +429,35 @@ $export_extra = [
             <div class="collapse <?= $hidden_filter_count ? 'show' : '' ?>" id="advancedFilter">
                 <div class="row g-2 mt-1">
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Status</label>
-                        <select onchange="this.form.submit()" class="form-select select2" name="status[]" data-placeholder="Any status" multiple>
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Status') ?></label>
+                        <select onchange="this.form.submit()" class="form-select select2" name="status[]" data-placeholder="<?= escapeHtml(__('Any status')) ?>" multiple>
                             <?php
                             // The ones in use - and a switched-off one when it is asked for (from Admin > Ticket Statuses), so it stays picked
                             foreach (ticketStatusOptions($status_filter) as $filter_status_id => $row) { ?>
-                                <option value="<?= $filter_status_id ?>" <?= in_array($filter_status_id, $status_filter, true) ? 'selected' : '' ?><?= selectOptionColor($row['ticket_status_color'] ?? '') ?> title="<?= escapeHtml(ticketStatusAbout($row)) ?>"><?= escapeHtml($row['ticket_status_name']) ?><?= intval($row['ticket_status_active']) === 1 ? '' : ' (switched off)' ?></option>
+                                <option value="<?= $filter_status_id ?>" <?= in_array($filter_status_id, $status_filter, true) ? 'selected' : '' ?><?= selectOptionColor($row['ticket_status_color'] ?? '') ?> title="<?= escapeHtml(ticketStatusAbout($row)) ?>"><?= escapeHtml(ticketStatusLabel($filter_status_id, $row['ticket_status_name'])) ?><?= intval($row['ticket_status_active']) === 1 ? '' : ' ' . __('(switched off)') ?></option>
                             <?php } ?>
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Priority</label>
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Priority') ?></label>
                         <select onchange="this.form.submit()" class="form-select select2" name="priority">
-                            <option value="">Any priority</option>
+                            <option value=""><?= __('Any priority') ?></option>
                             <?php foreach (array_reverse(TICKET_PRIORITIES) as $priority_option) { ?>
-                                <option value="<?= $priority_option ?>" <?= $priority_filter === $priority_option ? 'selected' : '' ?>><?= $priority_option ?></option>
+                                <option value="<?= $priority_option ?>" <?= $priority_filter === $priority_option ? 'selected' : '' ?>><?= escapeHtml(ticketPriorityLabel($priority_option)) ?></option>
                             <?php } ?>
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Category</label>
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Category') ?></label>
                         <select onchange="this.form.submit()" class="form-select select2" name="category">
-                            <option value="">Any category</option>
+                            <option value=""><?= __('Any category') ?></option>
                             <?= categoryFilterOptionsHtml('Ticket', $category_filter, "SELECT DISTINCT ticket_category FROM tickets WHERE ticket_category <> ''") ?>
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Project</label>
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Project') ?></label>
                         <select onchange="this.form.submit()" class="form-select select2" name="project">
-                            <option value="">Any project</option>
+                            <option value=""><?= __('Any project') ?></option>
                             <?php
                             $sql_projects = mysqli_query($mysqli, "SELECT project_id, project_prefix, project_number, project_name FROM projects
                                 WHERE ((project_completed_at IS NULL AND project_archived_at IS NULL) OR project_id = $project_filter)
@@ -469,16 +470,16 @@ $export_extra = [
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Tags</label>
-                        <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="Any tag" multiple>
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Tags') ?></label>
+                        <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('Any tag')) ?>" multiple>
                             <?= tagFilterOptionsHtml('ticket', $tag_filter_ids, '1 ' . clientScopeSql('ticket_client_id') . ($client_url ? " AND ticket_client_id = $client_id" : '')) ?>
                         </select>
                     </div>
                     <?php if ($sla_in_use) { ?>
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-body-secondary mb-1">SLA</label>
+                            <label class="form-label small text-body-secondary mb-1"><?= __('SLA') ?></label>
                             <select class="form-select select2" name="sla" onchange="this.form.submit()">
-                                <option value="">Any SLA state</option>
+                                <option value=""><?= __('Any SLA state') ?></option>
                                 <?php foreach ($sla_filters as $sla_option => [$sla_option_label]) { ?>
                                     <option value="<?= $sla_option ?>" <?= $sla_filter === $sla_option ? 'selected' : '' ?>><?= $sla_option_label ?></option>
                                 <?php } ?>
@@ -487,9 +488,9 @@ $export_extra = [
                     <?php } ?>
                     <?php if ($show_billing) { ?>
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-body-secondary mb-1">Billing</label>
+                            <label class="form-label small text-body-secondary mb-1"><?= __('Billing') ?></label>
                             <select class="form-select select2" name="billing" onchange="this.form.submit()">
-                                <option value="">Any</option>
+                                <option value=""><?= __('Any') ?></option>
                                 <?php foreach ($billing_filters as $billing_option => [$billing_option_label]) { ?>
                                     <option value="<?= $billing_option ?>" <?= $billing_filter === $billing_option ? 'selected' : '' ?>><?= $billing_option_label ?></option>
                                 <?php } ?>
@@ -497,8 +498,8 @@ $export_extra = [
                         </div>
                     <?php } ?>
                     <div class="col-lg-3 col-md-6">
-                        <label class="form-label small text-body-secondary mb-1">Created</label>
-                        <input type="text" id="dateFilter" class="form-control" autocomplete="off" placeholder="Any time">
+                        <label class="form-label small text-body-secondary mb-1"><?= __('Created') ?></label>
+                        <input type="text" id="dateFilter" class="form-control" autocomplete="off" placeholder="<?= escapeHtml(__('Any time')) ?>">
                         <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                         <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                         <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
@@ -525,10 +526,10 @@ $export_extra = [
                 <?php foreach ($active_filters as $filter) { ?>
                     <span class="badge rounded-pill bg-body-secondary text-body fw-normal border py-2 px-2">
                         <span class="text-body-secondary"><?= $filter['label'] ?>:</span> <?= $filter['value'] ?>
-                        <a href="<?= escapeHtml($filter_url($filter['drop'])) ?>" class="text-danger ms-1" title="Remove this filter"><i class="fas fa-times"></i></a>
+                        <a href="<?= escapeHtml($filter_url($filter['drop'])) ?>" class="text-danger ms-1" title="<?= escapeHtml(__('Remove this filter')) ?>"><i class="fas fa-times"></i></a>
                     </span>
                 <?php } ?>
-                <a href="<?= escapeHtml($filter_url(['status' => null, 'priority' => null, 'category' => null, 'project' => null, 'tags' => null, 'sla' => null, 'billing' => null, 'canned_date' => null, 'dtf' => null, 'dtt' => null])) ?>" class="small text-danger ms-1">Clear</a>
+                <a href="<?= escapeHtml($filter_url(['status' => null, 'priority' => null, 'category' => null, 'project' => null, 'tags' => null, 'sla' => null, 'billing' => null, 'canned_date' => null, 'dtf' => null, 'dtt' => null])) ?>" class="small text-danger ms-1"><?= __('Clear') ?></a>
             </div>
         <?php } ?>
     </div>

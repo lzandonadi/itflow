@@ -652,7 +652,7 @@ if (isset($_POST['bulk_delete_tickets'])) {
 
     logAudit("Ticket", "Bulk Delete", "$session_name deleted $count ticket(s)");
 
-    flashAlert("Deleted <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . ($kept ? ", kept <strong>$kept</strong> closed - closed tickets are not deleted" : ''), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> ticket', 'Deleted <strong>%d</strong> tickets', $count) . ($kept ? _n(', kept <strong>%d</strong> closed - closed tickets are not deleted', ', kept <strong>%d</strong> closed - closed tickets are not deleted', $kept) : ''), 'error');
 
     redirect();
 
@@ -664,7 +664,7 @@ if (isset($_POST['bulk_assign_ticket'])) {
 
     $assign_to = ticketAgentId($_POST['assign_to'] ?? 0);
     if (intval($_POST['assign_to'] ?? 0) && !$assign_to) {
-        flashAlert('Pick an active agent.', 'error');
+        flashAlert(__('Pick an active agent.'), 'error');
         redirect();
     }
     $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No One';
@@ -701,12 +701,12 @@ if (isset($_POST['bulk_assign_ticket'])) {
 
     // One notification and one email for the lot
     if ($count && $assign_to && $assign_to != $session_user_id) {
-        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '$count ticket" . ($count === 1 ? ' has' : 's have') . " been assigned to you by $session_name', notification_action = '/agent/tickets.php?assigned=$assign_to', notification_user_id = $assign_to");
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . escapeSql(_n('%1$d ticket has been assigned to you by %2$s', '%1$d tickets have been assigned to you by %2$s', $count, $count, stripslashes($session_name))) . "', notification_action = '/agent/tickets.php?assigned=$assign_to', notification_user_id = $assign_to");
 
         ticketMailAssigned($assign_to, $assigned_ids, stripslashes($session_name));
     }
 
-    flashAlert("Assigned <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " to <strong>" . escapeHtml($agent_name) . "</strong>" . ($skipped ? ", <strong>$skipped</strong> closed left as they were" : ''));
+    flashAlert(_n('Assigned <strong>%1$d</strong> ticket to <strong>%2$s</strong>', 'Assigned <strong>%1$d</strong> tickets to <strong>%2$s</strong>', $count, $count, escapeHtml($agent_name)) . ($skipped ? _n(', <strong>%d</strong> closed left as they were', ', <strong>%d</strong> closed left as they were', $skipped) : ''));
 
     redirect();
 
@@ -718,7 +718,7 @@ if (isset($_POST['bulk_edit_ticket_priority'])) {
 
     $priority = $_POST['bulk_priority'] ?? '';
     if (!in_array($priority, TICKET_PRIORITIES, true)) {
-        flashAlert('That is not a priority.', 'error');
+        flashAlert(__('That is not a priority.'), 'error');
         redirect();
     }
 
@@ -731,7 +731,7 @@ if (isset($_POST['bulk_edit_ticket_priority'])) {
 
     logAudit("Ticket", "Bulk Edit", "$session_name set the priority of $count ticket(s) to $priority");
 
-    flashAlert("Priority set to <strong>$priority</strong> on <strong>$count</strong> ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Priority set to <strong>%1$s</strong> on <strong>%2$d</strong> ticket', 'Priority set to <strong>%1$s</strong> on <strong>%2$d</strong> tickets', $count, escapeHtml(ticketPriorityLabel($priority)), $count));
 
     redirect();
 
@@ -761,7 +761,7 @@ if (isset($_POST['bulk_edit_ticket_category'])) {
 
     logAudit("Ticket", "Bulk Edit", "$session_name set the category of $count ticket(s) to " . escapeSql($category_name));
 
-    flashAlert("Category set to <strong>" . escapeHtml($category_name) . "</strong> on <strong>$count</strong> ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Category set to <strong>%1$s</strong> on <strong>%2$d</strong> ticket', 'Category set to <strong>%1$s</strong> on <strong>%2$d</strong> tickets', $count, escapeHtml($category_name), $count));
 
     redirect();
 
@@ -791,9 +791,9 @@ if (isset($_POST['bulk_merge_tickets'])) {
         $count++;
     }
 
-    flashAlert("<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " merged into <strong>" . escapeHtml(ticketReference($parent)) . "</strong>"
-        . ($skipped ? ", <strong>$skipped</strong> left - closed already, or the ticket itself" : '')
-        . ($other_client ? ", <strong>$other_client</strong> left - another client's" : ''), $count ? 'success' : 'error');
+    flashAlert(_n('<strong>%1$d</strong> ticket merged into <strong>%2$s</strong>', '<strong>%1$d</strong> tickets merged into <strong>%2$s</strong>', $count, $count, escapeHtml(ticketReference($parent)))
+        . ($skipped ? _n(', <strong>%d</strong> left - closed already, or the ticket itself', ', <strong>%d</strong> left - closed already, or the ticket itself', $skipped) : '')
+        . ($other_client ? _n(", <strong>%d</strong> left - another client's", ", <strong>%d</strong> left - another client's", $other_client) : ''), $count ? 'success' : 'error');
 
     redirect();
 
@@ -837,9 +837,9 @@ if (isset($_POST['bulk_resolve_tickets'])) {
         $count++;
     }
 
-    flashAlert("Resolved <strong>$count</strong> ticket" . ($count === 1 ? '' : 's')
-        . ($skipped_tasks ? ", <strong>$skipped_tasks</strong> not resolved - they have open tasks" : '')
-        . ($skipped_done ? ", <strong>$skipped_done</strong> resolved or closed already" : ''), $skipped_tasks ? 'warning' : 'success');
+    flashAlert(_n('Resolved <strong>%d</strong> ticket', 'Resolved <strong>%d</strong> tickets', $count)
+        . ($skipped_tasks ? _n(', <strong>%d</strong> not resolved - it has open tasks', ', <strong>%d</strong> not resolved - they have open tasks', $skipped_tasks) : '')
+        . ($skipped_done ? _n(', <strong>%d</strong> resolved or closed already', ', <strong>%d</strong> resolved or closed already', $skipped_done) : ''), $skipped_tasks ? 'warning' : 'success');
 
     redirect();
 
@@ -916,14 +916,14 @@ if (isset($_POST['bulk_ticket_reply'])) {
         }
 
         // Tell the agent it is assigned to, and whoever opened it
-        ticketNotifyAgent($row['ticket_assigned_to'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that is assigned to you");
+        ticketNotifyAgent($row['ticket_assigned_to'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that is assigned to you', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         if (intval($row['ticket_created_by']) !== intval($row['ticket_assigned_to'])) {
-            ticketNotifyAgent($row['ticket_created_by'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that you opened");
+            ticketNotifyAgent($row['ticket_created_by'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that you opened', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
         $count++;
     }
 
-    flashAlert("Updated <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . ($skipped ? ", <strong>$skipped</strong> closed left as they were" : ''));
+    flashAlert(_n('Updated <strong>%d</strong> ticket', 'Updated <strong>%d</strong> tickets', $count) . ($skipped ? _n(', <strong>%d</strong> closed left as they were', ', <strong>%d</strong> closed left as they were', $skipped) : ''));
 
     redirect();
 
@@ -953,8 +953,10 @@ if (isset($_POST['bulk_add_ticket_project'])) {
     }
 
     // The project is named once a ticket went into it - one that fits none of them may be a client this agent can't see
-    flashAlert(($project_input ? "<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " added to " . ($count ? "project <strong>" . escapeHtml($project_name) . "</strong>" : 'the project') : "<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " taken out of their project")
-        . ($skipped ? ", <strong>$skipped</strong> skipped - the project is another client's" : ''));
+    flashAlert(($project_input
+            ? ($count ? _n('<strong>%1$d</strong> ticket added to project <strong>%2$s</strong>', '<strong>%1$d</strong> tickets added to project <strong>%2$s</strong>', $count, $count, escapeHtml($project_name)) : __('<strong>0</strong> tickets added to the project'))
+            : _n('<strong>%d</strong> ticket taken out of its project', '<strong>%d</strong> tickets taken out of their project', $count))
+        . ($skipped ? _n(", <strong>%d</strong> skipped - the project is another client's", ", <strong>%d</strong> skipped - the project is another client's", $skipped) : ''));
 
     redirect();
 
@@ -1147,10 +1149,10 @@ if (isset($_POST['add_ticket_reply'])) {
 
         // Tell the agent it is assigned to, and whoever opened it - unless it mentions them, which told them already
         if (!isset($told[intval($row['ticket_assigned_to'])])) {
-            ticketNotifyAgent($row['ticket_assigned_to'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that is assigned to you");
+            ticketNotifyAgent($row['ticket_assigned_to'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that is assigned to you', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
         if (intval($row['ticket_created_by']) !== intval($row['ticket_assigned_to']) && !isset($told[intval($row['ticket_created_by'])])) {
-            ticketNotifyAgent($row['ticket_created_by'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that you opened");
+            ticketNotifyAgent($row['ticket_created_by'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that you opened', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
 
         // Handle first response

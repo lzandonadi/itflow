@@ -72,7 +72,7 @@ return [
     'Your activity' => 'Sua atividade',
     'The same in Admin > Audit Logs, with each entry\'s quick look and export' => 'O mesmo em Admin > Logs de auditoria, com a visualização rápida e a exportação de cada registro',
     'Admin &gt; Audit Logs' => 'Admin &gt; Logs de auditoria',
-    'Search what you did' => 'Pesquisar o que você fez',
+    'Search what you did' => 'Buscar o que você fez',
     'What you did, the client, the IP address or the browser' => 'O que você fez, o cliente, o endereço IP ou o navegador',
     'What' => 'O quê',
     'What this is about has been deleted' => 'O registro de que se trata foi excluído',
