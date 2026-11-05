@@ -46,13 +46,14 @@ function itflowInlineNotes(textarea) {
         payload[textarea.dataset.endpoint] = 'TRUE';
         payload[textarea.dataset.idField] = textarea.dataset.id;
 
-        setStatus('Saving...', 'text-muted');
+        setStatus(__('Saving...'), 'text-muted');
 
         itflowPost('ajax.php', payload, function () {
             lastSaved = textarea.value;
-            setStatus('Saved', 'text-success');
+            const saved = __('Saved');
+            setStatus(saved, 'text-success');
             setTimeout(function () {
-                if (status.textContent === 'Saved') {
+                if (status.textContent === saved) {
                     setStatus('', '');
                 }
             }, 2000);

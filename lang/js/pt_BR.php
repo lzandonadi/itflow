@@ -201,4 +201,8 @@ return [
     'The two new passwords are not the same' => 'As duas novas senhas não são iguais',
     'Not the same as the new password above.' => 'Diferente da nova senha acima.',
 
+    // Notes saved as you type (js/inline_notes.js)
+    'Saving...' => 'Salvando...',
+    'Saved' => 'Salvo',
+
 ];
