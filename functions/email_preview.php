@@ -167,11 +167,11 @@ function emailPreviewCatalog() {
         // ---- Tickets, to clients
         'ticket_created' => ['group' => 'Tickets - to clients', 'label' => 'Ticket opened for them', 'to' => 'The contact and the watchers', 'when' => 'An agent opens a ticket for a contact',
             'run' => function ($s) {
-                ticketMailCreated($s['ticket'], 'Ticket Created -');
+                ticketMailCreated($s['ticket'], __('Ticket Created -'));
             }],
         'ticket_created_email' => ['group' => 'Tickets - to clients', 'label' => 'Their email became a ticket', 'to' => 'Whoever emailed', 'when' => 'The email parser makes a ticket from an email',
             'run' => function ($s) {
-                ticketMailCreated($s['ticket'], 'Ticket created -', [], false, 'email', [['email' => $s['alex_email'], 'name' => $s['alex_name']]]);
+                ticketMailCreated($s['ticket'], __('Ticket created -'), [], false, 'email', [['email' => $s['alex_email'], 'name' => $s['alex_name']]]);
             }],
         'ticket_created_scheduled' => ['group' => 'Tickets - to clients', 'label' => 'Scheduled ticket raised', 'to' => 'The contact and the watchers', 'when' => 'A recurring ticket raises its ticket',
             'pick' => 'contact', 'run' => function ($s) {

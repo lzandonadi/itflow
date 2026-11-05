@@ -398,7 +398,7 @@ $tickets_pending_assignment = mysqli_num_rows($sql_tickets_pending_assignment);
 
 if ($tickets_pending_assignment > 0) {
 
-    appNotify("Pending Tickets", "There are $tickets_pending_assignment new tickets pending assignment", "/agent/tickets.php?status=New");
+    appNotify("Pending Tickets", escapeSql(_n('There is %d new ticket pending assignment', 'There are %d new tickets pending assignment', $tickets_pending_assignment)), "/agent/tickets.php?status=New");
 
     // Logging
     logApp("Cron", "info", "Cron created notifications for new tickets that are pending assignment");

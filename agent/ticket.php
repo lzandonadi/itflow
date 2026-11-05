@@ -192,7 +192,7 @@ if (isset($_GET['ticket_id'])) {
 
         $ticket_closed_by_display = '';
         if ($ticket_is_closed) {
-            $ticket_closed_by_display = 'User';
+            $ticket_closed_by_display = escapeHtml(__('User'));
             if (!empty($ticket_closed_by)) {
                 $closed_by_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_name FROM users WHERE user_id = $ticket_closed_by"));
                 $ticket_closed_by_display = escapeHtml($closed_by_row['user_name']);
@@ -1803,7 +1803,7 @@ if (isset($_GET['ticket_id'])) {
                                     // A zero closed_by is the client closing it from the portal or guest link,
                                     // or the nightly auto-close on an unassigned ticket - so no name is shown
                                     // rather than the old catch-all "User"
-                                    if (!empty($ticket_closed_by)) { echo "<div class='small text-muted'>by " . $ticket_closed_by_display . "</div>"; }
+                                    if (!empty($ticket_closed_by)) { echo "<div class='small text-muted'>" . __('by %s', $ticket_closed_by_display) . "</div>"; }
                                     ?>
                                 </dd>
                                 <?php if ($ticket_feedback) { ?>

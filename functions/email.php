@@ -22,6 +22,36 @@ const EMAIL_TONES = ['primary' => '#0d6efd', 'success' => '#198754', 'warning' =
  */
 const EMAIL_REPLY_MARKER = '##- Please type your reply above this line -##';
 
+/** The reply line in the interface language - what an email people reply to starts with. */
+function emailReplyMarker() {
+    return __('##- Please type your reply above this line -##');
+}
+
+/*
+ * A regex (for / delimiters) matching the reply line in every language ITFlow
+ * speaks, English always among them - the email parser cuts a reply there
+ * whatever language the email it answers went out in. Words may be split by
+ * any whitespace, as mail programs rewrap.
+ */
+function emailReplyMarkerPattern() {
+    static $pattern = null;
+    if ($pattern === null) {
+        $markers = [EMAIL_REPLY_MARKER];
+        $was = i18nLocale();
+        foreach (array_keys(i18nLanguages()) as $locale) {
+            i18nSetLocale($locale);
+            $markers[] = emailReplyMarker();
+        }
+        i18nSetLocale($was);
+        $pattern = '(?:' . implode('|', array_map(function ($marker) {
+            return implode('\s*', array_map(function ($word) {
+                return preg_quote($word, '/');
+            }, preg_split('/\s+/', trim($marker))));
+        }, array_unique($markers))) . ')';
+    }
+    return $pattern;
+}
+
 /**
  * One email as HTML. $email, every value raw - it is escaped here, but for
  * message.html, which is HTML:
@@ -151,7 +181,7 @@ function emailHtml(array $email) {
         foreach ($email['history']['items'] as $item) {
             if (isset($item['gap'])) {
                 $gap = intval($item['gap']);
-                $items .= '<p style="margin:0 0 14px;font-size:13px;color:' . $muted . ';">&middot;&middot;&middot; ' . $gap . ' earlier ' . ($gap === 1 ? 'message' : 'messages') . ' - see the ticket</p>';
+                $items .= '<p style="margin:0 0 14px;font-size:13px;color:' . $muted . ';">&middot;&middot;&middot; ' . _n('%d earlier message - see the ticket', '%d earlier messages - see the ticket', $gap) . '</p>';
                 continue;
             }
             $meta = '<strong style="color:' . $text . ';">' . $e($item['by'] ?? '') . '</strong>';
@@ -182,7 +212,7 @@ function emailHtml(array $email) {
 
     // The reply line - first, so a reply quoting this email is cut off cleanly
     $marker = !empty($email['marker'])
-        ? '<div style="padding:0 0 10px;font-size:12px;color:#808080;' . $font . '"><i style="color:#808080">' . EMAIL_REPLY_MARKER . '</i></div>'
+        ? '<div style="padding:0 0 10px;font-size:12px;color:#808080;' . $font . '"><i style="color:#808080">' . $e(emailReplyMarker()) . '</i></div>'
         : '';
     $preview = trim((string) ($email['preview'] ?? '')) !== ''
         ? '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#f1f3f5;">' . $e($email['preview']) . str_repeat('&#8204;&nbsp;', 40) . '</div>'
@@ -291,7 +321,7 @@ function emailFrom($which = 'system') {
  */
 function emailMessageHtml($html) {
     global $config_base_url;
-    $html = str_replace(EMAIL_REPLY_MARKER, '', (string) $html);
+    $html = preg_replace('/' . emailReplyMarkerPattern() . '/i', '', (string) $html);
     $html = documentHtmlPurify($html);
     if (!empty($config_base_url)) {
         $base = 'https://' . $config_base_url;
@@ -309,7 +339,7 @@ function emailMessageHtml($html) {
  * $limit, cut at a word near that many characters with an ellipsis.
  */
 function emailPlainText($html, $limit = 0) {
-    $html = str_replace(EMAIL_REPLY_MARKER, '', (string) $html);
+    $html = preg_replace('/' . emailReplyMarkerPattern() . '/i', '', (string) $html);
     $html = preg_replace('#<(script|style|title|head)\b[^>]*>.*?</\1\s*>#is', '', $html);
     $pictures = preg_match_all('#<img\b#i', $html);
     // A paragraph ends with a blank line, anything else that breaks a line with one break
