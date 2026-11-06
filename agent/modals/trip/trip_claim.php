@@ -19,13 +19,13 @@ $picked = array_values(array_unique(array_filter(array_map('intval', (array) ($_
 if (!$user_id && $picked) {
     $drivers = tripsToClaim(0, $picked);
     if (count($drivers) > 1) {
-        exit(json_encode(['error' => 'Those were driven by ' . count($drivers) . ' different agents - tick one driver\'s trips at a time.']));
+        exit(json_encode(['error' => __("Those were driven by %d different agents - tick one driver's trips at a time.", count($drivers))]));
     }
     $user_id = $drivers ? intval(array_key_first($drivers)) : 0;
 }
 $driver = $user_id ? (tripsToClaim($user_id)[$user_id] ?? null) : null;
 if (!$driver) {
-    exit(json_encode(['error' => $picked ? 'None of those are waiting to be paid back for - they were in a company vehicle, or paid back for already.' : 'Nothing is waiting to be paid back for them.']));
+    exit(json_encode(['error' => $picked ? __('None of those are waiting to be paid back for - they were in a company vehicle, or paid back for already.') : __('Nothing is waiting to be paid back for them.')]));
 }
 
 $rules = tripRules();
@@ -39,7 +39,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-car-side me-2"></i>Pay Mileage <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($driver['user_name']) ?></span></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-car-side me-2"></i><?= __('Pay Mileage') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($driver['user_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" id="tripClaim">
@@ -48,7 +48,7 @@ ob_start();
 
     <div class="modal-body p-0">
         <div class="px-3 py-2 small text-body-secondary border-bottom">
-            <?= escapeHtml($driver['user_name']) ?>'s trips in their own vehicle, not paid back for yet. Each client's become a mileage expense <?= escapeHtml($driver['user_name']) ?> paid personally<?= $category_name !== '' ? ', under ' . escapeHtml($category_name) : '' ?> - so the client's costs include the driving - to pay back now or later with Reimburse.
+            <?= escapeHtml($category_name !== '' ? __("%1\$s's trips in their own vehicle, not paid back for yet. Each client's become a mileage expense %1\$s paid personally, under %2\$s - so the client's costs include the driving - to pay back now or later with Reimburse.", $driver['user_name'], $category_name) : __("%1\$s's trips in their own vehicle, not paid back for yet. Each client's become a mileage expense %1\$s paid personally - so the client's costs include the driving - to pay back now or later with Reimburse.", $driver['user_name'])) ?>
         </div>
         <div class="list-group list-group-flush" style="max-height: 18rem; overflow-y: auto;">
             <?php foreach ($driver['trips'] as $trip_id => $trip) { ?>
@@ -57,7 +57,7 @@ ob_start();
                         <?= !$picked || in_array($trip_id, $picked, true) ? 'checked' : '' ?> data-claim data-miles="<?= floatval($trip['trip_miles']) ?>">
                     <span class="flex-grow-1 min-w-0">
                         <span class="d-block text-truncate"><?= escapeHtml($trip['trip_destination']) ?> <span class="text-body-secondary">- <?= escapeHtml(truncate((string) $trip['trip_purpose'], 60)) ?></span></span>
-                        <span class="small text-body-secondary"><?= escapeHtml(implode(' · ', array_filter([$trip['trip_date'], intval($trip['trip_client_id']) ? $trip['client_name'] : 'Our own', intval($trip['round_trip']) ? 'round trip' : '']))) ?></span>
+                        <span class="small text-body-secondary"><?= escapeHtml(implode(' · ', array_filter([$trip['trip_date'], intval($trip['trip_client_id']) ? $trip['client_name'] : __('Our own'), intval($trip['round_trip']) ? __('round trip') : '']))) ?></span>
                     </span>
                     <span class="text-nowrap fw-semibold"><?= escapeHtml(tripMilesText($trip['trip_miles'])) ?></span>
                 </label>
@@ -66,34 +66,34 @@ ob_start();
         <div class="p-3 border-top">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Rate <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Rate') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
                         <input type="text" class="form-control text-end" name="rate" inputmode="decimal" value="<?= $rules['rate'] > 0 ? rtrim(rtrim(number_format($rules['rate'], 4, '.', ''), '0'), '.') : '' ?>" required data-claim-rate>
-                        <span class="input-group-text">a <?= tripUnitOne() ?></span>
+                        <span class="input-group-text"><?= escapeHtml(__('a %s', tripUnitOne())) ?></span>
                     </div>
-                    <div class="form-text">The rate for when these were driven<?= $session_is_admin ? ' - <a href="/admin/settings_invoice.php#mileage">the usual rate</a>' : '' ?>.</div>
+                    <div class="form-text"><?= $session_is_admin ? __('The rate for when these were driven - %s.', '<a href="/admin/settings_invoice.php#mileage">' . escapeHtml(__('the usual rate')) . '</a>') : __('The rate for when these were driven.') ?></div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Date <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                         <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= date('Y-m-d') ?>" required>
                     </div>
-                    <div class="form-text">Of the mileage expense - when it counts as spent.</div>
+                    <div class="form-text"><?= __('Of the mileage expense - when it counts as spent.') ?></div>
                 </div>
                 <div class="col-12">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" name="pay_now" value="1" id="tripClaimPayNow" data-claim-pay-now>
-                        <label class="form-check-label" for="tripClaimPayNow">Pay it back now</label>
+                        <label class="form-check-label" for="tripClaimPayNow"><?= __('Pay it back now') ?></label>
                     </div>
                 </div>
                 <div class="col-md-7" data-claim-pay hidden>
-                    <label class="form-label">Paid back from <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Paid back from') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
                         <select class="form-select select2" name="account">
-                            <option value="">- Which account -</option>
+                            <option value=""><?= __('- Which account -') ?></option>
                             <?php foreach ($accounts as $account_id => $account) { ?>
                                 <option value="<?= $account_id ?>" <?= $account_id === $default_account ? 'selected' : '' ?> data-icon="fas fa-piggy-bank"
                                     data-description="<?= escapeHtml(billingMoney($account['balance'], $account['account_currency_code'])) ?>"><?= escapeHtml($account['account_name']) ?></option>
@@ -102,11 +102,11 @@ ob_start();
                     </div>
                 </div>
                 <div class="col-md-5" data-claim-pay hidden>
-                    <label class="form-label">How</label>
+                    <label class="form-label"><?= __('How') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
                         <select class="form-select select2" name="payment_method">
-                            <option value="">- How they were paid -</option>
+                            <option value=""><?= __('- How they were paid -') ?></option>
                             <?php foreach ($methods as $method) { ?>
                                 <option value="<?= escapeHtml($method) ?>"><?= escapeHtml($method) ?></option>
                             <?php } ?>
@@ -114,10 +114,10 @@ ob_start();
                     </div>
                 </div>
                 <div class="col-12" data-claim-pay hidden>
-                    <label class="form-label">Reference</label>
+                    <label class="form-label"><?= __('Reference') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-                        <input type="text" class="form-control" name="reference" maxlength="200" placeholder="Check or transfer number">
+                        <input type="text" class="form-control" name="reference" maxlength="200" placeholder="<?= escapeHtml(__('Check or transfer number')) ?>">
                     </div>
                 </div>
             </div>
@@ -125,8 +125,8 @@ ob_start();
     </div>
     <div class="modal-footer">
         <span class="me-auto small text-body-secondary" data-claim-summary></span>
-        <button type="submit" name="trip_claim" class="btn btn-primary text-bold" data-claim-submit><i class="fas fa-check me-2"></i><span data-claim-submit-label>Pay Mileage</span></button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="trip_claim" class="btn btn-primary text-bold" data-claim-submit><i class="fas fa-check me-2"></i><span data-claim-submit-label><?= __('Pay Mileage') ?></span></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -163,7 +163,7 @@ ob_start();
         var perUnit = Number(String(rate.value).replace(/[\s,$]/g, ''));
         var valid = rate.value.trim() !== '' && !isNaN(perUnit) && perUnit > 0;
         rate.classList.toggle('is-invalid', rate.value.trim() !== '' && !valid);
-        summary.textContent = count ? count + ' trip' + (count === 1 ? '' : 's') + ' · ' + miles.toFixed(1) + ' ' + unit + (valid ? ' · ' + money(Math.round(miles * perUnit * 100) / 100) : '') : 'Tick the trips to pay for';
+        summary.textContent = count ? (count === 1 ? __('%d trip', count) : __('%d trips', count)) + ' · ' + miles.toFixed(1) + ' ' + unit + (valid ? ' · ' + money(Math.round(miles * perUnit * 100) / 100) : '') : __('Tick the trips to pay for');
         submit.disabled = count === 0 || !valid;
         form.querySelectorAll('[data-claim-pay]').forEach(function (box) {
             box.hidden = !payNow.checked;
@@ -171,7 +171,7 @@ ob_start();
                 select.required = payNow.checked;
             });
         });
-        submitLabel.textContent = payNow.checked ? 'Pay Mileage and Pay Back' : 'Pay Mileage';
+        submitLabel.textContent = payNow.checked ? __('Pay Mileage and Pay Back') : __('Pay Mileage');
     }
     form.addEventListener('change', update);
     form.addEventListener('input', update);

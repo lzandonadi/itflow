@@ -64,7 +64,7 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     $html = '';
     foreach ($form_accounts as $id => $account) {
         $html .= '<option value="' . $id . '"' . ($selected === $id ? ' selected' : '') . ' data-icon="fas ' . $form_types[$account['type']]['icon'] . '" data-type="' . $account['type'] . '"'
-            . ' data-currency="' . escapeHtml($account['account_currency_code']) . '" data-description="' . escapeHtml(accountBalanceText($account) . ($account['account_archived_at'] ? ' - archived' : '')) . '">'
+            . ' data-currency="' . escapeHtml($account['account_currency_code']) . '" data-description="' . escapeHtml($account['account_archived_at'] ? __('%s - archived', accountBalanceText($account)) : accountBalanceText($account)) . '">'
             . escapeHtml($account['account_name']) . '</option>';
     }
     return $html;
@@ -75,11 +75,11 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     <?= reconcileFormNoteHtml($form_lock) ?>
 
     <div class="col-md-6">
-        <label class="form-label">From <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('From') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-sign-out-alt"></i></span>
             <select class="form-select select2" name="account_from" required data-transfer-from <?= $form_lock_out ? 'disabled' : '' ?>>
-                <option value="">- Out of which account -</option>
+                <option value=""><?= __('- Out of which account -') ?></option>
                 <?= $form_account_options($form_from) ?>
             </select>
             <?php if ($form_lock_out) { ?>
@@ -89,32 +89,32 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     </div>
 
     <div class="col-md-6">
-        <label class="form-label d-flex align-items-center">To <strong class="text-danger ms-1">*</strong>
-            <button type="button" class="btn btn-link btn-sm p-0 ms-auto text-decoration-none" data-transfer-swap title="Turn it round" <?= $form_lock ? 'hidden' : '' ?>><i class="fas fa-exchange-alt me-1"></i>Swap</button>
+        <label class="form-label d-flex align-items-center"><?= __('To') ?> <strong class="text-danger ms-1">*</strong>
+            <button type="button" class="btn btn-link btn-sm p-0 ms-auto text-decoration-none" data-transfer-swap title="<?= escapeHtml(__('Turn it round')) ?>" <?= $form_lock ? 'hidden' : '' ?>><i class="fas fa-exchange-alt me-1"></i><?= __('Swap') ?></button>
         </label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-sign-in-alt"></i></span>
             <select class="form-select select2" name="account_to" required data-transfer-to <?= $form_lock_in ? 'disabled' : '' ?>>
-                <option value="">- Into which account -</option>
+                <option value=""><?= __('- Into which account -') ?></option>
                 <?= $form_account_options($form_to) ?>
             </select>
             <?php if ($form_lock_in) { ?>
                 <input type="hidden" name="account_to" value="<?= $form_to ?>">
             <?php } ?>
         </div>
-        <div class="form-text" data-transfer-card hidden>Paying off the card - what is owed on it goes down.</div>
+        <div class="form-text" data-transfer-card hidden><?= __('Paying off the card - what is owed on it goes down.') ?></div>
     </div>
 
     <?php if ($form_deposits) { ?>
         <div class="col-12" data-transfer-deposit data-deposits="<?= escapeHtml(json_encode($form_deposits)) ?>" hidden>
-            <label class="form-label">In this deposit</label>
+            <label class="form-label"><?= __('In this deposit') ?></label>
             <div class="list-group itflow-deposit-list" data-transfer-deposit-list></div>
-            <div class="form-text">Tick the checks and cash going to the bank - the amount and notes fill in, and they won't be offered again.</div>
+            <div class="form-text"><?= __('Tick the checks and cash going to the bank - the amount and notes fill in, and they won\'t be offered again.') ?></div>
         </div>
     <?php } ?>
 
     <div class="col-md-6">
-        <label class="form-label">Amount <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Amount') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
             <input type="text" class="form-control text-end fw-semibold" inputmode="decimal" pattern="[0-9,]*\.?[0-9]{0,2}" name="amount" placeholder="0.00" required
@@ -124,7 +124,7 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">Date <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
             <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_row ? $form_row['transfer_date'] : date('Y-m-d')) ?>" required <?= $form_lock ? 'readonly' : '' ?>>
@@ -132,11 +132,11 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">Moved by</label>
+        <label class="form-label"><?= __('Moved by') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-money-check-alt"></i></span>
             <select class="form-select select2" name="transfer_method">
-                <option value="">- How it was moved -</option>
+                <option value=""><?= __('- How it was moved -') ?></option>
                 <?php foreach ($form_methods as $method) { ?>
                     <option value="<?= escapeHtml($method) ?>" <?= $form_method === $method ? 'selected' : '' ?>><?= escapeHtml($method) ?></option>
                 <?php } ?>
@@ -145,10 +145,10 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
     </div>
 
     <div class="col-12">
-        <label class="form-label">Notes</label>
+        <label class="form-label"><?= __('Notes') ?></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="3" name="notes" placeholder="What it was for - the card's October statement, the quarter's tax reserve, a Stripe payout"><?= escapeHtml($form_row['transfer_notes'] ?? '') ?></textarea>
+            <textarea class="form-control" rows="3" name="notes" placeholder="<?= escapeHtml(__('What it was for - the card\'s October statement, the quarter\'s tax reserve, a Stripe payout')) ?>"><?= escapeHtml($form_row['transfer_notes'] ?? '') ?></textarea>
         </div>
     </div>
 
@@ -174,7 +174,7 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
         currency.textContent = option && option.dataset.currency ? option.dataset.currency : <?= json_encode((string) $session_company_currency) ?>;
         var into = picked(to);
         card.hidden = !(into && into.dataset.type === '3');
-        to.setCustomValidity(from.value !== '' && from.value === to.value ? 'Pick two different accounts' : '');
+        to.setCustomValidity(from.value !== '' && from.value === to.value ? __('Pick two different accounts') : '');
     }
     root.querySelector('[data-transfer-swap]').addEventListener('click', function () {
         var was = from.value;
@@ -212,7 +212,7 @@ $form_account_options = function ($selected) use ($form_accounts, $form_types) {
             amount.value = total;
             filledAmount = total;
         }
-        var text = ticked.length ? 'Deposit of ' + ticked.length + (ticked.length === 1 ? ' item' : ' items') + ':\n' + ticked.map(line).join('\n') : '';
+        var text = ticked.length ? (ticked.length === 1 ? __('Deposit of %d item:', ticked.length) : __('Deposit of %d items:', ticked.length)) + '\n' + ticked.map(line).join('\n') : '';
         if (notes.value === '' || notes.value === filledNotes) {
             notes.value = text;
             filledNotes = text;

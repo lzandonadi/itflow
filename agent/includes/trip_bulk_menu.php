@@ -8,7 +8,7 @@ isset($mysqli) || die("Direct file access is not allowed");
 ?>
 <div class="dropdown" id="bulkActionButton" hidden>
     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-xxl-inline ms-1">Bulk</span> (<span id="selectedCount">0</span>)
+        <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-xxl-inline ms-1"><?= __('Bulk') ?></span> (<span id="selectedCount">0</span>)
     </button>
     <div class="dropdown-menu dropdown-menu-end">
         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/trip/trip_bulk_edit.php?field=driver" data-bulk="true"><i class="fas fa-fw fa-user text-secondary me-2"></i><?= __('Set Driver') ?></a>

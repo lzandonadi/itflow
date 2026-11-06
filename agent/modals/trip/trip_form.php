@@ -62,7 +62,7 @@ if ($form_return) {
     [$form_source, $form_destination] = [$form_destination, $form_source];
     $form_location = 0;
     $form_round = false;
-    $form_purpose = mb_substr('Back from ' . $form_row['trip_destination'] . ($form_purpose !== '' ? " - $form_purpose" : ''), 0, 200);
+    $form_purpose = mb_substr(__('Back from %s', $form_row['trip_destination']) . ($form_purpose !== '' ? " - $form_purpose" : ''), 0, 200);
 }
 
 $form_can_manage = tripCanManage() && !$form_claimed;
@@ -88,20 +88,20 @@ $unit = tripUnit();
     <?php if ($form_locked) { ?>
         <div class="col-12">
             <div class="alert alert-secondary small mb-0">
-                <i class="fas fa-lock me-2"></i><?php if ($form_claimed) { ?>Paid back for on a <a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($form_row['claim_expense_id']) ?>">mileage expense</a> - the distance, driver and vehicle stay as they were paid<?= $form_billed ? '.' : '. Delete that expense to change them.' ?><?php } ?>
-                <?php if ($form_billed) { ?><?= $form_claimed ? ' ' : '' ?>Billed on <a href="invoice.php?invoice_id=<?= intval($form_row['trip_invoice_id']) ?>"><?= escapeHtml($form_row['invoice_prefix'] . $form_row['invoice_number']) ?></a> - the distance and client stay as they were billed. Take it off the invoice to change them.<?php } ?>
+                <i class="fas fa-lock me-2"></i><?php if ($form_claimed) { ?><?= __('Paid back for on a %s - the distance, driver and vehicle stay as they were paid.', '<a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=' . intval($form_row['claim_expense_id']) . '">' . escapeHtml(__('mileage expense')) . '</a>') ?><?= $form_billed ? '' : ' ' . __('Delete that expense to change them.') ?><?php } ?>
+                <?php if ($form_billed) { ?><?= $form_claimed ? ' ' : '' ?><?= __('Billed on %s - the distance and client stay as they were billed. Take it off the invoice to change them.', '<a href="invoice.php?invoice_id=' . intval($form_row['trip_invoice_id']) . '">' . escapeHtml($form_row['invoice_prefix'] . $form_row['invoice_number']) . '</a>') ?><?php } ?>
             </div>
         </div>
     <?php } ?>
 
     <?php if ($form_return) { ?>
         <div class="col-12">
-            <div class="alert alert-info small mb-0"><i class="fas fa-undo-alt me-2"></i>The way back from <?= escapeHtml($form_row['trip_destination']) ?> - a trip of its own, one way.</div>
+            <div class="alert alert-info small mb-0"><i class="fas fa-undo-alt me-2"></i><?= escapeHtml(__('The way back from %s - a trip of its own, one way.', $form_row['trip_destination'])) ?></div>
         </div>
     <?php } ?>
 
     <div class="col-md-4">
-        <label class="form-label">Date <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
             <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_date) ?>" required>
@@ -109,7 +109,7 @@ $unit = tripUnit();
     </div>
 
     <div class="col-md-8">
-        <label class="form-label">Driver <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Driver') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
             <select class="form-select select2" name="driver" required data-trip-driver <?= $form_claimed ? 'disabled' : '' ?>>
@@ -119,16 +119,16 @@ $unit = tripUnit();
             </select>
         </div>
         <?php if (!tripCanManage()) { ?>
-            <div class="form-text">You log your own trips.</div>
+            <div class="form-text"><?= __('You log your own trips.') ?></div>
         <?php } ?>
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">Client</label>
+        <label class="form-label"><?= __('Client') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
             <select class="form-select select2" name="client_id" data-trip-client <?= $form_billed ? 'disabled' : '' ?>>
-                <option value="0">- Our own - not for a client -</option>
+                <option value="0"><?= __('- Our own - not for a client -') ?></option>
                 <?php foreach ($form_clients as $client) { ?>
                     <option value="<?= intval($client['client_id']) ?>" <?= $form_client === intval($client['client_id']) ? 'selected' : '' ?><?= selectOptionClient($client['client_id'], $client['client_name'], $client['client_abbreviation'] ?? '') ?>><?= escapeHtml($client['client_name']) ?></option>
                 <?php } ?>
@@ -137,20 +137,20 @@ $unit = tripUnit();
     </div>
 
     <div class="col-md-6" data-trip-ticket-box hidden>
-        <label class="form-label">For the ticket</label>
+        <label class="form-label"><?= __('For the ticket') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-life-ring"></i></span>
             <select class="form-select" name="ticket_id" data-trip-ticket data-selected="<?= $form_ticket ?>">
-                <option value="0">- No ticket -</option>
+                <option value="0"><?= __('- No ticket -') ?></option>
             </select>
         </div>
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">From <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('From') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-dot-circle"></i></span>
-            <input type="text" class="form-control" name="source" maxlength="200" value="<?= escapeHtml($form_source) ?>" list="<?= $form_id ?>Places" placeholder="Where you started - the office, home" required data-trip-from>
+            <input type="text" class="form-control" name="source" maxlength="200" value="<?= escapeHtml($form_source) ?>" list="<?= $form_id ?>Places" placeholder="<?= escapeHtml(__('Where you started - the office, home')) ?>" required data-trip-from>
             <datalist id="<?= $form_id ?>Places">
                 <?php foreach ($form_places as $place) { ?>
                     <option value="<?= escapeHtml($place) ?>"></option>
@@ -160,47 +160,47 @@ $unit = tripUnit();
     </div>
 
     <div class="col-md-6" data-trip-site-box hidden>
-        <label class="form-label">Their site</label>
+        <label class="form-label"><?= __('Their site') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-map-marker-alt"></i></span>
             <select class="form-select" name="location_id" data-trip-site data-selected="<?= $form_location ?>">
-                <option value="0">- Somewhere else -</option>
+                <option value="0"><?= __('- Somewhere else -') ?></option>
             </select>
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">To <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('To') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-map-marker-alt text-danger"></i></span>
-            <input type="text" class="form-control" name="destination" maxlength="200" value="<?= escapeHtml($form_destination) ?>" placeholder="The address, or the place" required data-trip-to>
+            <input type="text" class="form-control" name="destination" maxlength="200" value="<?= escapeHtml($form_destination) ?>" placeholder="<?= escapeHtml(__('The address, or the place')) ?>" required data-trip-to>
         </div>
     </div>
 
     <div class="col-md-4">
-        <label class="form-label"><?= ucfirst($unit) ?> one way <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= escapeHtml(__('%s one way', ucfirst($unit))) ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-road"></i></span>
             <input type="text" class="form-control text-end" name="miles" inputmode="decimal" placeholder="0.0" value="<?= $form_miles === null ? '' : number_format($form_miles, 1, '.', '') ?>" required data-trip-miles <?= $form_mode === 'new' && !$form_location ? 'autofocus' : '' ?> <?= $form_locked ? 'disabled' : '' ?>>
             <span class="input-group-text"><?= tripUnit(true) ?></span>
         </div>
-        <div class="form-text" data-trip-known hidden><i class="fas fa-history me-1"></i>As the last time you drove it</div>
+        <div class="form-text" data-trip-known hidden><i class="fas fa-history me-1"></i><?= __('As the last time you drove it') ?></div>
     </div>
     <div class="col-md-4 d-flex align-items-md-end">
         <div class="form-check form-switch mb-md-2">
             <input class="form-check-input" type="checkbox" role="switch" name="round_trip" value="1" id="<?= $form_id ?>Round" <?= $form_round ? 'checked' : '' ?> data-trip-round <?= $form_locked ? 'disabled' : '' ?>>
-            <label class="form-check-label" for="<?= $form_id ?>Round">Round trip - there and back</label>
+            <label class="form-check-label" for="<?= $form_id ?>Round"><?= __('Round trip - there and back') ?></label>
         </div>
     </div>
     <div class="col-md-4 d-flex align-items-md-end">
-        <div class="mb-md-2"><span class="text-body-secondary">The trip is</span> <strong class="fs-5" data-trip-total></strong></div>
+        <div class="mb-md-2"><span class="text-body-secondary"><?= __('The trip is') ?></span> <strong class="fs-5" data-trip-total></strong></div>
     </div>
 
     <?php if ($form_pay_back || $form_own) { ?>
         <div class="col-md-6">
             <div class="form-check form-switch mb-0">
                 <input class="form-check-input" type="checkbox" role="switch" name="own_vehicle" value="1" id="<?= $form_id ?>Own" <?= $form_own ? 'checked' : '' ?> data-trip-own <?= $form_claimed ? 'disabled' : '' ?>>
-                <label class="form-check-label" for="<?= $form_id ?>Own"><i class="fas fa-car-side text-body-secondary me-1"></i>In their own vehicle</label>
+                <label class="form-check-label" for="<?= $form_id ?>Own"><i class="fas fa-car-side text-body-secondary me-1"></i><?= __('In their own vehicle') ?></label>
             </div>
             <div class="form-text" data-trip-own-note></div>
         </div>
@@ -209,39 +209,39 @@ $unit = tripUnit();
         <div class="form-check form-switch mb-0">
             <input class="form-check-input" type="checkbox" role="switch" name="billable" value="1" id="<?= $form_id ?>Bill" <?= $form_billable ? 'checked' : '' ?> data-trip-billable <?= $form_billed ? 'disabled' : '' ?>
                 data-auto="<?= $form_billable === null ? '1' : '' ?>">
-            <label class="form-check-label" for="<?= $form_id ?>Bill"><i class="fas fa-file-invoice-dollar text-body-secondary me-1"></i>Bill the client for it</label>
+            <label class="form-check-label" for="<?= $form_id ?>Bill"><i class="fas fa-file-invoice-dollar text-body-secondary me-1"></i><?= __('Bill the client for it') ?></label>
         </div>
         <div class="form-text" data-trip-bill-note></div>
     </div>
 
     <div class="col-12">
-        <a class="small" data-bs-toggle="collapse" href="#<?= $form_id ?>Odometer" role="button"><i class="fas fa-tachometer-alt me-1"></i>Odometer readings</a>
+        <a class="small" data-bs-toggle="collapse" href="#<?= $form_id ?>Odometer" role="button"><i class="fas fa-tachometer-alt me-1"></i><?= __('Odometer readings') ?></a>
         <div class="collapse <?= $form_odo_start !== null || $form_odo_end !== null ? 'show' : '' ?>" id="<?= $form_id ?>Odometer">
             <div class="row g-3 mt-0">
                 <div class="col-md-6">
-                    <label class="form-label">At the start</label>
+                    <label class="form-label"><?= __('At the start') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-tachometer-alt"></i></span>
                         <input type="text" class="form-control text-end" name="odometer_start" inputmode="numeric" value="<?= $form_odo_start === null ? '' : intval($form_odo_start) ?>" data-trip-odo-start <?= $form_locked ? 'disabled' : '' ?>>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">At the end</label>
+                    <label class="form-label"><?= __('At the end') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-flag-checkered"></i></span>
                         <input type="text" class="form-control text-end" name="odometer_end" inputmode="numeric" value="<?= $form_odo_end === null ? '' : intval($form_odo_end) ?>" data-trip-odo-end <?= $form_locked ? 'disabled' : '' ?>>
                     </div>
                 </div>
-                <div class="col-12 form-text mt-1">With both, the trip is what the odometer says.</div>
+                <div class="col-12 form-text mt-1"><?= __('With both, the trip is what the odometer says.') ?></div>
             </div>
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">What for <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('What for') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="2" name="purpose" maxlength="200" placeholder="Onsite - replace the front office switch" required data-trip-purpose><?= escapeHtml($form_purpose) ?></textarea>
+            <textarea class="form-control" rows="2" name="purpose" maxlength="200" placeholder="<?= escapeHtml(__('Onsite - replace the front office switch')) ?>" required data-trip-purpose><?= escapeHtml($form_purpose) ?></textarea>
         </div>
     </div>
 
@@ -329,8 +329,8 @@ $unit = tripUnit();
         var id = client.value;
         var siteList = sites[id] || [];
         var ticketList = tickets[id] || [];
-        fill(site, siteList, first ? site.getAttribute('data-selected') : '0', '- Somewhere else -');
-        fill(ticket, ticketList, first ? ticket.getAttribute('data-selected') : '0', '- No ticket -');
+        fill(site, siteList, first ? site.getAttribute('data-selected') : '0', __('- Somewhere else -'));
+        fill(ticket, ticketList, first ? ticket.getAttribute('data-selected') : '0', __('- No ticket -'));
         root.querySelector('[data-trip-site-box]').hidden = !siteList.length;
         root.querySelector('[data-trip-ticket-box]').hidden = !ticketList.length;
         billBox.hidden = client.value === '0' || (!money.billing && !billable.checked);
@@ -400,11 +400,11 @@ $unit = tripUnit();
 
         // What it is paid back, and what it bills
         if (own && ownNote) {
-            ownNote.textContent = money.claimed ? 'Paid back for' : (own.checked && money.rate > 0 ? 'Paid back ' + (whole !== null ? cash(Math.round(whole * money.rate * 100) / 100) + ' - ' : '') + 'at ' + money.rateText : (own.checked ? 'Not paid back - there is no mileage rate' : 'A company vehicle - not paid back'));
+            ownNote.textContent = money.claimed ? __('Paid back for') : (own.checked && money.rate > 0 ? (whole !== null ? __('Paid back %1$s - at %2$s', cash(Math.round(whole * money.rate * 100) / 100), money.rateText) : __('Paid back at %s', money.rateText)) : (own.checked ? __('Not paid back - there is no mileage rate') : __('A company vehicle - not paid back')));
         }
         if (billNote) {
             var price = Math.round((money.charge + money.billRate * Math.max(0, (whole || 0) - money.included)) * 100) / 100;
-            billNote.textContent = money.billed ? 'Billed' : (billable.checked ? (money.billing ? 'Bills ' + cash(price) + ' - at ' + money.rule : 'Bills nothing until trips have a charge or rate') : 'Not billed - our cost');
+            billNote.textContent = money.billed ? __('Billed') : (billable.checked ? (money.billing ? __('Bills %1$s - at %2$s', cash(price), money.rule) : __('Bills nothing until trips have a charge or rate')) : __('Not billed - our cost'));
         }
     }
 

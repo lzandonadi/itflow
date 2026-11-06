@@ -28,7 +28,7 @@ if (isExportRequest('export_transactions')) {
     if ($account) {
         $filter_summary = [__('Account') => $account['account_name']] + $filter_summary;
     }
-    $kinds = accountLedgerKinds();
+    $kinds = $format === 'csv' ? i18nEnglish('accountLedgerKinds') : accountLedgerKinds(); // CSV values stay English
 
     // The balance after each line is in the export of one account only
     $sql = mysqli_query($mysqli, "SELECT ledger.* FROM (" . accountLedgerSql($account_id, (bool) $account) . ") AS ledger WHERE $where
@@ -41,7 +41,7 @@ if (isExportRequest('export_transactions')) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $name = $account ? $account['account_name'] : 'All accounts';
+        $name = $account ? $account['account_name'] : __('All accounts');
         $export = beginExport('transactions', $format, "$session_company_name-$name-Transactions", __('%s - Transactions', $name), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
@@ -52,12 +52,12 @@ if (isExportRequest('export_transactions')) {
                 'transaction_date' => $row['txn_date'],
                 'transaction_account' => $row['account_name'],
                 'transaction_type' => $kinds[$row['txn_kind']]['label'],
-                'transaction_what' => $row['txn_kind'] === 'payment' && $row['txn_what'] !== '' ? 'Payment on ' . $row['txn_what'] : $row['txn_what'],
+                'transaction_what' => $row['txn_kind'] === 'payment' && $row['txn_what'] !== '' ? ($format === 'csv' ? 'Payment on ' . $row['txn_what'] /* i18n-ignore - CSV values stay English */ : __('Payment on %s', $row['txn_what'])) : $row['txn_what'],
                 'transaction_description' => trim((string) $row['txn_description']),
                 'transaction_other_account' => $transfer ? (string) $row['other_account_name'] : '',
                 'transaction_reference' => (string) $row['txn_reference'],
                 'transaction_category' => $transfer ? '' : (string) $row['category_name'],
-                'transaction_client' => $row['hidden'] ? 'Another client' : (string) $row['client_name'],
+                'transaction_client' => $row['hidden'] ? ($format === 'csv' ? i18nEnglish(fn () => __('Another client')) : __('Another client')) : (string) $row['client_name'],
                 'transaction_payment_method' => (string) $row['txn_method'],
                 'transaction_in' => $amount > 0 ? $amount : '',
                 'transaction_out' => $amount < 0 ? -$amount : '',

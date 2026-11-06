@@ -25,9 +25,9 @@ if (isset($_POST['add_trip'])) {
     }
 
     $row = tripRow($trip_id, false);
-    logAudit("Trip", "Create", "$session_name logged the trip " . escapeSql(tripLabel($row)), intval($row['trip_client_id']), $trip_id);
+    logAudit("Trip", "Create", "$session_name logged the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))), intval($row['trip_client_id']), $trip_id);
 
-    flashAlert("Trip to <strong>" . escapeHtml($row['trip_destination']) . "</strong> logged - " . escapeHtml(tripMilesText($row['trip_miles'])));
+    flashAlert(__('Trip to %1$s logged - %2$s', '<strong>' . escapeHtml($row['trip_destination']) . '</strong>', escapeHtml(tripMilesText($row['trip_miles']))));
 
     redirect();
 
@@ -44,9 +44,9 @@ if (isset($_POST['edit_trip'])) {
     }
 
     $row = tripRow($trip_id, false);
-    logAudit("Trip", "Edit", "$session_name edited the trip " . escapeSql(tripLabel($row)), intval($row['trip_client_id']), $trip_id);
+    logAudit("Trip", "Edit", "$session_name edited the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))), intval($row['trip_client_id']), $trip_id);
 
-    flashAlert("Trip to <strong>" . escapeHtml($row['trip_destination']) . "</strong> saved");
+    flashAlert(__('Trip to %s saved', '<strong>' . escapeHtml($row['trip_destination']) . '</strong>'));
 
     redirect();
 
@@ -62,9 +62,9 @@ if (isset($_GET['delete_trip'])) {
         redirect();
     }
 
-    logAudit("Trip", "Delete", "$session_name deleted the trip " . escapeSql(tripLabel($row)), intval($row['trip_client_id']));
+    logAudit("Trip", "Delete", "$session_name deleted the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))), intval($row['trip_client_id']));
 
-    flashAlert("Trip to <strong>" . escapeHtml($row['trip_destination']) . "</strong> deleted", 'error');
+    flashAlert(__('Trip to %s deleted', '<strong>' . escapeHtml($row['trip_destination']) . '</strong>'), 'error');
 
     redirect();
 
@@ -91,31 +91,36 @@ if (isset($_POST['bulk_edit_trips'])) {
         $drivers = tripDrivers();
         if (isset($drivers[$value])) {
             $set = "trip_user_id = $value";
-            $label = 'the driver to ' . $drivers[$value]['user_name'];
+            $label = 'the driver to ' . $drivers[$value]['user_name']; // i18n-ignore - the audit log
+            $shown = __('the driver to %s', $drivers[$value]['user_name']);
             $skip = 'trip_expense_id = 0';
         }
     } elseif ($field === 'client') {
         $skip = 'trip_invoice_id = 0';
         if (!$value) {
             $set = 'trip_client_id = 0, trip_location_id = 0, trip_ticket_id = 0, trip_billable = 0';
-            $label = 'no client';
+            $label = 'no client'; // i18n-ignore - the audit log
+            $shown = __('no client');
         } elseif (mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $value " . clientScopeSql('client_id')))) {
             // The site and ticket first - the client after, as MySQL sets them in order
             $set = "trip_location_id = IF(trip_client_id = $value, trip_location_id, 0), trip_ticket_id = IF(trip_client_id = $value, trip_ticket_id, 0), trip_client_id = $value";
-            $label = 'the client to ' . getFieldById('clients', $value, 'client_name');
+            $label = 'the client to ' . getFieldById('clients', $value, 'client_name'); // i18n-ignore - the audit log
+            $shown = __('the client to %s', getFieldById('clients', $value, 'client_name'));
         }
     } elseif ($field === 'vehicle') {
         $set = 'trip_own_vehicle = ' . ($value ? 1 : 0);
-        $label = $value ? 'their own vehicle' : 'a company vehicle';
+        $label = $value ? 'their own vehicle' : 'a company vehicle'; // i18n-ignore - the audit log
+        $shown = $value ? __('their own vehicle') : __('a company vehicle');
         $skip = 'trip_expense_id = 0';
     } elseif ($field === 'billable') {
         $set = 'trip_billable = ' . ($value ? 'IF(trip_client_id > 0, 1, 0)' : 0);
-        $label = $value ? 'billable' : 'not billable';
+        $label = $value ? 'billable' : 'not billable'; // i18n-ignore - the audit log
+        $shown = $value ? __('billable') : __('not billable');
         $skip = 'trip_invoice_id = 0';
     }
     $trip_ids = array_unique(array_filter(array_map('intval', (array) ($_POST['trip_ids'] ?? []))));
     if ($set === '' || !$trip_ids) {
-        flashAlert($trip_ids ? 'Pick what to set them to' : 'Tick the trips to change first', 'error');
+        flashAlert($trip_ids ? __('Pick what to set them to') : __('Tick the trips to change first'), 'error');
         redirect();
     }
 
@@ -131,13 +136,13 @@ if (isset($_POST['bulk_edit_trips'])) {
             $kept++;
             continue;
         }
-        logAudit("Trip", "Edit", "$session_name set " . escapeSql($label) . " on the trip " . escapeSql(tripLabel($row)), intval($row['trip_client_id']), $trip_id);
+        logAudit("Trip", "Edit", "$session_name set " . escapeSql($label) . " on the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))), intval($row['trip_client_id']), $trip_id);
         $count++;
     }
-    logAudit("Trip", "Bulk Edit", "$session_name set " . escapeSql($label) . " on $count trip" . ($count === 1 ? '' : 's'));
+    logAudit("Trip", "Bulk Edit", "$session_name set " . escapeSql($label) . " on $count trip" . ($count === 1 ? '' : 's')); // i18n-ignore - the audit log
 
-    flashAlert("Set " . escapeHtml($label) . " on <strong>$count</strong> trip" . ($count === 1 ? '' : 's')
-        . ($kept ? " - $kept " . ($kept === 1 ? 'was' : 'were') . ' left as ' . ($kept === 1 ? 'it was' : 'they were') . ', ' . ($skip === 'trip_expense_id = 0' ? 'paid back for already' : 'billed already') : ''), $kept ? 'warning' : 'success');
+    flashAlert(_n('Set %2$s on %1$s trip', 'Set %2$s on %1$s trips', $count, "<strong>$count</strong>", escapeHtml($shown ?? $label))
+        . ($kept ? ($skip === 'trip_expense_id = 0' ? _n(' - %d was left as it was, paid back for already', ' - %d were left as they were, paid back for already', $kept) : _n(' - %d was left as it was, billed already', ' - %d were left as they were, billed already', $kept)) : ''), $kept ? 'warning' : 'success');
 
     redirect();
 
@@ -154,15 +159,15 @@ if (isset($_POST['bulk_delete_trips'])) {
     foreach (array_unique(array_filter(array_map('intval', (array) ($_POST['trip_ids'] ?? [])))) as $trip_id) {
         $row = tripDelete($trip_id, $delete_error);
         if (!$row) {
-            $kept += $delete_error !== '' && strpos($delete_error, 'no longer exists') === false ? 1 : 0;
+            $kept += $delete_error !== '' && $delete_error !== __('That trip no longer exists, or is not one you can see') ? 1 : 0;
             continue;
         }
-        logAudit("Trip", "Delete", "$session_name deleted the trip " . escapeSql(tripLabel($row)), intval($row['trip_client_id']));
+        logAudit("Trip", "Delete", "$session_name deleted the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))), intval($row['trip_client_id']));
         $count++;
     }
-    logAudit("Trip", "Bulk Delete", "$session_name deleted $count trip" . ($count === 1 ? '' : 's'));
+    logAudit("Trip", "Bulk Delete", "$session_name deleted $count trip" . ($count === 1 ? '' : 's')); // i18n-ignore - the audit log
 
-    flashAlert("<strong>$count</strong> trip" . ($count === 1 ? '' : 's') . " deleted" . ($kept ? " - $kept paid back for or billed " . ($kept === 1 ? 'was' : 'were') . ' kept' : ''), 'error');
+    flashAlert(_n('%s trip deleted', '%s trips deleted', $count, "<strong>$count</strong>") . ($kept ? _n(' - %d paid back for or billed was kept', ' - %d paid back for or billed were kept', $kept) : ''), 'error');
 
     redirect();
 
@@ -190,10 +195,10 @@ if (isset($_POST['trip_claim'])) {
         redirect();
     }
 
-    $what = '<strong>' . escapeHtml($result['user_name']) . '</strong>\'s mileage - ' . ($result['count'] === 1 ? '1 trip' : $result['count'] . ' trips') . ', '
-        . escapeHtml(tripDistanceText($result['miles'])) . ' at ' . escapeHtml(tripRateText($result['rate'])) . ': <strong>' . escapeHtml(billingMoney($result['amount'], $result['currency'])) . '</strong>';
+    $what = _n("%2\$s's mileage - %1\$d trip, %3\$s at %4\$s: %5\$s", "%2\$s's mileage - %1\$d trips, %3\$s at %4\$s: %5\$s", $result['count'], $result['count'], '<strong>' . escapeHtml($result['user_name']) . '</strong>',
+        escapeHtml(tripDistanceText($result['miles'])), escapeHtml(tripRateText($result['rate'])), '<strong>' . escapeHtml(billingMoney($result['amount'], $result['currency'])) . '</strong>');
     if (empty($_POST['pay_now'])) {
-        flashAlert("$what to pay back - in To reimburse on the expenses");
+        flashAlert(__('%s to pay back - in To reimburse on the expenses', $what));
         redirect();
     }
     $paid = expenseReimburse($user_id, $result['expense_ids'], [
@@ -204,10 +209,10 @@ if (isset($_POST['trip_claim'])) {
         'by' => stripslashes($session_name),
     ], $pay_error);
     if (!$paid) {
-        flashAlert("$what to pay back - not paid back yet: " . escapeHtml($pay_error), 'warning');
+        flashAlert(__('%1$s to pay back - not paid back yet: %2$s', $what, escapeHtml($pay_error)), 'warning');
         redirect();
     }
-    flashAlert("$what, paid back");
+    flashAlert(__('%s, paid back', $what));
 
     redirect();
 
@@ -225,16 +230,16 @@ if (isset($_GET['trip_unbill'])) {
     $row = tripRow($trip_id);
     $number = $row ? tripUnbill($trip_id, $error) : '';
     if (!$row || $number === '') {
-        flashAlert(escapeHtml($row ? $error : 'That trip no longer exists'), 'error');
+        flashAlert(escapeHtml($row ? $error : __('That trip no longer exists')), 'error');
         redirect();
     }
 
-    logAudit("Trip", "Unbill", "$session_name took the trip " . escapeSql(tripLabel($row)) . " off invoice " . escapeSql($number), intval($row['trip_client_id']), $trip_id);
+    logAudit("Trip", "Unbill", "$session_name took the trip " . escapeSql(i18nEnglish(fn () => tripLabel($row))) . " off invoice " . escapeSql($number), intval($row['trip_client_id']), $trip_id);
     if ($row['invoice_status'] !== null) {
-        billingLog('invoice', intval($row['trip_invoice_id']), $row['invoice_status'], 'Trip taken off by ' . stripslashes($session_name) . ' - ' . tripLabel($row));
+        billingLog('invoice', intval($row['trip_invoice_id']), $row['invoice_status'], 'Trip taken off by ' . stripslashes($session_name) . ' - ' . i18nEnglish(fn () => tripLabel($row))); // i18n-ignore - invoice history stays English
     }
 
-    flashAlert("Trip to <strong>" . escapeHtml($row['trip_destination']) . "</strong> taken off " . escapeHtml($number) . " - it is to bill again");
+    flashAlert(__('Trip to %1$s taken off %2$s - it is to bill again', '<strong>' . escapeHtml($row['trip_destination']) . '</strong>', escapeHtml($number)));
 
     redirect();
 
@@ -251,7 +256,7 @@ if (isset($_POST['invoice_add_trips'])) {
     $invoice_id = intval($_POST['invoice_id'] ?? 0);
     $invoice = billingRow('invoice', $invoice_id);
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($invoice['client_id']);
@@ -271,8 +276,7 @@ if (isset($_POST['invoice_add_trips'])) {
         redirect("invoice.php?invoice_id=$invoice_id");
     }
 
-    flashAlert('<strong>' . ($result['trips'] === 1 ? '1 trip' : $result['trips'] . ' trips') . '</strong> billed - ' . escapeHtml(billingMoney($result['amount'], $invoice['invoice_currency_code']))
-        . ' for ' . escapeHtml(tripDistanceText($result['miles'])));
+    flashAlert(_n('%2$s billed - %3$s for %4$s', '%2$s billed - %3$s for %4$s', $result['trips'], $result['trips'], '<strong>' . escapeHtml(_n('%d trip', '%d trips', $result['trips'])) . '</strong>', escapeHtml(billingMoney($result['amount'], $invoice['invoice_currency_code'])), escapeHtml(tripDistanceText($result['miles']))));
 
     redirect("invoice.php?invoice_id=$invoice_id#items");
 
@@ -316,12 +320,16 @@ if (isExportRequest('export_trips')) {
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['user_name'] = $row['driver_name'];
-            $row['round_trip_display'] = intval($row['round_trip']) ? 'Yes' : 'No';
+            // CSV values stay English, so the file reads the same in every language
+            $labels = fn () => [
+                intval($row['round_trip']) ? __('Yes') : __('No'),
+                intval($row['trip_own_vehicle']) ? _x('Own', 'vehicle') : _x('Company', 'vehicle'),
+                !intval($row['trip_own_vehicle']) ? '' : ($row['claim_expense_id'] === null ? __('To pay back') : ($row['reimbursement_date'] !== null ? __('Paid back %s', $row['reimbursement_date']) : __('On a mileage expense'))),
+                $row['invoice_number'] !== null ? __('Billed on %s', $row['invoice_prefix'] . $row['invoice_number']) : (intval($row['trip_billable']) ? __('To bill') : ''),
+            ];
+            [$row['round_trip_display'], $row['vehicle_display'], $row['paid_back_display'], $row['billing_display']] = $format === 'csv' ? i18nEnglish($labels) : $labels();
             $row['trip_one_way'] = number_format(tripOneWay($row), 1, '.', '');
             $row['ticket_display'] = $row['ticket_number'] !== null ? ticketReference($row) . ' - ' . $row['ticket_subject'] : '';
-            $row['vehicle_display'] = intval($row['trip_own_vehicle']) ? 'Own' : 'Company';
-            $row['paid_back_display'] = !intval($row['trip_own_vehicle']) ? '' : ($row['claim_expense_id'] === null ? 'To pay back' : ($row['reimbursement_date'] !== null ? 'Paid back ' . $row['reimbursement_date'] : 'On a mileage expense'));
-            $row['billing_display'] = $row['invoice_number'] !== null ? 'Billed on ' . $row['invoice_prefix'] . $row['invoice_number'] : (intval($row['trip_billable']) ? 'To bill' : '');
             addExportRow($export, $row);
         }
 

@@ -25,12 +25,12 @@
 /** The kinds of account - id => label and icon. Stored in accounts.account_type. */
 function accountTypes() {
     return [
-        1 => ['label' => 'Checking', 'icon' => 'fa-university'],
-        2 => ['label' => 'Savings', 'icon' => 'fa-piggy-bank'],
-        3 => ['label' => 'Credit card', 'icon' => 'fa-credit-card'],
-        4 => ['label' => 'Cash', 'icon' => 'fa-money-bill-wave'],
-        5 => ['label' => 'Payment processor', 'icon' => 'fa-globe'],
-        6 => ['label' => 'Other', 'icon' => 'fa-wallet'],
+        1 => ['label' => __('Checking'), 'icon' => 'fa-university'],
+        2 => ['label' => __('Savings'), 'icon' => 'fa-piggy-bank'],
+        3 => ['label' => __('Credit card'), 'icon' => 'fa-credit-card'],
+        4 => ['label' => _x('Cash', 'account type'), 'icon' => 'fa-money-bill-wave'],
+        5 => ['label' => __('Payment processor'), 'icon' => 'fa-globe'],
+        6 => ['label' => _x('Other', 'account type'), 'icon' => 'fa-wallet'],
     ];
 }
 
@@ -141,10 +141,10 @@ function accountDefaults() {
     global $mysqli, $config_default_payment_account, $config_default_expense_account, $config_default_transfer_from_account, $config_default_transfer_to_account;
     $defaults = [];
     foreach ([
-        [$config_default_payment_account, 'Payments go in'],
-        [$config_default_expense_account, 'Expenses paid from'],
-        [$config_default_transfer_from_account, 'Transfers from'],
-        [$config_default_transfer_to_account, 'Transfers to'],
+        [$config_default_payment_account, __('Payments go in')],
+        [$config_default_expense_account, __('Expenses paid from')],
+        [$config_default_transfer_from_account, __('Transfers from')],
+        [$config_default_transfer_to_account, __('Transfers to')],
     ] as [$id, $label]) {
         if (intval($id)) {
             $defaults[intval($id)][] = $label;
@@ -161,7 +161,7 @@ function accountDefaults() {
 function accountBalanceText(array $account) {
     $balance = floatval($account['balance']);
     if (accountType($account) === 3 && $balance < 0) {
-        return billingMoney(-$balance, $account['account_currency_code']) . ' owed';
+        return __('%s owed', billingMoney(-$balance, $account['account_currency_code']));
     }
     return billingMoney($balance, $account['account_currency_code']);
 }
@@ -226,32 +226,32 @@ function accountSave(array $in, $account_id = 0, &$error = '') {
     $account_id = intval($account_id);
     $existing = $account_id ? accountRow($account_id) : null;
     if ($account_id && !$existing) {
-        $error = 'That account no longer exists';
+        $error = __('That account no longer exists');
         return 0;
     }
     $name = mb_substr(trim((string) ($in['name'] ?? '')), 0, 200);
     if ($name === '') {
-        $error = 'Name the account';
+        $error = __('Name the account');
         return 0;
     }
     $duplicate = mysqli_fetch_row(mysqli_query($mysqli, "SELECT account_id FROM accounts WHERE account_name = '" . escapeSql($name) . "' AND account_id <> $account_id AND account_archived_at IS NULL LIMIT 1"));
     if ($duplicate) {
-        $error = "There's an account called $name already";
+        $error = __("There's an account called %s already", $name);
         return 0;
     }
     $type = intval($in['type'] ?? 0);
     if (!isset(accountTypes()[$type])) {
-        $error = 'Pick what kind of account it is';
+        $error = __('Pick what kind of account it is');
         return 0;
     }
     $opening = billingNumberInput($in['opening_balance'] ?? '0');
     if ($opening === null || abs($opening) >= 1e12) {
-        $error = 'Enter the opening balance - 0.00 for none';
+        $error = __('Enter the opening balance - 0.00 for none');
         return 0;
     }
     // Reconciled statements start from it - it stays as it was once one is finished
     if ($existing && round($opening, 2) != round(floatval($existing['opening_balance']), 2) && reconcileAccountReconciled($account_id)) {
-        $error = 'The opening balance is where its first reconciled statement starts - undo its reconciliations to change it';
+        $error = __('The opening balance is where its first reconciled statement starts - undo its reconciliations to change it');
         return 0;
     }
     $currency = strtoupper(trim((string) ($in['currency'] ?? '')));
@@ -259,7 +259,7 @@ function accountSave(array $in, $account_id = 0, &$error = '') {
     if ($locked) {
         $currency = (string) $existing['account_currency_code'];
     } elseif (!isset($currencies_array[$currency])) {
-        $error = 'Pick the currency';
+        $error = __('Pick the currency');
         return 0;
     }
     $description = mb_substr(trim((string) ($in['description'] ?? '')), 0, 250);
@@ -281,15 +281,15 @@ function accountArchive($account_id, &$error = '') {
     global $mysqli;
     $row = accountRow($account_id);
     if (!$row || $row['account_archived_at']) {
-        $error = $row ? 'That account is archived already' : 'That account no longer exists';
+        $error = $row ? __('That account is archived already') : __('That account no longer exists');
         return null;
     }
     if (abs($row['balance']) >= 0.005) {
-        $error = $row['account_name'] . ' still holds ' . accountBalanceText($row) . ' - move it to another account first';
+        $error = __('%1$s still holds %2$s - move it to another account first', $row['account_name'], accountBalanceText($row));
         return null;
     }
     if (mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM payment_providers WHERE payment_provider_active = 1 AND payment_provider_account = " . intval($row['account_id'])))) {
-        $error = 'Online payments go into ' . $row['account_name'] . ' - pick another account for them in Admin > Payment Providers first';
+        $error = __('Online payments go into %s - pick another account for them in Admin > Payment Providers first', $row['account_name']);
         return null;
     }
     mysqli_query($mysqli, "UPDATE accounts SET account_archived_at = NOW() WHERE account_id = " . intval($row['account_id']));
@@ -301,7 +301,7 @@ function accountRestore($account_id, &$error = '') {
     global $mysqli;
     $row = accountRow($account_id);
     if (!$row || !$row['account_archived_at']) {
-        $error = $row ? "That account isn't archived" : 'That account no longer exists';
+        $error = $row ? __('That account isn\'t archived') : __('That account no longer exists');
         return null;
     }
     mysqli_query($mysqli, "UPDATE accounts SET account_archived_at = NULL WHERE account_id = " . intval($row['account_id']));
@@ -313,11 +313,11 @@ function accountDelete($account_id, &$error = '') {
     global $mysqli;
     $row = accountRow($account_id);
     if (!$row) {
-        $error = 'That account no longer exists';
+        $error = __('That account no longer exists');
         return null;
     }
     if (accountInUse($row['account_id'])) {
-        $error = $row['account_name'] . ' has payments, income or expenses on it - archive it instead, so your books keep it';
+        $error = __('%s has payments, income or expenses on it - archive it instead, so your books keep it', $row['account_name']);
         return null;
     }
     $id = intval($row['account_id']);
@@ -333,12 +333,12 @@ function accountDelete($account_id, &$error = '') {
 /** The kinds of line on an account - kind => label, icon, and which way the money goes. */
 function accountLedgerKinds() {
     return [
-        'payment' => ['label' => 'Invoice payment', 'icon' => 'fa-file-invoice-dollar', 'in' => true],
-        'revenue' => ['label' => 'Other income', 'icon' => 'fa-hand-holding-usd', 'in' => true],
-        'transfer_in' => ['label' => 'Transfer in', 'icon' => 'fa-arrow-down', 'in' => true],
-        'expense' => ['label' => 'Expense', 'icon' => 'fa-shopping-cart', 'in' => false],
-        'transfer_out' => ['label' => 'Transfer out', 'icon' => 'fa-arrow-up', 'in' => false],
-        'reimbursement' => ['label' => 'Reimbursement', 'icon' => 'fa-user-check', 'in' => false],
+        'payment' => ['label' => __('Invoice payment'), 'icon' => 'fa-file-invoice-dollar', 'in' => true],
+        'revenue' => ['label' => __('Other income'), 'icon' => 'fa-hand-holding-usd', 'in' => true],
+        'transfer_in' => ['label' => __('Transfer in'), 'icon' => 'fa-arrow-down', 'in' => true],
+        'expense' => ['label' => __('Expense'), 'icon' => 'fa-shopping-cart', 'in' => false],
+        'transfer_out' => ['label' => __('Transfer out'), 'icon' => 'fa-arrow-up', 'in' => false],
+        'reimbursement' => ['label' => __('Reimbursement'), 'icon' => 'fa-user-check', 'in' => false],
     ];
 }
 
@@ -456,13 +456,14 @@ function accountLedgerWhat(array $row) {
     $what = trim((string) $row['txn_what']);
     $description = trim((string) strtok((string) $row['txn_description'], "\n"));
     if ($kind === 'transfer_in') {
-        $what = 'From ' . ($row['other_account_name'] ?: 'an account since deleted');
+        $what = __('From %s', $row['other_account_name'] ?: __('an account since deleted'));
     } elseif ($kind === 'transfer_out') {
-        $what = (accountType(['account_type' => $row['other_account_type'], 'account_name' => $row['other_account_name']]) === 3 ? 'Paid ' : 'To ') . ($row['other_account_name'] ?: 'an account since deleted');
+        $other = $row['other_account_name'] ?: __('an account since deleted');
+        $what = accountType(['account_type' => $row['other_account_type'], 'account_name' => $row['other_account_name']]) === 3 ? __('Paid %s', $other) : __('To %s', $other);
     } elseif ($kind === 'payment') {
-        $what = $what !== '' ? 'Payment on ' . $what : 'A payment';
+        $what = $what !== '' ? __('Payment on %s', $what) : __('A payment');
     } elseif ($kind === 'reimbursement') {
-        $what = 'Paid back ' . ($what ?: 'an agent');
+        $what = __('Paid back %s', $what ?: __('an agent'));
     } elseif ($what === '') {
         $what = $description !== '' ? $description : (accountLedgerKinds()[$kind]['label'] ?? '');
         $description = '';
@@ -479,11 +480,11 @@ function accountLedgerWhat(array $row) {
 function accountLedgerShows($all_accounts = false) {
     $not_transfer = $all_accounts ? " AND ledger.txn_kind NOT IN ('transfer_in', 'transfer_out')" : '';
     return [
-        '' => ['label' => 'All', 'where' => ''],
-        'in' => ['label' => 'Money in', 'icon' => 'fa-arrow-down', 'where' => 'ledger.txn_amount > 0' . $not_transfer],
-        'out' => ['label' => 'Money out', 'icon' => 'fa-arrow-up', 'where' => 'ledger.txn_amount < 0' . $not_transfer],
-        'transfers' => ['label' => 'Transfers', 'icon' => 'fa-exchange-alt', 'where' => $all_accounts ? "ledger.txn_kind = 'transfer_out'" : "ledger.txn_kind IN ('transfer_in', 'transfer_out')"],
-        'uncleared' => ['label' => 'Uncleared', 'icon' => 'fa-hourglass-half', 'where' => 'ledger.txn_cleared_id IS NULL'],
+        '' => ['label' => __('All'), 'where' => ''],
+        'in' => ['label' => __('Money in'), 'icon' => 'fa-arrow-down', 'where' => 'ledger.txn_amount > 0' . $not_transfer],
+        'out' => ['label' => __('Money out'), 'icon' => 'fa-arrow-up', 'where' => 'ledger.txn_amount < 0' . $not_transfer],
+        'transfers' => ['label' => __('Transfers'), 'icon' => 'fa-exchange-alt', 'where' => $all_accounts ? "ledger.txn_kind = 'transfer_out'" : "ledger.txn_kind IN ('transfer_in', 'transfer_out')"],
+        'uncleared' => ['label' => __('Uncleared'), 'icon' => 'fa-hourglass-half', 'where' => 'ledger.txn_cleared_id IS NULL'],
     ];
 }
 
@@ -526,7 +527,7 @@ function accountLedgerFiltersSql(array $src, &$summary = [], $with_show = true, 
         $id = intval($src[$key] ?? 0);
         if ($id && $key === 'client' && !hasClientAccess($id)) {
             $sql .= " AND 1 = 0";
-            $summary[$f[3]] = 'A client you cannot open';
+            $summary[$f[3]] = __('A client you cannot open');
         } elseif ($id) {
             $sql .= " AND {$f[0]} = $id";
             $summary[$f[3]] = (string) getFieldById($f[1], $id, $f[2]);
@@ -535,13 +536,13 @@ function accountLedgerFiltersSql(array $src, &$summary = [], $with_show = true, 
     $method = trim((string) ($src['method'] ?? ($src['payment_method'] ?? '')));
     if ($method !== '') {
         $sql .= " AND ledger.txn_method = '" . escapeSql($method) . "'";
-        $summary['Paid by'] = $method;
+        $summary[__('Paid by')] = $method;
     }
     foreach (['amount_min' => '>=', 'amount_max' => '<='] as $key => $op) {
         $value = trim((string) ($src[$key] ?? ''));
         if ($value !== '' && is_numeric($value)) {
             $sql .= " AND ABS(ledger.txn_amount) $op " . round(abs(floatval($value)), 2);
-            $summary[$key === 'amount_min' ? 'At least' : 'At most'] = billingMoney(abs(floatval($value)));
+            $summary[$key === 'amount_min' ? __('At least') : __('At most')] = billingMoney(abs(floatval($value)));
         }
     }
     $reconciliation_id = intval($src['reconciliation'] ?? 0);
@@ -549,7 +550,7 @@ function accountLedgerFiltersSql(array $src, &$summary = [], $with_show = true, 
         $sql .= " AND ledger.txn_cleared_id = $reconciliation_id";
         $statement = getFieldById('account_reconciliations', $reconciliation_id, 'reconciliation_statement_date');
         $brought = intval(getFieldById('account_reconciliations', $reconciliation_id, 'reconciliation_opening')) === 1;
-        $summary['Cleared on'] = $statement ? ($brought ? 'brought forward to ' : 'the statement to ') . date('M j, Y', strtotime($statement)) : 'a statement since undone';
+        $summary[__('Cleared on')] = $statement ? ($brought ? __('brought forward to %s', formatDate($statement, 'date')) : __('the statement to %s', formatDate($statement, 'date'))) : __('a statement since undone');
     }
     $show = (string) ($src['show'] ?? '');
     $shows = accountLedgerShows($all_accounts);
@@ -613,14 +614,14 @@ function transferRow($transfer_id) {
 
 /** A transfer in a phrase - "$500.00 from Operating Checking to Business Savings on 2026-10-14". Raw. */
 function transferLabel(array $row) {
-    return billingMoney($row['transfer_amount'], $row['transfer_currency_code']) . ' from ' . ($row['from_account_name'] ?: 'an account since deleted')
-        . ' to ' . ($row['to_account_name'] ?: 'an account since deleted') . ' on ' . $row['transfer_date'];
+    return __('%1$s from %2$s to %3$s on %4$s', billingMoney($row['transfer_amount'], $row['transfer_currency_code']), $row['from_account_name'] ?: __('an account since deleted'),
+        $row['to_account_name'] ?: __('an account since deleted'), $row['transfer_date']);
 }
 
 /** What a transfer is - paying a credit card when it goes into one. */
 function transferWhat(array $row) {
     $to_type = isset(accountTypes()[intval($row['to_account_type'] ?? 0)]) ? intval($row['to_account_type']) : accountTypeGuess($row['to_account_name'] ?? '');
-    return $to_type === 3 ? 'Card payment' : 'Transfer';
+    return $to_type === 3 ? 'Card payment' : 'Transfer'; // i18n-ignore - compared; shown through __()
 }
 
 /**
@@ -635,17 +636,17 @@ function transferSave(array $in, $transfer_id = 0, &$error = '') {
     $transfer_id = intval($transfer_id);
     $existing = $transfer_id ? transferRow($transfer_id) : null;
     if ($transfer_id && !$existing) {
-        $error = 'That transfer no longer exists';
+        $error = __('That transfer no longer exists');
         return 0;
     }
     $date = trim((string) ($in['date'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date it moved';
+        $error = __('Enter the date it moved');
         return 0;
     }
     $amount = billingNumberInput($in['amount'] ?? '');
     if ($amount === null || $amount <= 0 || $amount >= 1e12) {
-        $error = 'Enter the amount moved';
+        $error = __('Enter the amount moved');
         return 0;
     }
     $keep = $existing ? [intval($existing['transfer_from_id']), intval($existing['transfer_to_id'])] : [];
@@ -658,20 +659,20 @@ function transferSave(array $in, $transfer_id = 0, &$error = '') {
     $from = intval($in['from'] ?? 0);
     $to = intval($in['to'] ?? 0);
     if (!isset($accounts[$from])) {
-        $error = 'Pick the account it came out of';
+        $error = __('Pick the account it came out of');
         return 0;
     }
     if (!isset($accounts[$to])) {
-        $error = 'Pick the account it went into';
+        $error = __('Pick the account it went into');
         return 0;
     }
     if ($from === $to) {
-        $error = 'Pick two different accounts';
+        $error = __('Pick two different accounts');
         return 0;
     }
     $method = trim((string) ($in['method'] ?? ''));
     if ($method !== '' && !in_array($method, paymentMethods(), true) && !($existing && $method === (string) $existing['transfer_method'])) {
-        $error = 'Pick how it was moved';
+        $error = __('Pick how it was moved');
         return 0;
     }
     $notes = trim(str_replace("\r\n", "\n", (string) ($in['notes'] ?? '')));
@@ -720,7 +721,7 @@ function transferDelete($transfer_id, &$error = '') {
     $error = '';
     $row = transferRow($transfer_id);
     if (!$row) {
-        $error = 'That transfer no longer exists';
+        $error = __('That transfer no longer exists');
         return null;
     }
     if (!reconcileCheckDelete('expense', $row['transfer_expense_id'], $error) || !reconcileCheckDelete('revenue', $row['transfer_revenue_id'], $error)) {
@@ -781,7 +782,7 @@ function transferDepositCandidates($account_id, $limit = 200) {
         $row['key'] = $row['kind'] . '-' . $row['id'];
         $row['amount'] = round(floatval($row['amount']), 2);
         $what = trim((string) strtok((string) $row['what'], "\n"));
-        $row['what'] = $row['kind'] === 'payment' ? ($what !== '' ? "Payment on $what" : 'A payment') : ($what !== '' ? $what : 'Other income');
+        $row['what'] = $row['kind'] === 'payment' ? ($what !== '' ? __('Payment on %s', $what) : __('A payment')) : ($what !== '' ? $what : __('Other income'));
         $rows[] = $row;
     }
     return $rows;
@@ -842,7 +843,7 @@ function transferDepositItems($transfer_id) {
     $rows = [];
     while ($row = mysqli_fetch_assoc($sql)) {
         $what = trim((string) strtok((string) $row['what'], "\n"));
-        $row['what'] = $row['kind'] === 'payment' ? ($what !== '' ? "Payment on $what" : 'A payment') : ($what !== '' ? $what : 'Other income');
+        $row['what'] = $row['kind'] === 'payment' ? ($what !== '' ? __('Payment on %s', $what) : __('A payment')) : ($what !== '' ? $what : __('Other income'));
         $rows[] = $row;
     }
     return $rows;
@@ -854,9 +855,9 @@ function transferDepositedGlanceHtml($deposit) {
         return '';
     }
     $others = intval($deposit['count']) - 1;
-    return '<div class="itflow-glance-item" title="Deposited"><i class="fas fa-fw fa-piggy-bank"></i><span><a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/transfer/transfer.php?id='
-        . intval($deposit['transfer_id']) . '">Deposited to ' . escapeHtml($deposit['to_account_name'] ?: 'an account since deleted') . ' on ' . escapeHtml(date('M j, Y', strtotime($deposit['transfer_date']))) . '</a>'
-        . ($others > 0 ? ' <span class="text-body-secondary">with ' . $others . ' other' . ($others === 1 ? '' : 's') . '</span>' : '') . '</span></div>';
+    return '<div class="itflow-glance-item" title="' . escapeHtml(__('Deposited')) . '"><i class="fas fa-fw fa-piggy-bank"></i><span><a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/transfer/transfer.php?id='
+        . intval($deposit['transfer_id']) . '">' . escapeHtml(__('Deposited to %1$s on %2$s', $deposit['to_account_name'] ?: __('an account since deleted'), formatDate($deposit['transfer_date'], 'date'))) . '</a>'
+        . ($others > 0 ? ' <span class="text-body-secondary">' . escapeHtml(_n('with %d other', 'with %d others', $others)) . '</span>' : '') . '</span></div>';
 }
 
 /** The deposit a payment or other income went to the bank in - transfer_id, transfer_date, to_account_name and count (in it all) - or null. */

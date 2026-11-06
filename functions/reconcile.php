@@ -220,21 +220,21 @@ function reconcileStatementInput(array $account, array $in, &$error = '') {
     $error = '';
     $date = reconcileDateInput($in['statement_date'] ?? '');
     if ($date === '') {
-        $error = "Enter the statement's ending date";
+        $error = __('Enter the statement\'s ending date');
         return null;
     }
     if ($date > date('Y-m-d')) {
-        $error = "The statement's ending date can't be after today";
+        $error = __('The statement\'s ending date can\'t be after today');
         return null;
     }
     $last = reconcileLast($account['account_id']);
     if ($last && $date <= $last['reconciliation_statement_date']) {
-        $error = $account['account_name'] . ' is reconciled to ' . date('M j, Y', strtotime($last['reconciliation_statement_date'])) . ' - the next statement ends after that';
+        $error = __('%1$s is reconciled to %2$s - the next statement ends after that', $account['account_name'], formatDate($last['reconciliation_statement_date'], 'date'));
         return null;
     }
     $ending = reconcileEndingInput($in['ending_balance'] ?? '', $account['type'] === 3);
     if ($ending === null || trim((string) ($in['ending_balance'] ?? '')) === '') {
-        $error = $account['type'] === 3 ? 'Enter what the statement says is owed - 0.00 for nothing' : "Enter the statement's ending balance";
+        $error = $account['type'] === 3 ? __('Enter what the statement says is owed - 0.00 for nothing') : __("Enter the statement's ending balance");
         return null;
     }
     $notes = mb_substr(trim((string) ($in['notes'] ?? '')), 0, 250);
@@ -254,11 +254,11 @@ function reconcileStart($account_id, array $in, &$error = '') {
     $error = '';
     $account = accountRow($account_id);
     if (!$account || $account['account_archived_at']) {
-        $error = $account ? 'Restore the account before reconciling it' : 'That account no longer exists';
+        $error = $account ? __('Restore the account before reconciling it') : __('That account no longer exists');
         return 0;
     }
     if (reconcileOpen($account['account_id'])) {
-        $error = 'A statement is being reconciled on ' . $account['account_name'] . ' already - finish or discard it first';
+        $error = __('A statement is being reconciled on %s already - finish or discard it first', $account['account_name']);
         return 0;
     }
     $statement = reconcileStatementInput($account, $in, $error);
@@ -273,12 +273,12 @@ function reconcileStart($account_id, array $in, &$error = '') {
     if (($in['start_from'] ?? '') === 'statement' && !reconcileLast($account_id)) {
         $start = reconcileDateInput($in['start_date'] ?? '');
         if ($start === '' || $start > $date) {
-            $error = "Enter the day the statement starts - on or before the day it ends";
+            $error = __('Enter the day the statement starts - on or before the day it ends');
             return 0;
         }
         $balance = reconcileEndingInput($in['start_balance'] ?? '', $account['type'] === 3);
         if ($balance === null || trim((string) ($in['start_balance'] ?? '')) === '') {
-            $error = $account['type'] === 3 ? 'Enter what the statement says was owed when it started' : 'Enter the balance the statement starts from';
+            $error = $account['type'] === 3 ? __('Enter what the statement says was owed when it started') : __('Enter the balance the statement starts from');
             return 0;
         }
         $from = date('Y-m-d', strtotime("$start -1 day"));
@@ -343,16 +343,16 @@ function reconcileCorrectOpening($reconciliation_id, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || !$row['opening']) {
-        $error = 'That reconciliation no longer exists';
+        $error = __('That reconciliation no longer exists');
         return null;
     }
     if (abs(floatval($row['reconciliation_adjustment'])) >= 0.005) {
-        $error = 'The opening balance was corrected already';
+        $error = __('The opening balance was corrected already');
         return null;
     }
     $gap = reconcileOpeningGap($row);
     if (abs($gap) < 0.005) {
-        $error = 'ITFlow matches the bank there already';
+        $error = __('ITFlow matches the bank there already');
         return null;
     }
     $gap_sql = number_format($gap, 2, '.', '');
@@ -372,7 +372,7 @@ function reconcileUpdate($reconciliation_id, array $in, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || $row['finished']) {
-        $error = $row ? 'That statement is reconciled already - undo it to change it' : 'That reconciliation no longer exists';
+        $error = $row ? __('That statement is reconciled already - undo it to change it') : __('That reconciliation no longer exists');
         return false;
     }
     $statement = reconcileStatementInput($row['account'], $in, $error);
@@ -405,7 +405,7 @@ function reconcileTick($reconciliation_id, array $keys, $tick, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || $row['finished']) {
-        $error = $row ? 'That statement is reconciled already - undo it to change what cleared' : 'That reconciliation no longer exists - start again';
+        $error = $row ? __('That statement is reconciled already - undo it to change what cleared') : __('That reconciliation no longer exists - start again');
         return null;
     }
     $id = intval($row['reconciliation_id']);
@@ -436,12 +436,12 @@ function reconcileFinish($reconciliation_id, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || $row['finished']) {
-        $error = $row ? 'That statement is reconciled already' : 'That reconciliation no longer exists';
+        $error = $row ? __('That statement is reconciled already') : __('That reconciliation no longer exists');
         return null;
     }
     $totals = reconcileTotals($row);
     if (abs($totals['difference']) >= 0.005) {
-        $error = 'It is ' . billingMoney(abs($totals['difference']), $row['account']['account_currency_code']) . ' off the statement - tick what cleared until the difference is nothing';
+        $error = __('It is %s off the statement - tick what cleared until the difference is nothing', billingMoney(abs($totals['difference']), $row['account']['account_currency_code']));
         return null;
     }
     mysqli_query($mysqli, "UPDATE account_reconciliations SET reconciliation_starting_balance = " . number_format($totals['starting'], 2, '.', '') . ",
@@ -455,7 +455,7 @@ function reconcileDiscard($reconciliation_id, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || $row['finished']) {
-        $error = $row ? 'That statement is reconciled - undo it instead' : 'That reconciliation no longer exists';
+        $error = $row ? __('That statement is reconciled - undo it instead') : __('That reconciliation no longer exists');
         return null;
     }
     $id = intval($row['reconciliation_id']);
@@ -477,16 +477,16 @@ function reconcileUndo($reconciliation_id, &$error = '') {
     $error = '';
     $row = reconcileRow($reconciliation_id);
     if (!$row || !$row['finished']) {
-        $error = $row ? 'That statement is still being reconciled' : 'That reconciliation no longer exists';
+        $error = $row ? __('That statement is still being reconciled') : __('That reconciliation no longer exists');
         return null;
     }
     $last = reconcileLast($row['reconciliation_account_id']);
     if (!$last || intval($last['reconciliation_id']) !== intval($row['reconciliation_id'])) {
-        $error = 'Only the latest statement can be undone - undo the ones after it first';
+        $error = __('Only the latest statement can be undone - undo the ones after it first');
         return null;
     }
     if (reconcileOpen($row['reconciliation_account_id'])) {
-        $error = 'Another statement is being reconciled on ' . $row['account']['account_name'] . ' - discard it first';
+        $error = __('Another statement is being reconciled on %s - discard it first', $row['account']['account_name']);
         return null;
     }
     $id = intval($row['reconciliation_id']);
@@ -524,12 +524,13 @@ function reconcileLock($kind, $id) {
 }
 
 /** What to say about a cleared line - "It cleared on the Operating Checking statement to Sep 30, 2026 - undo that reconciliation to ..." */
-function reconcileLockText(array $lock, $to = 'change its amount, date or account') {
-    $day = date('M j, Y', strtotime($lock['reconciliation_statement_date']));
+function reconcileLockText(array $lock, $to = 'change its amount, date or account') { // i18n-ignore - translated below
+    $day = formatDate($lock['reconciliation_statement_date'], 'date');
+    $to = ['change its amount, date or account' => __('change its amount, date or account'), 'delete it' => __('delete it'), 'undo it' => __('undo it')][$to] ?? $to;
     if (!empty($lock['reconciliation_opening'])) {
-        return "It is before $day, when {$lock['account_name']} was brought forward as reconciled - undo that to $to";
+        return __('It is before %1$s, when %2$s was brought forward as reconciled - undo that to %3$s', $day, $lock['account_name'], $to);
     }
-    return 'It cleared on the ' . $lock['account_name'] . " statement to $day - undo that reconciliation to $to";
+    return __('It cleared on the %1$s statement to %2$s - undo that reconciliation to %3$s', $lock['account_name'], $day, $to);
 }
 
 /** A quick look's line for a cleared one - the statement it cleared on, opening the lines it cleared. '' for null. */
@@ -538,10 +539,10 @@ function reconcileGlanceHtml($lock) {
         return '';
     }
     $link = '<a href="transactions.php?account=' . intval($lock['reconciliation_account_id']) . '&amp;reconciliation=' . intval($lock['reconciliation_id']) . '">'
-        . escapeHtml(date('M j, Y', strtotime($lock['reconciliation_statement_date']))) . '</a>';
-    return '<div class="itflow-glance-item" title="Reconciled"><i class="fas fa-fw fa-check-circle text-success-emphasis"></i><span>'
-        . (!empty($lock['reconciliation_opening']) ? 'Brought forward as reconciled on ' . escapeHtml($lock['account_name']) . ' to ' . $link
-            : 'Cleared on the ' . escapeHtml($lock['account_name']) . ' statement to ' . $link) . '</span></div>';
+        . escapeHtml(formatDate($lock['reconciliation_statement_date'], 'date')) . '</a>';
+    return '<div class="itflow-glance-item" title="' . escapeHtml(__('Reconciled')) . '"><i class="fas fa-fw fa-check-circle text-success-emphasis"></i><span>'
+        . (!empty($lock['reconciliation_opening']) ? __('Brought forward as reconciled on %1$s to %2$s', escapeHtml($lock['account_name']), $link)
+            : __('Cleared on the %1$s statement to %2$s', escapeHtml($lock['account_name']), $link)) . '</span></div>';
 }
 
 /** An edit form's note for a cleared one - its amount, date and account are locked. '' for null. */
@@ -555,7 +556,7 @@ function reconcileFormNoteHtml($lock) {
 /** A quick look's Delete (or Undo) for a cleared one - there, but off, saying why. */
 function reconcileLockedButtonHtml(array $lock, $label = 'Delete', $icon = 'fa-trash', $to = 'delete it') {
     return '<span class="d-inline-block" tabindex="0" title="' . escapeHtml(reconcileLockText($lock, $to)) . '"><button type="button" class="btn btn-outline-danger" disabled>'
-        . '<i class="fas ' . escapeHtml($icon) . '"></i><span class="d-none d-sm-inline ms-2">' . escapeHtml($label) . '</span></button></span>';
+        . '<i class="fas ' . escapeHtml($icon) . '"></i><span class="d-none d-sm-inline ms-2">' . escapeHtml(__($label)) /* i18n-dynamic - Delete or Undo */ . '</span></button></span>';
 }
 
 /**

@@ -33,7 +33,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Transactions</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Transactions') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -50,32 +50,32 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <?php if ($reconciliation_filter) { ?>
-            <div class="alert alert-success py-2 small"><i class="fas fa-check-circle me-2"></i>Only the lines cleared on the statement to <?= $reconciliation_date ? escapeHtml(date('M j, Y', strtotime($reconciliation_date))) : 'that was undone' ?></div>
+            <div class="alert alert-success py-2 small"><i class="fas fa-check-circle me-2"></i><?= escapeHtml(__('Only the lines cleared on the statement to %s', $reconciliation_date ? formatDate($reconciliation_date, 'date') : __('that was undone'))) ?></div>
         <?php } ?>
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">Account</label>
+                <label class="form-label"><?= __('Account') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
                     <select class="form-select select2" name="account">
-                        <option value="">- Every account -</option>
+                        <option value=""><?= __('- Every account -') ?></option>
                         <?php foreach (accountsList(null) as $id => $account) { ?>
                             <option value="<?= $id ?>" <?= $account_filter === $id ? 'selected' : '' ?> data-icon="fas <?= $types[$account['type']]['icon'] ?>"><?= escapeHtml($account['account_name']) ?><?= $account['account_archived_at'] ? ' (archived)' : '' ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">One account comes with its balance after each line.</div>
+                <div class="form-text"><?= __('One account comes with its balance after each line.') ?></div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Search</label>
+                <label class="form-label"><?= __('Search') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                    <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Who or what, reference, amount, category, client">
+                    <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Who or what, reference, amount, category, client')) ?>">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Showing</label>
+                <label class="form-label"><?= __('Showing') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-filter"></i></span>
                     <select class="form-select select2" name="show">
@@ -86,11 +86,11 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Kind</label>
+                <label class="form-label"><?= __('Kind') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-shapes"></i></span>
                     <select class="form-select select2" name="kind">
-                        <option value="">- Any kind -</option>
+                        <option value=""><?= __('- Any kind -') ?></option>
                         <?php foreach (accountLedgerKinds() as $key => $info) { ?>
                             <option value="<?= $key ?>" <?= $kind_filter === $key ? 'selected' : '' ?>><?= escapeHtml($info['label']) ?></option>
                         <?php } ?>
@@ -98,28 +98,28 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Category</label>
+                <label class="form-label"><?= __('Category') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
                     <select class="form-select select2" name="category">
-                        <option value="">- Any category -</option>
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT category_id, category_name, category_type, category_color, category_icon FROM categories
                             WHERE category_type IN ('Income', 'Expense') AND category_name <> 'Account Transfer' AND (category_archived_at IS NULL OR category_id = $category_filter)
                             ORDER BY category_type DESC, category_name ASC");
                         while ($row = mysqli_fetch_assoc($sql)) {
                             $option_id = intval($row['category_id']); ?>
-                            <option <?= $category_filter === $option_id ? 'selected' : '' ?> value="<?= $option_id ?>"<?= selectOptionColor($row['category_color'] ?? '', $row['category_icon'] ?? '') ?>><?= escapeHtml($row['category_name']) ?> (<?= $row['category_type'] === 'Income' ? 'in' : 'out' ?>)</option>
+                            <option <?= $category_filter === $option_id ? 'selected' : '' ?> value="<?= $option_id ?>"<?= selectOptionColor($row['category_color'] ?? '', $row['category_icon'] ?? '') ?>><?= escapeHtml($row['category_name']) ?> (<?= $row['category_type'] === 'Income' ? _x('in', 'money') : _x('out', 'money') ?>)</option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Client</label>
+                <label class="form-label"><?= __('Client') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                     <select class="form-select select2" name="client">
-                        <option value="">- Any client -</option>
+                        <option value=""><?= __('- Any client -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE (client_archived_at IS NULL OR client_id = $client_filter) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
                         while ($row = mysqli_fetch_assoc($sql)) {
@@ -130,11 +130,11 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Paid by</label>
+                <label class="form-label"><?= __('Paid by') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
                     <select class="form-select select2" name="method">
-                        <option value="">- Any payment method -</option>
+                        <option value=""><?= __('- Any payment method -') ?></option>
                         <?php foreach (paymentMethods('', true) as $method) { ?>
                             <option <?= $method_filter === $method ? 'selected' : '' ?> value="<?= escapeHtml($method) ?>"><?= escapeHtml($method) ?></option>
                         <?php } ?>
@@ -142,22 +142,22 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Amount</label>
+                <label class="form-label"><?= __('Amount') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
-                    <input type="number" step="0.01" min="0" class="form-control" name="amount_min" value="<?= escapeHtml($amount_min) ?>" placeholder="At least">
-                    <input type="number" step="0.01" min="0" class="form-control" name="amount_max" value="<?= escapeHtml($amount_max) ?>" placeholder="At most">
+                    <input type="number" step="0.01" min="0" class="form-control" name="amount_min" value="<?= escapeHtml($amount_min) ?>" placeholder="<?= escapeHtml(__('At least')) ?>">
+                    <input type="number" step="0.01" min="0" class="form-control" name="amount_max" value="<?= escapeHtml($amount_max) ?>" placeholder="<?= escapeHtml(__('At most')) ?>">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated from</label>
+                <label class="form-label"><?= __('Dated from') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated to</label>
+                <label class="form-label"><?= __('Dated to') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">
