@@ -30,7 +30,9 @@
  * text between tags, title / placeholder / aria-label / alt / data-placeholder /
  * data-confirm-* attributes, and
  * sentences in PHP and JS strings. A guess, to find what a batch missed - a line
- * marked i18n-ignore is left out. Always exits 0.
+ * marked i18n-ignore is left out, and so are the lines between an i18n-ignore-start
+ * and an i18n-ignore-end (an AI prompt, sample data) and a whole file that says
+ * i18n-ignore-file (content that is data, not interface). Always exits 0.
  */
 
 chdir(__DIR__);
@@ -98,8 +100,14 @@ function i18nCheckIsProse(string $text, bool $single_word_ok): bool {
 
 /* Records a candidate unless its line opts out - $lines[0] is line $lines_first. */
 function i18nCheckHardcoded(array &$hardcoded, array $lines, int $lines_first, string $file, int $line, string $text): void {
+    global $i18n_check_ignored;
     if (strpos($lines[$line - $lines_first] ?? '', 'i18n-ignore') !== false) {
         return;
+    }
+    foreach ($i18n_check_ignored[$file] ?? [] as [$from, $to]) {
+        if ($line >= $from && $line <= $to) {
+            return;
+        }
     }
     $text = trim(preg_replace('/\s+/', ' ', $text));
     $hardcoded["$file:$line"] = (isset($hardcoded["$file:$line"]) ? $hardcoded["$file:$line"] . ' | ' : '') . mb_substr($text, 0, 100);
@@ -115,6 +123,10 @@ function i18nCheckHardcodedHtml(string $html, array $lines, int $lines_first, st
     $at = fn($offset) => $first_line + substr_count(substr($html, 0, $offset), "\n");
     if (preg_match_all('/(?:^|>)([^<>]+)(?=<|$)/', $html, $m, PREG_OFFSET_CAPTURE)) {
         foreach ($m[1] as [$text, $offset]) {
+            // The tail of an attribute cut by a PHP tag (id="...Favorite"), or a bare word between two PHP tags
+            if (preg_match('/^[^\s"]*"(\s|$)|="/', $text) || (trim($text) === $html && !preg_match('/\s/', trim($text)))) {
+                continue;
+            }
             if (i18nCheckIsProse($text, true)) {
                 $lead = strlen($text) - strlen(ltrim($text));
                 i18nCheckHardcoded($hardcoded, $lines, $lines_first, $file, $at($offset + $lead), $text);
@@ -155,13 +167,14 @@ function i18nCheckSplitScript(string $html, int $first_line, bool &$in_script): 
 
 /* The JS calls in a piece of script - comments taken out first - and, when looking for them, its fixed sentences. */
 function i18nCheckJs(string $code, string $file, int $first_line, array &$calls, array &$not_literal, array &$literals, ?array &$hardcoded = null): void {
+    $original = $code;  // with its comments, where an i18n-ignore marker is read
     // Blank out comments, keeping line breaks so line numbers still count
     $code = preg_replace_callback('#/\*.*?\*/#s', fn($m) => preg_replace('/[^\n]/', ' ', $m[0]), $code);
     $code = preg_replace('#(^|[\s;{}(])//[^\n]*#', '$1', $code);
 
     $string = "'(?:[^'\\\\\\n]|\\\\.)*'|\"(?:[^\"\\\\\\n]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`";
     if (preg_match_all("/(?:$string)/", $code, $all, PREG_OFFSET_CAPTURE)) {
-        $lines = $hardcoded !== null ? explode("\n", $code) : [];
+        $lines = $hardcoded !== null ? explode("\n", $original) : [];
         foreach ($all[0] as [$literal, $offset]) {
             $value = stripcslashes(substr($literal, 1, -1));
             $literals[$value] = true;
@@ -271,14 +284,16 @@ function i18nCheckPhp(string $code, string $file, array &$calls, array &$not_lit
             if ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
                 $literals[i18nCheckUnquote($token[1])] = true;
             }
-            if ($hardcoded !== null && !array_intersect($stack, ['__', '_x', '_n']) && !($stack && i18nCheckQuietCall(end($stack)))) {
+            if ($hardcoded !== null && !array_intersect($stack, ['__', '_x', '_n', 'i18nEnglish', 'logAudit', 'logApp', 'appLog', 'logHistory', 'logTicketHistory', 'error_log', 'mysqli_query', 'cronJobLog', 'reportCsv', 'fputcsv', 'billingLog', 'signInLogFailure']) && !($stack && i18nCheckQuietCall(end($stack)))) {
                 $text = $token[0] === T_CONSTANT_ENCAPSED_STRING ? i18nCheckUnquote($token[1]) : $token[1];
                 $next = $significant($i + 1, 1);
                 $prev = $significant($i - 1, -1);
                 $is_key = $next >= 0 && is_array($tokens[$next]) && $tokens[$next][0] === T_DOUBLE_ARROW;
                 $compared = ($next >= 0 && is_array($tokens[$next]) && in_array($tokens[$next][0], [T_IS_EQUAL, T_IS_IDENTICAL, T_IS_NOT_EQUAL, T_IS_NOT_IDENTICAL], true))
                     || ($prev >= 0 && is_array($tokens[$prev]) && in_array($tokens[$prev][0], [T_IS_EQUAL, T_IS_IDENTICAL, T_IS_NOT_EQUAL, T_IS_NOT_IDENTICAL, T_CASE], true));
-                $sql = preg_match('/\b(SELECT|INSERT INTO|UPDATE|DELETE FROM|WHERE|ORDER BY|LEFT JOIN|SET [a-z_]+ =)\b/', $text);
+                // SQL, or a piece of a query: a column compared, a function of SQL's own
+                $sql = preg_match('/\b(SELECT|INSERT INTO|UPDATE|DELETE FROM|WHERE|ORDER BY|GROUP BY|LEFT JOIN|SET [a-z_]+ =)\b/', $text)
+                    || preg_match('/\b[a-z]+_[a-z_]+\)?\s*(=|<|>|!=|<>|LIKE\b|IN\b|NOT IN\b|IS\b|BETWEEN\b)|\b(COUNT|COALESCE|CURDATE|NOW|REGEXP_REPLACE|IFNULL|GREATEST|INTERVAL)\b|\b(ASC|DESC)\b,?\s*$|\bINTERVAL \d|\b(FROM|JOIN|UNION ALL|AS) [a-z_]+\b|\bIS (NOT )?NULL\b|^\s*\x27?\s*(AND|OR) \(|\bAND [a-z]+\./', $text);
                 if (!$is_key && !$compared && !$sql) {
                     if (strpos($text, '<') !== false && strpos($text, '>') !== false) {
                         i18nCheckHardcodedHtml($text, $lines, 1, $file, $token[2], $hardcoded);
@@ -368,10 +383,21 @@ if ($hardcoded_paths !== null) {
         }
         $files = array_merge($files, $found);
     }
+    $i18n_check_ignored = [];  // file => [[first line, last line], ...] between i18n-ignore-start and -end
     foreach (array_unique($files) as $relative) {
         $code = file_get_contents("$root/$relative");
-        if ($code === false) {
+        // Migrations are history, never edited - and what they write is data
+        if ($code === false || strpos($code, 'i18n-ignore-file') !== false || str_starts_with($relative, 'admin/database_updates/')) {
             continue;
+        }
+        $from = null;
+        foreach (explode("\n", $code) as $index => $text) {
+            if (strpos($text, 'i18n-ignore-start') !== false) {
+                $from = $index + 1;
+            } elseif ($from !== null && strpos($text, 'i18n-ignore-end') !== false) {
+                $i18n_check_ignored[$relative][] = [$from, $index + 1];
+                $from = null;
+            }
         }
         if (str_ends_with($relative, '.php')) {
             i18nCheckPhp($code, $relative, $calls, $not_literal, $literals, $hardcoded);
@@ -385,6 +411,15 @@ if ($hardcoded_paths !== null) {
     }
     echo count($hardcoded) . " line(s) with what looks like fixed text\n";
     exit(0);
+}
+
+// setup/ stays English, but the health checks show its requirement texts through __()
+foreach (i18nCheckFiles($root, 'setup', array_diff($skip_dirs, ['setup']), $skip_files) as $relative) {
+    foreach (token_get_all((string) file_get_contents("$root/$relative")) as $token) {
+        if (is_array($token) && $token[0] === T_CONSTANT_ENCAPSED_STRING) {
+            $literals[i18nCheckUnquote($token[1])] = true;
+        }
+    }
 }
 
 foreach (i18nCheckFiles($root, '', $skip_dirs, $skip_files) as $relative) {

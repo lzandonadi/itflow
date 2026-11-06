@@ -31,6 +31,7 @@ const ASSET_FIELDS = ['contact', 'os', 'network', 'nat', 'links', 'serial', 'pur
  * 'firmware'), specs (keys of ASSET_SPECS) and example (what the form's
  * name, description, make, model and OS fields suggest for it).
  */
+// i18n-ignore-start - labels and examples are shown through assetTypeLabel(), assetSpecLabel(), assetTypeExample() and the like
 const ASSET_TYPES = [
     'Laptop' => ['icon' => 'fa-laptop', 'tone' => 'workstation', 'group' => 'workstation', 'os' => 'os',
         'fields' => ['contact', 'os', 'network', 'links', 'serial', 'purchase', 'warranty'], 'specs' => ['cpu', 'ram_gb', 'storage'],
@@ -90,6 +91,7 @@ const ASSET_TYPES = [
         'fields' => ASSET_FIELDS, 'specs' => [],
         'example' => ['name' => 'ASSET-01', 'description' => 'What it is for', 'make' => 'Make', 'model' => 'Model', 'os' => '']],
 ];
+// i18n-ignore-end
 
 /**
  * The details, by key - label, input (text, number, select, date or asset),
@@ -101,6 +103,7 @@ const ASSET_TYPES = [
  * alone, one whose value says what it is (Managed, Wi-Fi 6), so a short line
  * of an asset's details leaves its label off.
  */
+// i18n-ignore-start - labels and examples are shown through assetTypeLabel(), assetSpecLabel(), assetTypeExample() and the like
 const ASSET_SPECS = [
     'cpu' => ['label' => 'CPU', 'input' => 'text', 'icon' => 'fa-microchip', 'placeholder' => 'Intel Core i7-1365U'],
     'ram_gb' => ['label' => 'RAM', 'input' => 'number', 'icon' => 'fa-memory', 'unit' => 'GB', 'min' => 0, 'max' => 1048576, 'step' => 'any', 'placeholder' => '16'],
@@ -137,11 +140,13 @@ const ASSET_SPECS = [
     'size_in' => ['label' => 'Size', 'input' => 'number', 'icon' => 'fa-expand', 'unit' => 'in', 'min' => 0, 'max' => 1000, 'step' => 'any', 'placeholder' => '27'],
     'resolution' => ['label' => 'Resolution', 'input' => 'text', 'icon' => 'fa-th', 'placeholder' => '2560 x 1440, 4 MP', 'suggest' => ['1920 x 1080', '2560 x 1440', '3840 x 2160', '2 MP', '4 MP', '8 MP']],
 ];
+// i18n-ignore-end
 
 /** The types that go in a rack - offered first when racking an asset, and on a rack page as kit not in one yet. */
 const ASSET_RACK_TYPES = ['Firewall/Router', 'Switch', 'Server', 'NAS', 'UPS', 'PDU', 'NVR/DVR', 'Modem/ONT'];
 
 /** The groups types fall into - for the assets list's tabs, the portal and the client overview. */
+// i18n-ignore-start - labels and examples are shown through assetTypeLabel(), assetSpecLabel(), assetTypeExample() and the like
 const ASSET_TYPE_GROUPS = [
     'workstation' => ['label' => 'Workstations', 'icon' => 'fa-desktop'],
     'server' => ['label' => 'Servers & storage', 'icon' => 'fa-server'],
@@ -153,6 +158,7 @@ const ASSET_TYPE_GROUPS = [
     'peripheral' => ['label' => 'Displays & cameras', 'icon' => 'fa-tv'],
     'other' => ['label' => 'Other', 'icon' => 'fa-tag'],
 ];
+// i18n-ignore-end
 
 /** An asset type as people read it - the stored English name in the interface language. */
 function assetTypeLabel($asset_type) {
@@ -327,10 +333,10 @@ function assetTypeGroupSql($group, $column = 'asset_type') {
     };
     if ($group === 'other') {
         $known = array_diff(array_keys(ASSET_TYPES), assetTypesInGroup('other'));
-        return "$column NOT IN (" . $in($known) . ")";
+        return "$column NOT IN (" . $in($known) . ")"; // i18n-ignore - SQL
     }
     $types = assetTypesInGroup($group);
-    return $types ? "$column IN (" . $in($types) . ")" : '1 = 0';
+    return $types ? "$column IN (" . $in($types) . ")" : '1 = 0'; // i18n-ignore - SQL
 }
 
 /**
@@ -352,10 +358,10 @@ function assetTypeTabs($column = 'asset_type') {
         $types = assetTypesInGroup(...$tab['groups']);
         $taken = array_merge($taken, $types);
         $tabs[$key]['icon'] = ASSET_TYPE_GROUPS[$tab['groups'][0]]['icon'];
-        $tabs[$key]['query'] = "$column IN ('" . implode("', '", array_map('escapeSql', $types)) . "')";
+        $tabs[$key]['query'] = "$column IN ('" . implode("', '", array_map('escapeSql', $types)) . "')"; // i18n-ignore - SQL
     }
     $tabs['other'] = ['label' => __('Other'), 'new' => __('New Asset'), 'groups' => ['mobile', 'peripheral', 'other'], 'icon' => 'fa-tag',
-        'query' => "$column NOT IN ('" . implode("', '", array_map('escapeSql', $taken)) . "')"];
+        'query' => "$column NOT IN ('" . implode("', '", array_map('escapeSql', $taken)) . "')"]; // i18n-ignore - SQL
     return $tabs;
 }
 

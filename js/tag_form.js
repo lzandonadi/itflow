@@ -107,7 +107,7 @@
         }
 
         name.addEventListener('input', function () {
-            previewName.textContent = name.value.trim() || 'New tag';
+            previewName.textContent = name.value.trim() || __('New tag');
         });
         swatches.forEach(function (swatch) {
             swatch.addEventListener('click', function () {

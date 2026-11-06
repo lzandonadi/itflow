@@ -26,7 +26,7 @@ $sort_sql = [
     'client_name' => "client_name $order, ticket_number DESC",
     'contact_name' => "contact_name $order, ticket_number DESC",
     'ticket_billable' => "ticket_invoice_id > 0 $order, ticket_billable $order, ticket_number DESC",
-    'ticket_priority' => "CASE ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order, ticket_number DESC",
+    'ticket_priority' => "CASE ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order, ticket_number DESC", // i18n-ignore - SQL
     'ticket_status' => "ticket_status_order $order, ticket_status $order, ticket_number DESC",
     'user_name' => "ticket_assigned_to = 0 $order, user_name $order, ticket_number DESC",
     'ticket_updated_at' => "COALESCE(ticket_updated_at, ticket_created_at) $order",

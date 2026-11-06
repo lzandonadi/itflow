@@ -517,7 +517,7 @@ function itflowInit() {
             alertEl.style.opacity = '0';
             setTimeout(function () {
                 alertEl.style.overflow = 'hidden';
-                alertEl.style.transition = 'height .5s ease, margin .5s ease, padding .5s ease';
+                alertEl.style.transition = 'height .5s ease, margin .5s ease, padding .5s ease'; // i18n-ignore - editor settings
                 alertEl.style.height = alertEl.offsetHeight + 'px';
                 void alertEl.offsetHeight;
                 alertEl.style.height = '0px';
@@ -570,11 +570,11 @@ function itflowInit() {
         ],
         mobile: {
             menubar: false,
-            plugins: 'autosave lists autolink',
-            toolbar: 'bold italic styles'
+            plugins: 'autosave lists autolink', // i18n-ignore - editor settings
+            toolbar: 'bold italic styles' // i18n-ignore - editor settings
         },
         convert_urls: false,
-        plugins: 'link image lists table code codesample fullscreen autoresize',
+        plugins: 'link image lists table code codesample fullscreen autoresize', // i18n-ignore - editor settings
         setup: function (editor) {
             editor.on('init', function() {
                 // When the modal closes, mark editor clean
@@ -619,11 +619,11 @@ function itflowInit() {
         ],
         mobile: {
             menubar: false,
-            plugins: 'autosave lists autolink',
-            toolbar: 'bold italic styles'
+            plugins: 'autosave lists autolink', // i18n-ignore - editor settings
+            toolbar: 'bold italic styles' // i18n-ignore - editor settings
         },
         convert_urls: false,
-        plugins: 'link image lists table code codesample fullscreen autoresize',
+        plugins: 'link image lists table code codesample fullscreen autoresize', // i18n-ignore - editor settings
         license_key: 'gpl',
         setup: function(editor) {
             itflowCannedAutocompleter(editor);
@@ -683,7 +683,7 @@ function itflowInit() {
             ],
         },
         convert_urls: false,
-        plugins: 'link image lists table code codesample fullscreen autoresize code',
+        plugins: 'link image lists table code codesample fullscreen autoresize code', // i18n-ignore - editor settings
         license_key: 'gpl',
         setup: function(editor) {
             itflowCannedAutocompleter(editor);
@@ -734,11 +734,11 @@ function itflowInit() {
         toolbar: 'redactButton',
         mobile: {
             menubar: false,
-            plugins: 'autosave lists autolink',
+            plugins: 'autosave lists autolink', // i18n-ignore - editor settings
             toolbar: 'redactButton'
         },
         convert_urls: false,
-        plugins: 'link image lists table code fullscreen autoresize',
+        plugins: 'link image lists table code fullscreen autoresize', // i18n-ignore - editor settings
         license_key: 'gpl',
         setup: function(editor) {
 

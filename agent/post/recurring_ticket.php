@@ -339,7 +339,7 @@ if (isset($_POST['bulk_assign_recurring_ticket'])) {
         flashAlert(__('Pick an active agent.'), 'error');
         redirect();
     }
-    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No one';
+    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No one'; // i18n-ignore - the audit log
 
     $count = 0;
     $subjects = [];
@@ -390,7 +390,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_category'])) {
     validateCSRFToken();
 
     $category_id = ticketCategoryId($_POST['bulk_category'] ?? 0);
-    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized';
+    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized'; // i18n-ignore - the audit log
 
     $count = 0;
     foreach (recurringTicketsForBulk(2) as $recurring_ticket_id => $row) {
@@ -413,7 +413,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_billable'])) {
     enforceUserPermission('module_sales', 2);
 
     $billable = intval($_POST['billable'] ?? 0) ? 1 : 0;
-    $billable_wording = $billable ? 'Billable' : 'Not billable';
+    $billable_wording = $billable ? 'Billable' : 'Not billable'; // i18n-ignore - the audit log
 
     $count = 0;
     foreach (recurringTicketsForBulk(2) as $recurring_ticket_id => $row) {

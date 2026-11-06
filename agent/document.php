@@ -121,7 +121,7 @@ $page_title = $row['document_name'];
                     <i class="fas fa-share-alt me-2"></i><?= __('Share') ?>
                 </button>
             <?php } ?>
-            <a class="btn btn-outline-secondary" href="post.php?export_document=<?= $document_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Export as PDF')) ?>"><i class="fas fa-file-pdf"></i><span class="d-none d-md-inline ms-2">PDF</span></a>
+            <a class="btn btn-outline-secondary" href="post.php?export_document=<?= $document_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Export as PDF')) ?>"><i class="fas fa-file-pdf"></i><span class="d-none d-md-inline ms-2">PDF</span></a> <?php // i18n-ignore - PDF ?>
             <button type="button" class="btn btn-outline-secondary" onclick="window.print();" title="<?= escapeHtml(__('Print')) ?>"><i class="fas fa-print"></i></button>
             <?php if ($can_edit) { ?>
                 <div class="dropdown">

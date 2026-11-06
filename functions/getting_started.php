@@ -25,22 +25,22 @@
 
 /** The steps, in order - key => nav label, title, icon and what it is for. Billing and Support go with their modules. */
 const GETTING_STARTED_STEPS = [
-    'cron' => ['label' => 'Cron', 'title' => 'Background jobs', 'icon' => 'fa-clock',
-        'about' => 'Everything that happens without someone clicking - email going out, mail turned into tickets, invoices made, backups taken - is run by cron, once a minute.'],
+    'cron' => ['label' => 'Cron', 'title' => 'Background jobs', 'icon' => 'fa-clock', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'Everything that happens without someone clicking - email going out, mail turned into tickets, invoices made, backups taken - is run by cron, once a minute.'], // i18n-ignore - shown through __(), or the audit log
     'mail' => ['label' => 'Email', 'title' => 'Email', 'icon' => 'fa-envelope',
-        'about' => 'The mailbox ITFlow sends from - ticket updates, invoices, quotes and alerts - and, if you like, a support mailbox it turns into tickets.'],
+        'about' => 'The mailbox ITFlow sends from - ticket updates, invoices, quotes and alerts - and, if you like, a support mailbox it turns into tickets.'], // i18n-ignore - shown through __(), or the audit log
     'backups' => ['label' => 'Backups', 'title' => 'Backups', 'icon' => 'fa-save',
-        'about' => 'A backup every night - the database and your files, locked with your backup key - and how many to keep.'],
+        'about' => 'A backup every night - the database and your files, locked with your backup key - and how many to keep.'], // i18n-ignore - shown through __(), or the audit log
     'billing' => ['label' => 'Billing', 'title' => 'Billing', 'icon' => 'fa-file-invoice-dollar', 'module' => 'accounting',
-        'about' => 'What you charge an hour, when invoices are due, how invoices and quotes are numbered, your tax, and card payments.'],
+        'about' => 'What you charge an hour, when invoices are due, how invoices and quotes are numbered, your tax, and card payments.'], // i18n-ignore - shown through __(), or the audit log
     'support' => ['label' => 'Support', 'title' => 'Support', 'icon' => 'fa-life-ring', 'module' => 'ticketing',
-        'about' => 'Your business hours, how fast you answer each priority, how tickets are numbered, and the client portal.'],
-    'team' => ['label' => 'Team', 'title' => 'Your team', 'icon' => 'fa-users',
-        'about' => 'The people who work tickets, send invoices and look after clients with you.'],
-    'content' => ['label' => 'Content', 'title' => 'Starter content', 'icon' => 'fa-seedling',
-        'about' => 'Ticket and project templates, canned responses, documents, vendors, licenses and products to start from - all yours to change.'],
-    'client' => ['label' => 'First client', 'title' => 'Your first client', 'icon' => 'fa-user-friends',
-        'about' => 'A client to raise tickets and send invoices for - or the demo data, to look around first.'],
+        'about' => 'Your business hours, how fast you answer each priority, how tickets are numbered, and the client portal.'], // i18n-ignore - shown through __(), or the audit log
+    'team' => ['label' => 'Team', 'title' => 'Your team', 'icon' => 'fa-users', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'The people who work tickets, send invoices and look after clients with you.'], // i18n-ignore - shown through __(), or the audit log
+    'content' => ['label' => 'Content', 'title' => 'Starter content', 'icon' => 'fa-seedling', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'Ticket and project templates, canned responses, documents, vendors, licenses and products to start from - all yours to change.'], // i18n-ignore - shown through __(), or the audit log
+    'client' => ['label' => 'First client', 'title' => 'Your first client', 'icon' => 'fa-user-friends', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'A client to raise tickets and send invoices for - or the demo data, to look around first.'], // i18n-ignore - shown through __(), or the audit log
 ];
 
 /**
@@ -306,7 +306,7 @@ function gettingStartedBackupSave($enabled, $daily_at, $type, $keep_count, $keep
 
     $lines = [];
     if ($before['enabled'] !== (bool) $enabled) {
-        $lines[] = $enabled ? 'nightly backups on' : 'nightly backups off';
+        $lines[] = $enabled ? 'nightly backups on' : 'nightly backups off'; // i18n-ignore - shown through __(), or the audit log
     }
     if ($enabled && $before['daily_at'] !== $daily_at) {
         $lines[] = "at $daily_at";
@@ -315,7 +315,7 @@ function gettingStartedBackupSave($enabled, $daily_at, $type, $keep_count, $keep
         $lines[] = (function_exists('backupTypeLabel') ? strtolower(backupTypeLabel($type)) : $type);
     }
     if (intval($settings['config_backup_retention_count'] ?? 0) !== intval($keep_count) || intval($settings['config_backup_retention_days'] ?? 0) !== intval($keep_days)) {
-        $lines[] = 'keeping ' . intval($keep_count) . ($keep_days ? ' for up to ' . intval($keep_days) . ' days' : '');
+        $lines[] = 'keeping ' . intval($keep_count) . ($keep_days ? ' for up to ' . intval($keep_days) . ' days' : ''); // i18n-ignore - shown through __(), or the audit log
     }
     return $lines;
 }

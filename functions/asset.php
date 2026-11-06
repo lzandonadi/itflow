@@ -411,7 +411,7 @@ function assetQuickSet($asset_id, $field, $value) {
         }
         $status = escapeSql($value);
         mysqli_query($mysqli, "UPDATE assets SET asset_status = '$status' WHERE asset_id = $asset_id");
-        $what = $value === '' ? "cleared the status on $asset_name" : "set status to $status on $asset_name";
+        $what = $value === '' ? "cleared the status on $asset_name" : "set status to $status on $asset_name"; // i18n-ignore - the audit log
         $message = $value === '' ? __('Status cleared') : __('Status set to %s', $value);
 
     } elseif ($field === 'asset_location') {
@@ -425,7 +425,7 @@ function assetQuickSet($asset_id, $field, $value) {
         $location_name = $location_id ? (string) mysqli_fetch_row(mysqli_query($mysqli, "SELECT location_name FROM locations WHERE location_id = $location_id"))[0] : '';
         $status = escapeSql($row['asset_status']);
         mysqli_query($mysqli, "UPDATE assets SET asset_location_id = $location_id WHERE asset_id = $asset_id");
-        $what = $location_id ? "assigned asset $asset_name to location " . escapeSql($location_name) : "removed asset $asset_name from its location";
+        $what = $location_id ? "assigned asset $asset_name to location " . escapeSql($location_name) : "removed asset $asset_name from its location"; // i18n-ignore - the audit log
         $message = $location_id ? __('Moved to %s', $location_name) : __('Location removed');
 
     } elseif ($field === 'asset_contact') {

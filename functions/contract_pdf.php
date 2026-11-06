@@ -156,7 +156,7 @@ function contractPdfRender(array $row, $round = null) {
             $rows .= '<tr><td width="27%" style="color:' . $grey . ';">' . $e($when) . '</td><td width="73%">' . $e($what) . ($detail !== '' ? '<br><span style="color:' . $grey . ';">' . $e($detail) . '</span>' : '') . '</td></tr>';
         }
         $html = '<table cellpadding="2.5" cellspacing="0" width="100%" nobr="true"><tr><td colspan="2"><span style="font-size:9pt; font-weight:bold;">' . $e(__('How it was signed')) . '</span></td></tr>' . $rows
-            . '<tr><td width="27%" style="color:' . $grey . ';">' . $e(__('Document fingerprint')) . '</td><td width="73%"><span style="font-family:dejavusansmono; font-size:7pt;">SHA-256 ' . $e($round['contract_signature_document_hash']) . '</span></td></tr></table>';
+            . '<tr><td width="27%" style="color:' . $grey . ';">' . $e(__('Document fingerprint')) . '</td><td width="73%"><span style="font-family:dejavusansmono; font-size:7pt;">SHA-256 ' . $e($round['contract_signature_document_hash']) . '</span></td></tr></table>'; // i18n-ignore - algorithm name
         $pdf->Ln(6);
         $pdf->SetFont('dejavusans', '', 7.5);
         $pdf->writeHTML($html, true, false, true, false, '');

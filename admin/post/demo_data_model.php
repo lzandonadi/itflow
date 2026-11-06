@@ -1,7 +1,8 @@
 <?php
 defined('FROM_POST_HANDLER') || defined('FROM_STARTER_CONTENT') || die("Direct file access is not allowed");
 
-/*
+/* i18n-ignore-file - the demo records are data, in English
+ *
  * ITFlow - Demo data library
  *
  * A fictional book of business for demos, training and screenshots - ten

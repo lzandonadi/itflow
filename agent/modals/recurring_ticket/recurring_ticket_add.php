@@ -190,7 +190,7 @@ ob_start();
                         <select class="form-select select2" name="frequency" required>
                             <option value=""><?= __('- Select Frequency -') ?></option>
                             <optgroup label="<?= escapeHtml(__('Days')) ?>">
-                                <?php foreach (['Three Days', 'Weekly', 'Biweekly'] as $option) { ?>
+                                <?php foreach (['Three Days', 'Weekly', 'Biweekly'] as $option) { // i18n-ignore - stored values, shown through recurringTicketFrequencyLabel() ?>
                                     <option value="<?= $option ?>"><?= recurringTicketFrequencyLabel($option) ?></option>
                                 <?php } ?>
                             </optgroup>

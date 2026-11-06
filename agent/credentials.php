@@ -471,7 +471,7 @@ $filter_url = function ($changes) use ($client_url) {
     </form>
     <?php
     $empty_state = [
-        'thing' => 'credentials',
+        'thing' => __('credentials'),
         'icon' => 'fa-key',
         'filtered' => $q || $tag_query,
         'views' => ['show'],

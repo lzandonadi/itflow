@@ -64,7 +64,7 @@ if (!$client_url) {
 $status_filters = softwareStatusFilters();
 $status = isset($status_filters[$_GET['status'] ?? '']) ? $_GET['status'] : '';
 $_GET['status'] = $status;
-$status_query = $status ? "AND ({$status_filters[$status]['sql']})" : '';
+$status_query = $status ? "AND ({$status_filters[$status]['sql']})" : ''; // i18n-ignore - SQL
 
 // Tags - a license with any of them
 $tag_filter_ids = tagFilterIds();
@@ -579,7 +579,7 @@ while ($license_type_row = mysqli_fetch_row($sql_license_types)) {
     </form>
     <?php
     $empty_state = [
-        'thing' => 'licenses',
+        'thing' => __('licenses'),
         'icon' => 'fa-cube',
         'views' => ['status'],
         'view' => emptyStatePill($status_filters, $status, '', ['renewing', 'expired', 'over', 'unused']),

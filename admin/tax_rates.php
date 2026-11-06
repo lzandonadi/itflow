@@ -180,7 +180,7 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
             </div>
             <?php
             $empty_state = [
-                'thing' => 'taxes',
+                'thing' => __('taxes'),
                 'icon' => 'fa-balance-scale',
                 'filtered' => $q !== '',
                 'archived' => $show_archived,

@@ -30,7 +30,7 @@ function rdapHttpGet($url, &$http_code = null) {
         CURLOPT_PROTOCOLS      => CURLPROTO_HTTPS,
         CURLOPT_FOLLOWLOCATION => true, // RDAP bootstrap/redirectors use 30x
         CURLOPT_MAXREDIRS      => 5,
-        CURLOPT_HTTPHEADER     => array('Accept: application/rdap+json'),
+        CURLOPT_HTTPHEADER     => array('Accept: application/rdap+json'), // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
     ));
  
     $response = curl_exec($ch);
@@ -388,17 +388,17 @@ function getDomainExpirationDate($domain) {
  
     // Every expiry label seen in the wild, longest/most-specific first
     $labels = array(
-        'Registrar Registration Expiration Date',
-        'Registry Expiry Date',
-        'Expiration Date',
-        'Expiration Time',
+        'Registrar Registration Expiration Date', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+        'Registry Expiry Date', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+        'Expiration Date', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+        'Expiration Time', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
         '\[Expires on\]',
-        'Expires On',
-        'Expiry Date',
-        'Expire Date',
+        'Expires On', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+        'Expiry Date', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+        'Expire Date', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
         'expire-date',
         'renewal date',
-        'Valid Until',
+        'Valid Until', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
         'paid-till',
         'validity',
         'renewal',
@@ -426,7 +426,7 @@ function getDomainExpirationDate($domain) {
         'd.m.Y',
         'd/m/Y',
         'Y/m/d H:i:s',
-        'Ymd H:i:s',
+        'Ymd H:i:s', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
         'Y.m.d H:i:s',
         'Y-m-d H:i:s',
         'd-M-Y H:i:s',
@@ -480,8 +480,8 @@ const DOMAIN_ROLES = [
 /** What each tracked column is called in a domain's history. */
 const DOMAIN_HISTORY_LABELS = [
     'domain_name' => 'Name', 'domain_description' => 'Description', 'domain_expire' => 'Expiry', 'domain_auto_renew' => 'Auto-renew',
-    'registrar_name' => 'Registrar', 'dnshost_name' => 'DNS host', 'webhost_name' => 'Web host', 'mailhost_name' => 'Mail host',
-    'domain_ip' => 'A records', 'domain_name_servers' => 'Name servers', 'domain_mail_servers' => 'MX records', 'domain_txt' => 'TXT records',
+    'registrar_name' => 'Registrar', 'dnshost_name' => 'DNS host', 'webhost_name' => 'Web host', 'mailhost_name' => 'Mail host', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
+    'domain_ip' => 'A records', 'domain_name_servers' => 'Name servers', 'domain_mail_servers' => 'MX records', 'domain_txt' => 'TXT records', // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
     'domain_dmarc' => 'DMARC', 'domain_dkim' => 'DKIM', 'domain_raw_whois' => 'WHOIS', 'domain_notes' => 'Notes',
 ];
 
@@ -725,7 +725,7 @@ function domainHistory($domain_id, $limit = 25) {
         ORDER BY domain_history_modified_at DESC, domain_history_id DESC LIMIT $limit");
     $rows = [];
     while ($row = mysqli_fetch_assoc($sql)) {
-        $row['label'] = DOMAIN_HISTORY_LABELS[$row['domain_history_column']] ?? ucfirst(str_replace('_', ' ', preg_replace('/^domain_/', '', $row['domain_history_column'])));
+        $row['label'] = isset(DOMAIN_HISTORY_LABELS[$row['domain_history_column']]) ? __(DOMAIN_HISTORY_LABELS[$row['domain_history_column']]) : ucfirst(str_replace('_', ' ', preg_replace('/^domain_/', '', $row['domain_history_column']))); // i18n-dynamic
         $rows[] = $row;
     }
     return $rows;
@@ -861,7 +861,7 @@ function domainMailChecks($row) {
         $policy = preg_match('/\bp\s*=\s*(none|quarantine|reject)/i', $dmarc, $match) ? strtolower($match[1]) : 'none';
         $checks['dmarc'] = $policy === 'none'
             ? ['label' => 'DMARC', 'state' => 'warn', 'text' => __('DMARC p=none - reports only, spoofed mail still delivered: %s', $dmarc)]
-            : ['label' => 'DMARC', 'state' => 'ok', 'text' => "DMARC p=$policy: $dmarc"];
+            : ['label' => 'DMARC', 'state' => 'ok', 'text' => "DMARC p=$policy: $dmarc"]; // i18n-ignore - WHOIS field names and HTTP headers, or shown through __()
     }
 
     $dkim = domainLines($row['domain_dkim'] ?? '');

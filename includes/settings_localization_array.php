@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - country, currency and timezone names are stored as they are; translating them is its own change
 $countries_array = array(
     "Afghanistan",
     "Albania",

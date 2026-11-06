@@ -49,8 +49,8 @@ if (isset($_POST['check_ai_model']) || isset($_POST['add_ai_model']) || isset($_
             ];
             $started = microtime(true);
             $result = callAiApi($model, [
-                ['role' => 'system', 'content' => 'You are checking that you are set up and working. Answer in one short, friendly sentence.'],
-                ['role' => 'user', 'content' => 'Say hello, and which model you are.'],
+                ['role' => 'system', 'content' => 'You are checking that you are set up and working. Answer in one short, friendly sentence.'], // i18n-ignore - AI prompt
+                ['role' => 'user', 'content' => 'Say hello, and which model you are.'], // i18n-ignore - AI prompt
             ], ['feature' => 'test']);
             $ms = intval(round((microtime(true) - $started) * 1000));
             if ($result['ok']) {
@@ -84,14 +84,15 @@ if (isset($_POST['check_ai_model']) || isset($_POST['add_ai_model']) || isset($_
         redirect('ai_models.php');
     }
 
-    $lines = aiModelChangeLines($before, $after);
+    $lines = i18nEnglish(fn () => aiModelChangeLines($before, $after));
+    $shown = aiModelChangeLines($before, $after);
     if (!$lines) {
         flashAlert(__('Nothing changed on <strong>%s</strong>', escapeHtml($name)), 'info');
         redirect();
     }
     aiModelWrite($after, $model_id);
     logAudit("AI Model", "Edit", "$session_name changed AI model " . escapeSql("$name: " . implode('; ', $lines)), 0, $model_id);
-    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes')));
+    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($shown) === 1 ? $shown[0] : _n('%d change', '%d changes', count($shown)))));
     redirect();
 
 }

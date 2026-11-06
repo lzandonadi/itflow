@@ -537,7 +537,7 @@ $csrf = $_SESSION['csrf_token'];
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'users',
+        'thing' => __('users'),
         'icon' => 'fa-users',
         'filtered' => $q !== '' || $role_filter,
         'archived' => $show === 'archived',

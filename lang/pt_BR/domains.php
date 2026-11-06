@@ -399,5 +399,16 @@ return [
     'All %s in the audit log' => 'Todos os %s no log de auditoria',
     'In the audit log' => 'No log de auditoria',
     'services view::Active' => 'Ativos',
+    // Shown through __() from the constants
+    'OK' => 'OK',
+    'Name mismatch' => 'Nome não confere',
+    'Untrusted' => 'Não confiável',
+    'Unreachable' => 'Inacessível',
+    'Names covered' => 'Nomes cobertos',
+    'Fingerprint' => 'Impressão digital',
+    'A records' => 'Registros A',
+    'MX records' => 'Registros MX',
+    'TXT records' => 'Registros TXT',
+    'DKIM' => 'DKIM',
 
 ];

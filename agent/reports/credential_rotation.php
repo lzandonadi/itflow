@@ -58,7 +58,7 @@ foreach ($credentials as $row) {
             }
         }
     } else {
-        $age_counts['Never recorded']++;
+        $age_counts['Never recorded']++; // i18n-ignore - keys - shown through __() where the counts are drawn
     }
 }
 foreach ($by_client as &$client) {
@@ -142,7 +142,7 @@ $span = ['30' => __('30 days'), '60' => __('60 days'), '90' => __('90 days'), '1
         ['label' => __('Due for rotation'), 'value' => reportCount(count($due)), 'tone' => $due ? 'warning' : 'success',
             'sub' => $credentials ? reportPercent(reportShare(count($due), count($credentials), 0)) . ' <span class="text-body-tertiary">' . __('of them') . '</span>' : ''],
         ['label' => __('Over a year or never'), 'value' => reportCount($overdue), 'tone' => $overdue ? 'danger' : 'success',
-            'sub' => reportCount($age_counts['Never recorded']) . ' <span class="text-body-tertiary">' . __('never recorded') . '</span>'],
+            'sub' => reportCount($age_counts['Never recorded']) . ' <span class="text-body-tertiary">' . __('never recorded') . '</span>'], // i18n-ignore - keys - shown through __() where the counts are drawn
         ['label' => __('Clients with some due'), 'value' => reportCount($clients_due), 'tone' => $clients_due ? 'warning' : ''],
     ]) ?>
 

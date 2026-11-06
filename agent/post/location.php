@@ -541,7 +541,7 @@ if (isset($_GET['download_locations_csv_template'])) {
     $f = fopen('php://memory', 'w');
 
     //set column headers
-    $fields = array('Name', 'Description', 'Address', 'City', 'State', 'Postal Code', 'Phone', 'Hours');
+    $fields = array('Name', 'Description', 'Address', 'City', 'State', 'Postal Code', 'Phone', 'Hours'); // i18n-ignore - CSV headings stay English, so files import in any language
     fputcsv($f, $fields, $delimiter, $enclosure, $escape);
 
     //move back to beginning of file

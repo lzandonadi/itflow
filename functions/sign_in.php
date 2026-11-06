@@ -16,8 +16,8 @@ const SIGN_IN_WINDOW_MINUTES = 10;
 const SIGN_IN_LOCKOUT = 15;
 
 /** The kinds of audit log entry that are signing in, and the actions that are a failed one. */
-const SIGN_IN_TYPES = ['Login', 'Client Login'];
-const SIGN_IN_FAILED = ['Failed', 'MFA Failed'];
+const SIGN_IN_TYPES = ['Login', 'Client Login']; // i18n-ignore - the sign-in log
+const SIGN_IN_FAILED = ['Failed', 'MFA Failed']; // i18n-ignore - the sign-in log
 
 /** The choices for when admins are told - failures in SIGN_IN_WINDOW_MINUTES => label. */
 function signInAlertOptions() {
@@ -55,17 +55,17 @@ function signInFailureReason($email) {
         WHERE user_email = '$email_sql'
         ORDER BY user_type ASC, users.user_id ASC LIMIT 1"));
     if (!$row) {
-        return ['user_id' => 0, 'client_id' => 0, 'name' => '', 'type' => 'Login', 'reason' => 'no account uses that email'];
+        return ['user_id' => 0, 'client_id' => 0, 'name' => '', 'type' => 'Login', 'reason' => 'no account uses that email']; // i18n-ignore - the sign-in log
     }
     $agent = intval($row['user_type']) === 1;
     if ($row['user_archived_at'] !== null) {
-        $reason = 'the account is archived';
+        $reason = 'the account is archived'; // i18n-ignore - the sign-in log
     } elseif (intval($row['user_status']) === 2) {
-        $reason = "they haven't set a password yet";
+        $reason = "they haven't set a password yet"; // i18n-ignore - the sign-in log
     } elseif (intval($row['user_status']) !== 1) {
-        $reason = $agent ? 'the account is disabled' : 'their portal access is turned off';
+        $reason = $agent ? 'the account is disabled' : 'their portal access is turned off'; // i18n-ignore - the sign-in log
     } elseif (!$agent && $row['client_archived_at'] !== null) {
-        $reason = 'their client is archived';
+        $reason = 'their client is archived'; // i18n-ignore - the sign-in log
     } else {
         $reason = 'wrong password';
     }
@@ -73,7 +73,7 @@ function signInFailureReason($email) {
         'user_id' => intval($row['user_id']),
         'client_id' => $agent ? 0 : intval($row['contact_client_id']),
         'name' => (string) $row['user_name'],
-        'type' => $agent ? 'Login' : 'Client Login',
+        'type' => $agent ? 'Login' : 'Client Login', // i18n-ignore - the sign-in log
         'reason' => $reason,
     ];
 }

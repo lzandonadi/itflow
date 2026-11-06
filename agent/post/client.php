@@ -712,7 +712,7 @@ if (isset($_GET['download_clients_csv_template'])) {
     $f = fopen('php://memory', 'w');
 
     //set column headers
-    $fields = array('Client Name', 'Industry', 'Referral', 'Website', 'Primary Location Name', 'Location Phone', 'Location Address', 'City', 'State', 'Postal Code', 'Country', 'Primary Contact Name', 'Title', 'Contact Phone', 'Extension', 'Contact Mobile', 'Contact Email', 'Hourly Rate', 'Currency', 'Payment Terms', 'Tax ID', 'Abbreviation');
+    $fields = array('Client Name', 'Industry', 'Referral', 'Website', 'Primary Location Name', 'Location Phone', 'Location Address', 'City', 'State', 'Postal Code', 'Country', 'Primary Contact Name', 'Title', 'Contact Phone', 'Extension', 'Contact Mobile', 'Contact Email', 'Hourly Rate', 'Currency', 'Payment Terms', 'Tax ID', 'Abbreviation'); // i18n-ignore - CSV headings stay English, so files import in any language
     fputcsv($f, $fields, $delimiter, $enclosure, $escape);
 
     //move back to beginning of file
@@ -978,7 +978,7 @@ if (isset($_POST['bulk_send_client_email']) && isset($_POST['client_ids'])) {
 
     $contact_filter_query = '';
     if (!empty($filters)) {
-        $contact_filter_query = ' AND (' . implode(' OR ', $filters) . ')';
+        $contact_filter_query = ' AND (' . implode(' OR ', $filters) . ')'; // i18n-ignore - SQL
     }
 
     // Prepare client ID list for SQL
@@ -1115,7 +1115,7 @@ if (isset($_POST['export_client_pdf']) || isset($_POST['export_client_archive'])
     // A big client's files take a while to gather; the request is the export
     set_time_limit(0);
 
-    $logged = escapeSql(clientExportSummary($options)) . ($options['secrets'] ? ', including passwords and 2FA secrets' : '');
+    $logged = escapeSql(clientExportSummary($options)) . ($options['secrets'] ? ', including passwords and 2FA secrets' : ''); // i18n-ignore - the audit log
 
     if ($kind === 'pdf') {
         try {

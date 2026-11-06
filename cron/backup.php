@@ -69,7 +69,7 @@ if ($already > 0) {
 
     if ($backup_id > 0) {
         echo "Scheduled " . backupTypeLabel($type) . " complete\n";
-        appNotify("Backup", "Scheduled " . backupTypeLabel($type) . " is ready to download", "/admin/backup.php");
+        appNotify("Backup", __('Scheduled %s is ready to download', __(backupTypeLabel($type))), "/admin/backup.php"); // i18n-dynamic - backupTypeLabel()
         logAudit("Backup", "Create", "Scheduled " . backupTypeLabel($type) . " completed");
     } else {
         echo "Scheduled backup FAILED: $error\n";

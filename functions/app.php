@@ -507,11 +507,11 @@ function checkForUpdates() {
     // fatal, because the nightly job calls this too and one host's php.ini must not take
     // the whole cron cycle down with it.
     if (!shellCommandsAvailable()) {
-        $updates->output = ["PHP on this server cannot run external commands, so ITFlow cannot check for updates."];
+        $updates->output = ["PHP on this server cannot run external commands, so ITFlow cannot check for updates."]; // i18n-ignore - what the update check stores and prints - the update page words its own
         $updates->result = 127;
         $updates->current_version = '';
         $updates->latest_version = '';
-        $updates->update_message = "Cannot check for updates";
+        $updates->update_message = "Cannot check for updates"; // i18n-ignore - what the update check stores and prints - the update page words its own
         $updates->pending_commits = [];
 
         return $updates;
@@ -555,9 +555,9 @@ function checkForUpdates() {
     }
 
     if ($current_version == $latest_version) {
-        $update_message = "No Updates available";
+        $update_message = "No Updates available"; // i18n-ignore - what the update check stores and prints - the update page words its own
     } else {
-        $update_message = "New Updates are Available [$latest_version]";
+        $update_message = "New Updates are Available [$latest_version]"; // i18n-ignore - what the update check stores and prints - the update page words its own
     }
 
 
@@ -749,12 +749,12 @@ function documentDefaultContactFilterSql($document_type) {
  */
 function getSentMethods() {
     return [
-        'Sent by Snail Mail',
-        'Sent by Email Client',
-        'Hand Delivered',
-        'Sent by Fax',
-        'Sent by Courier',
-        'Shared Guest Link',
+        'Sent by Snail Mail', // i18n-ignore - stored values
+        'Sent by Email Client', // i18n-ignore - stored values
+        'Hand Delivered', // i18n-ignore - stored values
+        'Sent by Fax', // i18n-ignore - stored values
+        'Sent by Courier', // i18n-ignore - stored values
+        'Shared Guest Link', // i18n-ignore - stored values
         'Other'
     ];
 }
@@ -858,7 +858,9 @@ function agentUserLimitMessage(): string
     $limit = getAgentUserLimit();
     $invites = userInvitesHoldingSeats();
 
-    return "Agent user limit reached - this installation allows <strong>$limit</strong> active agent " . ($limit == 1 ? "user" : "users")
-        . ($invites ? ", and $invites invite" . ($invites === 1 ? ' is' : 's are') . " waiting for one" : '')
-        . ". Archive or disable a user" . ($invites ? ' or cancel an invite' : '') . " first, or contact your provider to add more.";
+    $allows = _n('Agent user limit reached - this installation allows <strong>%d</strong> active agent user', 'Agent user limit reached - this installation allows <strong>%d</strong> active agent users', $limit);
+    if ($invites) {
+        return $allows . _n(', and %d invite is waiting for one.', ', and %d invites are waiting for one.', $invites) . ' ' . __('Archive or disable a user or cancel an invite first, or contact your provider to add more.');
+    }
+    return $allows . '. ' . __('Archive or disable a user first, or contact your provider to add more.');
 }

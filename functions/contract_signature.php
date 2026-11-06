@@ -31,27 +31,27 @@
 
 /** The placeholders a contract's terms can use - what each becomes. */
 const CONTRACT_PLACEHOLDERS = [
-    'Client' => "the client's name",
-    'Client Address' => "the client's main address, on one line",
-    'Contact' => 'the contact on the contract',
-    'Contact Title' => "the contact's job title",
-    'Contact Email' => "the contact's email",
+    'Client' => "the client's name", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Client Address' => "the client's main address, on one line", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact' => 'the contact on the contract', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact Title' => "the contact's job title", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact Email' => "the contact's email", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     'Company' => 'your company',
-    'Contract' => "the contract's name",
-    'Type' => 'what kind of contract - Fully managed',
-    'Start Date' => 'the day it starts',
-    'End Date' => 'its last day',
-    'Term' => 'how long it runs - 1 year',
-    'Renewal' => 'whether it renews itself, in a sentence',
-    'Notice' => 'the notice to end it - 30 days',
-    'Support Hours' => 'its support hours',
-    'Monthly Hours' => 'the hours of support included each month - 10 hours',
-    'Rate' => 'the hourly rate',
+    'Contract' => "the contract's name", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Type' => 'what kind of contract - Fully managed', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Start Date' => 'the day it starts', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'End Date' => 'its last day', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Term' => 'how long it runs - 1 year', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Renewal' => 'whether it renews itself, in a sentence', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Notice' => 'the notice to end it - 30 days', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Support Hours' => 'its support hours', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Monthly Hours' => 'the hours of support included each month - 10 hours', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Rate' => 'the hourly rate', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     'After Hours Rate' => 'the after-hours rate',
-    'Net Terms' => 'when invoices are due - Net 30',
-    'Owner' => 'who looks after it for you',
-    'SLA' => 'on a line of its own, the response times for each priority as a table',
-    'Date' => 'the day it is sent',
+    'Net Terms' => 'when invoices are due - Net 30', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Owner' => 'who looks after it for you', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'SLA' => 'on a line of its own, the response times for each priority as a table', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Date' => 'the day it is sent', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
 ];
 
 /** The largest signature picture taken, in bytes. */
@@ -281,7 +281,7 @@ function contractDocumentHtml(array $row, $as_of = null) {
     if ($values['rate'] !== '') {
         $rates[] = __('%s an hour', $values['rate']);
     }
-    if ($values['after hours rate'] !== '') {
+    if ($values['after hours rate'] !== '') { // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
         $rates[] = __('%s an hour after hours', $values['after hours rate']);
     }
     $net = $values['net terms'];
@@ -547,7 +547,7 @@ function contractSignatureSend(array $row, $to_name, $to_email, $contact_id, $no
     $contract_id = intval($row['contract_id']);
     foreach (contractSignatureRounds($contract_id) as $round) {
         if (contractSignaturePending($round)) {
-            contractSignatureWithdraw($round, 'Replaced by a new request');
+            contractSignatureWithdraw($round, 'Replaced by a new request'); // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
         }
     }
     $document = contractDocumentHtml($row, date('Y-m-d'));
@@ -673,7 +673,7 @@ function contractSignatureClientSign(array $round, array $f, $via, $contact_id =
         return false;
     }
     $name = escapeSql($f['name']);
-    $where = $via === 'portal' ? 'in the client portal' : 'from its link';
+    $where = $via === 'portal' ? 'in the client portal' : 'from its link'; // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     logAudit("Contract", "Sign", "$name signed contract " . escapeSql($round['contract_name']) . " for " . escapeSql($round['client_name']) . " $where", intval($round['contract_client_id']), intval($round['contract_id']));
     appNotify("Contract", escapeSql(__('%1$s signed %2$s for %3$s - it is ready to countersign', $f['name'], $round['contract_name'], $round['client_name'])), contractAgentPath($round), intval($round['contract_client_id']), intval($round['contract_id']));
     if (!empty($round['owner_email'])) {
@@ -876,7 +876,7 @@ function contractSignatureCheckChanged(array $row) {
     if (contractDocumentSame($row, $as_of, $round['contract_signature_document_hash'])) {
         return null;
     }
-    return contractSignatureWithdraw($round, 'The contract was changed after it was sent') ? $round : null;
+    return contractSignatureWithdraw($round, 'The contract was changed after it was sent') ? $round : null; // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
 }
 
 /** Whether what a contract says now differs from a signed round - by what the document would be on the day that round was sent. */

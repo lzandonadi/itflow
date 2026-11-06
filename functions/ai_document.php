@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the context and prompts are for the model, in English (what agents see goes through __() here and in the modals)
 
 /*
  * ITFlow - AI on documents

@@ -175,7 +175,7 @@ if ($totals['undated']) {
 
 // Coming due - hardware reaching the replacement age, by quarter for the next two years
 $quarters = [];
-$cursor = new DateTime('first day of this month');
+$cursor = new DateTime('first day of this month'); // i18n-ignore - a date expression
 $cursor->setDate(intval($cursor->format('Y')), intval((ceil($cursor->format('n') / 3) - 1) * 3 + 1), 1);
 for ($q = 0; $q < 8; $q++) {
     $key = $cursor->format('Y') . '-Q' . ceil($cursor->format('n') / 3);
@@ -199,7 +199,7 @@ foreach ($assets as $asset) {
     if ($asset['asset_type'] === 'Virtual Machine') {
         continue;
     }
-    $warranty_counts[!$asset['warranty'] ? 'No date' : ($asset['expired'] ? 'Expired' : ($asset['ending'] ? 'Ends within 90 days' : 'Covered'))]++;
+    $warranty_counts[!$asset['warranty'] ? 'No date' : ($asset['expired'] ? 'Expired' : ($asset['ending'] ? 'Ends within 90 days' : 'Covered'))]++; // i18n-ignore - keys - shown through __() where the counts are drawn
 }
 
 $type_choices = ['' => __('Every type')];

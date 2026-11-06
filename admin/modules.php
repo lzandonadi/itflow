@@ -103,7 +103,7 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
     </div>
     <?php
     $empty_state = [
-        'thing' => 'modules',
+        'thing' => __('modules'),
         'icon' => 'fa-puzzle-piece',
         'actions' => [['label' => __('New Module'), 'modal' => 'modals/module/module_add.php']],
     ];

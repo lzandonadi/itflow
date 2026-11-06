@@ -128,13 +128,13 @@
             { label: 'Income', data: cf.income, backgroundColor: alpha(colors.success, 0.8), borderRadius: roundUnless(cf.expected_income), maxBarThickness: 22, stack: 'income' }
         ];
         if (forecast) {
-            datasets.push(Object.assign({ label: 'Expected income', data: cf.expected_income, stack: 'income' }, ghost(colors.success)));
+            datasets.push(Object.assign({ label: __('Expected income'), data: cf.expected_income, stack: 'income' }, ghost(colors.success)));
         }
         datasets.push({ label: 'Expenses', data: cf.expenses, backgroundColor: alpha(colors.danger, 0.75), borderRadius: roundUnless(cf.expected_expenses), maxBarThickness: 22, stack: 'expenses' });
         if (forecast) {
-            datasets.push(Object.assign({ label: 'Expected expenses', data: cf.expected_expenses, stack: 'expenses' }, ghost(colors.danger)));
+            datasets.push(Object.assign({ label: __('Expected expenses'), data: cf.expected_expenses, stack: 'expenses' }, ghost(colors.danger)));
         }
-        datasets.push({ type: 'line', label: 'Income last year', data: cf.income_last_year, borderColor: colors.muted, borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.3, stack: 'last-year', order: -1 });
+        datasets.push({ type: 'line', label: __('Income last year'), data: cf.income_last_year, borderColor: colors.muted, borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.3, stack: 'last-year', order: -1 });
 
         draw('dashCashFlow', {
             type: 'bar',
@@ -169,7 +169,7 @@
                 labels: tw.map(function (d) { return d.label; }),
                 datasets: [
                     { label: 'Billable', data: tw.map(function (d) { return d.billable; }), backgroundColor: colors.accent, borderRadius: roundUnless(other), maxBarThickness: 18, stack: 'time' },
-                    { label: 'Not billable', data: other, backgroundColor: colors.faint, borderRadius: 3, maxBarThickness: 18, stack: 'time' }
+                    { label: __('Not billable'), data: other, backgroundColor: colors.faint, borderRadius: 3, maxBarThickness: 18, stack: 'time' }
                 ]
             },
             options: {

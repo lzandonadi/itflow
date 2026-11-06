@@ -1,3 +1,4 @@
+<?php // i18n-ignore-file - a sample side menu for your own custom pages ?>
 <!-- Do not modify - copy if you need to edit -->
 <!-- Main Sidebar Container -->
 <aside class="app-sidebar shadow d-print-none" data-bs-theme="dark">

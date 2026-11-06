@@ -1043,11 +1043,11 @@ if (isset($_POST['portal_pay'])) {
         redirect($back);
     }
 
-    $booked = billingStripeBook($charge['pi'], $session_client_id, ['name' => $contact_name, 'how' => 'Saved card', 'via' => 'in the client portal']);
+    $booked = billingStripeBook($charge['pi'], $session_client_id, ['name' => $contact_name, 'how' => 'Saved card', 'via' => 'in the client portal']); // i18n-ignore - the payment history stays English
     if (!$booked['ok']) {
         $pi_id = escapeSql((string) $charge['pi']->id);
         logApp("Stripe", "error", "Saved card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", escapeSql(__('A card payment of %1$s from %2$s went through in the client portal but could not be recorded - %3$s', billingMoney($selection['total'], $selection['currency']), $session_client_name, $pi_id)), "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
+        appNotify("Invoice Payment", escapeSql(__('A card payment of %1$s from %2$s went through in the client portal but could not be recorded - %3$s', billingMoney($selection['total'], $selection['currency']), $session_client_name, $pi_id)), "/agent/invoices.php?client_id=$session_client_id", $session_client_id); // i18n-ignore - the notification kind is a key
         flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
@@ -1097,11 +1097,11 @@ if (isset($_GET['portal_pay_return'])) {
         redirect('pay.php');
     }
 
-    $booked = billingStripeBook($pi, $session_client_id, ['name' => (string) ($contact['contact_name'] ?? ''), 'how' => 'Online card', 'via' => 'in the client portal']);
+    $booked = billingStripeBook($pi, $session_client_id, ['name' => (string) ($contact['contact_name'] ?? ''), 'how' => 'Online card', 'via' => 'in the client portal']); // i18n-ignore - the payment history stays English
     if (!$booked['ok']) {
         $pi_id_sql = escapeSql($pi_id);
         logApp("Stripe", "error", "Card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", vsprintf(escapeSql(__('A card payment from %1$s went through in the client portal but could not be recorded - %2$s')), [$session_client_name, $pi_id_sql]), "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
+        appNotify("Invoice Payment", vsprintf(escapeSql(__('A card payment from %1$s went through in the client portal but could not be recorded - %2$s')), [$session_client_name, $pi_id_sql]), "/agent/invoices.php?client_id=$session_client_id", $session_client_id); // i18n-ignore - the notification kind is a key
         flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
@@ -1222,7 +1222,7 @@ if (isset($_GET['create_stripe_checkout'])) {
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
         http_response_code(400);
-        echo json_encode(['error' => 'Stripe provider not configured']);
+        echo json_encode(['error' => __('Stripe provider not configured')]);
         exit();
     }
 
@@ -1231,7 +1231,7 @@ if (isset($_GET['create_stripe_checkout'])) {
 
     if (empty($stripe_secret_key)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Stripe secret key missing']);
+        echo json_encode(['error' => __('Stripe secret key missing')]);
         exit();
     }
 
@@ -1282,7 +1282,7 @@ if (isset($_GET['create_stripe_checkout'])) {
         error_log("Stripe error creating checkout session: $error");
         logApp("Stripe", "error", "Exception creating checkout session: $error");
         http_response_code(500);
-        echo json_encode(['error' => 'Stripe Checkout session failed']);
+        echo json_encode(['error' => __('Stripe Checkout session failed')]);
     }
 
     exit;

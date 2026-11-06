@@ -23,20 +23,20 @@
 
 /** The steps, in order - key => nav label, title, icon and what it is for. */
 const CLIENT_ONBOARDING_STEPS = [
-    'company' => ['label' => 'Company', 'title' => 'The company', 'icon' => 'fa-building',
-        'about' => 'Who they are - the name you know them by, what they do, their website and how they found you.'],
+    'company' => ['label' => 'Company', 'title' => 'The company', 'icon' => 'fa-building', // i18n-ignore - shown through __()
+        'about' => 'Who they are - the name you know them by, what they do, their website and how they found you.'], // i18n-ignore - shown through __()
     'locations' => ['label' => 'Locations', 'title' => 'Locations', 'icon' => 'fa-map-marker-alt',
-        'about' => 'Where they work - their main office first, then any other sites you look after.'],
+        'about' => 'Where they work - their main office first, then any other sites you look after.'], // i18n-ignore - shown through __()
     'people' => ['label' => 'People', 'title' => 'People', 'icon' => 'fa-users',
-        'about' => 'Who you deal with - the primary contact, who gets the invoices and who to call about technical things - and client portal access for them.'],
+        'about' => 'Who you deal with - the primary contact, who gets the invoices and who to call about technical things - and client portal access for them.'], // i18n-ignore - shown through __()
     'agreement' => ['label' => 'Agreement', 'title' => 'Agreement', 'icon' => 'fa-file-contract',
-        'about' => 'The contract you look after them on, from one of your templates - its rates, net terms and SLAs are theirs while it is in force. Send it to them to sign, if you like.'],
+        'about' => 'The contract you look after them on, from one of your templates - its rates, net terms and SLAs are theirs while it is in force. Send it to them to sign, if you like.'], // i18n-ignore - shown through __()
     'billing' => ['label' => 'Billing', 'title' => 'Billing', 'icon' => 'fa-file-invoice-dollar',
-        'about' => 'Who gets the invoices, their tax, and the recurring invoice that bills the agreement.'],
-    'it' => ['label' => 'IT basics', 'title' => 'IT basics', 'icon' => 'fa-network-wired',
-        'about' => 'Their domains, to watch for renewals, and the vendors and licenses most of your clients have - from your templates.'],
+        'about' => 'Who gets the invoices, their tax, and the recurring invoice that bills the agreement.'], // i18n-ignore - shown through __()
+    'it' => ['label' => 'IT basics', 'title' => 'IT basics', 'icon' => 'fa-network-wired', // i18n-ignore - shown through __()
+        'about' => 'Their domains, to watch for renewals, and the vendors and licenses most of your clients have - from your templates.'], // i18n-ignore - shown through __()
     'kickoff' => ['label' => 'Kickoff', 'title' => 'Kickoff', 'icon' => 'fa-flag',
-        'about' => 'The onboarding project - its tickets raised from a project template, for your team to work through.'],
+        'about' => 'The onboarding project - its tickets raised from a project template, for your team to work through.'], // i18n-ignore - shown through __()
 ];
 
 /** A step of CLIENT_ONBOARDING_STEPS with its label, title and what it is for in the interface language. */

@@ -403,4 +403,11 @@ return [
     'Edit %s' => 'Editar %s',
     'by email' => 'por e-mail',
     'Invite' => 'Convite',
+
+    // Block 10 - the last screens
+    'Agent user limit reached - this installation allows <strong>%d</strong> active agent user' => ['Limite de técnicos atingido - esta instalação permite <strong>%d</strong> técnico ativo', 'Limite de técnicos atingido - esta instalação permite <strong>%d</strong> técnicos ativos'],
+    ', and %d invite is waiting for one.' => [', e %d convite está aguardando vaga.', ', e %d convites estão aguardando vaga.'],
+    'Archive or disable a user or cancel an invite first, or contact your provider to add more.' => 'Arquive ou desative um usuário ou cancele um convite primeiro, ou fale com seu provedor para adicionar mais.',
+    'Archive or disable a user first, or contact your provider to add more.' => 'Arquive ou desative um usuário primeiro, ou fale com seu provedor para adicionar mais.',
+
 ];

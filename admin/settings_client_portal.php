@@ -110,7 +110,7 @@ $signup_clients = $signup_ready ? portalSignupClients() : [];
                 <tr>
                     <td class="ps-3">
                         <div class="d-flex align-items-start gap-2">
-                            <span class="itflow-announcement-dot is-<?= $tone_key ?> mt-2" title="<?= escapeHtml(PORTAL_ANNOUNCEMENT_TONES[$tone_key]['label']) ?>"></span>
+                            <span class="itflow-announcement-dot is-<?= $tone_key ?> mt-2" title="<?= escapeHtml(__(PORTAL_ANNOUNCEMENT_TONES[$tone_key]['label'])) /* i18n-dynamic */ ?>"></span>
                             <div class="min-w-0">
                                 <a class="ajax-modal fw-semibold" href="#" data-modal-url="modals/portal_announcement/portal_announcement_edit.php?id=<?= $announcement_id ?>" data-modal-size="lg"><?= escapeHtml($row['announcement_title']) ?></a>
                                 <span class="badge rounded-pill <?= $state_badges[$state['key']] ?> ms-1"><?= $state['label'] ?></span>

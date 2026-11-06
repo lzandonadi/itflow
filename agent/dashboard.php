@@ -201,7 +201,7 @@ if ($getting_started) {
                                     <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml($ticket['client_name'] ?: __('No client')) ?></span>
                                 </span>
                                 <?php if ($ticket['sla_breached']) { ?>
-                                    <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('SLA breached')) ?>"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span>
+                                    <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('SLA breached')) ?>"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span> <?php // i18n-ignore - SLA ?>
                                 <?php } ?>
                                 <span class="d-none d-sm-inline"><?= ticketStatusHtml($ticket['ticket_status_name'], $ticket['ticket_status_color'], 'detail') ?></span>
                                 <span class="small text-body-secondary text-nowrap d-none d-md-inline" title="Last activity <?= escapeHtml($last_activity) ?>"><?= escapeHtml(timeAgo($last_activity)) ?></span>

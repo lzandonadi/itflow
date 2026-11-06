@@ -432,7 +432,7 @@ function productStockTypes() {
 
 /** Why stock is written off. */
 function productWriteOffReasons() {
-    return ['Damaged', 'Lost or stolen', 'Used by us', 'Sent back to the vendor', 'Other'];
+    return ['Damaged', 'Lost or stolen', 'Used by us', 'Sent back to the vendor', 'Other']; // i18n-ignore - stored values, or the stock history
 }
 
 /** A write-off reason (stored in English) in the interface language. */
@@ -523,7 +523,7 @@ function productReorderCheck($product_id, $before, $after) {
     if ($product['vendor_name']) {
         $text .= __(' from %s', $product['vendor_name']);
     }
-    appNotify('Low Stock', escapeSql($text), 'product.php?product_id=' . intval($product['product_id']), 0, intval($product['product_id']));
+    appNotify('Low Stock', escapeSql($text), 'product.php?product_id=' . intval($product['product_id']), 0, intval($product['product_id'])); // i18n-ignore - stored values, or the stock history
 }
 
 /**
@@ -872,7 +872,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
                         asset_make = IF(asset_make = '', '$make', asset_make),
                         asset_model = IF(COALESCE(asset_model, '') = '', $model, asset_model)
                     WHERE asset_id = $asset_id");
-                $history = escapeSql(mb_substr("$by linked {$unit['name']} to $number, where it was sold", 0, 255));
+                $history = escapeSql(mb_substr("$by linked {$unit['name']} to $number, where it was sold", 0, 255)); // i18n-ignore - stored values, or the stock history
                 mysqli_query($mysqli, "INSERT INTO asset_history SET asset_history_status = COALESCE((SELECT asset_status FROM assets WHERE asset_id = $asset_id), ''), asset_history_description = '$history', asset_history_asset_id = $asset_id");
                 logAudit("Asset", "Edit", "$session_name linked asset $name to invoice $number_sql", $client_id, $asset_id);
                 $done['linked']++;

@@ -301,7 +301,7 @@ if (isset($_POST['mark_quote_sent'])) {
 
     mysqli_query($mysqli,"UPDATE quotes SET quote_status = 'Sent' WHERE quote_id = $quote_id");
 
-    $history_description = "Quote marked sent by $session_name - $sent_method";
+    $history_description = "Quote marked sent by $session_name - $sent_method"; // i18n-ignore - quote history stays English
     if (!empty($note)) {
         $history_description .= "\nNote: $note";
     }

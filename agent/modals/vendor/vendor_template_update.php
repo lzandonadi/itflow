@@ -47,14 +47,14 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-sync-alt me-2"></i>Bring in line<?= $template ? ' with <strong>' . escapeHtml($template['vendor_template_name']) . '</strong>' : '' ?></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-sync-alt me-2"></i><?= $template ? __('Bring in line with <strong>%s</strong>', escapeHtml($template['vendor_template_name'])) : __('Bring in line') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
 <?php if (!$template || !$vendors) { ?>
-    <div class="modal-body text-center text-secondary py-5"><?= !$template ? 'That template no longer exists.' : 'None of those vendors are made from it, or yours to change.' ?></div>
+    <div class="modal-body text-center text-secondary py-5"><?= !$template ? __('That template no longer exists.') : __('None of those vendors are made from it, or yours to change.') ?></div>
 <?php } elseif (!$differing) { ?>
-    <div class="modal-body text-center text-secondary py-5" data-in-step><i class="fas fa-check-circle text-success fa-2x d-block mb-2"></i><?= count($vendors) === 1 ? 'It says' : 'They say' ?> what the template says already.</div>
+    <div class="modal-body text-center text-secondary py-5" data-in-step><i class="fas fa-check-circle text-success fa-2x d-block mb-2"></i><?= count($vendors) === 1 ? __('It says what the template says already.') : __('They say what the template says already.') ?></div>
 <?php } else { ?>
 <form action="/agent/post.php" method="post" autocomplete="off" data-vendor-template-update>
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -71,13 +71,13 @@ ob_start();
             </p>
             <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0">
-                    <thead class="table-light"><tr><th style="width: 2rem;"></th><th>Field</th><th>It says</th><th>The template says</th></tr></thead>
+                    <thead class="table-light"><tr><th style="width: 2rem;"></th><th><?= __('Field') ?></th><th><?= __('It says') ?></th><th><?= __('The template says') ?></th></tr></thead>
                     <tbody>
                     <?php foreach ($vendor['differences'] as $key => $label) { ?>
                         <tr data-difference="<?= $key ?>">
                             <td><input class="form-check-input" type="checkbox" name="fields[]" value="<?= $key ?>" id="vtField<?= $key ?>" checked></td>
                             <td class="text-nowrap"><label for="vtField<?= $key ?>"><i class="fas fa-fw <?= $labels[$key]['icon'] ?> text-secondary me-1"></i><?= $label ?></label></td>
-                            <td class="small text-break"><?= vendorTemplateValueHtml($key, $vendor, 'vendor') ?: '<span class="text-body-secondary">Nothing</span>' ?></td>
+                            <td class="small text-break"><?= vendorTemplateValueHtml($key, $vendor, 'vendor') ?: '<span class="text-body-secondary">' . __('Nothing') . '</span>' ?></td>
                             <td class="small text-break"><?= vendorTemplateValueHtml($key, $template, 'template') ?></td>
                         </tr>
                     <?php } ?>
@@ -85,30 +85,30 @@ ob_start();
                 </table>
             </div>
         <?php } else { ?>
-            <p class="small text-body-secondary mb-2"><?= count($differing) === count($vendors) ? (count($vendors) === 2 ? 'Both vendors differ' : 'All ' . count($vendors) . ' vendors differ') : count($differing) . ' of the ' . count($vendors) . ' vendors differ' ?> from the template. Tick the fields to take from it - only the ones that differ change.</p>
+            <p class="small text-body-secondary mb-2"><?= count($differing) === count($vendors) ? (count($vendors) === 2 ? __('Both vendors differ from the template.') : __('All %d vendors differ from the template.', count($vendors))) : __('%1$d of the %2$d vendors differ from the template.', count($differing), count($vendors)) ?> <?= __('Tick the fields to take from it - only the ones that differ change.') ?></p>
             <div class="list-group mb-3">
                 <?php foreach ($field_counts as $key => $count) { ?>
                     <label class="list-group-item d-flex align-items-center gap-2" data-difference="<?= $key ?>">
                         <input class="form-check-input mt-0" type="checkbox" name="fields[]" value="<?= $key ?>" checked>
                         <i class="fas fa-fw <?= $labels[$key]['icon'] ?> text-secondary"></i>
                         <span class="flex-grow-1"><?= $labels[$key]['label'] ?></span>
-                        <span class="small text-body-secondary text-truncate" style="max-width: 50%;" title="What the template says"><?= vendorTemplateValueHtml($key, $template, 'template') ?></span>
+                        <span class="small text-body-secondary text-truncate" style="max-width: 50%;" title="<?= escapeHtml(__('What the template says')) ?>"><?= vendorTemplateValueHtml($key, $template, 'template') ?></span>
                         <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal"><?= $count ?> differ<?= $count === 1 ? 's' : '' ?></span>
                     </label>
                 <?php } ?>
             </div>
-            <div class="small text-body-secondary mb-1">The vendors</div>
+            <div class="small text-body-secondary mb-1"><?= __('The vendors') ?></div>
             <ul class="list-unstyled small mb-0" style="max-height: 12rem; overflow-y: auto;">
                 <?php foreach ($differing as $vendor) { ?>
                     <li class="py-1 border-bottom d-flex gap-2"><span class="fw-semibold"><?= escapeHtml($vendor['client_name'] ?? 'Ours') ?></span><span class="text-body-secondary text-truncate"><?= escapeHtml(implode(', ', $vendor['differences'])) ?></span></li>
                 <?php } ?>
             </ul>
         <?php } ?>
-        <div class="form-text mt-3">Their account number, PIN and account manager stay their own.</div>
+        <div class="form-text mt-3"><?= __('Their account number, PIN and account manager stay their own.') ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="update_vendors_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Take them from the template</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="update_vendors_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Take them from the template') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 <?php } ?>

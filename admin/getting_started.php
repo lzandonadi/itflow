@@ -97,7 +97,7 @@ define('FROM_GETTING_STARTED', true);
             <?php if (!empty($gs_company['company_logo']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/settings/' . $gs_company['company_logo'])) { ?>
                 <img src="/uploads/settings/<?= escapeHtml($gs_company['company_logo']) ?>" alt="" class="itflow-gs-logo">
             <?php } else { ?>
-                <span><span class="text-primary fw-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow</span>
+                <span><span class="text-primary fw-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow</span> <?php // i18n-ignore - product name ?>
             <?php } ?>
             <span class="itflow-setup-brand-sub"><?= __('Get started') ?></span>
         </a>

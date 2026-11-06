@@ -430,7 +430,7 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
     </form>
     <?php
     $empty_state = [
-        'thing' => 'services',
+        'thing' => __('services'),
         'icon' => 'fa-stream',
         'filtered' => $q !== '' || $importance_filter || $category_filter !== '' || $client_filter,
         'archived' => $show === 'archived',

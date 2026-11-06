@@ -82,4 +82,24 @@ return [
     'language::Korean' => 'Coreano',
     'category::none' => 'nenhuma',
 
+    // Block 10 - the last screens
+    'your deployment name' => 'o nome da sua implantação',
+    'the model loaded in LM Studio' => 'o modelo carregado no LM Studio',
+    'Other (OpenAI-compatible)' => 'Outro (compatível com OpenAI)',
+    'its model name' => 'o nome do modelo',
+    'Kind %1$s → %2$s' => 'Tipo %1$s → %2$s',
+    'Address %1$s → %2$s' => 'Endereço %1$s → %2$s',
+    'API key added' => 'Chave de API adicionada',
+    'API key removed' => 'Chave de API removida',
+    'API key changed' => 'Chave de API alterada',
+    'Passwords and keys taken out of what is sent' => 'Senhas e chaves retiradas do que é enviado',
+    'Passwords and keys sent as they are' => 'Senhas e chaves enviadas como estão',
+    'Provider %1$s → %2$s' => 'Provedor %1$s → %2$s',
+    'Model %1$s → %2$s' => 'Modelo %1$s → %2$s',
+    'For %1$s → %2$s' => 'Para %1$s → %2$s',
+    'Temperature %1$s → %2$s' => 'Temperatura %1$s → %2$s',
+    'Instructions removed' => 'Instruções removidas',
+    'Instructions added' => 'Instruções adicionadas',
+    'Instructions changed' => 'Instruções alteradas',
+
 ];

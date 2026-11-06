@@ -262,7 +262,7 @@ if (isset($_GET['withdraw_contract_signature'])) {
     enforceUserPermission('module_sales', 2);
 
     $round = contractSignaturePostRound($_GET['withdraw_contract_signature']);
-    if (!contractSignaturePending($round) || !contractSignatureWithdraw($round, 'Withdrawn by ' . stripslashes($session_name))) {
+    if (!contractSignaturePending($round) || !contractSignatureWithdraw($round, 'Withdrawn by ' . stripslashes($session_name))) { // i18n-ignore - the contract history stays English
         flashAlert(__('That request isn\'t waiting on anyone any more.'), 'error');
         redirect();
     }

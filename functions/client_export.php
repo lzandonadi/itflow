@@ -250,6 +250,7 @@ function clientExportFolderPath($tree, $folder_id) {
  */
 function clientExportDatasets() {
     $archived = ['created' => 'Created', 'archived' => 'Archived'];
+    // i18n-ignore-start - the CSV headings stay English; the README and PDF name the tables through clientExportDatasetLabel()
     return [
         'client' => ['section' => '', 'label' => 'Client', 'columns' => [
             'name' => 'Name', 'abbreviation' => 'Abbreviation', 'industry' => 'Industry', 'website' => 'Website', 'referral' => 'Referral', 'lead' => 'Lead',
@@ -402,6 +403,7 @@ function clientExportDatasets() {
             'amount' => 'Amount', 'type' => 'Type', 'note' => 'Note', 'created' => 'Created', 'expires' => 'Expires', 'invoice' => 'Used on invoice',
         ]],
     ];
+    // i18n-ignore-end
 }
 
 /** The datasets the options cover, in order. */
@@ -466,7 +468,7 @@ function clientExportRows($dataset, $client_id, $options) {
                     'tags' => clientExportTags('client_tags', 'client_id', [$client_id])[$client_id] ?? '',
                     'hourly_rate' => $terms ? sprintf('%.2f', $terms['rate']['rate']) : '', 'after_hours_rate' => $terms && $terms['after_hours'][0] > 0 ? sprintf('%.2f', $terms['after_hours'][0]) : '',
                     'net_terms' => $terms ? $terms['net_terms'][0] : '',
-                    'terms_from' => $terms ? (($terms['rate']['contract_name'] ?: ($terms['net_terms'][1] ?: $terms['after_hours'][1])) ?: 'The defaults') : '',
+                    'terms_from' => $terms ? (($terms['rate']['contract_name'] ?: ($terms['net_terms'][1] ?: $terms['after_hours'][1])) ?: 'The defaults') : '', // i18n-ignore - a CSV value, stays English
                     'currency' => $billing ? $row['client_currency_code'] : '', 'tax_id' => $billing ? $row['client_tax_id_number'] : '',
                     'notes' => $row['client_notes'], 'created' => clientExportDate($row['client_created_at']), 'archived' => clientExportDate($row['client_archived_at']),
                 ];
@@ -1418,7 +1420,7 @@ function clientExportPdf($client_id, $options) {
         foreach ($families as $family => $types) {
             $placed[$family] = array_values(array_filter($assets, function ($a) use ($types) { return in_array($a['type'], $types, true); }));
         }
-        $placed['Printers and other devices'] = array_values(array_filter($assets, function ($a) use ($families) {
+        $placed['Printers and other devices'] = array_values(array_filter($assets, function ($a) use ($families) { // i18n-ignore - a key, shown through clientExportAssetFamilyLabel()
             return !in_array($a['type'], array_merge(...array_values($families)), true);
         }));
         $warranty = function ($date) {
@@ -1729,7 +1731,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
     $client_id = intval($client_id);
     $client = clientExportRows('client', $client_id, $options)[0] ?? null;
     if (!$client) {
-        $error = 'That client no longer exists.';
+        $error = __('That client no longer exists.');
         return false;
     }
 
@@ -1984,7 +1986,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
 
     $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Records') . '</h2><table><tr><th>' . __('Table') . '</th><th class="num">' . __('Rows') . '</th><th>' . __('Download') . '</th></tr>';
     foreach ($manifest_sets as $set_key => $set) {
-        $readme .= '<tr><td>' . escapeHtml(clientExportDatasetLabel($set_key, $set['label'])) . '</td><td class="num">' . $set['rows'] . '</td><td><a href="' . $set['csv'] . '">CSV</a> · <a href="' . $set['json'] . '">JSON</a></td></tr>';
+        $readme .= '<tr><td>' . escapeHtml(clientExportDatasetLabel($set_key, $set['label'])) . '</td><td class="num">' . $set['rows'] . '</td><td><a href="' . $set['csv'] . '">CSV</a> · <a href="' . $set['json'] . '">JSON</a></td></tr>'; // i18n-ignore - file formats
     }
     $readme .= '</table></div>';
 

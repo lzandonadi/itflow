@@ -257,7 +257,7 @@ $csrf = $_SESSION['csrf_token'];
 
             <?php
             $empty_state = [
-                'thing' => "$kind_word tags",
+                'thing' => __('%s tags', $kind_word),
                 'icon' => 'fa-tags',
                 'filtered' => $q !== '',
                 'archived' => $show_archived,

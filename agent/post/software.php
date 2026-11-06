@@ -509,7 +509,7 @@ if (isExportRequest('export_software')) {
     $status = (string) ($_POST['status'] ?? '');
     $status_query = '';
     if (isset($status_filters[$status])) {
-        $status_query = "AND ({$status_filters[$status]['sql']})";
+        $status_query = "AND ({$status_filters[$status]['sql']})"; // i18n-ignore - SQL
         $filter_summary[__('Showing')] = $status_filters[$status]['label'];
     }
 

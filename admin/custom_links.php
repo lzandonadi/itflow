@@ -218,7 +218,7 @@ $csrf = $_SESSION['csrf_token'];
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'custom links',
+        'thing' => __('custom links'),
         'icon' => 'fa-external-link-alt',
         'filtered' => $q !== '',
         'archived' => $show === 'archived',

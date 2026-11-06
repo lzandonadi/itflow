@@ -217,7 +217,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'payment providers',
+        'thing' => __('payment providers'),
         'icon' => 'fa-credit-card',
         'text' => __('Set up Stripe and clients can pay their invoices by card, save a card, and pay recurring invoices by autopay.'),
         'actions' => $can_add ? [['label' => __('Add Provider'), 'modal' => $add_url]] : [],

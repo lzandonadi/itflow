@@ -116,7 +116,7 @@
                     ipInput.value = data.ip;
                     check(true);
                 } else {
-                    render('warning', data.message || 'No free address.');
+                    render('warning', data.message || __('No free address.'));
                 }
             });
         });

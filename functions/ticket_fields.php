@@ -335,16 +335,16 @@ function projectChangeManager($project_id, $manager_id) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT project_id, project_prefix, project_number, project_name, project_client_id, project_manager FROM projects WHERE project_id = $project_id"));
     if (!$row) {
-        return [false, 'Invalid project!'];
+        return [false, __('Invalid project!')];
     }
     if ($manager_id) {
         $agent = quickPickAgent($manager_id);
         if (!$agent) {
-            return [false, 'Invalid agent!'];
+            return [false, __('Invalid agent!')];
         }
         $manager_name = escapeSql($agent['user_name']);
     } else {
-        $manager_name = 'No One';
+        $manager_name = 'No One'; // i18n-ignore - ticket history stays English
     }
 
     $project = escapeSql($row['project_prefix'] . $row['project_number'] . ' - ' . $row['project_name']);
@@ -358,7 +358,7 @@ function projectChangeManager($project_id, $manager_id) {
         projectNotifyManager($row, $manager_id);
     }
 
-    return [true, $manager_id ? "Project manager set to $manager_name" : 'Project manager removed'];
+    return [true, $manager_id ? "Project manager set to $manager_name" : 'Project manager removed']; // i18n-ignore - ticket history stays English
 }
 
 /*
@@ -374,16 +374,16 @@ function recurringTicketChangeAssignee($recurring_ticket_id, $assigned_to) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT recurring_ticket_subject, recurring_ticket_client_id FROM recurring_tickets WHERE recurring_ticket_id = $recurring_ticket_id"));
     if (!$row) {
-        return [false, 'Invalid recurring ticket!'];
+        return [false, __('Invalid recurring ticket!')];
     }
     if ($assigned_to) {
         $agent = quickPickAgent($assigned_to);
         if (!$agent) {
-            return [false, 'Invalid agent!'];
+            return [false, __('Invalid agent!')];
         }
         $agent_name = escapeSql($agent['user_name']);
     } else {
-        $agent_name = 'No One';
+        $agent_name = 'No One'; // i18n-ignore - ticket history stays English
     }
 
     $subject = escapeSql($row['recurring_ticket_subject']);
@@ -399,5 +399,5 @@ function recurringTicketChangeAssignee($recurring_ticket_id, $assigned_to) {
         recurringTicketMailAssigned($assigned_to, [(string) $row['recurring_ticket_subject']], stripslashes($session_name));
     }
 
-    return [true, $assigned_to ? "Recurring ticket assigned to $agent_name" : 'Recurring ticket unassigned'];
+    return [true, $assigned_to ? "Recurring ticket assigned to $agent_name" : 'Recurring ticket unassigned']; // i18n-ignore - ticket history stays English
 }

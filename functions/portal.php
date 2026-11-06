@@ -13,21 +13,21 @@ const PORTAL_RESET_REQUEST_GAP_MINUTES = 5;    // one Forgot password email per 
 
 /** The ticket emails a contact can ask for about their own tickets (contacts.contact_ticket_emails). */
 const PORTAL_TICKET_EMAILS = [
-    'all' => ['label' => 'Every email', 'text' => 'When a ticket is raised for you, every reply and update, when it is fixed and when it is closed'],
-    'replies' => ['label' => 'Replies and fixes only', 'text' => 'Our replies and when it is fixed - not the emails saying a ticket was raised or closed'],
+    'all' => ['label' => 'Every email', 'text' => 'When a ticket is raised for you, every reply and update, when it is fixed and when it is closed'], // i18n-ignore - shown through __()
+    'replies' => ['label' => 'Replies and fixes only', 'text' => 'Our replies and when it is fixed - not the emails saying a ticket was raised or closed'], // i18n-ignore - shown through __()
 ];
 
 /** About the company's other tickets - primary and technical contacts (contacts.contact_company_ticket_emails). */
 const PORTAL_COMPANY_TICKET_EMAILS = [
-    'none' => ['label' => 'Only the tickets I am on', 'text' => 'Nothing about tickets other people raise'],
-    'new' => ['label' => 'New tickets', 'text' => 'An email when anyone raises one - in the portal, by email or by calling us'],
-    'all' => ['label' => 'New tickets and every update', 'text' => 'As if you were copied in on all of them'],
+    'none' => ['label' => 'Only the tickets I am on', 'text' => 'Nothing about tickets other people raise'], // i18n-ignore - shown through __()
+    'new' => ['label' => 'New tickets', 'text' => 'An email when anyone raises one - in the portal, by email or by calling us'], // i18n-ignore - shown through __()
+    'all' => ['label' => 'New tickets and every update', 'text' => 'As if you were copied in on all of them'], // i18n-ignore - shown through __()
 ];
 
 /** How an announcement looks - its badge and icon. */
 const PORTAL_ANNOUNCEMENT_TONES = [
     'info' => ['label' => 'Notice', 'icon' => 'fa-info-circle'],
-    'warning' => ['label' => 'Heads up', 'icon' => 'fa-exclamation-triangle'],
+    'warning' => ['label' => 'Heads up', 'icon' => 'fa-exclamation-triangle'], // i18n-ignore - shown through __()
     'danger' => ['label' => 'Urgent', 'icon' => 'fa-exclamation-circle'],
 ];
 
@@ -119,9 +119,9 @@ function portalContactAccess(array $row) {
 /** The ways a portal user can sign in here - a password, and Microsoft when it is set up. method => label. */
 function portalSignInMethods() {
     global $config_azure_client_id;
-    $methods = ['local' => 'With a password'];
+    $methods = ['local' => 'With a password']; // i18n-ignore - shown through __()
     if (!empty($config_azure_client_id)) {
-        $methods['azure'] = 'With their Microsoft 365 account';
+        $methods['azure'] = 'With their Microsoft 365 account'; // i18n-ignore - shown through __()
     }
     return $methods;
 }
@@ -158,7 +158,7 @@ function portalMfaQrSvg($secret, $email) {
     }
     require_once dirname(__DIR__) . '/libs/barcode/barcode.php';
     $company = mysqli_fetch_row(mysqli_query($mysqli, "SELECT company_name FROM companies WHERE company_id = 1"));
-    $issuer = trim((string) ($company[0] ?? '')) ?: 'Client portal';
+    $issuer = trim((string) ($company[0] ?? '')) ?: 'Client portal'; // i18n-ignore - shown through __()
     $uri = 'otpauth://totp/' . rawurlencode($issuer) . ':' . rawurlencode((string) $email) . '?secret=' . rawurlencode((string) $secret) . '&issuer=' . rawurlencode($issuer);
     $svg = (new barcode_generator())->render_svg('qr', $uri, ['w' => 200, 'h' => 200, 'p' => 0]);
     $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', (string) $svg);

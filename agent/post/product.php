@@ -547,7 +547,7 @@ if (isset($_POST['product_stock_count'])) {
             $same++;
             continue;
         }
-        productStockMove($product['product_id'], $difference, 'adjusted', ['note' => 'Stock count - ' . billingQuantity($counted) . ($note !== '' ? " - $note" : '')]);
+        productStockMove($product['product_id'], $difference, 'adjusted', ['note' => 'Stock count - ' . billingQuantity($counted) . ($note !== '' ? " - $note" : '')]); // i18n-ignore - the stock history stays English
         logAudit("Product", "Stock", "$session_name counted product " . escapeSql($product['product_name']) . ' - ' . billingQuantity($counted) . ' on the shelf, ' . productStockQty($difference), 0, intval($product['product_id']));
         $changed++;
     }

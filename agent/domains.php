@@ -42,7 +42,7 @@ if (!$client_url && !empty($_GET['client'])) {
 
 // Vendor Filter - the registrar or any of the hosts
 $vendor_filter = intval($_GET['vendor'] ?? 0);
-$vendor_query = $vendor_filter ? "AND $vendor_filter IN (domain_registrar, domain_dnshost, domain_webhost, domain_mailhost)" : '';
+$vendor_query = $vendor_filter ? "AND $vendor_filter IN (domain_registrar, domain_dnshost, domain_webhost, domain_mailhost)" : ''; // i18n-ignore - SQL
 
 // Tags Filter - a domain with any of them
 if (isset($_GET['tags']) && is_array($_GET['tags']) && !empty($_GET['tags'])) {
@@ -436,7 +436,7 @@ $bulk_vendor_options = $can_edit ? domainVendorChoices($client_url ? $client_id 
     </form>
     <?php
     $empty_state = [
-        'thing' => 'domains',
+        'thing' => __('domains'),
         'icon' => 'fa-globe',
         'filtered' => $q || $tag_query || $vendor_query || $expire_query,
         'views' => ['show'],

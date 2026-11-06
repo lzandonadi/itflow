@@ -541,7 +541,7 @@ function accountLedgerFiltersSql(array $src, &$summary = [], $with_show = true, 
     foreach (['amount_min' => '>=', 'amount_max' => '<='] as $key => $op) {
         $value = trim((string) ($src[$key] ?? ''));
         if ($value !== '' && is_numeric($value)) {
-            $sql .= " AND ABS(ledger.txn_amount) $op " . round(abs(floatval($value)), 2);
+            $sql .= " AND ABS(ledger.txn_amount) $op " . round(abs(floatval($value)), 2); // i18n-ignore - SQL
             $summary[$key === 'amount_min' ? __('At least') : __('At most')] = billingMoney(abs(floatval($value)));
         }
     }

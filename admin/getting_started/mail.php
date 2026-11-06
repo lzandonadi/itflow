@@ -34,7 +34,7 @@ $gs_parse = intval($gs_mail['config_ticket_email_parse'] ?? 0) === 1;
         </div>
     <?php } else { ?>
         <h2 class="h6 fw-semibold"><?= __('Sending') ?></h2>
-        <p class="small text-body-secondary"><?= __('Your mail host\'s SMTP server, as its setup guide gives it. Microsoft 365 or Google Workspace sign in with an app you register with them instead - set that up in') ?> <a href="settings_mail.php?tab=oauth">Admin &gt; Mail</a>, then come back.</p>
+        <p class="small text-body-secondary"><?= __('Your mail host\'s SMTP server, as its setup guide gives it. Microsoft 365 or Google Workspace sign in with an app you register with them instead - set that up in %s, then come back.', '<a href="settings_mail.php?tab=oauth">' . __('Admin &gt; Mail') . '</a>') ?></p>
         <input type="hidden" name="config_smtp_provider" value="standard_smtp">
         <div class="row g-3 mb-3">
             <div class="col-12">

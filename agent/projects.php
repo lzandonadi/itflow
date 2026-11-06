@@ -476,7 +476,7 @@ $hidden_filter_count = $date_filter_active ? 1 : 0;
     </form>
     <?php
     $empty_state = [
-        'thing' => 'projects',
+        'thing' => __('projects'),
         'icon' => 'fa-project-diagram',
         'filtered' => $q !== '' || $manager_filter !== '' || $client_filter !== '' || $date_filter_active,
         'archived' => $show === 'archived',

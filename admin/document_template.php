@@ -16,7 +16,7 @@ require_once "includes/inc_all_admin.php";
 
 $template = documentTemplateRow($_GET['document_template_id'] ?? 0);
 if (!$template) {
-    echo emptyStateHtml(['thing' => 'document templates', 'title' => __('That document template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-file-alt', 'filtered' => false,
+    echo emptyStateHtml(['thing' => __('document templates'), 'title' => __('That document template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-file-alt', 'filtered' => false,
         'actions' => [['label' => __('Document Templates'), 'href' => 'document_templates.php']]]);
     require_once "../includes/footer.php";
     exit();

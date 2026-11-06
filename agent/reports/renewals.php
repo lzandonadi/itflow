@@ -87,7 +87,7 @@ require_once "includes/inc_report_layout.php";
 
 // By month: lapsed first, then each month from this one to the end of the window
 $months = ['lapsed' => 'Lapsed'];
-$cursor = new DateTime('first day of this month');
+$cursor = new DateTime('first day of this month'); // i18n-ignore - a date expression
 $last = (new DateTime('today'))->modify("+$ahead days");
 while ($cursor <= $last) {
     $months[$cursor->format('Y-m')] = $cursor->format('M y');

@@ -237,7 +237,7 @@ function globalSearchGroups($terms, $deep) {
     // in hand is as likely to be the iDRAC as the OS NIC. A MAC typed as
     // aabb.ccdd.eeff finds 00:AA:BB... however it was saved.
     $asset_mac = normalizeMacAddress($q);
-    $asset_mac_match = $asset_mac ? "OR REPLACE(REPLACE(REPLACE(UPPER(interface_mac), ':', ''), '-', ''), '.', '') = '" . str_replace(':', '', $asset_mac) . "'" : '';
+    $asset_mac_match = $asset_mac ? "OR REPLACE(REPLACE(REPLACE(UPPER(interface_mac), ':', ''), '-', ''), '.', '') = '" . str_replace(':', '', $asset_mac) . "'" : ''; // i18n-ignore - SQL
     $groups[] = [
         'key' => 'assets', 'label' => __('Assets'), 'icon' => 'desktop', 'module' => 'module_support',
         'select' => 'asset_id, asset_name, asset_type, asset_make, asset_model, asset_client_id, client_name,
@@ -456,7 +456,7 @@ function globalSearchGroups($terms, $deep) {
         },
     ];
 
-    $document_deep_match = $deep ? "OR MATCH(document_content_raw) AGAINST ('$eq')" : '';
+    $document_deep_match = $deep ? "OR MATCH(document_content_raw) AGAINST ('$eq')" : ''; // i18n-ignore - SQL
     $groups[] = [
         'key' => 'documents', 'label' => __('Documents'), 'icon' => 'file-alt', 'module' => 'module_support',
         'select' => 'document_id, document_name, document_description, document_client_id, client_name',

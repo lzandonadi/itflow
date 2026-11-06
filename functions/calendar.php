@@ -1115,7 +1115,7 @@ function icsCalendar(array $calendar, array $items, $timezone) {
     $lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//ITFlow//ITFlow Calendar//EN',
+        'PRODID:-//ITFlow//ITFlow Calendar//EN', // i18n-ignore - calendar feed header
         'CALSCALE:GREGORIAN',
         'METHOD:' . ($calendar['method'] ?? 'PUBLISH'),
     ];

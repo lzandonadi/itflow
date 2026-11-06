@@ -377,7 +377,7 @@ if (isset($_POST['add_payment_stripe'])) {
         }
 
         // Notify/log
-        appNotify("Invoice Paid", escapeSql(__('Invoice %s automatically paid', $invoice_prefix . $invoice_number)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
+        appNotify("Invoice Paid", escapeSql(__('Invoice %s automatically paid', $invoice_prefix . $invoice_number)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id); // i18n-ignore - the notification kind is a key
         logAudit("Invoice", "Payment", "$session_name initiated Stripe payment amount of " . numfmt_format_currency($currency_format, $invoice_amount, $invoice_currency_code) . " added to invoice $invoice_prefix$invoice_number - $pi_id $extended_log_desc", $client_id, $invoice_id);
         triggerCustomAction('invoice_pay', $invoice_id);
 

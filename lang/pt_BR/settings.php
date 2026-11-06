@@ -712,4 +712,13 @@ return [
     'Prefix' => 'Prefixo',
     '2 hours' => '2 horas',
 
+    // Block 10 - the last screens
+    'Admin access required.' => 'É preciso acesso de administrador.',
+    'Microsoft OAuth authorization failed: %s' => 'A autorização OAuth da Microsoft falhou: %s',
+    'Microsoft OAuth callback validation failed. Please try connecting again.' => 'A validação do retorno OAuth da Microsoft falhou. Tente conectar de novo.',
+    'Microsoft OAuth settings are incomplete. Please fill Client ID, Client Secret, and Tenant ID.' => 'As configurações OAuth da Microsoft estão incompletas. Preencha o Client ID, o Client Secret e o Tenant ID.',
+    'Microsoft OAuth token exchange failed: %s' => 'A troca de token OAuth da Microsoft falhou: %s',
+    'Microsoft OAuth token exchange failed: refresh token or access token missing.' => 'A troca de token OAuth da Microsoft falhou: falta o refresh token ou o access token.',
+    'Microsoft 365 connected - ITFlow can now use the mailbox' => 'Microsoft 365 conectado - o ITFlow já pode usar a caixa de correio',
+
 ];

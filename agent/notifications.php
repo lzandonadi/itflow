@@ -128,7 +128,7 @@ $empty_state_skip = true;
     <?php if ($num_rows[0] == 0) { ?>
 
         <?= emptyStateHtml([
-            'thing' => 'notifications',
+            'thing' => __('notifications'),
             'icon' => 'fa-bell-slash',
             'filtered' => $notifications_filtered,
             'clear_url' => 'notifications.php' . ($view === 'all' ? '?view=all' : ''),

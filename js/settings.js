@@ -238,7 +238,7 @@
                 var none = document.createElement('div');
                 none.className = 'list-group-item small text-body-secondary';
                 none.setAttribute('data-settings-none', '');
-                none.textContent = 'No setting matches "' + input.value.trim() + '".';
+                none.textContent = __('No setting matches "%s".', input.value.trim());
                 results.appendChild(none);
             }
             found.forEach(function (pair) {

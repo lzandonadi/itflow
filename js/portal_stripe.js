@@ -106,7 +106,7 @@
                         .then(function (response) { return response.json(); })
                         .then(function (data) {
                             if (!data.clientSecret) {
-                                throw new Error(data.error || 'No checkout');
+                                throw new Error(data.error || __('No checkout'));
                             }
                             return data.clientSecret;
                         });

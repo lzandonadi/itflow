@@ -623,7 +623,7 @@ function folderOwnedId($folder_id, $client_id) {
 /** A folder's name for messages and logs - "Top level" for the root. Raw. */
 function folderDisplayName($folder_id) {
     $folder_id = intval($folder_id);
-    return $folder_id ? (string) getFieldById('folders', $folder_id, 'folder_name') : 'Top level';
+    return $folder_id ? (string) getFieldById('folders', $folder_id, 'folder_name') : __('Top level');
 }
 
 /*

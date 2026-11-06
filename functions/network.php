@@ -23,26 +23,26 @@
  * Shown as the tile on every list and page.
  */
 const NETWORK_TYPES = [
-    'LAN' => ['fa-network-wired', 'network', 'The main wired network - workstations, printers'],
-    'Wireless' => ['fa-wifi', 'wireless', 'Staff wireless'],
-    'Guest' => ['fa-user-friends', 'wireless', 'Visitors - kept apart from everything else'],
-    'Voice' => ['fa-phone', 'phone', 'Phones and the phone system'],
-    'Servers' => ['fa-server', 'server', 'Servers and hypervisors'],
-    'Storage' => ['fa-hdd', 'virtual', 'SAN, iSCSI and backup traffic'],
-    'Management' => ['fa-tools', 'peripheral', 'Switch, firewall and iDRAC / iLO management'],
-    'IoT' => ['fa-microchip', 'other', 'Cameras, door access, HVAC - what should not talk to the LAN'],
-    'DMZ' => ['fa-shield-alt', 'firewall', 'Public-facing servers'],
-    'VPN' => ['fa-lock', 'workstation', 'Remote access and site-to-site tunnels'],
-    'WAN' => ['fa-globe', 'firewall', 'An internet connection - the circuit, the provider and its public addresses'],
+    'LAN' => ['fa-network-wired', 'network', 'The main wired network - workstations, printers'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Wireless' => ['fa-wifi', 'wireless', 'Staff wireless'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Guest' => ['fa-user-friends', 'wireless', 'Visitors - kept apart from everything else'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Voice' => ['fa-phone', 'phone', 'Phones and the phone system'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Servers' => ['fa-server', 'server', 'Servers and hypervisors'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Storage' => ['fa-hdd', 'virtual', 'SAN, iSCSI and backup traffic'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Management' => ['fa-tools', 'peripheral', 'Switch, firewall and iDRAC / iLO management'], // i18n-ignore - shown through networkIpTypes() and __()
+    'IoT' => ['fa-microchip', 'other', 'Cameras, door access, HVAC - what should not talk to the LAN'], // i18n-ignore - shown through networkIpTypes() and __()
+    'DMZ' => ['fa-shield-alt', 'firewall', 'Public-facing servers'], // i18n-ignore - shown through networkIpTypes() and __()
+    'VPN' => ['fa-lock', 'workstation', 'Remote access and site-to-site tunnels'], // i18n-ignore - shown through networkIpTypes() and __()
+    'WAN' => ['fa-globe', 'firewall', 'An internet connection - the circuit, the provider and its public addresses'], // i18n-ignore - shown through networkIpTypes() and __()
     'Other' => ['fa-project-diagram', 'other', ''],
 ];
 
 /** What a documented address is: [type => icon, tone, what it means, what it is called]. */
 const NETWORK_IP_TYPES = [
-    'Static' => ['fa-thumbtack', 'secondary', 'Set on the device itself', 'Fixed'],
-    'Reservation' => ['fa-bookmark', 'info', 'DHCP hands this device the same address every time', 'DHCP reservation'],
-    'Reserved' => ['fa-ban', 'warning', 'Held back - not in use, do not hand it out', 'Held back'],
-    'Virtual' => ['fa-clone', 'primary', 'A floating address - a cluster, VRRP / CARP or a load balancer', 'Floating'],
+    'Static' => ['fa-thumbtack', 'secondary', 'Set on the device itself', 'Fixed'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Reservation' => ['fa-bookmark', 'info', 'DHCP hands this device the same address every time', 'DHCP reservation'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Reserved' => ['fa-ban', 'warning', 'Held back - not in use, do not hand it out', 'Held back'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Virtual' => ['fa-clone', 'primary', 'A floating address - a cluster, VRRP / CARP or a load balancer', 'Floating'], // i18n-ignore - shown through networkIpTypes() and __()
 ];
 
 /** A network type's name in the interface language (LAN, Wireless, Guest...). */

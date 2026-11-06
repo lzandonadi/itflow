@@ -95,14 +95,15 @@ if (isset($_POST['check_ai_provider']) || isset($_POST['add_ai_provider']) || is
         redirect('ai_providers.php');
     }
 
-    $lines = aiProviderChangeLines($before, $after);
+    $lines = i18nEnglish(fn () => aiProviderChangeLines($before, $after));
+    $shown = aiProviderChangeLines($before, $after);
     if (!$lines) {
         flashAlert(__('Nothing changed on <strong>%s</strong>', escapeHtml($name)), 'info');
         redirect();
     }
     aiProviderWrite($after, $provider_id);
     logAudit("AI Provider", "Edit", "$session_name changed AI provider " . escapeSql("$name: " . implode('; ', $lines)), 0, $provider_id);
-    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes')));
+    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($shown) === 1 ? $shown[0] : _n('%d change', '%d changes', count($shown)))));
     redirect();
 
 }

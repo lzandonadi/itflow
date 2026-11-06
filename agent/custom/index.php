@@ -1,4 +1,4 @@
-<?php require_once "includes/inc_all_custom.php"; ?>
+<?php require_once "includes/inc_all_custom.php";  // i18n-ignore-file - a sample page for your own custom pages ?>
 
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">

@@ -1437,14 +1437,14 @@ if (isset($_GET['download_contacts_csv_template'])) {
 
     //set column headers
     $fields = array(
-        'Full Name           ',
-        'Job Title           ',
-        'Department Name     ',
-        'Email Address       ',
-        'Office Phone        ',
-        'Office Extension    ',
-        'Mobile Phone        ',
-        'Office Location     '
+        'Full Name           ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Job Title           ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Department Name     ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Email Address       ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Office Phone        ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Office Extension    ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Mobile Phone        ', // i18n-ignore - CSV headings stay English, so files import in any language
+        'Office Location     ' // i18n-ignore - CSV headings stay English, so files import in any language
     );
     fputcsv($f, $fields, $delimiter, $enclosure, $escape);
 

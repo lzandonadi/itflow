@@ -20,7 +20,7 @@
 // Check if our database versions are defined
 // If undefined, the file is probably being accessed directly rather than called via update_cli.php
 if (!defined("LATEST_DATABASE_VERSION") || !defined("CURRENT_DATABASE_VERSION") || !isset($mysqli)) {
-    echo "Cannot access this file directly.";
+    echo "Cannot access this file directly."; // i18n-ignore - answers a direct request before anything is loaded
     exit();
 }
 

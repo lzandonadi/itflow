@@ -17,9 +17,9 @@
 
 /** What a method is for - payment_method_use. */
 const PAYMENT_METHOD_USES = [
-    0 => ['label' => 'Money in and out', 'short' => 'In and out', 'icon' => 'fa-exchange-alt', 'about' => 'Offered for payments, income, expenses and transfers'],
-    1 => ['label' => 'Money in - payments and income', 'short' => 'Money in', 'icon' => 'fa-arrow-down', 'about' => 'Offered for payments from clients and other income'],
-    2 => ['label' => 'Money out - expenses', 'short' => 'Money out', 'icon' => 'fa-arrow-up', 'about' => 'Offered for expenses, recurring expenses, reimbursements and mileage claims'],
+    0 => ['label' => 'Money in and out', 'short' => 'In and out', 'icon' => 'fa-exchange-alt', 'about' => 'Offered for payments, income, expenses and transfers'], // i18n-ignore - shown through __(), or the audit log
+    1 => ['label' => 'Money in - payments and income', 'short' => 'Money in', 'icon' => 'fa-arrow-down', 'about' => 'Offered for payments from clients and other income'], // i18n-ignore - shown through __(), or the audit log
+    2 => ['label' => 'Money out - expenses', 'short' => 'Money out', 'icon' => 'fa-arrow-up', 'about' => 'Offered for expenses, recurring expenses, reimbursements and mileage claims'], // i18n-ignore - shown through __(), or the audit log
 ];
 
 /** A use (PAYMENT_METHOD_USES) with its words in the interface language - the constant stays English for the audit log. */
@@ -313,11 +313,11 @@ function paymentMethodUpdate(array $row, array $f) {
     }
     $was_use = intval($row['payment_method_use']);
     if ($was_use !== $f['use']) {
-        $changes[] = 'for ' . strtolower(PAYMENT_METHOD_USES[$was_use]['short'] ?? 'in and out') . ' now ' . strtolower(PAYMENT_METHOD_USES[$f['use']]['short']);
+        $changes[] = 'for ' . strtolower(PAYMENT_METHOD_USES[$was_use]['short'] ?? 'in and out') . ' now ' . strtolower(PAYMENT_METHOD_USES[$f['use']]['short']); // i18n-ignore - shown through __(), or the audit log
         foreach (paymentMethodDefaultFor($f['name']) as $way) {
             if (($way === 'in' && $f['use'] === 2) || ($way === 'out' && $f['use'] === 1)) {
                 paymentMethodSetDefault($way, '');
-                $changes[] = 'no longer the default for ' . ($way === 'in' ? 'payments' : 'expenses');
+                $changes[] = 'no longer the default for ' . ($way === 'in' ? 'payments' : 'expenses'); // i18n-ignore - shown through __(), or the audit log
             }
         }
     }

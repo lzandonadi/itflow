@@ -252,7 +252,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'canned responses',
+        'thing' => __('canned responses'),
         'icon' => 'fa-comment-dots',
         'filtered' => $q !== '' || $category_filter !== '',
         'archived' => $show_archived,

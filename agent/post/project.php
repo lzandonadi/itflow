@@ -431,7 +431,7 @@ if (isset($_POST['bulk_edit_project_manager'])) {
     validateCSRFToken();
 
     $manager_id = ticketAgentId($_POST['project_manager'] ?? 0);
-    $manager_name = $manager_id ? escapeSql((string) getFieldById('users', $manager_id, 'user_name')) : 'No One';
+    $manager_name = $manager_id ? escapeSql((string) getFieldById('users', $manager_id, 'user_name')) : 'No One'; // i18n-ignore - the audit log
 
     $done = 0;
     foreach (projectsForBulk(2) as $row) {

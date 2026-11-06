@@ -93,7 +93,7 @@
         if (on) {
             button.dataset.label = button.innerHTML;
             button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>One moment...';
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>' + __('One moment...');
         } else if (button.dataset.label) {
             button.disabled = false;
             button.innerHTML = button.dataset.label;

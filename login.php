@@ -433,7 +433,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                                 SET remember_token_user_id = $user_id,
                                     remember_token_token   = '$newRememberToken'
                             ");
-                            $extended_log .= ", generated a new remember-me token";
+                            $extended_log .= ", generated a new remember-me token"; // i18n-ignore - the sign-in log
                         }
 
                         // Suspicious login checks / email notify
@@ -642,7 +642,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                                 while ($remember_row = mysqli_fetch_assoc($remember_tokens)) {
                                     if (hash_equals($remember_row['remember_token_token'], (string) $_COOKIE['rememberme'])) {
                                         $client_mfa_done = true;
-                                        $client_mfa_how = ' with a remembered browser';
+                                        $client_mfa_how = ' with a remembered browser'; // i18n-ignore - the sign-in log
                                         break;
                                     }
                                 }
@@ -700,7 +700,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                                 $newRememberToken = bin2hex(random_bytes(64));
                                 setcookie('rememberme', $newRememberToken, time() + 86400 * $config_login_remember_me_expire, "/", null, true, true);
                                 mysqli_query($mysqli, "INSERT INTO remember_tokens SET remember_token_user_id = $user_id, remember_token_token = '$newRememberToken'");
-                                $client_mfa_how .= ', remembering this browser';
+                                $client_mfa_how .= ', remembering this browser'; // i18n-ignore - the sign-in log
                             }
 
                             // New session ID for the authenticated session (CWE-384)

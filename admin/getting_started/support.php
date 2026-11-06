@@ -79,7 +79,7 @@ $gs_use_standard = settingsChecked('standard_slas', true);
         </table>
     </div>
     <?php if (count($gs_slas) < count(GETTING_STARTED_SLAS)) { ?>
-        <div class="mb-4"><?= settingsSwitch('standard_slas', $gs_use_standard, ['id' => 'gsStandardSlas', 'label' => $gs_slas ? __('Use these for the priorities that have none') : 'Use these',
+        <div class="mb-4"><?= settingsSwitch('standard_slas', $gs_use_standard, ['id' => 'gsStandardSlas', 'label' => $gs_slas ? __('Use these for the priorities that have none') : __('Use these'),
             'help' => __('Open tickets get them too.')]) ?></div>
     <?php } ?>
 

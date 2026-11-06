@@ -102,7 +102,7 @@ if (isset($_GET['tag_picker'])) {
 
     if ($records === false) {
         http_response_code(403);
-        echo json_encode(['error' => 'You cannot change the tags on these.']);
+        echo json_encode(['error' => __('You cannot change the tags on these.')]);
         exit();
     }
 
@@ -154,7 +154,7 @@ if (isset($_POST['tag_picker_set']) || isset($_POST['tag_picker_create'])) {
 
     if ($records === false) {
         http_response_code(403);
-        echo json_encode(['error' => 'You cannot change the tags on these.']);
+        echo json_encode(['error' => __('You cannot change the tags on these.')]);
         exit();
     }
 
@@ -169,7 +169,7 @@ if (isset($_POST['tag_picker_set']) || isset($_POST['tag_picker_create'])) {
         $name = trim((string) ($_POST['name'] ?? ''));
         if (!$session_is_admin || $name === '' || mb_strlen($name) > 200) {
             http_response_code(403);
-            echo json_encode(['error' => 'That tag cannot be made here.']);
+            echo json_encode(['error' => __('That tag cannot be made here.')]);
             exit();
         }
         $name_sql = escapeSql($name);
@@ -197,13 +197,13 @@ if (isset($_POST['tag_picker_set']) || isset($_POST['tag_picker_create'])) {
     $tag = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT tag_name, tag_archived_at FROM tags WHERE tag_id = $tag_id AND tag_type = $type"));
     if (!$tag) {
         http_response_code(404);
-        echo json_encode(['error' => 'That tag no longer exists.']);
+        echo json_encode(['error' => __('That tag no longer exists.')]);
         exit();
     }
     // An archived tag can come off records, not go on more
     if ($on && $tag['tag_archived_at']) {
         http_response_code(409);
-        echo json_encode(['error' => 'That tag is archived.']);
+        echo json_encode(['error' => __('That tag is archived.')]);
         exit();
     }
     $tag_name = escapeSql($tag['tag_name']);
@@ -272,10 +272,10 @@ if (isset($_GET['quick_pick_options'])) {
     } elseif ($field === 'assignee' || $field === 'recurring_assignee') {
         $options = quickPickAgents();
     } elseif ($field === 'project_manager') {
-        $options = quickPickAgents('No manager');
+        $options = quickPickAgents(__('No manager'));
     } elseif ($field === 'service_importance') {
         $colors = ['High' => 'var(--bs-danger)', 'Medium' => 'var(--bs-warning)', 'Low' => 'var(--bs-secondary)'];
-        $descriptions = ['High' => 'Down means the client cannot work', 'Medium' => 'Down hurts, but there is a way round it', 'Low' => 'Down is an inconvenience'];
+        $descriptions = ['High' => __('Down means the client cannot work'), 'Medium' => __('Down hurts, but there is a way round it'), 'Low' => __('Down is an inconvenience')];
         foreach (SERVICE_IMPORTANCE as $importance) {
             $options[] = ['value' => $importance, 'label' => $importance, 'color' => $colors[$importance], 'description' => $descriptions[$importance]];
         }
@@ -288,12 +288,12 @@ if (isset($_GET['quick_pick_options'])) {
         $options = assetQuickOptions($field === 'contact_location' ? 'asset_location' : $field, intval($_GET['scope'] ?? 0));
         if ($options === null) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot see that client.']);
+            echo json_encode(['error' => __('You cannot see that client.')]);
             exit();
         }
     } else {
         http_response_code(400);
-        echo json_encode(['error' => 'Unknown field']);
+        echo json_encode(['error' => __('Unknown field')]);
         exit();
     }
 
@@ -325,7 +325,7 @@ if (isset($_POST['quick_pick_set'])) {
         }
         if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot change that on these assets.']);
+            echo json_encode(['error' => __('You cannot change that on these assets.')]);
             exit();
         }
 
@@ -359,7 +359,7 @@ if (isset($_POST['quick_pick_set'])) {
         }
         if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot change that on these contacts.']);
+            echo json_encode(['error' => __('You cannot change that on these contacts.')]);
             exit();
         }
 
@@ -394,7 +394,7 @@ if (isset($_POST['quick_pick_set'])) {
         }
         if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot change that on these networks.']);
+            echo json_encode(['error' => __('You cannot change that on these networks.')]);
             exit();
         }
 
@@ -407,7 +407,7 @@ if (isset($_POST['quick_pick_set'])) {
             $html = networkTypeLabel($value);
             $response['records'][$id] = ['current' => $value, 'html' => ['list' => $html, 'detail' => $html]];
         }
-        $response['message'] = count($rows) === 1 ? 'Type set to ' . $value : 'Updated ' . count($rows) . ' networks';
+        $response['message'] = count($rows) === 1 ? __('Type set to %s', $value) : _n('Updated %d network', 'Updated %d networks', count($rows));
         echo json_encode($response);
         exit();
     }
@@ -426,7 +426,7 @@ if (isset($_POST['quick_pick_set'])) {
         }
         if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot change that on these services.']);
+            echo json_encode(['error' => __('You cannot change that on these services.')]);
             exit();
         }
 
@@ -439,7 +439,7 @@ if (isset($_POST['quick_pick_set'])) {
             $html = serviceImportancePill($value);
             $response['records'][$id] = ['current' => $value, 'html' => ['list' => $html, 'detail' => $html]];
         }
-        $response['message'] = count($rows) === 1 ? 'Importance set to ' . $value : 'Updated ' . count($rows) . ' services';
+        $response['message'] = count($rows) === 1 ? __('Importance set to %s', _x($value, 'service importance')) : _n('Updated %d service', 'Updated %d services', count($rows)); // i18n-dynamic - High, Medium, Low
         echo json_encode($response);
         exit();
     }
@@ -461,7 +461,7 @@ if (isset($_POST['quick_pick_set'])) {
         }
         if (!$allowed) {
             http_response_code(403);
-            echo json_encode(['error' => 'You cannot change that here.']);
+            echo json_encode(['error' => __('You cannot change that here.')]);
             exit();
         }
 
@@ -477,7 +477,7 @@ if (isset($_POST['quick_pick_set'])) {
                 ? "SELECT project_manager AS user_id, user_name, user_avatar FROM projects LEFT JOIN users ON user_id = project_manager WHERE project_id = $id"
                 : "SELECT recurring_ticket_assigned_to AS user_id, user_name, user_avatar FROM recurring_tickets LEFT JOIN users ON user_id = recurring_ticket_assigned_to WHERE recurring_ticket_id = $id"
             ));
-            $html = formatAssignee($row['user_id'], $row['user_name'], $row['user_avatar'], false, $is_project ? 'No manager' : 'Unassigned');
+            $html = formatAssignee($row['user_id'], $row['user_name'], $row['user_avatar'], false, $is_project ? __('No manager') : __('Unassigned'));
             $response['records'][$id] = ['current' => (string) intval($row['user_id']), 'html' => ['list' => $html, 'detail' => $html]];
         }
         $response['message'] = $message;
@@ -840,9 +840,9 @@ if (isset($_GET['ticket_query_views'])) {
     $users = array_values(array_unique($users));
     $response = ['message' => ''];
     if (count($users) > 1) {
-        $response['message'] = "<i class='fas fa-fw fa-eye me-2'></i>" . escapeHtml(implode(", ", $users) . " are viewing this ticket.");
+        $response['message'] = "<i class='fas fa-fw fa-eye me-2'></i>" . escapeHtml(__('%s are viewing this ticket.', implode(", ", $users)));
     } elseif ($users) {
-        $response['message'] = "<i class='fas fa-fw fa-eye me-2'></i>" . escapeHtml($users[0] . " is viewing this ticket.");
+        $response['message'] = "<i class='fas fa-fw fa-eye me-2'></i>" . escapeHtml(__('%s is viewing this ticket.', $users[0]));
     }
 
     echo json_encode($response);
@@ -1057,14 +1057,13 @@ if (isset($_GET['document_template_asks'])) {
         $filled = array_map(function ($word) {
             return '[' . $word . ']';
         }, array_values($asks_used['placeholder'] + $asks_used['table']));
-        $html .= '<div class="small text-secondary mb-2"><i class="fas fa-fw fa-magic me-1"></i>Filled in from the client: <span class="font-monospace">' . escapeHtml(implode(' ', $filled)) . '</span>'
-            . ($asks_used['table'] ? ' - its records as they are now' : '') . '</div>';
+        $html .= '<div class="small text-secondary mb-2"><i class="fas fa-fw fa-magic me-1"></i>' . escapeHtml($asks_used['table'] ? __('Filled in from the client, its records as they are now:') : __('Filled in from the client:')) . ' <span class="font-monospace">' . escapeHtml(implode(' ', $filled)) . '</span></div>';
     }
     if ($asks_site || $asks_contact) {
         $html .= '<div class="row g-2 mb-2">';
         if ($asks_site) {
-            $html .= '<div class="col-md-6"><label class="form-label mb-1">Site</label><div class="input-group"><span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>'
-                . '<select class="form-select select2" name="location_id"><option value="-1">- None -</option>';
+            $html .= '<div class="col-md-6"><label class="form-label mb-1">' . __('Site') . '</label><div class="input-group"><span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>'
+                . '<select class="form-select select2" name="location_id"><option value="-1">' . __('- None -') . '</option>';
             $first = true;
             foreach (documentTemplateClientLocations($asks_client_id) as $location_id => $location) {
                 $html .= '<option value="' . $location_id . '"' . ($first ? ' selected' : '') . '>' . escapeHtml($location['location_name']) . (intval($location['location_primary']) ? ' (primary)' : '') . '</option>';
@@ -1073,8 +1072,8 @@ if (isset($_GET['document_template_asks'])) {
             $html .= '</select></div></div>';
         }
         if ($asks_contact) {
-            $html .= '<div class="col-md-6"><label class="form-label mb-1">Contact</label><div class="input-group"><span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>'
-                . '<select class="form-select select2" name="contact_id"><option value="-1">- None -</option>';
+            $html .= '<div class="col-md-6"><label class="form-label mb-1">' . __('Contact') . '</label><div class="input-group"><span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>'
+                . '<select class="form-select select2" name="contact_id"><option value="-1">' . __('- None -') . '</option>';
             $first = true;
             foreach (documentTemplateClientContacts($asks_client_id) as $contact_id => $contact) {
                 $html .= '<option value="' . $contact_id . '"' . ($first ? ' selected' : '') . '>' . escapeHtml($contact['contact_name']) . (intval($contact['contact_primary']) ? ' (primary)' : '') . '</option>';
@@ -1085,8 +1084,8 @@ if (isset($_GET['document_template_asks'])) {
         $html .= '</div>';
     }
     if ($asks_fill_ins) {
-        $html .= '<div class="fw-semibold mt-2 mb-1"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i>It asks for</div>'
-            . '<div class="small text-secondary mb-2">Each answer goes in wherever its [Name] is. Leave one blank to fill it in on the document later.</div><div class="row g-2">';
+        $html .= '<div class="fw-semibold mt-2 mb-1"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i>' . __('It asks for') . '</div>'
+            . '<div class="small text-secondary mb-2">' . __('Each answer goes in wherever its [Name] is. Leave one blank to fill it in on the document later.') . '</div><div class="row g-2">';
         foreach ($asks_fill_ins as $fill_in) {
             $html .= '<div class="col-md-6">' . ticketFillInFieldHtml($fill_in, '') . '</div>';
         }
@@ -1268,13 +1267,13 @@ if (isset($_GET['ticket_also_open'])) {
 
     $html = '';
     if ($rows) {
-        $html = '<div class="alert alert-warning small py-2 mb-3"><div class="fw-semibold mb-1"><i class="fas fa-layer-group me-1"></i>Already open for '
-            . ($also_contact_id && $also_asset_id ? 'this contact or asset' : ($also_contact_id ? 'this contact' : 'this asset')) . '</div>';
+        $html = '<div class="alert alert-warning small py-2 mb-3"><div class="fw-semibold mb-1"><i class="fas fa-layer-group me-1"></i>'
+            . ($also_contact_id && $also_asset_id ? __('Already open for this contact or asset') : ($also_contact_id ? __('Already open for this contact') : __('Already open for this asset'))) . '</div>';
         foreach ($rows as $row) {
             $html .= '<div class="d-flex align-items-center gap-2 text-truncate">' . ticketLink($row)
                 . ' <span class="ms-auto flex-shrink-0">' . ticketStatusHtml($row['ticket_status_name'], $row['ticket_status_color'], 'detail') . '</span></div>';
         }
-        $html .= '<div class="text-body-secondary mt-1">Add to one of these instead, if it is the same problem.</div></div>';
+        $html .= '<div class="text-body-secondary mt-1">' . __('Add to one of these instead, if it is the same problem.') . '</div></div>';
     }
 
     echo json_encode(['html' => $html]);
@@ -1515,14 +1514,14 @@ if (isset($_POST['update_kanban_ticket'])) {
             if ($open_tasks) {
                 $kanban_error(_n('Finish the %1$d open task on %2$s before resolving it.', 'Finish the %1$d open tasks on %2$s before resolving it.', intval($open_tasks), intval($open_tasks), $reference));
             }
-            ticketResolve($row, ' from the board');
+            ticketResolve($row, ' from the board'); // i18n-ignore - ticket history stays English
             if (intval($config_ticket_client_general_notifications) === 1) {
                 ticketMailResolved($ticket_id);
             }
             $message = __('%s resolved', $reference);
         } elseif (isset($pickable[$status_id])) {
             if (!empty($row['ticket_resolved_at'])) {
-                ticketReopen($row, $status_id, ' from the board');
+                ticketReopen($row, $status_id, ' from the board'); // i18n-ignore - ticket history stays English
                 $message = __('%s reopened', $reference);
             } else {
                 [$ok, $message] = ticketChangeStatus($ticket_id, $status_id);
@@ -1611,7 +1610,7 @@ if (isset($_POST['update_project_template_ticket_order'])) {
     // Project templates are the admins' - admin/project_template.php
     if (empty($session_is_admin)) {
         http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'Only an admin can change a project template.']);
+        echo json_encode(['status' => 'error', 'message' => __('Only an admin can change a project template.')]);
         exit;
     }
 
@@ -1646,7 +1645,7 @@ if (isset($_POST['billing_items_order'])) {
     $doc = billingType($type) ? billingRow($type, intval($_POST['doc_id'] ?? 0)) : null;
     if (!$doc || !hasClientAccess(intval($doc['client_id'])) || !billingCanEditItems($type, $doc)) {
         http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => "Those lines can't be moved now."]);
+        echo json_encode(['status' => 'error', 'message' => __('Those lines can\'t be moved now.')]);
         exit;
     }
 
@@ -1671,25 +1670,25 @@ if (isset($_GET['recurring_seat_count'])) {
     $recurring = billingRow('recurring', intval($_GET['recurring_invoice_id'] ?? 0));
     if (!$recurring || !hasClientAccess(intval($recurring['client_id']))) {
         http_response_code(403);
-        echo json_encode(['error' => "That recurring invoice can't be opened."]);
+        echo json_encode(['error' => __('That recurring invoice can\'t be opened.')]);
         exit;
     }
 
     $source = (string) ($_GET['source'] ?? '');
     if (!isset(recurringSeatSources()[$source])) {
-        echo json_encode(['error' => 'Pick what to count.']);
+        echo json_encode(['error' => __('Pick what to count.')]);
         exit;
     }
     $filter = recurringSeatFilter($source, ['tag' => $_GET['seat_tag'] ?? 0, 'types' => (array) ($_GET['seat_types'] ?? []),
         'software_id' => $_GET['seat_software_id'] ?? 0, 'count' => $_GET['seat_count'] ?? 'used']);
     $count = recurringSeatCount(intval($recurring['client_id']), $source, $filter);
     if ($count === null) {
-        echo json_encode(['error' => "Pick one of the client's licenses."]);
+        echo json_encode(['error' => __('Pick one of the client\'s licenses.')]);
         exit;
     }
     $minimum = billingNumberInput($_GET['seat_minimum'] ?? '0');
     if ($minimum === null || $minimum < 0) {
-        echo json_encode(['error' => 'The minimum has to be a number, zero or more.']);
+        echo json_encode(['error' => __('The minimum has to be a number, zero or more.')]);
         exit;
     }
 
@@ -1715,8 +1714,8 @@ if (isset($_GET['client_duplicate_check'])) {
             while ($row = mysqli_fetch_assoc($sql_clients)) {
                 // Named only to an agent who can open it - otherwise typing names would list the clients they can't see
                 $response['message'] = hasClientAccess($row['client_id'])
-                    ? "<i class='fas fa-fw fa-copy me-2'></i> Potential duplicate: <i>" . escapeHtml($row['client_name']) . "</i> already exists."
-                    : "<i class='fas fa-fw fa-copy me-2'></i> Potential duplicate: a client you cannot open has a name like this.";
+                    ? "<i class='fas fa-fw fa-copy me-2'></i> " . __('Potential duplicate: <i>%s</i> already exists.', escapeHtml($row['client_name']))
+                    : "<i class='fas fa-fw fa-copy me-2'></i> " . __('Potential duplicate: a client you cannot open has a name like this.');
             }
         }
     }
@@ -1763,7 +1762,7 @@ if (isset($_GET['network_ip_check'])) {
             $pool = networkParseRange($network['network_dhcp_range'] ?? '', networkSubnetInfo($network['network'] ?? ''));
             $int = ipv4ToInt($ip);
             if ($pool && $int !== null && $int >= $pool[0] && $int <= $pool[1]) {
-                $notes[] = 'inside the DHCP range - right for a reservation, not a fixed address';
+                $notes[] = __('inside the DHCP range - right for a reservation, not a fixed address');
             }
             if ($ip === normalizeIpAddress((string) ($network['network_gateway'] ?? ''))) {
                 $notes[] = 'the gateway';
@@ -1842,14 +1841,14 @@ if (isset($_GET['network_next_free_ip'])) {
 
     $network = networkRow($_GET['network_id'] ?? 0);
     if (!$network || !hasClientAccess($network['network_client_id'])) {
-        echo json_encode(['ip' => '', 'message' => 'That network no longer exists.']);
+        echo json_encode(['ip' => '', 'message' => __('That network no longer exists.')]);
         exit();
     }
 
     $plan = networkAddressPlan($network);
     echo json_encode([
         'ip' => $plan['next_free'],
-        'message' => $plan['next_free'] ? '' : ($plan['info'] && $plan['info']['family'] === 4 && $plan['info']['prefix'] >= 20 ? 'Every address outside the DHCP range is taken.' : 'Next free works on IPv4 networks up to a /20.'),
+        'message' => $plan['next_free'] ? '' : ($plan['info'] && $plan['info']['family'] === 4 && $plan['info']['prefix'] >= 20 ? __('Every address outside the DHCP range is taken.') : __('Next free works on IPv4 networks up to a /20.')),
     ]);
     exit();
 }
@@ -1880,17 +1879,17 @@ if (isset($_GET['interface_ip_check'])) {
     }
     $ip = normalizeIpAddress($ip_typed);
     if ($ip === false) {
-        $reply('error', escapeHtml($ip_typed) . ' is not an IP address');
+        $reply('error', __('%s is not an IP address', escapeHtml($ip_typed)));
     }
     if (!$network) {
-        $reply('ok', escapeHtml($ip) . ' - pick its network to check it against the others there');
+        $reply('ok', __('%s - pick its network to check it against the others there', escapeHtml($ip)));
     }
     if (networkSubnetInfo($network['network']) && !isIpInSubnet($ip, $network['network'])) {
         $reply('error', escapeHtml($ip) . ' is outside ' . escapeHtml($network['network_name']) . ' (' . escapeHtml($network['network']) . ')');
     }
     $info = networkSubnetInfo($network['network']);
     if ($info && $info['family'] === 4 && $info['prefix'] <= 30 && ($ip === $info['network'] || $ip === $info['last'])) {
-        $reply('error', escapeHtml($ip) . ' is the ' . ($ip === $info['network'] ? 'network' : 'broadcast') . ' address of ' . escapeHtml($network['network']) . ' - no device can use it');
+        $reply('error', $ip === $info['network'] ? __('%1$s is the network address of %2$s - no device can use it', escapeHtml($ip), escapeHtml($network['network'])) : __('%1$s is the broadcast address of %2$s - no device can use it', escapeHtml($ip), escapeHtml($network['network'])));
     }
     $clash = interfaceIpClash($ip, $network['network_id'], intval($_GET['interface_id'] ?? 0), intval($_GET['asset_id'] ?? 0));
     if ($clash) {
@@ -1899,20 +1898,20 @@ if (isset($_GET['interface_ip_check'])) {
     $documented = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ip_type, ip_hostname, ip_mac FROM network_ips WHERE ip_network_id = " . intval($network['network_id']) . " AND ip_address = '" . escapeSql($ip) . "' LIMIT 1"));
     $mac = normalizeMacAddress($_GET['mac'] ?? '');
     if ($documented && $documented['ip_type'] === 'Reservation' && $mac && normalizeMacAddress($documented['ip_mac']) && normalizeMacAddress($documented['ip_mac']) !== $mac) {
-        $reply('warning', escapeHtml($ip) . ' is reserved for ' . escapeHtml($documented['ip_mac']) . ($documented['ip_hostname'] ? ' (' . escapeHtml($documented['ip_hostname']) . ')' : ''));
+        $reply('warning', __('%1$s is reserved for %2$s', escapeHtml($ip), escapeHtml($documented['ip_mac']) . ($documented['ip_hostname'] ? ' (' . escapeHtml($documented['ip_hostname']) . ')' : '')));
     }
     if ($documented && $documented['ip_type'] === 'Reserved') {
-        $reply('warning', escapeHtml($ip) . ' is held back' . ($documented['ip_hostname'] ? ' for ' . escapeHtml($documented['ip_hostname']) : '') . ' - not to be used');
+        $reply('warning', $documented['ip_hostname'] ? __('%1$s is held back for %2$s - not to be used', escapeHtml($ip), escapeHtml($documented['ip_hostname'])) : __('%s is held back - not to be used', escapeHtml($ip)));
     }
     $pool = networkParseRange($network['network_dhcp_range'], $info);
     $int = ipv4ToInt($ip);
     if ($pool && $int !== null && $int >= $pool[0] && $int <= $pool[1]) {
-        $reply('warning', escapeHtml($ip) . ' is inside the DHCP range (' . escapeHtml($network['network_dhcp_range']) . ') - fixed there, DHCP can hand it to something else');
+        $reply('warning', __('%1$s is inside the DHCP range (%2$s) - fixed there, DHCP can hand it to something else', escapeHtml($ip), escapeHtml($network['network_dhcp_range'])));
     }
     if ($ip === normalizeIpAddress((string) $network['network_gateway'])) {
-        $reply('warning', escapeHtml($ip) . ' is the gateway of ' . escapeHtml($network['network_name']));
+        $reply('warning', __('%1$s is the gateway of %2$s', escapeHtml($ip), escapeHtml($network['network_name'])));
     }
-    $reply('ok', escapeHtml($ip) . ($documented ? ' - documented' . ($documented['ip_hostname'] ? ' as ' . escapeHtml($documented['ip_hostname']) : '') : ' is free on ' . escapeHtml($network['network_name'])));
+    $reply('ok', $documented ? ($documented['ip_hostname'] ? __('%1$s - documented as %2$s', escapeHtml($ip), escapeHtml($documented['ip_hostname'])) : __('%s - documented', escapeHtml($ip))) : __('%1$s is free on %2$s', escapeHtml($ip), escapeHtml($network['network_name'])));
 }
 
 if (isset($_GET['contact_email_check'])) {
@@ -1929,13 +1928,13 @@ if (isset($_GET['contact_email_check'])) {
         $sql_contacts = mysqli_query($mysqli, "SELECT contact_email FROM contacts WHERE contact_email = '$email' LIMIT 1");
         if (mysqli_num_rows($sql_contacts) > 0) {
             while ($row = mysqli_fetch_assoc($sql_contacts)) {
-                $response['message'] = "<i class='fas fa-fw fa-copy me-2'></i> Potential duplicate: <i>" . escapeHtml($row['contact_email']) . "</i> already exists.";
+                $response['message'] = "<i class='fas fa-fw fa-copy me-2'></i> " . __('Potential duplicate: <i>%s</i> already exists.', escapeHtml($row['contact_email']));
             }
         }
 
         // 2. MX record check
         if (!checkdnsrr($domain, 'MX')) {
-            $response['message'] = "<i class='fas fa-fw fa-exclamation-triangle me-2'></i> E-mail domain invalid.";
+            $response['message'] = "<i class='fas fa-fw fa-exclamation-triangle me-2'></i> " . __('E-mail domain invalid.');
         }
 
     }
@@ -1975,11 +1974,11 @@ if (isset($_GET['ai_reword'])) {
     $input = json_decode(file_get_contents('php://input'), true);
     $text = is_array($input) ? (string) ($input['text'] ?? '') : '';
     if (trim(str_replace("\xC2\xA0", ' ', html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8'))) === '') {
-        echo json_encode(['error' => 'There is nothing to reword yet - write something first.']);
+        echo json_encode(['error' => __('There is nothing to reword yet - write something first.')]);
         exit;
     }
     if (mb_strlen($text) > 60000) {
-        echo json_encode(['error' => 'That is too long to reword in one go - reword it a part at a time.']);
+        echo json_encode(['error' => __('That is too long to reword in one go - reword it a part at a time.')]);
         exit;
     }
     // The client it is for, when the editor knows - for AI Usage
@@ -1993,7 +1992,7 @@ if (isset($_GET['ai_reword'])) {
     $tone = isset(aiRewordTones()[$tone]) ? $tone : 'reword';
     $language = (string) ($input['language'] ?? '');
     if ($tone === 'translate' && !in_array($language, aiLanguages(), true)) {
-        echo json_encode(['error' => 'Pick a language to translate it into.']);
+        echo json_encode(['error' => __('Pick a language to translate it into.')]);
         exit;
     }
 
@@ -2010,7 +2009,7 @@ if (isset($_GET['ai_reword'])) {
     }
     $reworded = aiCleanHtml($result['content']);
     if ($reworded === '') {
-        echo json_encode(['error' => 'The AI provider answered with nothing - try again.']);
+        echo json_encode(['error' => __('The AI provider answered with nothing - try again.')]);
         exit;
     }
 
@@ -2030,7 +2029,7 @@ if (isset($_GET['ai_create_document_template'])) {
 
     $prompt = trim((string) ($_POST['prompt'] ?? ''));
     if ($prompt === '') {
-        echo "No prompt provided.";
+        echo __('No prompt provided.');
         exit;
     }
 
@@ -2041,6 +2040,7 @@ if (isset($_GET['ai_create_document_template'])) {
     }
 
     // It writes in the words a document template fills in from the client, and asks for the rest
+    // i18n-ignore-start - what the model is told, in English
     $system_message = "You are a helpful IT documentation assistant. You will create a well-structured HTML template for IT documentation based on a given prompt. Include headings, subheadings, bullet points, and possibly tables for clarity. No Lorem Ipsum, professional language."
         . " These words in square brackets are filled in from the client when a document is made from the template - use them where those details belong: " . implode(', ', array_map(function ($word) {
             return "[$word]";
@@ -2051,6 +2051,7 @@ if (isset($_GET['ai_create_document_template'])) {
         . " For anything else someone fills in, use a short name of its own in square brackets, like [Firewall Model] or [Backup Schedule] - letters, digits and spaces, starting with a letter."
         . " Answer with the HTML only - no <html>, <head> or <body>, no introduction, no code fences.";
     $user_message = "Create an HTML formatted IT documentation template based on the following request:\n\n\"$prompt\"\n\nThe template should be structured, professional, and useful for IT staff. Include relevant sections, instructions, prerequisites, and best practices.";
+    // i18n-ignore-end
 
     $result = callAiApi($model, [
         ["role" => "system", "content" => $system_message],
@@ -2080,7 +2081,7 @@ $aiTicket = function ($ticket_id, $level) use ($aiRefuse) {
     enforceUserPermission('module_support', $level);
     $row = ticketRow($ticket_id);
     if (!$row) {
-        echo json_encode(['error' => 'That ticket no longer exists.']);
+        echo json_encode(['error' => __('That ticket no longer exists.')]);
         exit;
     }
     if (intval($row['ticket_client_id']) && !hasClientAccess(intval($row['ticket_client_id']))) {
@@ -2103,7 +2104,7 @@ if (isset($_GET['ai_ticket_draft'])) {
     $input = is_array($input) ? $input : [];
     $row = $aiTicket($input['ticket_id'] ?? 0, 2);
     if (!empty($row['ticket_closed_at'])) {
-        echo json_encode(['error' => 'This ticket is closed - start a new one instead.']);
+        echo json_encode(['error' => __('This ticket is closed - start a new one instead.')]);
         exit;
     }
     $result = aiTicketDraft(intval($row['ticket_id']), (string) ($input['notes'] ?? ''), (string) ($input['type'] ?? 'email'));
@@ -2133,7 +2134,7 @@ $aiClient = function ($client_id, $module, $level) use ($aiRefuse) {
     $client_id = intval($client_id);
     $name = getFieldById('clients', $client_id, 'client_name');
     if ($name === null) {
-        echo json_encode(['error' => 'That client no longer exists.']);
+        echo json_encode(['error' => __('That client no longer exists.')]);
         exit;
     }
     if (!hasClientAccess($client_id)) {
@@ -2164,7 +2165,7 @@ if (isset($_GET['ai_document_review'])) {
     $document_client_id = getFieldById('documents', $document_id, 'document_client_id');
     if ($document_client_id === null) {
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'That document no longer exists.']);
+        echo json_encode(['error' => __('That document no longer exists.')]);
         exit;
     }
     $client_id = $aiClient($document_client_id, 'module_support', 1);
@@ -2183,7 +2184,7 @@ if (isset($_GET['ai_ticket_invoice_description'])) {
     $row = $aiTicket($_POST['ticket_id'] ?? 0, 1);
     enforceUserPermission('module_sales', 2);
     if (!intval($row['ticket_client_id'])) {
-        echo json_encode(['error' => 'Move the ticket to a client before invoicing it.']);
+        echo json_encode(['error' => __('Move the ticket to a client before invoicing it.')]);
         exit;
     }
     $result = aiTicketInvoiceDescription(intval($row['ticket_id']));
@@ -2201,14 +2202,14 @@ if (isset($_GET['ai_billing_draft'])) {
     $type = (string) ($_POST['type'] ?? '');
     $row = in_array($type, ['quote', 'invoice'], true) ? billingRow($type, intval($_POST['doc_id'] ?? 0)) : null;
     if (!$row) {
-        echo json_encode(['error' => 'That document no longer exists, or is not one you can open.']);
+        echo json_encode(['error' => __('That document no longer exists, or is not one you can open.')]);
         exit;
     }
     if (!hasClientAccess(intval($row['client_id']))) {
         permissionRefuse(__("You don't have access to %s.", $row['client_name']));
     }
     if (!billingCanEditItems($type, $row)) {
-        echo json_encode(['error' => billingNumber($type, $row) . " can't be changed now - " . ($type === 'quote' ? 'it has been answered or invoiced.' : 'it is paid, cancelled or non-billable.')]);
+        echo json_encode(['error' => $type === 'quote' ? __("%s can't be changed now - it has been answered or invoiced.", billingNumber($type, $row)) : __("%s can't be changed now - it is paid, cancelled or non-billable.", billingNumber($type, $row))]);
         exit;
     }
     $result = aiBillingDraft($type, $row, (string) ($_POST['prompt'] ?? ''), !empty($_POST['use_ticket']), !empty($_POST['use_client']));
@@ -2236,11 +2237,11 @@ if (isset($_GET['domain_check'])) {
         exit;
     }
     if ($name === '') {
-        echo json_encode(['state' => 'bad', 'message' => "That isn't a domain name - something like example.com.", 'name' => '']);
+        echo json_encode(['state' => 'bad', 'message' => __('That isn\'t a domain name - something like example.com.'), 'name' => '']);
         exit;
     }
 
-    $saved_as = strcasecmp(trim($input), $name) !== 0 ? "Saved as $name. " : '';
+    $saved_as = strcasecmp(trim($input), $name) !== 0 ? __('Saved as %s.', $name) . ' ' : '';
 
     // Already on this client?
     if ($check_client_id) {
@@ -2248,13 +2249,13 @@ if (isset($_GET['domain_check'])) {
         enforceClientAccess();
         $name_sql = escapeSql($name);
         if (mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM domains WHERE domain_name = '$name_sql' AND domain_client_id = $check_client_id AND domain_id <> $check_domain_id LIMIT 1"))) {
-            echo json_encode(['state' => 'bad', 'message' => $saved_as . "$name is already on this client.", 'name' => $name]);
+            echo json_encode(['state' => 'bad', 'message' => $saved_as . __('%s is already on this client.', $name), 'name' => $name]);
             exit;
         }
     }
 
     if (@checkdnsrr($name, 'SOA')) {
-        $response = ['state' => 'ok', 'message' => $saved_as . 'Found in DNS - its records and expiry are looked up when it is saved.', 'name' => $name];
+        $response = ['state' => 'ok', 'message' => $saved_as . __('Found in DNS - its records and expiry are looked up when it is saved.'), 'name' => $name];
     } else {
         // Nothing for the name itself - is it a subdomain of one that does answer?
         $parts = explode('.', $name);
@@ -2268,8 +2269,8 @@ if (isset($_GET['domain_check'])) {
             }
         }
         $response = $parent
-            ? ['state' => 'warn', 'message' => $saved_as . "That looks like a subdomain of $parent - add $parent instead, unless it is registered on its own.", 'name' => $name]
-            : ['state' => 'warn', 'message' => $saved_as . "Nothing answers for it in DNS yet - check the spelling. It can still be saved.", 'name' => $name];
+            ? ['state' => 'warn', 'message' => $saved_as . __('That looks like a subdomain of %1$s - add %1$s instead, unless it is registered on its own.', $parent), 'name' => $name]
+            : ['state' => 'warn', 'message' => $saved_as . __('Nothing answers for it in DNS yet - check the spelling. It can still be saved.'), 'name' => $name];
     }
 
     echo json_encode($response);
@@ -2303,7 +2304,7 @@ if (isset($_GET['get_credential_via_id'])) {
 
     $sql = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT credential_name, credential_username, credential_password, credential_client_id FROM credentials WHERE credential_id = $credential_id"));
     if (!$sql) {
-        echo json_encode(['error' => 'That credential no longer exists.']);
+        echo json_encode(['error' => __('That credential no longer exists.')]);
         exit;
     }
     $name = escapeSql($sql['credential_name']);
@@ -2348,7 +2349,7 @@ if (isset($_GET['calendar_items'])) {
     $client_id = intval($_GET['client_id'] ?? 0);
     if ($client_id && !hasClientAccess($client_id)) {
         http_response_code(403);
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     $opts = ['client_id' => $client_id, 'user_id' => intval($_GET['user_id'] ?? 0)];
@@ -2423,7 +2424,7 @@ if (isset($_POST['calendar_move'])) {
         $fail(permissionRefusedText('module_client', 2, intval(lookupUserPermission('module_client'))), 403);
     }
     if (calendarEventRepeats($event)) {
-        $fail('A repeating event is moved from Edit, so the whole series moves together.');
+        $fail(__('A repeating event is moved from Edit, so the whole series moves together.'));
     }
     $event_id = intval($event['event_id']);
 
@@ -2534,7 +2535,7 @@ if (isset($_GET['calendar_day'])) {
         $all_day = !empty($item['allDay']);
         $day[] = [
             'start' => $all_day ? $date . ' 00:00:00' : $item['start'],
-            'time' => $all_day ? 'All day' : date('g:i A', strtotime($item['start'])) . (!empty($item['end']) ? ' - ' . date('g:i A', strtotime($item['end'])) : ''),
+            'time' => $all_day ? __('All day') : formatDate($item['start'], 'time') . (!empty($item['end']) ? ' - ' . formatDate($item['end'], 'time') : ''),
             'title' => $item['title'],
             'kind' => $item['extendedProps']['kind'] ?? '',
             'color' => $item['color'] ?? '',
@@ -2562,7 +2563,7 @@ if (isset($_POST['reconcile_tick'])) {
 
     if (lookupUserPermission('module_financial') < 2) {
         http_response_code(403);
-        echo json_encode(['error' => 'Reconciling takes write access to Financial.']);
+        echo json_encode(['error' => __('Reconciling takes write access to Financial.')]);
         exit;
     }
     $reconciliation_id = intval($_POST['reconciliation_id'] ?? 0);

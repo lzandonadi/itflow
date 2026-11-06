@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the briefing context and prompt are for the model, in English (what agents see goes through __() here and in the modals)
 
 /*
  * ITFlow - AI client briefing

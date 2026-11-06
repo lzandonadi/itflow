@@ -72,8 +72,8 @@ function itflowExpenseImport(options) {
                 total += Number(row.getAttribute('data-amount'));
             }
         });
-        summary.textContent = count ? count + ' line' + (count === 1 ? '' : 's') + ' · ' + money(Math.round(total * 100) / 100) : 'Tick the lines to import';
-        submitLabel.textContent = count ? 'Import ' + count : 'Import';
+        summary.textContent = count ? (count === 1 ? __('%d line', count) : __('%d lines', count)) + ' · ' + money(Math.round(total * 100) / 100) : __('Tick the lines to import');
+        submitLabel.textContent = count ? __('Import %d', count) : __('Import');
         submit.disabled = count === 0;
         if (all) {
             var shown = rows.filter(function (row) { return !row.hidden && !part(row, 'take').disabled; });

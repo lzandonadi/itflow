@@ -184,11 +184,11 @@ function clientScopeSql($column) {
     // restricted user keeps seeing it. This also matches the deny branch below, where 0
     // already passes NOT IN, and the old hand-rolled ticket override that did IN (0,...).
     if (!empty($client_access_array)) {
-        $sql .= " AND $column IN (0," . implode(',', array_map('intval', $client_access_array)) . ")";
+        $sql .= " AND $column IN (0," . implode(',', array_map('intval', $client_access_array)) . ")"; // i18n-ignore - SQL
     }
 
     if (!empty($client_deny_array)) {
-        $sql .= " AND $column NOT IN (" . implode(',', array_map('intval', $client_deny_array)) . ")";
+        $sql .= " AND $column NOT IN (" . implode(',', array_map('intval', $client_deny_array)) . ")"; // i18n-ignore - SQL
     }
 
     return $sql;

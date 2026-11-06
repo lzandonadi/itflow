@@ -248,7 +248,7 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
 
     <?php
     $empty_state = [
-        'thing' => 'emails',
+        'thing' => __('emails'),
         'icon' => 'fa-inbox',
         'title' => $show !== '' ? 'Nothing ' . strtolower($tabs[$show][0]) : __('Nothing in the mail queue'),
         'text' => __('The email ITFlow sends waits here until it goes, and stays %d days after.', MAIL_QUEUE_KEEP_DAYS),

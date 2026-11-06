@@ -412,7 +412,7 @@ $invoices_url = 'invoices.php?' . ($client_page ? "client_id=$client_id&" : '') 
     </div>
     <?php
     $empty_state = [
-        'thing' => 'income',
+        'thing' => __('income'),
         'icon' => 'fa-hand-holding-usd',
         'filtered' => $q || ($client_filter && !$client_page) || $category_filter || $account_filter || $method_filter !== '' || $dtf !== '1970-01-01',
         'views' => ['show'],

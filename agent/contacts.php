@@ -728,14 +728,14 @@ $search_placeholder = $invites_view ? __('Search invites by email, name or clien
     <?php } ?>
     <?php
     $empty_state = $invites_view ? [
-        'thing' => 'invites',
+        'thing' => __('invites'),
         'icon' => 'fa-paper-plane',
         'views' => ['role'],
         'title' => __('No invites waiting'),
         'text' => __('Invite people to the client portal by email - they put in their own name, phone and password when they accept, and are added to the contacts then.'),
         'actions' => $can_edit && $client_url ? [['label' => __('Invite people'), 'modal' => "modals/contact/contact_invite.php?$client_url", 'icon' => 'fa-user-plus']] : [],
     ] : [
-        'thing' => 'contacts',
+        'thing' => __('contacts'),
         'icon' => 'fa-address-book',
         'views' => ['role'],
         'view' => emptyStatePill($contact_role_tabs, $role_filter),

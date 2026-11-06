@@ -58,7 +58,7 @@ function dashboardPeriodOptions() {
 function dashboardShiftMonths($date, $months) {
     $d = new DateTime($date);
     $day = intval($d->format('j'));
-    $d->modify('first day of this month')->modify(($months >= 0 ? '+' : '') . $months . ' months');
+    $d->modify('first day of this month')->modify(($months >= 0 ? '+' : '') . $months . ' months'); // i18n-ignore - date expressions
     $d->setDate(intval($d->format('Y')), intval($d->format('n')), min($day, intval($d->format('t'))));
     return $d->format('Y-m-d');
 }
@@ -530,7 +530,7 @@ function dashboardTimeThisWeek() {
     global $mysqli, $session_user_id;
 
     $user_id = intval($session_user_id);
-    $monday = new DateTime('monday this week');
+    $monday = new DateTime('monday this week'); // i18n-ignore - date expressions
     $this_monday = $monday->format('Y-m-d');
     $last_monday = (clone $monday)->modify('-1 week')->format('Y-m-d');
 
@@ -609,7 +609,7 @@ function dashboardTicketTrend() {
     global $mysqli;
 
     $scope = clientScopeSql('ticket_client_id');
-    $this_monday = new DateTime('monday this week');
+    $this_monday = new DateTime('monday this week'); // i18n-ignore - date expressions
     $first_monday = (clone $this_monday)->modify('-11 weeks')->format('Y-m-d');
 
     $weeks = [];
@@ -622,7 +622,7 @@ function dashboardTicketTrend() {
         $sql = mysqli_query($mysqli, "SELECT DATE($column) AS d, COUNT(ticket_id) AS n FROM tickets
             WHERE $column >= '$first_monday' $scope GROUP BY DATE($column)");
         while ($row = mysqli_fetch_assoc($sql)) {
-            $week = (new DateTime($row['d']))->modify('monday this week')->format('Y-m-d');
+            $week = (new DateTime($row['d']))->modify('monday this week')->format('Y-m-d'); // i18n-ignore - date expressions
             if (isset($weeks[$week])) {
                 $weeks[$week][$series] += intval($row['n']);
             }

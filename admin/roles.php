@@ -192,7 +192,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'roles',
+        'thing' => __('roles'),
         'icon' => 'fa-user-shield',
         'filtered' => $q !== '',
         'archived' => $show_archived,

@@ -314,4 +314,25 @@ return [
     // The guest ticket page's tab title
     'Ticket %s' => 'Chamado %s',
 
+    // Block 10 - the last screens
+    'Planned maintenance Saturday night' => 'Manutenção programada no sábado à noite',
+    'What is happening, when, and what they need to do - web addresses become links' => 'O que está acontecendo, quando e o que eles precisam fazer - endereços web viram links',
+    'Shown as' => 'Exibido como',
+    'Show from' => 'Exibir a partir de',
+    'Empty is straight away' => 'Vazio é imediatamente',
+    'Empty is until you archive it' => 'Vazio é até você arquivá-lo',
+    'Post Announcement' => 'Publicar aviso',
+    'That announcement is gone.' => 'Esse aviso não existe mais.',
+    'Editing announcement:' => 'Editando aviso:',
+    'An announcement needs a title' => 'Um aviso precisa de um título',
+    'That date is not one' => 'Essa data não é válida',
+    'It has to end after it starts' => 'Ele precisa terminar depois de começar',
+    'Announcement <strong>%s</strong> posted' => 'Aviso <strong>%s</strong> publicado',
+    'Announcement <strong>%s</strong> saved' => 'Aviso <strong>%s</strong> salvo',
+    'Announcement <strong>%s</strong> archived - the portal no longer shows it' => 'Aviso <strong>%s</strong> arquivado - o portal não o exibe mais',
+    'Announcement <strong>%s</strong> restored' => 'Aviso <strong>%s</strong> restaurado',
+    'Announcement <strong>%s</strong> deleted' => 'Aviso <strong>%s</strong> excluído',
+    // Shown through __() from the constants
+    'Heads up' => 'Atenção',
+
 ];

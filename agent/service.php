@@ -362,7 +362,7 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                                     <?php if ($phone) { ?><span><i class="fas fa-fw fa-phone text-secondary me-1"></i><?= $phone ?></span><?php } ?>
                                     <?php if (!empty($details['vendor_email'])) { ?><span class="text-truncate"><i class="fas fa-fw fa-envelope text-secondary me-1"></i><a href="mailto:<?= escapeHtml($details['vendor_email']) ?>"><?= escapeHtml($details['vendor_email']) ?></a></span><?php } ?>
                                     <?php if ($account) { ?><span title="<?= escapeHtml(__('Account number')) ?>"><i class="fas fa-fw fa-fingerprint text-secondary me-1"></i><span class="font-monospace"><?= $account ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy account number')) ?>" data-clipboard-text="<?= $account ?>"><i class="far fa-copy"></i></button></span><?php } ?>
-                                    <?php if ($pin) { ?><span><span class="text-body-secondary">PIN</span> <?= $pin ?></span><?php } ?>
+                                    <?php if ($pin) { ?><span><span class="text-body-secondary"><?= __('PIN') ?></span> <?= $pin ?></span><?php } ?>
                                     <?php if ($when) { ?><span class="text-body-secondary"><i class="fas fa-fw fa-clock me-1"></i><?= $when ?></span><?php } ?>
                                 </div>
                             </li>

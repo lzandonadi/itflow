@@ -257,13 +257,13 @@ if (isset($_GET['invoice_id'], $_GET['url_key']) && !isset($_GET['payment_intent
     mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Paid', history_description = 'Online Payment added (client) - $ip - $os - $browser', history_invoice_id = $invoice_id");
 
     // Notify
-    appNotify("Invoice Paid", vsprintf(escapeSql(__('Invoice %1$s has been paid by %2$s - %3$s - %4$s - %5$s')), ["$invoice_prefix$invoice_number", $client_name, $ip, $os, $browser]), "/agent/invoice.php?invoice_id=$invoice_id", $pi_client_id);
+    appNotify("Invoice Paid", vsprintf(escapeSql(__('Invoice %1$s has been paid by %2$s - %3$s - %4$s - %5$s')), ["$invoice_prefix$invoice_number", $client_name, $ip, $os, $browser]), "/agent/invoice.php?invoice_id=$invoice_id", $pi_client_id); // i18n-ignore - notification kind, or the payment history
 
     triggerCustomAction('invoice_pay', $invoice_id);
 
     $extended_log_desc = '';
     if (!$pi_livemode) {
-        $extended_log_desc = '(DEV MODE)';
+        $extended_log_desc = '(DEV MODE)'; // i18n-ignore - notification kind, or the payment history
     }
     mysqli_query($mysqli, "INSERT INTO logs SET log_type = 'Payment', log_action = 'Create', log_description = 'Stripe payment of $pi_currency $pi_amount_paid against invoice $invoice_prefix$invoice_number - $pi_id $extended_log_desc', log_ip = '$ip', log_user_agent = '$user_agent', log_client_id = $pi_client_id");
     logForwardQueue('audit', mysqli_insert_id($mysqli));
@@ -271,7 +271,7 @@ if (isset($_GET['invoice_id'], $_GET['url_key']) && !isset($_GET['payment_intent
     // The client's receipt, and the paid notification address - functions/billing_email.php
     $config_smtp_host = mysqli_fetch_row(mysqli_query($mysqli, "SELECT config_smtp_host FROM settings WHERE company_id = 1"))[0] ?? '';
     if (!empty($config_smtp_host)) {
-        billingPaymentSend($invoice_id, $pi_amount_paid, ['date' => $pi_date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => 'Online card'], true);
+        billingPaymentSend($invoice_id, $pi_amount_paid, ['date' => $pi_date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => 'Online card'], true); // i18n-ignore - notification kind, or the payment history
     }
 
     // Redirect user to invoice

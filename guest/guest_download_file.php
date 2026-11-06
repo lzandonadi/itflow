@@ -68,7 +68,7 @@ if (!$again) {
         shareDownloadStop(__('It has been downloaded as many times as it allowed.'), true);
     }
     shareSessionMark($row['item_id'], 'opened');
-    $who = shareProtection($row) === 'code' ? ' by ' . $row['item_recipient'] . ' (emailed code)' : (shareProtection($row) === 'passphrase' ? ' with the passphrase' : '');
+    $who = shareProtection($row) === 'code' ? ' by ' . $row['item_recipient'] . ' (emailed code)' : (shareProtection($row) === 'passphrase' ? ' with the passphrase' : ''); // i18n-ignore - the audit log
     logAudit('Share', 'Download', escapeSql("Downloaded$who"), intval($row['item_client_id']), intval($row['item_id']));
     $who_text = shareProtection($row) === 'code' ? ' ' . __('by %s (emailed code)', $row['item_recipient']) : (shareProtection($row) === 'passphrase' ? ' ' . __('with the passphrase') : '');
     shareNotifyCreator($row, __('Shared link opened'), __('File %s was downloaded', $file['file_name']) . $who_text . ' - ' . $row['client_name']);

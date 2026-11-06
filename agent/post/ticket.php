@@ -1045,7 +1045,7 @@ if (isset($_POST['bulk_add_asset_ticket'])) {
 
     logAudit("Ticket", "Bulk Create", "$session_name created $count ticket(s) for the assets picked");
 
-    flashAlert("Created <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " for the assets picked");
+    flashAlert(_n('Created <strong>%d</strong> ticket for the assets picked', 'Created <strong>%d</strong> tickets for the assets picked', $count));
 
     redirect();
 

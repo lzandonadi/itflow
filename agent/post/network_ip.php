@@ -221,7 +221,7 @@ if (isset($_POST['document_network_interfaces'])) {
 }
 
 // The import's columns - the original three, then type and MAC (optional)
-const NETWORK_IP_CSV_COLUMNS = ['IP Address', 'Hostname', 'Description', 'Type', 'MAC'];
+const NETWORK_IP_CSV_COLUMNS = ['IP Address', 'Hostname', 'Description', 'Type', 'MAC']; // i18n-ignore - CSV headings stay English, so files import in any language
 
 if (isset($_GET['download_network_ips_csv_template'])) {
 

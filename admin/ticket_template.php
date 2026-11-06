@@ -14,7 +14,7 @@ require_once "includes/inc_all_admin.php";
 
 $template = ticketTemplateRow($_GET['ticket_template_id'] ?? 0);
 if (!$template) {
-    echo emptyStateHtml(['thing' => 'ticket templates', 'title' => __('That ticket template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-life-ring', 'filtered' => false,
+    echo emptyStateHtml(['thing' => __('ticket templates'), 'title' => __('That ticket template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-life-ring', 'filtered' => false,
         'actions' => [['label' => __('Ticket Templates'), 'href' => 'ticket_templates.php']]]);
     require_once "../includes/footer.php";
     exit();

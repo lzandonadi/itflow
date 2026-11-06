@@ -34,7 +34,7 @@ header("X-Robots-Tag: noindex, nofollow");
 function feedNotFound() {
     header("HTTP/1.1 404 Not Found");
     header("Content-Type: text/plain; charset=utf-8");
-    echo "Not found.";
+    echo "Not found."; // i18n-ignore - read by calendar apps
     exit();
 }
 

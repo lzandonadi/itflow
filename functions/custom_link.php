@@ -175,10 +175,10 @@ function customLinkUpdate(array $row, array $f) {
         }
     }
     if ($was['location'] !== $f['location']) {
-        $changes[] = 'moved from the ' . ($locations[$was['location']]['label'] ?? 'menu ' . $was['location']) . ' to the ' . $locations[$f['location']]['label'];
+        $changes[] = 'moved from the ' . ($locations[$was['location']]['label'] ?? 'menu ' . $was['location']) . ' to the ' . $locations[$f['location']]['label']; // i18n-ignore - the audit log
     }
     if ($was['new_tab'] !== $f['new_tab']) {
-        $changes[] = $f['new_tab'] ? 'opens in a new tab' : 'opens in the same tab';
+        $changes[] = $f['new_tab'] ? 'opens in a new tab' : 'opens in the same tab'; // i18n-ignore - the audit log
     }
     return $changes;
 }

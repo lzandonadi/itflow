@@ -84,10 +84,10 @@ function billingCardParts($description) {
     $brands = [
         'visa' => ['Visa', 'fab fa-cc-visa'],
         'mastercard' => ['Mastercard', 'fab fa-cc-mastercard'],
-        'amex' => ['American Express', 'fab fa-cc-amex'],
-        'american express' => ['American Express', 'fab fa-cc-amex'],
+        'amex' => ['American Express', 'fab fa-cc-amex'], // i18n-ignore - card brand names
+        'american express' => ['American Express', 'fab fa-cc-amex'], // i18n-ignore - card brand names
         'discover' => ['Discover', 'fab fa-cc-discover'],
-        'diners' => ['Diners Club', 'fab fa-cc-diners-club'],
+        'diners' => ['Diners Club', 'fab fa-cc-diners-club'], // i18n-ignore - card brand names
         'jcb' => ['JCB', 'fab fa-cc-jcb'],
         'unionpay' => ['UnionPay', 'fas fa-credit-card'],
     ];
@@ -340,25 +340,25 @@ function billingStripeBook($pi, $client_id, array $by = []) {
         return ['ok' => false, 'error' => $error, 'applied' => [], 'payment_id' => 0, 'already' => false];
     };
     if (!preg_match('/^pi_[A-Za-z0-9_]+$/', $pi_id)) {
-        return $fail('not a payment');
+        return $fail('not a payment'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     if (($pi['status'] ?? '') !== 'succeeded') {
         return $fail('not succeeded');
     }
     $received = intval($pi['amount_received'] ?? 0);
     if ($received <= 0 || $received !== intval($pi['amount'] ?? -1)) {
-        return $fail('amount not received in full');
+        return $fail('amount not received in full'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     $metadata = (array) ($pi['metadata'] ?? []);
     if (intval($metadata['itflow_client_id'] ?? 0) !== $client_id) {
-        return $fail('not this client');
+        return $fail('not this client'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     $split = billingPaySplitParse($metadata['itflow_invoices'] ?? '');
     if (!$split && intval($metadata['itflow_invoice_id'] ?? 0)) {
         $split = [intval($metadata['itflow_invoice_id']) => $received];
     }
     if (!$split || array_sum($split) !== $received) {
-        return $fail('split does not add up');
+        return $fail('split does not add up'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
 
     $currency = strtoupper(preg_replace('/[^A-Za-z]/', '', (string) ($pi['currency'] ?? '')));
@@ -366,7 +366,7 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     foreach ($split as $invoice_id => $cents) {
         $invoice = billingRow('invoice', $invoice_id, false);
         if (!$invoice || intval($invoice['client_id']) !== $client_id || strtoupper((string) $invoice['invoice_currency_code']) !== $currency || $cents <= 0) {
-            return $fail("invoice $invoice_id does not fit");
+            return $fail("invoice $invoice_id does not fit"); // i18n-ignore - why a payment could not be recorded, for the app log
         }
         $invoices[$invoice_id] = $invoice;
     }
@@ -396,7 +396,7 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     $name = trim((string) ($by['name'] ?? ''));
     $via = trim((string) ($by['via'] ?? ''));
     $many = count($invoices) > 1;
-    $dev = empty($pi['livemode']) ? ' (DEV MODE)' : '';
+    $dev = empty($pi['livemode']) ? ' (DEV MODE)' : ''; // i18n-ignore - the payment history stays English
     $applied = [];
     $first_payment_id = 0;
 
@@ -416,7 +416,7 @@ function billingStripeBook($pi, $client_id, array $by = []) {
 
         $state = invoiceState($invoice, invoicePaid($invoice_id));
         if (!in_array($status_before, invoiceOpenStatuses(), true) || $state['balance'] < 0) {
-            appNotify("Invoice Payment", escapeSql($state['balance'] < 0
+            appNotify("Invoice Payment", escapeSql($state['balance'] < 0 // i18n-ignore - the notification kind is a key
                 ? __('Check %1$s for %2$s: a card payment of %3$s went on it and it is now overpaid by %4$s', $number, $invoice['client_name'], $money, billingMoney(-$state['balance'], $currency))
                 : __('Check %1$s for %2$s: a card payment of %3$s went on it while it was %4$s', $number, $invoice['client_name'], $money, invoiceStatusLabel($status_before))),
                 "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
@@ -433,14 +433,14 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     $client_name = (string) $applied[0]['invoice']['client_name'];
     $who = $name !== '' ? " ($name" . ($via !== '' ? ", $via" : '') . ')' : '';
     if ($many) {
-        appNotify("Invoice Paid", escapeSql(__('%1$s paid %2$d invoices online - %3$s', $client_name, count($applied), billingMoney($total, $currency)) . $who), "/agent/invoices.php?client_id=$client_id", $client_id);
+        appNotify("Invoice Paid", escapeSql(__('%1$s paid %2$d invoices online - %3$s', $client_name, count($applied), billingMoney($total, $currency)) . $who), "/agent/invoices.php?client_id=$client_id", $client_id); // i18n-ignore - the notification kind is a key
     } else {
         $number = billingNumber('invoice', $applied[0]['invoice']);
-        appNotify("Invoice Paid", escapeSql(__('Invoice %1$s has been paid by %2$s', $number, $client_name) . $who), "/agent/invoice.php?invoice_id=" . intval($applied[0]['invoice']['invoice_id']), $client_id);
+        appNotify("Invoice Paid", escapeSql(__('Invoice %1$s has been paid by %2$s', $number, $client_name) . $who), "/agent/invoice.php?invoice_id=" . intval($applied[0]['invoice']['invoice_id']), $client_id); // i18n-ignore - the notification kind is a key
     }
 
     if (billingEmailReady()) {
-        billingPaymentReceiptSend($applied, ['date' => $date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => $by['how'] ?? 'Online card'], true);
+        billingPaymentReceiptSend($applied, ['date' => $date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => $by['how'] ?? 'Online card'], true); // i18n-ignore - the payment history stays English
     }
 
     return ['ok' => true, 'error' => '', 'applied' => $applied, 'payment_id' => $first_payment_id, 'already' => false];

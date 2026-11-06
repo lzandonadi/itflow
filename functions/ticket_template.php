@@ -35,12 +35,12 @@
 
 /** The placeholders filled in from the ticket - what each becomes. */
 const TICKET_PLACEHOLDERS = [
-    'Client' => "the client's name",
-    'Contact' => "the contact's name",
-    'Asset' => "the asset's name",
-    'Site' => "the site's name",
-    'Agent' => 'the agent it is assigned to, or the agent who raised it',
-    'Project' => "the project's name",
+    'Client' => "the client's name", // i18n-ignore - shown through __() where listed
+    'Contact' => "the contact's name", // i18n-ignore - shown through __() where listed
+    'Asset' => "the asset's name", // i18n-ignore - shown through __() where listed
+    'Site' => "the site's name", // i18n-ignore - shown through __() where listed
+    'Agent' => 'the agent it is assigned to, or the agent who raised it', // i18n-ignore - shown through __() where listed
+    'Project' => "the project's name", // i18n-ignore - shown through __() where listed
     'Ticket' => 'its number - TCK-123',
     'Date' => "today's date",
     'Month' => 'the month - October 2026',
@@ -358,7 +358,7 @@ const TICKET_FILL_IN_TYPES = [
     'text' => ['label' => 'Text', 'icon' => 'fa-font'],
     'date' => ['label' => 'Date', 'icon' => 'fa-calendar-day'],
     'list' => ['label' => 'List', 'icon' => 'fa-list-ul'],
-    'yesno' => ['label' => 'Yes or no', 'icon' => 'fa-toggle-on'],
+    'yesno' => ['label' => 'Yes or no', 'icon' => 'fa-toggle-on'], // i18n-ignore - shown through __() where listed
 ];
 
 /*
@@ -880,17 +880,17 @@ function ticketTemplateFinish($ticket_id, $ticket_template_id, $defaults = false
 
 /** The icons a request form can have in the portal - fa- name => what it suits. */
 const TICKET_TEMPLATE_PORTAL_ICONS = [
-    'clipboard-list' => 'A request', 'user-plus' => 'Someone new', 'user-minus' => 'Someone leaving', 'user-edit' => 'A change for someone',
-    'key' => 'Access or a password', 'laptop' => 'A laptop', 'desktop' => 'A computer', 'mobile-alt' => 'A mobile phone', 'phone' => 'A desk phone',
-    'print' => 'A printer', 'envelope' => 'Email', 'wifi' => 'Wi-Fi or the network', 'shield-alt' => 'Security', 'folder-open' => 'Files and shares',
-    'cube' => 'Software', 'shopping-cart' => 'Something to buy', 'video' => 'Meetings', 'building' => 'An office', 'truck' => 'A move',
-    'calendar-alt' => 'Something to plan', 'cloud' => 'Cloud', 'server' => 'A server', 'tools' => 'A repair', 'question-circle' => 'A question',
+    'clipboard-list' => 'A request', 'user-plus' => 'Someone new', 'user-minus' => 'Someone leaving', 'user-edit' => 'A change for someone', // i18n-ignore - shown through __() where listed
+    'key' => 'Access or a password', 'laptop' => 'A laptop', 'desktop' => 'A computer', 'mobile-alt' => 'A mobile phone', 'phone' => 'A desk phone', // i18n-ignore - shown through __() where listed
+    'print' => 'A printer', 'envelope' => 'Email', 'wifi' => 'Wi-Fi or the network', 'shield-alt' => 'Security', 'folder-open' => 'Files and shares', // i18n-ignore - shown through __() where listed
+    'cube' => 'Software', 'shopping-cart' => 'Something to buy', 'video' => 'Meetings', 'building' => 'An office', 'truck' => 'A move', // i18n-ignore - shown through __() where listed
+    'calendar-alt' => 'Something to plan', 'cloud' => 'Cloud', 'server' => 'A server', 'tools' => 'A repair', 'question-circle' => 'A question', // i18n-ignore - shown through __() where listed
 ];
 
 /** Who may use a request form in the portal. */
 const TICKET_TEMPLATE_PORTAL_WHO = [
-    'everyone' => 'Everyone with portal access',
-    'managers' => 'Primary and technical contacts only',
+    'everyone' => 'Everyone with portal access', // i18n-ignore - shown through __() where listed
+    'managers' => 'Primary and technical contacts only', // i18n-ignore - shown through __() where listed
 ];
 
 /** What a template is called in the portal - its portal title, or its name. Raw. */
@@ -1007,7 +1007,7 @@ function ticketTemplatePortalRaise(array $template, $client_id, $contact_id, $us
         return 0;
     }
     applyTicketSla($ticket_id);
-    ticketTemplateFinish($ticket_id, $ticket_template_id, true, true, $answers, "$contact_name asked for " . ticketTemplatePortalTitle($template) . " in the client portal (template " . $template['ticket_template_name'] . ")");
+    ticketTemplateFinish($ticket_id, $ticket_template_id, true, true, $answers, "$contact_name asked for " . ticketTemplatePortalTitle($template) . " in the client portal (template " . $template['ticket_template_name'] . ")"); // i18n-ignore - shown through __() where listed
 
     // The agent it goes to hears about it
     if ($assigned_to) {

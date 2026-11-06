@@ -485,7 +485,7 @@ if (isExportRequest('export_domains')) {
     $vendor_query = '';
     if (!empty($_POST['vendor'])) {
         $vendor_filter = intval($_POST['vendor']);
-        $vendor_query = "AND $vendor_filter IN (domain_registrar, domain_dnshost, domain_webhost, domain_mailhost)";
+        $vendor_query = "AND $vendor_filter IN (domain_registrar, domain_dnshost, domain_webhost, domain_mailhost)"; // i18n-ignore - SQL
         $filter_summary[__('Vendor')] = exportRecordName('vendors', $vendor_filter, 'vendor_name', 'vendor_client_id');
     }
 

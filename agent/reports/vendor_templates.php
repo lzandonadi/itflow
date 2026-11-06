@@ -36,7 +36,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
 }
 $client_ids = array_keys($client_rows) ?: [0];
 $in_clients = function ($column) use ($client_ids) {
-    return "$column IN (" . implode(',', $client_ids) . ")";
+    return "$column IN (" . implode(',', $client_ids) . ")"; // i18n-ignore - SQL
 };
 
 // Every current template, and archived ones a vendor was made from in the period

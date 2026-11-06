@@ -17,7 +17,7 @@ require_once "includes/inc_all_admin.php";
 
 $template = vendorTemplateInfo($_GET['vendor_template_id'] ?? 0);
 if (!$template) {
-    echo emptyStateHtml(['thing' => 'vendor templates', 'title' => __('That vendor template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-building', 'filtered' => false,
+    echo emptyStateHtml(['thing' => __('vendor templates'), 'title' => __('That vendor template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-building', 'filtered' => false,
         'actions' => [['label' => __('Vendor Templates'), 'href' => 'vendor_templates.php']]]);
     require_once "../includes/footer.php";
     exit();

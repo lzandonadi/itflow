@@ -289,16 +289,16 @@ function reportEnforce($key) {
  */
 
 const REPORT_PERIODS = [
-    'this_month' => 'This month',
-    'last_month' => 'Last month',
-    'this_quarter' => 'This quarter',
-    'last_quarter' => 'Last quarter',
-    'this_year' => 'This year',
-    'last_year' => 'Last year',
+    'this_month' => 'This month', // i18n-ignore - shown through __(), date expressions and system names
+    'last_month' => 'Last month', // i18n-ignore - shown through __(), date expressions and system names
+    'this_quarter' => 'This quarter', // i18n-ignore - shown through __(), date expressions and system names
+    'last_quarter' => 'Last quarter', // i18n-ignore - shown through __(), date expressions and system names
+    'this_year' => 'This year', // i18n-ignore - shown through __(), date expressions and system names
+    'last_year' => 'Last year', // i18n-ignore - shown through __(), date expressions and system names
     'last_30' => 'Last 30 days',
     'last_90' => 'Last 90 days',
     'last_12' => 'Last 12 months',
-    'custom' => 'Custom dates',
+    'custom' => 'Custom dates', // i18n-ignore - shown through __(), date expressions and system names
 ];
 
 /** A preset period's name as shown - REPORT_PERIODS keeps the English. */
@@ -471,7 +471,7 @@ function reportBuckets($period) {
     if ($unit === 'week') {
         $cursor->modify('-' . (intval($cursor->format('N')) - 1) . ' days');
     } elseif ($unit === 'month') {
-        $cursor->modify('first day of this month');
+        $cursor->modify('first day of this month'); // i18n-ignore - shown through __(), date expressions and system names
     }
     $multi_year = substr($period['start'], 0, 4) !== substr($period['end'], 0, 4);
 
@@ -1625,7 +1625,7 @@ function reportTicketCategories() {
 
 /** How long open tickets have been open - the buckets the aging report counts in, with the most days each takes. */
 const REPORT_AGE_BUCKETS = [
-    'day' => ['Under a day', 0],
+    'day' => ['Under a day', 0], // i18n-ignore - shown through __(), date expressions and system names
     '3' => ['1–3 days', 3],
     '7' => ['4–7 days', 7],
     '30' => ['8–30 days', 30],
@@ -1761,14 +1761,14 @@ const REPORT_ASSET_GONE = ['Lost', 'Stolen', 'Retired'];
  * as more versions reach the end.
  */
 const REPORT_OS_END_OF_LIFE = [
-    ['/\bwindows\s+(xp|vista)\b/i', 'Windows XP / Vista'],
+    ['/\bwindows\s+(xp|vista)\b/i', 'Windows XP / Vista'], // i18n-ignore - shown through __(), date expressions and system names
     ['/\bwindows\s+(7|8(\.1)?)\b/i', 'Windows 7 / 8'],
     ['/\bwindows\s+10\b(?!.*\bltsc\b)/i', 'Windows 10'],
-    ['/\bserver\s+(2000|2003|2008|2012)\b/i', 'Windows Server 2012 or older'],
+    ['/\bserver\s+(2000|2003|2008|2012)\b/i', 'Windows Server 2012 or older'], // i18n-ignore - shown through __(), date expressions and system names
     ['/\b(mac\s?os|os\s?x)\s*(x\s*)?(10\.\d+|11|12|13)\b/i', 'macOS 13 or older'],
     ['/\bcentos\b(?!\s*stream\s*(9|10))/i', 'CentOS'],
-    ['/\bubuntu\b\D*(1\d|20)\.\d\d\b/i', 'Ubuntu 20.04 or older'],
-    ['/\bdebian\b\D*\b([6-9]|1[01])\b/i', 'Debian 11 or older'],
+    ['/\bubuntu\b\D*(1\d|20)\.\d\d\b/i', 'Ubuntu 20.04 or older'], // i18n-ignore - shown through __(), date expressions and system names
+    ['/\bdebian\b\D*\b([6-9]|1[01])\b/i', 'Debian 11 or older'], // i18n-ignore - shown through __(), date expressions and system names
 ];
 
 /** The end-of-support name for an asset's OS ('Windows 10'), or '' while it is supported or unknown. */

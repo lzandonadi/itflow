@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - its errors, the dump, the key file and the metadata are shared with the command line, the app log and the archive, so they stay English; the admin pages word what they show
 
 // Backup creation, storage, retention and restore
 // Shared by the admin pages, cron/backup.php and scripts/restore_cli.php
@@ -597,7 +597,7 @@ function backupRunQueued(mysqli $mysqli): int
 
         if ($built_ok) {
             $built++;
-            appNotify("Backup", backupTypeLabel($row['backup_type']) . " is ready to download", "/admin/backup.php");
+            appNotify("Backup", __('%s is ready to download', __(backupTypeLabel($row['backup_type']))), "/admin/backup.php"); // i18n-dynamic - backupTypeLabel()
             logAudit("Backup", "Create", backupTypeLabel($row['backup_type']) . " completed");
         } else {
             appNotify("Backup", backupTypeLabel($row['backup_type']) . " failed: " . $error, "/admin/backup.php");

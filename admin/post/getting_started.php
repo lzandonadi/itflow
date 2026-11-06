@@ -229,14 +229,14 @@ if (isset($_POST['getting_started_billing'])) {
         $tax_id = taxCreate($tax);
         taxSetDefault($tax_id);
         logAudit("Tax", "Create", "$session_name added tax " . escapeSql(taxLabel(taxRow($tax_id))) . " in Get started, the default for new lines", 0, $tax_id);
-        $lines[] = 'new lines taxed ' . taxLabel(taxRow($tax_id));
+        $lines[] = 'new lines taxed ' . taxLabel(taxRow($tax_id)); // i18n-ignore - the audit log
     }
 
     if ($stripe) {
         $provider_id = paymentProviderWrite($stripe);
         $mode = paymentProviderMode($stripe['payment_provider_private_key']);
         logAudit("Payment Provider", "Create", "$session_name added payment provider Stripe ($mode mode) in Get started, payments into " . escapeSql((string) (paymentProviderRow($provider_id)['account_name'] ?? '')), 0, $provider_id);
-        $lines[] = 'Stripe added' . ($mode === 'test' ? ' with test keys' : '');
+        $lines[] = 'Stripe added' . ($mode === 'test' ? ' with test keys' : ''); // i18n-ignore - the audit log
     }
 
     if ($changed) {
@@ -296,7 +296,7 @@ if (isset($_POST['getting_started_support'])) {
     $hours_changed = array_intersect_key($changed, array_flip(['config_business_days', 'config_business_hours_start', 'config_business_hours_end']));
     $lines = settingsChangeLines($before, array_diff_key($changed, $hours_changed));
     if ($hours_changed) {
-        $lines[] = 'Business hours ' . gettingStartedDaysText($days) . ' ' . date('g:i A', strtotime($start)) . ' - ' . date('g:i A', strtotime($end));
+        $lines[] = 'Business hours ' . gettingStartedDaysText($days) . ' ' . date('g:i A', strtotime($start)) . ' - ' . date('g:i A', strtotime($end)); // i18n-ignore - the audit log
     }
 
     // Response times count business hours - open tickets are stamped afresh with the ones just saved
@@ -305,7 +305,7 @@ if (isset($_POST['getting_started_support'])) {
     if (!empty($_POST['standard_slas'])) {
         $given = gettingStartedApplySlas();
         if ($given) {
-            $lines[] = 'Standard response times for ' . implode(', ', array_keys($given));
+            $lines[] = 'Standard response times for ' . implode(', ', array_keys($given)); // i18n-ignore - the audit log
         }
     }
 

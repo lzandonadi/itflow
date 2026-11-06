@@ -194,7 +194,7 @@ foreach ($racks as $rack_id => $row) {
         <?php if (!$racks) { ?>
 
             <?= emptyStateHtml([
-                'thing' => 'racks',
+                'thing' => __('racks'),
                 'icon' => 'fa-server',
                 'filtered' => $q || $location_filter || $client_filter || $type_filter !== '',
                 'archived' => $archived,

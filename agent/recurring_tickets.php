@@ -81,12 +81,12 @@ $joins = "LEFT JOIN clients ON recurring_ticket_client_id = client_id
     LEFT JOIN ticket_templates ON ticket_template_id = recurring_ticket_ticket_template_id";
 
 // Only these sort - an unknown column would take the page down
-$frequency_days_sql = "CASE recurring_ticket_frequency WHEN 'Three Days' THEN 3 WHEN 'Weekly' THEN 7 WHEN 'Biweekly' THEN 14 WHEN 'Monthly' THEN 30 WHEN 'Quarterly' THEN 91 WHEN 'Biannually' THEN 182 WHEN 'Annually' THEN 365 ELSE 999 END";
+$frequency_days_sql = "CASE recurring_ticket_frequency WHEN 'Three Days' THEN 3 WHEN 'Weekly' THEN 7 WHEN 'Biweekly' THEN 14 WHEN 'Monthly' THEN 30 WHEN 'Quarterly' THEN 91 WHEN 'Biannually' THEN 182 WHEN 'Annually' THEN 365 ELSE 999 END"; // i18n-ignore - SQL
 $sortable_columns = [
     'recurring_ticket_next_run' => "recurring_ticket_paused_at IS NOT NULL, recurring_ticket_next_run $order",
     'recurring_ticket_subject' => "recurring_ticket_subject $order",
     'recurring_ticket_frequency' => "$frequency_days_sql $order",
-    'recurring_ticket_priority' => "CASE recurring_ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order",
+    'recurring_ticket_priority' => "CASE recurring_ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order", // i18n-ignore - SQL
     'category_name' => "category_name $order",
     'user_name' => "recurring_ticket_assigned_to = 0 $order, user_name $order",
     'client_name' => "client_name $order",

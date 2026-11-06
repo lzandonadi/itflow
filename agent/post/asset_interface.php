@@ -330,7 +330,7 @@ if (isset($_POST['bulk_delete_asset_interfaces'])) {
 }
 
 // The import's columns - an export opens straight back in, VLANs last and optional
-const INTERFACE_CSV_COLUMNS = ['Name', 'Description', 'Type', 'MAC', 'IP', 'NAT IP', 'IPv6', 'Network', 'VLANs'];
+const INTERFACE_CSV_COLUMNS = ['Name', 'Description', 'Type', 'MAC', 'IP', 'NAT IP', 'IPv6', 'Network', 'VLANs']; // i18n-ignore - CSV headings stay English, so files import in any language
 
 if (isset($_POST['import_client_asset_interfaces_csv'])) {
 

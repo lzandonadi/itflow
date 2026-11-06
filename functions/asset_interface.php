@@ -14,7 +14,7 @@
  */
 
 /** Asset types drawn as a row of ports on the asset page, not only a table. */
-const INTERFACE_PORT_MAP_TYPES = ['Switch', 'Firewall/Router', 'Access Point', 'Modem/ONT', 'NAS', 'NVR/DVR'];
+const INTERFACE_PORT_MAP_TYPES = ['Switch', 'Firewall/Router', 'Access Point', 'Modem/ONT', 'NAS', 'NVR/DVR']; // i18n-ignore - a value that is stored and compared
 
 /** Interface types that are a cage for a module, not a copper port - an SFP port's kind. Matched without case. */
 const INTERFACE_SFP_TYPES = ['SFP', 'SFP+', 'SFP28', 'QSFP', 'QSFP+', 'QSFP28', 'QSFP-DD', 'Fiber'];

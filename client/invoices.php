@@ -20,7 +20,7 @@ $paid_sql = "COALESCE((SELECT SUM(payment_amount) FROM payments WHERE payment_in
 $open_sql = "invoice_status IN ('Sent', 'Viewed', 'Partial') AND ROUND(invoice_amount - $paid_sql, 2) > 0";
 $tabs = [
     'open' => ['label' => __('To pay'), 'icon' => 'fa-hourglass-half', 'where' => $open_sql],
-    'paid' => ['label' => _x('Paid', 'portal invoices tab'), 'icon' => 'fa-check', 'where' => "NOT ($open_sql) AND invoice_status NOT IN ('Cancelled', 'Non-Billable')"],
+    'paid' => ['label' => _x('Paid', 'portal invoices tab'), 'icon' => 'fa-check', 'where' => "NOT ($open_sql) AND invoice_status NOT IN ('Cancelled', 'Non-Billable')"], // i18n-ignore - SQL
     'all' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => '1 = 1'],
 ];
 $q = trim((string) ($_GET['q'] ?? ''));

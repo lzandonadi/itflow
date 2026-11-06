@@ -96,7 +96,7 @@ $not_transfer = $all && $show !== 'transfers' ? "AND ledger.txn_kind NOT IN ('tr
 $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query $not_transfer AND ledger.txn_amount > 0 THEN ledger.txn_amount END), 0)";
 $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query $not_transfer AND ledger.txn_amount < 0 THEN -ledger.txn_amount END), 0)";
 if ($transfer_cards) {
-    $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query THEN -ledger.txn_amount END), 0)";
+    $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query THEN -ledger.txn_amount END), 0)"; // i18n-ignore - SQL
     $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query AND ledger.other_account_type = 3 THEN -ledger.txn_amount END), 0)";
     $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query AND ledger.other_account_type = 3 THEN 1 END), 0)";
     $count_sql[] = "COALESCE(SUM(CASE WHEN 1 $show_query AND ledger.account_type = 5 THEN -ledger.txn_amount END), 0)";

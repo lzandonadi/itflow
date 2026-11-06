@@ -225,4 +225,10 @@ return [
     'Stripe customer created. Thank you for your consent.' => 'Cadastro de cliente na Stripe criado. Obrigado pelo consentimento.',
     'Stripe customer already exists for your account.' => 'Já existe um cadastro de cliente na Stripe para a sua conta.',
 
+    // Block 10 - the last screens
+    '%s credit added' => 'Crédito de %s adicionado',
+    'Stripe provider not configured' => 'Provedor Stripe não configurado',
+    'Stripe secret key missing' => 'Falta a chave secreta do Stripe',
+    'Stripe Checkout session failed' => 'A sessão de Checkout do Stripe falhou',
+
 ];

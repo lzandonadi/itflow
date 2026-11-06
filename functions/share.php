@@ -527,7 +527,7 @@ function shareCreate(array $in, &$error = '') {
     $what = i18nEnglish(fn () => shareTypes()[$type]['label']);
     $to = $recipient !== '' ? ' for ' . escapeSql($recipient) : '';
     $how = i18nEnglish(fn () => ', ' . strtolower(shareViewOptions()[$views]) . ', for ' . shareExpiryOptions()[$expires])
-        . ($protect === 'passphrase' ? ', with a passphrase' : '') . ($protect === 'code' ? ', with an emailed code' : '')
+        . ($protect === 'passphrase' ? ', with a passphrase' : '') . ($protect === 'code' ? ', with an emailed code' : '') // i18n-ignore - the audit log
         . ($emailed ? ', emailed' : '');
     if ($type === 'Request') {
         logAudit('Share', 'Create', "$session_name asked " . ($recipient !== '' ? escapeSql($recipient) : 'the client') . " for a login - " . escapeSql($name) . " - by link$how", $client_id, $item_id);

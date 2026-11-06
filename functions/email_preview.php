@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the sample client, people, tickets and messages the previews are filled with are made-up data, in English
 
 /*
  * Previews of every email ITFlow sends - Admin > Mail > Previews

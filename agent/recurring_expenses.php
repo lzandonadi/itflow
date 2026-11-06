@@ -312,7 +312,7 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
     </div>
     <?php
     $empty_state = [
-        'thing' => 'recurring expenses',
+        'thing' => __('recurring expenses'),
         'icon' => 'fa-redo-alt',
         'filtered' => $any_filter,
         'views' => ['status'],

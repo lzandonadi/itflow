@@ -397,7 +397,7 @@ if (isExportRequest('export_networks')) {
 }
 
 // The import's columns - an export opens straight back in, Type last and optional
-const NETWORK_CSV_COLUMNS = ['Name', 'Description', 'VLAN', 'Network (CIDR)', 'Gateway', 'IP Range', 'Primary DNS', 'Secondary DNS', 'Type'];
+const NETWORK_CSV_COLUMNS = ['Name', 'Description', 'VLAN', 'Network (CIDR)', 'Gateway', 'IP Range', 'Primary DNS', 'Secondary DNS', 'Type']; // i18n-ignore - CSV headings stay English, so files import in any language
 
 if (isset($_GET['download_networks_csv_template'])) {
 

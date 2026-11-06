@@ -21,17 +21,17 @@ const CERTIFICATE_SHORT_LIVED_DAYS = 100;
 
 /** What a check of the host can find. */
 const CERTIFICATE_CHECK_STATES = [
-    'ok' => ['label' => 'OK', 'tone' => 'success', 'icon' => 'fa-check', 'text' => 'The host serves it, valid and trusted'],
-    'mismatch' => ['label' => 'Name mismatch', 'tone' => 'warning', 'icon' => 'fa-not-equal', 'text' => 'What the host serves doesn\'t cover the host name - browsers will warn'],
-    'untrusted' => ['label' => 'Untrusted', 'tone' => 'warning', 'icon' => 'fa-exclamation-triangle', 'text' => 'Self-signed, or its chain is incomplete - browsers will warn'],
-    'expired' => ['label' => 'Expired', 'tone' => 'danger', 'icon' => 'fa-calendar-times', 'text' => 'The host serves an expired certificate'],
-    'unreachable' => ['label' => 'Unreachable', 'tone' => 'secondary', 'icon' => 'fa-plug', 'text' => 'Nothing answered on that host and port'],
+    'ok' => ['label' => 'OK', 'tone' => 'success', 'icon' => 'fa-check', 'text' => 'The host serves it, valid and trusted'], // i18n-ignore - shown through __()
+    'mismatch' => ['label' => 'Name mismatch', 'tone' => 'warning', 'icon' => 'fa-not-equal', 'text' => 'What the host serves doesn\'t cover the host name - browsers will warn'], // i18n-ignore - shown through __()
+    'untrusted' => ['label' => 'Untrusted', 'tone' => 'warning', 'icon' => 'fa-exclamation-triangle', 'text' => 'Self-signed, or its chain is incomplete - browsers will warn'], // i18n-ignore - shown through __()
+    'expired' => ['label' => 'Expired', 'tone' => 'danger', 'icon' => 'fa-calendar-times', 'text' => 'The host serves an expired certificate'], // i18n-ignore - shown through __()
+    'unreachable' => ['label' => 'Unreachable', 'tone' => 'secondary', 'icon' => 'fa-plug', 'text' => 'Nothing answered on that host and port'], // i18n-ignore - shown through __()
 ];
 
 /** What each tracked column is called in a certificate's history. */
 const CERTIFICATE_HISTORY_LABELS = [
     'certificate_name' => 'Name', 'certificate_description' => 'Description', 'certificate_domain' => 'Host', 'domain_name' => 'Domain',
-    'certificate_issued_by' => 'Issuer', 'certificate_issued_at' => 'Issued', 'certificate_expire' => 'Expiry', 'certificate_names' => 'Names covered',
+    'certificate_issued_by' => 'Issuer', 'certificate_issued_at' => 'Issued', 'certificate_expire' => 'Expiry', 'certificate_names' => 'Names covered', // i18n-ignore - shown through __()
     'certificate_fingerprint' => 'Fingerprint', 'certificate_notes' => 'Notes',
 ];
 
@@ -44,7 +44,7 @@ function certificateCheckStateLabel($status) {
         case 'expired': return _x('Expired', 'certificate check');
         case 'unreachable': return _x('Unreachable', 'certificate check');
     }
-    return CERTIFICATE_CHECK_STATES[$status]['label'] ?? (string) $status;
+    return isset(CERTIFICATE_CHECK_STATES[$status]) ? __(CERTIFICATE_CHECK_STATES[$status]['label']) : (string) $status; // i18n-dynamic
 }
 
 /** A CERTIFICATE_CHECK_STATES state's explanation in the interface language. */
@@ -487,7 +487,7 @@ function certificateStatusPill($row, $use_text = false) {
     $state = certificateCheckState($status);
     $when = !empty($row['certificate_checked_at']) ? ' - checked ' . timeAgo($row['certificate_checked_at']) : '';
     return '<span class="badge rounded-pill bg-' . $state['tone'] . '-subtle text-' . $state['tone'] . '-emphasis border border-' . $state['tone'] . '-subtle fw-normal" title="' . escapeHtml($state['text'] . $when) . '">'
-        . '<i class="fas ' . $state['icon'] . ' me-1"></i>' . escapeHtml($use_text ? $state['text'] : $state['label']) . '</span>';
+        . '<i class="fas ' . $state['icon'] . ' me-1"></i>' . escapeHtml(__($use_text ? $state['text'] : $state['label'])) /* i18n-dynamic */ . '</span>';
 }
 
 /** A certificate's tile - a padlock, in the same rounded square as the other tiles. $size 'xs' | 'sm' | '' | 'lg'. */
@@ -558,7 +558,7 @@ function certificateHistory($certificate_id, $limit = 25) {
         ORDER BY certificate_history_modified_at DESC, certificate_history_id DESC LIMIT $limit");
     $rows = [];
     while ($row = mysqli_fetch_assoc($sql)) {
-        $row['label'] = CERTIFICATE_HISTORY_LABELS[$row['certificate_history_column']] ?? ucfirst(str_replace('_', ' ', preg_replace('/^certificate_/', '', $row['certificate_history_column'])));
+        $row['label'] = isset(CERTIFICATE_HISTORY_LABELS[$row['certificate_history_column']]) ? __(CERTIFICATE_HISTORY_LABELS[$row['certificate_history_column']]) : ucfirst(str_replace('_', ' ', preg_replace('/^certificate_/', '', $row['certificate_history_column']))); // i18n-dynamic
         $rows[] = $row;
     }
     return $rows;

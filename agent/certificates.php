@@ -446,7 +446,7 @@ $export_extra = [
     </form>
     <?php
     $empty_state = [
-        'thing' => 'certificates',
+        'thing' => __('certificates'),
         'icon' => 'fa-lock',
         'filtered' => $q || $issuer_query || $expire_query,
         'views' => ['show'],

@@ -275,7 +275,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'license templates',
+        'thing' => __('license templates'),
         'icon' => 'fa-cube',
         'filtered' => $q !== '',
         'archived' => $show_archived,

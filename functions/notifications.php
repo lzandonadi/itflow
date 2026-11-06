@@ -25,16 +25,16 @@
 function notificationTypeModules() {
     return [
         'module_sales' => [
-            'Invoice', 'Invoice Paid', 'Invoice Viewed', 'Invoice Overdue', 'Invoice Late Charge',
-            'Draft Invoices', 'Recurring Sent', 'Recurring Generated',
-            'Quote Viewed', 'Quote Accepted', 'Quote Declined', 'Quote File', 'Low Stock',
+            'Invoice', 'Invoice Paid', 'Invoice Viewed', 'Invoice Overdue', 'Invoice Late Charge', // i18n-ignore - notification kinds are keys
+            'Draft Invoices', 'Recurring Sent', 'Recurring Generated', // i18n-ignore - notification kinds are keys
+            'Quote Viewed', 'Quote Accepted', 'Quote Declined', 'Quote File', 'Low Stock', // i18n-ignore - notification kinds are keys
         ],
-        'module_financial' => ['Expense', 'Expense Created'],
+        'module_financial' => ['Expense', 'Expense Created'], // i18n-ignore - notification kinds are keys
         'module_support' => [
-            'Ticket', 'Ticket SLA', 'Pending Tickets', 'Feedback', 'Recurring Ticket', 'Project',
-            'Domain Expiring', 'Certificate Expiring', 'Asset Warranty Expiring', 'UPS Battery Due', 'Service Review',
+            'Ticket', 'Ticket SLA', 'Pending Tickets', 'Feedback', 'Recurring Ticket', 'Project', // i18n-ignore - notification kinds are keys
+            'Domain Expiring', 'Certificate Expiring', 'Asset Warranty Expiring', 'UPS Battery Due', 'Service Review', // i18n-ignore - notification kinds are keys
             // Shared links - they open Shared Links (agent/shares.php), which is Support's
-            'Shared link opened', 'Shared link locked', 'Login sent back', 'Share Viewed',
+            'Shared link opened', 'Shared link locked', 'Login sent back', 'Share Viewed', // i18n-ignore - notification kinds are keys
         ],
     ];
 }

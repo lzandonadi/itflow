@@ -448,7 +448,7 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
     </div>
     <?php
     $empty_state = [
-        'thing' => 'expenses',
+        'thing' => __('expenses'),
         'icon' => 'fa-shopping-cart',
         'filtered' => $q || $vendor_filter || $category_filter || $account_filter || $client_filter || $method_filter !== '' || $recurring_filter || $paid_by_filter || $dtf !== '1970-01-01',
         'views' => ['show'],

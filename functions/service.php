@@ -62,30 +62,30 @@ const SERVICE_REVIEW_SOON_DAYS = 30;
 
 /** How often a service is reviewed, in months. */
 const SERVICE_REVIEW_INTERVALS = [
-    0 => 'Not on a schedule',
-    1 => 'Every month',
+    0 => 'Not on a schedule', // i18n-ignore - stored values, shown through __()
+    1 => 'Every month', // i18n-ignore - stored values, shown through __()
     3 => 'Every 3 months',
     6 => 'Every 6 months',
-    12 => 'Every year',
+    12 => 'Every year', // i18n-ignore - stored values, shown through __()
     24 => 'Every 2 years',
 ];
 
 /** Categories the form suggests - anything else can be typed. */
-const SERVICE_CATEGORY_SUGGESTIONS = ['Email', 'Backup', 'Network', 'Internet', 'Security', 'Web', 'Cloud', 'Phones', 'Line of business',
-    'Identity', 'Remote access', 'File storage', 'Printing', 'Hosting', 'Monitoring'];
+const SERVICE_CATEGORY_SUGGESTIONS = ['Email', 'Backup', 'Network', 'Internet', 'Security', 'Web', 'Cloud', 'Phones', 'Line of business', // i18n-ignore - stored values, shown through __()
+    'Identity', 'Remote access', 'File storage', 'Printing', 'Hosting', 'Monitoring']; // i18n-ignore - stored values, shown through __()
 
 /** What a service can depend on, in the order the page lists them. */
 const SERVICE_LINK_TYPES = ['asset', 'credential', 'domain', 'certificate', 'contact', 'vendor', 'document'];
 
 /** Asset statuses that mean it is not doing its job. */
-const SERVICE_ASSET_DOWN_STATUSES = ['Out for Repair', 'Lost', 'Stolen', 'Retired'];
+const SERVICE_ASSET_DOWN_STATUSES = ['Out for Repair', 'Lost', 'Stolen', 'Retired']; // i18n-ignore - stored values, shown through __()
 
 /**
  * One person's device - a service on many of them (endpoint protection) does
  * not hinge on any one, so their warranties and repairs are not the service's
  * problem. Servers, network kit, printers and the rest are.
  */
-const SERVICE_USER_DEVICE_TYPES = ['Laptop', 'Desktop', 'Mobile Phone', 'Tablet'];
+const SERVICE_USER_DEVICE_TYPES = ['Laptop', 'Desktop', 'Mobile Phone', 'Tablet']; // i18n-ignore - stored values, shown through __()
 
 /** May this agent do this with services? They are support documentation: 1 to see, 2 to change, 3 to delete. */
 function serviceCan($level) {
@@ -183,7 +183,7 @@ function serviceStyle($category) {
         ['print|scan|copier', 'fa-print', 'peripheral'],
         ['monitor|rmm|alert|patch', 'fa-heartbeat', 'network'],
         ['cloud|saas|365|workspace|azure|aws|tenant', 'fa-cloud', 'workstation'],
-        ['line of business|lob\b|erp|crm|accounting|payroll|app|database|sql|software|pos\b|point of sale|ehr|emr|practice', 'fa-briefcase', 'server'],
+        ['line of business|lob\b|erp|crm|accounting|payroll|app|database|sql|software|pos\b|point of sale|ehr|emr|practice', 'fa-briefcase', 'server'], // i18n-ignore - stored values, shown through __()
     ];
     foreach ($styles as [$pattern, $icon, $tone]) {
         if ($category !== '' && preg_match("/($pattern)/u", $category)) {
@@ -255,7 +255,7 @@ function serviceNextReview($months, $from = null) {
     $date = new DateTime($from ? substr((string) $from, 0, 10) : date('Y-m-d'));
     // The 31st plus a month is the end of next month, not the start of the one after
     $day = intval($date->format('j'));
-    $date->modify('first day of this month')->modify("+$months months");
+    $date->modify('first day of this month')->modify("+$months months"); // i18n-ignore - stored values, shown through __()
     $date->setDate(intval($date->format('Y')), intval($date->format('n')), min($day, intval($date->format('t'))));
     return $date->format('Y-m-d');
 }

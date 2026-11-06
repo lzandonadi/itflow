@@ -105,7 +105,7 @@ function itflowUnbilledTime(options) {
             if (input) {
                 input.classList.toggle('is-invalid', input.value.trim() !== '' && (isNaN(itflowBillingNumber(input.value)) || price < 0));
                 if (margin) {
-                    margin.textContent = price > 0 ? Math.round((price - cost) / price * 100) + '% margin' : 'No charge';
+                    margin.textContent = price > 0 ? __('%d%% margin', Math.round((price - cost) / price * 100)) : __('No charge');
                     margin.classList.toggle('text-danger-emphasis', price < cost);
                 }
             }
@@ -168,9 +168,9 @@ function itflowUnbilledTime(options) {
         }
         if (submitLabel) {
             if (mode === 'client') {
-                submitLabel.textContent = target && target.value !== '0' ? 'Add to Invoice' : 'Make Invoice';
+                submitLabel.textContent = target && target.value !== '0' ? __('Add to Invoice') : __('Make Invoice');
             } else {
-                submitLabel.textContent = picked === 1 ? 'Make 1 Invoice' : 'Make ' + picked + ' Invoices';
+                submitLabel.textContent = picked === 1 ? __('Make 1 Invoice') : __('Make %d Invoices', picked);
             }
         }
         if (all) {

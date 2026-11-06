@@ -194,7 +194,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'contract templates',
+        'thing' => __('contract templates'),
         'icon' => 'fa-file-contract',
         'filtered' => $q !== '',
         'archived' => $show === 'archived',

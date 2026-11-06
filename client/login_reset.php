@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
               AND contact_archived_at IS NULL AND client_archived_at IS NULL
             LIMIT 1"));
     }
-    $reset_log('Reset Requested', 'Asked for a portal password link for ' . mb_substr($email, 0, 200), intval($row['user_id'] ?? 0), intval($row['contact_client_id'] ?? 0));
+    $reset_log('Reset Requested', 'Asked for a portal password link for ' . mb_substr($email, 0, 200), intval($row['user_id'] ?? 0), intval($row['contact_client_id'] ?? 0)); // i18n-ignore - the sign-in log
 
     if ($row) {
         $user_id = intval($row['user_id']);
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
             AND log_user_id = $user_id AND log_created_at > NOW() - INTERVAL " . PORTAL_RESET_REQUEST_GAP_MINUTES . " MINUTE"))[0]);
         if (!$recent) {
             portalMailPasswordReset($user_id);
-            $reset_log('Reset Sent', 'Emailed a portal password link to ' . $row['user_email'], $user_id, intval($row['contact_client_id']));
+            $reset_log('Reset Sent', 'Emailed a portal password link to ' . $row['user_email'], $user_id, intval($row['contact_client_id'])); // i18n-ignore - the sign-in log
         }
     }
 
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_reset_email_
         $hash = escapeSql(password_hash($password, PASSWORD_DEFAULT));
         mysqli_query($mysqli, "UPDATE users SET user_password = '$hash' WHERE user_id = $user_id AND user_type = 2");
         portalPasswordLinkClear($user_id);
-        $reset_log('Password Reset', 'Set a new portal password from an emailed link', $user_id, $link['client']);
+        $reset_log('Password Reset', 'Set a new portal password from an emailed link', $user_id, $link['client']); // i18n-ignore - the sign-in log
         portalMailAccountChange($link_user['user_email'], $link_user['contact_name'], 'password_link');
         $_SESSION['login_message'] = __('Your password is set - sign in with it below.');
         $_SESSION['login_message_type'] = 'success';

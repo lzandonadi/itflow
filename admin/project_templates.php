@@ -139,7 +139,7 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
     </div>
     <?php
     $empty_state = [
-        'thing' => 'project templates',
+        'thing' => __('project templates'),
         'icon' => 'fa-cubes',
         'filtered' => $q !== '',
         'archived' => $show_archived,

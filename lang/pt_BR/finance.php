@@ -649,4 +649,10 @@ return [
     '%s has ended - there is nothing more to record' => '%s terminou - não há mais nada a registrar',
     '%s is part way through - nothing from it is imported yet.' => '%s está pela metade - nada dele foi importado ainda.',
 
+    // Block 10 - the last screens
+    'That is not a year a budget can be set for.' => 'Não é um ano para o qual se possa definir um orçamento.',
+    'The %s budget is saved' => 'O orçamento de %s foi salvo',
+    'Nothing changed in the %s budget' => 'Nada mudou no orçamento de %s',
+    'There is no %s budget to copy.' => 'Não há orçamento de %s para copiar.',
+
 ];

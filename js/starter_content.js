@@ -39,9 +39,9 @@
                 var short = count.dataset.starterFormat === 'short';
                 var more = count.dataset.starterMore === '1';
                 if (short) {
-                    count.textContent = ticked === of ? String(of) : ticked + ' of ' + of;
+                    count.textContent = ticked === of ? String(of) : __('%1$d of %2$d', ticked, of);
                 } else {
-                    count.textContent = ticked === of ? of + (more ? ' more to add' : ' to add') : (ticked ? ticked + ' of ' + of + ' to add' : 'None picked');
+                    count.textContent = ticked === of ? (more ? __('%d more to add', of) : __('%d to add', of)) : (ticked ? __('%1$d of %2$d to add', ticked, of) : __('None picked'));
                 }
             });
             adds.forEach(function (add) {
@@ -74,8 +74,8 @@
         }
         var title = modal.querySelector('#starterPreviewTitle');
         var body = modal.querySelector('[data-starter-preview-body]');
-        title.textContent = 'Preview';
-        body.innerHTML = '<div class="text-center text-body-secondary py-5"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Opening it</div>';
+        title.textContent = __('Preview');
+        body.innerHTML = '<div class="text-center text-body-secondary py-5"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>' + __('Opening it') + '</div>';
         bootstrap.Modal.getOrCreateInstance(modal).show();
 
         var url = modal.dataset.starterPreviewUrl + '?pack=' + encodeURIComponent(button.dataset.starterPreview) + '&item=' + encodeURIComponent(button.dataset.starterKey);
@@ -83,7 +83,7 @@
             .then(function (response) { return response.json(); })
             .then(function (answer) {
                 if (!answer || answer.error) {
-                    throw new Error(answer && answer.error ? answer.error : 'It could not be opened.');
+                    throw new Error(answer && answer.error ? answer.error : __('It could not be opened.'));
                 }
                 title.textContent = answer.title;
                 var pack = document.createElement('span');
@@ -97,7 +97,7 @@
                 body.textContent = '';
                 var message = document.createElement('div');
                 message.className = 'alert alert-warning mb-0';
-                message.textContent = error && error.message ? error.message : 'It could not be opened.';
+                message.textContent = error && error.message ? error.message : __('It could not be opened.');
                 body.appendChild(message);
             });
     }

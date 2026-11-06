@@ -414,7 +414,7 @@ $locations_counts = locationCounts(array_keys($locations));
     </form>
     <?php
     $empty_state = [
-        'thing' => 'locations',
+        'thing' => __('locations'),
         'icon' => 'fa-map-marker-alt',
         'filtered' => $q || $tag_query,
         'text' => __('Their offices and sites, with the address and phone of each.'),

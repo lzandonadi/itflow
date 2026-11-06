@@ -27,7 +27,7 @@ const VENDOR_USES = [
 ];
 
 /** What each domain column makes the vendor - shown beside the domain. */
-const VENDOR_DOMAIN_ROLES = ['domain_registrar' => 'Registrar', 'domain_webhost' => 'Web host', 'domain_dnshost' => 'DNS', 'domain_mailhost' => 'Mail'];
+const VENDOR_DOMAIN_ROLES = ['domain_registrar' => 'Registrar', 'domain_webhost' => 'Web host', 'domain_dnshost' => 'DNS', 'domain_mailhost' => 'Mail']; // i18n-ignore - shown through __()
 
 /** A VENDOR_DOMAIN_ROLES role in the interface language. */
 function vendorDomainRoleLabel($column) {

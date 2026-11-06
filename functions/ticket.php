@@ -1145,7 +1145,7 @@ function ticketSlaAlert($ticket_id, $track, $breached, $due, $address) {
     $subject_line = $resolution ? ($breached ? __('Resolution SLA breached') : __('Resolution SLA at risk')) : ($breached ? __('Response SLA breached') : __('Response SLA at risk'));
 
     // appNotify inserts what it is given - escape at the boundary
-    appNotify("Ticket SLA", escapeSql(__('%1$s - %2$s - %3$s', $subject_line, $ticket_ref, $row['ticket_subject'])), "/agent/ticket.php?ticket_id=$ticket_id", intval($row['ticket_client_id']), $ticket_id);
+    appNotify("Ticket SLA", escapeSql(__('%1$s - %2$s - %3$s', $subject_line, $ticket_ref, $row['ticket_subject'])), "/agent/ticket.php?ticket_id=$ticket_id", intval($row['ticket_client_id']), $ticket_id); // i18n-ignore - notification kind is a key
 
     $recipients = [];
     if (filter_var($address, FILTER_VALIDATE_EMAIL)) {

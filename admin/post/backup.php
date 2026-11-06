@@ -16,7 +16,7 @@ if (isset($_GET['queue_backup'])) {
     $type = strtolower(trim($_GET['queue_backup']));
 
     $error = null;
-    $backup_id = backupQueue($mysqli, $type, $session_name ?? 'Unknown User', $error);
+    $backup_id = backupQueue($mysqli, $type, $session_name ?? 'Unknown User', $error); // i18n-ignore - the audit log
 
     if ($backup_id > 0) {
         logAudit("Backup", "Queue", ($session_name ?? 'Unknown User') . " queued a " . backupTypeLabel($type));
@@ -26,9 +26,9 @@ if (isset($_GET['queue_backup'])) {
         $cron_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT config_enable_cron FROM settings WHERE company_id = 1"));
 
         if (intval($cron_row['config_enable_cron']) === 0) {
-            flashAlert(__('%s queued, but cron is switched off in Maintenance > Cron, so it will not start until that is enabled.', backupTypeLabel($type)), 'error');
+            flashAlert(__('%s queued, but cron is switched off in Maintenance > Cron, so it will not start until that is enabled.', __(backupTypeLabel($type))), 'error'); // i18n-dynamic - backupTypeLabel()
         } else {
-            flashAlert(__('%s queued - it will start within a minute and you will be notified when it is ready.', backupTypeLabel($type)));
+            flashAlert(__('%s queued - it will start within a minute and you will be notified when it is ready.', __(backupTypeLabel($type)))); // i18n-dynamic - backupTypeLabel()
         }
     } else {
         flashAlert($error ?? __('Could not queue the backup.'), 'error');
@@ -105,12 +105,12 @@ if (isset($_POST['backup_master_key'])) {
     }
 
     logAudit("Master Key", "Download", ($session_name ?? 'Unknown User') . " retrieved the master encryption key");
-    appNotify("Master Key", ($session_name ?? 'Unknown User') . " retrieved the master encryption key", "/admin/backup.php");
+    appNotify("Master Key", ($session_name ?? 'Unknown User') . " retrieved the master encryption key", "/admin/backup.php"); // i18n-ignore - the audit log
 
     // Written as an encrypted archive too, so it can be filed with the other backups.
     // This is the one type cron can never produce - the key only exists inside a session.
     $error = null;
-    backupCreate($mysqli, BACKUP_TYPE_MASTER_KEY, $session_name ?? 'Unknown User', 'Manual', $error, ['master_key' => $site_encryption_master_key]);
+    backupCreate($mysqli, BACKUP_TYPE_MASTER_KEY, $session_name ?? 'Unknown User', 'Manual', $error, ['master_key' => $site_encryption_master_key]); // i18n-ignore - the audit log
 
     $_SESSION['backup_master_key_reveal'] = $site_encryption_master_key;
 

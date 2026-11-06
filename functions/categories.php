@@ -85,7 +85,7 @@ function categoryKinds() {
                 $use('tickets', 'ticket_category', __('ticket'), __('tickets'), '/agent/tickets.php?category={id}&show=all', 'ticket_archived_at', 'ticket_updated_at', true),
                 $use('recurring_tickets', 'recurring_ticket_category', __('recurring ticket'), __('recurring tickets'), '/agent/recurring_tickets.php?category={id}', null, 'recurring_ticket_updated_at', true),
                 $use('canned_response_categories', 'category_id', __('canned response'), __('canned responses'), '/admin/canned_responses.php?category={id}', 'canned_response_archived_at', null, false,
-                    ['owner' => 'canned_response_id', 'records' => 'canned_responses', 'join' => 'JOIN canned_responses USING (canned_response_id)']),
+                    ['owner' => 'canned_response_id', 'records' => 'canned_responses', 'join' => 'JOIN canned_responses USING (canned_response_id)']), // i18n-ignore - SQL
             ],
         ],
         'network_interface' => [
@@ -285,7 +285,7 @@ function categoryUsage($kind) {
 
     $usage = [];
     foreach ($config['uses'] as $index => $use) {
-        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0';
+        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0'; // i18n-ignore - SQL
         $sql = mysqli_query($mysqli, "SELECT {$use['column']}, COUNT(*), $archived FROM {$use['table']} {$use['join']}
             WHERE {$use['column']} IS NOT NULL AND {$use['column']} <> " . ($config['by'] === 'name' || $use['text'] ? "''" : '0') . "
             GROUP BY {$use['column']}");
@@ -327,7 +327,7 @@ function categoryLooseNames($kind) {
     $loose = [];
     $spelling = [];
     foreach ($config['uses'] as $index => $use) {
-        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0';
+        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0'; // i18n-ignore - SQL
         $sql = mysqli_query($mysqli, "SELECT {$use['column']}, COUNT(*), $archived FROM {$use['table']} {$use['join']}
             WHERE {$use['column']} IS NOT NULL AND TRIM({$use['column']}) <> '' GROUP BY {$use['column']} ORDER BY COUNT(*) DESC");
         while ($row = mysqli_fetch_row($sql)) {
@@ -582,13 +582,13 @@ function categoryMerge(array $from_ids, $into_id) {
         $names = array_filter($from, function ($name) use ($into) {
             return categoryNameKey($name) !== categoryNameKey($into['category_name']);
         });
-        $moved = $names ? categoryMoveRecords($config, "IN ('" . implode("', '", array_map('escapeSql', $names)) . "')", "'" . escapeSql($into['category_name']) . "'") : 0;
+        $moved = $names ? categoryMoveRecords($config, "IN ('" . implode("', '", array_map('escapeSql', $names)) . "')", "'" . escapeSql($into['category_name']) . "'") : 0; // i18n-ignore - SQL
     } else {
         // An id held as text (tickets) is matched as text - comparing it to a number can fail on a value that isn't one
         $moved = 0;
         foreach ($config['uses'] as $use) {
             $list = $use['text'] ? "'" . implode("', '", array_keys($from)) . "'" : implode(', ', array_keys($from));
-            $moved += categoryMoveRecords(['uses' => [$use]], "IN ($list)", $use['text'] ? "'$into_id'" : $into_id);
+            $moved += categoryMoveRecords(['uses' => [$use]], "IN ($list)", $use['text'] ? "'$into_id'" : $into_id); // i18n-ignore - SQL
         }
         if ($config['kind'] === 'Expense') {
             categoryFoldBudget($into_id);

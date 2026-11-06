@@ -228,7 +228,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'payment methods',
+        'thing' => __('payment methods'),
         'icon' => 'fa-credit-card',
         'filtered' => $q !== '',
         'archived' => $show === 'archived',

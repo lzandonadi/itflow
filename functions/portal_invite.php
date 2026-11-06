@@ -526,7 +526,7 @@ function portalInviteAccept(array $invite, array $in, &$error = '') {
     $client_name = (string) $invite['client_name'];
     $by = portalInviteBy($invite);
     $agent_link = "/agent/contact.php?client_id=$client_id&contact_id=$contact_id";
-    $how = $signup ? 'signed up in the client portal' : 'accepted ' . ($by !== '' ? "$by's" : 'an') . ' invite to the client portal';
+    $how = $signup ? 'signed up in the client portal' : 'accepted ' . ($by !== '' ? "$by's" : 'an') . ' invite to the client portal'; // i18n-ignore - the audit log
     logAudit("Contact", $new_contact ? "Create" : "Edit", escapeSql("$name ($email) $how for $client_name" . ($new_contact ? '' : ' - an existing contact, now with portal access')), $client_id, $contact_id);
     if ($new_contact) {
         triggerCustomAction('contact_create', $contact_id);
@@ -675,11 +675,11 @@ function portalSignupClientFor($email, &$why = '') {
     $why = '';
     $email = trim((string) $email);
     if (intval($config_client_portal_enable) !== 1 || !portalSignupOn()) {
-        $why = 'signing up is off';
+        $why = 'signing up is off'; // i18n-ignore - the audit log
         return 0;
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $why = 'not an email address';
+        $why = 'not an email address'; // i18n-ignore - the audit log
         return 0;
     }
     $domain = strtolower(substr(strrchr($email, '@'), 1));
@@ -691,11 +691,11 @@ function portalSignupClientFor($email, &$why = '') {
         $clients[] = intval($row[0]);
     }
     if (count($clients) > 1) {
-        $why = "more than one client that lets people sign up has $domain among its domains";
+        $why = "more than one client that lets people sign up has $domain among its domains"; // i18n-ignore - the audit log
         return 0;
     }
     if (!$clients) {
-        $why = "no client that lets people sign up has $domain among its domains";
+        $why = "no client that lets people sign up has $domain among its domains"; // i18n-ignore - the audit log
         return 0;
     }
     return $clients[0];
@@ -726,9 +726,9 @@ function portalSignupRequest($email, $ip, $user_agent) {
     $asked = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM logs WHERE log_type = 'Client Login' AND log_action = 'Sign Up Requested'
         AND log_ip = '$ip_sql' AND log_created_at > NOW() - INTERVAL 10 MINUTE"))[0]);
     $client_id = portalSignupClientFor($email, $why);
-    $log('Sign Up Requested', 'Asked to sign up to the client portal as ' . $email, 0, $client_id);
+    $log('Sign Up Requested', 'Asked to sign up to the client portal as ' . $email, 0, $client_id); // i18n-ignore - the audit log
     if ($asked >= PORTAL_SIGNUP_IP_LIMIT) {
-        $log('Sign Up Refused', "Did not answer a sign-up for $email - too many from this address", 0, $client_id);
+        $log('Sign Up Refused', "Did not answer a sign-up for $email - too many from this address", 0, $client_id); // i18n-ignore - the audit log
         return 'refused';
     }
 
@@ -757,20 +757,20 @@ function portalSignupRequest($email, $ip, $user_agent) {
             return 'quiet';
         }
         portalMailSignupExists($account['user_id']);
-        $log('Sign Up Sent', "Told $email they have a client portal account already", $account['user_id'], $client_id);
+        $log('Sign Up Sent', "Told $email they have a client portal account already", $account['user_id'], $client_id); // i18n-ignore - the audit log
         return 'exists';
     }
 
     if (!$client_id) {
-        $log('Sign Up Refused', "Did not sign up $email - $why");
+        $log('Sign Up Refused', "Did not sign up $email - $why"); // i18n-ignore - the audit log
         return 'refused';
     }
     if ($who['state'] === 'elsewhere') {
-        $log('Sign Up Refused', "Did not sign up $email - " . ($who['type'] === 1 ? 'an agent signs in with it' : 'its portal account is turned off'), 0, $client_id);
+        $log('Sign Up Refused', "Did not sign up $email - " . ($who['type'] === 1 ? 'an agent signs in with it' : 'its portal account is turned off'), 0, $client_id); // i18n-ignore - the audit log
         return 'refused';
     }
     if ($who['state'] === 'contact' && $who['access'] === 'off') {
-        $log('Sign Up Refused', "Did not sign up $email - their portal access was turned off", 0, $client_id);
+        $log('Sign Up Refused', "Did not sign up $email - their portal access was turned off", 0, $client_id); // i18n-ignore - the audit log
         return 'refused';
     }
 
@@ -788,10 +788,10 @@ function portalSignupRequest($email, $ip, $user_agent) {
         $invite_id = intval(mysqli_insert_id($mysqli));
     }
     if (!portalInviteMail($invite_id, portalInviteNewToken($invite_id))) {
-        $log('Sign Up Refused', "Could not email $email a link to finish signing up", 0, $client_id);
+        $log('Sign Up Refused', "Could not email $email a link to finish signing up", 0, $client_id); // i18n-ignore - the audit log
         return 'refused';
     }
-    $log('Sign Up Sent', "Emailed $email a link to finish signing up", 0, $client_id);
+    $log('Sign Up Sent', "Emailed $email a link to finish signing up", 0, $client_id); // i18n-ignore - the audit log
     return 'sent';
 }
 

@@ -242,7 +242,7 @@ $page_title = __('Saved Cards');
     </div>
     <?php
     $empty_state = [
-        'thing' => 'saved cards',
+        'thing' => __('saved cards'),
         'icon' => 'fa-wallet',
         'text' => __('The cards clients save to pay by - in the client portal, or added for them - show here, with the recurring invoices that autopay with each.'),
         'filtered' => $q !== '' || $provider_filter || $client_filter || $show !== '',

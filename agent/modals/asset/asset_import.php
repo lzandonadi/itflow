@@ -18,7 +18,7 @@ ob_start();
 
     <div class="modal-body">
         <p><strong><?= __('Format csv file with headings & data:') ?></strong><br><?= __('Name, Description, Type, Make, Model, Serial, OS, Purchase Date, Assigned To, Location, Physical Location, Notes') ?></p>
-        <p class="small text-body-secondary mb-0"><?= __('After those, any of an asset\'s details can follow, headed as the asset export heads them -') ?> <span class="font-monospace"><?= __('Ports') ?></span>, <span class="font-monospace">SFP Ports</span>, <span class="font-monospace">RAM (GB)</span>, <span class="font-monospace"><?= __('Capacity (VA)') ?></span> <?= __('and so on. Each is kept where the row\'s type has it, and Ports and SFP Ports add its interfaces.') ?></p>
+        <p class="small text-body-secondary mb-0"><?= __('After those, any of an asset\'s details can follow, headed as the asset export heads them -') ?> <span class="font-monospace"><?= __('Ports') ?></span>, <span class="font-monospace">SFP Ports</span>, <span class="font-monospace">RAM (GB)</span>, <span class="font-monospace"><?= __('Capacity (VA)') ?></span> <?= __('and so on. Each is kept where the row\'s type has it, and Ports and SFP Ports add its interfaces.') ?></p> <?php // i18n-ignore - CSV headings stay English ?>
         <hr>
         <div class="mb-3 my-4">
             <input type="file" class="form-control" name="file" accept=".csv" required>

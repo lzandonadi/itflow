@@ -240,7 +240,7 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'ticket templates',
+        'thing' => __('ticket templates'),
         'icon' => 'fa-life-ring',
         'filtered' => $q !== '',
         'archived' => $show_archived,

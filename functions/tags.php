@@ -106,7 +106,7 @@ function tagEntity($entity) {
             'title' => __('Ticket'), 'plural' => __('tickets'), 'icon' => 'fa-life-ring',
             'type' => 12, 'label' => 'ticket', 'module' => 'module_support',
             'link_table' => 'ticket_tags', 'link_record' => 'ticket_id', 'link_tag' => 'tag_id',
-            'table' => 'tickets', 'id' => 'ticket_id', 'client' => 'ticket_client_id', 'name' => "CONCAT(ticket_prefix, ticket_number, ' ', ticket_subject)",
+            'table' => 'tickets', 'id' => 'ticket_id', 'client' => 'ticket_client_id', 'name' => "CONCAT(ticket_prefix, ticket_number, ' ', ticket_subject)", // i18n-ignore - SQL
             'log' => 'Ticket', 'list' => 'tickets.php'
         ],
     ];
@@ -226,7 +226,7 @@ function tagFilterSql($entity, array $tag_ids, $column = null) {
         return '';
     }
     $column = $column ?: "{$config['table']}.{$config['id']}";
-    return "AND $column IN (SELECT {$config['link_record']} FROM {$config['link_table']} WHERE {$config['link_tag']} IN (" . implode(',', $tag_ids) . "))";
+    return "AND $column IN (SELECT {$config['link_record']} FROM {$config['link_table']} WHERE {$config['link_tag']} IN (" . implode(',', $tag_ids) . "))"; // i18n-ignore - SQL
 }
 
 /*

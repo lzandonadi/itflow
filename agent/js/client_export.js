@@ -74,7 +74,7 @@
             form.querySelector('input[name="download_token"]').value = token;
             const label = submit.innerHTML;
             submit.disabled = true;
-            submit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Preparing...';
+            submit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + __('Preparing...');
 
             // A disabled button is left out of the post - carry its name across
             let marker = form.querySelector('input[data-client-export-trigger]');

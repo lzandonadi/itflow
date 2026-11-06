@@ -125,12 +125,12 @@ function usFederalHolidays($year)
     ];
 
     $floating = [
-        "third monday of january $year"    => __('Martin Luther King Jr. Day'),
-        "third monday of february $year"   => __("Presidents' Day"),
-        "last monday of may $year"         => __('Memorial Day'),
-        "first monday of september $year"  => __('Labor Day'),
-        "second monday of october $year"   => __('Columbus Day'),
-        "fourth thursday of november $year" => __('Thanksgiving Day'),
+        "third monday of january $year"    => __('Martin Luther King Jr. Day'), // i18n-ignore - date expressions
+        "third monday of february $year"   => __("Presidents' Day"), // i18n-ignore - date expressions
+        "last monday of may $year"         => __('Memorial Day'), // i18n-ignore - date expressions
+        "first monday of september $year"  => __('Labor Day'), // i18n-ignore - date expressions
+        "second monday of october $year"   => __('Columbus Day'), // i18n-ignore - date expressions
+        "fourth thursday of november $year" => __('Thanksgiving Day'), // i18n-ignore - date expressions
     ];
 
     $holidays = [];

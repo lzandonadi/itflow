@@ -64,7 +64,7 @@ if (isset($_POST['add_vendor'])) {
     vendorSetTags($vendor_id, $_POST['tags'] ?? []);
 
     $name = trim($_POST['name']);
-    $template_note = intval($_POST['vendor_template_id'] ?? 0) ? ' from a template' : '';
+    $template_note = intval($_POST['vendor_template_id'] ?? 0) ? ' from a template' : ''; // i18n-ignore - the audit log
     logAudit("Vendor", "Create", "$session_name created vendor " . escapeSql($name) . $template_note, $client_id, $vendor_id);
 
     flashAlert(__('Vendor <strong>%s</strong> created', $name));

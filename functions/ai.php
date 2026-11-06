@@ -29,11 +29,11 @@ function aiProviderKinds() {
     return [
         'openai' => ['name' => 'OpenAI', 'url' => 'https://api.openai.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
             'keys_url' => 'https://platform.openai.com/api-keys', 'example' => 'gpt-5-mini'],
-        'anthropic' => ['name' => 'Anthropic (Claude)', 'url' => 'https://api.anthropic.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'anthropic', 'local' => false,
+        'anthropic' => ['name' => 'Anthropic (Claude)', 'url' => 'https://api.anthropic.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'anthropic', 'local' => false, // i18n-ignore - provider names
             'keys_url' => 'https://console.anthropic.com/settings/keys', 'example' => 'claude-sonnet-5-5'],
-        'azure' => ['name' => 'Azure OpenAI', 'url' => 'https://YOUR-RESOURCE.openai.azure.com/openai/v1/chat/completions', 'key' => true, 'auth' => 'api-key', 'models' => '', 'local' => false,
-            'keys_url' => 'https://portal.azure.com', 'example' => 'your deployment name'],
-        'gemini' => ['name' => 'Google Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
+        'azure' => ['name' => 'Azure OpenAI', 'url' => 'https://YOUR-RESOURCE.openai.azure.com/openai/v1/chat/completions', 'key' => true, 'auth' => 'api-key', 'models' => '', 'local' => false, // i18n-ignore - provider names
+            'keys_url' => 'https://portal.azure.com', 'example' => __('your deployment name')],
+        'gemini' => ['name' => 'Google Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false, // i18n-ignore - provider names
             'keys_url' => 'https://aistudio.google.com/apikey', 'example' => 'gemini-2.5-flash'],
         'mistral' => ['name' => 'Mistral', 'url' => 'https://api.mistral.ai/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
             'keys_url' => 'https://console.mistral.ai/api-keys', 'example' => 'mistral-small-latest'],
@@ -43,10 +43,10 @@ function aiProviderKinds() {
             'keys_url' => 'https://openrouter.ai/keys', 'example' => 'openai/gpt-5-mini'],
         'ollama' => ['name' => 'Ollama', 'url' => 'http://localhost:11434/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true,
             'keys_url' => '', 'example' => 'llama3.1'],
-        'lmstudio' => ['name' => 'LM Studio', 'url' => 'http://localhost:1234/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true,
-            'keys_url' => '', 'example' => 'the model loaded in LM Studio'],
-        'custom' => ['name' => 'Other (OpenAI-compatible)', 'url' => '', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
-            'keys_url' => '', 'example' => 'its model name'],
+        'lmstudio' => ['name' => 'LM Studio', 'url' => 'http://localhost:1234/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true, // i18n-ignore - provider names
+            'keys_url' => '', 'example' => __('the model loaded in LM Studio')],
+        'custom' => ['name' => __('Other (OpenAI-compatible)'), 'url' => '', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
+            'keys_url' => '', 'example' => __('its model name')],
     ];
 }
 
@@ -167,9 +167,11 @@ function aiRewordTones() {
 
 /* The languages Translate offers. */
 function aiLanguages() {
+    // i18n-ignore-start - the names the model is asked for; aiLanguageLabels() shows them
     return ['English', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Polish', 'Swedish', 'Danish', 'Norwegian', 'Finnish', 'Czech', 'Romanian',
         'Hungarian', 'Greek', 'Turkish', 'Russian', 'Ukrainian', 'Arabic', 'Hebrew', 'Hindi', 'Vietnamese', 'Thai', 'Indonesian', 'Filipino', 'Chinese (Simplified)',
         'Chinese (Traditional)', 'Japanese', 'Korean'];
+    // i18n-ignore-end
 }
 
 /* The languages Translate offers as the menu shows them - the English name (what the model is asked for) => its name in the interface language. */
@@ -193,6 +195,7 @@ function aiUseCaseLabel($use_case) {
  * placeholders, and the HTML formatting.
  */
 function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
+    // i18n-ignore-start - what the model is told, in English
     $what = $use_case === 'Tickets' ? 'the replies an IT services company sends on support tickets' : 'what an IT services company writes';
     $asks = [
         'reword' => $use_case === 'Tickets'
@@ -212,6 +215,7 @@ function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
         . ' Don\'t add anything it doesn\'t say. Keep its HTML formatting - paragraphs, line breaks, lists, bold and links' . ($tone === 'structure' ? ', adding the headings and lists asked for' : '')
         . ' - and answer with the HTML only: no introduction, no notes, no code fences.';
     return $instructions;
+    // i18n-ignore-end
 }
 
 /*
@@ -316,10 +320,10 @@ function aiRestore($text, array $secrets) {
 
 /* The headers a provider is sent - its key, as its kind takes it. */
 function aiProviderHeaders($kind, $api_key, $json = true) {
-    $headers = $json ? ['Content-Type: application/json'] : [];
+    $headers = $json ? ['Content-Type: application/json'] : []; // i18n-ignore - HTTP headers
     $api_key = trim((string) $api_key);
     if ($api_key !== '') {
-        $headers[] = aiProviderKind($kind)['auth'] === 'api-key' ? "api-key: $api_key" : "Authorization: Bearer $api_key";
+        $headers[] = aiProviderKind($kind)['auth'] === 'api-key' ? "api-key: $api_key" : "Authorization: Bearer $api_key"; // i18n-ignore - HTTP headers
     }
     return $headers;
 }
@@ -340,6 +344,7 @@ function aiProviderHeaders($kind, $api_key, $json = true) {
  * diagnosable. The API key and the message bodies never do.
  */
 function callAiApi($model, $messages, array $context = []) {
+    // i18n-ignore-start - the system messages and what is recorded in AI usage are English
     $messages = array_values($messages);
     if (($messages[0]['role'] ?? '') !== 'system') {
         array_unshift($messages, ['role' => 'system', 'content' => 'You are a helpful assistant for an IT services company.']);
@@ -423,6 +428,7 @@ function callAiApi($model, $messages, array $context = []) {
     if (!is_string($content)) {
         logApp('AI', 'error', "$label - HTTP $status but the response carried no choices[0].message.content");
         aiUsageRecord($usage + ['ok' => false, 'error' => 'No answer in the response']);
+    // i18n-ignore-end
         return ['ok' => false, 'error' => __('The AI provider returned an unexpected response - see Admin > App Logs.')];
     }
 
@@ -726,24 +732,24 @@ function aiProviderWrite(array $after, $provider_id = 0) {
     return intval(mysqli_insert_id($mysqli));
 }
 
-/* What changed on a provider, a line each, from what to what - the key only as changed. Plain text. */
+/* What changed on a provider, a line each, from what to what - the key only as changed. Plain text, in the interface language (the audit log's copy through i18nEnglish()). */
 function aiProviderChangeLines(array $before, array $after) {
     $lines = [];
     if ((string) $before['ai_provider_name'] !== $after['ai_provider_name']) {
         $lines[] = "Name {$before['ai_provider_name']} → {$after['ai_provider_name']}";
     }
     if ((string) $before['ai_provider_kind'] !== $after['ai_provider_kind']) {
-        $lines[] = 'Kind ' . aiProviderKind($before['ai_provider_kind'])['name'] . ' → ' . aiProviderKind($after['ai_provider_kind'])['name'];
+        $lines[] = __('Kind %1$s → %2$s', aiProviderKind($before['ai_provider_kind'])['name'], aiProviderKind($after['ai_provider_kind'])['name']);
     }
     if ((string) $before['ai_provider_api_url'] !== $after['ai_provider_api_url']) {
-        $lines[] = "Address {$before['ai_provider_api_url']} → {$after['ai_provider_api_url']}";
+        $lines[] = __('Address %1$s → %2$s', $before['ai_provider_api_url'], $after['ai_provider_api_url']);
     }
     $was_key = (string) $before['ai_provider_api_key'];
     if ($was_key !== $after['ai_provider_api_key']) {
-        $lines[] = $was_key === '' ? 'API key added' : ($after['ai_provider_api_key'] === '' ? 'API key removed' : 'API key changed');
+        $lines[] = $was_key === '' ? __('API key added') : ($after['ai_provider_api_key'] === '' ? __('API key removed') : __('API key changed'));
     }
     if (intval($before['ai_provider_redact']) !== $after['ai_provider_redact']) {
-        $lines[] = $after['ai_provider_redact'] ? 'Passwords and keys taken out of what is sent' : 'Passwords and keys sent as they are';
+        $lines[] = $after['ai_provider_redact'] ? __('Passwords and keys taken out of what is sent') : __('Passwords and keys sent as they are');
     }
     return $lines;
 }
@@ -807,24 +813,24 @@ function aiTemperatureText($temperature) {
     return $temperature === null || $temperature === '' ? __("the model's own") : rtrim(rtrim(number_format(floatval($temperature), 2, '.', ''), '0'), '.');
 }
 
-/* What changed on a model, a line each, from what to what - the instructions only as changed. Plain text. */
+/* What changed on a model, a line each, from what to what - the instructions only as changed. Plain text, in the interface language (the audit log's copy through i18nEnglish()). */
 function aiModelChangeLines(array $before, array $after) {
     $lines = [];
     if (intval($before['ai_model_ai_provider_id']) !== $after['ai_model_ai_provider_id']) {
-        $lines[] = 'Provider ' . ($before['ai_provider_name'] ?? '#' . $before['ai_model_ai_provider_id']) . ' → ' . (aiProviderRow($after['ai_model_ai_provider_id'])['ai_provider_name'] ?? '');
+        $lines[] = __('Provider %1$s → %2$s', $before['ai_provider_name'] ?? '#' . $before['ai_model_ai_provider_id'], aiProviderRow($after['ai_model_ai_provider_id'])['ai_provider_name'] ?? '');
     }
     if ((string) $before['ai_model_name'] !== $after['ai_model_name']) {
-        $lines[] = "Model {$before['ai_model_name']} → {$after['ai_model_name']}";
+        $lines[] = __('Model %1$s → %2$s', $before['ai_model_name'], $after['ai_model_name']);
     }
     if ((string) $before['ai_model_use_case'] !== $after['ai_model_use_case']) {
-        $lines[] = "For {$before['ai_model_use_case']} → {$after['ai_model_use_case']}";
+        $lines[] = __('For %1$s → %2$s', aiUseCaseLabel($before['ai_model_use_case']), aiUseCaseLabel($after['ai_model_use_case']));
     }
     $was = $before['ai_model_temperature'] === null ? null : round(floatval($before['ai_model_temperature']), 2);
     if ($was !== $after['ai_model_temperature']) {
-        $lines[] = 'Temperature ' . aiTemperatureText($was) . ' → ' . aiTemperatureText($after['ai_model_temperature']);
+        $lines[] = __('Temperature %1$s → %2$s', aiTemperatureText($was), aiTemperatureText($after['ai_model_temperature']));
     }
     if (trim((string) $before['ai_model_prompt']) !== $after['ai_model_prompt']) {
-        $lines[] = $after['ai_model_prompt'] === '' ? 'Instructions removed' : (trim((string) $before['ai_model_prompt']) === '' ? 'Instructions added' : 'Instructions changed');
+        $lines[] = $after['ai_model_prompt'] === '' ? __('Instructions removed') : (trim((string) $before['ai_model_prompt']) === '' ? __('Instructions added') : __('Instructions changed'));
     }
     return $lines;
 }
@@ -929,5 +935,5 @@ function aiProblems() {
     }
     return [['warning', 'fa-robot', _n('%d AI request failed today', '%d AI requests failed today', $failed),
         __('The last, to %1$s, too%2$s. Reword and summaries fail for agents until it is put right.', $last['ai_usage_provider_name'], $last['ai_usage_error'] ? ' - ' . $last['ai_usage_error'] : ''),
-        'ai_usage.php?view=failed', 'See why']];
+        'ai_usage.php?view=failed', __('See why')]];
 }

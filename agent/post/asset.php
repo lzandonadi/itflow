@@ -1213,7 +1213,7 @@ if (isset($_GET['download_assets_csv_template'])) {
     $f = fopen('php://memory', 'w');
 
     //set column headers
-    $fields = array('Name', 'Description', 'Type', 'Make', 'Model', 'Serial', 'OS', 'Purchase Date', 'Assigned To', 'Location', 'Physical Location', 'Notes');
+    $fields = array('Name', 'Description', 'Type', 'Make', 'Model', 'Serial', 'OS', 'Purchase Date', 'Assigned To', 'Location', 'Physical Location', 'Notes'); // i18n-ignore - CSV headings stay English, so files import in any language
     fputcsv($f, $fields, $delimiter, $enclosure, $escape);
 
     //move back to beginning of file

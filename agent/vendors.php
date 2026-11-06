@@ -466,7 +466,7 @@ $missing_templates = $view === 'client' && !$archived ? vendorTemplatesMissingFo
     </form>
     <?php
     $empty_state = [
-        'thing' => 'vendors',
+        'thing' => __('vendors'),
         'icon' => 'fa-building',
         'filtered' => $q || $tag_query,
         'views' => ['view'],

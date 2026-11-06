@@ -59,7 +59,7 @@ $type_query = $type_filter !== '' ? "AND item_type = '$type_filter'" : '';
 $shows = [
     '' => ['label' => _x('Open', 'shared links'), 'icon' => 'fa-link', 'where' => shareOpenSql(), 'title' => __('Still work - not used up, expired or turned off')],
     'received' => ['label' => __('Sent back'), 'icon' => 'fa-inbox', 'where' => "item_type = 'Request' AND item_received_at IS NOT NULL AND item_ended_at IS NULL", 'title' => __('Logins clients sent back, waiting to be saved')],
-    'ended' => ['label' => __('Ended'), 'icon' => 'fa-history', 'where' => 'NOT (' . shareLiveSql() . ')', 'title' => __('Used up, expired, turned off, locked - kept for %d days', SHARE_KEEP_DAYS)],
+    'ended' => ['label' => __('Ended'), 'icon' => 'fa-history', 'where' => 'NOT (' . shareLiveSql() . ')', 'title' => __('Used up, expired, turned off, locked - kept for %d days', SHARE_KEEP_DAYS)], // i18n-ignore - SQL
     'all' => ['label' => __('All'), 'where' => '1'],
 ];
 $show = isset($shows[$_GET['show'] ?? '']) ? ($_GET['show'] ?? '') : '';

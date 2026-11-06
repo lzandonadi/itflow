@@ -86,7 +86,7 @@ function healthRequiredExtensions() {
         defined('FROM_SETUP') || define('FROM_SETUP', true); // the file's guard against being opened on its own
         require_once $file;
     }
-    return function_exists('setupRequiredExtensions') ? setupRequiredExtensions() : ['mysqli' => 'the database', 'intl' => 'money and dates', 'curl' => 'mail', 'mbstring' => 'text', 'gd' => 'images', 'xml' => 'mail and documents', 'openssl' => 'encryption', 'fileinfo' => 'uploads'];
+    return function_exists('setupRequiredExtensions') ? setupRequiredExtensions() : ['mysqli' => 'the database', 'intl' => 'money and dates', 'curl' => 'mail', 'mbstring' => 'text', 'gd' => 'images', 'xml' => 'mail and documents', 'openssl' => 'encryption', 'fileinfo' => 'uploads']; // i18n-ignore - the support report stays English
 }
 
 /** The host ITFlow's links use ($config_base_url), without a port or path - lower case. */
@@ -557,25 +557,25 @@ function healthStructureDifferences() {
     $differences = [];
     foreach ($expected as $table => $columns) {
         if (!isset($found[$table])) {
-            $differences[] = ['what' => 'Missing table', 'table' => $table, 'column' => '', 'expected' => '', 'found' => ''];
+            $differences[] = ['what' => 'Missing table', 'table' => $table, 'column' => '', 'expected' => '', 'found' => '']; // i18n-ignore - the support report stays English
             continue;
         }
         foreach ($columns as $column => $type) {
             if (!isset($found[$table][$column])) {
-                $differences[] = ['what' => 'Missing column', 'table' => $table, 'column' => $column, 'expected' => $type, 'found' => ''];
+                $differences[] = ['what' => 'Missing column', 'table' => $table, 'column' => $column, 'expected' => $type, 'found' => '']; // i18n-ignore - the support report stays English
             } elseif (healthColumnType($type) !== healthColumnType($found[$table][$column])) {
-                $differences[] = ['what' => 'Different type', 'table' => $table, 'column' => $column, 'expected' => $type, 'found' => $found[$table][$column]];
+                $differences[] = ['what' => 'Different type', 'table' => $table, 'column' => $column, 'expected' => $type, 'found' => $found[$table][$column]]; // i18n-ignore - the support report stays English
             }
         }
         foreach ($found[$table] as $column => $type) {
             if (!isset($columns[$column])) {
-                $differences[] = ['what' => 'Extra column', 'table' => $table, 'column' => $column, 'expected' => '', 'found' => $type];
+                $differences[] = ['what' => 'Extra column', 'table' => $table, 'column' => $column, 'expected' => '', 'found' => $type]; // i18n-ignore - the support report stays English
             }
         }
     }
     foreach (array_keys($found) as $table) {
         if (!isset($expected[$table])) {
-            $differences[] = ['what' => 'Extra table', 'table' => $table, 'column' => '', 'expected' => '', 'found' => ''];
+            $differences[] = ['what' => 'Extra table', 'table' => $table, 'column' => '', 'expected' => '', 'found' => '']; // i18n-ignore - the support report stays English
         }
     }
     return $differences;
@@ -636,7 +636,7 @@ function healthReport(array $sections, array $database, $differences, array $upl
     }
     $lines[] = '[Database]';
     $lines[] = count($database['tables']) . ' tables, ' . (empty($database['exact']) ? 'about ' : '') . number_format($database['rows']) . ' rows, ' . formatBytes($database['size'], 1);
-    $lines[] = $differences === null ? 'db.sql not found' : ($differences ? count($differences) . ' differences from db.sql:' : 'Matches db.sql');
+    $lines[] = $differences === null ? 'db.sql not found' : ($differences ? count($differences) . ' differences from db.sql:' : 'Matches db.sql'); // i18n-ignore - the support report stays English
     foreach (array_slice((array) $differences, 0, 30) as $difference) {
         $lines[] = '  ' . $difference['what'] . ': ' . $difference['table'] . ($difference['column'] !== '' ? '.' . $difference['column'] : '')
             . ($difference['expected'] !== '' || $difference['found'] !== '' ? ' (' . trim($difference['expected'] . ($difference['found'] !== '' ? ' -> ' . $difference['found'] : '')) . ')' : '');

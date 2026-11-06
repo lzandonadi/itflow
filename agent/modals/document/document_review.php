@@ -79,10 +79,12 @@ ob_start();
     var useSummary = form.querySelector('[data-ai-review-use-summary]');
     var mark = form.querySelector('[data-ai-review-mark]');
     var again = form.querySelector('[data-ai-review-again]');
+    // i18n-ignore-start - the verdicts are keys
     var verdicts = {
         'good': ['success', 'fa-check-circle', <?= json_encode(__('Looks good'), JSON_HEX_TAG | JSON_HEX_AMP) ?>],
         'needs work': ['warning', 'fa-tools', <?= json_encode(__('Needs work'), JSON_HEX_TAG | JSON_HEX_AMP) ?>],
         'out of date': ['danger', 'fa-history', <?= json_encode(__('Out of date'), JSON_HEX_TAG | JSON_HEX_AMP) ?>]
+    // i18n-ignore-end
     };
     var severities = { high: 'danger', medium: 'warning', low: 'secondary' };
     var t = {

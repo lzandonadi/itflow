@@ -274,7 +274,7 @@ function projectViews($with_budget = true) {
             'title' => __('Started, and none of their tickets has moved in %d days', PROJECT_STALLED_DAYS), 'alarm' => 'warning'],
         'over_budget' => ['label' => _x('Over budget', 'projects view'), 'icon' => 'fa-hourglass-end', 'where' => "$open AND projects.project_budget_hours > 0 AND " . projectSecondsSql() . " > projects.project_budget_hours * 3600",
             'title' => __('More time logged than the hours budgeted'), 'alarm' => 'danger'],
-        'ready' => ['label' => _x('Ready to close', 'projects view'), 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open",
+        'ready' => ['label' => _x('Ready to close', 'projects view'), 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open", // i18n-ignore - SQL
             'title' => __('Every ticket resolved or closed - mark them complete'), 'alarm' => 'success'],
         'completed' => ['label' => _x('Completed', 'projects view'), 'icon' => 'fa-check', 'where' => 'projects.project_completed_at IS NOT NULL AND projects.project_archived_at IS NULL'],
         'archived' => ['label' => _x('Archived', 'projects view'), 'icon' => 'fa-archive', 'where' => 'projects.project_archived_at IS NOT NULL'],

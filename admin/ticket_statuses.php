@@ -218,7 +218,7 @@ $csrf = $_SESSION['csrf_token'];
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'ticket statuses',
+        'thing' => __('ticket statuses'),
         'icon' => 'fa-info-circle',
         'filtered' => $q !== '',
         'views' => ['show'],

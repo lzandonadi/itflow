@@ -171,7 +171,7 @@ $sla_filters = [
 ];
 $sla_filter = isset($sla_filters[$_GET['sla'] ?? '']) ? $_GET['sla'] : '';
 if ($sla_filter) {
-    $filter_sql[] = "AND ({$sla_filters[$sla_filter][1]})";
+    $filter_sql[] = "AND ({$sla_filters[$sla_filter][1]})"; // i18n-ignore - SQL
     $active_filters[] = ['label' => 'SLA', 'value' => $sla_filters[$sla_filter][0], 'drop' => ['sla' => null]];
 }
 
@@ -183,7 +183,7 @@ $billing_filters = [
 ];
 $billing_filter = isset($billing_filters[$_GET['billing'] ?? '']) ? $_GET['billing'] : '';
 if ($billing_filter) {
-    $filter_sql[] = "AND ({$billing_filters[$billing_filter][1]})";
+    $filter_sql[] = "AND ({$billing_filters[$billing_filter][1]})"; // i18n-ignore - SQL
     $active_filters[] = ['label' => __('Billing'), 'value' => $billing_filters[$billing_filter][0], 'drop' => ['billing' => null]];
 }
 
@@ -256,7 +256,7 @@ $ticket_select_columns =
     ticket_status_id, ticket_status_name, ticket_status_color, ticket_status_pauses_sla,
     client_name, contact_id, contact_name, contact_email, contact_photo,
     user_name, user_avatar, asset_name, category_name, category_color, category_icon, project_prefix, project_number, project_name,
-    " . ticketLastSpokeSql() . " AS ticket_last_spoke";
+    " . ticketLastSpokeSql() . " AS ticket_last_spoke"; // i18n-ignore - SQL
 
 $ticket_joins =
     "LEFT JOIN clients ON ticket_client_id = client_id

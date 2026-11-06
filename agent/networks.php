@@ -446,7 +446,7 @@ $csrf = $_SESSION['csrf_token'];
     </form>
     <?php
     $empty_state = [
-        'thing' => 'networks',
+        'thing' => __('networks'),
         'icon' => 'fa-network-wired',
         'filtered' => $q !== '' || $type_filter || $client_filter || $location_filter,
         'archived' => $show === 'archived',

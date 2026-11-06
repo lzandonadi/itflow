@@ -19,7 +19,7 @@ require_once "includes/inc_all_admin.php";
 
 $template = softwareTemplateRow($_GET['software_template_id'] ?? 0);
 if (!$template) {
-    echo emptyStateHtml(['thing' => 'license templates', 'title' => __('That license template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-cube', 'filtered' => false,
+    echo emptyStateHtml(['thing' => __('license templates'), 'title' => __('That license template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-cube', 'filtered' => false,
         'actions' => [['label' => __('License Templates'), 'href' => 'software_templates.php']]]);
     require_once "../includes/footer.php";
     exit();

@@ -93,8 +93,8 @@ $missing_templates = $archived ? [] : documentTemplatesMissingFor($client_id);
 
 // ---- What is on show: files and documents, merged and sorted here ----
 $search_sql = escapeSql($search);
-$file_where = "file_client_id = $client_id AND file_$archive_query" . ($look_everywhere ? '' : " AND file_folder_id = $folder_id") . ($tag_filter_ids || $type_filter === 'due' ? ' AND 0' : '');
-$document_where = "document_client_id = $client_id AND document_$archive_query" . ($look_everywhere ? '' : " AND document_folder_id = $folder_id")
+$file_where = "file_client_id = $client_id AND file_$archive_query" . ($look_everywhere ? '' : " AND file_folder_id = $folder_id") . ($tag_filter_ids || $type_filter === 'due' ? ' AND 0' : ''); // i18n-ignore - SQL
+$document_where = "document_client_id = $client_id AND document_$archive_query" . ($look_everywhere ? '' : " AND document_folder_id = $folder_id") // i18n-ignore - SQL
     . ' ' . tagFilterSql('document', $tag_filter_ids, 'documents.document_id')
     . ($type_filter === 'due' ? ' AND documents.document_id IN (' . ($due_documents ? implode(',', array_keys($due_documents)) : '0') . ')' : '');
 if ($search !== '') {
@@ -401,7 +401,7 @@ $preview = []; // the grid's previewer payload
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Document tags -')) ?>" multiple>
-                        <?= tagFilterOptionsHtml('document', $tag_filter_ids, "document_client_id = $client_id AND document_$archive_query") ?>
+                        <?= tagFilterOptionsHtml('document', $tag_filter_ids, "document_client_id = $client_id AND document_$archive_query") ?> <?php // i18n-ignore - SQL ?>
                     </select>
                 </div>
                 <div class="col-md-auto ms-md-auto d-flex flex-wrap gap-2">

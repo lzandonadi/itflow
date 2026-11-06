@@ -790,7 +790,7 @@ $total_leads = intval($row['leads']);
 
     <?php
     $empty_state = [
-        'thing' => $leads_filter ? 'leads' : 'clients',
+        'thing' => $leads_filter ? __('leads') : __('clients'),
         'icon' => 'fa-user-friends',
         'views' => ['leads'],
         'text' => $leads_filter ? __('Prospects you are talking to, kept apart from your clients.') : __('Add the companies you look after, or import them all at once.'),

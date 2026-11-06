@@ -237,7 +237,7 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         <label class="form-label"><?= __('Model') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-cube"></i></span>
-            <input type="text" class="form-control" name="model" maxlength="200" value="<?= escapeHtml($form_value('product_model')) ?>" placeholder="OptiPlex 7020, U6-Pro, RS1221+">
+            <input type="text" class="form-control" name="model" maxlength="200" value="<?= escapeHtml($form_value('product_model')) ?>" placeholder="OptiPlex 7020, U6-Pro, RS1221+"> <?php // i18n-ignore - model numbers as examples ?>
         </div>
     </div>
     <div class="col-12 mt-1" data-product-only>

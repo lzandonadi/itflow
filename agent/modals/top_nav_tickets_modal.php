@@ -3,13 +3,13 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-dark">
-                <h5 class="modal-title" id="openTicketsModalLabel">Open Tickets</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="openTicketsModalLabel"><?= __('Open Tickets') ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
             </div>
             <div class="modal-body">
 
                 <div class="alert alert-danger" role="alert">
-                    This "Open Tickets" tracker will be removed in a future version of ITFlow. Time tracking will still be a feature.
+                    <?= __('This "Open Tickets" tracker will be removed in a future version of ITFlow. Time tracking will still be a feature.') ?>
                 </div>
 
                 <div id="openTicketsContainer">
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="clearAllTimers">Clear All</button>
+                <button type="button" class="btn btn-secondary" id="clearAllTimers"><?= __('Clear All') ?></button>
             </div>
         </div>
     </div>

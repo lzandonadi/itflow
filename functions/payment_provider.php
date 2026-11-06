@@ -241,16 +241,16 @@ function paymentProviderChangeLines(array $before, array $after) {
         $lines[] = "Mode $was_mode → $now_mode";
     }
     if ((string) $before['payment_provider_public_key'] !== $after['payment_provider_public_key']) {
-        $lines[] = 'Publishable key changed';
+        $lines[] = 'Publishable key changed'; // i18n-ignore - the audit log, or SQL
     }
     if ((string) $before['payment_provider_private_key'] !== $after['payment_provider_private_key']) {
-        $lines[] = 'Secret key changed';
+        $lines[] = 'Secret key changed'; // i18n-ignore - the audit log, or SQL
     }
     if (intval($before['payment_provider_account']) !== $after['payment_provider_account']) {
-        $lines[] = 'Payments go into ' . $name_of('accounts', $before['payment_provider_account']) . ' → ' . $name_of('accounts', $after['payment_provider_account']);
+        $lines[] = 'Payments go into ' . $name_of('accounts', $before['payment_provider_account']) . ' → ' . $name_of('accounts', $after['payment_provider_account']); // i18n-ignore - the audit log, or SQL
     }
     if (round(floatval($before['payment_provider_threshold']), 2) !== round($after['payment_provider_threshold'], 2)) {
-        $lines[] = 'Card limit ' . paymentProviderLimitText($before['payment_provider_threshold']) . ' → ' . paymentProviderLimitText($after['payment_provider_threshold']);
+        $lines[] = 'Card limit ' . paymentProviderLimitText($before['payment_provider_threshold']) . ' → ' . paymentProviderLimitText($after['payment_provider_threshold']); // i18n-ignore - the audit log, or SQL
     }
     $fees = function ($vendor_id, $category_id) use ($name_of) {
         return intval($vendor_id) && intval($category_id) ? $name_of('vendors', $vendor_id) . ', ' . $name_of('categories', $category_id) : 'not recorded';
@@ -261,7 +261,7 @@ function paymentProviderChangeLines(array $before, array $after) {
         $lines[] = "Fees $fees_before → $fees_after";
     }
     if (intval($before['payment_provider_active']) !== $after['payment_provider_active']) {
-        $lines[] = $after['payment_provider_active'] ? 'Turned on' : 'Turned off';
+        $lines[] = $after['payment_provider_active'] ? 'Turned on' : 'Turned off'; // i18n-ignore - the audit log, or SQL
     }
     return $lines;
 }
@@ -300,7 +300,7 @@ function paymentProviderWrite(array $after, $provider_id = 0) {
 function paymentCardExpirySql($column = 'saved_payment_description') {
     $exp = "REGEXP_SUBSTR($column, '[0-9]{1,2}/[0-9]{2,4}$')";
     $year = "CAST(SUBSTRING_INDEX($exp, '/', -1) AS UNSIGNED)";
-    return "(CASE WHEN $exp IS NULL OR $exp = '' THEN NULL ELSE (IF($year < 100, 2000 + $year, $year) * 100 + CAST(SUBSTRING_INDEX($exp, '/', 1) AS UNSIGNED)) END)";
+    return "(CASE WHEN $exp IS NULL OR $exp = '' THEN NULL ELSE (IF($year < 100, 2000 + $year, $year) * 100 + CAST(SUBSTRING_INDEX($exp, '/', 1) AS UNSIGNED)) END)"; // i18n-ignore - the audit log, or SQL
 }
 
 /*

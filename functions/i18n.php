@@ -30,8 +30,8 @@
 /** The languages ITFlow can be shown in - each named in itself, so it can be found whatever the interface is in. */
 function i18nLanguages(): array {
     return [
-        'en_US' => 'English (US)',
-        'pt_BR' => 'Português (Brasil)',
+        'en_US' => 'English (US)', // i18n-ignore - each language in its own words
+        'pt_BR' => 'Português (Brasil)', // i18n-ignore - each language in its own words
     ];
 }
 

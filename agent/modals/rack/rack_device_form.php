@@ -165,8 +165,8 @@ $item_types = rackItemTypes();
     var typeSelect = form.querySelector('#rackItemType');
 
     // Things that sit at the front and leave the back free, as a starting point
-    var halfDepthTypes = ['Patch Panel', 'Cable Management', 'Blanking Panel'];
-    var halfDepthAssetTypes = ['Access Point', 'Firewall/Router', 'Modem/ONT', 'PDU'];
+    var halfDepthTypes = ['Patch Panel', 'Cable Management', 'Blanking Panel']; // i18n-ignore - stored type values
+    var halfDepthAssetTypes = ['Access Point', 'Firewall/Router', 'Modem/ONT', 'PDU']; // i18n-ignore - stored type values
 
     function kind() {
         return form.querySelector('input[name="item_kind"]:checked').value;

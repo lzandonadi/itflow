@@ -107,8 +107,8 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
     if (isset($access_token_response['access_token'])) {
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array ('Authorization: Bearer '.$access_token_response['access_token'],
-            'Content-type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array ('Authorization: Bearer '.$access_token_response['access_token'], // i18n-ignore - HTTP headers
+            'Content-type: application/json')); // i18n-ignore - HTTP headers
         curl_setopt($ch, CURLOPT_URL, "https://graph.microsoft.com/v1.0/me/");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         #curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // DEBUG ONLY - WAMP
@@ -168,7 +168,7 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
             } else {
 
                 // Logged with why, against the account when there is one (functions/sign_in.php)
-                $entra_why = $row ? ['user_id' => $user_id, 'client_id' => $client_id, 'reason' => 'the account signs in with a password, not Microsoft 365'] : signInFailureReason($msgraph_response['userPrincipalName']);
+                $entra_why = $row ? ['user_id' => $user_id, 'client_id' => $client_id, 'reason' => 'the account signs in with a password, not Microsoft 365'] : signInFailureReason($msgraph_response['userPrincipalName']); // i18n-ignore - the sign-in log
                 signInLogFailure('Client Login', 'Failed', "Failed client portal sign in via Entra as $upn - " . escapeSql($entra_why['reason']), $entra_why['user_id'], $entra_why['client_id']);
 
                 $_SESSION['login_message'] = __('Something went wrong with logging you in: Your account is not configured for Entra SSO. Please ensure you are setup in ITFlow as a contact and have Entra SSO configured.');

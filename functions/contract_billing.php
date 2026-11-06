@@ -484,7 +484,7 @@ function contractRecurringFollow($contract_id, $by, $today = null) {
     if (contractRecurringShouldRun($row, $today)) {
         return contractRecurringStart($row, $by) ? 'started' : '';
     }
-    $why = $row['contract_status'] === 'Draft' ? 'it is a draft' : ($row['contract_status'] === 'Cancelled' ? 'it was cancelled' : 'it ended');
+    $why = $row['contract_status'] === 'Draft' ? 'it is a draft' : ($row['contract_status'] === 'Cancelled' ? 'it was cancelled' : 'it ended'); // i18n-ignore - contract history stays English
     return contractRecurringStop($row, $by, $why) ? 'stopped' : '';
 }
 

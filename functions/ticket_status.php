@@ -38,8 +38,8 @@ function ticketStatusIsBuiltIn($ticket_status_id) {
 
 /** What a client's reply does to a ticket in a status - 1 moves it back to Open, 0 leaves it where it is. */
 const TICKET_STATUS_CLIENT_REPLY = [
-    1 => ['label' => 'Move it back to Open', 'short' => 'Back to Open', 'icon' => 'fa-undo-alt'],
-    0 => ['label' => 'Leave it in this status', 'short' => 'Stays', 'icon' => 'fa-equals'],
+    1 => ['label' => 'Move it back to Open', 'short' => 'Back to Open', 'icon' => 'fa-undo-alt'], // i18n-ignore - shown through __(), or the audit log
+    0 => ['label' => 'Leave it in this status', 'short' => 'Stays', 'icon' => 'fa-equals'], // i18n-ignore - shown through __(), or the audit log
 ];
 
 /** Whether the 3.4.0 update has run - ticket_status_description and ticket_status_client_reply. */
@@ -293,11 +293,11 @@ function ticketStatusUpdate(array $row, array $f) {
         }
     }
     if (intval($row['ticket_status_pauses_sla']) !== $f['pauses_sla']) {
-        $changes[] = $f['pauses_sla'] ? 'the resolution clock now pauses' : 'the resolution clock now keeps running';
+        $changes[] = $f['pauses_sla'] ? 'the resolution clock now pauses' : 'the resolution clock now keeps running'; // i18n-ignore - shown through __(), or the audit log
         ticketStatusSyncClocks($id);
     }
     if (intval($row['ticket_status_client_reply'] ?? 1) !== $f['client_reply']) {
-        $changes[] = 'a client\'s reply now ' . ($f['client_reply'] ? 'moves the ticket back to Open' : 'leaves the ticket in it');
+        $changes[] = 'a client\'s reply now ' . ($f['client_reply'] ? 'moves the ticket back to Open' : 'leaves the ticket in it'); // i18n-ignore - shown through __(), or the audit log
     }
     if (intval($row['ticket_status_active']) !== $f['active']) {
         $changes[] = $f['active'] ? 'switched on' : 'switched off';

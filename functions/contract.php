@@ -16,12 +16,12 @@
 
 /** The kinds of contract - key => label, icon and what it means. */
 const CONTRACT_TYPES = [
-    'managed' => ['label' => 'Fully managed', 'icon' => 'fa-shield-alt', 'about' => 'A fixed monthly fee covers support and looking after everything'],
-    'comanaged' => ['label' => 'Co-managed', 'icon' => 'fa-handshake', 'about' => 'Shared with the client\'s own IT people'],
-    'block' => ['label' => 'Block hours', 'icon' => 'fa-hourglass-half', 'about' => 'Hours paid for up front, drawn down as work is done'],
-    'time_materials' => ['label' => 'Time and materials', 'icon' => 'fa-clock', 'about' => 'Billed for the time and parts each job takes'],
-    'break_fix' => ['label' => 'Break/fix', 'icon' => 'fa-wrench', 'about' => 'Fixed when something breaks, billed per job'],
-    'project' => ['label' => 'Project', 'icon' => 'fa-project-diagram', 'about' => 'One piece of work, with a start and an end'],
+    'managed' => ['label' => 'Fully managed', 'icon' => 'fa-shield-alt', 'about' => 'A fixed monthly fee covers support and looking after everything'], // i18n-ignore - shown through contractTypeLabel()
+    'comanaged' => ['label' => 'Co-managed', 'icon' => 'fa-handshake', 'about' => 'Shared with the client\'s own IT people'], // i18n-ignore - shown through contractTypeLabel()
+    'block' => ['label' => 'Block hours', 'icon' => 'fa-hourglass-half', 'about' => 'Hours paid for up front, drawn down as work is done'], // i18n-ignore - shown through contractTypeLabel()
+    'time_materials' => ['label' => 'Time and materials', 'icon' => 'fa-clock', 'about' => 'Billed for the time and parts each job takes'], // i18n-ignore - shown through contractTypeLabel()
+    'break_fix' => ['label' => 'Break/fix', 'icon' => 'fa-wrench', 'about' => 'Fixed when something breaks, billed per job'], // i18n-ignore - shown through contractTypeLabel()
+    'project' => ['label' => 'Project', 'icon' => 'fa-project-diagram', 'about' => 'One piece of work, with a start and an end'], // i18n-ignore - shown through contractTypeLabel()
     'other' => ['label' => 'Other', 'icon' => 'fa-file-contract', 'about' => ''],
 ];
 

@@ -208,14 +208,14 @@ if ($action === 'passphrase') {
     if ($passphrase !== '' && password_verify($passphrase, $row['item_passphrase'])) {
         mysqli_query($mysqli, "UPDATE shared_items SET item_failed_attempts = 0 WHERE item_id = " . intval($row['item_id']));
         shareSessionMark($row['item_id'], 'verified');
-        shareGuestRecord($row, 'Verify', 'The passphrase was entered');
+        shareGuestRecord($row, 'Verify', 'The passphrase was entered'); // i18n-ignore - the share history stays English
         exit(json_encode(shareGuestOpen(shareRow($row['item_id']))));
     }
     $attempts = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT item_failed_attempts FROM shared_items WHERE item_id = " . intval($row['item_id'])))[0] ?? SHARE_ATTEMPTS);
-    shareGuestRecord($row, 'Fail', 'A wrong passphrase was entered');
+    shareGuestRecord($row, 'Fail', 'A wrong passphrase was entered'); // i18n-ignore - the share history stays English
     if ($attempts >= SHARE_ATTEMPTS) {
         shareEnd($row['item_id'], 'Locked');
-        shareGuestRecord($row, 'Lock', 'Locked after ' . SHARE_ATTEMPTS . ' wrong passphrases', __('Shared link locked'), __('%1$s locked after %2$d wrong passphrases', shareName($row), SHARE_ATTEMPTS));
+        shareGuestRecord($row, 'Lock', 'Locked after ' . SHARE_ATTEMPTS . ' wrong passphrases', __('Shared link locked'), __('%1$s locked after %2$d wrong passphrases', shareName($row), SHARE_ATTEMPTS)); // i18n-ignore - the share history stays English
         shareGuestGone(shareGuestReason($row, 'locked'));
     }
     $left = SHARE_ATTEMPTS - $attempts;
@@ -235,7 +235,7 @@ if ($action === 'send_code') {
     $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     mysqli_query($mysqli, "UPDATE shared_items SET item_code = '" . escapeSql(password_hash($code, PASSWORD_DEFAULT)) . "', item_code_sent_at = NOW() WHERE item_id = " . intval($row['item_id']));
     shareEmailCode($row, $code);
-    shareGuestRecord($row, 'Code', 'A code was emailed to ' . $row['item_recipient']);
+    shareGuestRecord($row, 'Code', 'A code was emailed to ' . $row['item_recipient']); // i18n-ignore - the share history stays English
     exit(json_encode(['sent' => true]));
 }
 
@@ -253,14 +253,14 @@ if ($action === 'code') {
     if (strlen($code) === 6 && password_verify($code, $row['item_code'])) {
         mysqli_query($mysqli, "UPDATE shared_items SET item_failed_attempts = 0, item_code = NULL WHERE item_id = " . intval($row['item_id']));
         shareSessionMark($row['item_id'], 'verified');
-        shareGuestRecord($row, 'Verify', $row['item_recipient'] . ' entered the emailed code');
+        shareGuestRecord($row, 'Verify', $row['item_recipient'] . ' entered the emailed code'); // i18n-ignore - the share history stays English
         exit(json_encode(shareGuestOpen(shareRow($row['item_id']))));
     }
     $attempts = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT item_failed_attempts FROM shared_items WHERE item_id = " . intval($row['item_id'])))[0] ?? SHARE_ATTEMPTS);
-    shareGuestRecord($row, 'Fail', 'A wrong code was entered');
+    shareGuestRecord($row, 'Fail', 'A wrong code was entered'); // i18n-ignore - the share history stays English
     if ($attempts >= SHARE_ATTEMPTS) {
         shareEnd($row['item_id'], 'Locked');
-        shareGuestRecord($row, 'Lock', 'Locked after ' . SHARE_ATTEMPTS . ' wrong codes', __('Shared link locked'), __('%1$s locked after %2$d wrong codes', shareName($row), SHARE_ATTEMPTS));
+        shareGuestRecord($row, 'Lock', 'Locked after ' . SHARE_ATTEMPTS . ' wrong codes', __('Shared link locked'), __('%1$s locked after %2$d wrong codes', shareName($row), SHARE_ATTEMPTS)); // i18n-ignore - the share history stays English
         shareGuestGone(shareGuestReason($row, 'locked'));
     }
     $left = SHARE_ATTEMPTS - $attempts;
@@ -349,7 +349,7 @@ if ($action === 'destroy') {
         exit(json_encode(['error' => __('Open it first.')]));
     }
     if (shareEnd($row['item_id'], 'Destroyed')) {
-        shareGuestRecord($row, 'Destroy', 'Destroyed by the person who opened it');
+        shareGuestRecord($row, 'Destroy', 'Destroyed by the person who opened it'); // i18n-ignore - the share history stays English
     }
     unset($_SESSION['itflow_shares'][intval($row['item_id'])]);
     exit(json_encode(['state' => 'destroyed']));
@@ -384,7 +384,7 @@ if ($action === 'submit') {
     $payload = shareSeal($fields, shareContentKey($secret));
     mysqli_query($mysqli, "UPDATE shared_items SET item_payload = '" . escapeSql($payload) . "', item_received_at = NOW() WHERE item_id = " . intval($row['item_id']));
     $row = shareRow($row['item_id']);
-    shareGuestRecord($row, 'Receive', 'The login was sent back', __('Login sent back'), __('%s was sent back - save it to the credentials', shareName($row)));
+    shareGuestRecord($row, 'Receive', 'The login was sent back', __('Login sent back'), __('%s was sent back - save it to the credentials', shareName($row))); // i18n-ignore - the share history stays English
     exit(json_encode(['state' => 'sent']));
 }
 
