@@ -19,9 +19,9 @@ $per_page = 20;
 $paid_sql = "COALESCE((SELECT SUM(payment_amount) FROM payments WHERE payment_invoice_id = invoice_id), 0)";
 $open_sql = "invoice_status IN ('Sent', 'Viewed', 'Partial') AND ROUND(invoice_amount - $paid_sql, 2) > 0";
 $tabs = [
-    'open' => ['label' => 'To pay', 'icon' => 'fa-hourglass-half', 'where' => $open_sql],
-    'paid' => ['label' => 'Paid', 'icon' => 'fa-check', 'where' => "NOT ($open_sql) AND invoice_status NOT IN ('Cancelled', 'Non-Billable')"],
-    'all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1'],
+    'open' => ['label' => __('To pay'), 'icon' => 'fa-hourglass-half', 'where' => $open_sql],
+    'paid' => ['label' => _x('Paid', 'portal invoices tab'), 'icon' => 'fa-check', 'where' => "NOT ($open_sql) AND invoice_status NOT IN ('Cancelled', 'Non-Billable')"],
+    'all' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => '1 = 1'],
 ];
 $q = trim((string) ($_GET['q'] ?? ''));
 $where = "invoice_client_id = $session_client_id AND invoice_status != 'Draft'";
@@ -74,12 +74,12 @@ function invoicesUrl(array $changes) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Invoices</h1>
+        <h1><?= escapeHtml(__('Invoices')) ?></h1>
         <p>
             <?php if ($owed > 0) { ?>
-                You owe <strong class="text-body"><?= escapeHtml(billingMoney($owed, $currency)) ?></strong><?php if ($late > 0) { ?> - <span class="text-danger-emphasis"><?= escapeHtml(billingMoney($late, $currency)) ?> of it past due</span><?php } ?>
+                <?= __('You owe %s', '<strong class="text-body">' . escapeHtml(billingMoney($owed, $currency)) . '</strong>') ?><?php if ($late > 0) { ?> - <span class="text-danger-emphasis"><?= escapeHtml(__('%s of it past due', billingMoney($late, $currency))) ?></span><?php } ?>
             <?php } else { ?>
-                Nothing is owed - thank you
+                <?= escapeHtml(__('Nothing is owed - thank you')) ?>
             <?php } ?>
         </p>
     </div>
@@ -88,16 +88,16 @@ function invoicesUrl(array $changes) {
             <input type="hidden" name="tab" value="<?= escapeHtml($tab) ?>">
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="Search number or scope" aria-label="Search invoices" maxlength="200">
+                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="<?= escapeHtml(__('Search number or scope')) ?>" aria-label="<?= escapeHtml(__('Search invoices')) ?>" maxlength="200">
             </div>
         </form>
         <?php if ($owed > 0 && $cards) { ?>
-            <a class="btn btn-primary" href="unpaid_invoices.php"><i class="fas fa-credit-card me-2"></i>Pay invoices</a>
+            <a class="btn btn-primary" href="unpaid_invoices.php"><i class="fas fa-credit-card me-2"></i><?= escapeHtml(__('Pay invoices')) ?></a>
         <?php } ?>
     </div>
 </div>
 
-<nav class="itflow-portal-tabs" aria-label="Invoices">
+<nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Invoices')) ?>">
     <?php foreach ($tabs as $key => $t) { ?>
         <a class="<?= $key === $tab ? 'active' : '' ?><?= $key === 'open' && $counts['open'] && $late > 0 ? ' itflow-portal-tab-alert' : '' ?>" href="<?= escapeHtml(invoicesUrl(['tab' => $key, 'page' => null])) ?>">
             <i class="fas <?= $t['icon'] ?>"></i><?= escapeHtml($t['label']) ?>
@@ -109,13 +109,13 @@ function invoicesUrl(array $changes) {
 <section class="itflow-portal-panel">
     <?php if (!$total) { ?>
         <?php if ($q !== '') { ?>
-            <?= emptyStateHtml(['thing' => 'invoices', 'filtered' => true, 'match_text' => 'Nothing here has &ldquo;' . escapeHtml($q) . '&rdquo; in its number or scope.', 'clear_url' => invoicesUrl(['q' => null, 'page' => null])]) ?>
+            <?= emptyStateHtml(['thing' => __('invoices'), 'filtered' => true, 'match_text' => _x('Nothing here has %s in its number or scope.', 'invoices', '&ldquo;' . escapeHtml($q) . '&rdquo;'), 'clear_url' => invoicesUrl(['q' => null, 'page' => null])]) ?>
         <?php } elseif ($tab === 'open') { ?>
-            <?= emptyStateHtml(['title' => 'Nothing to pay', 'text' => 'You are all paid up - thank you.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('Nothing to pay'), 'text' => __('You are all paid up - thank you.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
         <?php } elseif ($tab === 'paid') { ?>
-            <?= emptyStateHtml(['title' => 'No paid invoices yet', 'text' => 'Invoices show here once they are paid.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No paid invoices yet'), 'text' => __('Invoices show here once they are paid.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
         <?php } else { ?>
-            <?= emptyStateHtml(['title' => 'No invoices yet', 'text' => 'When we bill you, the invoice shows here.', 'icon' => 'fa-file-invoice-dollar', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No invoices yet'), 'text' => __('When we bill you, the invoice shows here.'), 'icon' => 'fa-file-invoice-dollar', 'filtered' => false]) ?>
         <?php } ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">
@@ -127,9 +127,9 @@ function invoicesUrl(array $changes) {
                         <span class="itflow-portal-ticket-main">
                             <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml($row['invoice_prefix'] . $row['invoice_number']) ?><?php if (trim((string) $row['invoice_scope']) !== '') { ?><span class="fw-normal text-body-secondary"> · <?= escapeHtml($row['invoice_scope']) ?></span><?php } ?></span>
                             <span class="itflow-portal-ticket-meta">
-                                <span>Dated <?= escapeHtml(date('M j, Y', strtotime($row['invoice_date']))) ?></span>
-                                <?php if ($open) { ?><span>Due <?= escapeHtml(date('M j, Y', strtotime($row['invoice_due']))) ?></span><?php } ?>
-                                <?php if ($open && $state['paid'] > 0) { ?><span><?= escapeHtml(billingMoney($state['paid'], $row['invoice_currency_code'])) ?> of <?= escapeHtml(billingMoney($row['invoice_amount'], $row['invoice_currency_code'])) ?> paid</span><?php } ?>
+                                <span><?= escapeHtml(_x('Dated %s', 'invoice', formatDate($row['invoice_date'], 'date'))) ?></span>
+                                <?php if ($open) { ?><span><?= escapeHtml(_x('Due %s', 'invoice due', formatDate($row['invoice_due'], 'date'))) ?></span><?php } ?>
+                                <?php if ($open && $state['paid'] > 0) { ?><span><?= escapeHtml(__('%1$s of %2$s paid', billingMoney($state['paid'], $row['invoice_currency_code']), billingMoney($row['invoice_amount'], $row['invoice_currency_code']))) ?></span><?php } ?>
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">
@@ -142,10 +142,10 @@ function invoicesUrl(array $changes) {
         </ul>
         <?php if ($pages > 1) { ?>
             <div class="itflow-portal-pager">
-                <span><?= $offset + 1 ?>-<?= min($offset + $per_page, $total) ?> of <?= $total ?></span>
+                <span><?= escapeHtml(__('%1$d-%2$d of %3$d', $offset + 1, min($offset + $per_page, $total), $total)) ?></span>
                 <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(invoicesUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="Previous page"><i class="fas fa-chevron-left"></i></a>
-                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(invoicesUrl(['page' => $page + 1])) ?>" aria-label="Next page"><i class="fas fa-chevron-right"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(invoicesUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="<?= escapeHtml(__('Previous page')) ?>"><i class="fas fa-chevron-left"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(invoicesUrl(['page' => $page + 1])) ?>" aria-label="<?= escapeHtml(__('Next page')) ?>"><i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
         <?php } ?>

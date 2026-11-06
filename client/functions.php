@@ -367,38 +367,38 @@ function portalInvoiceState(array $row, $paid) {
     $days = $state['days'];
     switch ($state['state']) {
         case 'paid':
-            return $state + ['label' => 'Paid', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+            return $state + ['label' => _x('Paid', 'invoice status'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
         case 'cancelled':
-            return $state + ['label' => 'Cancelled', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => _x('Cancelled', 'invoice status'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
         case 'nonbillable':
-            return $state + ['label' => 'No charge', 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => __('No charge'), 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
         case 'draft':
-            return $state + ['label' => 'Draft', 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => _x('Draft', 'invoice status'), 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-closed'];
         case 'overdue':
-            return $state + ['label' => -$days . ' ' . (-$days === 1 ? 'day' : 'days') . ' overdue', 'icon' => 'fa-exclamation-circle', 'class' => 'itflow-portal-state-late'];
+            return $state + ['label' => _n('%d day overdue', '%d days overdue', -$days), 'icon' => 'fa-exclamation-circle', 'class' => 'itflow-portal-state-late'];
     }
     if ($days === 0) {
-        return $state + ['label' => 'Due today', 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
+        return $state + ['label' => __('Due today'), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
     }
     if ($days <= 7) {
-        return $state + ['label' => "Due in $days " . ($days === 1 ? 'day' : 'days'), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
+        return $state + ['label' => _n('Due in %d day', 'Due in %d days', $days), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
     }
-    return $state + ['label' => 'Due ' . date('M j', strtotime((string) $row['invoice_due'])), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-new'];
+    return $state + ['label' => _x('Due %s', 'invoice due', formatDate((string) $row['invoice_due'], 'date_short')), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-new'];
 }
 
 /** Where a quote stands for the client - waiting for their answer, run out, accepted or declined - with a label, icon and class. */
 function portalQuoteState(array $row) {
     $status = (string) $row['quote_status'];
     if (in_array($status, ['Accepted', 'Invoiced'], true)) {
-        return ['key' => 'accepted', 'label' => 'Accepted', 'icon' => 'fa-thumbs-up', 'class' => 'itflow-portal-state-resolved'];
+        return ['key' => 'accepted', 'label' => _x('Accepted', 'quote status'), 'icon' => 'fa-thumbs-up', 'class' => 'itflow-portal-state-resolved'];
     }
     if ($status === 'Declined') {
-        return ['key' => 'declined', 'label' => 'Declined', 'icon' => 'fa-thumbs-down', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'declined', 'label' => _x('Declined', 'quote status'), 'icon' => 'fa-thumbs-down', 'class' => 'itflow-portal-state-closed'];
     }
     if (quoteExpired($row)) {
-        return ['key' => 'expired', 'label' => 'Expired', 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
+        return ['key' => 'expired', 'label' => _x('Expired', 'quote status'), 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
     }
-    return ['key' => 'waiting', 'label' => 'Waiting for you', 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
+    return ['key' => 'waiting', 'label' => __('Waiting for you'), 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
 }
 
 /** SQL: quotes waiting for the client's answer - sent or viewed, and not run out. */

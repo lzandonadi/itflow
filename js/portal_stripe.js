@@ -73,7 +73,7 @@
                     if (result.error) {
                         errorBox.textContent = result.error.type === 'card_error' || result.error.type === 'validation_error'
                             ? result.error.message
-                            : 'Something went wrong taking the payment - nothing has been charged. Try again.';
+                            : __('Something went wrong taking the payment - nothing has been charged. Try again.');
                         show(errorBox, true);
                     }
                     busy(false);

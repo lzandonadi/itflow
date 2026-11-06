@@ -517,7 +517,7 @@ if (isset($_GET['export_statement_pdf'])) {
     $statement = billingStatement($session_client_id, $with_paid ? date('Y-m-d', strtotime('-12 months')) : '', '', $with_paid);
 
     if (!$statement['invoices']) {
-        flashAlert("There is nothing to put on a statement", 'error');
+        flashAlert(escapeHtml(__('There is nothing to put on a statement')), 'error');
         redirect("statement.php");
     }
 
@@ -912,11 +912,11 @@ if (isset($_POST['portal_quote_answer'])) {
 
     $quote = billingRow('quote', $quote_id, false);
     if (!$quote || intval($quote['client_id']) !== $session_client_id || $quote['quote_status'] === 'Draft') {
-        flashAlert("That quote isn't here", 'error');
+        flashAlert(__("That quote isn't here"), 'error');
         redirect('quotes.php');
     }
     if ($name === '' || ($accept && empty($_POST['authorised']))) {
-        flashAlert($name === '' ? 'Put your name to your answer' : 'Tick to confirm you can accept the quote', 'error');
+        flashAlert($name === '' ? __('Put your name to your answer') : __('Tick to confirm you can accept the quote'), 'error');
         redirect("quote.php?id=$quote_id");
     }
 
@@ -927,7 +927,7 @@ if (isset($_POST['portal_quote_answer'])) {
     }
 
     $number = escapeHtml(billingNumber('quote', $quote));
-    flashAlert($accept ? "Thank you - quote <strong>$number</strong> is accepted and our team has been told" : "Quote <strong>$number</strong> declined - thank you for letting us know");
+    flashAlert($accept ? __('Thank you - quote %s is accepted and our team has been told', "<strong>$number</strong>") : __('Quote %s declined - thank you for letting us know', "<strong>$number</strong>"));
 
     redirect("quote.php?id=$quote_id");
 
@@ -981,17 +981,17 @@ if (isset($_POST['portal_quote_file'])) {
     $quote_id = intval($_POST['quote_id'] ?? 0);
     $quote = billingRow('quote', $quote_id, false);
     if (!$quote || intval($quote['client_id']) !== $session_client_id || $quote['quote_status'] !== 'Accepted') {
-        flashAlert("Files can only be sent with an accepted quote", 'error');
+        flashAlert(__('Files can only be sent with an accepted quote'), 'error');
         redirect($quote ? "quote.php?id=$quote_id" : 'quotes.php');
     }
 
     $upload = billingQuoteAddFiles($quote_id, $_FILES['file'] ?? [], ['name' => (string) ($contact['contact_name'] ?? '')]);
     if ($upload['added'] && !$upload['failed']) {
-        flashAlert('Sent - thank you. ' . escapeHtml(implode(', ', $upload['added'])) . ' is with us now');
+        flashAlert(__('Sent - thank you. %s is with us now', escapeHtml(implode(', ', $upload['added']))));
     } elseif ($upload['added']) {
-        flashAlert('Sent ' . escapeHtml(implode(', ', $upload['added'])) . ' - but ' . $upload['failed'] . ' could not be taken. Only PDFs can be sent', 'error');
+        flashAlert(_n('Sent %2$s - but %1$d could not be taken. Only PDFs can be sent', 'Sent %2$s - but %1$d could not be taken. Only PDFs can be sent', $upload['failed'], $upload['failed'], escapeHtml(implode(', ', $upload['added']))), 'error');
     } else {
-        flashAlert('That file could not be taken - only PDFs can be sent', 'error');
+        flashAlert(__('That file could not be taken - only PDFs can be sent'), 'error');
     }
 
     redirect("quote.php?id=$quote_id");
@@ -1015,7 +1015,7 @@ if (isset($_POST['portal_pay'])) {
     $back = 'unpaid_invoices.php' . ($invoice_ids ? '?' . http_build_query(['select' => implode(',', $invoice_ids)]) : '');
 
     if (!billingStripeProvider()) {
-        flashAlert('Card payments are not set up', 'error');
+        flashAlert(escapeHtml(__('Card payments are not set up')), 'error');
         redirect('invoices.php');
     }
 
@@ -1033,7 +1033,7 @@ if (isset($_POST['portal_pay'])) {
     // A saved card, charged now - the form's token keeps a double click to one charge
     $token = (string) ($_POST['pay_token'] ?? '');
     if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
-        flashAlert('That page was out of date - check the invoices and try again', 'error');
+        flashAlert(escapeHtml(__('That page was out of date - check the invoices and try again')), 'error');
         redirect($back);
     }
     $contact_name = (string) ($contact['contact_name'] ?? '');
@@ -1047,12 +1047,12 @@ if (isset($_POST['portal_pay'])) {
     if (!$booked['ok']) {
         $pi_id = escapeSql((string) $charge['pi']->id);
         logApp("Stripe", "error", "Saved card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", "A card payment of " . escapeSql(billingMoney($selection['total'], $selection['currency'])) . " from $session_client_name went through in the client portal but could not be recorded - $pi_id", "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
-        flashAlert('Your card was charged, but we could not record the payment here - we have been told and will put it right', 'error');
+        appNotify("Invoice Payment", escapeSql(__('A card payment of %1$s from %2$s went through in the client portal but could not be recorded - %3$s', billingMoney($selection['total'], $selection['currency']), $session_client_name, $pi_id)), "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
+        flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
 
-    flashAlert('Thank you - your payment of <strong>' . escapeHtml(billingMoney($selection['total'], $selection['currency'])) . '</strong> went through');
+    flashAlert(__('Thank you - your payment of %s went through', '<strong>' . escapeHtml(billingMoney($selection['total'], $selection['currency'])) . '</strong>'));
     redirect('receipt.php?id=' . $booked['payment_id']);
 
 }
@@ -1071,7 +1071,7 @@ if (isset($_GET['portal_pay_return'])) {
     $secret = (string) ($_GET['payment_intent_client_secret'] ?? '');
     $stripe = billingStripeClient();
     if (!$stripe || !preg_match('/^pi_[A-Za-z0-9_]+$/', $pi_id)) {
-        flashAlert('That payment could not be found', 'error');
+        flashAlert(escapeHtml(__('That payment could not be found')), 'error');
         redirect('invoices.php');
     }
 
@@ -1079,21 +1079,21 @@ if (isset($_GET['portal_pay_return'])) {
         $pi = $stripe->paymentIntents->retrieve($pi_id);
     } catch (Throwable $e) {
         logApp("Stripe", "error", "Could not retrieve $pi_id on return to the client portal: " . $e->getMessage());
-        flashAlert('We could not check that payment just now - if your card was charged, it will show here shortly', 'error');
+        flashAlert(escapeHtml(__('We could not check that payment just now - if your card was charged, it will show here shortly')), 'error');
         redirect('invoices.php');
     }
 
     if (!hash_equals((string) $pi->client_secret, $secret) || intval($pi->metadata['itflow_client_id'] ?? 0) !== $session_client_id) {
-        flashAlert('That payment could not be found', 'error');
+        flashAlert(escapeHtml(__('That payment could not be found')), 'error');
         redirect('invoices.php');
     }
 
     if ($pi->status === 'processing') {
-        flashAlert('Your payment is processing - the invoices show as paid once it clears');
+        flashAlert(escapeHtml(__('Your payment is processing - the invoices show as paid once it clears')));
         redirect('invoices.php');
     }
     if ($pi->status !== 'succeeded') {
-        flashAlert('That payment did not go through - nothing was charged. Try again, or use another card', 'error');
+        flashAlert(escapeHtml(__('That payment did not go through - nothing was charged. Try again, or use another card')), 'error');
         redirect('pay.php');
     }
 
@@ -1101,14 +1101,14 @@ if (isset($_GET['portal_pay_return'])) {
     if (!$booked['ok']) {
         $pi_id_sql = escapeSql($pi_id);
         logApp("Stripe", "error", "Card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", "A card payment from $session_client_name went through in the client portal but could not be recorded - $pi_id_sql", "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
-        flashAlert('Your card was charged, but we could not record the payment here - we have been told and will put it right', 'error');
+        appNotify("Invoice Payment", vsprintf(escapeSql(__('A card payment from %1$s went through in the client portal but could not be recorded - %2$s')), [$session_client_name, $pi_id_sql]), "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
+        flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
 
     unset($_SESSION['portal_checkout']);
     if (!$booked['already']) {
-        flashAlert('Thank you - your payment of <strong>' . escapeHtml(billingMoney(intval($pi->amount_received) / 100, strtoupper((string) $pi->currency))) . '</strong> went through');
+        flashAlert(__('Thank you - your payment of %s went through', '<strong>' . escapeHtml(billingMoney(intval($pi->amount_received) / 100, strtoupper((string) $pi->currency))) . '</strong>'));
     }
     redirect('receipt.php?id=' . $booked['payment_id']);
 
@@ -1130,7 +1130,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
-        flashAlert("Stripe provider is not configured in the system.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider is not configured in the system.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1138,7 +1138,7 @@ if (isset($_POST['create_stripe_customer'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials missing. Please contact support.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials missing. Please contact support.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1180,7 +1180,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
             logAudit("Stripe", "Create", "$session_contact_name created Stripe customer for $session_client_name as $stripe_customer_id and authorized future automatic payments", $session_client_id, $session_client_id);
 
-            flashAlert("Thank you - now add your card.");
+            flashAlert(escapeHtml(__('Thank you - now add your card.')));
 
             redirect('saved_payment_methods.php?add=1');
 
@@ -1191,7 +1191,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
             logApp("Stripe", "error", "Failed to create Stripe customer for $session_client_name: $error");
 
-            flashAlert("An error occurred while creating your Stripe customer. Please try again.", 'danger');
+            flashAlert(escapeHtml(__('An error occurred while creating your Stripe customer. Please try again.')), 'danger');
 
         }
 
@@ -1304,7 +1304,7 @@ if (isset($_GET['stripe_save_card'])) {
 
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
-        flashAlert("Stripe provider not configured.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider not configured.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1312,7 +1312,7 @@ if (isset($_GET['stripe_save_card'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials missing.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials missing.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1328,7 +1328,7 @@ if (isset($_GET['stripe_save_card'])) {
     $stripe_customer_id = escapeSql($client_provider['payment_provider_client'] ?? '');
 
     if (empty($stripe_customer_id)) {
-        flashAlert("Stripe customer ID not found for client.", 'danger');
+        flashAlert(escapeHtml(__('Stripe customer ID not found for client.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1373,7 +1373,7 @@ if (isset($_GET['stripe_save_card'])) {
         error_log("Stripe error while saving payment method: $error");
         logApp("Stripe", "error", "Exception saving payment method: $error");
 
-        flashAlert("An error occurred while saving your payment method.", 'danger');
+        flashAlert(escapeHtml(__('An error occurred while saving your payment method.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1385,7 +1385,7 @@ if (isset($_GET['stripe_save_card'])) {
 
     logAudit("Stripe", "Create", "$session_contact_name saved payment method ($saved_payment_description) (PM: $payment_method_id)", $session_client_id);
 
-    flashAlert("Payment method saved – thank you.");
+    flashAlert(escapeHtml(__('Payment method saved – thank you.')));
     redirect("saved_payment_methods.php");
 }
 
@@ -1407,7 +1407,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
 
     if (!$stripe_provider) {
-        flashAlert("Stripe provider is not configured.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider is not configured.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1415,7 +1415,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials are missing.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials are missing.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1431,7 +1431,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $saved_payment = mysqli_fetch_assoc($saved_payment_result);
 
     if (!$saved_payment) {
-        flashAlert("Payment method not found or does not belong to you.", 'danger');
+        flashAlert(escapeHtml(__('Payment method not found or does not belong to you.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1455,7 +1455,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
         logApp("Stripe", "error", "Exception removing payment method $payment_method_id: $error");
 
-        flashAlert("An error occurred while removing your payment method.", 'danger');
+        flashAlert(escapeHtml(__('An error occurred while removing your payment method.')), 'danger');
 
         redirect("saved_payment_methods.php");
 
@@ -1486,7 +1486,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
     logAudit("Stripe", "Delete", "$session_contact_name deleted Stripe payment method $saved_payment_description (PM: $payment_method_id)", $session_client_id);
 
-    flashAlert("Payment method $saved_payment_description removed.");
+    flashAlert(escapeHtml(__('Payment method %s removed.', $saved_payment_description)));
 
     redirect("saved_payment_methods.php");
 }
@@ -1506,7 +1506,7 @@ if (isset($_POST['set_recurring_payment'])) {
     $row = mysqli_fetch_assoc($sql);
 
     if (!$row) {
-        flashAlert("Recurring invoice not found.", 'danger');
+        flashAlert(escapeHtml(__('Recurring invoice not found.')), 'danger');
         redirect("recurring_invoices.php");
     }
 
@@ -1530,7 +1530,7 @@ if (isset($_POST['set_recurring_payment'])) {
         $row = mysqli_fetch_assoc($sql);
 
         if (!$row) {
-            flashAlert("Payment method not found or does not belong to you.", 'danger');
+            flashAlert(escapeHtml(__('Payment method not found or does not belong to you.')), 'danger');
             redirect("recurring_invoices.php");
         }
 
@@ -1546,14 +1546,14 @@ if (isset($_POST['set_recurring_payment'])) {
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_contact_name created Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $session_client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment $saved_payment_description enabled for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number");
+        flashAlert(escapeHtml(__('Automatic Payment %1$s enabled for Recurring Invoice %2$s', $saved_payment_description, "$recurring_invoice_prefix$recurring_invoice_number")));
     } else {
         // Delete
         mysqli_query($mysqli, "DELETE FROM recurring_payments WHERE recurring_payment_recurring_invoice_id = $recurring_invoice_id");
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_contact_name removed Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $session_client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment Disabled for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number");
+        flashAlert(escapeHtml(__('Automatic Payment Disabled for Recurring Invoice %s', "$recurring_invoice_prefix$recurring_invoice_number")));
     }
 
     redirect();

@@ -240,9 +240,9 @@
             var over = limit > 0 && cents >= limit;
             var tooMany = max > 0 && count > max;
             text('[data-pay-total]', amount);
-            text('[data-pay-count]', count + (count === 1 ? ' invoice' : ' invoices'));
-            text('[data-pay-label]', !count ? 'Tick an invoice to pay' : (tooMany ? 'Pay up to ' + max + ' invoices at a time'
-                : (method && method.value === 'new' ? 'Continue to pay ' : 'Pay ') + amount));
+            text('[data-pay-count]', count === 1 ? __('%d invoice', count) : __('%d invoices', count));
+            text('[data-pay-label]', !count ? __('Tick an invoice to pay') : (tooMany ? __('Pay up to %d invoices at a time', max)
+                : (method && method.value === 'new' ? __('Continue to pay %s', amount) : __('Pay %s', amount))));
             var note = form.querySelector('[data-pay-limit-note]');
             if (note) {
                 note.hidden = !over;

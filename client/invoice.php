@@ -16,10 +16,10 @@ portalBillingGate();
 
 $invoice = billingRow('invoice', intval($_GET['id'] ?? 0), false);
 if (!$invoice || intval($invoice['client_id']) !== $session_client_id || $invoice['invoice_status'] === 'Draft') { ?>
-    <a class="itflow-portal-back" href="invoices.php"><i class="fas fa-chevron-left"></i>Invoices</a>
+    <a class="itflow-portal-back" href="invoices.php"><i class="fas fa-chevron-left"></i><?= escapeHtml(__('Invoices')) ?></a>
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => "That invoice isn't here", 'text' => 'It may have been replaced, or the link is not quite right.', 'icon' => 'fa-file-invoice-dollar', 'filtered' => false,
-            'actions' => [['label' => 'All invoices', 'href' => 'invoices.php', 'icon' => 'fa-arrow-left']]]) ?>
+        <?= emptyStateHtml(['title' => __("That invoice isn't here"), 'text' => _x('It may have been replaced, or the link is not quite right.', 'invoice'), 'icon' => 'fa-file-invoice-dollar', 'filtered' => false,
+            'actions' => [['label' => __('All invoices'), 'href' => 'invoices.php', 'icon' => 'fa-arrow-left']]]) ?>
     </section>
     <?php
     require_once "includes/footer.php";
@@ -72,16 +72,16 @@ $paper = [
 ];
 ?>
 
-<a class="itflow-portal-back d-print-none" href="invoices.php"><i class="fas fa-chevron-left"></i>Invoices</a>
+<a class="itflow-portal-back d-print-none" href="invoices.php"><i class="fas fa-chevron-left"></i><?= escapeHtml(__('Invoices')) ?></a>
 
 <div class="itflow-portal-page-head d-print-none">
     <div>
-        <h1>Invoice <?= escapeHtml($number) ?></h1>
-        <p><?= trim((string) $invoice['invoice_scope']) !== '' ? escapeHtml($invoice['invoice_scope']) : 'Dated ' . escapeHtml(date('M j, Y', strtotime($invoice['invoice_date']))) ?></p>
+        <h1><?= escapeHtml(__('Invoice %s', $number)) ?></h1>
+        <p><?= trim((string) $invoice['invoice_scope']) !== '' ? escapeHtml($invoice['invoice_scope']) : escapeHtml(_x('Dated %s', 'invoice', formatDate($invoice['invoice_date'], 'date'))) ?></p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a class="btn btn-outline-secondary" href="pdf.php?invoice=<?= $invoice_id ?>"><i class="fas fa-file-pdf me-2"></i>Download PDF</a>
-        <button type="button" class="btn btn-outline-secondary" data-portal-print title="Print"><i class="fas fa-print"></i><span class="visually-hidden">Print</span></button>
+        <a class="btn btn-outline-secondary" href="pdf.php?invoice=<?= $invoice_id ?>"><i class="fas fa-file-pdf me-2"></i><?= escapeHtml(__('Download PDF')) ?></a>
+        <button type="button" class="btn btn-outline-secondary" data-portal-print title="<?= escapeHtml(__('Print')) ?>"><i class="fas fa-print"></i><span class="visually-hidden"><?= escapeHtml(__('Print')) ?></span></button>
     </div>
 </div>
 
@@ -95,45 +95,45 @@ $paper = [
                     <div class="itflow-portal-outcome">
                         <span class="itflow-portal-outcome-icon is-success" aria-hidden="true"><i class="fas fa-check"></i></span>
                         <div>
-                            <div class="fw-semibold">Paid in full</div>
-                            <div class="small text-body-secondary"><?= $payments ? 'On ' . escapeHtml(date('M j, Y', strtotime($payments[0]['payment_date']))) . ' - thank you.' : 'Thank you.' ?></div>
+                            <div class="fw-semibold"><?= escapeHtml(__('Paid in full')) ?></div>
+                            <div class="small text-body-secondary"><?= escapeHtml($payments ? __('On %s - thank you.', formatDate($payments[0]['payment_date'], 'date')) : __('Thank you.')) ?></div>
                         </div>
                     </div>
                 <?php } elseif (!$owing) { ?>
                     <div class="itflow-portal-outcome">
                         <span class="itflow-portal-outcome-icon" aria-hidden="true"><i class="fas fa-ban"></i></span>
                         <div>
-                            <div class="fw-semibold"><?= $state['state'] === 'cancelled' ? 'Cancelled' : 'Nothing to pay' ?></div>
-                            <div class="small text-body-secondary">Nothing is owed on this invoice.</div>
+                            <div class="fw-semibold"><?= escapeHtml($state['state'] === 'cancelled' ? _x('Cancelled', 'invoice status') : __('Nothing to pay')) ?></div>
+                            <div class="small text-body-secondary"><?= escapeHtml(__('Nothing is owed on this invoice.')) ?></div>
                         </div>
                     </div>
                 <?php } else { ?>
-                    <div class="itflow-billing-stat-label">Amount due</div>
+                    <div class="itflow-billing-stat-label"><?= escapeHtml(__('Amount due')) ?></div>
                     <div class="itflow-portal-big-amount itflow-money<?= $state['state'] === 'overdue' ? ' text-danger-emphasis' : '' ?>"><?= escapeHtml(billingMoney($state['balance'], $currency)) ?></div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                         <?= portalStateBadge($state) ?>
                         <?php if ($state['class'] !== 'itflow-portal-state-new') { // "Due Nov 30" already says when ?>
-                            <span class="small text-body-secondary">Due <?= escapeHtml(date('M j, Y', strtotime($invoice['invoice_due']))) ?></span>
+                            <span class="small text-body-secondary"><?= escapeHtml(_x('Due %s', 'invoice due', formatDate($invoice['invoice_due'], 'date'))) ?></span>
                         <?php } ?>
                     </div>
                     <?php if ($state['paid'] > 0) { ?>
-                        <p class="small text-body-secondary mb-3"><?= escapeHtml(billingMoney($state['paid'], $currency)) ?> of <?= escapeHtml(billingMoney($invoice['invoice_amount'], $currency)) ?> paid so far.</p>
+                        <p class="small text-body-secondary mb-3"><?= escapeHtml(__('%1$s of %2$s paid so far.', billingMoney($state['paid'], $currency), billingMoney($invoice['invoice_amount'], $currency))) ?></p>
                     <?php } ?>
                     <?php if ($autopay_card) { ?>
                         <div class="itflow-portal-note mb-3">
                             <i class="<?= escapeHtml($autopay_card['icon']) ?> fa-fw"></i>
-                            <span>Autopay will charge <?= escapeHtml($autopay_card['label']) ?> on <?= escapeHtml(date('M j', strtotime($invoice['invoice_due']))) ?> - nothing to do, unless you would rather pay now.</span>
+                            <span><?= escapeHtml(__('Autopay will charge %1$s on %2$s - nothing to do, unless you would rather pay now.', $autopay_card['label'], formatDate($invoice['invoice_due'], 'date_short'))) ?></span>
                         </div>
                     <?php } ?>
                     <?php if ($can_pay) { ?>
-                        <a class="btn btn-success btn-lg w-100" href="unpaid_invoices.php?select=<?= $invoice_id ?>"><i class="fas fa-credit-card me-2"></i>Pay <?= escapeHtml(billingMoney($state['balance'], $currency)) ?></a>
+                        <a class="btn btn-success btn-lg w-100" href="unpaid_invoices.php?select=<?= $invoice_id ?>"><i class="fas fa-credit-card me-2"></i><?= escapeHtml(__('Pay %s', billingMoney($state['balance'], $currency))) ?></a>
                         <?php if ($others) { ?>
-                            <div class="text-center mt-2"><a class="small" href="unpaid_invoices.php">Or pay it with your <?= count($others) ?> other open <?= count($others) === 1 ? 'invoice' : 'invoices' ?></a></div>
+                            <div class="text-center mt-2"><a class="small" href="unpaid_invoices.php"><?= escapeHtml(_n('Or pay it with your %d other open invoice', 'Or pay it with your %d other open invoices', count($others))) ?></a></div>
                         <?php } ?>
                     <?php } elseif ($cards) { ?>
-                        <p class="small text-body-secondary mb-0">This invoice is too large to pay by card here - please pay it another way, or <a href="<?= escapeHtml(portalAskUrl("Paying invoice $number")) ?>">ask us</a>.</p>
+                        <p class="small text-body-secondary mb-0"><?= __('This invoice is too large to pay by card here - please pay it another way, or <a href="%s">ask us</a>.', escapeHtml(portalAskUrl(__('Paying invoice %s', $number)))) ?></p>
                     <?php } else { ?>
-                        <p class="small text-body-secondary mb-0">To pay, use the payment details on the invoice, or <a href="<?= escapeHtml(portalAskUrl("Paying invoice $number")) ?>">ask us</a> how.</p>
+                        <p class="small text-body-secondary mb-0"><?= __('To pay, use the payment details on the invoice, or <a href="%s">ask us</a> how.', escapeHtml(portalAskUrl(__('Paying invoice %s', $number)))) ?></p>
                     <?php } ?>
                 <?php } ?>
             </div>
@@ -142,7 +142,7 @@ $paper = [
         <?php if ($payments) { ?>
             <section class="itflow-portal-panel mb-4">
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-receipt"></i>Payments</h2>
+                    <h2><i class="fas fa-receipt"></i><?= escapeHtml(__('Payments')) ?></h2>
                 </div>
                 <ul class="itflow-portal-list">
                     <?php foreach ($payments as $payment) { ?>
@@ -150,9 +150,9 @@ $paper = [
                             <a class="itflow-portal-todo" href="receipt.php?id=<?= intval($payment['payment_id']) ?>">
                                 <span class="itflow-portal-todo-main">
                                     <div class="itflow-money"><?= escapeHtml(billingMoney($payment['payment_amount'], $payment['payment_currency_code'])) ?></div>
-                                    <div><?= escapeHtml(billingPaymentMethodText($payment['payment_method'], $payment['payment_reference'])) ?> · <?= escapeHtml(date('M j, Y', strtotime($payment['payment_date']))) ?></div>
+                                    <div><?= escapeHtml(billingPaymentMethodText($payment['payment_method'], $payment['payment_reference'])) ?> · <?= escapeHtml(formatDate($payment['payment_date'], 'date')) ?></div>
                                 </span>
-                                <span class="small text-body-secondary">Receipt<i class="fas fa-chevron-right ms-2"></i></span>
+                                <span class="small text-body-secondary"><?= escapeHtml(__('Receipt')) ?><i class="fas fa-chevron-right ms-2"></i></span>
                             </a>
                         </li>
                     <?php } ?>
@@ -166,7 +166,7 @@ $paper = [
                     <span class="itflow-portal-todo-icon is-info"><i class="fas fa-redo-alt"></i></span>
                     <span class="itflow-portal-todo-main">
                         <div><?= escapeHtml(trim((string) $recurring['recurring_invoice_scope']) !== '' ? $recurring['recurring_invoice_scope'] : billingNumber('recurring', $recurring)) ?></div>
-                        <div>Billed <?= escapeHtml(strtolower(recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? $recurring['recurring_invoice_frequency'])) ?> - see what it covers</div>
+                        <div><?= escapeHtml(__('Billed %s - see what it covers', mb_strtolower(recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? $recurring['recurring_invoice_frequency']))) ?></div>
                     </span>
                     <i class="fas fa-chevron-right text-body-secondary small"></i>
                 </a>
@@ -174,7 +174,8 @@ $paper = [
         <?php } ?>
 
         <p class="small text-body-secondary px-1">
-            Questions about this invoice? <a href="<?= escapeHtml(portalAskUrl("Question about invoice $number")) ?>">Ask us</a><?php if (!empty($company['phone_display'])) { ?> or call <?= escapeHtml($company['phone_display']) ?><?php } ?>.
+            <?php $ask = escapeHtml(portalAskUrl(__('Question about invoice %s', $number))); ?>
+            <?= !empty($company['phone_display']) ? __('Questions about this invoice? <a href="%1$s">Ask us</a> or call %2$s.', $ask, escapeHtml($company['phone_display'])) : __('Questions about this invoice? <a href="%s">Ask us</a>.', $ask) ?>
         </p>
 
     </div>
