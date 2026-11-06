@@ -42,7 +42,7 @@ if (isset($_POST['add_quote'])) {
 
     triggerCustomAction('quote_create', $quote_id);
 
-    flashAlert("Quote <strong>$config_quote_prefix$quote_number</strong> created");
+    flashAlert(__('Quote %s created', "<strong>$config_quote_prefix$quote_number</strong>"));
 
     redirect("quote.php?quote_id=$quote_id");
 
@@ -83,7 +83,7 @@ if (isset($_POST['add_quote_copy'])) {
         quote_number, quote_prefix, quote_scope FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $original_quote_prefix = escapeSql($row['quote_prefix']);
@@ -128,7 +128,7 @@ if (isset($_POST['add_quote_copy'])) {
 
     triggerCustomAction('quote_create', $new_quote_id);
 
-    flashAlert("Quote copied");
+    flashAlert(__('Quote copied'));
 
     redirect("quote.php?quote_id=$new_quote_id");
 
@@ -147,7 +147,7 @@ if (isset($_POST['add_quote_to_invoice'])) {
 
     $quote = billingRow('quote', intval($_POST['quote_id'] ?? 0));
     if (!$quote) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($quote['client_id']);
@@ -174,7 +174,7 @@ if (isset($_POST['add_quote_to_invoice'])) {
         redirect();
     }
 
-    flashAlert('<strong>' . escapeHtml(billingNumber('quote', $quote)) . '</strong> invoiced as ' . escapeHtml(implode(', ', $result['numbers'])));
+    flashAlert(__('%1$s invoiced as %2$s', '<strong>' . escapeHtml(billingNumber('quote', $quote)) . '</strong>', escapeHtml(implode(', ', $result['numbers']))));
 
     if ($result['invoice_id']) {
         redirect("invoice.php?invoice_id={$result['invoice_id']}");
@@ -197,7 +197,7 @@ if (isset($_POST['edit_quote'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -212,7 +212,7 @@ if (isset($_POST['edit_quote'])) {
 
     logAudit("Quote", "Edit", "$session_name edited quote $quote_prefix$quote_number", $client_id, $quote_id);
 
-    flashAlert("Quote edited");
+    flashAlert(__('Quote edited'));
 
     redirect();
 
@@ -230,7 +230,7 @@ if (isset($_GET['delete_quote'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -258,7 +258,7 @@ if (isset($_GET['delete_quote'])) {
 
     logAudit("Quote", "Delete", "$session_name deleted quote $quote_prefix$quote_number", $client_id);
 
-    flashAlert("Quote <strong>$quote_prefix$quote_number</strong> deleted", 'error');
+    flashAlert(__('Quote %s deleted', "<strong>$quote_prefix$quote_number</strong>"), 'error');
 
     if (isset($_GET['client_id'])) {
         $client_id = intval($_GET['client_id']);
@@ -280,7 +280,7 @@ if (isset($_POST['mark_quote_sent'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -292,7 +292,7 @@ if (isset($_POST['mark_quote_sent'])) {
     // The modal offers a fixed list, so anything else is a tampered form
     $sent_method = $_POST['sent_method'] ?? '';
     if (!in_array($sent_method, getSentMethods(), true)) {
-        flashAlert("Invalid delivery method", 'error');
+        flashAlert(__('Invalid delivery method'), 'error');
         redirect();
     }
     $sent_method = escapeSql($sent_method);
@@ -310,7 +310,7 @@ if (isset($_POST['mark_quote_sent'])) {
 
     logAudit("Quote", "Send", "$session_name marked quote $quote_prefix$quote_number as sent - $sent_method", $client_id, $quote_id);
 
-    flashAlert("Quote marked sent");
+    flashAlert(__('Quote marked sent'));
 
     redirect();
 
@@ -327,7 +327,7 @@ if (isset($_GET['accept_quote'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -344,7 +344,7 @@ if (isset($_GET['accept_quote'])) {
 
     triggerCustomAction('quote_accept', $quote_id);
 
-    flashAlert("Quote accepted");
+    flashAlert(__('Quote accepted'));
 
     redirect();
 
@@ -361,7 +361,7 @@ if (isset($_GET['decline_quote'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -378,7 +378,7 @@ if (isset($_GET['decline_quote'])) {
 
     logAudit("Quote", "Edit", "$session_name marked quote $quote_prefix$quote_number as declined", $client_id, $quote_id);
 
-    flashAlert("Quote declined", 'error');
+    flashAlert(__('Quote declined'), 'error');
 
     redirect();
 
@@ -392,7 +392,7 @@ if (isset($_POST['email_quote'])) {
 
     $quote = billingRow('quote', intval($_POST['quote_id'] ?? 0));
     if (!$quote) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect('quotes.php');
     }
     $quote_id = intval($quote['quote_id']);
@@ -407,13 +407,13 @@ if (isset($_POST['email_quote'])) {
     if (!empty($_POST['quick_send'])) {
         $recipients = billingEmailRecipients($client_id, null, 'quote');
         if (!$recipients) {
-            flashAlert("No default contacts to quick send to - use Send to choose recipients", 'error');
+            flashAlert(__('No default contacts to quick send to - use Send to choose recipients'), 'error');
             redirect();
         }
     } else {
         $recipients = billingEmailRecipients($client_id, (array) ($_POST['contacts'] ?? []));
         if (!$recipients) {
-            flashAlert(empty($_POST['contacts']) ? "Select at least one contact to send to" : "None of the selected contacts have a usable email address", 'error');
+            flashAlert(empty($_POST['contacts']) ? __('Select at least one contact to send to') : __('None of the selected contacts have a usable email address'), 'error');
             redirect();
         }
     }
@@ -437,7 +437,7 @@ if (isset($_POST['email_quote'])) {
         mysqli_query($mysqli, "UPDATE quotes SET quote_status = 'Sent' WHERE quote_id = $quote_id");
     }
 
-    flashAlert("Quote queued to " . count($sent) . " " . (count($sent) === 1 ? "recipient" : "recipients"));
+    flashAlert(_n('Quote queued to %d recipient', 'Quote queued to %d recipients', count($sent)));
 
     redirect();
 
@@ -454,7 +454,7 @@ if (isset($_GET['mark_quote_invoiced'])) {
     $sql = mysqli_query($mysqli,"SELECT quote_client_id, quote_number, quote_prefix FROM quotes WHERE quote_id = $quote_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect();
     }
     $quote_prefix = escapeSql($row['quote_prefix']);
@@ -469,7 +469,7 @@ if (isset($_GET['mark_quote_invoiced'])) {
 
     logAudit("Quote", "Send", "$session_name marked quote $quote_prefix$quote_number as invoiced", $client_id, $quote_id);
 
-    flashAlert("Quote marked invoiced");
+    flashAlert(__('Quote marked invoiced'));
 
     redirect();
 
@@ -574,7 +574,7 @@ if (isset($_GET['export_quote_pdf'])) {
 
     $quote = billingRow('quote', intval($_GET['export_quote_pdf']));
     if (!$quote) {
-        flashAlert('That quote no longer exists.', 'error');
+        flashAlert(__('That quote no longer exists.'), 'error');
         redirect('quotes.php');
     }
     $client_id = intval($quote['client_id']);

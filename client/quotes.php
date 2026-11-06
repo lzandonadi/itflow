@@ -16,9 +16,9 @@ portalBillingGate();
 
 $per_page = 20;
 $tabs = [
-    'waiting' => ['label' => 'Waiting for you', 'icon' => 'fa-reply', 'where' => portalQuoteWaitingSql()],
-    'accepted' => ['label' => 'Accepted', 'icon' => 'fa-thumbs-up', 'where' => "quote_status IN ('Accepted', 'Invoiced')"],
-    'all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1'],
+    'waiting' => ['label' => __('Waiting for you'), 'icon' => 'fa-reply', 'where' => portalQuoteWaitingSql()],
+    'accepted' => ['label' => _x('Accepted', 'portal quotes tab'), 'icon' => 'fa-thumbs-up', 'where' => "quote_status IN ('Accepted', 'Invoiced')"],
+    'all' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => '1 = 1'],
 ];
 $q = trim((string) ($_GET['q'] ?? ''));
 $where = "quote_client_id = $session_client_id AND quote_status != 'Draft'";
@@ -56,19 +56,19 @@ function quotesUrl(array $changes) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Quotes</h1>
-        <p><?= $counts['waiting'] ? $counts['waiting'] . ' waiting for your answer' : 'What we have quoted you' ?></p>
+        <h1><?= __('Quotes') ?></h1>
+        <p><?= escapeHtml($counts['waiting'] ? _n('%d waiting for your answer', '%d waiting for your answer', $counts['waiting']) : __('What we have quoted you')) ?></p>
     </div>
     <form method="get" class="d-flex" role="search">
         <input type="hidden" name="tab" value="<?= escapeHtml($tab) ?>">
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-            <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="Search number or scope" aria-label="Search quotes" maxlength="200">
+            <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="<?= escapeHtml(__('Search number or scope')) ?>" aria-label="<?= escapeHtml(__('Search quotes')) ?>" maxlength="200">
         </div>
     </form>
 </div>
 
-<nav class="itflow-portal-tabs" aria-label="Quotes">
+<nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Quotes')) ?>">
     <?php foreach ($tabs as $key => $t) { ?>
         <a class="<?= $key === $tab ? 'active' : '' ?><?= $key === 'waiting' && $counts['waiting'] ? ' itflow-portal-tab-alert' : '' ?>" href="<?= escapeHtml(quotesUrl(['tab' => $key, 'page' => null])) ?>">
             <i class="fas <?= $t['icon'] ?>"></i><?= escapeHtml($t['label']) ?>
@@ -80,14 +80,14 @@ function quotesUrl(array $changes) {
 <section class="itflow-portal-panel">
     <?php if (!$total) { ?>
         <?php if ($q !== '') { ?>
-            <?= emptyStateHtml(['thing' => 'quotes', 'filtered' => true, 'match_text' => 'Nothing here has &ldquo;' . escapeHtml($q) . '&rdquo; in its number or scope.', 'clear_url' => quotesUrl(['q' => null, 'page' => null])]) ?>
+            <?= emptyStateHtml(['thing' => __('quotes'), 'filtered' => true, 'match_text' => __('Nothing here has %s in its number or scope.', '&ldquo;' . escapeHtml($q) . '&rdquo;'), 'clear_url' => quotesUrl(['q' => null, 'page' => null])]) ?>
         <?php } elseif ($tab === 'waiting') { ?>
-            <?= emptyStateHtml(['title' => 'Nothing waiting for you', 'text' => 'When we send you a quote, it waits here for your answer.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('Nothing waiting for you'), 'text' => __('When we send you a quote, it waits here for your answer.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
         <?php } elseif ($tab === 'accepted') { ?>
-            <?= emptyStateHtml(['title' => 'No accepted quotes', 'text' => '', 'icon' => 'fa-thumbs-up', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No accepted quotes'), 'text' => '', 'icon' => 'fa-thumbs-up', 'filtered' => false]) ?>
         <?php } else { ?>
-            <?= emptyStateHtml(['title' => 'No quotes yet', 'text' => 'Need something priced up? Raise a ticket and we will put a quote together.', 'icon' => 'fa-comment-dollar', 'filtered' => false,
-                'actions' => [['label' => 'Ask for a quote', 'href' => portalAskUrl('Quote request'), 'icon' => 'fa-plus']]]) ?>
+            <?= emptyStateHtml(['title' => __('No quotes yet'), 'text' => __('Need something priced up? Raise a ticket and we will put a quote together.'), 'icon' => 'fa-comment-dollar', 'filtered' => false,
+                'actions' => [['label' => __('Ask for a quote'), 'href' => portalAskUrl(__('Quote request')), 'icon' => 'fa-plus']]]) ?>
         <?php } ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">
@@ -98,18 +98,18 @@ function quotesUrl(array $changes) {
                         <span class="itflow-portal-ticket-main">
                             <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml($row['quote_prefix'] . $row['quote_number']) ?><?php if (trim((string) $row['quote_scope']) !== '') { ?><span class="fw-normal text-body-secondary"> · <?= escapeHtml($row['quote_scope']) ?></span><?php } ?></span>
                             <span class="itflow-portal-ticket-meta">
-                                <span>Dated <?= escapeHtml(date('M j, Y', strtotime($row['quote_date']))) ?></span>
+                                <span><?= escapeHtml(_x('Dated %s', 'quote', formatDate($row['quote_date'], 'date'))) ?></span>
                                 <?php if ($state['key'] === 'waiting') { ?>
-                                    <span>Good until <?= escapeHtml(date('M j, Y', strtotime($row['quote_expire']))) ?></span>
+                                    <span><?= escapeHtml(__('Good until %s', formatDate($row['quote_expire'], 'date'))) ?></span>
                                 <?php } elseif ($state['key'] === 'expired') { ?>
-                                    <span>Ran out <?= escapeHtml(date('M j, Y', strtotime($row['quote_expire']))) ?></span>
+                                    <span><?= escapeHtml(__('Ran out %s', formatDate($row['quote_expire'], 'date'))) ?></span>
                                 <?php } ?>
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">
                             <span class="itflow-portal-amount itflow-money"><?= escapeHtml(billingMoney($row['quote_amount'], $row['quote_currency_code'])) ?></span>
                             <?php if (floatval($row['quote_monthly_amount']) != 0) { ?>
-                                <small>+ <?= escapeHtml(billingMoney($row['quote_monthly_amount'], $row['quote_currency_code'])) ?> a month</small>
+                                <small>+ <?= escapeHtml(__('%s a month', billingMoney($row['quote_monthly_amount'], $row['quote_currency_code']))) ?></small>
                             <?php } ?>
                             <?= portalStateBadge($state) ?>
                         </span>
@@ -119,10 +119,10 @@ function quotesUrl(array $changes) {
         </ul>
         <?php if ($pages > 1) { ?>
             <div class="itflow-portal-pager">
-                <span><?= $offset + 1 ?>-<?= min($offset + $per_page, $total) ?> of <?= $total ?></span>
+                <span><?= escapeHtml(__('%1$d-%2$d of %3$d', $offset + 1, min($offset + $per_page, $total), $total)) ?></span>
                 <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(quotesUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="Previous page"><i class="fas fa-chevron-left"></i></a>
-                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(quotesUrl(['page' => $page + 1])) ?>" aria-label="Next page"><i class="fas fa-chevron-right"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(quotesUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="<?= escapeHtml(__('Previous page')) ?>"><i class="fas fa-chevron-left"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(quotesUrl(['page' => $page + 1])) ?>" aria-label="<?= escapeHtml(__('Next page')) ?>"><i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
         <?php } ?>
