@@ -79,62 +79,62 @@ $count_cell = function ($key) {
 };
 $bucket_columns = [];
 foreach (REPORT_AGE_BUCKETS as $key => [$label]) {
-    $bucket_columns[$key] = ['label' => $label, 'type' => 'count', 'html' => $count_cell($key)];
+    $bucket_columns[$key] = ['label' => __($label), 'type' => 'count', 'html' => $count_cell($key)]; // i18n-dynamic - REPORT_AGE_BUCKETS
 }
 $tail_columns = [
-    'total' => ['label' => 'Open', 'type' => 'count', 'class' => 'fw-semibold'],
-    'us' => ['label' => 'Waiting on us', 'type' => 'count', 'title' => 'The client spoke last, or nobody has replied yet'],
-    'late' => ['label' => 'Late', 'type' => 'count', 'title' => 'Past their SLA or their due date', 'html' => function ($row) {
+    'total' => ['label' => __('Open'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'us' => ['label' => __('Waiting on us'), 'type' => 'count', 'title' => __('The client spoke last, or nobody has replied yet')],
+    'late' => ['label' => __('Late'), 'type' => 'count', 'title' => __('Past their SLA or their due date'), 'html' => function ($row) {
         return $row['late'] ? '<span class="text-danger-emphasis fw-semibold">' . $row['late'] . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
 ];
-$agent_columns = ['agent' => ['label' => 'Agent', 'csv' => function ($row) { return $row['user_id'] ? $row['agent'] : 'Unassigned'; }, 'html' => function ($row) use ($client_id) {
+$agent_columns = ['agent' => ['label' => __('Agent'), 'csv' => function ($row) { return $row['user_id'] ? $row['agent'] : 'Unassigned'; }, 'html' => function ($row) use ($client_id) {
     $url = '/agent/tickets.php?' . http_build_query(array_filter(['client_id' => $client_id ?: null, 'assigned' => $row['user_id'] ?: 'unassigned']));
     return '<a class="text-decoration-none" href="' . escapeHtml($url) . '">' . formatAssignee($row['user_id'], $row['agent'], $row['avatar'], true) . '</a>';
 }]] + $bucket_columns + $tail_columns;
-$client_columns = ['client' => ['label' => 'Client', 'csv' => function ($row) { return $row['client_id'] ? $row['client'] : 'No client'; }, 'html' => function ($row) {
+$client_columns = ['client' => ['label' => __('Client'), 'csv' => function ($row) { return $row['client_id'] ? $row['client'] : __('No client'); }, 'html' => function ($row) {
     return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'tickets.php');
 }]] + $bucket_columns + $tail_columns;
 
-$move_labels = ['us' => ['Waiting on us', 'danger', 'fa-reply'], 'client' => ['Waiting on client', 'secondary', 'fa-hourglass-half'], 'parked' => ['Parked', 'secondary', 'fa-pause']];
+$move_labels = ['us' => [__('Waiting on us'), 'danger', 'fa-reply'], 'client' => [__('Waiting on client'), 'secondary', 'fa-hourglass-half'], 'parked' => [__('Parked'), 'secondary', 'fa-pause']];
 $ticket_columns = [
-    'ticket' => ['label' => 'Ticket', 'class' => 'itflow-report-text', 'csv' => function ($row) { return ticketReference($row) . ' ' . $row['ticket_subject']; }, 'html' => function ($row) {
+    'ticket' => ['label' => __('Ticket'), 'class' => 'itflow-report-text', 'csv' => function ($row) { return ticketReference($row) . ' ' . $row['ticket_subject']; }, 'html' => function ($row) {
         return reportPriorityDot($row['ticket_priority']) . reportTicketLink($row);
     }],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['ticket_client_id'], $row['client_name'] ?? '', $row['client_abbreviation'] ?? '');
     }],
-    'user_name' => ['label' => 'Agent', 'csv' => function ($row) { return $row['user_name'] ?: 'Unassigned'; }, 'html' => function ($row) {
+    'user_name' => ['label' => __('Agent'), 'csv' => function ($row) { return $row['user_name'] ?: 'Unassigned'; }, 'html' => function ($row) {
         return formatAssignee($row['ticket_assigned_to'], $row['user_name'] ?? '', $row['user_avatar'] ?? '', true);
     }],
-    'ticket_status_name' => ['label' => 'Status', 'html' => function ($row) {
+    'ticket_status_name' => ['label' => __('Status'), 'html' => function ($row) {
         return ticketStatusHtml($row['ticket_status_name'], $row['ticket_status_color'], 'detail');
     }],
-    'move' => ['label' => 'Whose move', 'csv' => function ($row) use ($move_labels) { return $move_labels[$row['move']][0] ?? ''; }, 'html' => function ($row) use ($move_labels) {
+    'move' => ['label' => __('Whose move'), 'csv' => function ($row) use ($move_labels) { return $move_labels[$row['move']][0] ?? ''; }, 'html' => function ($row) use ($move_labels) {
         if (!isset($move_labels[$row['move']])) {
             return '';
         }
         [$label, $tone, $icon] = $move_labels[$row['move']];
         return '<span class="small text-nowrap text-' . $tone . '-emphasis"><i class="fas ' . $icon . ' me-1"></i>' . $label . '</span>';
     }],
-    'sla' => ['label' => 'SLA / due', 'sort' => false, 'csv' => function ($row) { return trim(($row['sla']['key'] !== 'none' ? $row['sla']['key'] : '') . ' ' . ($row['due'] ? 'due ' . $row['ticket_due_at'] : '')); }, 'html' => function ($row) {
+    'sla' => ['label' => __('SLA / due'), 'sort' => false, 'csv' => function ($row) { return trim(($row['sla']['key'] !== 'none' ? $row['sla']['key'] : '') . ' ' . ($row['due'] ? 'due ' . $row['ticket_due_at'] : '')); }, 'html' => function ($row) {
         return '<span class="d-inline-flex flex-wrap gap-1">' . ticketSlaPill($row['sla']) . ticketDuePill($row['due']) . '</span>';
     }],
-    'age_days' => ['label' => 'Open for', 'type' => 'decimal', 'decimals' => 1, 'csv_label' => 'Days open', 'html' => function ($row) {
+    'age_days' => ['label' => __('Open for'), 'type' => 'decimal', 'decimals' => 1, 'csv_label' => __('Days open'), 'html' => function ($row) {
         $days = $row['age_days'];
         $tone = $days > 30 ? 'text-danger-emphasis fw-semibold' : ($days > 7 ? 'text-warning-emphasis fw-semibold' : '');
-        return '<span class="' . $tone . '" title="Opened ' . escapeHtml($row['ticket_created_at']) . '">' . reportDuration($row['age_seconds']) . '</span>';
+        return '<span class="' . $tone . '" title="' . escapeHtml(__('Opened %s', formatDate($row['ticket_created_at'], 'datetime'))) . '">' . reportDuration($row['age_seconds']) . '</span>';
     }],
-    'last_activity' => ['label' => 'Last activity', 'type' => 'date', 'csv' => function ($row) { return $row['last_activity']; }, 'html' => function ($row) {
+    'last_activity' => ['label' => __('Last activity'), 'type' => 'date', 'csv' => function ($row) { return $row['last_activity']; }, 'html' => function ($row) {
         return '<span class="small text-body-secondary text-nowrap" title="' . escapeHtml($row['last_activity']) . '">' . escapeHtml(timeAgo($row['last_activity'])) . '</span>';
     }],
 ];
 
 if (reportExporting('agents')) {
-    reportCsv('Open Tickets by Agent', $agent_columns, array_values($by_agent), ['agent' => 'Total'] + $totals);
+    reportCsv('Open Tickets by Agent', $agent_columns, array_values($by_agent), ['agent' => __('Total')] + $totals);
 }
 if (reportExporting('clients')) {
-    reportCsv('Open Tickets by Client', $client_columns, array_values($by_client), ['client' => 'Total'] + $totals);
+    reportCsv('Open Tickets by Client', $client_columns, array_values($by_client), ['client' => __('Total')] + $totals);
 }
 if (reportExporting()) {
     reportCsv('Open Tickets', $ticket_columns, $tickets);
@@ -146,9 +146,9 @@ $unassigned = $by_agent[0]['total'] ?? 0;
 $oldest = $tickets[0] ?? null;
 $bucket_tones = ['day' => 'success', '3' => 'info', '7' => 'accent', '30' => 'warning', '90' => 'orange', 'old' => 'danger'];
 
-$agent_choices = '<div class="col-sm-6 col-lg-2"><select class="form-select select2" name="agent" data-report-autosubmit aria-label="Agent">'
-    . '<option value="">- All agents -</option>'
-    . '<option value="none"' . ($unassigned_only ? ' selected' : '') . ' data-icon="fas fa-user-slash">Unassigned</option>';
+$agent_choices = '<div class="col-sm-6 col-lg-2"><select class="form-select select2" name="agent" data-report-autosubmit aria-label="' . escapeHtml(__('Agent')) . '">'
+    . '<option value="">' . __('- All agents -') . '</option>'
+    . '<option value="none"' . ($unassigned_only ? ' selected' : '') . ' data-icon="fas fa-user-slash">' . __('Unassigned') . '</option>';
 $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE user_type = 1 AND ((user_archived_at IS NULL AND user_status = 1) OR user_id = $agent_id) ORDER BY user_name");
 while ($row = mysqli_fetch_assoc($sql)) {
     $id = intval($row['user_id']);
@@ -163,53 +163,52 @@ $agent_choices .= '</select></div>';
     <?php reportHeader('ticket_aging', [
         'client' => $client_id,
         'controls' => $agent_choices,
-        'subtitle' => 'As of ' . date('M j, Y g:i A'),
-        'export' => ['tickets' => 'Every open ticket', 'agents' => 'By agent', 'clients' => 'By client'],
+        'subtitle' => __('As of %s', formatDate('now', 'datetime')),
+        'export' => ['tickets' => __('Every open ticket'), 'agents' => __('By agent'), 'clients' => __('By client')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Open tickets', 'value' => reportCount(count($tickets)), 'url' => '/agent/tickets.php' . ($client_id ? "?client_id=$client_id" : ''),
-            'sub' => reportCount($totals['30'] + $totals['90'] + $totals['old']) . ' <span class="text-body-tertiary">open over a week</span>'],
-        ['label' => 'Waiting on us', 'value' => reportCount($totals['us']), 'tone' => $totals['us'] ? 'warning' : '', 'url' => '/agent/tickets.php?show=reply' . ($client_id ? "&client_id=$client_id" : ''),
-            'sub' => '<span class="text-body-tertiary">The client spoke last, or no reply yet</span>'],
-        ['label' => 'Late', 'value' => reportCount($totals['late']), 'tone' => $totals['late'] ? 'danger' : 'success', 'url' => '/agent/tickets.php?show=overdue' . ($client_id ? "&client_id=$client_id" : ''),
-            'sub' => '<span class="text-body-tertiary">Past their SLA or due date</span>'],
-        ['label' => 'Unassigned', 'value' => reportCount($unassigned), 'tone' => $unassigned ? 'warning' : '', 'url' => '/agent/tickets.php?assigned=unassigned' . ($client_id ? "&client_id=$client_id" : ''),
-            'sub' => $oldest ? 'Oldest open <span class="text-body">' . reportDuration($oldest['age_seconds']) . '</span>' : ''],
+        ['label' => __('Open tickets'), 'value' => reportCount(count($tickets)), 'url' => '/agent/tickets.php' . ($client_id ? "?client_id=$client_id" : ''),
+            'sub' => reportCount($totals['30'] + $totals['90'] + $totals['old']) . ' <span class="text-body-tertiary">' . __('open over a week') . '</span>'],
+        ['label' => __('Waiting on us'), 'value' => reportCount($totals['us']), 'tone' => $totals['us'] ? 'warning' : '', 'url' => '/agent/tickets.php?show=reply' . ($client_id ? "&client_id=$client_id" : ''),
+            'sub' => '<span class="text-body-tertiary">' . __('The client spoke last, or no reply yet') . '</span>'],
+        ['label' => __('Late'), 'value' => reportCount($totals['late']), 'tone' => $totals['late'] ? 'danger' : 'success', 'url' => '/agent/tickets.php?show=overdue' . ($client_id ? "&client_id=$client_id" : ''),
+            'sub' => '<span class="text-body-tertiary">' . __('Past their SLA or due date') . '</span>'],
+        ['label' => __('Unassigned'), 'value' => reportCount($unassigned), 'tone' => $unassigned ? 'warning' : '', 'url' => '/agent/tickets.php?assigned=unassigned' . ($client_id ? "&client_id=$client_id" : ''),
+            'sub' => $oldest ? __('Oldest open %s', '<span class="text-body">' . reportDuration($oldest['age_seconds']) . '</span>') : ''],
     ]) ?>
 
     <?php if ($tickets) { ?>
-        <?= reportSectionOpen('How long they have been open', '') ?>
+        <?= reportSectionOpen(__('How long they have been open'), '') ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
-                    'labels' => array_map(function ($b) { return $b[0]; }, array_values(REPORT_AGE_BUCKETS)),
-                    'series' => [['label' => 'Open tickets', 'data' => array_map(function ($k) use ($totals) { return $totals[$k]; }, $bucket_keys),
+                    'labels' => array_map(function ($b) { return __($b[0]); }, array_values(REPORT_AGE_BUCKETS)), // i18n-dynamic - REPORT_AGE_BUCKETS
+                    'series' => [['label' => __('Open tickets'), 'data' => array_map(function ($k) use ($totals) { return $totals[$k]; }, $bucket_keys),
                         'tones' => array_map(function ($k) use ($bucket_tones) { return $bucket_tones[$k]; }, $bucket_keys)]],
                     'format' => 'count',
                     'legend' => false,
-                ], '', 'Open tickets by how long they have been open') ?>
+                ], '', __('Open tickets by how long they have been open')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By agent', 'The longest-open work first') ?>
-        <?= reportTable($agent_columns, array_values($by_agent), ['empty' => reportEmpty('No open tickets.'), 'totals' => ['agent' => 'Total'] + $totals]) ?>
+    <?= reportSectionOpen(__('By agent'), __('The longest-open work first')) ?>
+        <?= reportTable($agent_columns, array_values($by_agent), ['empty' => reportEmpty(__('No open tickets.')), 'totals' => ['agent' => __('Total')] + $totals]) ?>
     </div>
 
     <?php if (!$client_id) { ?>
-        <?= reportSectionOpen('By client', 'The longest-open work first') ?>
-            <?= reportTable($client_columns, array_values($by_client), ['empty' => reportEmpty('No open tickets.'), 'limit' => 50, 'export_table' => 'clients', 'totals' => ['client' => 'Total'] + $totals]) ?>
+        <?= reportSectionOpen(__('By client'), __('The longest-open work first')) ?>
+            <?= reportTable($client_columns, array_values($by_client), ['empty' => reportEmpty(__('No open tickets.')), 'limit' => 50, 'export_table' => 'clients', 'totals' => ['client' => __('Total')] + $totals]) ?>
         </div>
     <?php } ?>
 
     <?php if ($tickets) { ?>
-        <?= reportSectionOpen('Every open ticket', 'Oldest first', 'itflow-report-long') ?>
+        <?= reportSectionOpen(__('Every open ticket'), __('Oldest first'), 'itflow-report-long') ?>
             <?= reportTable($ticket_columns, $tickets, ['limit' => 300, 'export_table' => 'tickets']) ?>
             <div class="card-footer small text-body-secondary">
-                Open is neither resolved nor closed. Ages run on the clock from when the ticket was raised; the SLA pills use business hours.
-                "Waiting on us" means the client wrote last, or nobody has replied yet; a status that pauses the SLA (such as On Hold) parks a ticket.
+                <?= __('Open is neither resolved nor closed. Ages run on the clock from when the ticket was raised; the SLA pills use business hours. "Waiting on us" means the client wrote last, or nobody has replied yet; a status that pauses the SLA (such as On Hold) parks a ticket.') ?>
             </div>
         </div>
     <?php } ?>

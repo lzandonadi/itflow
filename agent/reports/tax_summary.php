@@ -35,11 +35,11 @@ foreach ($sales['exempt_clients'] as $exempt_client_id => $exempt_client) {
     }
 }
 if ($hidden_exempt != 0) {
-    $sales['exempt_clients'][-1] = ['name' => 'Clients you cannot open', 'number' => '', 'expires' => '', 'expired' => false, 'amount' => $hidden_exempt];
+    $sales['exempt_clients'][-1] = ['name' => __('Clients you cannot open'), 'number' => '', 'expires' => '', 'expired' => false, 'amount' => $hidden_exempt];
 }
 $purchases = taxReportPurchases("$year-01-01", $to);
 $prev = taxReportSales(($year - 1) . '-01-01', $current_year ? dashboardShiftMonths(date('Y-m-d'), -12) : ($year - 1) . '-12-31', $basis);
-$compare = $current_year ? 'the same time last year' : (string) ($year - 1);
+$compare = $current_year ? __('the same time last year') : (string) ($year - 1);
 
 $sum = function (array $months) {
     return array_sum($months);
@@ -68,24 +68,24 @@ $has_purchases = (bool) $purchases['parts'];
 // A table row for each figure: [group, name, sub, months, emphasis]
 $grid = [];
 foreach ($sales['parts'] as $label => $part) {
-    $grid[] = ['Tax collected', $label, '', $part['months'], false];
+    $grid[] = [__('Tax collected'), $label, '', $part['months'], false];
 }
-$grid[] = ['Tax collected', 'Total tax collected', '', $tax_months, true];
-$grid[] = ['Sales, before tax and net of discounts', 'Total sales', '', $sales['sales'], true];
-$grid[] = ['Sales, before tax and net of discounts', 'Taxable', 'Lines with tax on them', $sales['taxable'], false];
-$grid[] = ['Sales, before tax and net of discounts', 'Exempt', 'No tax, for clients who are tax exempt', $sales['exempt'], false];
-$grid[] = ['Sales, before tax and net of discounts', 'Non-taxable', 'No tax, for clients who are not exempt', $sales['nontaxable'], false];
+$grid[] = [__('Tax collected'), __('Total tax collected'), '', $tax_months, true];
+$grid[] = [__('Sales, before tax and net of discounts'), __('Total sales'), '', $sales['sales'], true];
+$grid[] = [__('Sales, before tax and net of discounts'), 'Taxable', __('Lines with tax on them'), $sales['taxable'], false];
+$grid[] = [__('Sales, before tax and net of discounts'), 'Exempt', __('No tax, for clients who are tax exempt'), $sales['exempt'], false];
+$grid[] = [__('Sales, before tax and net of discounts'), 'Non-taxable', __('No tax, for clients who are not exempt'), $sales['nontaxable'], false];
 if ($has_purchases) {
     foreach ($purchases['parts'] as $label => $part) {
-        $grid[] = ['Tax paid on purchases', $label, '', $part['months'], false];
+        $grid[] = [__('Tax paid on purchases'), $label, '', $part['months'], false];
     }
-    $grid[] = ['Tax paid on purchases', 'Total tax paid', '', $paid_months, true];
-    $grid[] = ['Tax paid on purchases', 'Purchases it was paid on', 'Before tax', $purchases['purchases'], false];
-    $grid[] = ['Collected less paid', 'Net tax', 'For GST, HST and VAT returns that take off tax paid', $net_months, true];
+    $grid[] = [__('Tax paid on purchases'), __('Total tax paid'), '', $paid_months, true];
+    $grid[] = [__('Tax paid on purchases'), __('Purchases it was paid on'), __('Before tax'), $purchases['purchases'], false];
+    $grid[] = [__('Collected less paid'), __('Net tax'), __('For GST, HST and VAT returns that take off tax paid'), $net_months, true];
 }
 
 if (reportExporting() && ($_GET['table'] ?? 'tax') === 'tax') {
-    $csv_columns = ['group' => ['label' => 'Section'], 'name' => ['label' => 'Figure'], 'registration' => ['label' => 'Registration']];
+    $csv_columns = ['group' => ['label' => __('Section')], 'name' => ['label' => __('Figure')], 'registration' => ['label' => __('Registration')]];
     foreach ($columns as $i => [$label]) {
         $csv_columns["c$i"] = ['label' => $label, 'type' => 'money'];
     }
@@ -106,7 +106,7 @@ if (reportExporting('exempt')) {
         $rows[] = ['client' => $client['name'], 'number' => $client['number'], 'expires' => $client['expires'], 'amount' => round($client['amount'], 2)];
     }
     reportCsv("Exempt Sales $year", [
-        'client' => ['label' => 'Client'], 'number' => ['label' => 'Certificate'], 'expires' => ['label' => 'Expires'], 'amount' => ['label' => 'Exempt sales', 'type' => 'money'],
+        'client' => ['label' => __('Client')], 'number' => ['label' => __('Certificate')], 'expires' => ['label' => __('Expires')], 'amount' => ['label' => __('Exempt sales'), 'type' => 'money'],
     ], $rows);
 }
 
@@ -114,18 +114,19 @@ require_once "includes/inc_report_layout.php";
 
 $span = count($columns) + 2;
 $basis_note = $basis === 'invoiced'
-    ? 'Counted on each invoice\'s date once it is sent, paid or not. Drafts, cancelled and non-billable invoices are left out.'
-    : 'Counted as payments come in: each payment carries its share of its invoice\'s tax and sales, so a part-paid invoice counts only the part paid.';
+    ? __('Counted on each invoice\'s date once it is sent, paid or not. Drafts, cancelled and non-billable invoices are left out.')
+    : __('Counted as payments come in: each payment carries its share of its invoice\'s tax and sales, so a part-paid invoice counts only the part paid.');
+$basis_labels = ['invoiced' => __('Invoiced'), 'paid' => __('Paid')];
 
 $stats = [
-    ['label' => 'Tax collected', 'value' => reportMoney($tax_total), 'sub' => reportChangeHtml($tax_total, $prev_tax_total, 'up', $compare)],
-    ['label' => 'Taxable sales', 'value' => reportMoney($sum($sales['taxable'])), 'sub' => '<span class="text-body-tertiary">Of ' . escapeHtml(reportMoney($sum($sales['sales']))) . ' in sales</span>'],
-    ['label' => 'Exempt sales', 'value' => reportMoney($sum($sales['exempt'])), 'sub' => '<span class="text-body-tertiary">' . count($sales['exempt_clients']) . ' exempt client' . (count($sales['exempt_clients']) === 1 ? '' : 's') . '</span>'],
-    ['label' => 'Non-taxable sales', 'value' => reportMoney($sum($sales['nontaxable'])), 'sub' => '<span class="text-body-tertiary">No tax on the line</span>'],
+    ['label' => __('Tax collected'), 'value' => reportMoney($tax_total), 'sub' => reportChangeHtml($tax_total, $prev_tax_total, 'up', $compare)],
+    ['label' => __('Taxable sales'), 'value' => reportMoney($sum($sales['taxable'])), 'sub' => '<span class="text-body-tertiary">' . __('Of %s in sales', escapeHtml(reportMoney($sum($sales['sales'])))) . '</span>'],
+    ['label' => __('Exempt sales'), 'value' => reportMoney($sum($sales['exempt'])), 'sub' => '<span class="text-body-tertiary">' . _n('%d exempt client', '%d exempt clients', count($sales['exempt_clients'])) . '</span>'],
+    ['label' => __('Non-taxable sales'), 'value' => reportMoney($sum($sales['nontaxable'])), 'sub' => '<span class="text-body-tertiary">' . __('No tax on the line') . '</span>'],
 ];
 if ($has_purchases) {
-    $stats[] = ['label' => 'Tax paid on purchases', 'value' => reportMoney($paid_total), 'sub' => '<span class="text-body-tertiary">On ' . $purchases['expenses'] . ' expense' . ($purchases['expenses'] === 1 ? '' : 's') . '</span>'];
-    $stats[] = ['label' => 'Net tax', 'value' => reportMoney($tax_total - $paid_total), 'sub' => '<span class="text-body-tertiary">Collected less paid</span>'];
+    $stats[] = ['label' => __('Tax paid on purchases'), 'value' => reportMoney($paid_total), 'sub' => '<span class="text-body-tertiary">' . _n('On %d expense', 'On %d expenses', $purchases['expenses']) . '</span>'];
+    $stats[] = ['label' => __('Net tax'), 'value' => reportMoney($tax_total - $paid_total), 'sub' => '<span class="text-body-tertiary">' . __('Collected less paid') . '</span>'];
 }
 
 ?>
@@ -134,21 +135,21 @@ if ($has_purchases) {
 
     <?php reportHeader('tax_summary', [
         'year' => [$year, $years],
-        'controls' => reportSegmentControl('basis', $basis, TAX_REPORT_BASES) . reportSegmentControl('view', $view, ['quarter' => 'Quarterly', 'month' => 'Monthly']),
-        'subtitle' => ($current_year ? "$year to date" : (string) $year) . ' · ' . TAX_REPORT_BASES[$basis],
-        'export' => $sales['exempt_clients'] ? ['tax' => 'Tax by ' . $view, 'exempt' => 'Exempt sales by client'] : ['tax' => 'Tax by ' . $view],
-        'note' => escapeHtml($basis_note) . ' Sales are before tax and net of discounts.',
-        'print_meta' => TAX_REPORT_BASES[$basis] . ' basis',
+        'controls' => reportSegmentControl('basis', $basis, $basis_labels) . reportSegmentControl('view', $view, ['quarter' => __('Quarterly'), 'month' => __('Monthly')]),
+        'subtitle' => ($current_year ? __('%d to date', $year) : (string) $year) . ' · ' . $basis_labels[$basis],
+        'export' => $sales['exempt_clients'] ? ['tax' => $view === 'quarter' ? __('Tax by quarter') : __('Tax by month'), 'exempt' => __('Exempt sales by client')] : ['tax' => $view === 'quarter' ? __('Tax by quarter') : __('Tax by month')],
+        'note' => escapeHtml($basis_note . ' ' . __('Sales are before tax and net of discounts.')),
+        'print_meta' => __('%s basis', $basis_labels[$basis]),
     ]); ?>
 
     <?= reportStats($stats) ?>
 
     <?php if (!$sales['invoices'] && !$has_purchases) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty($basis === 'invoiced' ? "No invoices were sent in $year." : "No payments came in during $year.", 'fa-percent', 'secondary') ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty($basis === 'invoiced' ? __('No invoices were sent in %d.', $year) : __('No payments came in during %d.', $year), 'fa-percent', 'secondary') ?></div></div>
     <?php } else { ?>
 
         <?php if ($tax_total != 0) { ?>
-            <?= reportSectionOpen('Tax collected by month', escapeHtml((string) $year)) ?>
+            <?= reportSectionOpen(__('Tax collected by month'), escapeHtml((string) $year)) ?>
                 <div class="card-body">
                     <?php
                     $months_shown = $current_year ? intval(date('n')) : 12;
@@ -164,24 +165,24 @@ if ($has_purchases) {
                     }
                     echo reportChart([
                         'type' => 'bar',
-                        'labels' => array_map(function ($m) { return date('M', mktime(0, 0, 0, $m, 1)); }, range(1, 12)),
+                        'labels' => array_map(function ($m) { return formatDate(mktime(0, 0, 0, $m, 1), 'month'); }, range(1, 12)),
                         'series' => $series,
                         'stacked' => true,
                         'format' => 'money',
-                    ], 'sm', 'Tax collected per month, by part');
+                    ], 'sm', __('Tax collected per month, by part'));
                     ?>
                 </div>
             </div>
         <?php } ?>
 
-        <?= reportSectionOpen('By ' . ($view === 'quarter' ? 'quarter' : 'month'), $view === 'quarter' ? 'Calendar quarters' : '') ?>
+        <?= reportSectionOpen($view === 'quarter' ? __('By quarter') : __('By month'), $view === 'quarter' ? __('Calendar quarters') : '') ?>
             <div class="table-responsive">
                 <table class="table table-sm table-hover align-middle mb-0 itflow-report-table itflow-report-grid">
                     <thead class="table-light">
                     <tr>
-                        <th><?= TAX_REPORT_BASES[$basis] ?> basis</th>
+                        <th><?= __('%s basis', $basis_labels[$basis]) ?></th>
                         <?php foreach ($columns as [$label, $first, $last]) { ?>
-                            <th class="text-end"<?php if ($view === 'quarter') { ?> title="<?= date('M', mktime(0, 0, 0, $first, 1)) ?> – <?= date('M', mktime(0, 0, 0, $last, 1)) ?>"<?php } ?>><?= $label ?></th>
+                            <th class="text-end"<?php if ($view === 'quarter') { ?> title="<?= formatDate(mktime(0, 0, 0, $first, 1), 'month') ?> – <?= formatDate(mktime(0, 0, 0, $last, 1), 'month') ?>"<?php } ?>><?= $label ?></th>
                         <?php } ?>
                         <th class="text-end"><?= $year ?></th>
                     </tr>
@@ -200,7 +201,7 @@ if ($has_purchases) {
                             <td class="<?= $strong ? '' : 'itflow-report-sub' ?>">
                                 <?= escapeHtml($name) ?>
                                 <?php if ($sub !== '') { ?><div class="small text-body-secondary fw-normal"><?= escapeHtml($sub) ?></div><?php } ?>
-                                <?php if ($registration !== '') { ?><div class="small text-body-secondary fw-normal">No. <?= escapeHtml($registration) ?></div><?php } ?>
+                                <?php if ($registration !== '') { ?><div class="small text-body-secondary fw-normal"><?= __('No. %s', escapeHtml($registration)) ?></div><?php } ?>
                             </td>
                             <?php foreach ($cells as $value) { ?>
                                 <td class="text-end<?= $strong ? '' : ' text-body-secondary' ?>"><?= abs($value) < 0.005 ? '<span class="itflow-report-zero">–</span>' : reportMoney($value) ?></td>
@@ -212,21 +213,21 @@ if ($has_purchases) {
                 </table>
             </div>
             <div class="card-footer small text-body-secondary">
-                Tax shows by part, so a rate made of a state's and a county's part counts each where it is due. A rate that changed shows its old and new percents apart.
-                Exempt sales are untaxed lines for clients marked tax exempt now. Check the figures with your accountant before filing.
+                <?= __('Tax shows by part, so a rate made of a state\'s and a county\'s part counts each where it is due. A rate that changed shows its old and new percents apart.') ?>
+                <?= __('Exempt sales are untaxed lines for clients marked tax exempt now. Check the figures with your accountant before filing.') ?>
             </div>
         </div>
 
         <?php if ($sales['exempt_clients']) { ?>
-            <?= reportSectionOpen('Exempt sales by client', count($sales['exempt_clients']) . ' client' . (count($sales['exempt_clients']) === 1 ? '' : 's')) ?>
+            <?= reportSectionOpen(__('Exempt sales by client'), _n('%d client', '%d clients', count($sales['exempt_clients']))) ?>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover align-middle mb-0 itflow-report-table">
                         <thead class="table-light">
                         <tr>
-                            <th>Client</th>
-                            <th>Certificate</th>
-                            <th>Expires</th>
-                            <th class="text-end">Exempt sales</th>
+                            <th><?= __('Client') ?></th>
+                            <th><?= __('Certificate') ?></th>
+                            <th><?= __('Expires') ?></th>
+                            <th class="text-end"><?= __('Exempt sales') ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -237,14 +238,14 @@ if ($has_purchases) {
                                     <td><span class="text-body-secondary">–</span></td>
                                 <?php } else { ?>
                                     <td><?= reportClientLink($client_id, $client['name']) ?></td>
-                                    <td><?= $client['number'] !== '' ? escapeHtml($client['number']) : '<span class="text-warning-emphasis">None on file</span>' ?></td>
+                                    <td><?= $client['number'] !== '' ? escapeHtml($client['number']) : '<span class="text-warning-emphasis">' . __('None on file') . '</span>' ?></td>
                                 <?php } ?>
                                 <td>
                                     <?php if ($client['expires'] === '') { ?>
                                         <span class="text-body-secondary">–</span>
                                     <?php } else { ?>
-                                        <?= escapeHtml(date('M j, Y', strtotime($client['expires']))) ?>
-                                        <?php if ($client['expired']) { ?><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal ms-1">Expired</span><?php } ?>
+                                        <?= escapeHtml(formatDate($client['expires'], 'date')) ?>
+                                        <?php if ($client['expired']) { ?><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal ms-1"><?= __('Expired') ?></span><?php } ?>
                                     <?php } ?>
                                 </td>
                                 <td class="text-end"><?= reportMoney($client['amount']) ?></td>

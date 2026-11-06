@@ -55,7 +55,7 @@ foreach ($trips as $trip) {
     $by_agent[$a]['trips']++;
     $by_agent[$a]['miles'] += $trip['miles'];
     $c = intval($trip['trip_client_id']);
-    $by_client[$c] = $by_client[$c] ?? ['client_id' => $c, 'client' => $c ? $trip['client_name'] : 'No client (our own)', 'abbr' => $trip['client_abbreviation'] ?? '', 'trips' => 0, 'miles' => 0.0];
+    $by_client[$c] = $by_client[$c] ?? ['client_id' => $c, 'client' => $c ? $trip['client_name'] : __('No client (our own)'), 'abbr' => $trip['client_abbreviation'] ?? '', 'trips' => 0, 'miles' => 0.0];
     $by_client[$c]['trips']++;
     $by_client[$c]['miles'] += $trip['miles'];
 }
@@ -70,20 +70,20 @@ unset($row);
 usort($by_agent, function ($a, $b) { return $b['miles'] <=> $a['miles']; });
 usort($by_client, function ($a, $b) { return $b['miles'] <=> $a['miles']; });
 
-$value_column = ['label' => 'At ' . ($rate ? tripRateText($rate) : 'your rate'), 'type' => 'money', 'csv_label' => 'Amount'];
+$value_column = ['label' => __('At %s', $rate ? tripRateText($rate) : __('your rate')), 'type' => 'money', 'csv_label' => __('Amount')];
 
 $trip_columns = [
-    'trip_date' => ['label' => 'Date', 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
+    'trip_date' => ['label' => __('Date'), 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
         // Opens the trip's quick look on the Trips list
-        return '<a href="/agent/trips.php?open=' . intval($row['trip_id']) . '">' . escapeHtml(date('M j, Y', strtotime($row['trip_date']))) . '</a>';
+        return '<a href="/agent/trips.php?open=' . intval($row['trip_id']) . '">' . escapeHtml(formatDate($row['trip_date'], 'date')) . '</a>';
     }],
-    'user_name' => ['label' => 'Agent', 'html' => function ($row) {
-        return reportAgentCell($row['trip_user_id'], $row['user_name'] ?? '', $row['user_avatar'] ?? '', 'No one');
+    'user_name' => ['label' => __('Agent'), 'html' => function ($row) {
+        return reportAgentCell($row['trip_user_id'], $row['user_name'] ?? '', $row['user_avatar'] ?? '', __('No one'));
     }],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['trip_client_id'], $row['client_name'] ?? '', $row['client_abbreviation'] ?? '');
     }],
-    'trip_purpose' => ['label' => 'Purpose', 'class' => 'itflow-report-text', 'html' => function ($row) {
+    'trip_purpose' => ['label' => __('Purpose'), 'class' => 'itflow-report-text', 'html' => function ($row) {
         $for = [];
         if ($row['ticket_number'] !== null && intval($row['trip_ticket_id'])) {
             $for[] = '<span class="font-monospace">' . escapeHtml(ticketReference($row)) . '</span>';
@@ -94,15 +94,15 @@ $trip_columns = [
         return escapeHtml($row['trip_purpose']) . ($for ? '<div class="small text-body-secondary">' . implode(' &middot; ', $for) . '</div>' : '');
     }],
 
-    'route' => ['label' => 'From → to', 'class' => 'small text-body-secondary', 'csv' => function ($row) {
+    'route' => ['label' => __('From → to'), 'class' => 'small text-body-secondary', 'csv' => function ($row) {
         return $row['trip_source'] . ' → ' . $row['trip_destination'];
     }, 'html' => function ($row) {
         return escapeHtml($row['trip_source']) . ' <i class="fas fa-long-arrow-alt-right mx-1"></i> ' . escapeHtml($row['trip_destination']);
     }],
-    'round_trip' => ['label' => 'Round trip', 'csv' => function ($row) {
+    'round_trip' => ['label' => __('Round trip'), 'csv' => function ($row) {
         return intval($row['round_trip']) ? 'Yes' : 'No';
     }, 'html' => function ($row) {
-        return intval($row['round_trip']) ? '<i class="fas fa-sync-alt text-body-secondary" title="Round trip"></i>' : '';
+        return intval($row['round_trip']) ? '<i class="fas fa-sync-alt text-body-secondary" title="' . escapeHtml(__('Round trip')) . '"></i>' : '';
     }, 'class' => 'text-center'],
     'miles' => ['label' => $unit, 'type' => 'decimal', 'decimals' => 1],
 ];
@@ -111,26 +111,26 @@ if ($rate) {
 }
 // The CSV has the site and ticket in columns of their own
 $trip_csv_columns = array_slice($trip_columns, 0, 4, true) + [
-    'location_name' => ['label' => 'Site', 'csv' => function ($row) {
+    'location_name' => ['label' => __('Site'), 'csv' => function ($row) {
         return intval($row['trip_location_id']) ? (string) $row['location_name'] : '';
     }],
-    'ticket' => ['label' => 'Ticket', 'csv' => function ($row) {
+    'ticket' => ['label' => __('Ticket'), 'csv' => function ($row) {
         return $row['ticket_number'] !== null && intval($row['trip_ticket_id']) ? ticketReference($row) : '';
     }],
 ] + array_slice($trip_columns, 4, null, true);
 
 $agent_columns = [
-    'agent' => ['label' => 'Agent', 'html' => function ($row) {
-        return reportAgentCell($row['user_id'], $row['agent'], $row['avatar'], 'No one');
+    'agent' => ['label' => __('Agent'), 'html' => function ($row) {
+        return reportAgentCell($row['user_id'], $row['agent'], $row['avatar'], __('No one'));
     }],
-    'trips' => ['label' => 'Trips', 'type' => 'count'],
+    'trips' => ['label' => __('Trips'), 'type' => 'count'],
     'miles' => ['label' => $unit, 'type' => 'decimal', 'decimals' => 1],
 ];
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
-        return $row['client_id'] ? reportClientCell($row['client_id'], $row['client'], $row['abbr']) : '<span class="text-body-secondary fst-italic">No client (our own)</span>';
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
+        return $row['client_id'] ? reportClientCell($row['client_id'], $row['client'], $row['abbr']) : '<span class="text-body-secondary fst-italic">' . __('No client (our own)') . '</span>';
     }],
-    'trips' => ['label' => 'Trips', 'type' => 'count'],
+    'trips' => ['label' => __('Trips'), 'type' => 'count'],
     'miles' => ['label' => $unit, 'type' => 'decimal', 'decimals' => 1],
 ];
 if ($rate) {
@@ -141,13 +141,13 @@ if ($rate) {
 $totals = ['trips' => count($trips), 'miles' => $miles, 'value' => $rate ? $miles * $rate : null];
 $name = 'Mileage ' . $period['start'] . ' to ' . $period['end'];
 if (reportExporting('agents')) {
-    reportCsv("$name by agent", $agent_columns, $by_agent, ['agent' => 'Total'] + $totals);
+    reportCsv("$name by agent", $agent_columns, $by_agent, ['agent' => __('Total')] + $totals);
 }
 if (reportExporting('clients')) {
-    reportCsv("$name by client", $client_columns, $by_client, ['client' => 'Total'] + $totals);
+    reportCsv("$name by client", $client_columns, $by_client, ['client' => __('Total')] + $totals);
 }
 if (reportExporting()) {
-    reportCsv($name, $trip_csv_columns, $trips, ['trip_date' => 'Total', 'miles' => $miles, 'value' => $totals['value']]);
+    reportCsv($name, $trip_csv_columns, $trips, ['trip_date' => __('Total'), 'miles' => $miles, 'value' => $totals['value']]);
 }
 
 $buckets = reportBuckets($period);
@@ -157,7 +157,7 @@ require_once "includes/inc_report_layout.php";
 
 $rate_control = '<div class="col-sm-6 col-lg-2"><div class="input-group">'
     . '<span class="input-group-text"><i class="fas fa-fw fa-dollar-sign"></i></span>'
-    . '<input type="text" inputmode="decimal" class="form-control" name="rate" value="' . ($rate ? escapeHtml(rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.')) : '') . '" placeholder="Rate a ' . $unit_one . '" aria-label="Rate a ' . $unit_one . '" data-report-autosubmit title="Your reimbursement rate a ' . $unit_one . ' - press Enter">'
+    . '<input type="text" inputmode="decimal" class="form-control" name="rate" value="' . ($rate ? escapeHtml(rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.')) : '') . '" placeholder="' . escapeHtml(__('Rate a %s', $unit_one)) . '" aria-label="' . escapeHtml(__('Rate a %s', $unit_one)) . '" data-report-autosubmit title="' . escapeHtml(__('Your reimbursement rate a %s - press Enter', $unit_one)) . '">'
     . '</div></div>';
 
 ?>
@@ -170,15 +170,15 @@ $rate_control = '<div class="col-sm-6 col-lg-2"><div class="input-group">'
         'client' => $client_id,
         'agent' => $agent_id,
         'controls' => $rate_control,
-        'export' => ['trips' => 'Every trip', 'agents' => 'By agent', 'clients' => 'By client'],
+        'export' => ['trips' => __('Every trip'), 'agents' => __('By agent'), 'clients' => __('By client')],
     ]); ?>
 
     <?= reportStats([
         ['label' => $unit, 'value' => number_format($miles, 1), 'sub' => reportChangeHtml($miles, $prev_miles, 'up', $period['compare'])],
-        ['label' => 'Trips', 'value' => reportCount(count($trips)), 'sub' => count($trips) ? reportCount(count(array_filter(array_column($trips, 'round_trip')))) . ' <span class="text-body-tertiary">round trips</span>' : ''],
-        ['label' => 'Average trip', 'value' => count($trips) ? number_format($miles / count($trips), 1) . ' ' . tripUnit(true) : '-', 'sub' => '<span class="text-body-tertiary">' . $unit . ' a trip</span>'],
+        ['label' => __('Trips'), 'value' => reportCount(count($trips)), 'sub' => count($trips) ? reportCount(count(array_filter(array_column($trips, 'round_trip')))) . ' <span class="text-body-tertiary">' . __('round trips') . '</span>' : ''],
+        ['label' => __('Average trip'), 'value' => count($trips) ? number_format($miles / count($trips), 1) . ' ' . tripUnit(true) : '-', 'sub' => '<span class="text-body-tertiary">' . __('%s a trip', $unit) . '</span>'],
         ['label' => $rate ? 'At ' . tripRateText($rate) : 'Reimbursement', 'value' => $rate ? reportMoney($miles * $rate) : '-',
-            'sub' => $rate ? '<span class="text-body-tertiary">' . $unit . ' × your rate</span>' : '<span class="text-body-tertiary">Enter a rate a ' . $unit_one . ' above</span>'],
+            'sub' => $rate ? '<span class="text-body-tertiary">' . __('%s × your rate', $unit) . '</span>' : '<span class="text-body-tertiary">' . __('Enter a rate a %s above', $unit_one) . '</span>'],
     ]) ?>
 
     <?= reportSectionOpen($unit . ' driven', escapeHtml($period['range'])) ?>
@@ -189,27 +189,28 @@ $rate_control = '<div class="col-sm-6 col-lg-2"><div class="input-group">'
                 'series' => [['label' => $unit, 'data' => $miles_series, 'tone' => 'accent']],
                 'format' => 'decimal',
                 'legend' => false,
-            ], 'sm', $unit . ' driven over the period') ?>
+            ], 'sm', __('%s driven over the period', $unit)) ?>
         </div>
     </div>
 
     <div class="row g-3">
         <div class="col-xl-6">
-            <?= reportSectionOpen('By agent', '', 'h-100 mb-0') ?>
-                <?= reportTable($agent_columns, $by_agent, ['empty' => 'No trips in this period.', 'totals' => ['agent' => 'Total'] + $totals]) ?>
+            <?= reportSectionOpen(__('By agent'), '', 'h-100 mb-0') ?>
+                <?= reportTable($agent_columns, $by_agent, ['empty' => __('No trips in this period.'), 'totals' => ['agent' => __('Total')] + $totals]) ?>
             </div>
         </div>
         <div class="col-xl-6">
-            <?= reportSectionOpen('By client', '', 'h-100 mb-0') ?>
-                <?= reportTable($client_columns, $by_client, ['empty' => 'No trips in this period.', 'totals' => ['client' => 'Total'] + $totals]) ?>
+            <?= reportSectionOpen(__('By client'), '', 'h-100 mb-0') ?>
+                <?= reportTable($client_columns, $by_client, ['empty' => __('No trips in this period.'), 'totals' => ['client' => __('Total')] + $totals]) ?>
             </div>
         </div>
     </div>
 
-    <?= reportSectionOpen('Every trip', reportCount(count($trips)) . ' trip' . (count($trips) === 1 ? '' : 's'), 'itflow-report-long') ?>
-        <?= reportTable($trip_columns, $trips, ['empty' => 'No trips in this period.', 'limit' => 250, 'export_table' => 'trips', 'totals' => ['trip_date' => 'Total', 'miles' => $miles, 'value' => $totals['value']]]) ?>
+    <?= reportSectionOpen(__('Every trip'), _n('%s trip', '%s trips', count($trips), reportCount(count($trips))), 'itflow-report-long') ?>
+        <?= reportTable($trip_columns, $trips, ['empty' => __('No trips in this period.'), 'limit' => 250, 'export_table' => 'trips', 'totals' => ['trip_date' => __('Total'), 'miles' => $miles, 'value' => $totals['value']]]) ?>
         <div class="card-footer small text-body-secondary">
-            <?= $unit ?> count as entered on each trip - the whole trip, both ways for a round trip. Archived trips are left out. The rate starts at the mileage rate<?= $session_is_admin ? ' in <a href="/admin/settings_invoice.php#mileage">Settings</a>' : '' ?>, and paying agents back is Pay Mileage on <a href="/agent/trips.php?show=to_pay">Trips</a>.
+            <?= __('%s count as entered on each trip - the whole trip, both ways for a round trip. Archived trips are left out.', $unit) ?>
+            <?= $session_is_admin ? __('The rate starts at the mileage rate in %1$s, and paying agents back is Pay Mileage on %2$s.', '<a href="/admin/settings_invoice.php#mileage">' . __('Settings') . '</a>', '<a href="/agent/trips.php?show=to_pay">' . __('Trips') . '</a>') : __('The rate starts at the mileage rate, and paying agents back is Pay Mileage on %s.', '<a href="/agent/trips.php?show=to_pay">' . __('Trips') . '</a>') ?>
         </div>
     </div>
 

@@ -114,38 +114,38 @@ usort($clients, function ($a, $b) {
 });
 
 $columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr']);
     }],
-    'income' => ['label' => 'Income', 'type' => 'money'],
-    'costs' => ['label' => 'Direct costs', 'type' => 'money', 'title' => 'Expenses filed against the client', 'html' => function ($row) use ($period) {
+    'income' => ['label' => __('Income'), 'type' => 'money'],
+    'costs' => ['label' => __('Direct costs'), 'type' => 'money', 'title' => __('Expenses filed against the client'), 'html' => function ($row) use ($period) {
         return $row['costs'] > 0 ? '<a class="itflow-report-amount" href="/agent/expenses.php?client=' . intval($row['client_id']) . '&amp;canned_date=custom&amp;dtf=' . $period['start'] . '&amp;dtt=' . $period['end'] . '">' . reportMoney($row['costs']) . '</a>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'net' => ['label' => 'Net', 'type' => 'money', 'class' => 'fw-semibold'],
+    'net' => ['label' => __('Net'), 'type' => 'money', 'class' => 'fw-semibold'],
 ];
 if ($with_tickets) {
-    $columns['seconds'] = ['label' => 'Hours', 'type' => 'hours', 'title' => 'Time logged on their tickets in the period'];
-    $columns['billable_share'] = ['label' => 'Billable', 'type' => 'percent', 'title' => 'Share of the hours on billable tickets', 'class' => 'text-body-secondary'];
-    $columns['rate'] = ['label' => 'Per hour', 'type' => 'money', 'title' => 'Net divided by hours - your effective hourly rate', 'html' => function ($row) use ($target) {
+    $columns['seconds'] = ['label' => __('Hours'), 'type' => 'hours', 'title' => __('Time logged on their tickets in the period')];
+    $columns['billable_share'] = ['label' => __('Billable'), 'type' => 'percent', 'title' => __('Share of the hours on billable tickets'), 'class' => 'text-body-secondary'];
+    $columns['rate'] = ['label' => __('Per hour'), 'type' => 'money', 'title' => __('Net divided by hours - your effective hourly rate'), 'html' => function ($row) use ($target) {
         if ($row['rate'] === null) {
-            return '<span class="itflow-report-zero">No time</span>';
+            return '<span class="itflow-report-zero">' . __('No time') . '</span>';
         }
         $tone = $row['flag'] ? 'text-danger fw-semibold' : ($target > 0 && $row['rate'] >= $target ? 'text-success-emphasis fw-semibold' : 'fw-semibold');
         return '<span class="' . $tone . '">' . reportMoney($row['rate']) . '</span>';
     }];
-    $columns['tickets'] = ['label' => 'Tickets', 'type' => 'count'];
+    $columns['tickets'] = ['label' => __('Tickets'), 'type' => 'count'];
 }
-$columns['mrr'] = ['label' => 'Recurring / month', 'type' => 'money', 'html' => function ($row) {
+$columns['mrr'] = ['label' => __('Recurring / month'), 'type' => 'money', 'html' => function ($row) {
     return $row['mrr'] > 0 ? reportMoney($row['mrr']) : '<span class="itflow-report-zero">–</span>';
 }];
-$columns['flag'] = ['label' => '', 'sort' => false, 'csv_label' => 'Flag', 'csv' => function ($row) {
-    return ['unpaid' => 'Time but no income', 'below' => 'Below target'][$row['flag']] ?? '';
+$columns['flag'] = ['label' => '', 'sort' => false, 'csv_label' => __('Flag'), 'csv' => function ($row) {
+    return ['unpaid' => __('Time but no income'), 'below' => __('Below target')][$row['flag']] ?? '';
 }, 'html' => function ($row) {
     if ($row['flag'] === 'unpaid') {
-        return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal">Time, no income</span>';
+        return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal">' . __('Time, no income') . '</span>';
     }
     if ($row['flag'] === 'below') {
-        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">Below target</span>';
+        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">' . __('Below target') . '</span>';
     }
     return '';
 }];
@@ -158,7 +158,7 @@ $income = array_sum(array_column($clients, 'income'));
 $costs = array_sum(array_column($clients, 'costs'));
 $seconds = array_sum(array_column($clients, 'seconds'));
 $overall_rate = $seconds ? ($income - $costs) / ($seconds / 3600) : null;
-$totals = ['client' => 'Total', 'income' => $income, 'costs' => $costs, 'net' => $income - $costs, 'seconds' => $seconds,
+$totals = ['client' => __('Total'), 'income' => $income, 'costs' => $costs, 'net' => $income - $costs, 'seconds' => $seconds,
     'rate' => $overall_rate, 'tickets' => array_sum(array_column($clients, 'tickets')), 'mrr' => array_sum(array_column($clients, 'mrr')),
     'billable_share' => reportShare(array_sum(array_column($clients, 'billable_seconds')), $seconds)];
 
@@ -174,7 +174,7 @@ usort($chart_rows, function ($a, $b) { return $b['seconds'] <=> $a['seconds']; }
 $chart_rows = array_slice($chart_rows, 0, 15);
 usort($chart_rows, function ($a, $b) { return $a['rate'] <=> $b['rate']; });
 
-$target_control = '<div class="col-sm-6 col-lg-2"><div class="input-group" title="The hourly rate you aim to earn - your default hourly rate unless you enter another">'
+$target_control = '<div class="col-sm-6 col-lg-2"><div class="input-group" title="' . escapeHtml(__('The hourly rate you aim to earn - your default hourly rate unless you enter another')) . '">'
     . '<span class="input-group-text"><i class="fas fa-fw fa-bullseye"></i></span>'
     . '<input type="text" inputmode="decimal" class="form-control" name="target" value="' . ($target > 0 ? escapeHtml(number_format($target, 2, '.', '')) : '') . '" placeholder="Target per hour" aria-label="Target per hour" data-report-autosubmit>'
     . '</div></div>';
@@ -190,35 +190,34 @@ $target_control = '<div class="col-sm-6 col-lg-2"><div class="input-group" title
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Income from clients', 'value' => reportMoney($income), 'sub' => $costs > 0 ? escapeHtml(reportMoney($costs)) . ' <span class="text-body-tertiary">in direct costs</span>' : '<span class="text-body-tertiary">No direct costs filed</span>'],
-        ['label' => 'Hours worked', 'value' => $with_tickets ? reportHours($seconds) : '-', 'sub' => $with_tickets ? escapeHtml(reportPercent(reportShare(array_sum(array_column($clients, 'billable_seconds')), $seconds))) . ' <span class="text-body-tertiary">on billable tickets</span>' : '<span class="text-body-tertiary">Ticketing is off</span>'],
-        ['label' => 'Earned per hour', 'value' => $overall_rate === null ? '-' : reportMoney($overall_rate), 'tone' => $overall_rate !== null && $target > 0 ? ($overall_rate >= $target ? 'success' : 'danger') : '',
-            'sub' => $target > 0 ? 'Target <span class="text-body">' . reportMoney($target) . '</span>' : '<span class="text-body-tertiary">Enter a target above</span>'],
-        ['label' => 'Clients to look at', 'value' => reportCount(count($flagged)), 'tone' => $flagged ? 'danger' : 'success',
-            'sub' => '<span class="text-body-tertiary">Below target, or time with no income</span>'],
+        ['label' => __('Income from clients'), 'value' => reportMoney($income), 'sub' => $costs > 0 ? escapeHtml(reportMoney($costs)) . ' <span class="text-body-tertiary">' . __('in direct costs') . '</span>' : '<span class="text-body-tertiary">' . __('No direct costs filed') . '</span>'],
+        ['label' => __('Hours worked'), 'value' => $with_tickets ? reportHours($seconds) : '-', 'sub' => $with_tickets ? escapeHtml(reportPercent(reportShare(array_sum(array_column($clients, 'billable_seconds')), $seconds))) . ' <span class="text-body-tertiary">' . __('on billable tickets') . '</span>' : '<span class="text-body-tertiary">' . __('Ticketing is off') . '</span>'],
+        ['label' => __('Earned per hour'), 'value' => $overall_rate === null ? '-' : reportMoney($overall_rate), 'tone' => $overall_rate !== null && $target > 0 ? ($overall_rate >= $target ? 'success' : 'danger') : '',
+            'sub' => $target > 0 ? __('Target %s', '<span class="text-body">' . reportMoney($target) . '</span>') : '<span class="text-body-tertiary">' . __('Enter a target above') . '</span>'],
+        ['label' => __('Clients to look at'), 'value' => reportCount(count($flagged)), 'tone' => $flagged ? 'danger' : 'success',
+            'sub' => '<span class="text-body-tertiary">' . __('Below target, or time with no income') . '</span>'],
     ]) ?>
 
     <?php if ($with_tickets && $chart_rows) { ?>
-        <?= reportSectionOpen('Earned per hour', 'The ' . count($chart_rows) . ' clients you spent the most time on - red is below target') ?>
+        <?= reportSectionOpen(__('Earned per hour'), __('The %d clients you spent the most time on - red is below target', count($chart_rows))) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
                     'labels' => array_map(function ($r) { return $r['client']; }, $chart_rows),
-                    'series' => [['label' => 'Per hour', 'data' => array_map(function ($r) { return round($r['rate'], 2); }, $chart_rows),
+                    'series' => [['label' => __('Per hour'), 'data' => array_map(function ($r) { return round($r['rate'], 2); }, $chart_rows),
                         'tones' => array_map(function ($r) use ($target) { return $r['flag'] ? 'danger' : ($target > 0 ? 'success' : 'accent'); }, $chart_rows)]],
                     'format' => 'money',
                     'legend' => false,
-                ], '', 'What each client earned per hour of work') ?>
+                ], '', __('What each client earned per hour of work')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Lowest earning per hour first', 'itflow-report-long') ?>
-        <?= reportTable($columns, $clients, ['empty' => 'No income or time logged for any client in this period.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By client'), __('Lowest earning per hour first'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $clients, ['empty' => __('No income or time logged for any client in this period.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Net is income (payments and revenue) less the expenses filed against the client. Per hour is net divided by the hours logged on their tickets in the same period -
-            a client who pays in one period for work done in another reads high or low; a longer period evens that out.
+            <?= __('Net is income (payments and revenue) less the expenses filed against the client. Per hour is net divided by the hours logged on their tickets in the same period - a client who pays in one period for work done in another reads high or low; a longer period evens that out.') ?>
         </div>
     </div>
 

@@ -13,7 +13,7 @@
 require_once "includes/inc_report.php";
 reportEnforce('asset_lifecycle');
 
-$year_choices = [3 => 'Replace after 3 years', 4 => 'Replace after 4 years', 5 => 'Replace after 5 years', 6 => 'Replace after 6 years', 7 => 'Replace after 7 years'];
+$year_choices = [3 => __('Replace after 3 years'), 4 => __('Replace after 4 years'), 5 => __('Replace after 5 years'), 6 => __('Replace after 6 years'), 7 => __('Replace after 7 years')];
 $years = isset($year_choices[intval($_GET['years'] ?? 0)]) ? intval($_GET['years']) : 5;
 $limit_days = $years * 365.25;
 $client_id = reportClientId();
@@ -80,71 +80,71 @@ $count_cell = function ($key, $tone) {
     };
 };
 $figure_columns = [
-    'assets' => ['label' => 'In use', 'type' => 'count'],
-    'average' => ['label' => 'Average age', 'type' => 'decimal', 'csv_label' => 'Average age (years)', 'csv' => function ($row) {
+    'assets' => ['label' => __('In use'), 'type' => 'count'],
+    'average' => ['label' => __('Average age'), 'type' => 'decimal', 'csv_label' => __('Average age (years)'), 'csv' => function ($row) {
         return $row['average'] === null ? '' : number_format($row['average'] / 365.25, 1, '.', '');
     }, 'html' => function ($row) {
         return $row['average'] === null ? '<span class="itflow-report-zero">–</span>' : reportYears($row['average']);
     }],
     'old' => ['label' => "Over $years years", 'type' => 'count', 'html' => $count_cell('old', 'danger')],
-    'expired' => ['label' => 'Out of warranty', 'type' => 'count', 'html' => $count_cell('expired', 'danger')],
-    'ending' => ['label' => 'Ends in 90 days', 'type' => 'count', 'title' => 'The warranty ends in the next 90 days', 'html' => $count_cell('ending', 'warning')],
-    'os' => ['label' => 'Unsupported OS', 'type' => 'count', 'html' => $count_cell('os', 'danger')],
-    'undated' => ['label' => 'No date', 'type' => 'count', 'title' => 'Hardware with neither a purchase nor an install date', 'html' => function ($row) {
+    'expired' => ['label' => __('Out of warranty'), 'type' => 'count', 'html' => $count_cell('expired', 'danger')],
+    'ending' => ['label' => __('Ends in 90 days'), 'type' => 'count', 'title' => __('The warranty ends in the next 90 days'), 'html' => $count_cell('ending', 'warning')],
+    'os' => ['label' => __('Unsupported OS'), 'type' => 'count', 'html' => $count_cell('os', 'danger')],
+    'undated' => ['label' => __('No date'), 'type' => 'count', 'title' => __('Hardware with neither a purchase nor an install date'), 'html' => function ($row) {
         return $row['undated'] ? '<span class="text-body-secondary">' . reportCount($row['undated']) . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
 ];
-$type_columns = ['type' => ['label' => 'Type', 'html' => function ($row) {
+$type_columns = ['type' => ['label' => __('Type'), 'html' => function ($row) {
     return '<span class="d-inline-flex align-items-center gap-2"><span class="itflow-asset-icon itflow-asset-icon-sm itflow-asset-tone-' . assetTypeTone($row['type']) . '" aria-hidden="true"><i class="fas fa-fw fa-' . getAssetIcon($row['type']) . '"></i></span>'
         . '<a class="text-body fw-semibold text-nowrap" href="' . escapeHtml(reportUrl(['type' => $row['type'], 'export' => null, 'table' => null])) . '">' . escapeHtml($row['type']) . '</a></span>';
 }]] + $figure_columns;
-$client_columns = ['client' => ['label' => 'Client', 'html' => function ($row) {
+$client_columns = ['client' => ['label' => __('Client'), 'html' => function ($row) {
     return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'assets.php');
 }]] + $figure_columns;
 
 $warranty_pill = function ($warranty) {
     if (!$warranty) {
-        return '<span class="text-body-tertiary small">No date</span>';
+        return '<span class="text-body-tertiary small">' . __('No date') . '</span>';
     }
     $tone = $warranty['tone'];
     return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal text-nowrap" title="' . escapeHtml($warranty['text']) . '">'
         . escapeHtml($warranty['short']) . '</span>';
 };
 $candidate_columns = [
-    'asset_name' => ['label' => 'Asset', 'html' => function ($row) { return reportAssetCell($row); }],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'asset_name' => ['label' => __('Asset'), 'html' => function ($row) { return reportAssetCell($row); }],
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['asset_client_id'], $row['client_name'], $row['client_abbreviation'], 'assets.php');
     }],
-    'asset_type' => ['label' => 'Type'],
-    'model' => ['label' => 'Make and model', 'csv' => function ($row) { return trim($row['asset_make'] . ' ' . $row['asset_model']); }, 'html' => function ($row) {
+    'asset_type' => ['label' => __('Type')],
+    'model' => ['label' => __('Make and model'), 'csv' => function ($row) { return trim($row['asset_make'] . ' ' . $row['asset_model']); }, 'html' => function ($row) {
         return '<span class="text-nowrap">' . escapeHtml(trim($row['asset_make'] . ' ' . $row['asset_model'])) . '</span>';
     }],
-    'asset_os' => ['label' => 'Operating system', 'html' => function ($row) {
+    'asset_os' => ['label' => __('Operating system'), 'html' => function ($row) {
         if ($row['os_eol'] === '') {
             return '<span class="text-nowrap">' . escapeHtml($row['asset_os']) . '</span>';
         }
-        return '<span class="text-danger-emphasis fw-semibold text-nowrap" title="Past its end of support">' . escapeHtml($row['asset_os']) . ' <i class="fas fa-fw fa-exclamation-circle small"></i></span>';
+        return '<span class="text-danger-emphasis fw-semibold text-nowrap" title="' . escapeHtml(__('Past its end of support')) . '">' . escapeHtml($row['asset_os']) . ' <i class="fas fa-fw fa-exclamation-circle small"></i></span>';
     }],
-    'age_days' => ['label' => 'Age', 'type' => 'decimal', 'csv_label' => 'Age (years)', 'csv' => function ($row) {
+    'age_days' => ['label' => __('Age'), 'type' => 'decimal', 'csv_label' => __('Age (years)'), 'csv' => function ($row) {
         return $row['age_days'] === null ? '' : number_format($row['age_days'] / 365.25, 1, '.', '');
     }, 'html' => function ($row) {
         return $row['age_days'] === null ? '<span class="itflow-report-zero">–</span>'
             : '<span class="' . ($row['old'] ? 'text-danger-emphasis fw-semibold' : '') . '" title="Since ' . escapeHtml($row['age_date']) . '">' . reportYears($row['age_days']) . '</span>';
     }],
-    'warranty' => ['label' => 'Warranty', 'sort' => false, 'csv' => function ($row) { return $row['warranty'] ? $row['warranty']['date'] : ''; }, 'csv_label' => 'Warranty ends',
+    'warranty' => ['label' => __('Warranty'), 'sort' => false, 'csv' => function ($row) { return $row['warranty'] ? $row['warranty']['date'] : ''; }, 'csv_label' => __('Warranty ends'),
         'html' => function ($row) use ($warranty_pill) { return $warranty_pill($row['warranty']); }],
-    'contact_name' => ['label' => 'Used by', 'html' => function ($row) {
+    'contact_name' => ['label' => __('Used by'), 'html' => function ($row) {
         return $row['contact_name'] ? '<span class="text-nowrap">' . escapeHtml($row['contact_name']) . '</span>' : '<span class="text-body-tertiary">-</span>';
     }],
-    'location_name' => ['label' => 'Location', 'screen' => false],
-    'asset_status' => ['label' => 'Status', 'screen' => false],
+    'location_name' => ['label' => __('Location'), 'screen' => false],
+    'asset_status' => ['label' => __('Status'), 'screen' => false],
 ];
 
 if (reportExporting('types')) {
-    reportCsv('Assets by Type', $type_columns, array_values($by_type), ['type' => 'Total'] + $totals);
+    reportCsv('Assets by Type', $type_columns, array_values($by_type), ['type' => __('Total')] + $totals);
 }
 if (reportExporting('clients')) {
-    reportCsv('Assets by Client', $client_columns, array_values($by_client), ['client' => 'Total'] + $totals);
+    reportCsv('Assets by Client', $client_columns, array_values($by_client), ['client' => __('Total')] + $totals);
 }
 if (reportExporting()) {
     reportCsv('Replacement Candidates', $candidate_columns, $candidates);
@@ -168,7 +168,7 @@ foreach ($assets as $asset) {
     }
 }
 if ($totals['undated']) {
-    $age_labels[] = 'No date';
+    $age_labels[] = __('No date');
     $age_counts[] = $totals['undated'];
     $age_tones[] = 'muted';
 }
@@ -202,7 +202,7 @@ foreach ($assets as $asset) {
     $warranty_counts[!$asset['warranty'] ? 'No date' : ($asset['expired'] ? 'Expired' : ($asset['ending'] ? 'Ends within 90 days' : 'Covered'))]++;
 }
 
-$type_choices = ['' => 'Every type'];
+$type_choices = ['' => __('Every type')];
 $sql = mysqli_query($mysqli, "SELECT DISTINCT asset_type FROM assets WHERE asset_archived_at IS NULL AND asset_type != '' " . reportClientSql('asset_client_id', 0) . " ORDER BY asset_type");
 while ($row = mysqli_fetch_assoc($sql)) {
     $type_choices[$row['asset_type']] = $row['asset_type'];
@@ -217,73 +217,74 @@ $dated_share = $totals['dated'] ? reportShare($totals['old'], $totals['dated'], 
 <div class="itflow-report">
 
     <?php reportHeader('asset_lifecycle', [
-        'subtitle' => 'As of ' . date('M j, Y'),
+        'subtitle' => __('As of %s', formatDate('now', 'date')),
         'client' => $client_id,
         'controls' => reportSelectControl('type', $type, $type_choices, 'fa-desktop') . reportSelectControl('years', $years, $year_choices, 'fa-recycle'),
-        'export' => ['candidates' => 'Replacement candidates', 'types' => 'By type', 'clients' => 'By client'],
+        'export' => ['candidates' => __('Replacement candidates'), 'types' => __('By type'), 'clients' => __('By client')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Assets in use', 'value' => reportCount($totals['assets']), 'url' => '/agent/assets.php' . ($client_id ? "?client_id=$client_id" : ''),
-            'sub' => $totals['average'] !== null ? 'Average age <span class="text-body">' . reportYears($totals['average']) . '</span>' : ''],
+        ['label' => __('Assets in use'), 'value' => reportCount($totals['assets']), 'url' => '/agent/assets.php' . ($client_id ? "?client_id=$client_id" : ''),
+            'sub' => $totals['average'] !== null ? __('Average age %s', '<span class="text-body">' . reportYears($totals['average']) . '</span>') : ''],
         ['label' => "Over $years years old", 'value' => reportCount($totals['old']), 'tone' => $totals['old'] ? 'danger' : 'success',
-            'sub' => $dated_share !== null ? reportPercent($dated_share) . ' <span class="text-body-tertiary">of dated hardware</span>' : ''],
-        ['label' => 'Out of warranty', 'value' => reportCount($totals['expired']), 'tone' => $totals['expired'] ? 'warning' : '',
-            'sub' => reportCount($totals['ending']) . ' <span class="text-body-tertiary">more within 90 days</span>'],
-        ['label' => 'Unsupported OS', 'value' => reportCount($totals['os']), 'tone' => $totals['os'] ? 'danger' : 'success',
-            'sub' => $os_names ? escapeHtml(array_key_first($os_names)) . ' <span class="text-body-tertiary">the most</span>' : '<span class="text-body-tertiary">All supported or unknown</span>'],
+            'sub' => $dated_share !== null ? reportPercent($dated_share) . ' <span class="text-body-tertiary">' . __('of dated hardware') . '</span>' : ''],
+        ['label' => __('Out of warranty'), 'value' => reportCount($totals['expired']), 'tone' => $totals['expired'] ? 'warning' : '',
+            'sub' => reportCount($totals['ending']) . ' <span class="text-body-tertiary">' . __('more within 90 days') . '</span>'],
+        ['label' => __('Unsupported OS'), 'value' => reportCount($totals['os']), 'tone' => $totals['os'] ? 'danger' : 'success',
+            'sub' => $os_names ? escapeHtml(array_key_first($os_names)) . ' <span class="text-body-tertiary">' . __('the most') . '</span>' : '<span class="text-body-tertiary">' . __('All supported or unknown') . '</span>'],
     ]) ?>
 
     <?php if (!$assets) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty('No assets in use match these filters.', 'fa-desktop', 'secondary') ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty(__('No assets in use match these filters.'), 'fa-desktop', 'secondary') ?></div></div>
     <?php } else { ?>
 
         <div class="row g-3">
             <div class="col-lg-7">
-                <?= reportSectionOpen('Age', 'From purchase, else install date', 'h-100') ?>
+                <?= reportSectionOpen('Age', __('From purchase, else install date'), 'h-100') ?>
                     <div class="card-body">
-                        <?= reportChart(['type' => 'bar', 'labels' => $age_labels, 'series' => [['label' => 'Assets', 'data' => array_values($age_counts), 'tones' => $age_tones]],
-                            'format' => 'count', 'legend' => false], '', 'Assets in use by age') ?>
+                        <?= reportChart(['type' => 'bar', 'labels' => $age_labels, 'series' => [['label' => __('Assets'), 'data' => array_values($age_counts), 'tones' => $age_tones]],
+                            'format' => 'count', 'legend' => false], '', __('Assets in use by age')) ?>
                     </div>
                 </div>
             </div>
             <div class="col-lg-5">
                 <?= reportSectionOpen('Warranty', 'Hardware', 'h-100') ?>
                     <div class="card-body">
-                        <?= reportChart(['type' => 'doughnut', 'labels' => array_keys($warranty_counts), 'series' => [['label' => 'Assets', 'data' => array_values($warranty_counts)]],
-                            'colors' => ['success', 'warning', 'danger', 'muted'], 'format' => 'count'], 'donut', 'Hardware by warranty') ?>
-                        <div class="mt-3"><?= reportLegendHtml(array_keys($warranty_counts), array_values($warranty_counts), ['success', 'warning', 'danger', 'muted'], 'count') ?></div>
+                        <?= reportChart(['type' => 'doughnut', 'labels' => array_map('__', array_keys($warranty_counts)), // i18n-dynamic - the warranty names above
+                        'series' => [['label' => __('Assets'), 'data' => array_values($warranty_counts)]],
+                            'colors' => ['success', 'warning', 'danger', 'muted'], 'format' => 'count'], 'donut', __('Hardware by warranty')) ?>
+                        <div class="mt-3"><?= reportLegendHtml(array_map('__', array_keys($warranty_counts)), // i18n-dynamic
+                             array_values($warranty_counts), ['success', 'warning', 'danger', 'muted'], 'count') ?></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <?= reportSectionOpen("Reaching $years years", reportCount($coming) . ' over the next two years - for budgeting') ?>
+        <?= reportSectionOpen(__('Reaching %d years', $years), __('%s over the next two years - for budgeting', reportCount($coming))) ?>
             <div class="card-body">
-                <?= reportChart(['type' => 'bar', 'labels' => array_column($quarters, 'label'), 'series' => [['label' => 'Reaching ' . $years . ' years', 'data' => array_column($quarters, 'count'), 'tone' => 'warning']],
-                    'format' => 'count', 'legend' => false], 'sm', "Hardware reaching $years years old, by quarter") ?>
+                <?= reportChart(['type' => 'bar', 'labels' => array_column($quarters, 'label'), 'series' => [['label' => __('Reaching %d years', $years), 'data' => array_column($quarters, 'count'), 'tone' => 'warning']],
+                    'format' => 'count', 'legend' => false], 'sm', __('Hardware reaching %d years old, by quarter', $years)) ?>
             </div>
         </div>
 
         <?php if (!$type) { ?>
-            <?= reportSectionOpen('By type', 'Pick one to see only that type') ?>
-                <?= reportTable($type_columns, array_values($by_type), ['totals' => ['type' => 'Total'] + $totals, 'totals_html' => ['average' => $totals['average'] === null ? '' : reportYears($totals['average'])]]) ?>
+            <?= reportSectionOpen(__('By type'), __('Pick one to see only that type')) ?>
+                <?= reportTable($type_columns, array_values($by_type), ['totals' => ['type' => __('Total')] + $totals, 'totals_html' => ['average' => $totals['average'] === null ? '' : reportYears($totals['average'])]]) ?>
             </div>
         <?php } ?>
 
         <?php if (!$client_id) { ?>
-            <?= reportSectionOpen('By client', 'The most to replace first') ?>
-                <?= reportTable($client_columns, array_values($by_client), ['limit' => 50, 'export_table' => 'clients', 'totals' => ['client' => 'Total'] + $totals,
+            <?= reportSectionOpen(__('By client'), __('The most to replace first')) ?>
+                <?= reportTable($client_columns, array_values($by_client), ['limit' => 50, 'export_table' => 'clients', 'totals' => ['client' => __('Total')] + $totals,
                     'totals_html' => ['average' => $totals['average'] === null ? '' : reportYears($totals['average'])]]) ?>
             </div>
         <?php } ?>
 
-        <?= reportSectionOpen('Replacement candidates', "Over $years years old, or on an unsupported OS - oldest first", 'itflow-report-long') ?>
+        <?= reportSectionOpen(__('Replacement candidates'), __('Over %d years old, or on an unsupported OS - oldest first', $years), 'itflow-report-long') ?>
             <?= reportTable($candidate_columns, $candidates, ['limit' => 300, 'export_table' => 'candidates',
-                'empty' => reportEmpty("Nothing is over $years years old or on an unsupported operating system.")]) ?>
+                'empty' => reportEmpty(__('Nothing is over %d years old or on an unsupported operating system.', $years))]) ?>
             <div class="card-footer small text-body-secondary">
-                Assets not archived and not lost, stolen or retired. Age runs from the purchase date, else the install date; virtual machines have no age or warranty.
-                Unsupported means the operating system is past its maker's end of support (such as Windows 10, Windows Server 2012 or older, macOS 13 or older).
+                <?= __('Assets not archived and not lost, stolen or retired. Age runs from the purchase date, else the install date; virtual machines have no age or warranty. Unsupported means the operating system is past its maker\'s end of support (such as Windows 10, Windows Server 2012 or older, macOS 13 or older).') ?>
             </div>
         </div>
 

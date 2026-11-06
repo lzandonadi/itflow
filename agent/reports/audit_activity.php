@@ -111,7 +111,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
         $id = -1;
     }
     if (!isset($people[$id])) {
-        $people[$id] = ['id' => $id, 'person' => $id > 0 ? $row['user_name'] : ($id === 0 ? 'ITFlow itself' : 'People since deleted'), 'avatar' => (string) $row['user_avatar'],
+        $people[$id] = ['id' => $id, 'person' => $id > 0 ? $row['user_name'] : ($id === 0 ? __('ITFlow itself') : __('People since deleted')), 'avatar' => (string) $row['user_avatar'],
             'kind' => $id === 0 ? 'system' : ($id < 0 ? 'gone' : (intval($row['user_type']) === 2 ? 'portal' : 'agent')), 'entries' => 0, 'prev' => 0,
             'ips' => 0, 'clients' => 0, 'last' => null, 'count' => 0] + array_fill_keys(array_keys($parts), 0);
     }
@@ -167,7 +167,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     }
 }
 if ($gone_clients) {
-    $gone_clients['client'] = $gone_clients['count'] . ' client' . ($gone_clients['count'] === 1 ? '' : 's') . ' since deleted';
+    $gone_clients['client'] = _n('%d client since deleted', '%d clients since deleted', $gone_clients['count']);
     $clients[] = $gone_clients;
 }
 
@@ -200,103 +200,103 @@ $last_cell = function ($row) {
 };
 
 $people_columns = [
-    'person' => ['label' => 'Who', 'html' => function ($row) use ($log_url) {
+    'person' => ['label' => __('Who'), 'html' => function ($row) use ($log_url) {
         if ($row['kind'] === 'system') {
-            $cell = '<span class="small text-nowrap"><i class="fas fa-fw fa-cog text-body-tertiary me-1"></i>ITFlow itself</span><span class="d-block small text-body-secondary text-nowrap">cron, the API, the email parser</span>';
+            $cell = '<span class="small text-nowrap"><i class="fas fa-fw fa-cog text-body-tertiary me-1"></i>' . __('ITFlow itself') . '</span><span class="d-block small text-body-secondary text-nowrap">' . __('cron, the API, the email parser') . '</span>';
         } elseif ($row['kind'] === 'gone') {
             return '<span class="small text-body-secondary"><i class="fas fa-fw fa-user-slash text-body-tertiary me-1"></i>' . escapeHtml($row['person']) . '</span>';
         } else {
-            $cell = reportAgentCell($row['id'], $row['person'], $row['avatar'], 'Someone since deleted')
-                . ($row['kind'] === 'portal' ? ' <span class="badge text-bg-light border fw-normal">Portal</span>' : '');
+            $cell = reportAgentCell($row['id'], $row['person'], $row['avatar'], __('Someone since deleted'))
+                . ($row['kind'] === 'portal' ? ' <span class="badge text-bg-light border fw-normal">' . __('Portal') . '</span>' : '');
         }
         $url = $log_url(['user' => $row['id'] ?: 'system']);
-        return $url !== '' ? '<a class="text-decoration-none" href="' . escapeHtml($url) . '" title="Their entries in the audit log">' . $cell . '</a>' : $cell;
+        return $url !== '' ? '<a class="text-decoration-none" href="' . escapeHtml($url) . '" title="' . escapeHtml(__('Their entries in the audit log')) . '">' . $cell . '</a>' : $cell;
     }, 'csv' => function ($row) {
         return $row['person'] . ($row['kind'] === 'portal' ? ' (portal)' : '');
     }],
-    'entries' => ['label' => 'Entries', 'type' => 'count', 'class' => 'fw-semibold'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'entries' => ['label' => __('Entries'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['entries'], $row['prev'], 'up') . '</span>';
     }],
-    'changes' => ['label' => 'Changes', 'type' => 'count', 'title' => 'Records made, changed, archived, restored and deleted'],
-    'deletions' => ['label' => 'Deleted', 'type' => 'count', 'title' => 'Records deleted for good', 'html' => function ($row) use ($zero) {
+    'changes' => ['label' => __('Changes'), 'type' => 'count', 'title' => __('Records made, changed, archived, restored and deleted')],
+    'deletions' => ['label' => __('Deleted'), 'type' => 'count', 'title' => __('Records deleted for good'), 'html' => function ($row) use ($zero) {
         return $zero($row['deletions'], 'danger');
     }],
-    'passwords' => ['label' => 'Passwords seen', 'type' => 'count', 'title' => 'Passwords and 2FA codes looked at', 'html' => function ($row) use ($zero) {
+    'passwords' => ['label' => __('Passwords seen'), 'type' => 'count', 'title' => __('Passwords and 2FA codes looked at'), 'html' => function ($row) use ($zero) {
         return $zero($row['passwords'], 'warning');
     }],
-    'exports' => ['label' => 'Exports', 'type' => 'count', 'title' => 'Exports and downloads', 'html' => function ($row) use ($zero) {
+    'exports' => ['label' => __('Exports'), 'type' => 'count', 'title' => __('Exports and downloads'), 'html' => function ($row) use ($zero) {
         return $zero($row['exports'], 'warning');
     }],
-    'clients' => ['label' => 'Clients', 'type' => 'count', 'title' => 'Clients they did something for'],
+    'clients' => ['label' => __('Clients'), 'type' => 'count', 'title' => __('Clients they did something for')],
 ];
 if ($admin) {
-    $people_columns['signins'] = ['label' => 'Sign-ins', 'type' => 'count'];
-    $people_columns['failed'] = ['label' => 'Failed', 'type' => 'count', 'title' => 'Failed sign-ins against the account - not always them', 'html' => function ($row) use ($zero) {
+    $people_columns['signins'] = ['label' => __('Sign-ins'), 'type' => 'count'];
+    $people_columns['failed'] = ['label' => __('Failed'), 'type' => 'count', 'title' => __('Failed sign-ins against the account - not always them'), 'html' => function ($row) use ($zero) {
         return $zero($row['failed'], 'danger');
     }];
-    $people_columns['ips'] = ['label' => 'IP addresses', 'type' => 'count', 'title' => 'Places it was done from'];
+    $people_columns['ips'] = ['label' => __('IP addresses'), 'type' => 'count', 'title' => __('Places it was done from')];
 }
-$people_columns['last'] = ['label' => 'Last', 'type' => 'date', 'html' => $last_cell];
+$people_columns['last'] = ['label' => __('Last'), 'type' => 'date', 'html' => $last_cell];
 
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) use ($log_url) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) use ($log_url) {
         if ($row['gone']) {
             return '<span class="small text-body-secondary"><i class="fas fa-fw fa-ghost text-body-tertiary me-1"></i>' . escapeHtml($row['client']) . '</span>';
         }
         $url = $log_url(['client' => $row['id']]);
         return reportClientCell($row['id'], $row['client'], $row['abbr'], 'client_overview.php')
-            . ($url !== '' ? ' <a class="small ms-1" href="' . escapeHtml($url) . '" title="Its audit log for the period"><i class="fas fa-history"></i></a>' : '');
+            . ($url !== '' ? ' <a class="small ms-1" href="' . escapeHtml($url) . '" title="' . escapeHtml(__('Its audit log for the period')) . '"><i class="fas fa-history"></i></a>' : '');
     }],
-    'entries' => ['label' => 'Entries', 'type' => 'count', 'class' => 'fw-semibold'],
-    'changes' => ['label' => 'Changes', 'type' => 'count'],
-    'deletions' => ['label' => 'Deleted', 'type' => 'count', 'html' => function ($row) use ($zero) {
+    'entries' => ['label' => __('Entries'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'changes' => ['label' => __('Changes'), 'type' => 'count'],
+    'deletions' => ['label' => __('Deleted'), 'type' => 'count', 'html' => function ($row) use ($zero) {
         return $zero($row['deletions'], 'danger');
     }],
-    'data' => ['label' => 'Data out', 'type' => 'count', 'title' => 'Passwords looked at, exports, downloads and shared links', 'html' => function ($row) use ($zero) {
+    'data' => ['label' => __('Data out'), 'type' => 'count', 'title' => __('Passwords looked at, exports, downloads and shared links'), 'html' => function ($row) use ($zero) {
         return $zero($row['data'], 'warning');
     }],
-    'people' => ['label' => 'People', 'type' => 'count', 'title' => 'Agents and portal contacts'],
-    'last' => ['label' => 'Last', 'type' => 'date', 'html' => $last_cell],
+    'people' => ['label' => __('People'), 'type' => 'count', 'title' => __('Agents and portal contacts')],
+    'last' => ['label' => __('Last'), 'type' => 'date', 'html' => $last_cell],
 ];
 
 $kind_columns = [
-    'type' => ['label' => 'What', 'html' => function ($row) use ($log_url) {
+    'type' => ['label' => __('What'), 'html' => function ($row) use ($log_url) {
         $url = $log_url(['type' => $row['type']]);
-        $label = '<i class="fas fa-fw ' . auditLogTypeIcon($row['type']) . ' text-body-tertiary me-1"></i>' . escapeHtml($row['type']);
+        $label = '<i class="fas fa-fw ' . auditLogTypeIcon($row['type']) . ' text-body-tertiary me-1"></i>' . escapeHtml(auditLogTypeLabel($row['type']));
         return $url !== '' ? '<a class="text-body" href="' . escapeHtml($url) . '">' . $label . '</a>' : $label;
     }],
-    'entries' => ['label' => 'Entries', 'type' => 'count', 'class' => 'fw-semibold'],
-    'records' => ['label' => 'Records', 'type' => 'count', 'title' => 'Different records'],
-    'created' => ['label' => 'Made', 'type' => 'count'],
-    'edited' => ['label' => 'Changed', 'type' => 'count'],
-    'deletions' => ['label' => 'Deleted', 'type' => 'count', 'html' => function ($row) use ($zero) {
+    'entries' => ['label' => __('Entries'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'records' => ['label' => __('Records'), 'type' => 'count', 'title' => __('Different records')],
+    'created' => ['label' => __('Made'), 'type' => 'count'],
+    'edited' => ['label' => __('Changed'), 'type' => 'count'],
+    'deletions' => ['label' => __('Deleted'), 'type' => 'count', 'html' => function ($row) use ($zero) {
         return $zero($row['deletions'], 'danger');
     }],
-    'data' => ['label' => 'Data out', 'type' => 'count', 'html' => function ($row) use ($zero) {
+    'data' => ['label' => __('Data out'), 'type' => 'count', 'html' => function ($row) use ($zero) {
         return $zero($row['data'], 'warning');
     }],
-    'last' => ['label' => 'Last', 'type' => 'date', 'html' => $last_cell],
+    'last' => ['label' => __('Last'), 'type' => 'date', 'html' => $last_cell],
 ];
 
 $security_columns = [
-    'what' => ['label' => 'What', 'html' => function ($row) use ($log_url) {
+    'what' => ['label' => __('What'), 'html' => function ($row) use ($log_url) {
         $url = $log_url(['view' => 'security', 'type' => $row['type'], 'action' => $row['action']]);
-        return '<a class="text-body text-decoration-none" href="' . escapeHtml($url) . '"><i class="fas fa-fw ' . auditLogTypeIcon($row['type']) . ' text-body-tertiary me-1"></i>' . escapeHtml($row['type']) . '</a> ' . auditLogActionPill($row['action']);
+        return '<a class="text-body text-decoration-none" href="' . escapeHtml($url) . '"><i class="fas fa-fw ' . auditLogTypeIcon($row['type']) . ' text-body-tertiary me-1"></i>' . escapeHtml(auditLogTypeLabel($row['type'])) . '</a> ' . auditLogActionPill($row['action']);
     }, 'csv' => function ($row) {
         return $row['type'] . ' ' . $row['action'];
     }],
-    'n' => ['label' => 'Times', 'type' => 'count', 'class' => 'fw-semibold'],
-    'ips' => ['label' => 'IP addresses', 'type' => 'count'],
-    'last' => ['label' => 'Last', 'type' => 'date', 'html' => $last_cell],
+    'n' => ['label' => __('Times'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'ips' => ['label' => __('IP addresses'), 'type' => 'count'],
+    'last' => ['label' => __('Last'), 'type' => 'date', 'html' => $last_cell],
 ];
 
 $sum = function (array $rows, $key) {
     return array_sum(array_column($rows, $key));
 };
-$people_totals = ['person' => 'Total', 'entries' => $overall['entries']] + array_intersect_key($overall, $parts);
-$client_totals = ['client' => 'Total', 'entries' => $sum($clients, 'entries'), 'changes' => $sum($clients, 'changes'), 'deletions' => $sum($clients, 'deletions'), 'data' => $sum($clients, 'data')];
-$kind_totals = ['type' => 'Total', 'entries' => $overall['entries'], 'created' => $sum($kinds, 'created'), 'edited' => $sum($kinds, 'edited'), 'deletions' => $overall['deletions'], 'data' => $overall['data']];
+$people_totals = ['person' => __('Total'), 'entries' => $overall['entries']] + array_intersect_key($overall, $parts);
+$client_totals = ['client' => __('Total'), 'entries' => $sum($clients, 'entries'), 'changes' => $sum($clients, 'changes'), 'deletions' => $sum($clients, 'deletions'), 'data' => $sum($clients, 'data')];
+$kind_totals = ['type' => __('Total'), 'entries' => $overall['entries'], 'created' => $sum($kinds, 'created'), 'edited' => $sum($kinds, 'edited'), 'deletions' => $overall['deletions'], 'data' => $overall['data']];
 
 $name = $period['start'] . ' to ' . $period['end'];
 if (reportExporting('clients')) {
@@ -306,7 +306,7 @@ if (reportExporting('kinds')) {
     reportCsv("Audit Activity by Kind $name", $kind_columns, $kinds, $kind_totals);
 }
 if ($admin && reportExporting('security')) {
-    reportCsv("Audit Activity Security $name", $security_columns, $security, ['what' => 'Total', 'n' => $sum($security, 'n')]);
+    reportCsv("Audit Activity Security $name", $security_columns, $security, ['what' => __('Total'), 'n' => $sum($security, 'n')]);
 }
 if (reportExporting()) {
     reportCsv("Audit Activity by Person $name", $people_columns, $people, $people_totals);
@@ -322,32 +322,32 @@ for ($y = intval(date('Y')) - 2; $oldest && $y >= intval($oldest); $y--) {
 }
 $retention = appLogRetention();
 
-$exports = ['' => 'By person', 'clients' => 'By client', 'kinds' => 'By kind'] + ($admin ? ['security' => 'Security events'] : []);
+$exports = ['' => __('By person'), 'clients' => __('By client'), 'kinds' => __('By kind')] + ($admin ? ['security' => __('Security events')] : []);
 $stats = [
-    ['label' => 'Changes', 'value' => reportCount($overall['changes']),
-        'sub' => ($before['changes'] || $overall['changes'] ? reportChangeHtml($overall['changes'], $before['changes'], 'up', 'the period before') . ' · ' : '')
+    ['label' => __('Changes'), 'value' => reportCount($overall['changes']),
+        'sub' => ($before['changes'] || $overall['changes'] ? reportChangeHtml($overall['changes'], $before['changes'], 'up', __('the period before')) . ' · ' : '')
             . $overall['people'] . ' <span class="text-body-tertiary">' . ($overall['people'] === 1 ? 'person' : 'people') . '</span>'],
-    ['label' => 'Deleted', 'value' => reportCount($overall['deletions']), 'tone' => $overall['deletions'] ? 'danger' : '',
-        'sub' => $before['deletions'] || $overall['deletions'] ? reportChangeHtml($overall['deletions'], $before['deletions'], 'down', 'the period before') : '<span class="text-body-tertiary">Nothing deleted</span>'],
-    ['label' => 'Data out', 'value' => reportCount($overall['data']), 'tone' => $overall['data'] ? 'warning' : '',
+    ['label' => __('Deleted'), 'value' => reportCount($overall['deletions']), 'tone' => $overall['deletions'] ? 'danger' : '',
+        'sub' => $before['deletions'] || $overall['deletions'] ? reportChangeHtml($overall['deletions'], $before['deletions'], 'down', __('the period before')) : '<span class="text-body-tertiary">' . __('Nothing deleted') . '</span>'],
+    ['label' => __('Data out'), 'value' => reportCount($overall['data']), 'tone' => $overall['data'] ? 'warning' : '',
         'sub' => reportCount($overall['passwords']) . ' <span class="text-body-tertiary">password' . ($overall['passwords'] === 1 ? '' : 's') . ' seen</span> · '
             . reportCount($overall['exports']) . ' <span class="text-body-tertiary">export' . ($overall['exports'] === 1 ? '' : 's') . '</span>'],
 ];
 if ($admin) {
-    $stats[] = ['label' => 'Sign-ins', 'value' => reportCount($overall['signins']), 'tone' => $overall['failed'] > $overall['signins'] ? 'danger' : '',
-        'sub' => $overall['failed'] ? '<span class="text-danger-emphasis">' . reportCount($overall['failed']) . ' failed</span>' : '<span class="text-body-tertiary">None failed</span>'];
+    $stats[] = ['label' => __('Sign-ins'), 'value' => reportCount($overall['signins']), 'tone' => $overall['failed'] > $overall['signins'] ? 'danger' : '',
+        'sub' => $overall['failed'] ? '<span class="text-danger-emphasis">' . reportCount($overall['failed']) . ' failed</span>' : '<span class="text-body-tertiary">' . __('None failed') . '</span>'];
 } else {
-    $stats[] = ['label' => 'Out of hours', 'value' => $by_people ? reportPercent(reportShare($out_of_hours, $by_people)) : '-',
+    $stats[] = ['label' => __('Out of hours'), 'value' => $by_people ? reportPercent(reportShare($out_of_hours, $by_people)) : '-',
         'sub' => reportCount($out_of_hours) . ' <span class="text-body-tertiary">of ' . reportCount($by_people) . ' entries</span>'];
 }
 
 $chart_series = [
-    ['label' => 'Changes', 'tone' => 'accent', 'data' => array_values($series['changes']), 'stack' => 'a'],
-    ['label' => 'Data out', 'tone' => 'warning', 'data' => array_values($series['data']), 'stack' => 'a'],
+    ['label' => __('Changes'), 'tone' => 'accent', 'data' => array_values($series['changes']), 'stack' => 'a'],
+    ['label' => __('Data out'), 'tone' => 'warning', 'data' => array_values($series['data']), 'stack' => 'a'],
 ];
 if ($admin) {
-    $chart_series[] = ['label' => 'Sign-ins', 'tone' => 'info', 'data' => array_values($series['signins']), 'stack' => 'a'];
-    $chart_series[] = ['label' => 'Failed sign-ins', 'tone' => 'danger', 'data' => array_values($series['failed']), 'stack' => 'a'];
+    $chart_series[] = ['label' => __('Sign-ins'), 'tone' => 'info', 'data' => array_values($series['signins']), 'stack' => 'a'];
+    $chart_series[] = ['label' => __('Failed sign-ins'), 'tone' => 'danger', 'data' => array_values($series['failed']), 'stack' => 'a'];
 }
 
 ?>
@@ -361,47 +361,48 @@ if ($admin) {
         'agent' => $agent_id,
         'export' => $exports,
         'print_meta' => implode(' · ', array_filter([$client_id ? reportClientName($client_id) : '', $agent_id ? getFieldById('users', $agent_id, 'user_name') : ''])),
-        'note' => escapeHtml(reportFind('audit_activity')['description']) . ($admin ? '' : ' You see the kinds of entry your role covers.')
-            . ($retention['audit'] ? ' The audit log keeps ' . escapeHtml(strtolower(appLogRetentionText($retention['audit']))) . ', so a period before that is empty.' : ''),
+        'note' => escapeHtml(reportFind('audit_activity')['description']) . ($admin ? '' : ' ' . __('You see the kinds of entry your role covers.'))
+            . ($retention['audit'] ? ' ' . __('The audit log keeps %s, so a period before that is empty.', escapeHtml(mb_strtolower(appLogRetentionText($retention['audit'])))) : ''),
     ]); ?>
 
     <?= reportStats($stats) ?>
 
     <?php if (!$overall['entries']) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty('Nothing was done in this period that you can see.', 'fa-history', 'secondary') ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty(__('Nothing was done in this period that you can see.'), 'fa-history', 'secondary') ?></div></div>
     <?php } else { ?>
 
-        <?= reportSectionOpen('Over time', escapeHtml($period['range'])) ?>
+        <?= reportSectionOpen(__('Over time'), escapeHtml($period['range'])) ?>
             <div class="card-body">
-                <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $chart_series, 'stacked' => true, 'format' => 'count'], '', 'Entries by ' . $buckets['unit']) ?>
+                <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $chart_series, 'stacked' => true, 'format' => 'count'], '', __('Entries by %s', $buckets['unit_label'])) ?>
             </div>
         </div>
 
-        <?= reportSectionOpen('When', reportCount($out_of_hours) . ' of ' . reportCount($by_people) . ' entries by people out of hours - before ' . escapeHtml(date('g:ia', strtotime($work_start))) . ', after ' . escapeHtml(date('g:ia', strtotime($work_end))) . ' or on a day off') ?>
+        <?= reportSectionOpen(__('When'), __('%1$s of %2$s entries by people out of hours - before %3$s, after %4$s or on a day off', reportCount($out_of_hours), reportCount($by_people), escapeHtml(formatDate($work_start, 'time')), escapeHtml(formatDate($work_end, 'time')))) ?>
             <div class="card-body">
                 <?= reportHeatmap($heat, 'entry') ?>
             </div>
         </div>
 
-        <?= reportSectionOpen('By person', 'Most first, then ITFlow itself') ?>
-            <?= reportTable($people_columns, $people, ['empty' => 'Nobody did anything in this period.', 'totals' => $people_totals]) ?>
+        <?= reportSectionOpen(__('By person'), __('Most first, then ITFlow itself')) ?>
+            <?= reportTable($people_columns, $people, ['empty' => __('Nobody did anything in this period.'), 'totals' => $people_totals]) ?>
             <div class="card-footer small text-body-secondary">
-                Changes are records made, changed, archived, restored and deleted. Failed sign-ins are against the account, so they may be someone else trying it. Each person opens their entries in the audit log<?= $admin ? '' : ' when a client is picked' ?>.
+                <?= __('Changes are records made, changed, archived, restored and deleted. Failed sign-ins are against the account, so they may be someone else trying it.') ?>
+                <?= $admin ? __('Each person opens their entries in the audit log.') : __('Each person opens their entries in the audit log when a client is picked.') ?>
             </div>
         </div>
 
         <?php if ($security) { ?>
-            <?= reportSectionOpen('Security events', 'Failed and turned away sign-ins, alerts, access denied, and changes to users, roles, keys and settings') ?>
+            <?= reportSectionOpen(__('Security events'), __('Failed and turned away sign-ins, alerts, access denied, and changes to users, roles, keys and settings')) ?>
                 <?= reportTable($security_columns, $security, ['empty' => '']) ?>
             </div>
         <?php } ?>
 
-        <?= reportSectionOpen('By client', 'Most first', 'itflow-report-long') ?>
-            <?= reportTable($client_columns, $clients, ['empty' => 'Nothing was done for a client in this period.', 'totals' => $client_totals]) ?>
+        <?= reportSectionOpen(__('By client'), __('Most first'), 'itflow-report-long') ?>
+            <?= reportTable($client_columns, $clients, ['empty' => __('Nothing was done for a client in this period.'), 'totals' => $client_totals]) ?>
         </div>
 
-        <?= reportSectionOpen('By kind', 'What it was done to', 'itflow-report-long') ?>
-            <?= reportTable($kind_columns, $kinds, ['empty' => 'Nothing in this period.', 'totals' => $kind_totals]) ?>
+        <?= reportSectionOpen(__('By kind'), __('What it was done to'), 'itflow-report-long') ?>
+            <?= reportTable($kind_columns, $kinds, ['empty' => __('Nothing in this period.'), 'totals' => $kind_totals]) ?>
         </div>
 
     <?php } ?>

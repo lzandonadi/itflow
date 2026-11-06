@@ -403,6 +403,7 @@ return [
     'vs %d' => 'vs. %d',
     'compared with %d' => 'em comparação com %d',
     'audit type::Asset Interface' => 'Interface de ativo',
+    'audit type::Ticket Template' => 'Modelo de chamado',
     '%d invoice,' => ['%d fatura,', '%d faturas,'],
     'Uncategorised' => 'Sem categoria',
     'Yesterday' => 'Ontem',
