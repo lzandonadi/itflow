@@ -107,6 +107,9 @@ function contractPossessive($name) {
 
 /** A type's label - the key's, or the text itself for one ITFlow doesn't know. */
 function contractTypeLabel($type) {
+    if ((string) $type === 'other') {
+        return _x('Other', 'contract type');
+    }
     if (isset(CONTRACT_TYPES[(string) $type])) {
         return __(CONTRACT_TYPES[(string) $type]['label']); // i18n-dynamic - the labels in CONTRACT_TYPES
     }

@@ -103,11 +103,7 @@ $app_update_available = $latest_version !== ''
                 <h5><i class="fas fa-fw fa-exclamation-triangle me-2"></i><?= __('The last update check did not finish') ?></h5>
                 <?= __('Anything below is from the check before it, so it may be out of date.') ?>
                 <pre class="bg-dark text-white p-2 mt-2 mb-2"><?= escapeHtml($check_job['cron_job_last_error']) ?></pre>
-                <?= __('Recorded %s. Check that Git is installed', escapeHtml((string) $check_job['cron_job_last_error_at'])) ?>
-                <?= __('and that the remote is reachable from this server, then clear the error from') ?>
-                <a href="cron.php" class="alert-link"><?= __('Maintenance &gt; Cron') ?></a>. <?= __('The') ?>
-                <a href="https://forum.itflow.org" class="alert-link" target="_blank"><?= __('forum') ?></a> <?= __('can help - include the') ?>
-                <?= __('output above.') ?>
+                <?= __('Recorded %1$s. Check that Git is installed and that the remote is reachable from this server, then clear the error from %2$s. The %3$s can help - include the output above.', escapeHtml((string) $check_job['cron_job_last_error_at']), '<a href="cron.php" class="alert-link">' . __('Maintenance &gt; Cron') . '</a>', '<a href="https://forum.itflow.org" class="alert-link" target="_blank">' . __('forum') . '</a>') ?>
             </div>
         <?php } ?>
 
@@ -121,9 +117,7 @@ $app_update_available = $latest_version !== ''
                 <?php if ($cron_is_running) { ?>
                     <?= __('Cron runs the check within a minute; this page refreshes itself.') ?>
                 <?php } else { ?>
-                    <strong class="text-warning"><?= __('Nothing is going to pick it up') ?></strong> <?= __('- cron has not checked in') ?>
-                    <?= __('recently or the master switch is off. See') ?>
-                    <a href="cron.php" class="alert-link"><?= __('Maintenance &gt; Cron') ?></a>.
+                    <strong class="text-warning"><?= __('Nothing is going to pick it up') ?></strong> <?= __('- cron has not checked in recently or the master switch is off. See %s.', '<a href="cron.php" class="alert-link">' . __('Maintenance &gt; Cron') . '</a>') ?>
                 <?php } ?>
             </div>
         <?php } ?>
@@ -191,8 +185,7 @@ $app_update_available = $latest_version !== ''
             <div class="alert alert-warning">
                 <h5><i class="fas fa-fw fa-exclamation-triangle me-2"></i><?= __('The last queued update did not finish') ?></h5>
                 <pre class="bg-dark text-white p-2 mt-2 mb-2"><?= escapeHtml($update_job['cron_job_last_error']) ?></pre>
-                <?= __('Recorded %s. Clear it from', escapeHtml((string) $update_job['cron_job_last_error_at'])) ?>
-                <a href="cron.php" class="alert-link"><?= __('Maintenance &gt; Cron') ?></a> <?= __('once it has been dealt with.') ?>
+                <?= __('Recorded %1$s. Clear it from %2$s once it has been dealt with.', escapeHtml((string) $update_job['cron_job_last_error_at']), '<a href="cron.php" class="alert-link">' . __('Maintenance &gt; Cron') . '</a>') ?>
             </div>
         <?php } ?>
 
@@ -217,10 +210,7 @@ $app_update_available = $latest_version !== ''
 
             <div class="alert alert-danger">
                 <h5><i class="fas fa-fw fa-exclamation-triangle me-2"></i><?= __('Do not update without a backup') ?></h5>
-                <?= __('A VM snapshot is the safest option - other methods are covered in the') ?>
-                <a href="https://docs.itflow.org/backups" class="alert-link" target="_blank"><?= __('docs') ?></a>. <?= __('Read the') ?>
-                <a href="https://github.com/itflow-org/itflow/blob/master/CHANGELOG.md" class="alert-link" target="_blank"><?= __('changelog') ?></a>
-                <?= __('first: some releases need manual steps, and this page will not do them for you.') ?>
+                <?= __('A VM snapshot is the safest option - other methods are covered in the %1$s. Read the %2$s first: some releases need manual steps, and this page will not do them for you.', '<a href="https://docs.itflow.org/backups" class="alert-link" target="_blank">' . __('docs') . '</a>', '<a href="https://github.com/itflow-org/itflow/blob/master/CHANGELOG.md" class="alert-link" target="_blank">' . __('changelog') . '</a>') ?>
             </div>
 
             <?php /* One action covers both halves - scripts/update_cli.php always runs the database
@@ -235,23 +225,17 @@ $app_update_available = $latest_version !== ''
                     <?php if ($app_update_available) { ?>
                         <p class="mb-2">
                             <strong><?= __('Application files:') ?></strong>
-                            <?= count($pending_commits) ?> commit<?= count($pending_commits) === 1 ? '' : 's' ?>
-                            behind <code><?= escapeHtml("origin/$repo_branch") ?></code>.
+                            <?= _n('%1$d commit behind %2$s.', '%1$d commits behind %2$s.', count($pending_commits), count($pending_commits), '<code>' . escapeHtml("origin/$repo_branch") . '</code>') ?>
                         </p>
                     <?php } elseif (empty($update_checked_at)) { ?>
                         <p class="mb-2">
-                            <strong><?= __('Application files:') ?></strong> <?= __('this install has not checked') ?>
-                            <code><?= escapeHtml("origin/$repo_branch") ?></code> yet, so there may or may not be
-                            <?= __('anything waiting. Queueing an update when there is nothing to do is harmless.') ?>
+                            <strong><?= __('Application files:') ?></strong> <?= __('this install has not checked %s yet, so there may or may not be anything waiting. Queueing an update when there is nothing to do is harmless.', '<code>' . escapeHtml("origin/$repo_branch") . '</code>') ?>
                         </p>
                     <?php } ?>
 
                     <?php if ($db_update_available) { ?>
                         <p class="mb-2">
-                            <strong><?= __('Database:') ?></strong> <?= __('schema is at') ?>
-                            <strong><?= escapeHtml(CURRENT_DATABASE_VERSION) ?></strong> <?= __('and this code expects') ?>
-                            <strong><?= escapeHtml(LATEST_DATABASE_VERSION) ?></strong>. Parts of the app will error
-                            <?= __('until the update runs.') ?>
+                            <strong><?= __('Database:') ?></strong> <?= __('schema is at %1$s and this code expects %2$s. Parts of the app will error until the update runs.', '<strong>' . escapeHtml(CURRENT_DATABASE_VERSION) . '</strong>', '<strong>' . escapeHtml(LATEST_DATABASE_VERSION) . '</strong>') ?>
                         </p>
                     <?php } ?>
 
@@ -264,21 +248,13 @@ $app_update_available = $latest_version !== ''
                     <p class="text-muted mt-2 mb-0">
                         <small>
                             <?php if ($update_queue_available) { ?>
-                                <?= __('Queue Update hands the job to cron, which runs') ?>
-                                <code><?= __('scripts/update_cli.php') ?></code> in its own process - it updates the files and then
-                                <?= __('applies every pending migration, with no request timeout, as the user that owns the') ?>
-                                <?= __('files. It resets the files to %s, so', '<code>' . escapeHtml("origin/$repo_branch") . '</code>') ?>
-                                <?= __('local changes to them are lost. A migration that fails part way stops without advancing') ?>
-                                <?= __('the recorded version, so it is safe to queue again once the cause is fixed.') ?>
+                                <?= __('Queue Update hands the job to cron, which runs %1$s in its own process - it updates the files and then applies every pending migration, with no request timeout, as the user that owns the files. It resets the files to %2$s, so local changes to them are lost. A migration that fails part way stops without advancing the recorded version, so it is safe to queue again once the cause is fixed.', '<code>scripts/update_cli.php</code>', '<code>' . escapeHtml("origin/$repo_branch") . '</code>') ?>
                                 <?php if (!$cron_is_running) { ?>
                                     <strong class="text-warning"><?= __('Cron is not checking in, so a queued update will sit there until it is.') ?></strong>
                                     
                                 <?php } ?>
                             <?php } else { ?>
-                                <strong><?= __('This install cannot queue yet.') ?></strong> <?= __('Queueing needs a schema change it has not') ?>
-                                <?= __('caught up with, so this one has to be started from a shell:') ?>
-                                <code>php scripts/update_cli.php</code>, <?= __('as the user that owns the files. It updates the') ?>
-                                <?= __('files and the database in one step, and Queue Update works from then on.') ?>
+                                <strong><?= __('This install cannot queue yet.') ?></strong> <?= __('Queueing needs a schema change it has not caught up with, so this one has to be started from a shell: %s, as the user that owns the files. It updates the files and the database in one step, and Queue Update works from then on.', '<code>php scripts/update_cli.php</code>') ?>
                             <?php } ?>
                         </small>
                     </p>

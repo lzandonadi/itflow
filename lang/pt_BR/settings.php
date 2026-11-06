@@ -685,7 +685,7 @@ return [
     'None - or 3, or 3, 7' => 'Nenhum - ou 3, ou 3, 7',
     'days late' => 'dias de atraso',
     'None - or 7, 14, 30' => 'Nenhum - ou 7, 14, 30',
-    'An invoice a recurring autopay charges on its due date isn\'t reminded before then.' => 'Uma fatura que um pagamento automático recorrente cobra no vencimento não recebe lembrete antes disso.',
+    'An invoice a recurring autopay charges on its due date isn\'t reminded before then.' => 'Uma fatura que uma cobrança automática recorrente cobra no vencimento não recebe lembrete antes disso.',
     'Support [Hourly]' => 'Suporte [por hora]',
     '%1$s, the oldest from %2$s.' => '%1$s, o mais antigo de %2$s.',
     '%s entry' => ['%s registro', '%s registros'],

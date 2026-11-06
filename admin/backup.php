@@ -42,22 +42,19 @@ if (!empty($_SESSION['backup_master_key_reveal'])) {
 <?php if ($backup_key === '') { ?>
     <div class="alert alert-danger">
         <h5><i class="fas fa-fw fa-exclamation-triangle me-2"></i><?= __('No backup encryption key') ?></h5>
-        <?= __('ITFlow could not write a backup encryption key to') ?> <strong>config.php</strong>, so it cannot produce an encrypted backup.
-        <?= __('Make config.php writable by the web server user and reload this page, or add a line like') ?>
-        <code>$config_backup_key = '&lt;32 random characters&gt;';</code> <?= __('to it yourself.') ?>
+        <?= __('ITFlow could not write a backup encryption key to %s, so it cannot produce an encrypted backup.', '<strong>config.php</strong>') ?>
+        <?= __('Make config.php writable by the web server user and reload this page, or add a line like %s to it yourself.', '<code>$config_backup_key = \'&lt;' . __('32 random characters') . '&gt;\';</code>') ?>
     </div>
 <?php } ?>
 
 <?php if (!$cron_is_running) { ?>
     <div class="alert alert-danger">
         <h5><i class="fas fa-fw fa-exclamation-triangle me-2"></i><?= __('Cron is not running') ?></h5>
-        <?= __('Backups are built by the cron dispatcher, not by your browser. Until cron is running, anything you') ?>
-        <?= __('start here will sit in the queue. See %s.', '<a href="cron.php">' . __('Maintenance &gt; Cron') . '</a>') ?>
+        <?= __('Backups are built by the cron dispatcher, not by your browser. Until cron is running, anything you start here will sit in the queue. See %s.', '<a href="cron.php">' . __('Maintenance &gt; Cron') . '</a>') ?>
     </div>
 <?php } elseif ($config_enable_cron == 0) { ?>
     <div class="alert alert-warning">
-        <i class="fas fa-fw fa-exclamation-circle me-2"></i><?= __('Cron is switched off in') ?>
-        <a href="cron.php"><?= __('Maintenance &gt; Cron') ?></a>.
+        <i class="fas fa-fw fa-exclamation-circle me-2"></i><?= __('Cron is switched off in %s.', '<a href="cron.php">' . __('Maintenance &gt; Cron') . '</a>') ?>
     </div>
 <?php } ?>
 
@@ -69,8 +66,7 @@ if (!empty($_SESSION['backup_master_key_reveal'])) {
 
         <?php if ($pending_count > 0) { ?>
             <div class="alert alert-info">
-                <i class="fas fa-fw fa-spinner me-2"></i><strong><?= $pending_count ?></strong> backup<?= $pending_count == 1 ? ' is' : 's are' ?>
-                <?= __('queued or building. You will get a notification when ready - this page does not refresh itself.') ?>
+                <i class="fas fa-fw fa-spinner me-2"></i><?= _n('<strong>%d</strong> backup is queued or building. You will get a notification when it is ready - this page does not refresh itself.', '<strong>%d</strong> backups are queued or building. You will get a notification when they are ready - this page does not refresh itself.', intval($pending_count)) ?>
             </div>
         <?php } ?>
 
@@ -179,9 +175,7 @@ if (!empty($_SESSION['backup_master_key_reveal'])) {
         <div class="alert alert-warning mb-3">
             <i class="fas fa-fw fa-exclamation-triangle me-2"></i>
             <strong><?= __('Write this down and keep it somewhere other than this server.') ?></strong>
-            <?= __('Every backup is encrypted with it, and without it a backup cannot be restored - not by you,') ?>
-            <?= __('not by anyone. It is stored in config.php and never in the database, which is what stops a') ?>
-            <?= __('stolen backup from carrying its own key.') ?>
+            <?= __('Every backup is encrypted with it, and without it a backup cannot be restored - not by you, not by anyone. It is stored in config.php and never in the database, which is what stops a stolen backup from carrying its own key.') ?>
         </div>
 
         <?php if ($backup_key !== '') { ?>
@@ -194,8 +188,7 @@ if (!empty($_SESSION['backup_master_key_reveal'])) {
         <?php } ?>
 
         <p class="text-muted small mt-3 mb-0">
-            <?= __('Archives are AES-256 encrypted zips.') ?> <?= __('%s can open them with this key.', '<strong>7-Zip, WinZip, PeaZip and Keka</strong>') ?>
-            <?= __('The %s command, Windows Explorer and the macOS Archive Utility cannot - they do not support AES.', '<code>unzip</code>') ?>
+            <?= __('Archives are AES-256 encrypted zips, which %1$s can open with this key. The %2$s command, Windows Explorer and the macOS Archive Utility cannot - they do not support AES.', '<strong>7-Zip, WinZip, PeaZip and Keka</strong>', '<code>unzip</code>') ?>
         </p>
     </div>
 </div>
@@ -243,8 +236,7 @@ if (!empty($_SESSION['backup_master_key_reveal'])) {
             <?= __('Turn them on or change the time in %s.', '<a href="cron.php">' . __('Maintenance &gt; Cron') . '</a>') ?>
         </p>
         <p class="text-muted small mt-2 mb-0">
-            <?= __('Old backups are removed by the nightly job, never by the backup itself, so a failed nightly') ?>
-            <?= __('cannot delete an archive that was never replaced.') ?>
+            <?= __('Old backups are removed by the nightly job, never by the backup itself, so a failed nightly cannot delete an archive that was never replaced.') ?>
         </p>
     </div>
 </div>

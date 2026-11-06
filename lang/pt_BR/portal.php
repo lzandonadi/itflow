@@ -15,7 +15,7 @@ return [
     'Recurring invoices' => 'Faturas recorrentes',
     'Payments' => 'Pagamentos',
     'Statement' => 'Extrato',
-    'Cards & autopay' => 'Cartões e pagamento automático',
+    'Cards & autopay' => 'Cartões e cobrança automática',
     'Billing' => 'Financeiro',
     'Devices' => 'Dispositivos',
     'Domains & certificates' => 'Domínios e certificados',

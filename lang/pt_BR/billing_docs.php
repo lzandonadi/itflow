@@ -157,7 +157,7 @@ return [
     'Online payment of %s.' => 'Pagamento online de %s.',
     'Online card payment of %s.' => 'Pagamento online com cartão de %s.',
     'Saved card payment of %s.' => 'Pagamento com cartão salvo de %s.',
-    'Automatic card payment of %s.' => 'Pagamento automático com cartão de %s.',
+    'Automatic card payment of %s.' => 'Cobrança automática com cartão de %s.',
     'Card payment of %s.' => 'Pagamento com cartão de %s.',
     '%1$s payment of %2$s.' => 'Pagamento (%1$s) de %2$s.',
     '%dd late' => ['%dd de atraso', '%dd de atraso'],

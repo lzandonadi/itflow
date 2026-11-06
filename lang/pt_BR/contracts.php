@@ -596,5 +596,6 @@ return [
     'who looks after it for you' => 'quem cuida dele por você',
     'on a line of its own, the response times for each priority as a table' => 'em uma linha própria, os tempos de resposta de cada prioridade em tabela',
     'the day it is sent' => 'o dia em que é enviado',
+    'contract type::Other' => 'Outro',
 
 ];

@@ -50,6 +50,15 @@ Termos e convenções da tradução da interface (`lang/pt_BR.php`). Termos **fi
 
 Mantidos em inglês: Backup, Cron, Rack, Software, Tag, SLA, MFA, API, e nomes de produtos e empresas (Stripe, Microsoft 365, Google Workspace).
 
+Notas da revisão final (bloco 10):
+
+- **Calendar**: "Agenda" é o nome do módulo e do menu; um calendário específico (os que se criam e assinam) e o app de calendário do celular ou do Outlook continuam "calendário".
+- **Role**: "Perfil de acesso" é o perfil de um usuário (Admin > Perfis de acesso). Os papéis de um contato do cliente (Principal, Técnico, Cobrança) são "funções".
+- **Due date**: "Vencimento" vale para faturas; o prazo de um projeto ou de uma tarefa é "data de entrega".
+- **Autopay**: sempre "cobrança automática" (feminino), inclusive no portal.
+- **Tag**: fica "tag" (feminino, "a tag"), não "etiqueta".
+- **Other** como tipo de contrato: `_x('Other', 'contract type')` = "Outro"; o "Outros" genérico continua nas listas.
+
 ## Valores com contexto
 
 Status e prioridades gravados no banco **nunca** são traduzidos na gravação; só na exibição, com `_x()` e contexto explícito.
