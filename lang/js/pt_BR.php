@@ -368,4 +368,14 @@ return [
     'What is ticked comes to more than the statement' => 'O que está marcado soma mais que o extrato',
     'That tick was not saved - try again.' => 'Essa marcação não foi salva - tente de novo.',
 
+    // Contracts (task 7.1)
+    'No end date - it runs until it is cancelled.' => 'Sem data de término - vale até ser cancelado.',
+    'Renews itself after %1$s - notice to stop it by %2$s.' => 'Renova-se sozinho após %1$s - aviso para encerrar até %2$s.',
+    'Renews itself after %s.' => 'Renova-se sozinho após %s.',
+    'Ends on %1$s - notice by %2$s.' => 'Termina em %1$s - aviso até %2$s.',
+    'Ends on %s.' => 'Termina em %s.',
+    'Sign here with your mouse, finger or pen' => 'Assine aqui com o mouse, o dedo ou uma caneta',
+    'Write your full name above' => 'Escreva seu nome completo acima',
+    'Draw your signature here first - or choose Type' => 'Desenhe sua assinatura aqui primeiro - ou escolha Digitar',
+
 ];

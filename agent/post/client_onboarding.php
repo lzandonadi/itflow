@@ -256,7 +256,7 @@ if (isset($_POST['client_onboarding_agreement'])) {
         settingsRefuse('client_onboarding_agreement', [stripos($error, 'date') !== false ? 'start' : 'template_id' => $error], clientOnboardingUrl($client_id, 'agreement'));
     }
     $row = contractRow($contract_id);
-    logAudit("Contract", "Create", "$session_name added " . ($send ? 'draft' : 'active') . " contract " . escapeSql($row['contract_name']) . " (" . escapeSql(contractTypeLabel($row['contract_type'])) . ") from "
+    logAudit("Contract", "Create", "$session_name added " . ($send ? 'draft' : 'active') . " contract " . escapeSql($row['contract_name']) . " (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($row['contract_type']))) . ") from "
         . escapeSql($row['contract_start_date']) . ($row['contract_end_date'] ? " to " . escapeSql($row['contract_end_date']) : '') . ", from its template, onboarding the client", $client_id, $contract_id);
     clientOnboardingMade($client_id, 'contract', $contract_id);
 

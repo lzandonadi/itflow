@@ -59,28 +59,28 @@ if (isset($_POST['sign_contract'])) {
     $round = contractSignaturesReady() ? contractSignatureByKey($_POST['contract_signature_id'] ?? 0, $_POST['key'] ?? '') : null;
     if (!$round) {
         http_response_code(404);
-        exit("This contract link isn't working - open it again from the email.");
+        exit(__('This contract link isn\'t working - open it again from the email.'));
     }
     $back = '/guest/guest_view_contract.php?id=' . intval($round['contract_signature_id']) . '&key=' . rawurlencode((string) $round['contract_signature_url_key']);
     $state = contractSignatureState($round);
     if (!in_array($state['key'], ['sent', 'viewed'], true)) {
-        flashAlert($state['key'] === 'withdrawn' ? "This request was withdrawn, so it wasn't signed." : "It has already been signed.", 'error');
+        flashAlert($state['key'] === 'withdrawn' ? __('This request was withdrawn, so it wasn\'t signed.') : __('It has already been signed.'), 'error');
         redirect($back);
     }
     if (!hash_equals((string) $round['contract_signature_document_hash'], (string) ($_POST['document_hash'] ?? ''))) {
-        flashAlert("The contract changed while you had it open - read it again before signing.", 'error');
+        flashAlert(__('The contract changed while you had it open - read it again before signing.'), 'error');
         redirect($back);
     }
     [$f, $error] = contractSignatureFromInput($_POST);
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' It was not signed yet.', 'error');
+        flashAlert(__('%s It was not signed yet.', escapeHtml($error)), 'error');
         redirect($back);
     }
     if (!contractSignatureClientSign($round, $f, 'link')) {
-        flashAlert("It couldn't be signed - it may have just been withdrawn.", 'error');
+        flashAlert(__('It couldn\'t be signed - it may have just been withdrawn.'), 'error');
         redirect($back);
     }
-    flashAlert("Signed - thank you. We'll countersign it and email you a copy.");
+    flashAlert(__('Signed - thank you. We\'ll countersign it and email you a copy.'));
     redirect($back);
 
 }
@@ -90,7 +90,7 @@ if (isset($_GET['export_contract_pdf'])) {
     $round = contractSignaturesReady() ? contractSignatureByKey($_GET['id'] ?? 0, $_GET['key'] ?? '') : null;
     if (!$round) {
         http_response_code(404);
-        exit("This contract link isn't working - open it again from the email.");
+        exit(__('This contract link isn\'t working - open it again from the email.'));
     }
     billingPdfSend(contractPdf(contractRow(intval($round['contract_id'])), $round), true);
 

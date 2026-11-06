@@ -111,8 +111,8 @@ if ($can_billing) {
                 'href' => 'contract.php?id=' . intval($row['contract_id']),
                 'icon' => 'fa-file-signature',
                 'tone' => '',
-                'title' => $row['contract_name'] . ' is waiting for your signature',
-                'line' => contractTypeLabel($row['contract_type']) . ' contract - read it and sign it here',
+                'title' => __('%s is waiting for your signature', $row['contract_name']),
+                'line' => __('%s contract - read it and sign it here', contractTypeLabel($row['contract_type'])),
             ];
         }
     }

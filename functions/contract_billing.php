@@ -140,13 +140,13 @@ function contractUsualTerms(array $row, $date = null) {
     $legacy = billingClientLegacyTerms($client_id);
     foreach (CONTRACT_SLA_PRIORITIES as $priority => $part) {
         // The default for the priority - or, before the update, the client's own
-        $usual['slas'][$priority] = [intval(getTicketSlaId($client_id, $priority, false)), $legacy && array_key_exists($priority, $legacy['slas']) ? "the client's" : ''];
+        $usual['slas'][$priority] = [intval(getTicketSlaId($client_id, $priority, false)), $legacy && array_key_exists($priority, $legacy['slas']) ? __("the client's") : ''];
     }
     if ($legacy) {
-        $usual['rate'] = [$legacy['rate'], "the client's"];
+        $usual['rate'] = [$legacy['rate'], __("the client's")];
         $usual['after_hours'] = [null, ''];
         if ($legacy['net_terms'] !== null) {
-            $usual['net_terms'] = [$legacy['net_terms'], "the client's"];
+            $usual['net_terms'] = [$legacy['net_terms'], __("the client's")];
         }
         return $usual;
     }
@@ -273,23 +273,23 @@ function contractTicketRate(array $ticket) {
     if (($after_rates || $defaults['after_hours'] > 0) && contractAfterHours($ticket['ticket_created_at'] ?? '')) {
         foreach ($after_rates as $row) {
             return ['rate' => floatval($row['contract_rate_after_hours']), 'source' => 'after_hours', 'contract_id' => intval($row['contract_id']), 'contract_name' => $row['contract_name'],
-                'note' => contractPossessive($row['contract_name']) . " after-hours rate - opened outside business hours"];
+                'note' => __('%s after-hours rate - opened outside business hours', contractPossessive($row['contract_name']))];
         }
         return ['rate' => $defaults['after_hours'], 'source' => 'default_after_hours', 'contract_id' => 0, 'contract_name' => '',
-            'note' => 'the default after-hours rate - opened outside business hours'];
+            'note' => __('the default after-hours rate - opened outside business hours')];
     }
     foreach ($in_force as $row) {
         if (floatval($row['contract_rate_standard']) > 0) {
             return ['rate' => floatval($row['contract_rate_standard']), 'source' => 'contract', 'contract_id' => intval($row['contract_id']), 'contract_name' => $row['contract_name'],
-                'note' => contractPossessive($row['contract_name']) . " rate"];
+                'note' => __('%s rate', contractPossessive($row['contract_name']))];
         }
     }
     // Before the 3.5.0 update, the client's own rate, as it was
     $legacy = billingClientLegacyTerms($ticket['ticket_client_id'] ?? 0);
     if ($legacy && $legacy['rate'] !== null) {
-        return ['rate' => $legacy['rate'], 'source' => 'client', 'contract_id' => 0, 'contract_name' => '', 'note' => "the client's rate"];
+        return ['rate' => $legacy['rate'], 'source' => 'client', 'contract_id' => 0, 'contract_name' => '', 'note' => __('the client\'s rate')];
     }
-    return ['rate' => $defaults['rate'], 'source' => 'default', 'contract_id' => 0, 'contract_name' => '', 'note' => 'the default rate'];
+    return ['rate' => $defaults['rate'], 'source' => 'default', 'contract_id' => 0, 'contract_name' => '', 'note' => __('the default rate')];
 }
 
 /*
@@ -431,7 +431,9 @@ function contractRecurringShouldRun(array $row, $today = null) {
 
 /** A recurring invoice's amount and how often - "$1,500.00 a month". */
 function contractRecurringAmountText(array $recurring) {
-    return billingMoney($recurring['recurring_invoice_amount'], $recurring['recurring_invoice_currency_code'] ?? '') . ' a ' . recurringInvoicePeriodWord($recurring['recurring_invoice_frequency']);
+    $money = billingMoney($recurring['recurring_invoice_amount'], $recurring['recurring_invoice_currency_code'] ?? '');
+    $period = recurringInvoicePeriodWord($recurring['recurring_invoice_frequency']);
+    return $period === 'year' ? __('%s a year', $money) : ($period === 'quarter' ? __('%s a quarter', $money) : __('%s a month', $money));
 }
 
 /*
@@ -527,13 +529,13 @@ function contractRecurringFromInput(array $in) {
         'auto_send' => !empty($in['auto_send']) ? 1 : 0,
     ];
     if ($amount === null || $f['amount'] <= 0 || $f['amount'] >= 1e9) {
-        return [$f, 'Give the amount each time - more than nothing, such as 1,500.00.'];
+        return [$f, __('Give the amount each time - more than nothing, such as 1,500.00.')];
     }
     if ($f['start'] === '') {
-        return [$f, 'Give the day of the first invoice.'];
+        return [$f, __('Give the day of the first invoice.')];
     }
     if ($f['item_name'] === '') {
-        return [$f, 'Give the line a name.'];
+        return [$f, __('Give the line a name.')];
     }
     return [$f, ''];
 }

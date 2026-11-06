@@ -40,7 +40,7 @@ if (isset($_POST['add_contract_template']) || isset($_POST['edit_contract_templa
     } else {
         mysqli_query($mysqli, "INSERT INTO contract_templates SET $set");
         $contract_template_id = mysqli_insert_id($mysqli);
-        logAudit("Contract Template", "Create", "$session_name created contract template $name (" . escapeSql(contractTypeLabel($fields['type'])) . ")", 0, $contract_template_id);
+        logAudit("Contract Template", "Create", "$session_name created contract template $name (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($fields['type']))) . ")", 0, $contract_template_id);
         flashAlert("Contract template <strong>" . escapeHtml($fields['name']) . "</strong> created");
     }
 

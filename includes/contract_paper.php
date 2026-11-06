@@ -31,22 +31,22 @@ $contract_paper_lines = array_filter([
 ]);
 $contract_paper_dates = [];
 if ($contract_paper_round && !empty($contract_paper_round['contract_signature_sent_at'])) {
-    $contract_paper_dates['Sent'] = date('M j, Y', strtotime($contract_paper_round['contract_signature_sent_at']));
+    $contract_paper_dates[_x('Sent', 'contract signing')] = formatDate($contract_paper_round['contract_signature_sent_at'], 'date');
 }
 if ($contract_paper_state && $contract_paper_state['key'] === 'signed') {
-    $contract_paper_dates['Signed'] = date('M j, Y', strtotime(max($contract_paper_round['contract_signature_client_signed_at'], $contract_paper_round['contract_signature_agent_signed_at'])));
+    $contract_paper_dates[_x('Signed', 'contract signing')] = formatDate((max($contract_paper_round['contract_signature_client_signed_at'], $contract_paper_round['contract_signature_agent_signed_at'])), 'date');
 }
 if (!$contract_paper_dates) {
-    $contract_paper_dates['As of'] = date('M j, Y');
+    $contract_paper_dates[__('As of')] = formatDate(date('Y-m-d'), 'date');
 }
 
 ?>
 <div class="itflow-paper itflow-contract-paper" data-contract-paper>
 
     <?php if ($contract_paper_state && $contract_paper_state['key'] === 'signed') { ?>
-        <div class="itflow-paper-stamp text-success" aria-hidden="true">Signed</div>
+        <div class="itflow-paper-stamp text-success" aria-hidden="true"><?= _x('Signed', 'contract signing') ?></div>
     <?php } elseif ($contract_paper_state && $contract_paper_state['key'] === 'withdrawn') { ?>
-        <div class="itflow-paper-stamp text-secondary" aria-hidden="true">Withdrawn</div>
+        <div class="itflow-paper-stamp text-secondary" aria-hidden="true"><?= _x('Withdrawn', 'contract signing') ?></div>
     <?php } ?>
 
     <div class="itflow-paper-head">
@@ -58,11 +58,11 @@ if (!$contract_paper_dates) {
             <div class="small text-body-secondary"><?= nl2br(escapeHtml(implode("\n", $contract_paper_lines))) ?></div>
         </div>
         <div class="itflow-paper-what text-md-end">
-            <div class="itflow-paper-title">Contract</div>
+            <div class="itflow-paper-title"><?= __('Contract') ?></div>
             <div class="fs-6 fw-semibold"><?= escapeHtml(contractTypeLabel($contract_paper_row['contract_type'])) ?></div>
             <dl class="itflow-paper-dates">
                 <?php foreach ($contract_paper_dates as $contract_paper_label => $contract_paper_value) { ?>
-                    <dt><?= $contract_paper_label ?></dt><dd><?= escapeHtml($contract_paper_value) ?></dd>
+                    <dt><?= escapeHtml($contract_paper_label) ?></dt><dd><?= escapeHtml($contract_paper_value) ?></dd>
                 <?php } ?>
             </dl>
         </div>

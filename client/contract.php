@@ -47,10 +47,10 @@ $contract_id = intval($_GET['id'] ?? 0);
 $visible = $contract_id && mysqli_num_rows(mysqli_query($mysqli, "SELECT contract_id FROM contracts WHERE contract_id = $contract_id AND " . portalContractScopeSql()));
 $contract = $visible ? contractRow($contract_id) : null;
 if (!$contract) { ?>
-    <a class="itflow-portal-back" href="contracts.php"><i class="fas fa-chevron-left"></i>Contracts</a>
+    <a class="itflow-portal-back" href="contracts.php"><i class="fas fa-chevron-left"></i><?= __('Contracts') ?></a>
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => "That contract isn't here", 'text' => 'It may have been withdrawn, or the link is not quite right.', 'icon' => 'fa-file-contract', 'filtered' => false,
-            'actions' => [['label' => 'All contracts', 'href' => 'contracts.php', 'icon' => 'fa-arrow-left']]]) ?>
+        <?= emptyStateHtml(['title' => __('That contract isn\'t here'), 'text' => __('It may have been withdrawn, or the link is not quite right.'), 'icon' => 'fa-file-contract', 'filtered' => false,
+            'actions' => [['label' => __('All contracts'), 'href' => 'contracts.php', 'icon' => 'fa-arrow-left']]]) ?>
     </section>
     <?php
     require_once "includes/footer.php";
@@ -80,7 +80,7 @@ $signature_pad = [
     'id' => 'portalSign',
     'name' => $contact_name,
     'title' => (string) ($contact['contact_title'] ?? ''),
-    'agree' => 'I have read this contract and agree to it for ' . $session_client_name . ', and to signing it electronically',
+    'agree' => __('I have read this contract and agree to it for %s, and to signing it electronically', $session_client_name),
 ];
 // Prepaid hours - shown once there are some, or some each month
 $blocks = contractHoursReady() ? contractBlocks($contract_id) : [];
@@ -88,14 +88,14 @@ $hours = contractHoursSummary($blocks);
 $show_hours = contractHoursReady() && ($blocks || floatval($contract['contract_monthly_hours']) > 0);
 $hours_uses = $show_hours ? contractHoursUses($contract_id, 8) : [];
 $terms = [
-    'Type' => contractTypeLabel($contract['contract_type']),
-    'Term' => contractTermLabel($contract['contract_term_months']) . ($contract['contract_start_date'] ? ' from ' . date('M j, Y', strtotime($contract['contract_start_date'])) : ''),
-    intval($contract['contract_auto_renew']) ? 'Renews' : 'Ends' => $contract['contract_end_date'] ? date('M j, Y', intval($contract['contract_auto_renew']) ? strtotime('+1 day', strtotime($contract['contract_end_date'])) : strtotime($contract['contract_end_date'])) : '',
-    'Notice' => intval($contract['contract_notice_days']) ? intval($contract['contract_notice_days']) . ' days before it ends' : '',
+    __('Type') => contractTypeLabel($contract['contract_type']),
+    __('Term') => $contract['contract_start_date'] ? __('%1$s from %2$s', contractTermLabel($contract['contract_term_months']), formatDate($contract['contract_start_date'], 'date')) : contractTermLabel($contract['contract_term_months']),
+    (intval($contract['contract_auto_renew']) ? __('Renews') : __('Ends')) => $contract['contract_end_date'] ? formatDate(intval($contract['contract_auto_renew']) ? date('Y-m-d', strtotime('+1 day', strtotime($contract['contract_end_date']))) : $contract['contract_end_date'], 'date') : '',
+    __('Notice') => intval($contract['contract_notice_days']) ? __('%d days before it ends', intval($contract['contract_notice_days'])) : '',
 ];
 ?>
 
-<a class="itflow-portal-back d-print-none" href="contracts.php"><i class="fas fa-chevron-left"></i>Contracts</a>
+<a class="itflow-portal-back d-print-none" href="contracts.php"><i class="fas fa-chevron-left"></i><?= __('Contracts') ?></a>
 
 <div class="itflow-portal-page-head d-print-none">
     <div>
@@ -103,13 +103,13 @@ $terms = [
         <p><?= portalStateBadge($state) ?></p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a class="btn btn-outline-secondary" href="pdf.php?contract=<?= $contract_id ?>"><i class="fas fa-file-pdf me-2"></i>Download PDF</a>
-        <button type="button" class="btn btn-outline-secondary" data-portal-print title="Print"><i class="fas fa-print"></i><span class="visually-hidden">Print</span></button>
+        <a class="btn btn-outline-secondary" href="pdf.php?contract=<?= $contract_id ?>"><i class="fas fa-file-pdf me-2"></i><?= __('Download PDF') ?></a>
+        <button type="button" class="btn btn-outline-secondary" data-portal-print title="<?= escapeHtml(__('Print')) ?>"><i class="fas fa-print"></i><span class="visually-hidden"><?= __('Print') ?></span></button>
     </div>
 </div>
 
 <?php if ($state['key'] === 'waiting') { ?>
-    <a class="btn btn-success w-100 mb-3 d-lg-none d-print-none" href="#sign"><i class="fas fa-file-signature me-2"></i>Read it through - you sign at the end</a>
+    <a class="btn btn-success w-100 mb-3 d-lg-none d-print-none" href="#sign"><i class="fas fa-file-signature me-2"></i><?= __('Read it through - you sign at the end') ?></a>
 <?php } ?>
 
 <div class="row g-4">
@@ -123,28 +123,28 @@ $terms = [
         <section class="itflow-portal-panel mb-4" data-contract-sign-panel>
             <div class="itflow-portal-panel-body">
                 <?php if ($state['key'] === 'waiting') { ?>
-                    <p class="small text-body-secondary mb-3">Read it through, then sign - we countersign after, and email you a copy signed by both of us.</p>
+                    <p class="small text-body-secondary mb-3"><?= __('Read it through, then sign - we countersign after, and email you a copy signed by both of us.') ?></p>
                     <form action="post.php" method="post" autocomplete="off" data-portal-once>
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <input type="hidden" name="contract_signature_id" value="<?= intval($round['contract_signature_id']) ?>">
                         <input type="hidden" name="document_hash" value="<?= escapeHtml($round['contract_signature_document_hash']) ?>">
                         <?php require $_SERVER['DOCUMENT_ROOT'] . '/includes/contract_signature_pad.php'; ?>
-                        <button type="submit" class="btn btn-success btn-lg w-100 mt-3" name="portal_sign_contract"><i class="fas fa-file-signature me-2"></i>Sign</button>
+                        <button type="submit" class="btn btn-success btn-lg w-100 mt-3" name="portal_sign_contract"><i class="fas fa-file-signature me-2"></i><?= __('Sign') ?></button>
                     </form>
                 <?php } elseif ($state['key'] === 'countersign') { ?>
                     <div class="itflow-portal-outcome">
                         <span class="itflow-portal-outcome-icon is-success" aria-hidden="true"><i class="fas fa-check"></i></span>
                         <div>
-                            <div class="fw-semibold">Signed - thank you</div>
-                            <div class="small text-body-secondary"><?= escapeHtml($round['contract_signature_client_name']) ?> signed it <?= escapeHtml(date('M j, Y', strtotime($round['contract_signature_client_signed_at']))) ?>. We'll countersign it and email you a copy.</div>
+                            <div class="fw-semibold"><?= __('Signed - thank you') ?></div>
+                            <div class="small text-body-secondary"><?= escapeHtml(__('%1$s signed it %2$s. We\'ll countersign it and email you a copy.', $round['contract_signature_client_name'], formatDate($round['contract_signature_client_signed_at'], 'date'))) ?></div>
                         </div>
                     </div>
                 <?php } elseif ($signing && $signing['key'] === 'signed') { ?>
                     <div class="itflow-portal-outcome">
                         <span class="itflow-portal-outcome-icon is-success" aria-hidden="true"><i class="fas fa-file-signature"></i></span>
                         <div>
-                            <div class="fw-semibold">Signed by both</div>
-                            <div class="small text-body-secondary"><?= escapeHtml($signing['when']) ?>. The PDF is the signed copy.</div>
+                            <div class="fw-semibold"><?= __('Signed by both') ?></div>
+                            <div class="small text-body-secondary"><?= escapeHtml(__('%s. The PDF is the signed copy.', $signing['when'])) ?></div>
                         </div>
                     </div>
                 <?php } else { ?>
@@ -152,7 +152,7 @@ $terms = [
                         <span class="itflow-portal-outcome-icon" aria-hidden="true"><i class="fas fa-file-contract"></i></span>
                         <div>
                             <div class="fw-semibold"><?= escapeHtml($state['label']) ?></div>
-                            <div class="small text-body-secondary">The contract as it stands. There is no copy signed here.</div>
+                            <div class="small text-body-secondary"><?= __('The contract as it stands. There is no copy signed here.') ?></div>
                         </div>
                     </div>
                 <?php } ?>
@@ -161,7 +161,7 @@ $terms = [
 
         <section class="itflow-portal-panel mb-4">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-calendar-alt"></i>The term</h2>
+                <h2><i class="fas fa-calendar-alt"></i><?= __('The term') ?></h2>
             </div>
             <div class="itflow-portal-panel-body">
                 <dl class="row small mb-0">
@@ -177,23 +177,23 @@ $terms = [
             $monthly = floatval($contract['contract_monthly_hours']); ?>
             <section class="itflow-portal-panel mb-4" data-portal-contract-hours>
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-hourglass-half"></i>Prepaid hours</h2>
+                    <h2><i class="fas fa-hourglass-half"></i><?= __('Prepaid hours') ?></h2>
                 </div>
                 <div class="itflow-portal-panel-body">
                     <div class="d-flex align-items-baseline justify-content-between gap-2">
-                        <span class="fs-4 fw-semibold"><?= escapeHtml(contractHoursText($hours['left'])) ?> <span class="fs-6 fw-normal text-body-secondary">left</span></span>
-                        <?php if ($hours['bought'] > 0) { ?><span class="small text-body-secondary"><?= escapeHtml(contractHoursText($hours['used'])) ?> of <?= escapeHtml(contractHoursText($hours['bought'])) ?> used</span><?php } ?>
+                        <span class="fs-4 fw-semibold"><?= escapeHtml(contractHoursText($hours['left'])) ?> <span class="fs-6 fw-normal text-body-secondary"><?= __('left') ?></span></span>
+                        <?php if ($hours['bought'] > 0) { ?><span class="small text-body-secondary"><?= escapeHtml(__('%1$s of %2$s used', contractHoursText($hours['used']), contractHoursText($hours['bought']))) ?></span><?php } ?>
                     </div>
                     <?php if ($hours['bought'] > 0) { ?>
-                        <progress class="itflow-hours-bar my-2" value="<?= escapeHtml((string) $hours['used']) ?>" max="<?= escapeHtml((string) $hours['bought']) ?>"><?= escapeHtml(contractHoursText($hours['used'])) ?> used</progress>
+                        <progress class="itflow-hours-bar my-2" value="<?= escapeHtml((string) $hours['used']) ?>" max="<?= escapeHtml((string) $hours['bought']) ?>"><?= escapeHtml(__('%s used', contractHoursText($hours['used']))) ?></progress>
                     <?php } ?>
                     <ul class="list-unstyled small text-body-secondary mb-0">
-                        <?php if ($monthly > 0) { ?><li><?= escapeHtml(contractHoursWords($monthly)) ?> included each month</li><?php } ?>
-                        <?php if ($hours['next_expiry'] !== '') { ?><li><?= escapeHtml(contractHoursText($hours['next_expiry_hours'])) ?> to use by <?= escapeHtml(date('M j, Y', strtotime($hours['next_expiry']))) ?></li><?php } ?>
-                        <li>Time on your tickets comes out of them; time beyond them is invoiced.</li>
+                        <?php if ($monthly > 0) { ?><li><?= escapeHtml(__('%s included each month', contractHoursWords($monthly))) ?></li><?php } ?>
+                        <?php if ($hours['next_expiry'] !== '') { ?><li><?= escapeHtml(__('%1$s to use by %2$s', contractHoursText($hours['next_expiry_hours']), formatDate($hours['next_expiry'], 'date'))) ?></li><?php } ?>
+                        <li><?= __('Time on your tickets comes out of them; time beyond them is invoiced.') ?></li>
                     </ul>
                     <?php if ($hours_uses) { ?>
-                        <div class="small fw-semibold mt-3 mb-1">Used on</div>
+                        <div class="small fw-semibold mt-3 mb-1"><?= __('Used on') ?></div>
                         <ul class="list-unstyled small mb-0">
                             <?php foreach ($hours_uses as $use) {
                                 $sees = portalSeesAllTickets() || intval($use['ticket_contact_id']) === intval($session_contact_id); ?>
@@ -202,7 +202,7 @@ $terms = [
                                         <?php if ($sees) { ?>
                                             <a href="ticket.php?id=<?= intval($use['ticket_id']) ?>"><?= escapeHtml($use['ticket_subject']) ?></a>
                                         <?php } else { ?>
-                                            <span class="text-body-secondary">Ticket <?= escapeHtml($use['ticket_prefix'] . $use['ticket_number']) ?></span>
+                                            <span class="text-body-secondary"><?= escapeHtml(__('Ticket %s', $use['ticket_prefix'] . $use['ticket_number'])) ?></span>
                                         <?php } ?>
                                     </span>
                                     <span class="text-nowrap fw-semibold"><?= escapeHtml(contractHoursText($use['hours'])) ?></span>
@@ -215,7 +215,7 @@ $terms = [
         <?php } ?>
 
         <p class="small text-body-secondary px-1">
-            Questions about this contract? <a href="<?= escapeHtml(portalAskUrl('Question about contract: ' . $contract['contract_name'])) ?>">Ask us</a><?php if (!empty($company['phone_display'])) { ?> or call <?= escapeHtml($company['phone_display']) ?><?php } ?>.
+            <?= __('Questions about this contract?') ?> <a href="<?= escapeHtml(portalAskUrl(__('Question about contract: %s', $contract['contract_name']))) ?>"><?= __('Ask us') ?></a><?php if (!empty($company['phone_display'])) { ?> <?= escapeHtml(__('or call %s', $company['phone_display'])) ?><?php } ?>.
         </p>
 
     </div>

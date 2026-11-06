@@ -17,9 +17,9 @@ portalContractsGate();
 
 $per_page = 20;
 $tabs = [
-    'waiting' => ['label' => 'To sign', 'icon' => 'fa-file-signature', 'where' => portalContractWaitingSql()],
-    'active' => ['label' => 'In force', 'icon' => 'fa-check-circle', 'where' => "contract_status = 'Active'"],
-    'all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1'],
+    'waiting' => ['label' => __('To sign'), 'icon' => 'fa-file-signature', 'where' => portalContractWaitingSql()],
+    'active' => ['label' => __('In force'), 'icon' => 'fa-check-circle', 'where' => "contract_status = 'Active'"],
+    'all' => ['label' => _x('All', 'contracts view'), 'icon' => 'fa-list', 'where' => '1 = 1'],
 ];
 $q = trim((string) ($_GET['q'] ?? ''));
 $where = portalContractScopeSql();
@@ -56,19 +56,19 @@ function contractsUrl(array $changes) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Contracts</h1>
-        <p><?= $counts['waiting'] ? $counts['waiting'] . ' waiting for your signature' : 'Your agreements with us' ?></p>
+        <h1><?= __('Contracts') ?></h1>
+        <p><?= $counts['waiting'] ? escapeHtml(_n('%d waiting for your signature', '%d waiting for your signature', $counts['waiting'])) : __('Your agreements with us') ?></p>
     </div>
     <form method="get" class="d-flex" role="search">
         <input type="hidden" name="tab" value="<?= escapeHtml($tab) ?>">
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-            <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="Search contracts" aria-label="Search contracts" maxlength="200">
+            <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="<?= escapeHtml(__('Search contracts')) ?>" aria-label="<?= escapeHtml(__('Search contracts')) ?>" maxlength="200">
         </div>
     </form>
 </div>
 
-<nav class="itflow-portal-tabs" aria-label="Contracts">
+<nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Contracts')) ?>">
     <?php foreach ($tabs as $key => $t) { ?>
         <a class="<?= $key === $tab ? 'active' : '' ?><?= $key === 'waiting' && $counts['waiting'] ? ' itflow-portal-tab-alert' : '' ?>" href="<?= escapeHtml(contractsUrl(['tab' => $key, 'page' => null])) ?>">
             <i class="fas <?= $t['icon'] ?>"></i><?= escapeHtml($t['label']) ?>
@@ -80,11 +80,11 @@ function contractsUrl(array $changes) {
 <section class="itflow-portal-panel">
     <?php if (!$total) { ?>
         <?php if ($q !== '') { ?>
-            <?= emptyStateHtml(['thing' => 'contracts', 'filtered' => true, 'match_text' => 'Nothing here has &ldquo;' . escapeHtml($q) . '&rdquo; in its name.', 'clear_url' => contractsUrl(['q' => null, 'page' => null])]) ?>
+            <?= emptyStateHtml(['thing' => __('contracts'), 'filtered' => true, 'match_text' => __('Nothing here has &ldquo;%s&rdquo; in its name.', escapeHtml($q)), 'clear_url' => contractsUrl(['q' => null, 'page' => null])]) ?>
         <?php } elseif ($tab === 'waiting') { ?>
-            <?= emptyStateHtml(['title' => 'Nothing to sign', 'text' => 'When we send you a contract to sign, it waits here.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('Nothing to sign'), 'text' => __('When we send you a contract to sign, it waits here.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
         <?php } else { ?>
-            <?= emptyStateHtml(['title' => 'No contracts here', 'text' => '', 'icon' => 'fa-file-contract', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No contracts here'), 'text' => '', 'icon' => 'fa-file-contract', 'filtered' => false]) ?>
         <?php } ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">
@@ -97,12 +97,12 @@ function contractsUrl(array $changes) {
                         <span class="itflow-portal-ticket-main">
                             <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml($row['contract_name']) ?><span class="fw-normal text-body-secondary"> · <?= escapeHtml(contractTypeLabel($row['contract_type'])) ?></span></span>
                             <span class="itflow-portal-ticket-meta">
-                                <span><?= escapeHtml(contractTermLabel($row['contract_term_months'])) ?><?= $row['contract_start_date'] ? ' from ' . escapeHtml(date('M j, Y', strtotime($row['contract_start_date']))) : '' ?></span>
+                                <span><?= escapeHtml(contractTermLabel($row['contract_term_months'])) ?><?= $row['contract_start_date'] ? ' ' . escapeHtml(__('from %s', formatDate($row['contract_start_date'], 'date'))) : '' ?></span>
                                 <?php if ($row['contract_end_date'] && in_array($row['contract_status'], ['Active', 'Draft'], true)) { ?>
-                                    <span><?= intval($row['contract_auto_renew']) ? 'Renews' : 'Ends' ?> <?= escapeHtml(date('M j, Y', intval($row['contract_auto_renew']) ? strtotime('+1 day', strtotime($row['contract_end_date'])) : strtotime($row['contract_end_date']))) ?></span>
+                                    <span><?= escapeHtml(intval($row['contract_auto_renew']) ? _x('Renews %s', 'contract state', formatDate(date('Y-m-d', strtotime('+1 day', strtotime($row['contract_end_date']))), 'date')) : _x('Ends %s', 'contract state', formatDate($row['contract_end_date'], 'date'))) ?></span>
                                 <?php } ?>
                                 <?php if ($hours_left) { ?>
-                                    <span><i class="fas fa-hourglass-half me-1"></i><?= escapeHtml(contractHoursText($hours_left['left'])) ?> prepaid left</span>
+                                    <span><i class="fas fa-hourglass-half me-1"></i><?= escapeHtml(__('%s prepaid left', contractHoursText($hours_left['left']))) ?></span>
                                 <?php } ?>
                             </span>
                         </span>
@@ -115,10 +115,10 @@ function contractsUrl(array $changes) {
         </ul>
         <?php if ($pages > 1) { ?>
             <div class="itflow-portal-pager">
-                <span><?= $offset + 1 ?>-<?= min($offset + $per_page, $total) ?> of <?= $total ?></span>
+                <span><?= escapeHtml(__('%1$d-%2$d of %3$d', $offset + 1, min($offset + $per_page, $total), $total)) ?></span>
                 <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(contractsUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="Previous page"><i class="fas fa-chevron-left"></i></a>
-                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(contractsUrl(['page' => $page + 1])) ?>" aria-label="Next page"><i class="fas fa-chevron-right"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(contractsUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="<?= escapeHtml(__('Previous page')) ?>"><i class="fas fa-chevron-left"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(contractsUrl(['page' => $page + 1])) ?>" aria-label="<?= escapeHtml(__('Next page')) ?>"><i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
         <?php } ?>

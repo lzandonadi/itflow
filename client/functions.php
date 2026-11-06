@@ -484,25 +484,25 @@ function portalContractRound($contract_id) {
 function portalContractState(array $row, $round = null) {
     $signing = contractSignatureState($round);
     if ($signing && in_array($signing['key'], ['sent', 'viewed'], true)) {
-        return ['key' => 'waiting', 'label' => 'Waiting for your signature', 'icon' => 'fa-file-signature', 'class' => 'itflow-portal-state-you'];
+        return ['key' => 'waiting', 'label' => __('Waiting for your signature'), 'icon' => 'fa-file-signature', 'class' => 'itflow-portal-state-you'];
     }
     if ($signing && $signing['key'] === 'countersign') {
-        return ['key' => 'countersign', 'label' => 'Signed - with us to countersign', 'icon' => 'fa-pen-nib', 'class' => 'itflow-portal-state-progress'];
+        return ['key' => 'countersign', 'label' => __('Signed - with us to countersign'), 'icon' => 'fa-pen-nib', 'class' => 'itflow-portal-state-progress'];
     }
     $state = contractState($row);
     switch ($state['key']) {
         case 'draft':
-            return ['key' => 'draft', 'label' => 'Being prepared', 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-hold'];
+            return ['key' => 'draft', 'label' => __('Being prepared'), 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-hold'];
         case 'upcoming':
             return ['key' => 'upcoming', 'label' => $state['when'], 'icon' => 'fa-hourglass-start', 'class' => 'itflow-portal-state-new'];
         case 'ending':
             return ['key' => 'ending', 'label' => $state['when'], 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
         case 'ended':
-            return ['key' => 'ended', 'label' => 'Ended', 'icon' => 'fa-flag-checkered', 'class' => 'itflow-portal-state-closed'];
+            return ['key' => 'ended', 'label' => _x('Ended', 'contract state'), 'icon' => 'fa-flag-checkered', 'class' => 'itflow-portal-state-closed'];
         case 'cancelled':
-            return ['key' => 'cancelled', 'label' => 'Cancelled', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+            return ['key' => 'cancelled', 'label' => _x('Cancelled', 'contract state'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
     }
-    return ['key' => 'active', 'label' => 'In force', 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-resolved'];
+    return ['key' => 'active', 'label' => __('In force'), 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-resolved'];
 }
 
 /*

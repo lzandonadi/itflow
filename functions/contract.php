@@ -92,27 +92,43 @@ function contractTemplates() {
     return $templates;
 }
 
-/** A contract's name as its owner, for "Gold's rate" - a name ending in s takes only the apostrophe: "Standard terms' rate". */
+/*
+ * A contract's name as its owner, for "Gold's rate" - a name ending in s
+ * takes only the apostrophe: "Standard terms' rate". English only: other
+ * languages say whose in the sentence ("taxa de Gold"), so get the name.
+ */
 function contractPossessive($name) {
     $name = (string) $name;
+    if (i18nLocale() !== 'en_US') {
+        return $name;
+    }
     return $name . (preg_match('/s$/i', $name) ? "'" : "'s");
 }
 
 /** A type's label - the key's, or the text itself for one ITFlow doesn't know. */
 function contractTypeLabel($type) {
-    return CONTRACT_TYPES[(string) $type]['label'] ?? ((string) $type !== '' ? (string) $type : 'Contract');
+    if (isset(CONTRACT_TYPES[(string) $type])) {
+        return __(CONTRACT_TYPES[(string) $type]['label']); // i18n-dynamic - the labels in CONTRACT_TYPES
+    }
+    return (string) $type !== '' ? (string) $type : __('Contract');
+}
+
+/** What a type means, in a line - '' for one without. */
+function contractTypeAbout($type) {
+    $about = CONTRACT_TYPES[(string) $type]['about'] ?? CONTRACT_TYPES['other']['about'];
+    return $about !== '' ? __($about) : ''; // i18n-dynamic - the lines in CONTRACT_TYPES
 }
 
 /** A term in words - "1 year", "18 months". */
 function contractTermLabel($months) {
     $months = intval($months);
     if (isset(CONTRACT_TERMS[$months])) {
-        return CONTRACT_TERMS[$months];
+        return __(CONTRACT_TERMS[$months]); // i18n-dynamic - the terms in CONTRACT_TERMS
     }
     if ($months > 0 && $months % 12 === 0) {
-        return ($months / 12) . ' years';
+        return _n('%d year', '%d years', intdiv($months, 12));
     }
-    return $months === 1 ? '1 month' : "$months months";
+    return _n('%d month', '%d months', $months);
 }
 
 /** Whether $date is a real day, written 'Y-m-d' - 2026-02-30 isn't. */
@@ -244,37 +260,37 @@ function contractState(array $row, $today = null) {
     $start = (string) ($row['contract_start_date'] ?? '');
     $end = (string) ($row['contract_end_date'] ?? '');
     $day = function ($date) {
-        return date('M j, Y', strtotime($date));
+        return formatDate($date, 'date');
     };
     if ($status === 'Cancelled') {
-        return ['key' => 'cancelled', 'label' => 'Cancelled', 'tone' => 'secondary', 'icon' => 'fa-ban',
-            'when' => $end !== '' && $end >= $today ? 'Cancelled - in force until ' . $day($end) : 'Cancelled' . (!empty($row['contract_cancelled_at']) ? ' ' . $day($row['contract_cancelled_at']) : '')];
+        return ['key' => 'cancelled', 'label' => _x('Cancelled', 'contract state'), 'tone' => 'secondary', 'icon' => 'fa-ban',
+            'when' => $end !== '' && $end >= $today ? __('Cancelled - in force until %s', $day($end)) : (!empty($row['contract_cancelled_at']) ? _x('Cancelled %s', 'contract state', $day($row['contract_cancelled_at'])) : _x('Cancelled', 'contract state'))];
     }
     if ($status === 'Draft') {
-        return ['key' => 'draft', 'label' => 'Draft', 'tone' => 'secondary', 'icon' => 'fa-pencil-alt', 'when' => 'Not in force yet'];
+        return ['key' => 'draft', 'label' => _x('Draft', 'contract state'), 'tone' => 'secondary', 'icon' => 'fa-pencil-alt', 'when' => __('Not in force yet')];
     }
     if ($status === 'Ended' || ($end !== '' && $end < $today && !intval($row['contract_auto_renew']))) {
-        return ['key' => 'ended', 'label' => 'Ended', 'tone' => 'dark', 'icon' => 'fa-flag-checkered', 'when' => $end !== '' ? 'Ended ' . $day($end) : 'Ended'];
+        return ['key' => 'ended', 'label' => _x('Ended', 'contract state'), 'tone' => 'dark', 'icon' => 'fa-flag-checkered', 'when' => $end !== '' ? _x('Ended %s', 'contract state', $day($end)) : _x('Ended', 'contract state')];
     }
     if ($start !== '' && $start > $today) {
-        return ['key' => 'upcoming', 'label' => 'Starts soon', 'tone' => 'info', 'icon' => 'fa-hourglass-start', 'when' => 'Starts ' . $day($start)];
+        return ['key' => 'upcoming', 'label' => __('Starts soon'), 'tone' => 'info', 'icon' => 'fa-hourglass-start', 'when' => _x('Starts %s', 'contract state', $day($start))];
     }
     if ($end === '') {
-        return ['key' => 'active', 'label' => 'Active', 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => 'No end date'];
+        return ['key' => 'active', 'label' => _x('Active', 'contract state'), 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => __('No end date')];
     }
     $remind = contractReminderDate($row);
     if (intval($row['contract_auto_renew'])) {
         // Renews soon when it has notice to give during its term - without, it just renews (contractDueSoonSql())
         if ($remind !== '' && $today >= $remind && contractNoticeInTerm($row)) {
-            return ['key' => 'renewing', 'label' => 'Renews soon', 'tone' => 'primary', 'icon' => 'fa-sync-alt',
-                'when' => 'Renews ' . $day(date('Y-m-d', strtotime('+1 day', strtotime($end))))];
+            return ['key' => 'renewing', 'label' => __('Renews soon'), 'tone' => 'primary', 'icon' => 'fa-sync-alt',
+                'when' => _x('Renews %s', 'contract state', $day(date('Y-m-d', strtotime('+1 day', strtotime($end)))))];
         }
-        return ['key' => 'active', 'label' => 'Active', 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => 'Renews ' . $day(date('Y-m-d', strtotime('+1 day', strtotime($end))))];
+        return ['key' => 'active', 'label' => _x('Active', 'contract state'), 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => _x('Renews %s', 'contract state', $day(date('Y-m-d', strtotime('+1 day', strtotime($end)))))];
     }
     if ($remind !== '' && $today >= $remind) {
-        return ['key' => 'ending', 'label' => 'Ends soon', 'tone' => 'warning', 'icon' => 'fa-exclamation-triangle', 'when' => 'Ends ' . $day($end)];
+        return ['key' => 'ending', 'label' => __('Ends soon'), 'tone' => 'warning', 'icon' => 'fa-exclamation-triangle', 'when' => _x('Ends %s', 'contract state', $day($end))];
     }
-    return ['key' => 'active', 'label' => 'Active', 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => 'Ends ' . $day($end)];
+    return ['key' => 'active', 'label' => _x('Active', 'contract state'), 'tone' => 'success', 'icon' => 'fa-check-circle', 'when' => _x('Ends %s', 'contract state', $day($end))];
 }
 
 /** A contract's state as a badge. */
@@ -292,19 +308,19 @@ function contractStateHtml(array $row) {
 function contractViews() {
     $soon = contractDueSoonSql();
     $views = [
-        'active' => ['label' => 'Active', 'icon' => 'fa-check-circle', 'where' => "contract_status = 'Active'", 'title' => 'In force, or starting soon'],
-        'soon' => ['label' => 'Due soon', 'icon' => 'fa-hourglass-end', 'where' => $soon, 'title' => 'Renewing or ending - within a month of their notice date'],
+        'active' => ['label' => _x('Active', 'contracts view'), 'icon' => 'fa-check-circle', 'where' => "contract_status = 'Active'", 'title' => __('In force, or starting soon')],
+        'soon' => ['label' => __('Due soon'), 'icon' => 'fa-hourglass-end', 'where' => $soon, 'title' => __('Renewing or ending - within a month of their notice date')],
     ];
     // Out for signature, or signed by the client and waiting for us - a request not withdrawn and not countersigned (3.4.3 on)
     if (function_exists('contractSignaturesReady') && contractSignaturesReady()) {
-        $views['signing'] = ['label' => 'Signing', 'icon' => 'fa-file-signature', 'title' => 'Out for signature, or waiting for you to countersign',
+        $views['signing'] = ['label' => _x('Signing', 'contracts view'), 'icon' => 'fa-file-signature', 'title' => __('Out for signature, or waiting for you to countersign'),
             'where' => "EXISTS (SELECT 1 FROM contract_signatures WHERE contract_signature_contract_id = contract_id AND contract_signature_sent_at IS NOT NULL
                 AND contract_signature_withdrawn_at IS NULL AND contract_signature_agent_signed_at IS NULL AND contract_signature_url_key <> '')"];
     }
     return $views + [
-        'draft' => ['label' => 'Drafts', 'icon' => 'fa-pencil-alt', 'where' => "contract_status = 'Draft'", 'title' => 'Not in force yet'],
-        'ended' => ['label' => 'Ended', 'icon' => 'fa-flag-checkered', 'where' => "contract_status IN ('Ended', 'Cancelled')", 'title' => 'Ended or cancelled'],
-        'all' => ['label' => 'All', 'icon' => '', 'where' => '1 = 1'],
+        'draft' => ['label' => _x('Drafts', 'contracts view'), 'icon' => 'fa-pencil-alt', 'where' => "contract_status = 'Draft'", 'title' => __('Not in force yet')],
+        'ended' => ['label' => _x('Ended', 'contracts view'), 'icon' => 'fa-flag-checkered', 'where' => "contract_status IN ('Ended', 'Cancelled')", 'title' => __('Ended or cancelled')],
+        'all' => ['label' => _x('All', 'contracts view'), 'icon' => '', 'where' => '1 = 1'],
     ];
 }
 
@@ -329,41 +345,40 @@ function contractSlaChoices(array $keep = []) {
 function contractDefaultHints() {
     $defaults = billingDefaults();
     $hints = [
-        'rate' => 'Default: ' . number_format($defaults['rate'], 2, '.', ''),
-        'after_hours' => $defaults['after_hours'] > 0 ? 'Default: ' . number_format($defaults['after_hours'], 2, '.', '') : 'The hourly rate',
-        'net_terms' => $defaults['net_terms'] > 0 ? 'Default: ' . $defaults['net_terms'] : 'Default: on receipt',
+        'rate' => __('Default: %s', number_format($defaults['rate'], 2, '.', '')),
+        'after_hours' => $defaults['after_hours'] > 0 ? __('Default: %s', number_format($defaults['after_hours'], 2, '.', '')) : __('The hourly rate'),
+        'net_terms' => $defaults['net_terms'] > 0 ? __('Default: %s', $defaults['net_terms']) : __('Default: on receipt'),
         'slas' => [],
     ];
     $choices = contractSlaChoices();
     foreach (CONTRACT_SLA_PRIORITIES as $priority => $part) {
         $sla_id = intval(getTicketSlaId(0, $priority, false));
-        $hints['slas'][$priority] = isset($choices[$sla_id]) ? 'The default - ' . $choices[$sla_id]['sla_name'] : 'The default - none';
+        $hints['slas'][$priority] = isset($choices[$sla_id]) ? __('The default - %s', $choices[$sla_id]['sla_name']) : __('The default - none');
     }
     return $hints;
 }
 
 /** An SLA's targets in words - "Respond in 1 hr, resolve in 8 hrs". */
 function contractSlaTargets(array $sla) {
-    $text = 'Respond in ' . slaMinutesText($sla['sla_response_minutes']);
     if (intval($sla['sla_resolution_minutes'] ?? 0) > 0) {
-        $text .= ', resolve in ' . slaMinutesText($sla['sla_resolution_minutes']);
+        return __('Respond in %1$s, resolve in %2$s', slaMinutesText($sla['sla_response_minutes']), slaMinutesText($sla['sla_resolution_minutes']));
     }
-    return $text;
+    return __('Respond in %s', slaMinutesText($sla['sla_response_minutes']));
 }
 
 /** Minutes in words - "45 min", "4 hrs", "2 days". */
 function slaMinutesText($minutes) {
     $minutes = intval($minutes);
     if ($minutes > 0 && $minutes % 1440 === 0 && $minutes >= 2880) {
-        return ($minutes / 1440) . ' days';
+        return __('%d days', intdiv($minutes, 1440));
     }
     if ($minutes >= 60 && $minutes % 60 === 0) {
-        return ($minutes / 60) . ($minutes === 60 ? ' hr' : ' hrs');
+        return $minutes === 60 ? __('1 hr') : __('%s hrs', intdiv($minutes, 60));
     }
     if ($minutes >= 60) {
-        return round($minutes / 60, 1) . ' hrs';
+        return __('%s hrs', round($minutes / 60, 1));
     }
-    return "$minutes min";
+    return __('%d min', $minutes);
 }
 
 /*
@@ -423,52 +438,52 @@ function contractFromInput(array $in, $kind = 'contract') {
     }
 
     if ($f['name'] === '') {
-        return [$f, 'Give it a name.'];
+        return [$f, __('Give it a name.')];
     }
     if ($f['term_months'] < 1 || $f['term_months'] > 120) {
-        return [$f, 'A term is 1 to 120 months.'];
+        return [$f, __('A term is 1 to 120 months.')];
     }
     if ($f['notice_days'] < 0 || $f['notice_days'] > 365) {
-        return [$f, 'Notice is 0 to 365 days.'];
+        return [$f, __('Notice is 0 to 365 days.')];
     }
     if ($f['rate_standard'] === false || $f['rate_after_hours'] === false || ($f['rate_standard'] ?? 0) < 0 || ($f['rate_after_hours'] ?? 0) < 0) {
-        return [$f, 'A rate is an amount, such as 125.00 - or leave it empty for the default.'];
+        return [$f, __('A rate is an amount, such as 125.00 - or leave it empty for the default.')];
     }
     if ($f['net_terms'] !== null && ($f['net_terms'] < 0 || $f['net_terms'] > 365)) {
-        return [$f, 'Net terms are 0 to 365 days - or leave them empty for the default.'];
+        return [$f, __('Net terms are 0 to 365 days - or leave them empty for the default.')];
     }
     if ($f['monthly_hours'] === false || $f['monthly_hours'] < 0 || $f['monthly_hours'] >= 1000) {
-        return [$f, 'Hours each month are a number of hours under 1,000, such as 10 or 7.5 - or leave it empty for none.'];
+        return [$f, __('Hours each month are a number of hours under 1,000, such as 10 or 7.5 - or leave it empty for none.')];
     }
     if ($f['hours_alert'] === false || $f['hours_alert'] < 0 || $f['hours_alert'] >= 10000) {
-        return [$f, 'The hours to be told at are a number of hours, such as 2 - or leave it empty to not be told.'];
+        return [$f, __('The hours to be told at are a number of hours, such as 2 - or leave it empty to not be told.')];
     }
     $slas = contractSlaChoices(array_values($f['sla']));
     foreach ($f['sla'] as $part => $sla_id) {
         if ($sla_id && !isset($slas[$sla_id])) {
-            return [$f, 'Pick an SLA from the list.'];
+            return [$f, __('Pick an SLA from the list.')];
         }
     }
     if ($kind === 'contract') {
         if (!$f['client_id'] || !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = {$f['client_id']} AND client_archived_at IS NULL" . clientScopeSql('client_id')))) {
-            return [$f, 'Pick a client you can open.'];
+            return [$f, __('Pick a client you can open.')];
         }
         foreach (['start_date', 'end_date'] as $date) {
             if ($f[$date] !== '' && !contractDateValid($f[$date])) {
-                return [$f, 'A date is a day, like 2026-11-01.'];
+                return [$f, __('A date is a day, like 2026-11-01.')];
             }
         }
         if ($f['start_date'] !== '' && $f['end_date'] !== '' && $f['end_date'] < $f['start_date']) {
-            return [$f, 'It ends before it starts.'];
+            return [$f, __('It ends before it starts.')];
         }
         if ($f['status'] === 'Active' && $f['start_date'] === '') {
-            return [$f, 'An active contract needs a start date.'];
+            return [$f, __('An active contract needs a start date.')];
         }
         if ($f['contact_id'] && !mysqli_num_rows(mysqli_query($mysqli, "SELECT contact_id FROM contacts WHERE contact_id = {$f['contact_id']} AND contact_client_id = {$f['client_id']}"))) {
-            return [$f, 'Pick one of the client\'s contacts.'];
+            return [$f, __('Pick one of the client\'s contacts.')];
         }
         if ($f['owner_id'] && !mysqli_num_rows(mysqli_query($mysqli, "SELECT user_id FROM users WHERE user_id = {$f['owner_id']} AND user_type = 1 AND user_archived_at IS NULL"))) {
-            return [$f, 'Pick an agent to look after it.'];
+            return [$f, __('Pick an agent to look after it.')];
         }
         if ($f['template_id'] && !contractTemplateRow($f['template_id'])) {
             $f['template_id'] = 0;
@@ -590,11 +605,11 @@ function contractFromTemplateAdd($client_id, $template_id, $start = null, $owner
     global $mysqli;
     $template = contractTemplateRow($template_id);
     if (!$template || !empty($template['contract_template_archived_at'])) {
-        return [0, "That template isn't there any more."];
+        return [0, __('That template isn\'t there any more.')];
     }
     $start = trim((string) $start) !== '' ? trim((string) $start) : date('Y-m-d');
     if (!contractDateValid($start)) {
-        return [0, 'A start date is a day, like 2026-11-01.'];
+        return [0, __('A start date is a day, like 2026-11-01.')];
     }
     $client_id = intval($client_id);
     $term = intval($template['contract_template_term_months']);
@@ -641,7 +656,7 @@ function contractFromClientForm($client_id, array $post) {
         return [0, '', ''];
     }
     if (!contractClientPickReady()) {
-        return [0, '', 'adding a contract needs Sales at Modify, with accounting on'];
+        return [0, '', __('adding a contract needs Sales at Modify, with accounting on')];
     }
     // Who adds it looks after it, an agent
     $owner_id = mysqli_num_rows(mysqli_query($mysqli, "SELECT user_id FROM users WHERE user_id = " . intval($session_user_id) . " AND user_type = 1")) ? intval($session_user_id) : 0;
@@ -650,7 +665,7 @@ function contractFromClientForm($client_id, array $post) {
         return [0, '', $error];
     }
     $row = contractRow($contract_id);
-    logAudit("Contract", "Create", "$session_name added active contract " . escapeSql($row['contract_name']) . " (" . escapeSql(contractTypeLabel($row['contract_type'])) . ") from "
+    logAudit("Contract", "Create", "$session_name added active contract " . escapeSql($row['contract_name']) . " (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($row['contract_type']))) . ") from "
         . escapeSql($row['contract_start_date']) . ($row['contract_end_date'] ? " to " . escapeSql($row['contract_end_date']) : '') . ", from its template, on the client form", intval($client_id), $contract_id);
     return [$contract_id, (string) $row['contract_name'], ''];
 }
@@ -674,6 +689,8 @@ function contractUpdate(array $row, array $f) {
     // A new level to be told at is told again at it
     $reset .= $hours && round(floatval($row['contract_hours_alert']), 2) !== round($f['hours_alert'], 2) ? ', contract_hours_alerted_at = NULL' : '';
     mysqli_query($mysqli, "UPDATE contracts SET " . contractSetSql($f) . "$reset WHERE contract_id = $id");
+    // For the audit log - in English, whatever the interface is in
+    return i18nEnglish(function () use ($row, $f, $hours) {
     $changes = [];
     $was = [
         'name' => (string) $row['contract_name'], 'type' => contractTypeLabel($row['contract_type']), 'start' => (string) $row['contract_start_date'], 'end' => (string) $row['contract_end_date'],
@@ -723,6 +740,7 @@ function contractUpdate(array $row, array $f) {
         $changes[] = 'terms changed';
     }
     return $changes;
+    });
 }
 
 /* Make a draft active from $start (a 'Y-m-d'), with an end date from its term when it has none. */
@@ -798,7 +816,7 @@ function contractsNightly($today = null) {
         } else {
             mysqli_query($mysqli, "UPDATE contracts SET contract_status = 'Ended' WHERE contract_id = " . intval($row['contract_id']));
             logAudit("Contract", "Edit", "Contract $name ended on " . escapeSql($row['contract_end_date']), intval($row['contract_client_id']), intval($row['contract_id']));
-            appNotify("Contract", "Contract $name for " . escapeSql($row['client_name']) . " has ended", "/agent/contract.php?client_id=" . intval($row['contract_client_id']) . "&contract_id=" . intval($row['contract_id']), intval($row['contract_client_id']), intval($row['contract_id']));
+            appNotify("Contract", escapeSql(__('Contract %1$s for %2$s has ended', $row['contract_name'], $row['client_name'])), "/agent/contract.php?client_id=" . intval($row['contract_client_id']) . "&contract_id=" . intval($row['contract_id']), intval($row['contract_client_id']), intval($row['contract_id']));
             $done['ended']++;
         }
     }
@@ -840,23 +858,25 @@ function contractRemind(array $row) {
     // A notice date already gone by isn't a date to give notice by - say it has passed
     $notice_open = $notice !== '' && $notice >= date('Y-m-d');
     $end = (string) $row['contract_end_date'];
-    $what = $renews ? 'renews itself on ' . date('M j, Y', strtotime('+1 day', strtotime($end))) : 'ends on ' . date('M j, Y', strtotime($end));
-    appNotify("Contract", escapeSql("Contract {$row['contract_name']} for {$row['client_name']} $what" . ($notice_open ? ' - notice by ' . date('M j, Y', strtotime($notice)) : '')), $url, $client_id, intval($row['contract_id']));
+    $renews_on = formatDate(date('Y-m-d', strtotime('+1 day', strtotime($end))), 'date');
+    $what = $renews ? __('%1$s renews itself on %2$s', $row['contract_name'], $renews_on) : __('%1$s ends on %2$s', $row['contract_name'], formatDate($end, 'date'));
+    appNotify("Contract", escapeSql(($renews ? __('Contract %1$s for %2$s renews itself on %3$s', $row['contract_name'], $row['client_name'], $renews_on) : __('Contract %1$s for %2$s ends on %3$s', $row['contract_name'], $row['client_name'], formatDate($end, 'date')))
+        . ($notice_open ? __(' - notice by %s', formatDate($notice, 'date')) : '')), $url, $client_id, intval($row['contract_id']));
     if (!empty($row['owner_email'])) {
-        $passed = $notice !== '' && !$notice_open ? ' Its notice date, ' . date('F j, Y', strtotime($notice)) . ', has passed.' : '';
-        emailQueue([['email' => $row['owner_email'], 'name' => $row['owner_name'], 'footnote' => 'You look after this contract in ITFlow.']], "Contract " . ($renews ? 'renewal' : 'ending') . ": {$row['contract_name']} - {$row['client_name']}", [
-            'kind' => 'Contract', 'tone' => $renews ? 'primary' : 'warning',
-            'title' => $row['contract_name'] . ' ' . $what,
+        $passed = $notice !== '' && !$notice_open ? ' ' . __('Its notice date, %s, has passed.', formatDate($notice, 'date_long')) : '';
+        emailQueue([['email' => $row['owner_email'], 'name' => $row['owner_name'], 'footnote' => __('You look after this contract in ITFlow.')]], ($renews ? __('Contract renewal: %1$s - %2$s', $row['contract_name'], $row['client_name']) : __('Contract ending: %1$s - %2$s', $row['contract_name'], $row['client_name'])), [
+            'kind' => __('Contract'), 'tone' => $renews ? 'primary' : 'warning',
+            'title' => $what,
             'intro' => [$renews
-                ? "It renews for another " . contractTermLabel($row['contract_term_months']) . ($notice_open ? " unless notice is given by " . date('F j, Y', strtotime($notice)) . ". Now is the time to review it with the client." : ".$passed")
-                : "It doesn't renew itself. Renew it, or let the client know it is ending" . ($notice_open ? " - notice is due by " . date('F j, Y', strtotime($notice)) . "." : ".$passed")],
+                ? ($notice_open ? __('It renews for another %1$s unless notice is given by %2$s. Now is the time to review it with the client.', contractTermLabel($row['contract_term_months']), formatDate($notice, 'date_long')) : __('It renews for another %s.', contractTermLabel($row['contract_term_months'])) . $passed)
+                : ($notice_open ? __('It doesn\'t renew itself. Renew it, or let the client know it is ending - notice is due by %s.', formatDate($notice, 'date_long')) : __('It doesn\'t renew itself. Renew it, or let the client know it is ending.') . $passed)],
             'summary' => array_filter([
-                'Client' => (string) $row['client_name'],
-                'Type' => contractTypeLabel($row['contract_type']),
-                'Term' => (!empty($row['contract_start_date']) ? date('M j, Y', strtotime($row['contract_start_date'])) . ' to ' : 'Until ') . date('M j, Y', strtotime($end)),
-                'Notice' => $notice !== '' ? ($notice_open ? 'By ' : 'Passed - ') . date('M j, Y', strtotime($notice)) : '',
+                __('Client') => (string) $row['client_name'],
+                __('Type') => contractTypeLabel($row['contract_type']),
+                __('Term') => !empty($row['contract_start_date']) ? __('%1$s to %2$s', formatDate($row['contract_start_date'], 'date'), formatDate($end, 'date')) : __('Until %s', formatDate($end, 'date')),
+                __('Notice') => $notice !== '' ? ($notice_open ? __('By %s', formatDate($notice, 'date')) : __('Passed - %s', formatDate($notice, 'date'))) : '',
             ]),
-            'button' => ['label' => 'Open the contract', 'url' => "https://$config_base_url$url"],
+            'button' => ['label' => __('Open the contract'), 'url' => "https://$config_base_url$url"],
         ]);
     }
 }
@@ -873,8 +893,8 @@ function contractDeleteBlocker(array $row) {
 
 /* What deleting a contract that can be deleted takes with it - for the confirm. */
 function contractDeleteWarning(array $row) {
-    return 'It goes for good, with any prepaid hours and signing requests on it.'
-        . (($row['contract_status'] ?? '') === 'Active' ? ' Cancel it instead to keep a record of it.' : '');
+    return __('It goes for good, with any prepaid hours and signing requests on it.')
+        . (($row['contract_status'] ?? '') === 'Active' ? ' ' . __('Cancel it instead to keep a record of it.') : '');
 }
 
 /* Of these contracts (rows with contract_id and contract_status), the ones that can't be deleted - id => why. */
@@ -909,8 +929,8 @@ function contractDeleteBlockers(array $rows) {
     foreach ($why as $id => $what) {
         $active = $status[$id] === 'Active';
         $blocked[$id] = $what === 'drawn'
-            ? "Tickets' time was drawn from its prepaid hours - deleting it would send them back to bill. " . ($active ? 'Cancel it instead, or put those tickets back first.' : 'Put those tickets back first.')
-            : 'It was signed by both - it stays, as the record of what was agreed.' . ($active ? ' Cancel it instead.' : '');
+            ? __('Tickets\' time was drawn from its prepaid hours - deleting it would send them back to bill.') . ' ' . ($active ? __('Cancel it instead, or put those tickets back first.') : __('Put those tickets back first.'))
+            : __('It was signed by both - it stays, as the record of what was agreed.') . ($active ? ' ' . __('Cancel it instead.') : '');
     }
     return $blocked;
 }

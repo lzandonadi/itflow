@@ -19,7 +19,7 @@ function contractPostRow($id) {
     global $client_id;
     $row = contractRow($id);
     if (!$row) {
-        flashAlert("That contract is gone - it may have been deleted.", 'error');
+        flashAlert(__('That contract is gone - it may have been deleted.'), 'error');
         redirect();
     }
     $client_id = intval($row['contract_client_id']);
@@ -32,7 +32,7 @@ function contractSignaturePostRound($id) {
     global $client_id;
     $round = contractSignatureRow($id);
     if (!$round) {
-        flashAlert("That signing request is gone - it may have been deleted with its contract.", 'error');
+        flashAlert(__('That signing request is gone - it may have been deleted with its contract.'), 'error');
         redirect();
     }
     $client_id = intval($round['contract_client_id']);
@@ -54,7 +54,7 @@ if (isset($_POST['add_contract']) || isset($_POST['edit_contract'])) {
     }
     [$fields, $error] = contractFromInput($input, 'contract');
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' The contract was not saved.', 'error');
+        flashAlert(__('%s The contract was not saved.', escapeHtml($error)), 'error');
         redirect();
     }
     $client_id = $fields['client_id'];
@@ -72,13 +72,13 @@ if (isset($_POST['add_contract']) || isset($_POST['edit_contract'])) {
         if ($withdrawn) {
             logAudit("Contract", "Withdraw", "The signing request for contract " . escapeSql($fields['name']) . " sent to " . escapeSql($withdrawn['contract_signature_sent_to_name']) . " was withdrawn - the contract changed", $client_id, $contract_id);
         }
-        flashAlert("Contract <strong>" . escapeHtml($fields['name']) . "</strong> saved" . ($withdrawn ? " - it was out for signature, so that request was withdrawn. Send it again for the new version." : ''), $withdrawn ? 'warning' : 'success');
+        flashAlert($withdrawn ? __('Contract <strong>%s</strong> saved - it was out for signature, so that request was withdrawn. Send it again for the new version.', escapeHtml($fields['name'])) : __('Contract <strong>%s</strong> saved', escapeHtml($fields['name'])), $withdrawn ? 'warning' : 'success');
     } else {
         $contract_id = contractCreate($fields);
         contractHoursSync($contract_id);
-        logAudit("Contract", "Create", "$session_name added " . strtolower($fields['status']) . " contract " . escapeSql($fields['name']) . " (" . escapeSql(contractTypeLabel($fields['type'])) . ")"
+        logAudit("Contract", "Create", "$session_name added " . strtolower($fields['status']) . " contract " . escapeSql($fields['name']) . " (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($fields['type']))) . ")"
             . ($fields['start_date'] !== '' ? " from " . escapeSql($fields['start_date']) : '') . ($fields['end_date'] !== '' ? " to " . escapeSql($fields['end_date']) : ''), $client_id, $contract_id);
-        flashAlert("Contract <strong>" . escapeHtml($fields['name']) . "</strong> added" . ($fields['status'] === 'Draft' ? ' as a draft' : ''));
+        flashAlert($fields['status'] === 'Draft' ? __('Contract <strong>%s</strong> added as a draft', escapeHtml($fields['name'])) : __('Contract <strong>%s</strong> added', escapeHtml($fields['name'])));
         redirect("contract.php?client_id=$client_id&contract_id=$contract_id");
     }
 
@@ -94,11 +94,11 @@ if (isset($_POST['activate_contract'])) {
     $row = contractPostRow($_POST['contract_id'] ?? 0);
     $start = trim((string) ($_POST['start_date'] ?? ''));
     if ($row['contract_status'] !== 'Draft' || !contractDateValid($start)) {
-        flashAlert("Pick the day it is in force from.", 'error');
+        flashAlert(__('Pick the day it is in force from.'), 'error');
         redirect();
     }
     if ($row['contract_end_date'] && $row['contract_end_date'] < $start) {
-        flashAlert("It ends before that day - change its end date first.", 'error');
+        flashAlert(__('It ends before that day - change its end date first.'), 'error');
         redirect();
     }
 
@@ -106,7 +106,7 @@ if (isset($_POST['activate_contract'])) {
     contractHoursSync(intval($row['contract_id']));
     $recurring_state = contractRecurringFollow(intval($row['contract_id']), stripslashes($session_name));
     logAudit("Contract", "Edit", "$session_name made contract " . escapeSql($row['contract_name']) . " active from " . escapeSql($start) . ($end !== '' ? " to " . escapeSql($end) : ''), $client_id, intval($row['contract_id']));
-    flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> is active" . ($recurring_state === 'started' ? ' - its recurring invoice is running' : ''));
+    flashAlert($recurring_state === 'started' ? __('Contract <strong>%s</strong> is active - its recurring invoice is running', escapeHtml($row['contract_name'])) : __('Contract <strong>%s</strong> is active', escapeHtml($row['contract_name'])));
 
     redirect();
 
@@ -120,7 +120,7 @@ if (isset($_POST['renew_contract'])) {
     $row = contractPostRow($_POST['contract_id'] ?? 0);
     $end = trim((string) ($_POST['end_date'] ?? ''));
     if ($row['contract_status'] === 'Draft' || !contractDateValid($end) || $end < date('Y-m-d') || ($row['contract_end_date'] && $end <= $row['contract_end_date'])) {
-        flashAlert("Pick a new last day - after its current one, and not in the past.", 'error');
+        flashAlert(__('Pick a new last day - after its current one, and not in the past.'), 'error');
         redirect();
     }
 
@@ -128,7 +128,7 @@ if (isset($_POST['renew_contract'])) {
     contractHoursSync(intval($row['contract_id']));
     $recurring_state = contractRecurringFollow(intval($row['contract_id']), stripslashes($session_name));
     logAudit("Contract", "Edit", "$session_name renewed contract " . escapeSql($row['contract_name']) . " to " . escapeSql($end), $client_id, intval($row['contract_id']));
-    flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> renewed to " . date('M j, Y', strtotime($end)) . ($recurring_state === 'started' ? ' - its recurring invoice is running again' : ''));
+    flashAlert($recurring_state === 'started' ? __('Contract <strong>%1$s</strong> renewed to %2$s - its recurring invoice is running again', escapeHtml($row['contract_name']), formatDate($end, 'date')) : __('Contract <strong>%1$s</strong> renewed to %2$s', escapeHtml($row['contract_name']), formatDate($end, 'date')));
 
     redirect();
 
@@ -144,7 +144,7 @@ if (isset($_POST['cancel_contract'])) {
     $reason = mb_substr(trim(strip_tags((string) ($_POST['reason'] ?? ''))), 0, 255);
     if ($row['contract_status'] !== 'Active' || !contractDateValid($last_day)
         || ($row['contract_start_date'] && $last_day < $row['contract_start_date'])) {
-        flashAlert("Pick its last day - not before it started.", 'error');
+        flashAlert(__('Pick its last day - not before it started.'), 'error');
         redirect();
     }
 
@@ -157,8 +157,8 @@ if (isset($_POST['cancel_contract'])) {
     if ($withdrawn) {
         logAudit("Contract", "Withdraw", "The signing request for contract " . escapeSql($row['contract_name']) . " was withdrawn - the contract was cancelled", $client_id, intval($row['contract_id']));
     }
-    flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> cancelled" . ($last_day >= date('Y-m-d') ? " - in force until " . date('M j, Y', strtotime($last_day)) : '')
-        . ($recurring_state === 'stopped' ? ' - its recurring invoice is paused' : '') . ($withdrawn ? ' - its signing request was withdrawn' : ''), 'error');
+    flashAlert(($last_day >= date('Y-m-d') ? __('Contract <strong>%1$s</strong> cancelled - in force until %2$s', escapeHtml($row['contract_name']), formatDate($last_day, 'date')) : __('Contract <strong>%s</strong> cancelled', escapeHtml($row['contract_name'])))
+        . ($recurring_state === 'stopped' ? __(' - its recurring invoice is paused') : '') . ($withdrawn ? __(' - its signing request was withdrawn') : ''), 'error');
 
     redirect();
 
@@ -173,12 +173,12 @@ if (isset($_GET['delete_contract'])) {
     // Not once tickets drew on its hours, or it was signed by both
     $blocker = contractDeleteBlocker($row);
     if ($blocker !== '') {
-        flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> wasn't deleted. " . escapeHtml($blocker), 'error');
+        flashAlert(__('Contract <strong>%1$s</strong> wasn\'t deleted. %2$s', escapeHtml($row['contract_name']), escapeHtml($blocker)), 'error');
         redirect();
     }
     mysqli_query($mysqli, "DELETE FROM contracts WHERE contract_id = " . intval($row['contract_id']));
     logAudit("Contract", "Delete", "$session_name deleted contract " . escapeSql($row['contract_name']), $client_id, intval($row['contract_id']));
-    flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Contract <strong>%s</strong> deleted', escapeHtml($row['contract_name'])), 'error');
 
     redirect("contracts.php?client_id=$client_id");
 
@@ -192,15 +192,15 @@ if (isset($_POST['send_contract_signature'])) {
     $row = contractPostRow($_POST['contract_id'] ?? 0);
     $contract_id = intval($row['contract_id']);
     if (!contractSignaturesReady()) {
-        flashAlert("Signing needs the database update - run it from Maintenance > Update first.", 'error');
+        flashAlert(__('Signing needs the database update - run it from Maintenance > Update first.'), 'error');
         redirect();
     }
     if (in_array($row['contract_status'], ['Ended', 'Cancelled'], true)) {
-        flashAlert("An ended or cancelled contract isn't sent for signature - renew it first.", 'error');
+        flashAlert(__('An ended or cancelled contract isn\'t sent for signature - renew it first.'), 'error');
         redirect();
     }
     if (!empty(getFieldById('clients', $client_id, 'client_archived_at'))) {
-        flashAlert("The client is archived - restore them before sending them a contract to sign.", 'error');
+        flashAlert(__('The client is archived - restore them before sending them a contract to sign.'), 'error');
         redirect();
     }
 
@@ -211,7 +211,7 @@ if (isset($_POST['send_contract_signature'])) {
         $to_name = (string) ($contact['contact_name'] ?? '');
         $to_email = trim((string) ($contact['contact_email'] ?? ''));
         if (!$contact || !filter_var($to_email, FILTER_VALIDATE_EMAIL)) {
-            flashAlert("That contact has no email address - pick another, or type a name and an address.", 'error');
+            flashAlert(__('That contact has no email address - pick another, or type a name and an address.'), 'error');
             redirect();
         }
     } else {
@@ -219,7 +219,7 @@ if (isset($_POST['send_contract_signature'])) {
         $to_name = mb_substr(trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($_POST['to_name'] ?? '')))), 0, 200);
         $to_email = trim((string) ($_POST['to_email'] ?? ''));
         if ($to_name === '' || !filter_var($to_email, FILTER_VALIDATE_EMAIL) || strlen($to_email) > 255) {
-            flashAlert("Pick a contact, or give a name and an email address.", 'error');
+            flashAlert(__('Pick a contact, or give a name and an email address.'), 'error');
             redirect();
         }
     }
@@ -228,9 +228,9 @@ if (isset($_POST['send_contract_signature'])) {
     [$round_id, $queued] = contractSignatureSend($row, $to_name, $to_email, $contact_id, $note, $session_user_id);
     logAudit("Contract", "Send", "$session_name sent contract " . escapeSql($row['contract_name']) . " for signature to " . escapeSql("$to_name <$to_email>"), $client_id, $contract_id);
     if ($queued) {
-        flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> sent to <strong>" . escapeHtml($to_name) . "</strong> to sign");
+        flashAlert(__('Contract <strong>%1$s</strong> sent to <strong>%2$s</strong> to sign', escapeHtml($row['contract_name']), escapeHtml($to_name)));
     } else {
-        flashAlert("Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> is ready to sign, but nothing was emailed - mail isn't set up. Copy its signing link here and send it yourself.", 'warning');
+        flashAlert(__('Contract <strong>%s</strong> is ready to sign, but nothing was emailed - mail isn\'t set up. Copy its signing link here and send it yourself.', escapeHtml($row['contract_name'])), 'warning');
     }
 
     redirect();
@@ -245,12 +245,12 @@ if (isset($_GET['resend_contract_signature'])) {
     $round = contractSignaturePostRound($_GET['resend_contract_signature']);
     $state = contractSignatureState($round);
     if (!$state || !in_array($state['key'], ['sent', 'viewed'], true)) {
-        flashAlert("That request isn't waiting for the client any more.", 'error');
+        flashAlert(__('That request isn\'t waiting for the client any more.'), 'error');
         redirect();
     }
     $queued = contractSignatureRequestEmail($round);
     logAudit("Contract", "Send", "$session_name sent the signing link for contract " . escapeSql($round['contract_name']) . " again to " . escapeSql($round['contract_signature_sent_to_name'] . ' <' . $round['contract_signature_sent_to_email'] . '>'), $client_id, intval($round['contract_id']));
-    flashAlert($queued ? "Signing link sent again to <strong>" . escapeHtml($round['contract_signature_sent_to_name']) . "</strong>" : "Nothing was emailed - mail isn't set up. Copy the signing link and send it yourself.", $queued ? 'success' : 'warning');
+    flashAlert($queued ? __('Signing link sent again to <strong>%s</strong>', escapeHtml($round['contract_signature_sent_to_name'])) : __('Nothing was emailed - mail isn\'t set up. Copy the signing link and send it yourself.'), $queued ? 'success' : 'warning');
 
     redirect();
 
@@ -263,11 +263,11 @@ if (isset($_GET['withdraw_contract_signature'])) {
 
     $round = contractSignaturePostRound($_GET['withdraw_contract_signature']);
     if (!contractSignaturePending($round) || !contractSignatureWithdraw($round, 'Withdrawn by ' . stripslashes($session_name))) {
-        flashAlert("That request isn't waiting on anyone any more.", 'error');
+        flashAlert(__('That request isn\'t waiting on anyone any more.'), 'error');
         redirect();
     }
     logAudit("Contract", "Withdraw", "$session_name withdrew the signing request for contract " . escapeSql($round['contract_name']) . " sent to " . escapeSql($round['contract_signature_sent_to_name']), $client_id, intval($round['contract_id']));
-    flashAlert("Signing request withdrawn - its link no longer signs anything", 'error');
+    flashAlert(__('Signing request withdrawn - its link no longer signs anything'), 'error');
 
     redirect();
 
@@ -281,17 +281,17 @@ if (isset($_POST['countersign_contract'])) {
     $round = contractSignaturePostRound($_POST['contract_signature_id'] ?? 0);
     $state = contractSignatureState($round);
     if (!$state || $state['key'] !== 'countersign') {
-        flashAlert("That contract isn't waiting for a countersignature.", 'error');
+        flashAlert(__('That contract isn\'t waiting for a countersignature.'), 'error');
         redirect();
     }
     [$f, $error] = contractSignatureFromInput($_POST);
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' It was not countersigned.', 'error');
+        flashAlert(__('%s It was not countersigned.', escapeHtml($error)), 'error');
         redirect();
     }
     $was_draft = $round['contract_status'] === 'Draft';
     if (!contractSignatureAgentSign($round, $f, $session_user_id)) {
-        flashAlert("That contract isn't waiting for a countersignature.", 'error');
+        flashAlert(__('That contract isn\'t waiting for a countersignature.'), 'error');
         redirect();
     }
     if ($was_draft) {
@@ -299,7 +299,7 @@ if (isset($_POST['countersign_contract'])) {
         contractRecurringFollow(intval($round['contract_id']), stripslashes($session_name));
     }
     logAudit("Contract", "Sign", "$session_name countersigned contract " . escapeSql($round['contract_name']) . " as " . escapeSql($f['name']) . ($was_draft ? ", which is now active" : ''), $client_id, intval($round['contract_id']));
-    flashAlert("Contract <strong>" . escapeHtml($round['contract_name']) . "</strong> is signed by both" . ($was_draft ? " and active" : '') . " - a copy went to " . escapeHtml($round['contract_signature_sent_to_name']));
+    flashAlert($was_draft ? __('Contract <strong>%1$s</strong> is signed by both and active - a copy went to %2$s', escapeHtml($round['contract_name']), escapeHtml($round['contract_signature_sent_to_name'])) : __('Contract <strong>%1$s</strong> is signed by both - a copy went to %2$s', escapeHtml($round['contract_name']), escapeHtml($round['contract_signature_sent_to_name'])));
 
     redirect();
 
@@ -314,7 +314,7 @@ if (isset($_GET['export_contract_pdf'])) {
     if (!empty($_GET['round'])) {
         $round = contractSignatureRow($_GET['round']);
         if (!$round || intval($round['contract_id']) !== intval($row['contract_id'])) {
-            flashAlert("That copy of the contract is gone.", 'error');
+            flashAlert(__('That copy of the contract is gone.'), 'error');
             redirect();
         }
     }
@@ -331,28 +331,29 @@ if (isset($_POST['add_contract_hours'])) {
 
     $row = contractPostRow($_POST['contract_id'] ?? 0);
     if (!contractHoursReady()) {
-        flashAlert("Prepaid hours need the database update - run it from Maintenance > Update first.", 'error');
+        flashAlert(__('Prepaid hours need the database update - run it from Maintenance > Update first.'), 'error');
         redirect();
     }
     if (!($row['contract_status'] === 'Draft' || contractHoursLive($row))) {
-        flashAlert("Hours are added to a draft or active contract, or a cancelled one until its last day - renew it first.", 'error');
+        flashAlert(__('Hours are added to a draft or active contract, or a cancelled one until its last day - renew it first.'), 'error');
         redirect();
     }
     [$f, $error] = contractHoursFromInput($_POST);
     if ($error === '' && $f['invoice'] && intval($config_module_enable_accounting) !== 1) {
-        $error = 'Invoicing needs accounting turned on, in Admin > Settings > Modules.';
+        $error = __('Invoicing needs accounting turned on, in Admin > Settings > Modules.');
     }
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' No hours were added.', 'error');
+        flashAlert(__('%s No hours were added.', escapeHtml($error)), 'error');
         redirect();
     }
     [$block_id, $invoice_id, $number] = contractHoursAdd($row, $f, $session_user_id, stripslashes($session_name));
     $hours = contractHoursWords($f['hours']);
-    logAudit("Contract", "Edit", "$session_name added $hours to contract " . escapeSql($row['contract_name'])
+    $hours_log = i18nEnglish(fn () => contractHoursWords($f['hours']));
+    logAudit("Contract", "Edit", "$session_name added $hours_log to contract " . escapeSql($row['contract_name'])
         . ($f['price'] !== null ? " for " . escapeSql(billingMoney($f['price'], $session_company_currency)) : '')
         . ($f['expires'] !== '' ? ", good until " . escapeSql($f['expires']) : '') . ($invoice_id ? ", on invoice " . escapeSql($number) : ''), $client_id, intval($row['contract_id']));
-    flashAlert("<strong>" . escapeHtml($hours) . "</strong> added to <strong>" . escapeHtml($row['contract_name']) . "</strong>"
-        . ($invoice_id ? " - draft invoice <strong>" . escapeHtml($number) . "</strong> made for them" : ''));
+    flashAlert($invoice_id ? __('<strong>%1$s</strong> added to <strong>%2$s</strong> - draft invoice <strong>%3$s</strong> made for them', escapeHtml($hours), escapeHtml($row['contract_name']), escapeHtml($number))
+        : __('<strong>%1$s</strong> added to <strong>%2$s</strong>', escapeHtml($hours), escapeHtml($row['contract_name'])));
 
     redirect();
 
@@ -365,17 +366,18 @@ if (isset($_GET['delete_contract_block'])) {
 
     $block = contractBlockRow($_GET['delete_contract_block']);
     if (!$block) {
-        flashAlert("Those hours are gone - they may have been deleted.", 'error');
+        flashAlert(__('Those hours are gone - they may have been deleted.'), 'error');
         redirect();
     }
     $row = contractPostRow($block['contract_id']);
     if (intval($block['uses']) || !contractHoursBlockDelete($block['contract_block_id'])) {
-        flashAlert("Time was drawn from those hours, so they stay - put the tickets back first.", 'error');
+        flashAlert(__('Time was drawn from those hours, so they stay - put the tickets back first.'), 'error');
         redirect();
     }
     $hours = contractHoursWords($block['contract_block_hours']);
-    logAudit("Contract", "Edit", "$session_name deleted $hours from contract " . escapeSql($row['contract_name']) . " (" . escapeSql($block['contract_block_note'] ?: 'bought ' . $block['contract_block_bought']) . ")", $client_id, intval($row['contract_id']));
-    flashAlert("<strong>" . escapeHtml($hours) . "</strong> deleted from <strong>" . escapeHtml($row['contract_name']) . "</strong>" . (intval($block['contract_block_invoice_id']) ? " - the invoice for them stays" : ''), 'error');
+    $hours_log = i18nEnglish(fn () => contractHoursWords($block['contract_block_hours']));
+    logAudit("Contract", "Edit", "$session_name deleted $hours_log from contract " . escapeSql($row['contract_name']) . " (" . escapeSql($block['contract_block_note'] ?: 'bought ' . $block['contract_block_bought']) . ")", $client_id, intval($row['contract_id']));
+    flashAlert(intval($block['contract_block_invoice_id']) ? __('<strong>%1$s</strong> deleted from <strong>%2$s</strong> - the invoice for them stays', escapeHtml($hours), escapeHtml($row['contract_name'])) : __('<strong>%1$s</strong> deleted from <strong>%2$s</strong>', escapeHtml($hours), escapeHtml($row['contract_name'])), 'error');
 
     redirect();
 
@@ -397,7 +399,7 @@ if (isset($_POST['draw_contract_hours'])) {
         $client_id = intval($_POST['client_id'] ?? 0);
     }
     if (!$client_id || !contractHoursReady()) {
-        flashAlert("Pick a client with prepaid hours.", 'error');
+        flashAlert(__('Pick a client with prepaid hours.'), 'error');
         redirect();
     }
     enforceClientAccess();
@@ -405,13 +407,13 @@ if (isset($_POST['draw_contract_hours'])) {
     $result = contractHoursDraw($client_id, $ticket_ids, stripslashes($session_name), $session_user_id);
     $count = count($result['drawn']);
     if (!$count) {
-        flashAlert($result['contracts'] ? 'Nothing to draw - no done tickets waiting to bill fall within prepaid hours with time left.' : 'Nothing to draw - the client has no active contract with prepaid hours.', 'warning');
+        flashAlert($result['contracts'] ? __('Nothing to draw - no done tickets waiting to bill fall within prepaid hours with time left.') : __('Nothing to draw - the client has no active contract with prepaid hours.'), 'warning');
         redirect();
     }
-    logAudit("Contract", "Edit", "$session_name drew " . escapeSql(contractHoursWords($result['hours'])) . " of prepaid hours for $count ticket" . ($count === 1 ? '' : 's') . ": " . escapeSql(implode(', ', array_keys($result['drawn']))), $client_id);
+    logAudit("Contract", "Edit", "$session_name drew " . escapeSql(i18nEnglish(fn () => contractHoursWords($result['hours']))) . " of prepaid hours for $count ticket" . ($count === 1 ? '' : 's') . ": " . escapeSql(implode(', ', array_keys($result['drawn']))), $client_id);
     $over = array_sum($result['overage']);
-    flashAlert("<strong>" . escapeHtml(contractHoursWords($result['hours'])) . "</strong> drawn from prepaid hours for $count ticket" . ($count === 1 ? '' : 's')
-        . " - " . escapeHtml(contractHoursText($result['left'])) . " left" . ($over > 0 ? ". <strong>" . escapeHtml(contractHoursText($over)) . "</strong> went over and is left to bill" : ''), $over > 0 ? 'warning' : 'success');
+    flashAlert(_n('<strong>%1$s</strong> drawn from prepaid hours for %2$d ticket - %3$s left', '<strong>%1$s</strong> drawn from prepaid hours for %2$d tickets - %3$s left', $count, escapeHtml(contractHoursWords($result['hours'])), $count, escapeHtml(contractHoursText($result['left'])))
+        . ($over > 0 ? __('. <strong>%s</strong> went over and is left to bill', escapeHtml(contractHoursText($over))) : ''), $over > 0 ? 'warning' : 'success');
 
     redirect();
 
@@ -425,19 +427,19 @@ if (isset($_GET['put_back_contract_hours'])) {
     $ticket_id = intval($_GET['put_back_contract_hours']);
     $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_id, ticket_prefix, ticket_number, ticket_client_id, ticket_invoice_id FROM tickets WHERE ticket_id = $ticket_id"));
     if (!$ticket || !contractHoursReady()) {
-        flashAlert("That ticket is gone.", 'error');
+        flashAlert(__('That ticket is gone.'), 'error');
         redirect();
     }
     $client_id = intval($ticket['ticket_client_id']);
     enforceClientAccess();
     $hours = contractHoursPutBack($ticket_id, stripslashes($session_name), $session_user_id);
     if ($hours === null) {
-        flashAlert(intval($ticket['ticket_invoice_id']) ? "That ticket is on an invoice now, so its hours stay drawn." : "That ticket drew no prepaid hours.", 'error');
+        flashAlert(intval($ticket['ticket_invoice_id']) ? __('That ticket is on an invoice now, so its hours stay drawn.') : __('That ticket drew no prepaid hours.'), 'error');
         redirect();
     }
     $reference = $ticket['ticket_prefix'] . $ticket['ticket_number'];
-    logAudit("Contract", "Edit", "$session_name put " . escapeSql(contractHoursWords($hours)) . " back on the prepaid hours from ticket " . escapeSql($reference), $client_id, 0);
-    flashAlert("<strong>" . escapeHtml(contractHoursWords($hours)) . "</strong> put back from <strong>" . escapeHtml($reference) . "</strong> - it is in Unbilled Time to bill as usual");
+    logAudit("Contract", "Edit", "$session_name put " . escapeSql(i18nEnglish(fn () => contractHoursWords($hours))) . " back on the prepaid hours from ticket " . escapeSql($reference), $client_id, 0);
+    flashAlert(__('<strong>%1$s</strong> put back from <strong>%2$s</strong> - it is in Unbilled Time to bill as usual', escapeHtml(contractHoursWords($hours)), escapeHtml($reference)));
 
     redirect();
 
@@ -450,19 +452,19 @@ function contractRecurringPostRow($id) {
     global $config_module_enable_accounting;
     $row = contractPostRow($id);
     if (!contractBillingReady()) {
-        flashAlert("Linking a recurring invoice needs the database update - run it from Maintenance > Update first.", 'error');
+        flashAlert(__('Linking a recurring invoice needs the database update - run it from Maintenance > Update first.'), 'error');
         redirect();
     }
     if (intval($config_module_enable_accounting) !== 1) {
-        flashAlert("Recurring invoices need accounting turned on, in Admin > Settings > Modules.", 'error');
+        flashAlert(__('Recurring invoices need accounting turned on, in Admin > Settings > Modules.'), 'error');
         redirect();
     }
     if (!contractRecurringShouldRun($row) && $row['contract_status'] !== 'Draft') {
-        flashAlert("An ended contract isn't billed - renew it first.", 'error');
+        flashAlert(__('An ended contract isn\'t billed - renew it first.'), 'error');
         redirect();
     }
     if (contractRecurringRow($row)) {
-        flashAlert("It already has a recurring invoice - unlink that one first.", 'error');
+        flashAlert(__('It already has a recurring invoice - unlink that one first.'), 'error');
         redirect();
     }
     return $row;
@@ -476,13 +478,13 @@ if (isset($_POST['make_contract_recurring'])) {
     $row = contractRecurringPostRow($_POST['contract_id'] ?? 0);
     [$f, $error] = contractRecurringFromInput($_POST);
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' No recurring invoice was made.', 'error');
+        flashAlert(__('%s No recurring invoice was made.', escapeHtml($error)), 'error');
         redirect();
     }
     [$recurring_id, $number, $state] = contractRecurringCreate($row, $f, stripslashes($session_name));
     logAudit("Contract", "Edit", "$session_name made recurring invoice " . escapeSql($number) . " for contract " . escapeSql($row['contract_name']), $client_id, intval($row['contract_id']));
-    flashAlert("Recurring invoice <strong>" . escapeHtml($number) . "</strong> made for <strong>" . escapeHtml($row['contract_name']) . "</strong>"
-        . ($state === 'started' ? ' - the first invoice is on ' . date('M j, Y', strtotime($f['start'])) : " - paused until the contract is active"));
+    flashAlert($state === 'started' ? __('Recurring invoice <strong>%1$s</strong> made for <strong>%2$s</strong> - the first invoice is on %3$s', escapeHtml($number), escapeHtml($row['contract_name']), formatDate($f['start'], 'date'))
+        : __('Recurring invoice <strong>%1$s</strong> made for <strong>%2$s</strong> - paused until the contract is active', escapeHtml($number), escapeHtml($row['contract_name'])));
 
     redirect();
 
@@ -497,14 +499,14 @@ if (isset($_POST['link_contract_recurring'])) {
     $recurring_id = intval($_POST['recurring_invoice_id'] ?? 0);
     $choices = contractRecurringChoices($client_id, intval($row['contract_id']));
     if (!isset($choices[$recurring_id])) {
-        flashAlert("Pick one of the client's recurring invoices that isn't another contract's.", 'error');
+        flashAlert(__('Pick one of the client\'s recurring invoices that isn\'t another contract\'s.'), 'error');
         redirect();
     }
     $number = billingNumber('recurring', $choices[$recurring_id]);
     $state = contractRecurringLink($row, $recurring_id, stripslashes($session_name));
     logAudit("Contract", "Edit", "$session_name linked recurring invoice " . escapeSql($number) . " to contract " . escapeSql($row['contract_name']), $client_id, intval($row['contract_id']));
-    flashAlert("Recurring invoice <strong>" . escapeHtml($number) . "</strong> linked to <strong>" . escapeHtml($row['contract_name']) . "</strong>"
-        . ($state === 'started' ? ' - it is running now' : ($state === 'stopped' ? ' - paused until the contract is active' : '')));
+    flashAlert(__('Recurring invoice <strong>%1$s</strong> linked to <strong>%2$s</strong>', escapeHtml($number), escapeHtml($row['contract_name']))
+        . ($state === 'started' ? __(' - it is running now') : ($state === 'stopped' ? __(' - paused until the contract is active') : '')));
 
     redirect();
 
@@ -518,13 +520,13 @@ if (isset($_GET['unlink_contract_recurring'])) {
     $row = contractPostRow($_GET['unlink_contract_recurring']);
     $recurring = contractRecurringRow($row);
     if (!$recurring) {
-        flashAlert("It has no recurring invoice to unlink.", 'error');
+        flashAlert(__('It has no recurring invoice to unlink.'), 'error');
         redirect();
     }
     $number = billingNumber('recurring', $recurring);
     contractRecurringUnlink($row, stripslashes($session_name));
     logAudit("Contract", "Edit", "$session_name unlinked recurring invoice " . escapeSql($number) . " from contract " . escapeSql($row['contract_name']), $client_id, intval($row['contract_id']));
-    flashAlert("Recurring invoice <strong>" . escapeHtml($number) . "</strong> unlinked - it carries on as it is, " . (intval($recurring['recurring_invoice_status']) ? 'running' : 'paused'));
+    flashAlert(intval($recurring['recurring_invoice_status']) ? __('Recurring invoice <strong>%s</strong> unlinked - it carries on as it is, running', escapeHtml($number)) : __('Recurring invoice <strong>%s</strong> unlinked - it carries on as it is, paused', escapeHtml($number)));
 
     redirect();
 
