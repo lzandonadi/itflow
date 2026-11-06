@@ -16,64 +16,65 @@ $themes = settingsThemes();
 $retention = appLogRetention();
 $forward = logForwardSettings();
 $on_off = function ($on) {
-    return $on ? 'on' : 'off';
+    return $on ? __('on') : __('off');
 };
 $days = function ($n) {
-    return $n == 1 ? '1 day' : intval($n) . ' days';
+    return _n('%d day', '%d days', intval($n));
 };
 
 // How each page is set now - a line or two, and whether it is switched off
 $start_pages = settingsStartPages();
 $modules_on = array_keys(array_filter([
-    'IT documentation' => $config_module_enable_itdoc,
-    'Ticketing' => $config_module_enable_ticketing,
-    'Invoicing' => $config_module_enable_accounting,
-    'Client portal' => $config_client_portal_enable,
+    __('IT documentation') => $config_module_enable_itdoc,
+    __('Ticketing') => $config_module_enable_ticketing,
+    __('Invoicing') => $config_module_enable_accounting,
+    __('Client portal') => $config_client_portal_enable,
 ]));
 $where = array_filter([$company['company_city'] ?? '', $company['company_country'] ?? '']);
 $summaries = [
-    'company' => escapeHtml($company['company_name'] ?? '') . ($where ? ' · ' . escapeHtml(implode(', ', $where)) : '') . (empty($company['company_logo']) ? ' · <span class="text-warning-emphasis">no logo yet</span>' : ''),
+    'company' => escapeHtml($company['company_name'] ?? '') . ($where ? ' · ' . escapeHtml(implode(', ', $where)) : '') . (empty($company['company_logo']) ? ' · <span class="text-warning-emphasis">' . __('no logo yet') . '</span>' : ''),
     'localization' => escapeHtml(implode(' · ', array_filter([$localization['locales'][$company['company_locale'] ?? ''] ?? '', $company['company_currency'] ?? '', $config_timezone]))),
-    'theme' => '<span class="itflow-settings-dot theme-' . escapeHtml($config_theme) . '"></span>' . escapeHtml($themes[$config_theme] ?? $config_theme) . (file_exists(dirname(__DIR__) . '/uploads/favicon.ico') ? ' · its own tab icon' : ''),
-    'default' => 'Opens on ' . escapeHtml($start_pages[$config_start_page] ?? $config_start_page) . ' · ' . ($config_default_net_terms ? 'net ' . intval($config_default_net_terms) : 'due on receipt')
-        . ($config_default_hourly_rate > 0 ? ' · ' . escapeHtml(numfmt_format_currency($currency_format, $config_default_hourly_rate, $session_company_currency)) . ' an hour' : '')
-        . (billingDefaults()['after_hours'] > 0 ? ', ' . escapeHtml(numfmt_format_currency($currency_format, billingDefaults()['after_hours'], $session_company_currency)) . ' after hours' : ''),
-    'ticket' => 'Next ' . escapeHtml($config_ticket_prefix . $config_ticket_next_number) . ' · email to ticket ' . $on_off($config_ticket_email_parse),
-    'project' => 'Next ' . escapeHtml($config_project_prefix . $config_project_next_number),
-    'quote' => 'Next ' . escapeHtml($config_quote_prefix . $config_quote_next_number),
-    'invoice' => 'Next ' . escapeHtml($config_invoice_prefix . $config_invoice_next_number) . ' · reminders ' . $on_off($config_send_invoice_reminders) . ' · late fees ' . $on_off($config_invoice_late_fee_enable)
-        . ' · cards ' . $on_off(billingStripeProvider()),
-    'mail' => 'Sending ' . ($config_smtp_provider ? 'on' : '<span class="text-danger-emphasis">off</span>') . ' · receiving ' . $on_off($config_imap_provider)
-        . (mailQueueSummary()['failed_week'] ? ' · <span class="text-danger-emphasis">' . mailQueueSummary()['failed_week'] . ' failed this week</span>' : ''),
-    'notification' => 'Domain alerts ' . $on_off($config_enable_alert_domain_expire) . ' · ticket emails to clients ' . $on_off($config_ticket_client_general_notifications),
-    'security' => 'Login key ' . $on_off($config_login_key_required) . ' · devices remembered ' . $days($config_login_remember_me_expire),
-    'client_portal' => 'Two-step sign-in ' . ($config_client_portal_require_mfa ? 'required' : 'optional'),
-    'identity' => 'Microsoft Entra ' . ($config_azure_client_id ? 'set up' : 'not set up'),
-    'module' => $modules_on ? escapeHtml(implode(', ', $modules_on)) : 'None in use',
-    'logs' => 'Audit log ' . ($retention['audit'] ? 'kept ' . $days($retention['audit']) : 'kept forever') . ' · ' . ($forward['enabled'] ? 'sent to ' . escapeHtml($forward['host']) : 'not sent on'),
-    'telemetry' => $config_telemetry ? 'Nightly report on' : 'Off',
+    'theme' => '<span class="itflow-settings-dot theme-' . escapeHtml($config_theme) . '"></span>' . escapeHtml($themes[$config_theme] ?? $config_theme) . (file_exists(dirname(__DIR__) . '/uploads/favicon.ico') ? ' · ' . __('its own tab icon') : ''),
+    'default' => __('Opens on %s', escapeHtml($start_pages[$config_start_page] ?? $config_start_page)) . ' · ' . ($config_default_net_terms ? __('net %d', intval($config_default_net_terms)) : __('due on receipt'))
+        . ($config_default_hourly_rate > 0 ? ' · ' . __('%s an hour', escapeHtml(numfmt_format_currency($currency_format, $config_default_hourly_rate, $session_company_currency))) : '')
+        . (billingDefaults()['after_hours'] > 0 ? ', ' . __('%s after hours', escapeHtml(numfmt_format_currency($currency_format, billingDefaults()['after_hours'], $session_company_currency))) : ''),
+    'ticket' => __('Next %s', escapeHtml($config_ticket_prefix . $config_ticket_next_number)) . ' · ' . __('email to ticket %s', $on_off($config_ticket_email_parse)),
+    'project' => __('Next %s', escapeHtml($config_project_prefix . $config_project_next_number)),
+    'quote' => __('Next %s', escapeHtml($config_quote_prefix . $config_quote_next_number)),
+    'invoice' => __('Next %s', escapeHtml($config_invoice_prefix . $config_invoice_next_number)) . ' · ' . __('reminders %s', $on_off($config_send_invoice_reminders)) . ' · ' . __('late fees %s', $on_off($config_invoice_late_fee_enable))
+        . ' · ' . __('cards %s', $on_off(billingStripeProvider())),
+    'mail' => __('Sending %s', $config_smtp_provider ? __('on') : '<span class="text-danger-emphasis">' . __('off') . '</span>') . ' · ' . __('receiving %s', $on_off($config_imap_provider))
+        . (mailQueueSummary()['failed_week'] ? ' · <span class="text-danger-emphasis">' . __('%d failed this week', mailQueueSummary()['failed_week']) . '</span>' : ''),
+    'notification' => __('Domain alerts %s', $on_off($config_enable_alert_domain_expire)) . ' · ' . __('ticket emails to clients %s', $on_off($config_ticket_client_general_notifications)),
+    'security' => __('Login key %s', $on_off($config_login_key_required)) . ' · ' . __('devices remembered %s', $days($config_login_remember_me_expire)),
+    'client_portal' => $config_client_portal_require_mfa ? __('Two-step sign-in required') : __('Two-step sign-in optional'),
+    'identity' => 'Microsoft Entra ' . // i18n-ignore - a product name
+         ($config_azure_client_id ? __('set up') : __('not set up')),
+    'module' => $modules_on ? escapeHtml(implode(', ', $modules_on)) : __('None in use'),
+    'logs' => ($retention['audit'] ? __('Audit log kept %s', $days($retention['audit'])) : __('Audit log kept forever')) . ' · ' . ($forward['enabled'] ? __('sent to %s', escapeHtml($forward['host'])) : __('not sent on')),
+    'telemetry' => $config_telemetry ? __('Nightly report on') : __('Off'),
 ];
 
 // What needs looking at
 $attention = [];
 if (empty($config_smtp_provider)) {
-    $attention[] = ['danger', 'fa-envelope', 'Mail sending is off', 'No email leaves ITFlow - not invoices, reminders, ticket replies or password resets.', 'settings_mail.php?tab=sending#setting=config_smtp_provider', 'Set up sending'];
+    $attention[] = ['danger', 'fa-envelope', __('Mail sending is off'), __('No email leaves ITFlow - not invoices, reminders, ticket replies or password resets.'), 'settings_mail.php?tab=sending#setting=config_smtp_provider', __('Set up sending')];
 }
 if ($config_ticket_email_parse && $config_module_enable_ticketing && empty($config_imap_provider)) {
-    $attention[] = ['warning', 'fa-inbox', 'Email to ticket has no mailbox', 'Turning emails into tickets is on, but no mailbox is set up for ITFlow to read.', 'settings_mail.php?tab=receiving#setting=config_imap_provider', 'Set up receiving'];
+    $attention[] = ['warning', 'fa-inbox', __('Email to ticket has no mailbox'), __('Turning emails into tickets is on, but no mailbox is set up for ITFlow to read.'), 'settings_mail.php?tab=receiving#setting=config_imap_provider', __('Set up receiving')];
 }
 if ($config_login_key_required && trim((string) $config_login_key_secret) === '') {
-    $attention[] = ['warning', 'fa-key', 'A login key is required, but there isn\'t one', 'The sign-in page asks for a key nobody has been given.', 'settings_security.php#setting=config_login_key_secret', 'Set the key'];
+    $attention[] = ['warning', 'fa-key', __('A login key is required, but there isn\'t one'), __('The sign-in page asks for a key nobody has been given.'), 'settings_security.php#setting=config_login_key_secret', __('Set the key')];
 }
 // The mail queue - email given up on, or a queue that isn't moving (sending off is said above)
 $mail_queue = mailQueueSummary();
 if ($mail_queue['failed_day']) {
-    $attention[] = ['danger', 'fa-envelope-open-text', $mail_queue['failed_day'] . ' email' . ($mail_queue['failed_day'] === 1 ? '' : 's') . ' failed to send',
-        'In the last day - ITFlow tried ' . MAIL_QUEUE_TRIES . ' times and gave up. The Mail Queue says why, and can try again.', 'mail_queue.php?show=failed', 'See why'];
+    $attention[] = ['danger', 'fa-envelope-open-text', _n('%d email failed to send', '%d emails failed to send', $mail_queue['failed_day']),
+        __('In the last day - ITFlow tried %d times and gave up. The Mail Queue says why, and can try again.', MAIL_QUEUE_TRIES), 'mail_queue.php?show=failed', __('See why')];
 }
 $mail_queue_health = mailQueueHealth();
 if (!empty($config_smtp_provider) && in_array($mail_queue_health['key'], ['cron_off', 'cron_stopped', 'job_off', 'slow'], true)) {
-    $attention[] = [$mail_queue_health['level'], 'fa-inbox', $mail_queue_health['title'], $mail_queue_health['text'], 'mail_queue.php', 'Mail Queue'];
+    $attention[] = [$mail_queue_health['level'], 'fa-inbox', $mail_queue_health['title'], $mail_queue_health['text'], 'mail_queue.php', __('Mail Queue')];
 }
 // Taking card payments - test keys, an account that is archived or gone, fees not being recorded
 if ($config_module_enable_accounting) {
@@ -86,7 +87,7 @@ foreach (aiProblems() as $problem) {
     $attention[] = $problem;
 }
 if (trim((string) $config_timezone) === '') {
-    $attention[] = ['warning', 'fa-clock', 'No timezone', 'Dates and times are in the server\'s timezone until one is picked.', 'settings_localization.php#setting=config_timezone', 'Pick one'];
+    $attention[] = ['warning', 'fa-clock', __('No timezone'), __('Dates and times are in the server\'s timezone until one is picked.'), 'settings_localization.php#setting=config_timezone', __('Pick one')];
 }
 
 $pages = settingsPages();
@@ -99,8 +100,8 @@ $groups = settingsGroups();
     <div class="itflow-settings-head">
         <div class="itflow-settings-head-icon"><i class="fas fa-fw fa-sliders-h"></i></div>
         <div class="flex-grow-1 min-w-0">
-            <h1 class="h4 mb-1">Settings</h1>
-            <p class="text-body-secondary mb-0">How ITFlow is set up, for everyone in it. Your own preferences are under your name, top right.</p>
+            <h1 class="h4 mb-1"><?= __('Settings') ?></h1>
+            <p class="text-body-secondary mb-0"><?= __('How ITFlow is set up, for everyone in it. Your own preferences are under your name, top right.') ?></p>
         </div>
     </div>
 
@@ -108,7 +109,7 @@ $groups = settingsGroups();
     <div class="itflow-settings-find mb-4" data-settings-find>
         <div class="input-group input-group-lg">
             <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-            <input type="search" class="form-control" placeholder="Find a setting - late fee, logo, two-step, timezone..." aria-label="Find a setting" autocomplete="off" data-settings-find-input autofocus>
+            <input type="search" class="form-control" placeholder="<?= escapeHtml(__('Find a setting - late fee, logo, two-step, timezone...')) ?>" aria-label="<?= escapeHtml(__('Find a setting')) ?>" autocomplete="off" data-settings-find-input autofocus>
         </div>
         <div class="list-group itflow-settings-results" data-settings-results hidden></div>
         <script type="application/json" data-settings-index><?= json_encode(settingsSearchIndex(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?></script>
@@ -140,7 +141,7 @@ $groups = settingsGroups();
                         <span class="min-w-0">
                             <span class="itflow-settings-tile-title"><?= escapeHtml($page['title']) ?></span>
                             <span class="itflow-settings-tile-about"><?= escapeHtml($page['about']) ?></span>
-                            <span class="itflow-settings-tile-now" data-settings-now><?= $available ? $summaries[$page_key] : 'Not in use - turned off in Modules' ?></span>
+                            <span class="itflow-settings-tile-now" data-settings-now><?= $available ? $summaries[$page_key] : __('Not in use - turned off in Modules') ?></span>
                         </span>
                     </a>
                 <?php } ?>

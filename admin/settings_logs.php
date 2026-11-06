@@ -39,9 +39,9 @@ if ($sample_row) {
 
 $size_line = function ($size, $url) {
     if (!$size['count']) {
-        return 'Nothing in it yet.';
+        return __('Nothing in it yet.');
     }
-    return '<a href="' . $url . '">' . number_format($size['count']) . ' entr' . ($size['count'] === 1 ? 'y' : 'ies') . '</a>, the oldest from ' . escapeHtml(date('M j, Y', strtotime($size['oldest']))) . '.';
+    return __('%1$s, the oldest from %2$s.', '<a href="' . $url . '">' . _n('%s entry', '%s entries', $size['count'], number_format($size['count'])) . '</a>', escapeHtml(formatDate($size['oldest']))); // i18n-dynamic
 };
 
 // The days field and its keep forever switch, for one log
@@ -54,14 +54,14 @@ $retention_field = function ($name, $forever_name, $days, $label, $help) {
             <div class="col-sm-6 col-lg-4">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar-alt"></i></span>
-                    <input type="number" class="form-control" id="<?= $id ?>" name="<?= $name ?>" min="1" max="36500" placeholder="Days" value="<?= $days > 0 ? $days : '' ?>" <?= $days > 0 ? 'required' : 'disabled' ?>>
-                    <span class="input-group-text">days</span>
+                    <input type="number" class="form-control" id="<?= $id ?>" name="<?= $name ?>" min="1" max="36500" placeholder="<?= escapeHtml(__('Days')) ?>" value="<?= $days > 0 ? $days : '' ?>" <?= $days > 0 ? 'required' : 'disabled' ?>>
+                    <span class="input-group-text"><?= __('days') ?></span>
                 </div>
             </div>
             <div class="col-auto">
                 <div class="form-check form-switch mb-0">
                     <input type="checkbox" class="form-check-input" name="<?= $forever_name ?>" value="1" id="<?= $id ?>_forever" data-log-forever="<?= $id ?>" <?= $days > 0 ? '' : 'checked' ?>>
-                    <label class="form-check-label" for="<?= $id ?>_forever">Keep forever</label>
+                    <label class="form-check-label" for="<?= $id ?>_forever"><?= __('Keep forever') ?></label>
                 </div>
             </div>
         </div>
@@ -81,51 +81,51 @@ $retention_field = function ($name, $forever_name, $days, $label, $help) {
     <div class="card itflow-settings-card">
         <div class="card-body">
 
-            <?= settingsSectionStart('keeping', 'Keeping logs', 'Each night, entries older than this are deleted for good. Keep the audit log as long as your clients or insurers ask you to be able to say who did what.') ?>
+            <?= settingsSectionStart('keeping', __('Keeping logs'), __('Each night, entries older than this are deleted for good. Keep the audit log as long as your clients or insurers ask you to be able to say who did what.')) ?>
 
-            <?= $retention_field('config_log_retention', 'audit_forever', $retention['audit'], 'Audit log', 'Who did what, signed in, looked at a password or exported something. How each API key is used is kept as long. ' . $size_line($audit_size, 'audit_logs.php')) ?>
+            <?= $retention_field('config_log_retention', 'audit_forever', $retention['audit'], __('Audit log'), __('Who did what, signed in, looked at a password or exported something. How each API key is used is kept as long.') . ' ' . $size_line($audit_size, 'audit_logs.php')) ?>
 
-            <?= $retention_field('config_app_log_retention', 'app_forever', $retention['app'], 'App logs', 'What ITFlow itself does - cron runs, mail, payment providers - and the errors it runs into. They can also be cleared by hand. ' . $size_line($app_size, 'app_logs.php')) ?>
+            <?= $retention_field('config_app_log_retention', 'app_forever', $retention['app'], __('App logs'), __('What ITFlow itself does - cron runs, mail, payment providers - and the errors it runs into. They can also be cleared by hand.') . ' ' . $size_line($app_size, 'app_logs.php')) ?>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSectionStart('forwarding', 'Sending logs on', 'Each entry can also go to a syslog server or SIEM - Graylog, Splunk, Wazuh, Microsoft Sentinel and the like - as it is written, as a syslog message (RFC 5424, facility local0). A server that can\'t be reached doesn\'t slow ITFlow down: it is tried again a minute later, and the entries in between stay in ITFlow\'s own logs.', 'forwarding') ?>
+            <?= settingsSectionStart('forwarding', __('Sending logs on'), __('Each entry can also go to a syslog server or SIEM - Graylog, Splunk, Wazuh, Microsoft Sentinel and the like - as it is written, as a syslog message (RFC 5424, facility local0). A server that can\'t be reached doesn\'t slow ITFlow down: it is tried again a minute later, and the entries in between stay in ITFlow\'s own logs.'), 'forwarding') ?>
 
             <div class="itflow-settings-field" data-setting="config_log_forward_enabled" id="setting-config_log_forward_enabled">
                 <div class="form-check form-switch">
                     <input type="checkbox" class="form-check-input" name="config_log_forward_enabled" value="1" id="logForwardEnabled" <?= $forward['enabled'] ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="logForwardEnabled">Send log entries to a syslog server or SIEM</label>
+                    <label class="form-check-label" for="logForwardEnabled"><?= __('Send log entries to a syslog server or SIEM') ?></label>
                 </div>
             </div>
 
             <?php if ($forward_failure) { ?>
                 <div class="alert alert-warning small" data-log-forward-failure>
-                    <i class="fas fa-fw fa-exclamation-triangle me-1"></i>Sending failed <?= escapeHtml(timeAgo($forward_failure['app_log_created_at'])) ?>: <?= escapeHtml($forward_failure['app_log_details']) ?>
-                    <a class="ms-1" href="app_logs.php?category=<?= urlencode(LOG_FORWARD_CATEGORY) ?>&amp;open=<?= intval($forward_failure['app_log_id']) ?>">See it</a>
+                    <i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= escapeHtml(__('Sending failed %1$s: %2$s', timeAgo($forward_failure['app_log_created_at']), $forward_failure['app_log_details'])) ?>
+                    <a class="ms-1" href="app_logs.php?category=<?= urlencode(LOG_FORWARD_CATEGORY) ?>&amp;open=<?= intval($forward_failure['app_log_id']) ?>"><?= __('See it') ?></a>
                 </div>
             <?php } elseif (logForwardOn($forward)) { ?>
                 <div class="alert alert-info small" data-log-forward-status>
-                    <i class="fas fa-fw fa-share-square me-1"></i>Sending to <?= escapeHtml(logForwardTarget($forward)) ?> as <?= escapeHtml(LOG_FORWARD_FORMATS[$forward['format']]) ?>.
+                    <i class="fas fa-fw fa-share-square me-1"></i><?= escapeHtml(__('Sending to %1$s as %2$s.', logForwardTarget($forward), __(LOG_FORWARD_FORMATS[$forward['format']]))) /* i18n-dynamic - JSON, CEF, Plain text */ ?>
                 </div>
             <?php } ?>
 
             <div data-log-forward-fields>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6" data-setting="config_log_forward_host" id="setting-config_log_forward_host">
-                        <label class="form-label">Server</label>
+                        <label class="form-label"><?= __('Server') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-server"></i></span>
-                            <input type="text" class="form-control" name="config_log_forward_host" maxlength="200" placeholder="logs.example.com or 10.0.0.20" value="<?= escapeHtml($forward['host']) ?>" pattern="\[?[A-Za-z0-9.:_\-]{1,200}\]?" title="A name or an IP address">
+                            <input type="text" class="form-control" name="config_log_forward_host" maxlength="200" placeholder="<?= escapeHtml(__('logs.example.com or 10.0.0.20')) ?>" value="<?= escapeHtml($forward['host']) ?>" pattern="\[?[A-Za-z0-9.:_\-]{1,200}\]?" title="<?= escapeHtml(__('A name or an IP address')) ?>">
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-4">
-                        <label class="form-label">Port</label>
+                        <label class="form-label"><?= __('Port') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-plug"></i></span>
                             <input type="number" class="form-control" name="config_log_forward_port" min="1" max="65535" value="<?= intval($forward['port']) ?>" required>
                         </div>
                     </div>
                     <div class="col-md-4 col-sm-8">
-                        <label class="form-label">Over</label>
+                        <label class="form-label"><?= __('Over') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-exchange-alt"></i></span>
                             <select class="form-select select2" name="config_log_forward_protocol" id="logForwardProtocol">
@@ -140,25 +140,25 @@ $retention_field = function ($name, $forever_name, $days, $label, $help) {
                 <div class="mb-3 <?= $forward['protocol'] === 'tls' ? '' : 'd-none' ?>" data-log-forward-tls>
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="config_log_forward_tls_verify" value="1" id="logForwardVerify" <?= $forward['tls_verify'] ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="logForwardVerify">Check the server's certificate</label>
+                        <label class="form-check-label" for="logForwardVerify"><?= __('Check the server\'s certificate') ?></label>
                     </div>
-                    <div class="form-text">Turn off only for a server on your own network with a certificate it made itself - anyone in between could otherwise read the entries.</div>
+                    <div class="form-text"><?= __('Turn off only for a server on your own network with a certificate it made itself - anyone in between could otherwise read the entries.') ?></div>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">As</label>
+                        <label class="form-label"><?= __('As') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-code"></i></span>
                             <select class="form-select select2" name="config_log_forward_format" id="logForwardFormat">
                                 <?php foreach (LOG_FORWARD_FORMATS as $key => $label) { ?>
-                                    <option value="<?= $key ?>" <?= $forward['format'] === $key ? 'selected' : '' ?><?= selectOptionData(['description' => logForwardFormatHelp()[$key]]) ?>><?= $label ?></option>
+                                    <option value="<?= $key ?>" <?= $forward['format'] === $key ? 'selected' : '' ?><?= selectOptionData(['description' => logForwardFormatHelp()[$key]]) ?>><?= escapeHtml(__($label)) /* i18n-dynamic - LOG_FORWARD_FORMATS */ ?></option>
                                 <?php } ?>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">App logs</label>
+                        <label class="form-label"><?= __('App logs') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-clipboard-list"></i></span>
                             <select class="form-select select2" name="config_log_forward_app_level">
@@ -173,14 +173,14 @@ $retention_field = function ($name, $forever_name, $days, $label, $help) {
                 <div class="mb-3">
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="config_log_forward_audit" value="1" id="logForwardAudit" <?= $forward['audit'] ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="logForwardAudit">The audit log - every entry</label>
+                        <label class="form-check-label" for="logForwardAudit"><?= __('The audit log - every entry') ?></label>
                     </div>
                 </div>
 
                 <?php if ($samples) { ?>
                     <details class="mb-3" data-log-forward-sample>
-                        <summary class="small">What an entry looks like</summary>
-                        <div class="small text-body-secondary mt-2">The latest audit log entry, as it would be sent:</div>
+                        <summary class="small"><?= __('What an entry looks like') ?></summary>
+                        <div class="small text-body-secondary mt-2"><?= __('The latest audit log entry, as it would be sent:') ?></div>
                         <?php foreach ($samples as $format => $sample) { ?>
                             <pre class="small bg-body-tertiary border rounded p-2 mt-1 mb-0 text-wrap text-break <?= $format === $forward['format'] ? '' : 'd-none' ?>" data-log-forward-sample-format="<?= $format ?>"><?= escapeHtml($sample) ?></pre>
                         <?php } ?>
@@ -189,7 +189,7 @@ $retention_field = function ($name, $forever_name, $days, $label, $help) {
             </div>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSaveBar('edit_log_settings', 'Save', '<button type="submit" name="test_log_forward" class="btn btn-outline-secondary" title="Saves, then sends one test message to the server"><i class="fas fa-paper-plane me-2"></i>Save and send a test</button>') ?>
+            <?= settingsSaveBar('edit_log_settings', __('Save'), '<button type="submit" name="test_log_forward" class="btn btn-outline-secondary" title="' . escapeHtml(__('Saves, then sends one test message to the server')) . '"><i class="fas fa-paper-plane me-2"></i>' . __('Save and send a test') . '</button>') ?>
         </div>
     </div>
 </form>

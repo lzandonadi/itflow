@@ -34,7 +34,7 @@ if (isset($_POST['edit_module_settings'])) {
         // The one already in use, run out - kept, not in force
         $after['config_whitelabel_enabled'] = 0;
     } else {
-        $errors['config_whitelabel_key'] = 'That isn\'t a white-label key, or it has run out.';
+        $errors['config_whitelabel_key'] = __('That isn\'t a white-label key, or it has run out.');
     }
     if ($errors) {
         settingsRefuse('module', $errors);

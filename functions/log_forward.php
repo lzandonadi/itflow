@@ -27,10 +27,10 @@ const LOG_FORWARD_CATEGORY = 'Log Forwarding';
 /** Which app log entries go out - the level and the ones above it, '' for none. */
 function logForwardAppLevels() {
     return [
-        '' => 'None',
-        'error' => 'Errors',
-        'warning' => 'Warnings and errors',
-        'info' => 'Info, warnings and errors',
+        '' => __('None'),
+        'error' => __('Errors'),
+        'warning' => __('Warnings and errors'),
+        'info' => __('Info, warnings and errors'),
         'debug' => 'Everything, debug too',
     ];
 }
@@ -47,9 +47,9 @@ function logForwardProtocolHelp() {
 /** What each format is, in a line. */
 function logForwardFormatHelp() {
     return [
-        'json' => 'One JSON object an entry - Graylog, Splunk, Elastic, Wazuh and most others read it as it is.',
-        'cef' => 'Common Event Format - for Microsoft Sentinel, QRadar, ArcSight and other SIEMs that take it.',
-        'plain' => 'A line of text an entry, as a person would read it.',
+        'json' => __('One JSON object an entry - Graylog, Splunk, Elastic, Wazuh and most others read it as it is.'),
+        'cef' => __('Common Event Format - for Microsoft Sentinel, QRadar, ArcSight and other SIEMs that take it.'),
+        'plain' => __('A line of text an entry, as a person would read it.'),
     ];
 }
 

@@ -33,17 +33,17 @@ if (isset($_POST['edit_default_settings'])) {
 
     $after['config_default_calendar'] = intval($in['config_default_calendar']);
     if ($after['config_default_calendar'] && !mysqli_num_rows(mysqli_query($mysqli, "SELECT calendar_id FROM calendars WHERE calendar_id = {$after['config_default_calendar']}"))) {
-        $errors['config_default_calendar'] = 'That calendar isn\'t there any more.';
+        $errors['config_default_calendar'] = __('That calendar isn\'t there any more.');
     }
 
     $after['config_default_net_terms'] = intval($in['config_default_net_terms']);
     if (!isset(settingsNetTerms()[$after['config_default_net_terms']]) && $after['config_default_net_terms'] !== intval($before['config_default_net_terms'])) {
-        $errors['config_default_net_terms'] = 'Pick the terms from the list.';
+        $errors['config_default_net_terms'] = __('Pick the terms from the list.');
     }
 
     $rate = billingNumberInput($in['config_default_hourly_rate']);
     if ($rate === null || $rate < 0 || $rate >= 1000000) {
-        $errors['config_default_hourly_rate'] = 'An amount, such as 125.00 - 0 for none.';
+        $errors['config_default_hourly_rate'] = __('An amount, such as 125.00 - 0 for none.');
     }
     $after['config_default_hourly_rate'] = $rate;
 
@@ -53,7 +53,7 @@ if (isset($_POST['edit_default_settings'])) {
         $after_hours_text = trim((string) $_POST['config_default_after_hours_rate']);
         $after_hours = $after_hours_text === '' ? null : billingNumberInput($after_hours_text);
         if ($after_hours_text !== '' && ($after_hours === null || $after_hours < 0 || $after_hours >= 1000000)) {
-            $errors['config_default_after_hours_rate'] = 'An amount, such as 175.00 - or leave it empty for the hourly rate.';
+            $errors['config_default_after_hours_rate'] = __('An amount, such as 175.00 - or leave it empty for the hourly rate.');
         }
         $after['config_default_after_hours_rate'] = $after_hours !== null && round($after_hours, 2) > 0 ? round($after_hours, 2) : null;
     }
@@ -62,7 +62,7 @@ if (isset($_POST['edit_default_settings'])) {
         $after[$account] = intval($in[$account]);
         if ($after[$account] && $after[$account] !== intval($before[$account])
             && !mysqli_num_rows(mysqli_query($mysqli, "SELECT account_id FROM accounts WHERE account_id = {$after[$account]} AND account_archived_at IS NULL"))) {
-            $errors[$account] = 'That account isn\'t there any more, or is archived.';
+            $errors[$account] = __('That account isn\'t there any more, or is archived.');
         }
     }
 
@@ -71,7 +71,7 @@ if (isset($_POST['edit_default_settings'])) {
         // The payments default from the methods for money in, the expenses one from those for money out
         $payment_methods = paymentMethods($method === 'config_default_expense_payment_method' ? 'out' : 'in');
         if ($after[$method] !== '' && $after[$method] !== (string) $before[$method] && !in_array($after[$method], $payment_methods, true)) {
-            $errors[$method] = 'Pick one from the list - they are in Payment methods.';
+            $errors[$method] = __('Pick one from the list - they are in Payment methods.');
         }
     }
 

@@ -19,11 +19,11 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-puzzle-piece me-2"></i>Access Modules</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-puzzle-piece me-2"></i><?= __('Access Modules') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/module/module_add.php">
-                    <i class="fas fa-fw fa-plus me-2"></i>New Module
+                    <i class="fas fa-fw fa-plus me-2"></i><?= __('New Module') ?>
                 </button>
             </div>
         </div>
@@ -33,8 +33,8 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
             <div class="row g-2 align-items-center">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) {echo stripslashes(escapeHtml($q));} ?>" placeholder="Search Modules">
-                            <button class="btn btn-primary" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) {echo stripslashes(escapeHtml($q));} ?>" placeholder="<?= escapeHtml(__('Search Modules')) ?>">
+                            <button class="btn btn-primary" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -46,10 +46,10 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
             <tr>
                 <th class="ps-3">
                     <a class="text-dark" href="?<?= $url_query_strings_sort ?>&sort=module_name&order=<?= $disp ?>">
-                        Module <?php if ($sort == 'module_name') { echo $order_icon; } ?>
+                        <?= __('Module') ?> <?php if ($sort == 'module_name') { echo $order_icon; } ?>
                     </a>
                 </th>
-                <th class="text-center">Action</th>
+                <th class="text-center"><?= __('Action') ?></th>
             </tr>
             </thead>
             <tbody>
@@ -71,24 +71,24 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                     <td>
                         <?php if ($module_id > 6) { ?>
                             <div class="dropdown dropstart text-center">
-                                <button class="btn btn-secondary btn-sm" title="More actions" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-secondary btn-sm" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-ellipsis-h"></i>
                                 </button>
                                 <div class="dropdown-menu">
 
                                     <a class="dropdown-item ajax-modal" href="#"
                                         data-modal-url="modals/module/module_edit.php?id=<?= $module_id ?>">
-                                        <i class="fas fa-fw fa-user-edit me-2"></i>Edit
+                                        <i class="fas fa-fw fa-user-edit me-2"></i><?= __('Edit') ?>
                                     </a>
 
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger confirm-link" href="post.php?delete_module=<?= $module_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Delete
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Delete') ?>
                                     </a>
 
                                 </div>
                             </div>
-                        <?php } else { echo "<p class='text-center'>N/A Predefined</p>"; } ?>
+                        <?php } else { echo '<p class="text-center">' . __('N/A Predefined') . '</p>'; } ?>
                     </td>
                 </tr>
 
@@ -105,7 +105,7 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
     $empty_state = [
         'thing' => 'modules',
         'icon' => 'fa-puzzle-piece',
-        'actions' => [['label' => 'New Module', 'modal' => 'modals/module/module_add.php']],
+        'actions' => [['label' => __('New Module'), 'modal' => 'modals/module/module_add.php']],
     ];
     ?>
     <?php require_once "../includes/filter_footer.php";

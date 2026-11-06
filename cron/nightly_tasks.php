@@ -588,7 +588,7 @@ $sql_invalid_recurring_invoices = mysqli_query($mysqli, "SELECT recurring_invoic
 while ($row = mysqli_fetch_assoc($sql_invalid_recurring_invoices)) {
     $invoice_prefix = $row['recurring_invoice_prefix'];
     $invoice_number = intval($row['recurring_invoice_number']);
-    appNotify("Invoice", escapeSql("Recurring invoice $invoice_prefix$invoice_number is behind - its next date has passed and it won't bill until it is invoiced or moved on"), "/agent/recurring_invoice.php?recurring_invoice_id=" . intval($row['recurring_invoice_id']), intval($row['recurring_invoice_client_id']));
+    appNotify("Invoice", escapeSql(__("Recurring invoice %s is behind - its next date has passed and it won't bill until it is invoiced or moved on", $invoice_prefix . $invoice_number)), "/agent/recurring_invoice.php?recurring_invoice_id=" . intval($row['recurring_invoice_id']), intval($row['recurring_invoice_client_id']));
 }
 // End Flag any active recurring "next run" dates that are in the past
 
@@ -598,7 +598,7 @@ $invoices_pending_send = mysqli_num_rows($sql_invoices_pending_send);
 
 if ($invoices_pending_send > 0) {
 
-    appNotify("Draft Invoices", "There are $invoices_pending_send draft invoices pending review", "/agent/invoices.php?&status=Draft");
+    appNotify("Draft Invoices", escapeSql(_n('There is %d draft invoice pending review', 'There are %d draft invoices pending review', intval($invoices_pending_send))), "/agent/invoices.php?&status=Draft");
 }
 // End Notify draft invoices needing review
 
@@ -737,7 +737,7 @@ while ($row = mysqli_fetch_assoc($sql_recurring_payments)) {
 
                     // LOGGING
                     $extended_log_desc = !$pi_livemode ? '(DEV MODE)' : '';
-                    appNotify("Invoice Paid", "Invoice $invoice_prefix$invoice_number automatically paid", "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
+                    appNotify("Invoice Paid", escapeSql(__('Invoice %s automatically paid', $invoice_prefix . $invoice_number)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
                     logAudit("Invoice", "Payment", "Auto Stripe payment amount of " . numfmt_format_currency($currency_format, $invoice_amount, $recurring_payment_currency_code) . " added to invoice $invoice_prefix$invoice_number - $pi_id $extended_log_desc", $client_id, $invoice_id);
                     triggerCustomAction('invoice_pay', $invoice_id);
 
