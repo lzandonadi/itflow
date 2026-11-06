@@ -12,11 +12,11 @@ enforceUserPermission('module_financial', 2);
 
 $form_row = expenseRow(intval($_GET['id'] ?? 0));
 if (!$form_row || $form_row['transfer_id']) {
-    echo json_encode(['error' => 'That expense no longer exists.']);
+    echo json_encode(['error' => __('That expense no longer exists.')]);
     exit;
 }
 if (floatval($form_row['expense_amount']) <= 0) {
-    echo json_encode(['error' => 'That is a refund already - there is nothing to give back.']);
+    echo json_encode(['error' => __('That is a refund already - there is nothing to give back.')]);
     exit;
 }
 $form_mode = 'refund';
@@ -25,7 +25,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-undo-alt me-2"></i>Record a Refund</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-undo-alt me-2"></i><?= __('Record a Refund') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -34,8 +34,8 @@ ob_start();
         <?php require __DIR__ . '/expense_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_expense" class="btn btn-primary text-bold"><i class="fas fa-undo-alt me-2"></i>Record Refund</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_expense" class="btn btn-primary text-bold"><i class="fas fa-undo-alt me-2"></i><?= __('Record Refund') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

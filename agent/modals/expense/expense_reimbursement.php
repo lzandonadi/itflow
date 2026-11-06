@@ -13,7 +13,7 @@ enforceUserPermission('module_financial');
 
 $row = reimbursementRow(intval($_GET['id'] ?? 0));
 if (!$row) {
-    exit(json_encode(['error' => 'That reimbursement no longer exists - it was undone.']));
+    exit(json_encode(['error' => __('That reimbursement no longer exists - it was undone.')]));
 }
 
 $reimbursement_id = intval($row['reimbursement_id']);
@@ -30,30 +30,30 @@ ob_start();
     <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
         <span class="itflow-asset-icon itflow-asset-icon-lg bg-success-subtle text-success-emphasis" aria-hidden="true"><i class="fas fa-hand-holding-usd"></i></span>
         <div class="min-w-0 flex-grow-1">
-            <h5 class="modal-title fw-semibold text-break">Paid back to <?= escapeHtml($row['user_name'] ?: 'an agent since deleted') ?></h5>
-            <div class="small text-body-secondary mt-1"><?= escapeHtml(date('M j, Y', strtotime($row['reimbursement_date']))) ?> · <?= count($expenses) ?> expense<?= count($expenses) === 1 ? '' : 's' ?></div>
+            <h5 class="modal-title fw-semibold text-break"><?= escapeHtml(__('Paid back to %s', $row['user_name'] ?: __('an agent since deleted'))) ?></h5>
+            <div class="small text-body-secondary mt-1"><?= escapeHtml(formatDate($row['reimbursement_date'], 'date')) ?> · <?= count($expenses) ?> expense<?= count($expenses) === 1 ? '' : 's' ?></div>
         </div>
         <div class="fs-4 fw-semibold itflow-money text-white"><?= escapeHtml(billingMoney($row['reimbursement_amount'], $currency)) ?></div>
     </div>
-    <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
     <div class="row g-2 itflow-asset-glance">
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Paid from">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Paid from')) ?>">
                 <i class="fas fa-fw fa-piggy-bank"></i>
-                <span><?= escapeHtml($row['account_name'] ?: 'An account since deleted') ?><?= $row['reimbursement_payment_method'] ? ' <span class="text-body-secondary">&middot; ' . escapeHtml($row['reimbursement_payment_method']) . '</span>' : '' ?></span>
+                <span><?= escapeHtml($row['account_name'] ?: __('An account since deleted')) ?><?= $row['reimbursement_payment_method'] ? ' <span class="text-body-secondary">&middot; ' . escapeHtml($row['reimbursement_payment_method']) . '</span>' : '' ?></span>
             </div>
             <?php if ($row['reimbursement_reference']) { ?>
-                <div class="itflow-glance-item" title="Reference">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Reference')) ?>">
                     <i class="fas fa-fw fa-hashtag"></i>
                     <span class="font-monospace text-break"><?= escapeHtml($row['reimbursement_reference']) ?></span>
                 </div>
             <?php } ?>
         </div>
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Entered">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Entered')) ?>">
                 <i class="fas fa-fw fa-clock"></i>
                 <span><span title="<?= escapeHtml($row['reimbursement_created_at']) ?>"><?= timeAgo($row['reimbursement_created_at']) ?></span><?php if ($row['created_by_name']) { ?> <span class="text-body-secondary">by <?= escapeHtml($row['created_by_name']) ?></span><?php } ?></span>
             </div>
@@ -62,7 +62,7 @@ ob_start();
     </div>
 
     <div class="mt-3">
-        <div class="small fw-semibold text-uppercase text-body-secondary mb-1">What it paid back</div>
+        <div class="small fw-semibold text-uppercase text-body-secondary mb-1"><?= __('What it paid back') ?></div>
         <?php foreach ($expenses as $expense) { ?>
             <div class="d-flex justify-content-between gap-2 small py-1 border-bottom">
                 <a class="text-truncate ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($expense['expense_id']) ?>">
@@ -72,9 +72,9 @@ ob_start();
             </div>
         <?php } ?>
         <?php if (!$expenses) { ?>
-            <div class="small text-body-secondary">The expenses it paid back have since been deleted.</div>
+            <div class="small text-body-secondary"><?= __('The expenses it paid back have since been deleted.') ?></div>
         <?php } elseif (abs($expenses_total - floatval($row['reimbursement_amount'])) >= 0.005) { ?>
-            <div class="small text-warning-emphasis mt-2"><i class="fas fa-exclamation-triangle me-1"></i>They come to <?= escapeHtml(billingMoney($expenses_total, $currency)) ?> now - one was changed or deleted after it was paid back.</div>
+            <div class="small text-warning-emphasis mt-2"><i class="fas fa-exclamation-triangle me-1"></i><?= escapeHtml(__('They come to %s now - one was changed or deleted after it was paid back.', billingMoney($expenses_total, $currency))) ?></div>
         <?php } ?>
     </div>
 </div>
@@ -84,9 +84,9 @@ ob_start();
         <span class="me-auto"><?= reconcileLockedButtonHtml($cleared, 'Undo', 'fa-undo-alt', 'undo it') ?></span>
     <?php } elseif ($can_undo) { ?>
         <a class="btn btn-outline-danger confirm-link me-auto" href="post.php?expense_reimbursement_delete=<?= $reimbursement_id ?>&amp;csrf_token=<?= $_SESSION['csrf_token'] ?>"
-            data-confirm-text="The <?= escapeHtml(billingMoney($row['reimbursement_amount'], $currency)) ?> comes back off <?= escapeHtml($row['account_name'] ?: 'the account') ?>, and its expenses are to reimburse again."><i class="fas fa-undo-alt me-2"></i>Undo</a>
+            data-confirm-text="The <?= escapeHtml(billingMoney($row['reimbursement_amount'], $currency)) ?> comes back off <?= escapeHtml($row['account_name'] ?: 'the account') ?>, and its expenses are to reimburse again."><i class="fas fa-undo-alt me-2"></i><?= __('Undo') ?></a>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <?php

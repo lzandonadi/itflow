@@ -59,19 +59,19 @@ $form_currency = $form_account ? ($form_accounts[$form_account]['account_currenc
     <?= reconcileFormNoteHtml($form_lock) ?>
 
     <div class="col-md-7">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
             <select class="form-select select2" name="category" required>
-                <option value="">- What it was -</option>
-                <?= categoryOptionsHtml('Income', $form_category, ['exclude' => ['Account Transfer']]) ?>
+                <option value=""><?= __('- What it was -') ?></option>
+                <?= categoryOptionsHtml('Income', $form_category, ['exclude' => [__('Account Transfer')]]) ?>
             </select>
             <?= categoryAddButtonHtml('Income') ?>
         </div>
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Amount <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Amount') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
             <input type="text" class="form-control text-end fw-semibold" inputmode="decimal" pattern="-?[0-9,]*\.?[0-9]{0,2}" name="amount" placeholder="0.00" required
@@ -79,16 +79,16 @@ $form_currency = $form_account ? ($form_accounts[$form_account]['account_currenc
             <span class="input-group-text" data-revenue-currency><?= escapeHtml($form_currency) ?></span>
         </div>
         <?php if ($form_edit && $form_amount < 0) { ?>
-            <div class="form-text">Negative - money that went back out.</div>
+            <div class="form-text"><?= __('Negative - money that went back out.') ?></div>
         <?php } ?>
     </div>
 
     <div class="col-md-7">
-        <label class="form-label">Paid into <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Paid into') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
             <select class="form-select select2" name="account" required data-revenue-account <?= $form_lock ? 'disabled' : '' ?>>
-                <option value="">- Which account -</option>
+                <option value=""><?= __('- Which account -') ?></option>
                 <?php foreach ($form_accounts as $account_id => $account) { ?>
                     <option value="<?= $account_id ?>" <?= $form_account === $account_id ? 'selected' : '' ?> data-icon="fas fa-piggy-bank" data-currency="<?= escapeHtml($account['account_currency_code'] ?: $session_company_currency) ?>"
                         data-description="<?= escapeHtml(billingMoney($account['balance'], $account['account_currency_code'])) ?><?= $account['account_archived_at'] ? ' - archived' : '' ?>"><?= escapeHtml($account['account_name']) ?></option>
@@ -101,7 +101,7 @@ $form_currency = $form_account ? ($form_accounts[$form_account]['account_currenc
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Date <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
             <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_date) ?>" required <?= $form_lock ? 'readonly' : '' ?>>
@@ -109,25 +109,25 @@ $form_currency = $form_account ? ($form_accounts[$form_account]['account_currenc
     </div>
 
     <div class="col-12">
-        <label class="form-label">From client</label>
+        <label class="form-label"><?= __('From client') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
             <select class="form-select select2" name="client_id">
-                <option value="0">- Not from a client -</option>
+                <option value="0"><?= __('- Not from a client -') ?></option>
                 <?php foreach ($form_clients as $client) { ?>
                     <option value="<?= intval($client['client_id']) ?>" <?= $form_client === intval($client['client_id']) ? 'selected' : '' ?><?= selectOptionClient($client['client_id'], $client['client_name'], $client['client_abbreviation'] ?? '') ?>><?= escapeHtml($client['client_name']) ?></option>
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">Money of theirs that isn't for an invoice - it counts for them in Income by Client and Client Profitability.</div>
+        <div class="form-text"><?= __('Money of theirs that isn\'t for an invoice - it counts for them in Income by Client and Client Profitability.') ?></div>
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Paid by</label>
+        <label class="form-label"><?= __('Paid by') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
             <select class="form-select select2" name="payment_method">
-                <option value="">- How it was paid -</option>
+                <option value=""><?= __('- How it was paid -') ?></option>
                 <?php foreach ($form_methods as $method) { ?>
                     <option value="<?= escapeHtml($method) ?>" <?= $form_method === $method ? 'selected' : '' ?>><?= escapeHtml($method) ?></option>
                 <?php } ?>
@@ -136,20 +136,20 @@ $form_currency = $form_account ? ($form_accounts[$form_account]['account_currenc
     </div>
 
     <div class="col-md-7">
-        <label class="form-label">Reference</label>
+        <label class="form-label"><?= __('Reference') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-            <input type="text" class="form-control" name="reference" maxlength="200" placeholder="Check number, deposit or transaction number" value="<?= escapeHtml($form_reference) ?>">
+            <input type="text" class="form-control" name="reference" maxlength="200" placeholder="<?= escapeHtml(__('Check number, deposit or transaction number')) ?>" value="<?= escapeHtml($form_reference) ?>">
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">Description</label>
+        <label class="form-label"><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="3" name="description" placeholder="What it was - Pax8 partner rebate for Q3, referral fee from Ravenwood, interest"><?= escapeHtml($form_description) ?></textarea>
+            <textarea class="form-control" rows="3" name="description" placeholder="<?= escapeHtml(__('What it was - Pax8 partner rebate for Q3, referral fee from Ravenwood, interest')) ?>"><?= escapeHtml($form_description) ?></textarea>
         </div>
-        <div class="form-text">The first line shows in the list.</div>
+        <div class="form-text"><?= __('The first line shows in the list.') ?></div>
     </div>
 
 </div>

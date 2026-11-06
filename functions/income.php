@@ -88,11 +88,11 @@ function incomeUnionSql() {
 /** The ways the list can be cut - ?show= (and the old ?type=Payment / Revenue). */
 function incomeShows() {
     return [
-        '' => ['label' => 'All', 'where' => ''],
-        'payments' => ['label' => 'Invoice payments', 'icon' => 'fa-file-invoice-dollar', 'where' => "income.income_type = 'payment'", 'title' => 'Paid against an invoice'],
-        'other' => ['label' => 'Other income', 'icon' => 'fa-hand-holding-usd', 'where' => "income.income_type = 'revenue'", 'title' => "Money in that isn't for an invoice"],
-        'online' => ['label' => 'Paid online', 'icon' => 'fa-globe', 'where' => 'income.income_online = 1', 'title' => 'Paid by card through the payment provider'],
-        'uncategorised' => ['label' => 'No category', 'icon' => 'fa-question-circle', 'where' => 'income.income_category_id = 0', 'title' => 'Not in a category - the reports show it as No category'],
+        '' => ['label' => __('All'), 'where' => ''],
+        'payments' => ['label' => __('Invoice payments'), 'icon' => 'fa-file-invoice-dollar', 'where' => "income.income_type = 'payment'", 'title' => __('Paid against an invoice')],
+        'other' => ['label' => __('Other income'), 'icon' => 'fa-hand-holding-usd', 'where' => "income.income_type = 'revenue'", 'title' => __('Money in that isn\'t for an invoice')],
+        'online' => ['label' => __('Paid online'), 'icon' => 'fa-globe', 'where' => 'income.income_online = 1', 'title' => __('Paid by card through the payment provider')],
+        'uncategorised' => ['label' => __('No category'), 'icon' => 'fa-question-circle', 'where' => 'income.income_category_id = 0', 'title' => __('Not in a category - the reports show it as No category')],
     ];
 }
 
@@ -123,25 +123,25 @@ function incomeFiltersSql(array $src, &$summary = [], $with_show = true) {
         $sql .= " AND (income.income_description LIKE '%$like%' OR income.income_reference LIKE '%$like%' OR income.client_name LIKE '%$like%'
             OR income.category_name LIKE '%$like%' OR income.account_name LIKE '%$like%' OR income.income_method LIKE '%$like%'
             OR CONCAT(COALESCE(income.invoice_prefix, ''), COALESCE(income.invoice_number, '')) LIKE '%$like%'" . ($amount !== null ? " OR income.income_amount = $amount" : '') . ")";
-        $summary['Search'] = $q;
+        $summary[__('Search')] = $q;
     }
     foreach (['client' => ['income.income_client_id', 'clients', 'client_name', 'Client'], 'category' => ['income.income_category_id', 'categories', 'category_name', 'Category'],
         'account' => ['income.income_account_id', 'accounts', 'account_name', 'Account']] as $key => $f) {
         $id = intval($src[$key] ?? 0);
         if ($id) {
             $sql .= " AND {$f[0]} = $id";
-            $summary[$f[3]] = (string) getFieldById($f[1], $id, $f[2]);
+            $summary[__($f[3])] = (string) getFieldById($f[1], $id, $f[2]); // i18n-dynamic - Vendor, Category, Account, Client
         }
     }
     $method = trim((string) ($src['method'] ?? ''));
     if ($method !== '') {
         $sql .= " AND income.income_method = '" . escapeSql($method) . "'";
-        $summary['Paid by'] = $method;
+        $summary[__('Paid by')] = $method;
     }
     $show = incomeShowFrom($src);
     if ($with_show && $show !== '') {
         $sql .= ' AND ' . incomeShows()[$show]['where'];
-        $summary['Showing'] = incomeShows()[$show]['label'];
+        $summary[__('Showing')] = incomeShows()[$show]['label'];
     }
     $dtf = (string) ($src['dtf'] ?? '');
     $dtt = (string) ($src['dtt'] ?? '');
@@ -151,7 +151,7 @@ function incomeFiltersSql(array $src, &$summary = [], $with_show = true) {
         $sql .= " AND income.income_date BETWEEN '$dtf' AND '$dtt'";
         $range = formatExportDateRange($dtf, $dtt);
         if ($range) {
-            $summary['Dated'] = $range;
+            $summary[__('Dated')] = $range;
         }
     }
     return $sql;
@@ -209,7 +209,7 @@ function incomeStats($client_id = 0) {
 
 /** The income categories - id => row, archived ones left out but $keep_id, and the old Account Transfer one unless kept (categoryPicker()). */
 function incomeCategories($keep_id = 0) {
-    return categoryPicker('Income', [$keep_id], ['exclude' => ['Account Transfer']]);
+    return categoryPicker('Income', [$keep_id], ['exclude' => [__('Account Transfer')]]);
 }
 
 /* ---------------------------------------------------------- Other income */
@@ -237,9 +237,9 @@ function incomeRevenueRow($revenue_id, $scoped = true) {
 function incomeRevenueLabel(array $row) {
     $what = trim(strtok((string) ($row['revenue_description'] ?? ''), "\n"));
     if ($what === '') {
-        $what = trim((string) ($row['category_name'] ?? '')) ?: 'Other income';
+        $what = trim((string) ($row['category_name'] ?? '')) ?: __('Other income');
     }
-    return $what . ' - ' . billingMoney($row['revenue_amount'], $row['revenue_currency_code']) . ' on ' . $row['revenue_date'];
+    return __('%1$s - %2$s on %3$s', $what, billingMoney($row['revenue_amount'], $row['revenue_currency_code']), $row['revenue_date']);
 }
 
 /**
@@ -254,40 +254,40 @@ function incomeRevenueSave(array $in, $revenue_id = 0, &$error = '') {
     $revenue_id = intval($revenue_id);
     $existing = $revenue_id ? incomeRevenueRow($revenue_id) : null;
     if ($revenue_id && !$existing) {
-        $error = 'That income no longer exists, or is not one you can see';
+        $error = __('That income no longer exists, or is not one you can see');
         return 0;
     }
 
     $date = trim((string) ($in['date'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date it came in';
+        $error = __('Enter the date it came in');
         return 0;
     }
     $amount = billingNumberInput($in['amount'] ?? '');
     if ($amount === null || $amount == 0 || abs($amount) >= 1e12) {
-        $error = 'Enter the amount';
+        $error = __('Enter the amount');
         return 0;
     }
     $accounts = paymentAccounts($existing ? $existing['revenue_account_id'] : 0);
     $account_id = intval($in['account'] ?? 0);
     if (!isset($accounts[$account_id])) {
-        $error = 'Pick the account it went into';
+        $error = __('Pick the account it went into');
         return 0;
     }
     $categories = incomeCategories($existing ? $existing['revenue_category_id'] : 0);
     $category_id = intval($in['category'] ?? 0);
     if (!isset($categories[$category_id])) {
-        $error = 'Pick a category';
+        $error = __('Pick a category');
         return 0;
     }
     $client_id = intval($in['client_id'] ?? 0);
     if ($client_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $client_id " . clientScopeSql('client_id')))) {
-        $error = "That client isn't one you can open";
+        $error = __('That client isn\'t one you can open');
         return 0;
     }
     $method = trim((string) ($in['payment_method'] ?? ''));
     if ($method !== '' && !in_array($method, paymentMethods('in'), true) && !($existing && $method === (string) $existing['revenue_payment_method'])) {
-        $error = 'Pick how it was paid';
+        $error = __('Pick how it was paid');
         return 0;
     }
     $reference = mb_substr(trim((string) ($in['reference'] ?? '')), 0, 200);
@@ -316,7 +316,7 @@ function incomeRevenueDelete($revenue_id, &$error = '') {
     $error = '';
     $row = incomeRevenueRow($revenue_id);
     if (!$row) {
-        $error = 'That income no longer exists, or is not one you can see';
+        $error = __('That income no longer exists, or is not one you can see');
         return null;
     }
     if (!reconcileCheckDelete('revenue', $row['revenue_id'], $error)) {
@@ -371,8 +371,7 @@ function incomePaymentRow($payment_id) {
 
 /** A payment in a phrase - "INV-12 - $500.00 on 2026-10-05". Raw. */
 function incomePaymentLabel(array $row) {
-    return ($row['invoice_number'] !== null ? $row['invoice_prefix'] . $row['invoice_number'] : 'A payment') . ' - ' . billingMoney($row['payment_amount'], $row['payment_currency_code'])
-        . ' on ' . $row['payment_date'];
+    return __('%1$s - %2$s on %3$s', $row['invoice_number'] !== null ? $row['invoice_prefix'] . $row['invoice_number'] : __('A payment'), billingMoney($row['payment_amount'], $row['payment_currency_code']), $row['payment_date']);
 }
 
 /* ---------------------------------------------------------------- Bulk */

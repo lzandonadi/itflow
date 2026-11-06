@@ -31,7 +31,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Income</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Income') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -46,32 +46,32 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label class="form-label">Search</label>
+            <label class="form-label"><?= __('Search') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="What for, invoice number, reference, amount, client, category, account">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('What for, invoice number, reference, amount, client, category, account')) ?>">
             </div>
         </div>
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">Showing</label>
+                <label class="form-label"><?= __('Showing') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-filter"></i></span>
                     <select class="form-select select2" name="show">
                         <?php foreach ($shows as $key => $s) { ?>
-                            <option <?= $show_filter === $key ? 'selected' : '' ?> value="<?= escapeHtml($key) ?>"><?= escapeHtml($key === '' ? 'All income' : $s['label']) ?></option>
+                            <option <?= $show_filter === $key ? 'selected' : '' ?> value="<?= escapeHtml($key) ?>"><?= escapeHtml($key === '' ? __('All income') : $s['label']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <?php if (!$client_id) { ?>
                 <div class="col-md-6">
-                    <label class="form-label">Client</label>
+                    <label class="form-label"><?= __('Client') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                         <select class="form-select select2" name="client">
-                            <option value="">- Any client -</option>
+                            <option value=""><?= __('- Any client -') ?></option>
                             <?php
                             $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                                 WHERE (EXISTS (SELECT 1 FROM invoices JOIN payments ON payment_invoice_id = invoice_id WHERE invoice_client_id = client_id)
@@ -85,21 +85,21 @@ ob_start();
                 </div>
             <?php } ?>
             <div class="col-md-6">
-                <label class="form-label">Category</label>
+                <label class="form-label"><?= __('Category') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
                     <select class="form-select select2" name="category">
-                        <option value="">- Any category -</option>
-                        <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT revenue_category_id FROM revenues UNION SELECT invoice_category_id FROM payments JOIN invoices ON invoice_id = payment_invoice_id", ['exclude' => ['Account Transfer']]) ?>
+                        <option value=""><?= __('- Any category -') ?></option>
+                        <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT revenue_category_id FROM revenues UNION SELECT invoice_category_id FROM payments JOIN invoices ON invoice_id = payment_invoice_id", ['exclude' => ['Account Transfer']]) // i18n-ignore - a stored category name ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Paid into</label>
+                <label class="form-label"><?= __('Paid into') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
                     <select class="form-select select2" name="account">
-                        <option value="">- Any account -</option>
+                        <option value=""><?= __('- Any account -') ?></option>
                         <?php foreach (paymentAccounts($account_filter) as $option_id => $account) { ?>
                             <option <?= $account_filter === $option_id ? 'selected' : '' ?> value="<?= $option_id ?>"><?= escapeHtml($account['account_name']) ?></option>
                         <?php } ?>
@@ -107,11 +107,11 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Paid by</label>
+                <label class="form-label"><?= __('Paid by') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
                     <select class="form-select select2" name="method">
-                        <option value="">- Any payment method -</option>
+                        <option value=""><?= __('- Any payment method -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT DISTINCT payment_method AS method FROM payments WHERE COALESCE(payment_method, '') <> ''
                             UNION SELECT DISTINCT revenue_payment_method FROM revenues WHERE COALESCE(revenue_payment_method, '') <> '' ORDER BY method ASC");
@@ -122,14 +122,14 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated from</label>
+                <label class="form-label"><?= __('Dated from') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated to</label>
+                <label class="form-label"><?= __('Dated to') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

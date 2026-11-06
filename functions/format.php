@@ -289,6 +289,7 @@ function formatDate($value, string $style = 'date'): string {
         'date_weekday' => 'yMMMEd',
         'time' => 'jmm',
         'month' => 'MMM',
+        'month_long' => 'MMMM',
         'month_year' => 'yMMMM',
         'month_year_short' => 'yyMMM',
         'date_long' => 'yMMMMd',

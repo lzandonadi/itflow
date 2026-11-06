@@ -18,7 +18,7 @@ $row = expenseRow(intval($_GET['expense_id'] ?? 0));
 $path = $row ? expenseReceiptPath($row['expense_receipt']) : '';
 if (!$row || $path === '') {
     http_response_code(404);
-    exit("Receipt not found");
+    exit(__('Receipt not found'));
 }
 
 $finfo = finfo_open(FILEINFO_MIME_TYPE);

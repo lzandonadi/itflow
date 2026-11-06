@@ -415,7 +415,8 @@ if (isExportRequest('export_recurring_invoices')) {
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['recurring_invoice_number_display'] = $row['recurring_invoice_prefix'] . $row['recurring_invoice_number'];
-            $row['recurring_invoice_frequency_display'] = recurringInvoiceFrequencies()[$row['recurring_invoice_frequency']] ?? ucfirst((string) $row['recurring_invoice_frequency']);
+            $frequencies = $format === 'csv' ? i18nEnglish('recurringInvoiceFrequencies') : recurringInvoiceFrequencies(); // CSV values stay English
+            $row['recurring_invoice_frequency_display'] = $frequencies[$row['recurring_invoice_frequency']] ?? ucfirst((string) $row['recurring_invoice_frequency']);
             if (isset($export['columns']['recurring_invoice_tax'])) {
                 $row['recurring_invoice_tax'] = round(array_sum(array_column(billingItems('recurring', $row['recurring_invoice_id']), 'item_tax')), 2);
             }

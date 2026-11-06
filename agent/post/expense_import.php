@@ -22,7 +22,7 @@ if (isset($_POST['expense_import_upload'])) {
     $account_id = intval($_POST['account'] ?? 0);
     $accounts = paymentAccounts();
     if (!isset($accounts[$account_id])) {
-        flashAlert('Pick the account the statement is for', 'error');
+        flashAlert(__('Pick the account the statement is for'), 'error');
         redirect('expense_import.php');
     }
     $method = trim((string) ($_POST['payment_method'] ?? ''));
@@ -31,11 +31,12 @@ if (isset($_POST['expense_import_upload'])) {
     }
     $file = $_FILES['file'] ?? null;
     if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert(($file['error'] ?? 0) === UPLOAD_ERR_INI_SIZE ? 'That file is too big - export a month or two at a time' : 'Choose the statement file', 'error');
+        flashAlert(($file['error'] ?? 0) === UPLOAD_ERR_INI_SIZE ? __('That file is too big - export a month or two at a time') : __('Choose the statement file'), 'error');
         redirect('expense_import.php');
     }
     if (!in_array(strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION)), ['csv', 'txt', 'tsv'], true)) {
-        flashAlert('Export the statement as a CSV file - that is a ' . escapeHtml(strtoupper(pathinfo((string) $file['name'], PATHINFO_EXTENSION)) ?: 'different') . ' file', 'error');
+        $ext = strtoupper(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
+        flashAlert($ext !== '' ? __('Export the statement as a CSV file - that is a %s file', escapeHtml($ext)) : __('Export the statement as a CSV file - that is a different file'), 'error');
         redirect('expense_import.php');
     }
     $read = expenseImportRead($file['tmp_name'], $error);
@@ -69,18 +70,18 @@ if (isset($_POST['expense_import_columns'])) {
 
     $import = $_SESSION['expense_import'] ?? null;
     if (!$import) {
-        flashAlert('Upload the statement again - the one you started is gone', 'error');
+        flashAlert(__('Upload the statement again - the one you started is gone'), 'error');
         redirect('expense_import.php');
     }
     $map = expenseImportMapClean($_POST, count($import['header']));
     if (!$map) {
-        flashAlert('Pick the columns with the date, the description and the amount', 'error');
+        flashAlert(__('Pick the columns with the date, the description and the amount'), 'error');
         redirect('expense_import.php?step=columns');
     }
     $lines = expenseImportLines($import['rows'], $map);
     if (!array_filter($lines, function ($line) { return $line['problem'] === ''; })) {
         $_SESSION['expense_import']['guess'] = $map;
-        flashAlert("None of the lines read with those columns - check the date format and the amount", 'error');
+        flashAlert(__('None of the lines read with those columns - check the date format and the amount'), 'error');
         redirect('expense_import.php?step=columns');
     }
 
@@ -101,7 +102,7 @@ if (isset($_POST['expense_import_save'])) {
 
     $import = $_SESSION['expense_import'] ?? null;
     if (!$import || !$import['map']) {
-        flashAlert('Upload the statement again - the one you started is gone', 'error');
+        flashAlert(__('Upload the statement again - the one you started is gone'), 'error');
         redirect('expense_import.php');
     }
     $picks = [];
@@ -131,15 +132,15 @@ if (isset($_POST['expense_import_save'])) {
 
     $notes = [];
     if ($result['vendors']) {
-        $notes[] = $result['vendors'] . ' new vendor' . ($result['vendors'] === 1 ? '' : 's');
+        $notes[] = _n('%d new vendor', '%d new vendors', $result['vendors']);
     }
     if ($result['linked']) {
-        $notes[] = $result['linked'] . ' matched to ' . ($result['linked'] === 1 ? 'an expense' : 'expenses') . ' entered already';
+        $notes[] = _n('%d matched to an expense entered already', '%d matched to expenses entered already', $result['linked']);
     }
     if ($result['skipped']) {
-        $notes[] = $result['skipped'] . ' imported before';
+        $notes[] = __('%d imported before', $result['skipped']);
     }
-    flashAlert('<strong>' . $result['imported'] . ' expense' . ($result['imported'] === 1 ? '' : 's') . '</strong> imported - ' . escapeHtml(billingMoney($result['total'], $currency ?: $session_company_currency))
+    flashAlert(_n('%2$s imported - %3$s', '%2$s imported - %3$s', $result['imported'], $result['imported'], '<strong>' . escapeHtml(_n('%d expense', '%d expenses', $result['imported'])) . '</strong>', escapeHtml(billingMoney($result['total'], $currency ?: $session_company_currency)))
         . ($notes ? ' &middot; ' . escapeHtml(implode(', ', $notes)) : ''));
 
     if (!$result['imported']) {
@@ -174,7 +175,7 @@ if (isset($_GET['expense_import_rule_delete'])) {
         logAudit("Expense", "Import Rule Delete", "$session_name removed the statement match for " . escapeSql($match));
     }
 
-    flashAlert($match !== null ? 'Forgotten - <strong>' . escapeHtml($match) . '</strong> will be matched afresh next time' : 'That match was already gone', $match !== null ? 'success' : 'error');
+    flashAlert($match !== null ? __('Forgotten - %s will be matched afresh next time', '<strong>' . escapeHtml($match) . '</strong>') : __('That match was already gone'), $match !== null ? 'success' : 'error');
 
     redirect();
 

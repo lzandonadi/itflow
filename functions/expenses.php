@@ -77,13 +77,13 @@ function expenseJoinsSql() {
 /** The ways the list can be cut, for its pills - ?show= on the list. */
 function expenseShows() {
     return [
-        '' => ['label' => 'All', 'where' => ''],
-        'client' => ['label' => 'For a client', 'icon' => 'fa-user', 'where' => 'expense_client_id > 0', 'title' => 'Filed against a client - their direct costs'],
-        'no_receipt' => ['label' => 'No receipt', 'icon' => 'fa-paperclip', 'where' => "COALESCE(expense_receipt, '') = '' AND expense_amount > 0", 'title' => 'No receipt attached yet'],
-        'to_bill' => ['label' => 'To bill', 'icon' => 'fa-file-invoice-dollar', 'where' => expenseUnbilledSql(), 'title' => 'Billable to a client, and on no invoice yet'],
-        'billed' => ['label' => 'Billed', 'icon' => 'fa-check-circle', 'where' => 'expense_invoice_id IS NOT NULL', 'title' => 'Billed on to a client on an invoice'],
-        'to_reimburse' => ['label' => 'To reimburse', 'icon' => 'fa-hand-holding-usd', 'where' => expenseToReimburseSql(), 'title' => 'Paid personally by an agent, not paid back yet'],
-        'refunds' => ['label' => 'Refunds', 'icon' => 'fa-undo-alt', 'where' => 'expense_amount < 0', 'title' => 'Money that came back - refunds and credits'],
+        '' => ['label' => __('All'), 'where' => ''],
+        'client' => ['label' => __('For a client'), 'icon' => 'fa-user', 'where' => 'expense_client_id > 0', 'title' => __('Filed against a client - their direct costs')],
+        'no_receipt' => ['label' => __('No receipt'), 'icon' => 'fa-paperclip', 'where' => 'COALESCE(expense_receipt, \'\') = \'\' AND expense_amount > 0', 'title' => __('No receipt attached yet')],
+        'to_bill' => ['label' => __('To bill'), 'icon' => 'fa-file-invoice-dollar', 'where' => expenseUnbilledSql(), 'title' => __('Billable to a client, and on no invoice yet')],
+        'billed' => ['label' => __('Billed'), 'icon' => 'fa-check-circle', 'where' => 'expense_invoice_id IS NOT NULL', 'title' => __('Billed on to a client on an invoice')],
+        'to_reimburse' => ['label' => __('To reimburse'), 'icon' => 'fa-hand-holding-usd', 'where' => expenseToReimburseSql(), 'title' => __('Paid personally by an agent, not paid back yet')],
+        'refunds' => ['label' => __('Refunds'), 'icon' => 'fa-undo-alt', 'where' => 'expense_amount < 0', 'title' => __('Money that came back - refunds and credits')],
     ];
 }
 
@@ -104,37 +104,37 @@ function expenseFiltersSql(array $src, &$summary = []) {
         $like = escapeSql($q);
         $sql .= " AND (vendor_name LIKE '%$like%' OR client_name LIKE '%$like%' OR category_name LIKE '%$like%' OR account_name LIKE '%$like%'
             OR expense_description LIKE '%$like%' OR expense_reference LIKE '%$like%' OR expense_payment_method LIKE '%$like%' OR expense_amount LIKE '%$like%')";
-        $summary['Search'] = $q;
+        $summary[__('Search')] = $q;
     }
     foreach (['vendor' => ['expense_vendor_id', 'vendors', 'vendor_name', 'Vendor'], 'category' => ['expense_category_id', 'categories', 'category_name', 'Category'],
         'account' => ['expense_account_id', 'accounts', 'account_name', 'Account'], 'client' => ['expense_client_id', 'clients', 'client_name', 'Client']] as $key => $f) {
         $id = intval($src[$key] ?? 0);
         if ($id) {
             $sql .= " AND {$f[0]} = $id";
-            $summary[$f[3]] = (string) getFieldById($f[1], $id, $f[2]);
+            $summary[__($f[3])] = (string) getFieldById($f[1], $id, $f[2]); // i18n-dynamic - Vendor, Category, Account, Client
         }
     }
     $method = trim((string) ($src['method'] ?? ''));
     if ($method !== '') {
         $sql .= " AND expense_payment_method = '" . escapeSql($method) . "'";
-        $summary['Paid by'] = $method;
+        $summary[__('Paid by')] = $method;
     }
     $paid_by = intval($src['paid_by'] ?? 0);
     if ($paid_by) {
         $sql .= " AND expense_paid_by = $paid_by";
-        $summary['Paid personally by'] = (string) getFieldById('users', $paid_by, 'user_name');
+        $summary[__('Paid personally by')] = (string) getFieldById('users', $paid_by, 'user_name');
     }
     $recurring_id = intval($src['recurring_expense_id'] ?? 0);
     if ($recurring_id) {
         $sql .= " AND expense_recurring_expense_id = $recurring_id";
         $recurring = recurringExpenseRow($recurring_id, false);
-        $summary['Recorded by'] = $recurring ? recurringExpenseLabel($recurring) : 'a recurring expense';
+        $summary[__('Recorded by')] = $recurring ? recurringExpenseLabel($recurring) : __('a recurring expense');
     }
     $shows = expenseShows();
     $show = (string) ($src['show'] ?? '');
     if (isset($shows[$show]) && $shows[$show]['where']) {
         $sql .= " AND {$shows[$show]['where']}";
-        $summary['Showing'] = $shows[$show]['label'];
+        $summary[__('Showing')] = $shows[$show]['label'];
     }
     $dtf = (string) ($src['dtf'] ?? '');
     $dtt = (string) ($src['dtt'] ?? '');
@@ -144,7 +144,7 @@ function expenseFiltersSql(array $src, &$summary = []) {
         $sql .= " AND expense_date BETWEEN '$dtf' AND '$dtt'";
         $range = formatExportDateRange($dtf, $dtt);
         if ($range) {
-            $summary['Dated'] = $range;
+            $summary[__('Dated')] = $range;
         }
     }
     return $sql;
@@ -271,20 +271,20 @@ function expenseTaxFromInput(array $in, $amount, array $keep = [0, 0.0], &$error
     }
     $tax_id = intval($in['tax_id'] ?? 0);
     if ($tax_id && !taxRow($tax_id)) {
-        $error = 'Pick one of your taxes';
+        $error = __('Pick one of your taxes');
         return null;
     }
     $text = str_replace([',', ' ', '$'], '', trim((string) ($in['tax_amount'] ?? '')));
     if ($text === '') {
         $tax_amount = $tax_id ? taxIncluded(abs($amount), $tax_id) : 0.0;
     } elseif (!is_numeric($text)) {
-        $error = 'The tax is an amount, such as 12.50';
+        $error = __('The tax is an amount, such as 12.50');
         return null;
     } else {
         $tax_amount = round(abs(floatval($text)), 2);
     }
     if ($tax_amount >= abs($amount)) {
-        $error = 'The tax is part of what it cost, so less than the amount';
+        $error = __('The tax is part of what it cost, so less than the amount');
         return null;
     }
     return [$tax_id, $amount < 0 ? -$tax_amount : $tax_amount];
@@ -296,31 +296,31 @@ function expenseSave(array $in, $expense_id = 0, &$error = '') {
     $expense_id = intval($expense_id);
     $existing = $expense_id ? expenseRow($expense_id) : null;
     if ($expense_id && !$existing) {
-        $error = 'That expense no longer exists';
+        $error = __('That expense no longer exists');
         return 0;
     }
     if ($existing && $existing['transfer_id']) {
-        $error = 'That is the out side of a transfer between accounts - change it from Transfers';
+        $error = __('That is the out side of a transfer between accounts - change it from Transfers');
         return 0;
     }
     if ($existing && $existing['reimbursement_out_id']) {
-        $error = 'That is money paid back to ' . $existing['reimbursed_to_name'] . ' - undo the reimbursement to change it';
+        $error = __('That is money paid back to %s - undo the reimbursement to change it', $existing['reimbursed_to_name']);
         return 0;
     }
 
     $date = trim((string) ($in['date'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date it was paid';
+        $error = __('Enter the date it was paid');
         return 0;
     }
     $amount_text = str_replace([',', ' ', '$'], '', trim((string) ($in['amount'] ?? '')));
     if (!is_numeric($amount_text) || round(floatval($amount_text), 2) == 0) {
-        $error = 'Enter the amount';
+        $error = __('Enter the amount');
         return 0;
     }
     $amount = round(floatval($amount_text), 2);
     if (abs($amount) > 9999999999999.99) {
-        $error = 'That amount is too large';
+        $error = __('That amount is too large');
         return 0;
     }
 
@@ -328,7 +328,7 @@ function expenseSave(array $in, $expense_id = 0, &$error = '') {
     if (!$existing && $refund_of) {
         $original = expenseRow($refund_of);
         if (!$original || floatval($original['expense_amount']) <= 0 || $original['transfer_id']) {
-            $error = 'The expense being refunded no longer exists';
+            $error = __('The expense being refunded no longer exists');
             return 0;
         }
         $amount = -abs($amount);
@@ -337,13 +337,13 @@ function expenseSave(array $in, $expense_id = 0, &$error = '') {
     $vendor = intval($in['vendor'] ?? 0);
     $vendors = expenseVendors($existing ? $existing['expense_vendor_id'] : 0);
     if (!isset($vendors[$vendor])) {
-        $error = 'Pick one of your vendors';
+        $error = __('Pick one of your vendors');
         return 0;
     }
     $category = intval($in['category'] ?? 0);
     $categories = expenseCategories($existing ? $existing['expense_category_id'] : 0);
     if (!isset($categories[$category])) {
-        $error = 'Pick an expense category';
+        $error = __('Pick an expense category');
         return 0;
     }
     // From one of our accounts, or paid personally by an agent - on no account
@@ -353,30 +353,30 @@ function expenseSave(array $in, $expense_id = 0, &$error = '') {
     $accounts = paymentAccounts($existing ? $existing['expense_account_id'] : 0);
     $paid_by = $personal ? intval($in['paid_by'] ?? 0) : 0;
     if ($existing && $existing['expense_reimbursement_id'] && $paid_by !== intval($existing['expense_paid_by'])) {
-        $error = 'It was paid back to ' . $existing['paid_by_name'] . ' - undo that reimbursement before changing who paid it';
+        $error = __('It was paid back to %s - undo that reimbursement before changing who paid it', $existing['paid_by_name']);
         return 0;
     }
     if ($personal) {
         if ($amount < 0) {
-            $error = 'Money back goes to one of your accounts - pick which';
+            $error = __('Money back goes to one of your accounts - pick which');
             return 0;
         }
         if (!isset(expensePayers($existing ? $existing['expense_paid_by'] : 0)[$paid_by])) {
-            $error = 'Pick who paid it';
+            $error = __('Pick who paid it');
             return 0;
         }
     } elseif (!isset($accounts[$account])) {
-        $error = 'Pick the account it was paid from';
+        $error = __('Pick the account it was paid from');
         return 0;
     }
     $client_id = intval($in['client_id'] ?? 0);
     if ($client_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $client_id " . clientScopeSql('client_id')))) {
-        $error = "That client isn't one you can file expenses against";
+        $error = __('That client isn\'t one you can file expenses against');
         return 0;
     }
     $method = trim((string) ($in['payment_method'] ?? ''));
     if ($method !== '' && !in_array($method, paymentMethods('out'), true) && !($existing && $method === (string) $existing['expense_payment_method'])) {
-        $error = 'Pick how it was paid';
+        $error = __('Pick how it was paid');
         return 0;
     }
     $reference = mb_substr(trim((string) ($in['reference'] ?? '')), 0, 200);
@@ -394,14 +394,14 @@ function expenseSave(array $in, $expense_id = 0, &$error = '') {
     // already on an invoice stays billed, to that client, until it comes off it.
     $billed = $existing && !empty($existing['expense_invoice_id']);
     if ($billed && $client_id !== intval($existing['expense_client_id'])) {
-        $error = 'It is billed on an invoice for ' . $existing['client_name'] . ' - take it off that invoice before moving it to another client';
+        $error = __('It is billed on an invoice for %s - take it off that invoice before moving it to another client', $existing['client_name']);
         return 0;
     }
     $billable = $billed ? 1 : intval(!empty($in['billable']) && $client_id > 0 && $amount > 0);
     $markup_text = str_replace(['%', ' '], '', trim((string) ($in['markup'] ?? '')));
     $markup = $markup_text === '' ? ($existing ? floatval($existing['expense_markup']) : expenseMarkupDefault()) : floatval($markup_text);
     if ($billable && ($markup_text !== '' && !is_numeric($markup_text) || $markup < 0 || $markup > 1000)) {
-        $error = 'The markup is a percent, from 0 to 1000';
+        $error = __('The markup is a percent, from 0 to 1000');
         return 0;
     }
     $markup = round(max(0, min(1000, $markup)), 2);
@@ -435,15 +435,15 @@ function expenseDelete($expense_id, &$error = '') {
     $error = '';
     $row = expenseRow($expense_id);
     if (!$row) {
-        $error = 'That expense no longer exists';
+        $error = __('That expense no longer exists');
         return null;
     }
     if ($row['transfer_id']) {
-        $error = 'That is the out side of a transfer between accounts - delete the transfer instead';
+        $error = __('That is the out side of a transfer between accounts - delete the transfer instead');
         return null;
     }
     if ($row['reimbursement_out_id']) {
-        $error = 'That is money paid back to ' . $row['reimbursed_to_name'] . ' - undo the reimbursement instead';
+        $error = __('That is money paid back to %s - undo the reimbursement instead', $row['reimbursed_to_name']);
         return null;
     }
     $expense_id = intval($row['expense_id']);
@@ -512,7 +512,7 @@ function expenseReceiptStore($expense_id, $file, &$error = '') {
     }
     $new_name = checkFileUpload($file, expenseReceiptTypes());
     if (!$new_name) {
-        $error = 'The receipt was not saved - it has to be a photo (JPG, PNG, GIF or WebP) or a PDF';
+        $error = __('The receipt was not saved - it has to be a photo (JPG, PNG, GIF or WebP) or a PDF');
         return '';
     }
     $dir = dirname(__DIR__) . '/uploads/expenses';
@@ -520,7 +520,7 @@ function expenseReceiptStore($expense_id, $file, &$error = '') {
         mkdir($dir, 0775, true);
     }
     if (!move_uploaded_file($file['tmp_name'], "$dir/$new_name")) {
-        $error = 'The receipt could not be saved';
+        $error = __('The receipt could not be saved');
         return '';
     }
     $old = getFieldById('expenses', $expense_id, 'expense_receipt');
@@ -547,7 +547,7 @@ function expenseReceiptRemove($expense_id) {
  * Raw.
  */
 function expenseLabel(array $row) {
-    return trim(($row['vendor_name'] ?? 'Expense') . ' ' . billingMoney($row['expense_amount'], $row['expense_currency_code']) . ' on ' . $row['expense_date']);
+    return trim(__('%1$s %2$s on %3$s', $row['vendor_name'] ?? __('Expense'), billingMoney($row['expense_amount'], $row['expense_currency_code']), $row['expense_date']));
 }
 
 /* ------------------------------------------------------- Recurring expenses */
@@ -668,6 +668,9 @@ function recurringExpenseCatchUp(array $row) {
 /** 1st, 2nd, 3rd, 4th ... 31st. */
 function recurringExpenseOrdinal($n) {
     $n = intval($n);
+    if (strncmp(i18nLocale(), 'en', 2) !== 0) {
+        return (string) $n;
+    }
     $suffix = ($n % 100 >= 11 && $n % 100 <= 13) ? 'th' : (['th', 'st', 'nd', 'rd'][$n % 10] ?? 'th');
     return $n . $suffix;
 }
@@ -678,12 +681,12 @@ function recurringExpenseScheduleText(array $row) {
     $next = (string) $row['recurring_expense_next_date'];
     $day = intval($row['recurring_expense_anchor_day'] ?? 0) ?: intval(date('j', strtotime($next)));
     if ($frequency === 'year') {
-        $text = 'Every year on ' . date('M', strtotime($next)) . ' ' . $day;
+        $text = __('Every year on %s', formatDate($next, 'date_short'));
     } else {
-        $text = 'Every ' . ($frequency === 'quarter' ? 'quarter' : 'month') . ' on the ' . recurringExpenseOrdinal($day);
+        $text = $frequency === 'quarter' ? __('Every quarter on the %s', recurringExpenseOrdinal($day)) : __('Every month on the %s', recurringExpenseOrdinal($day));
     }
     if (!empty($row['recurring_expense_end_date'])) {
-        $text .= ', until ' . date('M j, Y', strtotime($row['recurring_expense_end_date']));
+        $text = __('%1$s, until %2$s', $text, formatDate($row['recurring_expense_end_date'], 'date'));
     }
     return $text;
 }
@@ -692,34 +695,34 @@ function recurringExpenseScheduleText(array $row) {
 function recurringExpenseNextPill(array $row) {
     $state = recurringExpenseState($row);
     if ($state === 'ended') {
-        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-flag-checkered me-1"></i>Ended</span>';
+        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-flag-checkered me-1"></i>' . escapeHtml(_x('Ended', 'recurring expense')) . '</span>';
     }
     if ($state === 'paused') {
-        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-pause me-1"></i>Paused</span>';
+        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-pause me-1"></i>' . escapeHtml(_x('Paused', 'recurring expense')) . '</span>';
     }
     $days = intval(round((strtotime((string) $row['recurring_expense_next_date']) - strtotime(date('Y-m-d'))) / 86400));
     if ($days < 0) {
-        $title = -$days <= RECURRING_EXPENSE_GRACE_DAYS ? 'Missed - the next nightly run records it' : 'Too far behind to be recorded by itself - record the missed runs, or move it on';
-        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . $title . '"><i class="fas fa-exclamation-triangle me-1"></i>' . (-$days) . ' ' . (-$days === 1 ? 'day' : 'days') . ' late</span>';
+        $title = -$days <= RECURRING_EXPENSE_GRACE_DAYS ? __('Missed - the next nightly run records it') : __('Too far behind to be recorded by itself - record the missed runs, or move it on');
+        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . escapeHtml($title) . '"><i class="fas fa-exclamation-triangle me-1"></i>' . escapeHtml(_n('%d day late', '%d days late', -$days)) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-info fw-normal">Today</span>';
+        return '<span class="badge rounded-pill text-bg-info fw-normal">' . escapeHtml(__('Today')) . '</span>';
     }
-    return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal">In ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal">' . escapeHtml(_n('In %d day', 'In %d days', $days)) . '</span>';
 }
 
 /** The pills on the recurring expenses list - ?status=. */
 function recurringExpenseShows() {
     $ended = "(recurring_expense_end_date IS NOT NULL AND recurring_expense_next_date > recurring_expense_end_date)";
     return [
-        'active' => ['label' => 'Active', 'icon' => 'fa-play', 'where' => 'recurring_expense_status = 1'],
-        'soon' => ['label' => 'Next 7 days', 'icon' => 'fa-calendar-day', 'where' => 'recurring_expense_status = 1 AND recurring_expense_next_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 7 DAY',
-            'title' => 'Running, and recorded in the next week'],
-        'late' => ['label' => 'Late', 'icon' => 'fa-exclamation-triangle', 'where' => 'recurring_expense_status = 1 AND recurring_expense_next_date < CURDATE()',
-            'title' => 'Running, but the next date has passed'],
-        'paused' => ['label' => 'Paused', 'icon' => 'fa-pause', 'where' => "recurring_expense_status = 0 AND NOT $ended"],
-        'ended' => ['label' => 'Ended', 'icon' => 'fa-flag-checkered', 'where' => "recurring_expense_status = 0 AND $ended", 'title' => 'Past their end date - leases and financing that are paid off'],
-        'all' => ['label' => 'All', 'where' => ''],
+        'active' => ['label' => _x('Active', 'recurring expense'), 'icon' => 'fa-play', 'where' => 'recurring_expense_status = 1'],
+        'soon' => ['label' => __('Next 7 days'), 'icon' => 'fa-calendar-day', 'where' => 'recurring_expense_status = 1 AND recurring_expense_next_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 7 DAY',
+            'title' => __('Running, and recorded in the next week')],
+        'late' => ['label' => _x('Late', 'recurring expense'), 'icon' => 'fa-exclamation-triangle', 'where' => 'recurring_expense_status = 1 AND recurring_expense_next_date < CURDATE()',
+            'title' => __('Running, but the next date has passed')],
+        'paused' => ['label' => _x('Paused', 'recurring expense'), 'icon' => 'fa-pause', 'where' => "recurring_expense_status = 0 AND NOT $ended"],
+        'ended' => ['label' => __('Ended'), 'icon' => 'fa-flag-checkered', 'where' => "recurring_expense_status = 0 AND $ended", 'title' => __('Past their end date - leases and financing that are paid off')],
+        'all' => ['label' => __('All'), 'where' => ''],
     ];
 }
 
@@ -760,24 +763,24 @@ function recurringExpenseSave(array $in, $recurring_expense_id = 0, &$error = ''
     $id = intval($recurring_expense_id);
     $existing = $id ? recurringExpenseRow($id) : null;
     if ($id && !$existing) {
-        $error = 'That recurring expense no longer exists';
+        $error = __('That recurring expense no longer exists');
         return 0;
     }
 
     $vendor = intval($in['vendor'] ?? 0);
     if (!isset(expenseVendors($existing ? $existing['recurring_expense_vendor_id'] : 0)[$vendor])) {
-        $error = 'Pick one of your vendors';
+        $error = __('Pick one of your vendors');
         return 0;
     }
     $amount_text = str_replace([',', ' ', '$'], '', trim((string) ($in['amount'] ?? '')));
     if (!is_numeric($amount_text) || round(floatval($amount_text), 2) <= 0 || floatval($amount_text) > 9999999999999.99) {
-        $error = 'Enter the amount each time';
+        $error = __('Enter the amount each time');
         return 0;
     }
     $amount = round(floatval($amount_text), 2);
     $frequency = (string) ($in['frequency'] ?? '');
     if (!isset(recurringInvoiceFrequencies()[$frequency])) {
-        $error = 'Pick how often it comes round';
+        $error = __('Pick how often it comes round');
         return 0;
     }
     $valid_date = function ($date) {
@@ -785,37 +788,37 @@ function recurringExpenseSave(array $in, $recurring_expense_id = 0, &$error = ''
     };
     $next = trim((string) ($in['next_date'] ?? ''));
     if (!$valid_date($next)) {
-        $error = $existing ? 'Enter the date of the next one' : 'Enter the date of the first one';
+        $error = $existing ? __('Enter the date of the next one') : __('Enter the date of the first one');
         return 0;
     }
     $end = trim((string) ($in['end_date'] ?? ''));
     if ($end !== '' && !$valid_date($end)) {
-        $error = 'Enter the end date as a date, or leave it empty';
+        $error = __('Enter the end date as a date, or leave it empty');
         return 0;
     }
     if (!$existing && $end !== '' && $end < $next) {
-        $error = 'The end date is before the first one';
+        $error = __('The end date is before the first one');
         return 0;
     }
     $category = intval($in['category'] ?? 0);
     if (!isset(expenseCategories($existing ? $existing['recurring_expense_category_id'] : 0)[$category])) {
-        $error = 'Pick an expense category';
+        $error = __('Pick an expense category');
         return 0;
     }
     $account = intval($in['account'] ?? 0);
     $accounts = paymentAccounts($existing ? $existing['recurring_expense_account_id'] : 0);
     if (!isset($accounts[$account])) {
-        $error = 'Pick the account it is paid from';
+        $error = __('Pick the account it is paid from');
         return 0;
     }
     $client_id = intval($in['client_id'] ?? 0);
     if ($client_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $client_id " . clientScopeSql('client_id')))) {
-        $error = "That client isn't one you can file expenses against";
+        $error = __('That client isn\'t one you can file expenses against');
         return 0;
     }
     $method = trim((string) ($in['payment_method'] ?? ''));
     if ($method !== '' && !in_array($method, paymentMethods('out'), true) && !($existing && $method === (string) $existing['recurring_expense_payment_method'])) {
-        $error = 'Pick how it is paid';
+        $error = __('Pick how it is paid');
         return 0;
     }
     $reference = mb_substr(trim((string) ($in['reference'] ?? '')), 0, 255);
@@ -832,7 +835,7 @@ function recurringExpenseSave(array $in, $recurring_expense_id = 0, &$error = ''
     $markup_text = str_replace(['%', ' '], '', trim((string) ($in['markup'] ?? '')));
     $markup = $markup_text === '' ? ($existing ? floatval($existing['recurring_expense_markup']) : expenseMarkupDefault()) : floatval($markup_text);
     if ($billable && ($markup_text !== '' && !is_numeric($markup_text) || $markup < 0 || $markup > 1000)) {
-        $error = 'The markup is a percent, from 0 to 1000';
+        $error = __('The markup is a percent, from 0 to 1000');
         return 0;
     }
     $markup = round(max(0, min(1000, $markup)), 2);
@@ -840,7 +843,7 @@ function recurringExpenseSave(array $in, $recurring_expense_id = 0, &$error = ''
     if ($billing === 'covered') {
         $covered_by = intval($in['recurring_invoice_id'] ?? 0);
         if (!isset(recurringExpenseCoverOptions($client_id, $existing ? intval($existing['recurring_expense_recurring_invoice_id']) : 0)[$covered_by])) {
-            $error = "Pick the client's recurring invoice that covers it";
+            $error = __('Pick the client\'s recurring invoice that covers it');
             return 0;
         }
     }
@@ -947,7 +950,7 @@ function recurringExpenseDelete($recurring_expense_id, &$error = '') {
     $error = '';
     $row = recurringExpenseRow($recurring_expense_id);
     if (!$row) {
-        $error = 'That recurring expense no longer exists';
+        $error = __('That recurring expense no longer exists');
         return null;
     }
     $id = intval($row['recurring_expense_id']);
@@ -962,7 +965,7 @@ function recurringExpenseDelete($recurring_expense_id, &$error = '') {
  */
 function recurringExpenseLabel(array $row) {
     $description = trim((string) ($row['recurring_expense_description'] ?? ''));
-    return trim(($row['vendor_name'] ?? 'Recurring expense') . ' ' . billingMoney($row['recurring_expense_amount'], $row['recurring_expense_currency_code']) . ' '
+    return trim(($row['vendor_name'] ?? __('Recurring expense')) . ' ' . billingMoney($row['recurring_expense_amount'], $row['recurring_expense_currency_code']) . ' '
         . strtolower(recurringInvoiceFrequencies()[$row['recurring_expense_frequency']] ?? 'monthly')
         . ($description !== '' ? ' - ' . mb_strimwidth($description, 0, 60, '...') : ''));
 }
@@ -1103,7 +1106,7 @@ function expenseBillInvoice($client_id, array $prices, array $opts, &$error = ''
     $by = (string) ($opts['by'] ?? 'ITFlow');
     $expenses = $prices ? expenseUnbilled($client_id, array_keys($prices)) : [];
     if (!$client_id || !$expenses) {
-        $error = 'Nothing to bill - those expenses are already on an invoice, or no longer billable.';
+        $error = __('Nothing to bill - those expenses are already on an invoice, or no longer billable.');
         return null;
     }
 
@@ -1112,14 +1115,14 @@ function expenseBillInvoice($client_id, array $prices, array $opts, &$error = ''
         $value = $prices[$id] ?? null;
         $price = ($value === null || trim((string) $value) === '') ? $expense['price'] : billingNumberInput($value);
         if ($price === null || $price < 0 || $price >= 1e9) {
-            $error = 'The price for ' . ($expense['vendor_name'] ?: 'an expense') . ' on ' . $expense['expense_date'] . ' has to be a number, zero or more.';
+            $error = __('The price for %1$s on %2$s has to be a number, zero or more.', $expense['vendor_name'] ?: __('an expense'), formatDate($expense['expense_date'], 'date'));
             return null;
         }
         $bill[$id] = round($price, 2);
     }
     $tax_id = taxChoice($opts['tax_id'] ?? 0, $client_id, 'expense');
     if ($tax_id && !taxRow($tax_id)) {
-        $error = 'That tax no longer exists.';
+        $error = __('That tax no longer exists.');
         return null;
     }
 
@@ -1128,13 +1131,13 @@ function expenseBillInvoice($client_id, array $prices, array $opts, &$error = ''
     if ($invoice_id) {
         $invoice = billingRow('invoice', $invoice_id);
         if (!$invoice || intval($invoice['client_id']) !== $client_id || !billingCanEditItems('invoice', $invoice)) {
-            $error = "That invoice isn't one of the client's you can still add to.";
+            $error = __('That invoice isn\'t one of the client\'s you can still add to.');
             return null;
         }
     } else {
         $invoice_id = billingInvoiceCreate($client_id, $opts['date'] ?? '', $opts['category_id'] ?? 0, $opts['scope'] ?? '', $by);
         if (!$invoice_id) {
-            $error = "The invoice couldn't be made.";
+            $error = __('The invoice couldn\'t be made.');
             return null;
         }
         $new = true;
@@ -1154,7 +1157,7 @@ function expenseBillInvoice($client_id, array $prices, array $opts, &$error = ''
             mysqli_query($mysqli, "DELETE FROM history WHERE history_invoice_id = $invoice_id");
             mysqli_query($mysqli, "DELETE FROM invoices WHERE invoice_id = $invoice_id");
         }
-        $error = 'Nothing to bill - someone else billed those expenses just now.';
+        $error = __('Nothing to bill - someone else billed those expenses just now.');
         return null;
     }
 
@@ -1176,7 +1179,7 @@ function expenseBillInvoice($client_id, array $prices, array $opts, &$error = ''
         $lines++;
         $amount += $price;
         $cost += $expense['cost'];
-        logAudit('Expense', 'Bill', escapeSql("$by billed " . expenseLabel($expense) . " on invoice $number at " . billingMoney($price, $expense['expense_currency_code'])), $client_id, $id);
+        logAudit('Expense', 'Bill', escapeSql("$by billed " . i18nEnglish(fn () => expenseLabel($expense)) . " on invoice $number at " . billingMoney($price, $expense['expense_currency_code'])), $client_id, $id);
     }
     billingRecalc('invoice', $invoice_id);
 
@@ -1211,18 +1214,18 @@ function expenseUnbill($expense_id, &$error = '') {
     $error = '';
     $row = expenseRow($expense_id);
     if (!$row || !$row['expense_invoice_id']) {
-        $error = "That expense isn't on an invoice";
+        $error = __('That expense isn\'t on an invoice');
         return '';
     }
     $invoice = billingRow('invoice', intval($row['expense_invoice_id']), false);
     $id = intval($row['expense_id']);
     if (!$invoice) {
         mysqli_query($mysqli, "UPDATE expenses SET expense_invoice_id = NULL, expense_invoice_item_id = NULL WHERE expense_id = $id");
-        return 'an invoice since deleted';
+        return __('an invoice since deleted');
     }
     $number = billingNumber('invoice', $invoice);
     if (!expenseCanUnbill($invoice['invoice_status'])) {
-        $error = "$number is " . strtolower($invoice['invoice_status']) . " - its lines can't change any more";
+        $error = __("%1\$s is %2\$s - its lines can't change any more", $number, mb_strtolower(invoiceStatusLabel($invoice['invoice_status'])));
         return '';
     }
     if ($row['expense_invoice_item_id'] && $invoice['invoice_status'] !== 'Cancelled') {
@@ -1383,7 +1386,7 @@ function expenseUnbilledMerge(array $clients, $client_id = 0) {
 function expenseBillWithTime($client_id, array $hours, array $prices, array $opts, &$error = '', array $trip_prices = []) {
     $error = '';
     if (!$hours && !$prices && !$trip_prices) {
-        $error = 'Nothing to bill - tick the tickets, expenses or trips to bill.';
+        $error = __('Nothing to bill - tick the tickets, expenses or trips to bill.');
         return null;
     }
     $time = null;
@@ -1430,7 +1433,7 @@ function expenseWriteOff($client_id, array $expense_ids, $by) {
     foreach ($expenses as $expense_id => $expense) {
         mysqli_query($mysqli, "UPDATE expenses SET expense_billable = 0 WHERE expense_id = $expense_id AND expense_invoice_id IS NULL AND expense_billable = 1");
         if (mysqli_affected_rows($mysqli) === 1) {
-            logAudit('Expense', 'Edit', escapeSql("$by marked the expense " . expenseLabel($expense) . ' not billable'), intval($client_id), $expense_id);
+            logAudit('Expense', 'Edit', escapeSql("$by marked the expense " . i18nEnglish(fn () => expenseLabel($expense)) . ' not billable'), intval($client_id), $expense_id);
             $done[] = expenseLabel($expense);
         }
     }
@@ -1520,23 +1523,23 @@ function expenseReimburse($user_id, array $expense_ids, array $opts, &$error = '
     $user_id = intval($user_id);
     $waiting = expenseToReimburse($user_id, $expense_ids)[$user_id] ?? null;
     if (!$user_id || !$expense_ids || !$waiting) {
-        $error = 'Nothing to pay back - those expenses are already paid back, or not paid personally.';
+        $error = __('Nothing to pay back - those expenses are already paid back, or not paid personally.');
         return null;
     }
     $account = intval($opts['account_id'] ?? 0);
     $accounts = paymentAccounts();
     if (!isset($accounts[$account])) {
-        $error = 'Pick the account the money comes from';
+        $error = __('Pick the account the money comes from');
         return null;
     }
     $date = (string) ($opts['date'] ?? '');
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date they were paid back';
+        $error = __('Enter the date they were paid back');
         return null;
     }
     $method = trim((string) ($opts['payment_method'] ?? ''));
     if ($method !== '' && !in_array($method, paymentMethods('out'), true)) {
-        $error = 'Pick how they were paid back';
+        $error = __('Pick how they were paid back');
         return null;
     }
     $reference = mb_substr(trim((string) ($opts['reference'] ?? '')), 0, 200);
@@ -1556,12 +1559,12 @@ function expenseReimburse($user_id, array $expense_ids, array $opts, &$error = '
     $amount = round(floatval($claimed[1]), 2);
     if (!$count) {
         mysqli_query($mysqli, "DELETE FROM reimbursements WHERE reimbursement_id = $reimbursement_id");
-        $error = 'Nothing to pay back - someone else paid those back just now.';
+        $error = __('Nothing to pay back - someone else paid those back just now.');
         return null;
     }
 
     // The money out of the account - an expense with no vendor, like a transfer's
-    $description = "Reimbursement to {$waiting['user_name']} - " . ($count === 1 ? '1 expense' : "$count expenses");
+    $description = "Reimbursement to {$waiting['user_name']} - " . ($count === 1 ? '1 expense' : "$count expenses"); // i18n-ignore - stored description
     mysqli_query($mysqli, "INSERT INTO expenses SET expense_date = '$date', expense_amount = $amount, expense_currency_code = '" . escapeSql($currency) . "',
         expense_vendor_id = 0, expense_category_id = 0, expense_account_id = $account, expense_client_id = 0,
         expense_payment_method = " . ($method === '' ? 'NULL' : "'" . escapeSql($method) . "'") . ", expense_reference = '" . escapeSql($reference) . "',
@@ -1613,7 +1616,7 @@ function reimbursementDelete($reimbursement_id, &$error = '') {
     $error = '';
     $row = reimbursementRow($reimbursement_id);
     if (!$row) {
-        $error = 'That reimbursement no longer exists';
+        $error = __('That reimbursement no longer exists');
         return null;
     }
     if (!reconcileCheckDelete('expense', $row['reimbursement_expense_id'], $error)) {

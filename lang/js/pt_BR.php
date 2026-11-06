@@ -335,5 +335,13 @@ return [
     'Counts %1$s now - %2$s' => 'Conta %1$s agora - %2$s',
     ' - billed at the minimum, %s' => ' - cobrado pelo mínimo, %s',
     'Couldn\'t count them just now - it is counted again when saved.' => 'Não deu para contar agora - a contagem é refeita ao salvar.',
+    'Enter what was paid.' => 'Informe o que foi pago.',
+    'Filed against them as a cost. It can also be shown against one of their recurring invoices.' => 'Lançada contra ele como custo. Também pode aparecer contra uma das faturas recorrentes dele.',
+    'Filed against them as a cost - they have no recurring invoice to cover it.' => 'Lançada contra ele como custo - ele não tem fatura recorrente que a cubra.',
+    '%s left to pay after this.' => 'Faltam %s depois deste.',
+    'That is %s more than is owed.' => 'São %s a mais do que o devido.',
+    '%1$d expense · %2$s' => '%1$d despesa · %2$s',
+    '%1$d expenses · %2$s' => '%1$d despesas · %2$s',
+    'Tick what to pay back' => 'Marque o que reembolsar',
 
 ];
