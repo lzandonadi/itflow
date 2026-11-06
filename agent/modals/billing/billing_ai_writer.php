@@ -22,7 +22,7 @@ $type = (string) ($_GET['type'] ?? '');
 $doc_id = intval($_GET['doc_id'] ?? 0);
 $doc = in_array($type, ['quote', 'invoice'], true) ? billingRow($type, $doc_id) : null;
 if (!$doc) {
-    exit(json_encode(['error' => 'That document no longer exists.']));
+    exit(json_encode(['error' => __('That document no longer exists.')]));
 }
 $client_id = intval($doc['client_id']);
 enforceClientAccess();
@@ -32,7 +32,7 @@ if (!aiCan()) {
     permissionRefuse(permissionRefusedText('module_ai', 1, 0));
 }
 if (!billingCanEditItems($type, $doc)) {
-    exit(json_encode(['error' => billingNumber($type, $doc) . " can't be changed now - " . ($type === 'quote' ? 'it has been answered or invoiced.' : 'it is paid, cancelled or non-billable.')]));
+    exit(json_encode(['error' => $type === 'quote' ? __("%s can't be changed now - it has been answered or invoiced.", billingNumber($type, $doc)) : __("%s can't be changed now - it is paid, cancelled or non-billable.", billingNumber($type, $doc))]));
 }
 
 $t = billingType($type);
@@ -45,14 +45,14 @@ $ticket = $support ? aiBillingTicket($type, $doc_id) : null;
 $rate = contractClientRate($client_id)['rate'];
 $catalog_count = count(aiBillingCatalog());
 $prompt = $scope !== '' ? $scope : ($ticket ? $ticket['ticket_subject'] : '');
-$word = $type === 'quote' ? 'quote' : 'invoice';
+$writing = $type === 'quote' ? __('AI is writing the quote...') : __('AI is writing the invoice...');
 
 ob_start();
 
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-magic me-2"></i>Write <?= escapeHtml($number) ?> with AI</h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-magic me-2"></i><?= __('Write %s with AI', escapeHtml($number)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-ai-billing-form data-type="<?= $type ?>" data-doc-id="<?= $doc_id ?>" data-currency="<?= escapeHtml($currency) ?>">
@@ -63,29 +63,29 @@ ob_start();
 
         <!-- What it is for -->
         <div data-ai-billing-ask>
-            <label class="form-label" for="aiBillingPrompt">What is it for?</label>
+            <label class="form-label" for="aiBillingPrompt"><?= __('What is it for?') ?></label>
             <div class="input-group">
                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-comment"></i></span>
                 <textarea class="form-control" id="aiBillingPrompt" rows="3" maxlength="2000" data-ai-billing-prompt
-                    placeholder="Three new laptops for the new starters - set up, joined to the domain and given Microsoft 365"><?= escapeHtml($prompt) ?></textarea>
+                    placeholder="<?= escapeHtml(__('Three new laptops for the new starters - set up, joined to the domain and given Microsoft 365')) ?>"><?= escapeHtml($prompt) ?></textarea>
             </div>
             <div class="mt-2">
                 <?php if ($ticket) { ?>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="aiBillingTicket" checked data-ai-billing-use-ticket>
-                        <label class="form-check-label" for="aiBillingTicket">Use <?= escapeHtml(ticketReference($ticket)) ?> - <?= escapeHtml($ticket['ticket_subject']) ?></label>
+                        <label class="form-check-label" for="aiBillingTicket"><?= __('Use %1$s - %2$s', escapeHtml(ticketReference($ticket)), escapeHtml($ticket['ticket_subject'])) ?></label>
                     </div>
                 <?php } ?>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="aiBillingClient" checked data-ai-billing-use-client>
-                    <label class="form-check-label" for="aiBillingClient">Use what ITFlow knows of <?= escapeHtml($doc['client_name']) ?> <span class="text-body-secondary">- <?= $support ? 'its people, sites and devices' : 'how many people it has' ?>, to size per-user and per-device lines</span></label>
+                    <label class="form-check-label" for="aiBillingClient"><?= __('Use what ITFlow knows of %s', escapeHtml($doc['client_name'])) ?> <span class="text-body-secondary">- <?= $support ? __('its people, sites and devices, to size per-user and per-device lines') : __('how many people it has, to size per-user and per-device lines') ?></span></label>
                 </div>
             </div>
             <div class="small text-body-secondary mt-2">
-                <i class="fas fa-fw fa-tags me-1"></i><?= $catalog_count ? "Lines come from your catalog of $catalog_count where one fits, at its prices" : 'Your catalog is empty, so only labor will have a price' ?>;
-                labor <?= $rate > 0 ? 'at ' . escapeHtml(billingMoney($rate, $currency)) . ' an hour' : 'has no rate - set one for the client or as the default' ?>. Nothing goes on until you add it.
+                <i class="fas fa-fw fa-tags me-1"></i><?= $catalog_count ? __('Lines come from your catalog of %d where one fits, at its prices', $catalog_count) : __('Your catalog is empty, so only labor will have a price') ?>;
+                <?= $rate > 0 ? __('labor at %s an hour', escapeHtml(billingMoney($rate, $currency))) : __('labor has no rate - set one for the client or as the default') ?>. <?= __('Nothing goes on until you add it.') ?>
             </div>
-            <button type="button" class="btn btn-primary mt-3" data-ai-billing-write><i class="fas fa-fw fa-magic me-2"></i>Write it</button>
+            <button type="button" class="btn btn-primary mt-3" data-ai-billing-write><i class="fas fa-fw fa-magic me-2"></i><?= __('Write it') ?></button>
         </div>
 
         <div class="mt-3" data-ai-billing-status aria-live="polite"></div>
@@ -95,16 +95,16 @@ ob_start();
             <div class="mb-3">
                 <div class="form-check mb-1">
                     <input class="form-check-input" type="checkbox" id="aiBillingUseScope" name="use_scope" value="1" <?= $scope === '' ? 'checked' : '' ?> data-ai-billing-use-scope>
-                    <label class="form-check-label" for="aiBillingUseScope">Use as the scope<?= $scope !== '' ? ' <span class="text-body-secondary">- now: ' . escapeHtml($scope) . '</span>' : '' ?></label>
+                    <label class="form-check-label" for="aiBillingUseScope"><?= __('Use as the scope') ?><?= $scope !== '' ? ' <span class="text-body-secondary">- ' . __('now: %s', escapeHtml($scope)) . '</span>' : '' ?></label>
                 </div>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-comment"></i></span>
-                    <input type="text" class="form-control" name="scope" maxlength="255" data-ai-billing-scope aria-label="Scope">
+                    <input type="text" class="form-control" name="scope" maxlength="255" data-ai-billing-scope aria-label="<?= __('Scope') ?>">
                 </div>
             </div>
 
             <div class="d-flex align-items-center mb-2">
-                <span class="fw-semibold me-auto">Lines</span>
+                <span class="fw-semibold me-auto"><?= __('Lines') ?></span>
                 <span class="small text-body-secondary" data-ai-billing-total></span>
             </div>
             <div data-ai-billing-lines></div>
@@ -112,25 +112,25 @@ ob_start();
             <div class="mt-3">
                 <div class="form-check mb-1">
                     <input class="form-check-input" type="checkbox" id="aiBillingUseNote" name="use_note" value="1" checked data-ai-billing-use-note>
-                    <label class="form-check-label" for="aiBillingUseNote">Add to its notes <span class="text-body-secondary">- the client sees them</span></label>
+                    <label class="form-check-label" for="aiBillingUseNote"><?= __('Add to its notes') ?> <span class="text-body-secondary">- <?= __('the client sees them') ?></span></label>
                 </div>
                 <div class="input-group">
                     <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-sticky-note"></i></span>
-                    <textarea class="form-control" name="note" rows="3" data-ai-billing-note aria-label="Note"></textarea>
+                    <textarea class="form-control" name="note" rows="3" data-ai-billing-note aria-label="<?= __('Note') ?>"></textarea>
                 </div>
             </div>
 
             <div class="alert alert-info small mt-3 mb-0 d-none" data-ai-billing-checks>
-                <div class="fw-semibold mb-1"><i class="fas fa-fw fa-clipboard-check me-1"></i>Before you send it</div>
+                <div class="fw-semibold mb-1"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= __('Before you send it') ?></div>
                 <ul class="mb-0 ps-3"></ul>
             </div>
-            <div class="small text-body-secondary mt-3"><i class="fas fa-fw fa-robot me-1"></i>Written by AI - check the quantities and hours. Prices are your catalog's and the client's rate; AI never sets one.</div>
+            <div class="small text-body-secondary mt-3"><i class="fas fa-fw fa-robot me-1"></i><?= __("Written by AI - check the quantities and hours. Prices are your catalog's and the client's rate; AI never sets one.") ?></div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="billing_ai_lines" class="btn btn-primary text-bold d-none" data-ai-billing-add><i class="fas fa-fw fa-plus me-2"></i><span>Add to <?= escapeHtml($number) ?></span></button>
-        <button type="button" class="btn btn-light border d-none" data-ai-billing-again><i class="fas fa-fw fa-redo me-2"></i>Again</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="billing_ai_lines" class="btn btn-primary text-bold d-none" data-ai-billing-add><i class="fas fa-fw fa-plus me-2"></i><span><?= __('Add to %s', escapeHtml($number)) ?></span></button>
+        <button type="button" class="btn btn-light border d-none" data-ai-billing-again><i class="fas fa-fw fa-redo me-2"></i><?= __('Again') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -158,11 +158,18 @@ ob_start();
     var checks = form.querySelector('[data-ai-billing-checks]');
     var add = form.querySelector('[data-ai-billing-add]');
     var again = form.querySelector('[data-ai-billing-again]');
-    var frequencies = { '': 'One time', month: 'Monthly', quarter: 'Quarterly', year: 'Yearly' };
+    var t = <?= json_encode([
+        'add_line' => __('Add this line'), 'item' => __('Item'), 'description' => __('Description (optional)'), 'description_label' => __('Description'),
+        'hours' => __('Hours'), 'qty' => __('Qty'), 'billed' => _x('Billed', 'how often'), 'price' => __('Price'), 'set_price' => __('Set a price'),
+        'once' => __('once'), 'comes_to' => __('Comes to %s, before tax'), 'add_one' => __('Add %d line'), 'add_many' => __('Add %d lines'),
+        'add_to' => __('Add to %s', $number), 'writing' => $writing, 'failed' => __('Could not write it - try again.'),
+        'per' => ['month' => _x('monthly', 'per period'), 'quarter' => _x('quarterly', 'per period'), 'year' => _x('yearly', 'per period')],
+    ], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    var frequencies = <?= json_encode(quoteFrequencies(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_FORCE_OBJECT) ?>;
     var kinds = {
-        catalog: ['bg-success-subtle text-success-emphasis', 'fa-tag', 'From the catalog'],
-        labor: ['bg-info-subtle text-info-emphasis', 'fa-user-clock', "Labor at the client's rate"],
-        other: ['bg-warning-subtle text-warning-emphasis', 'fa-exclamation-triangle', 'Not in the catalog - set a price']
+        catalog: ['bg-success-subtle text-success-emphasis', 'fa-tag', <?= json_encode(__('From the catalog'), JSON_HEX_TAG | JSON_HEX_AMP) ?>],
+        labor: ['bg-info-subtle text-info-emphasis', 'fa-user-clock', <?= json_encode(__("Labor at the client's rate"), JSON_HEX_TAG | JSON_HEX_AMP) ?>],
+        other: ['bg-warning-subtle text-warning-emphasis', 'fa-exclamation-triangle', <?= json_encode(__('Not in the catalog - set a price'), JSON_HEX_TAG | JSON_HEX_AMP) ?>]
     };
 
     function el(tag, className, text) {
@@ -213,7 +220,7 @@ ob_start();
         include.name = base + '[include]';
         include.value = '1';
         include.checked = true;
-        include.setAttribute('aria-label', 'Add this line');
+        include.setAttribute('aria-label', t.add_line);
         include.setAttribute('data-ai-billing-include', '');
         top.appendChild(include);
 
@@ -224,14 +231,14 @@ ob_start();
         name.maxLength = 200;
         name.required = true;
         name.value = item.name;
-        name.setAttribute('aria-label', 'Item');
+        name.setAttribute('aria-label', t.item);
         main.appendChild(name);
         var description = el('textarea', 'form-control form-control-sm');
         description.name = base + '[description]';
         description.rows = 2;
         description.value = item.description || '';
-        description.placeholder = 'Description (optional)';
-        description.setAttribute('aria-label', 'Description');
+        description.placeholder = t.description;
+        description.setAttribute('aria-label', t.description_label);
         main.appendChild(description);
 
         var kind = kinds[item.kind] || kinds.other;
@@ -249,7 +256,7 @@ ob_start();
         qty.name = base + '[qty]';
         qty.required = true;
         qty.value = item.qty;
-        numbers.appendChild(field(item.kind === 'labor' ? 'Hours' : 'Qty', item.kind === 'labor' ? 'fa-clock' : 'fa-balance-scale', qty, 'itflow-ai-line-qty'));
+        numbers.appendChild(field(item.kind === 'labor' ? t.hours : t.qty, item.kind === 'labor' ? 'fa-clock' : 'fa-balance-scale', qty, 'itflow-ai-line-qty'));
         if (type === 'quote') {
             var billed = el('select', 'form-select');
             billed.name = base + '[frequency]';
@@ -259,17 +266,17 @@ ob_start();
                 option.selected = value === (item.frequency || '');
                 billed.appendChild(option);
             });
-            numbers.appendChild(field('Billed', 'fa-redo-alt', billed, 'itflow-ai-line-billed'));
+            numbers.appendChild(field(t.billed, 'fa-redo-alt', billed, 'itflow-ai-line-billed'));
         }
         var price = el('input', 'form-control text-end');
         price.type = 'text';
         price.inputMode = 'decimal';
         price.name = base + '[price]';
         price.required = true;
-        price.placeholder = 'Set a price';
+        price.placeholder = t.set_price;
         price.value = item.price === null ? '' : Number(item.price).toFixed(2);
         price.setAttribute('data-ai-billing-price', '');
-        numbers.appendChild(field('Price', 'fa-dollar-sign', price, 'itflow-ai-line-price'));
+        numbers.appendChild(field(t.price, 'fa-dollar-sign', price, 'itflow-ai-line-price'));
         var amount = el('div', 'ms-auto align-self-end small fw-semibold text-nowrap pb-1');
         amount.setAttribute('data-ai-billing-amount', '');
         numbers.appendChild(amount);
@@ -317,11 +324,11 @@ ob_start();
         var parts = Object.keys(frequencies).filter(function (key) {
             return sums[key];
         }).map(function (key) {
-            return money(sums[key]) + (key === '' ? (Object.keys(sums).length > 1 ? ' once' : '') : ' ' + frequencies[key].toLowerCase());
+            return money(sums[key]) + (key === '' ? (Object.keys(sums).length > 1 ? ' ' + t.once : '') : ' ' + t.per[key]);
         });
-        total.textContent = parts.length ? 'Comes to ' + parts.join(' + ') + ', before tax' : '';
+        total.textContent = parts.length ? t.comes_to.replace('%s', parts.join(' + ')) : '';
         add.disabled = count === 0 && !(form.querySelector('[data-ai-billing-use-scope]').checked && scope.value.trim()) && !(useNote.checked && note.value.trim());
-        add.querySelector('span').textContent = count ? 'Add ' + count + ' line' + (count === 1 ? '' : 's') : 'Add to ' + <?= json_encode($number) ?>;
+        add.querySelector('span').textContent = count ? (count === 1 ? t.add_one : t.add_many).replace('%d', count) : t.add_to;
     }
 
     function show(answer) {
@@ -353,7 +360,7 @@ ob_start();
         write.disabled = true;
         again.disabled = true;
         add.disabled = true;
-        status.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>AI is writing the <?= $word ?>...</div>';
+        status.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>' + t.writing + '</div>';
         fetch('/agent/ajax.php?ai_billing_draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -380,7 +387,7 @@ ob_start();
             })
             .catch(function (error) {
                 status.innerHTML = '';
-                var p = el('p', 'text-danger-emphasis mb-0', error && error.message ? error.message : 'Could not write it - try again.');
+                var p = el('p', 'text-danger-emphasis mb-0', error && error.message ? error.message : t.failed);
                 p.setAttribute('data-ai-billing-error', '');
                 status.appendChild(p);
                 if (!result.classList.contains('d-none')) {

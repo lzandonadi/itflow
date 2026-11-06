@@ -38,11 +38,13 @@ if (isset($_POST['add_product'])) {
     }
     $product = productRow($product_id);
     $name = escapeSql($product['product_name']);
-    $type_label = productTypes()[$product['product_type']]['label'];
+    $type_label = i18nEnglish(fn () => productTypes()[$product['product_type']]['label']);
 
     logAudit("Product", "Create", "$session_name created " . strtolower($type_label) . " $name", 0, $product_id);
 
-    flashAlert("$type_label <strong>" . escapeHtml($product['product_name']) . "</strong> added");
+    flashAlert($product['product_type'] === 'product'
+        ? __('Product <strong>%s</strong> added', escapeHtml($product['product_name']))
+        : __('Service <strong>%s</strong> added', escapeHtml($product['product_name'])));
 
     redirect();
 
@@ -70,13 +72,13 @@ if (isset($_POST['edit_product'])) {
     $price_note = '';
     if ($price_before !== null && round(floatval($price_before), 2) != round(floatval($product['product_price']), 2)) {
         $behind = productRepriceCount(['product_id' => $product_id]);
-        $price_note = " - its price is now " . escapeHtml(billingMoney($product['product_price'], $product['product_currency_code']));
+        $price_note = __(' - its price is now %s', escapeHtml(billingMoney($product['product_price'], $product['product_currency_code'])));
         if ($behind['lines']) {
-            $price_note .= ", and <strong>" . intval($behind['lines']) . "</strong> line" . ($behind['lines'] == 1 ? ' is' : 's are') . " on recurring invoices, drafts or quotes at an old price. Update them from its page.";
+            $price_note .= _n(', and <strong>%d</strong> line is on recurring invoices, drafts or quotes at an old price. Update them from its page.', ', and <strong>%d</strong> lines are on recurring invoices, drafts or quotes at an old price. Update them from its page.', intval($behind['lines']));
         }
     }
 
-    flashAlert("<strong>" . escapeHtml($product['product_name']) . "</strong> saved$price_note");
+    flashAlert(__('<strong>%s</strong> saved', escapeHtml($product['product_name'])) . $price_note);
 
     redirect();
 
@@ -91,14 +93,14 @@ if (isset($_GET['copy_product'])) {
     $product = productRow(intval($_GET['copy_product']));
     $new_id = $product ? productCopy($product['product_id']) : 0;
     if (!$new_id) {
-        flashAlert('That product no longer exists.', 'error');
+        flashAlert(__('That product no longer exists.'), 'error');
         redirect('products.php');
     }
     $name = escapeSql($product['product_name']);
 
     logAudit("Product", "Create", "$session_name copied product $name", 0, $new_id);
 
-    flashAlert("Copy of <strong>" . escapeHtml($product['product_name']) . "</strong> made - give it a code and check its details");
+    flashAlert(__('Copy of <strong>%s</strong> made - give it a code and check its details', escapeHtml($product['product_name'])));
 
     redirect("product.php?product_id=$new_id");
 
@@ -118,7 +120,7 @@ if (isset($_GET['archive_product'])) {
 
     logAudit("Product", "Archive", "$session_name archived product $product_name", 0, $product_id);
 
-    flashAlert("Product <strong>" . escapeHtml(stripslashes($product_name)) . "</strong> archived - it is no longer offered on new lines", 'error');
+    flashAlert(__('Product <strong>%s</strong> archived - it is no longer offered on new lines', escapeHtml(stripslashes($product_name))), 'error');
 
     redirect();
 
@@ -138,7 +140,7 @@ if (isset($_GET['restore_product'])) {
 
     logAudit("Product", "Restore", "$session_name restored product $product_name", 0, $product_id);
 
-    flashAlert("Product <strong>" . escapeHtml(stripslashes($product_name)) . "</strong> restored");
+    flashAlert(__('Product <strong>%s</strong> restored', escapeHtml(stripslashes($product_name))));
 
     redirect();
 
@@ -158,7 +160,7 @@ if (isset($_GET['delete_product'])) {
 
     logAudit("Product", "Delete", "$session_name deleted product $product_name");
 
-    flashAlert("Product <strong>" . escapeHtml(stripslashes($product_name)) . "</strong> deleted", 'error');
+    flashAlert(__('Product <strong>%s</strong> deleted', escapeHtml(stripslashes($product_name))), 'error');
 
     // Not back to its page - it is gone
     redirect('products.php?archived=1');
@@ -196,7 +198,7 @@ if (isset($_POST['bulk_edit_product_category'])) {
 
         logAudit("Product", "Edit", "$session_name assigned category $category_name to $count product(s)");
 
-        flashAlert("Assigned category <strong>" . escapeHtml(stripslashes($category_name)) . "</strong> to <strong>$count</strong> product(s)");
+        flashAlert(_n('Assigned category <strong>%2$s</strong> to <strong>%1$d</strong> product', 'Assigned category <strong>%2$s</strong> to <strong>%1$d</strong> products', $count, $count, escapeHtml(stripslashes($category_name))));
     }
 
     redirect();
@@ -227,7 +229,7 @@ if (isset($_POST['bulk_archive_products'])) {
 
         logAudit("Product", "Bulk Archive", "$session_name archived $count product(s)");
 
-        flashAlert("Archived <strong>$count</strong> product(s)", 'error');
+        flashAlert(_n('Archived <strong>%d</strong> product', 'Archived <strong>%d</strong> products', $count), 'error');
 
     }
 
@@ -260,7 +262,7 @@ if (isset($_POST['bulk_restore_products'])) {
 
         logAudit("Product", "Bulk Restore", "$session_name restored $count product(s)");
 
-        flashAlert("Restored <strong>$count</strong> product(s)");
+        flashAlert(_n('Restored <strong>%d</strong> product', 'Restored <strong>%d</strong> products', $count));
 
     }
 
@@ -292,7 +294,7 @@ if (isset($_POST['bulk_delete_products'])) {
 
         logAudit("Product", "Bulk Delete", "$session_name deleted $count product(s)");
 
-        flashAlert("Deleted <strong>$count</strong> product(s)", 'error');
+        flashAlert(_n('Deleted <strong>%d</strong> product', 'Deleted <strong>%d</strong> products', $count), 'error');
 
     }
 
@@ -328,7 +330,7 @@ if (isExportRequest('export_products')) {
         'product' => ["AND product_type = 'product'", __('Products')],
         'recurring' => ["AND product_frequency IS NOT NULL", __('Billed each month, quarter or year')],
         'stocked' => ["AND product_track_stock = 1", __('Stock tracked')],
-        'reorder' => ["AND " . productReorderSql(), __('To reorder')],
+        'reorder' => ["AND " . productReorderSql(), _x('To reorder', 'stock')],
         'hardware' => ["AND " . productHardwareSql(), __('Become client assets')],
     ];
     $type_query = '';
@@ -390,8 +392,9 @@ if (isExportRequest('export_products')) {
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $margin = productMargin($row['product_price'], $row['product_cost']);
-            $row['product_type_label'] = productTypes()[$row['product_type']]['label'] ?? $row['product_type'];
-            $row['product_billed'] = productBilledText($row['product_frequency'], $row['product_seat_source']);
+            // The CSV keeps English values - an export opens straight back in by them
+            $labels = fn () => [productTypes()[$row['product_type']]['label'] ?? $row['product_type'], productBilledText($row['product_frequency'], $row['product_seat_source'])];
+            [$row['product_type_label'], $row['product_billed']] = $format === 'csv' ? i18nEnglish($labels) : $labels();
             $row['product_margin'] = $margin ? $margin['percent'] . '%' : '';
             $row['product_tax'] = $row['tax_name'] ? taxLabel($row) : '';
             $row['product_stock_display'] = intval($row['product_track_stock']) ? billingQuantity($row['product_stock']) : '';
@@ -434,13 +437,13 @@ if (isset($_POST['product_stock_save'])) {
 
     $product = productRow(intval($_POST['product_id'] ?? 0));
     if (!$product) {
-        flashAlert('That product no longer exists.', 'error');
+        flashAlert(__('That product no longer exists.'), 'error');
         redirect('products.php');
     }
     $product_id = intval($product['product_id']);
     $name_html = '<strong>' . escapeHtml($product['product_name']) . '</strong>';
     if (!intval($product['product_track_stock'])) {
-        flashAlert("$name_html doesn't track stock - turn on Track stock in Edit first.", 'error');
+        flashAlert(__('%s doesn\'t track stock - turn on Track stock in Edit first.', $name_html), 'error');
         redirect();
     }
     $mode = (string) ($_POST['mode'] ?? 'receive');
@@ -451,12 +454,12 @@ if (isset($_POST['product_stock_save'])) {
     if ($mode === 'receive') {
         $qty = productStockInput($_POST['qty'] ?? '');
         if ($qty === null) {
-            flashAlert('Enter how many came in - a number above zero.', 'error');
+            flashAlert(__('Enter how many came in - a number above zero.'), 'error');
             redirect();
         }
         $unit_cost = trim(str_replace([',', '$', ' '], '', (string) ($_POST['unit_cost'] ?? '')));
         if ($unit_cost !== '' && (!is_numeric($unit_cost) || floatval($unit_cost) < 0 || floatval($unit_cost) >= 1e13)) {
-            flashAlert('The unit cost has to be a number, zero or more.', 'error');
+            flashAlert(__('The unit cost has to be a number, zero or more.'), 'error');
             redirect();
         }
         // Linked to an expense only by a role that can see expenses, and one it can see (the window's list)
@@ -469,44 +472,44 @@ if (isset($_POST['product_stock_save'])) {
         if ($unit_cost !== '' && !empty($_POST['update_cost']) && round(floatval($unit_cost), 2) != round(floatval($product['product_cost']), 2)) {
             $cost_error = '';
             productSave(['cost' => $unit_cost], $product_id, $cost_error, 'receive');
-            $cost_note = ', and its cost is now ' . billingMoney($unit_cost, $product['product_currency_code']);
+            $cost_note = __(', and its cost is now %s', billingMoney($unit_cost, $product['product_currency_code']));
             logAudit("Product", "Edit", "$session_name changed the cost of product $product_name to " . escapeSql(billingMoney($unit_cost, $product['product_currency_code'])) . " from a delivery", 0, $product_id);
         }
         logAudit("Product", "Stock", "$session_name received " . billingQuantity($qty) . " of product $product_name", 0, $product_id);
-        flashAlert(billingQuantity($qty) . " of $name_html received - " . billingQuantity($on_hand + $qty) . " on the shelf" . escapeHtml($cost_note));
+        flashAlert(__('%1$s of %2$s received - %3$s on the shelf', billingQuantity($qty), $name_html, billingQuantity($on_hand + $qty)) . escapeHtml($cost_note));
 
     } elseif ($mode === 'count') {
         $counted = productStockInput($_POST['counted'] ?? '', true);
         if ($counted === null) {
-            flashAlert('Enter what is on the shelf - zero or more.', 'error');
+            flashAlert(__('Enter what is on the shelf - zero or more.'), 'error');
             redirect();
         }
         $difference = round($counted - $on_hand, 2);
         if ($difference == 0) {
-            flashAlert(billingQuantity($counted) . " of $name_html on the shelf - that is what ITFlow had, nothing to change");
+            flashAlert(__('%1$s of %2$s on the shelf - that is what ITFlow had, nothing to change', billingQuantity($counted), $name_html));
             redirect();
         }
         productStockMove($product_id, $difference, 'adjusted', ['note' => 'Counted ' . billingQuantity($counted) . ($note !== '' ? " - $note" : '')]);
         logAudit("Product", "Stock", "$session_name counted product $product_name - " . billingQuantity($counted) . ' on the shelf, ' . productStockQty($difference), 0, $product_id);
-        flashAlert("$name_html counted - " . billingQuantity($counted) . ' on the shelf, ' . productStockQty($difference) . ' from what ITFlow had');
+        flashAlert(__('%1$s counted - %2$s on the shelf, %3$s from what ITFlow had', $name_html, billingQuantity($counted), productStockQty($difference)));
 
     } elseif ($mode === 'write_off') {
         $qty = productStockInput($_POST['qty'] ?? '');
         if ($qty === null) {
-            flashAlert('Enter how many to write off - a number above zero.', 'error');
+            flashAlert(__('Enter how many to write off - a number above zero.'), 'error');
             redirect();
         }
         if ($qty > $on_hand) {
-            flashAlert("Only " . billingQuantity($on_hand) . " of $name_html on the shelf - count it first if there are more.", 'error');
+            flashAlert(__('Only %1$s of %2$s on the shelf - count it first if there are more.', billingQuantity($on_hand), $name_html), 'error');
             redirect();
         }
         $reason = in_array($_POST['reason'] ?? '', productWriteOffReasons(), true) ? $_POST['reason'] : 'Other';
         productStockMove($product_id, -$qty, 'written_off', ['note' => $reason . ($note !== '' ? " - $note" : '')]);
         logAudit("Product", "Stock", "$session_name wrote off " . billingQuantity($qty) . " of product $product_name - " . escapeSql($reason), 0, $product_id);
-        flashAlert(billingQuantity($qty) . " of $name_html written off - " . billingQuantity($on_hand - $qty) . ' on the shelf');
+        flashAlert(__('%1$s of %2$s written off - %3$s on the shelf', billingQuantity($qty), $name_html, billingQuantity($on_hand - $qty)));
 
     } else {
-        flashAlert('That is not something the Stock window does.', 'error');
+        flashAlert(__('That is not something the Stock window does.'), 'error');
     }
 
     redirect();
@@ -551,9 +554,9 @@ if (isset($_POST['product_stock_count'])) {
 
     logAudit("Product", "Stock", "$session_name saved a stock count - $changed changed, $same as expected");
 
-    $message = "Stock count saved - <strong>$changed</strong> changed, <strong>$same</strong> as expected";
+    $message = __('Stock count saved - <strong>%1$d</strong> changed, <strong>%2$d</strong> as expected', $changed, $same);
     if ($bad) {
-        $message .= '. Not a number, left alone: ' . escapeHtml(implode(', ', $bad));
+        $message .= '. ' . __('Not a number, left alone: %s', escapeHtml(implode(', ', $bad)));
     }
     flashAlert($message, $bad && !$changed ? 'error' : 'success');
 
@@ -576,11 +579,11 @@ if (isset($_POST["import_products_csv"])) {
     enforceUserPermission('module_sales', 2);
 
     if (empty($_FILES["file"]["tmp_name"]) || !is_uploaded_file($_FILES["file"]["tmp_name"])) {
-        flashAlert("Choose a CSV file to import.", 'error');
+        flashAlert(__('Choose a CSV file to import.'), 'error');
         redirect();
     }
     if (strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        flashAlert("That isn't a CSV file.", 'error');
+        flashAlert(__('That isn\'t a CSV file.'), 'error');
         redirect();
     }
     $update_existing = !empty($_POST['update_existing']);
@@ -588,7 +591,7 @@ if (isset($_POST["import_products_csv"])) {
     $file = fopen($_FILES["file"]["tmp_name"], "r");
     $header = $file ? fgetcsv($file, 0, ",", '"', '\\') : false;
     if (!$header) {
-        flashAlert("The file is empty.", 'error');
+        flashAlert(__('The file is empty.'), 'error');
         redirect();
     }
 
@@ -628,7 +631,7 @@ if (isset($_POST["import_products_csv"])) {
     // A price list update can go by code alone
     if (!isset($columns['name']) && !($update_existing && isset($columns['code']))) {
         fclose($file);
-        flashAlert("The first row needs a Name column - download the template to see the layout.", 'error');
+        flashAlert(__('The first row needs a Name column - download the template to see the layout.'), 'error');
         redirect();
     }
 
@@ -689,7 +692,7 @@ if (isset($_POST["import_products_csv"])) {
             $existing_id = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT product_id FROM products WHERE product_code = '$code' ORDER BY product_archived_at IS NOT NULL, product_id LIMIT 1"))[0] ?? 0);
         }
         if ($existing_id && !$update_existing) {
-            $skipped[] = "row $line - " . $in['code'] . " is already here";
+            $skipped[] = __('row %1$d - %2$s is already here', $line, $in['code']);
             continue;
         }
         if ($existing_id) {
@@ -699,7 +702,7 @@ if (isset($_POST["import_products_csv"])) {
             }
         } else {
             if (($in['name'] ?? '') === '') {
-                $skipped[] = "row $line has no name";
+                $skipped[] = __('row %d has no name', $line);
                 continue;
             }
             // A new one starts as the kind the file says, a product when it doesn't say
@@ -710,22 +713,22 @@ if (isset($_POST["import_products_csv"])) {
         if (productSave($in, $existing_id, $error, 'import')) {
             $existing_id ? $updated++ : $added++;
         } else {
-            $skipped[] = "row $line - " . rtrim($error, '.');
+            $skipped[] = __('row %1$d - %2$s', $line, rtrim($error, '.'));
         }
     }
     fclose($file);
 
     logAudit("Product", "Import", "$session_name imported products from a CSV file - $added added, $updated updated, " . count($skipped) . " skipped");
 
-    $message = "<strong>$added</strong> added" . ($update_existing ? ", <strong>$updated</strong> updated" : '');
+    $message = $update_existing ? __('<strong>%1$d</strong> added, <strong>%2$d</strong> updated', $added, $updated) : __('<strong>%d</strong> added', $added);
     if ($skipped) {
-        $message .= ", <strong>" . count($skipped) . "</strong> skipped: " . escapeHtml(implode('; ', array_slice($skipped, 0, 5))) . (count($skipped) > 5 ? '...' : '');
+        $message .= __(', <strong>%1$d</strong> skipped: %2$s', count($skipped), escapeHtml(implode('; ', array_slice($skipped, 0, 5))) . (count($skipped) > 5 ? '...' : ''));
     }
     // A new price list - say how many lines are at an old price now
     if ($updated) {
         $behind = productRepriceCount();
         if ($behind['lines']) {
-            $message .= ". <strong>" . intval($behind['lines']) . "</strong> line" . ($behind['lines'] == 1 ? ' is' : 's are') . " on recurring invoices, drafts or quotes at an old price - Update Prices is in the Products menu";
+            $message .= '. ' . _n('<strong>%d</strong> line is on recurring invoices, drafts or quotes at an old price - Update Prices is in the Products menu', '<strong>%d</strong> lines are on recurring invoices, drafts or quotes at an old price - Update Prices is in the Products menu', intval($behind['lines']));
         }
     }
     flashAlert($message, $skipped && !$added && !$updated ? 'error' : 'success');
@@ -756,9 +759,10 @@ if (isset($_POST['products_reprice_save'])) {
 
     logAudit("Product", "Edit", "$session_name updated the price of {$done['lines']} line(s) on {$done['documents']} recurring invoice(s), draft(s) and quote(s) from the catalog");
 
-    $message = "<strong>{$done['lines']}</strong> price" . ($done['lines'] === 1 ? '' : 's') . " updated on <strong>{$done['documents']}</strong> document" . ($done['documents'] === 1 ? '' : 's');
+    $message = _n('<strong>%d</strong> price updated', '<strong>%d</strong> prices updated', $done['lines']) . ' ' . _n('on <strong>%d</strong> document', 'on <strong>%d</strong> documents', $done['documents']);
     if ($done['monthly'] != 0) {
-        $message .= " - recurring invoices bring in " . escapeHtml(billingMoney(abs($done['monthly']), $session_company_currency)) . ($done['monthly'] > 0 ? ' more' : ' less') . " a month";
+        $monthly = escapeHtml(billingMoney(abs($done['monthly']), $session_company_currency));
+        $message .= $done['monthly'] > 0 ? __(' - recurring invoices bring in %s more a month', $monthly) : __(' - recurring invoices bring in %s less a month', $monthly);
     }
     flashAlert($message);
 

@@ -263,22 +263,22 @@ function projectViews($with_budget = true) {
     $has_tickets = "EXISTS (SELECT 1 FROM tickets rt WHERE rt.ticket_project_id = projects.project_id AND rt.ticket_archived_at IS NULL)";
     $has_open = "EXISTS (SELECT 1 FROM tickets rt WHERE rt.ticket_project_id = projects.project_id AND rt.ticket_archived_at IS NULL AND rt.ticket_resolved_at IS NULL AND rt.ticket_closed_at IS NULL)";
     $views = [
-        '' => ['label' => 'Active', 'icon' => 'fa-project-diagram', 'where' => $open, 'title' => 'Not completed or archived'],
-        'mine' => ['label' => 'Mine', 'icon' => 'fa-user-tie', 'where' => "$open AND projects.project_manager = " . intval($session_user_id), 'title' => 'Active projects you manage'],
-        'overdue' => ['label' => 'Overdue', 'icon' => 'fa-calendar-times', 'where' => "$open AND projects.project_due < CURDATE()",
-            'title' => 'Past their due date', 'alarm' => 'danger'],
-        'soon' => ['label' => 'Due soon', 'icon' => 'fa-calendar-day', 'where' => "$open AND projects.project_due BETWEEN CURDATE() AND CURDATE() + INTERVAL " . PROJECT_SOON_DAYS . " DAY",
-            'title' => 'Due in the next ' . PROJECT_SOON_DAYS . ' days', 'alarm' => 'warning'],
-        'stalled' => ['label' => 'Stalled', 'icon' => 'fa-hourglass-half', 'where' => "$open AND $started AND (NOT $has_tickets OR $has_open)
+        '' => ['label' => _x('Active', 'projects view'), 'icon' => 'fa-project-diagram', 'where' => $open, 'title' => __('Not completed or archived')],
+        'mine' => ['label' => _x('Mine', 'projects view'), 'icon' => 'fa-user-tie', 'where' => "$open AND projects.project_manager = " . intval($session_user_id), 'title' => __('Active projects you manage')],
+        'overdue' => ['label' => _x('Overdue', 'projects view'), 'icon' => 'fa-calendar-times', 'where' => "$open AND projects.project_due < CURDATE()",
+            'title' => __('Past their due date'), 'alarm' => 'danger'],
+        'soon' => ['label' => _x('Due soon', 'projects view'), 'icon' => 'fa-calendar-day', 'where' => "$open AND projects.project_due BETWEEN CURDATE() AND CURDATE() + INTERVAL " . PROJECT_SOON_DAYS . " DAY",
+            'title' => __('Due in the next %d days', PROJECT_SOON_DAYS), 'alarm' => 'warning'],
+        'stalled' => ['label' => _x('Stalled', 'projects view'), 'icon' => 'fa-hourglass-half', 'where' => "$open AND $started AND (NOT $has_tickets OR $has_open)
             AND COALESCE(" . projectLastActivitySql() . ", projects.project_created_at) < NOW() - INTERVAL " . PROJECT_STALLED_DAYS . " DAY",
-            'title' => 'Started, and none of their tickets has moved in ' . PROJECT_STALLED_DAYS . ' days', 'alarm' => 'warning'],
-        'over_budget' => ['label' => 'Over budget', 'icon' => 'fa-hourglass-end', 'where' => "$open AND projects.project_budget_hours > 0 AND " . projectSecondsSql() . " > projects.project_budget_hours * 3600",
-            'title' => 'More time logged than the hours budgeted', 'alarm' => 'danger'],
-        'ready' => ['label' => 'Ready to close', 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open",
-            'title' => 'Every ticket resolved or closed - mark them complete', 'alarm' => 'success'],
-        'completed' => ['label' => 'Completed', 'icon' => 'fa-check', 'where' => 'projects.project_completed_at IS NOT NULL AND projects.project_archived_at IS NULL'],
-        'archived' => ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'projects.project_archived_at IS NOT NULL'],
-        'all' => ['label' => 'All', 'where' => ''],
+            'title' => __('Started, and none of their tickets has moved in %d days', PROJECT_STALLED_DAYS), 'alarm' => 'warning'],
+        'over_budget' => ['label' => _x('Over budget', 'projects view'), 'icon' => 'fa-hourglass-end', 'where' => "$open AND projects.project_budget_hours > 0 AND " . projectSecondsSql() . " > projects.project_budget_hours * 3600",
+            'title' => __('More time logged than the hours budgeted'), 'alarm' => 'danger'],
+        'ready' => ['label' => _x('Ready to close', 'projects view'), 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open",
+            'title' => __('Every ticket resolved or closed - mark them complete'), 'alarm' => 'success'],
+        'completed' => ['label' => _x('Completed', 'projects view'), 'icon' => 'fa-check', 'where' => 'projects.project_completed_at IS NOT NULL AND projects.project_archived_at IS NULL'],
+        'archived' => ['label' => _x('Archived', 'projects view'), 'icon' => 'fa-archive', 'where' => 'projects.project_archived_at IS NOT NULL'],
+        'all' => ['label' => _x('All', 'projects view'), 'where' => ''],
     ];
     if (!$with_budget) {
         unset($views['over_budget']);

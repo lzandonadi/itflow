@@ -321,9 +321,9 @@ function contractNetTermsWhose($client_id, $date) {
     // Before the 3.5.0 update, the client's own, as it was
     $legacy = billingClientLegacyTerms($client_id);
     if ($legacy && $legacy['net_terms'] !== null) {
-        return [$legacy['net_terms'], "the client's"];
+        return [$legacy['net_terms'], __("the client's")];
     }
-    return [billingDefaults()['net_terms'], 'the default'];
+    return [billingDefaults()['net_terms'], __('the default')];
 }
 
 /*

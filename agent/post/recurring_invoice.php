@@ -19,7 +19,7 @@ if (isset($_POST['add_invoice_recurring'])) {
         invoice_date, invoice_note, invoice_number, invoice_prefix, invoice_scope FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -70,7 +70,7 @@ if (isset($_POST['add_invoice_recurring'])) {
 
     logAudit("Recurring Invoice", "Create", "$session_name created recurring Invoice from Invoice $invoice_prefix$invoice_number", $client_id, $recurring_invoice_id);
 
-    flashAlert("Created recurring Invoice from Invoice <strong>$invoice_prefix$invoice_number</strong>");
+    flashAlert(__('Created recurring invoice from invoice %s', "<strong>$invoice_prefix$invoice_number</strong>"));
 
     redirect("recurring_invoice.php?recurring_invoice_id=$recurring_invoice_id");
 
@@ -111,7 +111,7 @@ if (isset($_POST['add_recurring_invoice'])) {
 
     logAudit("Recurring Invoice", "Create", "$session_name created recurring invoice $config_recurring_invoice_prefix$recurring_invoice_number - $scope", $client_id, $recurring_invoice_id);
 
-    flashAlert("Recurring Invoice <strong>$config_recurring_invoice_prefix$recurring_invoice_number</strong> created");
+    flashAlert(__('Recurring invoice %s created', "<strong>$config_recurring_invoice_prefix$recurring_invoice_number</strong>"));
 
     redirect("recurring_invoice.php?recurring_invoice_id=$recurring_invoice_id");
 
@@ -136,7 +136,7 @@ if (isset($_POST['edit_recurring_invoice'])) {
     $sql = mysqli_query($mysqli,"SELECT recurring_invoice_prefix, recurring_invoice_number, recurring_invoice_client_id FROM recurring_invoices WHERE recurring_invoice_id = $recurring_invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $recurring_invoice_prefix = escapeSql($row['recurring_invoice_prefix']);
@@ -157,7 +157,7 @@ if (isset($_POST['edit_recurring_invoice'])) {
 
     logAudit("Recurring Invoice", "Edit", "$session_name edited recurring invoice $recurring_invoice_prefix$recurring_invoice_number - $scope", $client_id, $recurring_invoice_id);
 
-    flashAlert("Recurring Invoice <strong>$recurring_invoice_prefix$recurring_invoice_number</strong> edited");
+    flashAlert(__('Recurring invoice %s edited', "<strong>$recurring_invoice_prefix$recurring_invoice_number</strong>"));
 
     redirect();
 
@@ -175,7 +175,7 @@ if (isset($_GET['delete_recurring_invoice'])) {
     $sql = mysqli_query($mysqli,"SELECT recurring_invoice_prefix, recurring_invoice_number, recurring_invoice_scope, recurring_invoice_client_id FROM recurring_invoices WHERE recurring_invoice_id = $recurring_invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $recurring_invoice_prefix = escapeSql($row['recurring_invoice_prefix']);
@@ -214,7 +214,7 @@ if (isset($_GET['delete_recurring_invoice'])) {
 
     logAudit("Recurring Invoice", "Delete", "$session_name deleted recurring invoice $recurring_invoice_prefix$recurring_invoice_number - $recurring_invoice_scope", $client_id);
 
-    flashAlert("Recurring Invoice <strong>$recurring_invoice_prefix$recurring_invoice_number</strong> deleted", 'error');
+    flashAlert(__('Recurring invoice %s deleted', "<strong>$recurring_invoice_prefix$recurring_invoice_number</strong>"), 'error');
 
     redirect();
 
@@ -233,7 +233,7 @@ if (isset($_GET['force_recurring'])) {
     $recurring_invoice_id = intval($_GET['force_recurring']);
     $recurring = billingRow('recurring', $recurring_invoice_id);
     if (!$recurring) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($recurring['client_id']);
@@ -245,14 +245,14 @@ if (isset($_GET['force_recurring'])) {
     $run = (string) ($_GET['run'] ?? '');
     $invoice_id = recurringInvoiceGenerate($recurring_invoice_id, stripslashes($session_name), true, $run !== '' ? $run : null);
     if (!$invoice_id) {
-        flashAlert('The run on ' . escapeHtml($run !== '' ? $run : $recurring['recurring_invoice_next_date']) . ' was already billed - nothing more was made. It next runs on ' . escapeHtml(getFieldById('recurring_invoices', $recurring_invoice_id, 'recurring_invoice_next_date')) . '.', 'warning');
+        flashAlert(__('The run on %1$s was already billed - nothing more was made. It next runs on %2$s.', escapeHtml(formatDate($run !== '' ? $run : $recurring['recurring_invoice_next_date'], 'date')), escapeHtml(formatDate(getFieldById('recurring_invoices', $recurring_invoice_id, 'recurring_invoice_next_date'), 'date'))), 'warning');
         redirect();
     }
 
     $invoice = billingRow('invoice', $invoice_id);
     $next = getFieldById('recurring_invoices', $recurring_invoice_id, 'recurring_invoice_next_date');
-    flashAlert('<strong>' . escapeHtml(billingNumber('invoice', $invoice)) . '</strong> made from ' . escapeHtml(billingNumber('recurring', $recurring))
-        . ($invoice['invoice_status'] === 'Sent' ? ' and emailed' : ' - a draft to check and send') . '. The next one is on ' . escapeHtml($next) . '.');
+    $made_args = ['<strong>' . escapeHtml(billingNumber('invoice', $invoice)) . '</strong>', escapeHtml(billingNumber('recurring', $recurring)), escapeHtml(formatDate($next, 'date'))];
+    flashAlert($invoice['invoice_status'] === 'Sent' ? __('%1$s made from %2$s and emailed. The next one is on %3$s.', ...$made_args) : __('%1$s made from %2$s - a draft to check and send. The next one is on %3$s.', ...$made_args));
 
     redirect("invoice.php?invoice_id=$invoice_id");
 
@@ -272,7 +272,7 @@ if (isset($_POST['set_recurring_payment'])) {
         recurring_invoice_number, recurring_invoice_prefix FROM recurring_invoices WHERE recurring_invoice_id = $recurring_invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['recurring_invoice_client_id']);
@@ -297,7 +297,7 @@ if (isset($_POST['set_recurring_payment'])) {
         $row = mysqli_fetch_assoc($sql);
 
         if (!$row) {
-            flashAlert("Payment method not found for this client.", 'error');
+            flashAlert(__('Payment method not found for this client.'), 'error');
             redirect();
         }
 
@@ -313,14 +313,14 @@ if (isset($_POST['set_recurring_payment'])) {
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_name created Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment <strong>$saved_payment_description</strong> enabled for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number");
+        flashAlert(__('Automatic payment %1$s enabled for recurring invoice %2$s', "<strong>$saved_payment_description</strong>", "$recurring_invoice_prefix$recurring_invoice_number"));
     } else {
         // Delete
         mysqli_query($mysqli, "DELETE FROM recurring_payments WHERE recurring_payment_recurring_invoice_id = $recurring_invoice_id");
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_name removed Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment <strong>Disabled</strong> for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number", 'error');
+        flashAlert(__('Automatic payment <strong>disabled</strong> for recurring invoice %s', "$recurring_invoice_prefix$recurring_invoice_number"), 'error');
     }
 
     redirect();
@@ -341,7 +341,7 @@ if (isExportRequest('export_recurring_invoices')) {
 
     if (!empty($_POST['client_id'])) {
         $client_id = intval($_POST['client_id']);
-        $client_query = "AND recurring_invoice_client_id = $client_id";
+        $client_query = "AND recurring_invoice_client_id = $client_id"; // i18n-ignore - SQL, logs or history
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
         $filter_summary[__('Client')] = $client_name;
@@ -355,10 +355,10 @@ if (isExportRequest('export_recurring_invoices')) {
 
     // Status Filter
     if (isset($_POST['status']) && $_POST['status'] === 'inactive') {
-        $status_query = "AND recurring_invoice_status = 0";
+        $status_query = "AND recurring_invoice_status = 0"; // i18n-ignore - SQL, logs or history
         $filter_summary[__('Status')] = _x('Inactive', 'recurring invoices filter');
     } elseif (isset($_POST['status']) && $_POST['status'] === 'active') {
-        $status_query = "AND recurring_invoice_status = 1";
+        $status_query = "AND recurring_invoice_status = 1"; // i18n-ignore - SQL, logs or history
         $filter_summary[__('Status')] = _x('Active', 'recurring invoices filter');
     } else {
         // Default - any
@@ -383,7 +383,7 @@ if (isExportRequest('export_recurring_invoices')) {
     $category_query = '';
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
-        $category_query = "AND recurring_invoice_category_id = $filter_category_id";
+        $category_query = "AND recurring_invoice_category_id = $filter_category_id"; // i18n-ignore - SQL, logs or history
         $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     }
 
@@ -443,7 +443,7 @@ if (isset($_GET['recurring_invoice_email_notify'])) {
     $sql = mysqli_query($mysqli,"SELECT recurring_invoice_client_id, recurring_invoice_number, recurring_invoice_prefix FROM recurring_invoices WHERE recurring_invoice_id = $recurring_invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $recurring_invoice_prefix = escapeSql($row['recurring_invoice_prefix']);
@@ -463,7 +463,7 @@ if (isset($_GET['recurring_invoice_email_notify'])) {
 
     logAudit("Recurring Invoice", "Edit", "$session_name turned $notify_wording Email Notifications for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number", $client_id, $recurring_invoice_id);
 
-    flashAlert("Email Notifications <strong>$notify_wording</strong>", 'error');
+    flashAlert($recurring_invoice_email_notify ? __('Email notifications <strong>on</strong>') : __('Email notifications <strong>off</strong>'), 'error');
 
     redirect();
 

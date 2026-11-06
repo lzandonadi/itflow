@@ -42,7 +42,7 @@ $form_warranty = $form_edit && intval($form_product['product_warranty_months']) 
 $form_taxes = billingTaxes();
 $form_vendors = productVendors();
 if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('vendor_name') !== '') {
-    $form_vendors[$form_vendor_id] = $form_value('vendor_name') . ' (archived)';
+    $form_vendors[$form_vendor_id] = __('%s (archived)', $form_value('vendor_name'));
 }
 
 ?>
@@ -50,14 +50,14 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
 
     <!-- What it is -->
     <div class="col-12">
-        <div class="btn-group w-100 itflow-product-type" role="group" aria-label="Type">
+        <div class="btn-group w-100 itflow-product-type" role="group" aria-label="<?= escapeHtml(__('Type')) ?>">
             <?php foreach (productTypes() as $type_key => $type) { ?>
                 <input type="radio" class="btn-check" name="type" value="<?= $type_key ?>" id="<?= $form_id ?>Type<?= ucfirst($type_key) ?>" autocomplete="off" <?= $form_type === $type_key ? 'checked' : '' ?> data-product-type>
                 <label class="btn btn-outline-secondary text-start d-flex align-items-center gap-2" for="<?= $form_id ?>Type<?= ucfirst($type_key) ?>">
                     <i class="fas fa-fw <?= $type['icon'] ?> fa-lg"></i>
                     <span>
                         <span class="fw-semibold d-block"><?= $type['label'] ?></span>
-                        <span class="small opacity-75 d-none d-sm-block"><?= $type_key === 'service' ? 'Labor, managed services, hosting, licenses' : 'Hardware and goods - can track stock' ?></span>
+                        <span class="small opacity-75 d-none d-sm-block"><?= $type_key === 'service' ? __('Labor, managed services, hosting, licenses') : __('Hardware and goods - can track stock') ?></span>
                     </span>
                 </label>
             <?php } ?>
@@ -65,57 +65,57 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
     </div>
 
     <div class="col-12">
-        <label class="form-label">Name <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-tag"></i></span>
-            <input type="text" class="form-control" name="name" maxlength="200" value="<?= escapeHtml($form_value('product_name')) ?>" placeholder="Managed Workstation, 24 port PoE switch, Microsoft 365 Business Premium" required <?= $form_edit ? '' : 'autofocus' ?>>
+            <input type="text" class="form-control" name="name" maxlength="200" value="<?= escapeHtml($form_value('product_name')) ?>" placeholder="<?= escapeHtml(__('Managed Workstation, 24 port PoE switch, Microsoft 365 Business Premium')) ?>" required <?= $form_edit ? '' : 'autofocus' ?>>
         </div>
     </div>
 
     <div class="col-sm-7">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-list"></i></span>
             <select class="form-select select2" name="category" required>
-                <option value="">- Category -</option>
+                <option value=""><?= __('- Category -') ?></option>
                 <?= categoryOptionsHtml('Income', $form_category_id) ?>
             </select>
             <?= categoryAddButtonHtml('Income', 'btn btn-secondary') ?>
         </div>
     </div>
     <div class="col-sm-5">
-        <label class="form-label">Tax</label>
+        <label class="form-label"><?= __('Tax') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-balance-scale"></i></span>
             <select class="form-select" name="tax">
                 <?= taxOptionsHtml($form_taxes, $form_tax_id) ?>
             </select>
         </div>
-        <small class="text-secondary">Taxed, its lines take the client's own rate when it has one</small>
+        <small class="text-secondary"><?= __('Taxed, its lines take the client\'s own rate when it has one') ?></small>
     </div>
 
     <!-- What it sells for, what it costs us -->
     <div class="col-sm-6">
-        <label class="form-label">Price <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Price') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-dollar-sign"></i></span>
             <input type="text" class="form-control text-end" name="price" inputmode="decimal" value="<?= $form_price ?>" placeholder="0.00" required data-product-price>
         </div>
     </div>
     <div class="col-sm-6">
-        <label class="form-label">Cost <span class="text-body-secondary fw-normal small">what it costs you</span></label>
+        <label class="form-label"><?= __('Cost') ?> <span class="text-body-secondary fw-normal small"><?= __('what it costs you') ?></span></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-shopping-cart"></i></span>
             <input type="text" class="form-control text-end" name="cost" inputmode="decimal" value="<?= $form_cost ?>" placeholder="0.00" data-product-cost>
         </div>
     </div>
     <div class="col-12 mt-1">
-        <div class="form-text" data-product-margin>Add a cost to see your margin - only agents see it.</div>
+        <div class="form-text" data-product-margin><?= __('Add a cost to see your margin - only agents see it.') ?></div>
     </div>
 
     <!-- How it is billed by default -->
     <div class="col-sm-6">
-        <label class="form-label">Billed</label>
+        <label class="form-label"><?= _x('Billed', 'product frequency') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-redo-alt"></i></span>
             <select class="form-select" name="frequency" data-product-frequency>
@@ -126,7 +126,7 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         </div>
     </div>
     <div class="col-sm-6" data-product-counted>
-        <label class="form-label">Counted</label>
+        <label class="form-label"><?= _x('Counted', 'product seats') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-users"></i></span>
             <select class="form-select" name="seat_source">
@@ -137,23 +137,23 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         </div>
     </div>
     <div class="col-12 mt-1">
-        <div class="form-text" data-product-billed-help>Picked on a quote, it fills in Billed. On a recurring invoice, per user or per device takes the quantity from the client's count.</div>
+        <div class="form-text" data-product-billed-help><?= __('Picked on a quote, it fills in Billed. On a recurring invoice, per user or per device takes the quantity from the client\'s count.') ?></div>
     </div>
 
     <!-- Where it comes from -->
     <div class="col-sm-6">
-        <label class="form-label">Code</label>
+        <label class="form-label"><?= __('Code') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-barcode"></i></span>
-            <input type="text" class="form-control" name="code" maxlength="200" value="<?= escapeHtml($form_value('product_code')) ?>" placeholder="Your SKU - MS-WKS, HW-SW24">
+            <input type="text" class="form-control" name="code" maxlength="200" value="<?= escapeHtml($form_value('product_code')) ?>" placeholder="<?= escapeHtml(__('Your SKU - MS-WKS, HW-SW24')) ?>">
         </div>
     </div>
     <div class="col-sm-6">
-        <label class="form-label">Vendor</label>
+        <label class="form-label"><?= __('Vendor') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-building"></i></span>
             <select class="form-select select2" name="vendor">
-                <option value="0">- Who you buy it from -</option>
+                <option value="0"><?= __('- Who you buy it from -') ?></option>
                 <?php foreach ($form_vendors as $vendor_id => $vendor_name) { ?>
                     <option value="<?= intval($vendor_id) ?>" <?= $form_vendor_id === intval($vendor_id) ? 'selected' : '' ?>><?= escapeHtml($vendor_name) ?></option>
                 <?php } ?>
@@ -161,10 +161,10 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         </div>
     </div>
     <div class="col-12">
-        <label class="form-label">Vendor part number</label>
+        <label class="form-label"><?= __('Vendor part number') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-hashtag"></i></span>
-            <input type="text" class="form-control" name="vendor_part" maxlength="200" value="<?= escapeHtml($form_value('product_vendor_part')) ?>" placeholder="What to order it as - the vendor's SKU or the manufacturer part number">
+            <input type="text" class="form-control" name="vendor_part" maxlength="200" value="<?= escapeHtml($form_value('product_vendor_part')) ?>" placeholder="<?= escapeHtml(__('What to order it as - the vendor\'s SKU or the manufacturer part number')) ?>">
         </div>
     </div>
 
@@ -172,45 +172,45 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
     <div class="col-12" data-product-only>
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" name="track_stock" value="1" id="<?= $form_id ?>Track" <?= $form_track ? 'checked' : '' ?> data-product-track>
-            <label class="form-check-label" for="<?= $form_id ?>Track">Track stock</label>
+            <label class="form-check-label" for="<?= $form_id ?>Track"><?= __('Track stock') ?></label>
         </div>
-        <div class="form-text" data-product-track-on>Invoicing it takes it off the shelf, and it can't be sold past what is there. Add stock as it comes in.</div>
-        <div class="form-text" data-product-track-off>Ordered as needed - invoicing it doesn't touch stock.<?= $form_edit && $form_track && $form_stock ? ' The ' . billingQuantity($form_stock) . ' on the shelf stay on record but stop moving.' : '' ?></div>
+        <div class="form-text" data-product-track-on><?= __('Invoicing it takes it off the shelf, and it can\'t be sold past what is there. Add stock as it comes in.') ?></div>
+        <div class="form-text" data-product-track-off><?= __('Ordered as needed - invoicing it doesn\'t touch stock.') ?><?= $form_edit && $form_track && $form_stock ? ' ' . __('The %s on the shelf stay on record but stop moving.', billingQuantity($form_stock)) : '' ?></div>
     </div>
     <div class="col-sm-6" data-product-only data-product-tracked>
-        <label class="form-label">Reorder at</label>
+        <label class="form-label"><?= __('Reorder at') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-bell"></i></span>
-            <input type="text" class="form-control text-end" name="reorder_level" inputmode="decimal" value="<?= $form_reorder_level ?>" placeholder="When it is out">
+            <input type="text" class="form-control text-end" name="reorder_level" inputmode="decimal" value="<?= $form_reorder_level ?>" placeholder="<?= escapeHtml(__('When it is out')) ?>">
         </div>
     </div>
     <div class="col-sm-6" data-product-only data-product-tracked>
-        <label class="form-label">Order</label>
+        <label class="form-label"><?= _x('Order', 'reorder quantity') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-shopping-basket"></i></span>
-            <input type="text" class="form-control text-end" name="reorder_qty" inputmode="decimal" value="<?= $form_reorder_qty ?>" placeholder="How many to buy">
+            <input type="text" class="form-control text-end" name="reorder_qty" inputmode="decimal" value="<?= $form_reorder_qty ?>" placeholder="<?= escapeHtml(__('How many to buy')) ?>">
         </div>
     </div>
     <div class="col-12 mt-1" data-product-only data-product-tracked>
-        <div class="form-text">Agents are told when it gets down to this, and it is listed under Reorder with the vendor and part number.</div>
+        <div class="form-text"><?= __('Agents are told when it gets down to this, and it is listed under Reorder with the vendor and part number.') ?></div>
     </div>
     <div class="col-12" data-product-only data-product-tracked data-product-location>
-        <label class="form-label">Location</label>
+        <label class="form-label"><?= __('Location') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>
-            <input type="text" class="form-control" name="location" maxlength="250" value="<?= escapeHtml($form_value('product_location')) ?>" placeholder="Where it is kept - shelf B2, the van, the back office">
+            <input type="text" class="form-control" name="location" maxlength="250" value="<?= escapeHtml($form_value('product_location')) ?>" placeholder="<?= escapeHtml(__('Where it is kept - shelf B2, the van, the back office')) ?>">
         </div>
     </div>
 
     <!-- Hardware - becomes a client asset when it is sold -->
     <div class="col-sm-6" data-product-only>
-        <label class="form-label">Client asset</label>
+        <label class="form-label"><?= __('Client asset') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-laptop"></i></span>
             <select class="form-select select2" name="asset_type" data-product-asset-type>
-                <option value="">- Not an asset -</option>
+                <option value=""><?= __('- Not an asset -') ?></option>
                 <?php foreach (productAssetTypes() as $asset_type_option => $asset_type_icon) { ?>
-                    <option value="<?= escapeHtml($asset_type_option) ?>" <?= $form_asset_type === $asset_type_option ? 'selected' : '' ?><?= selectOptionData(['icon' => "fas $asset_type_icon"]) ?>><?= escapeHtml($asset_type_option) ?></option>
+                    <option value="<?= escapeHtml($asset_type_option) ?>" <?= $form_asset_type === $asset_type_option ? 'selected' : '' ?><?= selectOptionData(['icon' => "fas $asset_type_icon"]) ?>><?= escapeHtml(assetTypeLabel($asset_type_option)) ?></option>
                 <?php } ?>
                 <?php if ($form_asset_type !== '' && !isset(productAssetTypes()[$form_asset_type])) { ?>
                     <option value="<?= escapeHtml($form_asset_type) ?>" selected><?= escapeHtml($form_asset_type) ?></option>
@@ -219,44 +219,44 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         </div>
     </div>
     <div class="col-sm-6" data-product-only data-product-asset>
-        <label class="form-label">Warranty</label>
+        <label class="form-label"><?= __('Warranty') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-shield-alt"></i></span>
-            <input type="text" class="form-control text-end" name="warranty_months" inputmode="numeric" maxlength="3" value="<?= $form_warranty ?>" placeholder="None">
-            <span class="input-group-text">months</span>
+            <input type="text" class="form-control text-end" name="warranty_months" inputmode="numeric" maxlength="3" value="<?= $form_warranty ?>" placeholder="<?= escapeHtml(_x('None', 'warranty')) ?>">
+            <span class="input-group-text"><?= __('months') ?></span>
         </div>
     </div>
     <div class="col-sm-6" data-product-only data-product-asset>
-        <label class="form-label">Make</label>
+        <label class="form-label"><?= __('Make') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-industry"></i></span>
-            <input type="text" class="form-control" name="make" maxlength="200" value="<?= escapeHtml($form_value('product_make')) ?>" placeholder="Who makes it - Dell, Ubiquiti, Synology">
+            <input type="text" class="form-control" name="make" maxlength="200" value="<?= escapeHtml($form_value('product_make')) ?>" placeholder="<?= escapeHtml(__('Who makes it - Dell, Ubiquiti, Synology')) ?>">
         </div>
     </div>
     <div class="col-sm-6" data-product-only data-product-asset>
-        <label class="form-label">Model</label>
+        <label class="form-label"><?= __('Model') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-cube"></i></span>
             <input type="text" class="form-control" name="model" maxlength="200" value="<?= escapeHtml($form_value('product_model')) ?>" placeholder="OptiPlex 7020, U6-Pro, RS1221+">
         </div>
     </div>
     <div class="col-12 mt-1" data-product-only>
-        <div class="form-text" data-product-asset-on>When it is sold, the invoice offers to add each one to the client's assets with its serial number, this make and model, and the warranty counted from the invoice date.</div>
-        <div class="form-text" data-product-asset-off>Pick an asset type for hardware the client keeps - a laptop, a switch, a firewall - and selling it offers to add it to their assets.</div>
+        <div class="form-text" data-product-asset-on><?= __('When it is sold, the invoice offers to add each one to the client\'s assets with its serial number, this make and model, and the warranty counted from the invoice date.') ?></div>
+        <div class="form-text" data-product-asset-off><?= __('Pick an asset type for hardware the client keeps - a laptop, a switch, a firewall - and selling it offers to add it to their assets.') ?></div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">Description <span class="text-body-secondary fw-normal small">on invoices and quotes</span></label>
+        <label class="form-label"><?= __('Description') ?> <span class="text-body-secondary fw-normal small"><?= __('on invoices and quotes') ?></span></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" name="description" rows="3" placeholder="What the client sees under the line - what it covers, per user per month, what is included"><?= escapeHtml($form_value('product_description')) ?></textarea>
+            <textarea class="form-control" name="description" rows="3" placeholder="<?= escapeHtml(__('What the client sees under the line - what it covers, per user per month, what is included')) ?>"><?= escapeHtml($form_value('product_description')) ?></textarea>
         </div>
     </div>
     <div class="col-12">
-        <label class="form-label">Notes <span class="text-body-secondary fw-normal small">for agents only</span></label>
+        <label class="form-label"><?= __('Notes') ?> <span class="text-body-secondary fw-normal small"><?= __('for agents only') ?></span></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-sticky-note"></i></span>
-            <textarea class="form-control" name="notes" rows="2" placeholder="Lead time, where to order it, what to check before quoting"><?= escapeHtml($form_value('product_notes')) ?></textarea>
+            <textarea class="form-control" name="notes" rows="2" placeholder="<?= escapeHtml(__('Lead time, where to order it, what to check before quoting')) ?>"><?= escapeHtml($form_value('product_notes')) ?></textarea>
         </div>
     </div>
 </div>
@@ -277,6 +277,17 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
     var counted = form.querySelector('[data-product-counted]');
     var track = form.querySelector('[data-product-track]');
     var assetType = form.querySelector('[data-product-asset-type]');
+    var text = <?= json_encode([
+        'margin' => __('Margin %1$s (%2$s) - only agents see it.'),
+        'marginPeriod' => __('Margin %1$s (%2$s) %3$s - only agents see it.'),
+        'none' => __('Add a cost to see your margin - only agents see it.'),
+        'month' => __('a month'),
+        'quarter' => __('a quarter'),
+        'year' => __('a year'),
+    ], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    function fill(template, values) {
+        return template.replace(/%(\d)\$s/g, function (m, i) { return values[i - 1]; });
+    }
 
     function number(value) {
         var text = String(value || '').replace(/[\s,$€£]/g, '');
@@ -312,10 +323,12 @@ if ($form_vendor_id && !isset($form_vendors[$form_vendor_id]) && $form_value('ve
         margin.classList.remove('text-success-emphasis', 'text-warning-emphasis', 'text-danger-emphasis');
         if (!isNaN(p) && !isNaN(c) && c > 0 && p > 0) {
             var percent = Math.round((p - c) / p * 1000) / 10;
-            margin.textContent = 'Margin ' + money(p - c) + ' (' + percent + '%)' + (frequency.value ? ' ' + { month: 'a month', quarter: 'a quarter', year: 'a year' }[frequency.value] : '') + ' - only agents see it.';
+            margin.textContent = frequency.value && text[frequency.value]
+                ? fill(text.marginPeriod, [money(p - c), percent + '%', text[frequency.value]])
+                : fill(text.margin, [money(p - c), percent + '%']);
             margin.classList.add(percent >= 30 ? 'text-success-emphasis' : (percent > 0 ? 'text-warning-emphasis' : 'text-danger-emphasis'));
         } else {
-            margin.textContent = 'Add a cost to see your margin - only agents see it.';
+            margin.textContent = text.none;
         }
     }
     form.addEventListener('input', update);

@@ -13,7 +13,7 @@ enforceUserPermission('module_sales', 2);
 $doc_type = 'invoice';
 $doc = billingRow($doc_type, intval($_GET['invoice_id'] ?? 0));
 if (!$doc) {
-    exit(json_encode(['error' => 'That invoice no longer exists.']));
+    exit(json_encode(['error' => __('That invoice no longer exists.')]));
 }
 $client_id = intval($doc['client_id']);
 enforceClientAccess();
@@ -23,7 +23,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-check me-2"></i>Mark Sent <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($doc_number) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-check me-2"></i><?= __('Mark Sent') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($doc_number) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -31,31 +31,31 @@ ob_start();
     <input type="hidden" name="invoice_id" value="<?= intval($doc['invoice_id']) ?>">
 
     <div class="modal-body">
-        <p class="text-body-secondary small">For a invoice that went out some other way than ITFlow's email. It stops being a draft - it counts as owed from now, and the client can open and pay it from its link.</p>
+        <p class="text-body-secondary small"><?= __("For an invoice that went out some other way than ITFlow's email. It stops being a draft - it counts as owed from now, and the client can open and pay it from its link.") ?></p>
         <div class="row g-3">
             <div class="col-12">
-                <label class="form-label">How was it sent? <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('How was it sent?') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-paper-plane"></i></span>
                     <select class="form-select" name="sent_method" required>
                         <?php foreach (getSentMethods() as $sent_method) { ?>
-                            <option value="<?= escapeHtml($sent_method) ?>"><?= escapeHtml($sent_method) ?></option>
+                            <option value="<?= escapeHtml($sent_method) ?>"><?= escapeHtml(_x($sent_method, 'sent method')) /* i18n-dynamic */ ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-12">
-                <label class="form-label">Note</label>
+                <label class="form-label"><?= __('Note') ?></label>
                 <div class="input-group">
                     <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-sticky-note"></i></span>
-                    <textarea class="form-control" name="note" rows="3" maxlength="500" placeholder="Tracking number, who it went to, anything worth keeping"></textarea>
+                    <textarea class="form-control" name="note" rows="3" maxlength="500" placeholder="<?= __('Tracking number, who it went to, anything worth keeping') ?>"></textarea>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="mark_invoice_sent" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Mark Sent</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="mark_invoice_sent" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Mark Sent') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

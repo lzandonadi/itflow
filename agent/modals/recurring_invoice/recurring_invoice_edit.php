@@ -13,7 +13,7 @@ enforceUserPermission('module_sales', 2);
 $form_type = 'recurring';
 $form_row = billingRow($form_type, intval($_GET['id'] ?? 0));
 if (!$form_row) {
-    exit(json_encode(['error' => 'That recurring invoice no longer exists.']));
+    exit(json_encode(['error' => __('That recurring invoice no longer exists.')]));
 }
 $client_id = intval($form_row['client_id']);
 enforceClientAccess();
@@ -23,7 +23,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-redo-alt me-2"></i>Edit Recurring Invoice <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber($form_type, $form_row)) ?> &middot; <?= escapeHtml($form_row['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-redo-alt me-2"></i><?= __('Edit Recurring Invoice') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber($form_type, $form_row)) ?> &middot; <?= escapeHtml($form_row['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -34,8 +34,8 @@ ob_start();
         <?php require __DIR__ . '/../billing/billing_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_recurring_invoice" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_recurring_invoice" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

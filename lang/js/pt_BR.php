@@ -312,4 +312,28 @@ return [
     // Client export (agent/js/client_export.js)
     'The passwords do not match' => 'As senhas não conferem',
 
+    // Paying invoices (js/portal.js, js/portal_stripe.js, js/guest_pay_invoice_stripe.js)
+    '%d invoice' => '%d fatura',
+    '%d invoices' => '%d faturas',
+    'Tick an invoice to pay' => 'Marque uma fatura para pagar',
+    'Pay up to %d invoices at a time' => 'Pague até %d faturas por vez',
+    'Continue to pay %s' => 'Continuar para pagar %s',
+    'Pay %s' => 'Pagar %s',
+    'Something went wrong taking the payment - nothing has been charged. Try again.' => 'Algo deu errado ao receber o pagamento - nada foi cobrado. Tente de novo.',
+    'An unexpected error occurred.' => 'Ocorreu um erro inesperado.',
+    'Payment succeeded!' => 'Pagamento concluído!',
+    'Your payment is processing.' => 'Seu pagamento está em processamento.',
+    'Your payment was not successful, please try again.' => 'Seu pagamento não foi concluído, tente de novo.',
+    'Something went wrong.' => 'Algo deu errado.',
+    'Not a number' => 'Não é um número',
+    'Service' => 'Serviço',
+    'Product' => 'Produto',
+    'Tax %s%%' => 'Imposto %s%%',
+    '%s in stock' => '%s em estoque',
+    'Order saved' => 'Ordem salva',
+    'The new order didn\'t save - reloading' => 'A nova ordem não foi salva - recarregando',
+    'Counts %1$s now - %2$s' => 'Conta %1$s agora - %2$s',
+    ' - billed at the minimum, %s' => ' - cobrado pelo mínimo, %s',
+    'Couldn\'t count them just now - it is counted again when saved.' => 'Não deu para contar agora - a contagem é refeita ao salvar.',
+
 ];

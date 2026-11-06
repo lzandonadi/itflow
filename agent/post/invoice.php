@@ -47,7 +47,7 @@ if (isset($_POST['add_invoice'])) {
 
     triggerCustomAction('invoice_create', $invoice_id);
 
-    flashAlert("Invoice <strong>$config_invoice_prefix$invoice_number</strong> created");
+    flashAlert(__('Invoice %s created', "<strong>$config_invoice_prefix$invoice_number</strong>"));
 
     redirect("invoice.php?invoice_id=$invoice_id");
 
@@ -68,7 +68,7 @@ if (isset($_POST['edit_invoice'])) {
     $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -84,7 +84,7 @@ if (isset($_POST['edit_invoice'])) {
 
     logAudit("Invoice", "Edit", "$session_name edited Invoice $invoice_prefix$invoice_number - $scope", $client_id, $invoice_id);
 
-    flashAlert("Invoice <strong>$invoice_prefix$invoice_number</strong> edited");
+    flashAlert(__('Invoice %s edited', "<strong>$invoice_prefix$invoice_number</strong>"));
 
     redirect();
 
@@ -104,7 +104,7 @@ if (isset($_POST['add_invoice_copy'])) {
         invoice_prefix, invoice_scope FROM clients, invoices WHERE client_id = invoice_client_id AND invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_scope = escapeSql($row['invoice_scope']);
@@ -125,7 +125,7 @@ if (isset($_POST['add_invoice_copy'])) {
     $copy_items = billingItems('invoice', $invoice_id);
     $shortfall = productStockShortfall($copy_items);
     if ($shortfall !== '') {
-        flashAlert(escapeHtml($shortfall) . ' Add stock before copying it.', 'error');
+        flashAlert(escapeHtml($shortfall) . ' ' . __('Add stock before copying it.'), 'error');
         redirect();
     }
 
@@ -156,7 +156,7 @@ if (isset($_POST['add_invoice_copy'])) {
 
     triggerCustomAction('invoice_create', $new_invoice_id);
 
-    flashAlert("Created new Invoice <strong>$config_invoice_prefix$new_invoice_number</strong> from <strong>$old_invoice_prefix$old_invoice_number</strong>");
+    flashAlert(__('Created new Invoice %1$s from %2$s', "<strong>$config_invoice_prefix$new_invoice_number</strong>", "<strong>$old_invoice_prefix$old_invoice_number</strong>"));
 
     redirect("invoice.php?invoice_id=$new_invoice_id");
 
@@ -174,7 +174,7 @@ if (isset($_POST['mark_invoice_sent'])) {
     $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -186,7 +186,7 @@ if (isset($_POST['mark_invoice_sent'])) {
     // The modal offers a fixed list, so anything else is a tampered form
     $sent_method = $_POST['sent_method'] ?? '';
     if (!in_array($sent_method, getSentMethods(), true)) {
-        flashAlert("Invalid delivery method", 'error');
+        flashAlert(__('Invalid delivery method'), 'error');
         redirect();
     }
     $sent_method = escapeSql($sent_method);
@@ -195,7 +195,7 @@ if (isset($_POST['mark_invoice_sent'])) {
 
     mysqli_query($mysqli,"UPDATE invoices SET invoice_status = 'Sent' WHERE invoice_id = $invoice_id");
 
-    $history_description = "Invoice marked sent by $session_name - $sent_method";
+    $history_description = "Invoice marked sent by $session_name - $sent_method"; // i18n-ignore
     if (!empty($note)) {
         $history_description .= "\nNote: $note";
     }
@@ -204,7 +204,7 @@ if (isset($_POST['mark_invoice_sent'])) {
 
     logAudit("Invoice", "Edit", "$session_name marked invoice $invoice_prefix$invoice_number sent - $sent_method", $client_id, $invoice_id);
 
-    flashAlert("Invoice marked sent");
+    flashAlert(__('Invoice marked sent'));
 
     redirect();
 
@@ -222,7 +222,7 @@ if (isset($_GET['mark_invoice_non-billable'])) {
     $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -237,7 +237,7 @@ if (isset($_GET['mark_invoice_non-billable'])) {
 
     logAudit("Invoice", "Edit", "$session_name marked invoice $invoice_prefix$invoice_number Non-Billable", $client_id, $invoice_id);
 
-    flashAlert("Invoice marked Non-Billable");
+    flashAlert(__('Invoice marked Non-Billable'));
 
     redirect();
 
@@ -255,7 +255,7 @@ if (isset($_GET['cancel_invoice'])) {
     $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -273,7 +273,7 @@ if (isset($_GET['cancel_invoice'])) {
 
     logAudit("Invoice", "Edit", "$session_name cancelled invoice $invoice_prefix$invoice_number", $client_id, $invoice_id);
 
-    flashAlert("Invoice <strong>$invoice_prefix$invoice_number</strong> cancelled", 'error');
+    flashAlert(__('Invoice %s cancelled', "<strong>$invoice_prefix$invoice_number</strong>"), 'error');
 
     redirect();
 
@@ -291,7 +291,7 @@ if (isset($_GET['delete_invoice'])) {
     $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -303,7 +303,7 @@ if (isset($_GET['delete_invoice'])) {
     // Its payments go with it - not once one has cleared on a reconciled statement
     $lock = reconcileInvoiceLock($invoice_id);
     if ($lock) {
-        flashAlert(escapeHtml("A payment on $invoice_prefix$invoice_number cleared on the {$lock['account_name']} statement to " . date('M j, Y', strtotime($lock['reconciliation_statement_date'])) . ' - cancel the invoice instead, or undo that reconciliation to delete it'), 'error');
+        flashAlert(escapeHtml(__('A payment on %1$s cleared on the %2$s statement to %3$s - cancel the invoice instead, or undo that reconciliation to delete it', "$invoice_prefix$invoice_number", $lock['account_name'], formatDate($lock['reconciliation_statement_date']))), 'error');
         redirect();
     }
 
@@ -345,7 +345,7 @@ if (isset($_GET['delete_invoice'])) {
 
     logAudit("Invoice", "Delete", "$session_name deleted invoice $invoice_prefix$invoice_number", $client_id);
 
-    flashAlert("Invoice <strong>$invoice_prefix$invoice_number</strong> deleted", 'error');
+    flashAlert(__('Invoice %s deleted', "<strong>$invoice_prefix$invoice_number</strong>"), 'error');
 
     redirect();
 
@@ -366,7 +366,7 @@ if (isset($_POST['email_invoice'])) {
 
     $invoice = billingRow('invoice', intval($_POST['invoice_id'] ?? 0));
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect('invoices.php');
     }
     // A draft has nothing to remind about - sending one sends the invoice
@@ -385,13 +385,13 @@ if (isset($_POST['email_invoice'])) {
     if (!empty($_POST['quick_send'])) {
         $recipients = billingEmailRecipients($client_id);
         if (!$recipients) {
-            flashAlert("No default contacts to quick send to - use Send to choose recipients", 'error');
+            flashAlert(__('No default contacts to quick send to - use Send to choose recipients'), 'error');
             redirect();
         }
     } else {
         $recipients = billingEmailRecipients($client_id, (array) ($_POST['contacts'] ?? []));
         if (!$recipients) {
-            flashAlert(empty($_POST['contacts']) ? "Select at least one contact to send to" : "None of the selected contacts have a usable email address", 'error');
+            flashAlert(empty($_POST['contacts']) ? __('Select at least one contact to send to') : __('None of the selected contacts have a usable email address'), 'error');
             redirect();
         }
     }
@@ -406,17 +406,17 @@ if (isset($_POST['email_invoice'])) {
         $attach[] = $file;
     }
     // Nothing owed after all, so it would go as the invoice - Sales again
-    if ($kind === 'reminder' && $email['kind'] !== 'Payment reminder') {
+    if ($kind === 'reminder' && empty($email['reminder'])) {
         enforceUserPermission('module_sales', 2);
     }
     $sent = billingEmailQueue($recipients, $subject, $email, ['attach' => $attach]);
-    $reminder = $kind === 'reminder' && $email['kind'] === 'Payment reminder';
+    $reminder = $kind === 'reminder' && !empty($email['reminder']);
 
     $by = stripslashes($session_name);
     billingLog('invoice', $invoice_id, $invoice['invoice_status'] === 'Draft' ? 'Sent' : $invoice['invoice_status'],
-        ($reminder ? 'Reminder emailed' : 'Invoice emailed') . " by $by to " . implode(', ', $sent) . ($attach ? ' with the PDF' : ''));
+        ($reminder ? 'Reminder emailed' : 'Invoice emailed') . " by $by to " . implode(', ', $sent) . ($attach ? ' with the PDF' : '')); // i18n-ignore
     foreach ($recipients as $recipient) {
-        logAudit("Invoice", "Email", "$session_name emailed " . escapeSql($recipient['email']) . ($reminder ? " a reminder for" : "") . " invoice " . escapeSql($number), $client_id, $invoice_id);
+        logAudit("Invoice", "Email", "$session_name emailed " . escapeSql($recipient['email']) . ($reminder ? " a reminder for" : "") . " invoice " . escapeSql($number), $client_id, $invoice_id); // i18n-ignore
     }
 
     // Sending a draft sends it - anything further along keeps its status
@@ -424,7 +424,7 @@ if (isset($_POST['email_invoice'])) {
         mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Sent' WHERE invoice_id = $invoice_id");
     }
 
-    flashAlert(($reminder ? 'Reminder' : 'Invoice') . " queued to " . count($sent) . " " . (count($sent) === 1 ? "recipient" : "recipients"));
+    flashAlert($reminder ? _n('Reminder queued to %d recipient', 'Reminder queued to %d recipients', count($sent)) : _n('Invoice queued to %d recipient', 'Invoice queued to %d recipients', count($sent)));
 
     redirect();
 
@@ -446,17 +446,17 @@ if (isset($_POST['send_statement'])) {
     $statement_from = trim((string) ($_POST['dtf'] ?? ''));
     $statement = billingStatement($client_id, $statement_from !== '' ? validateDate($statement_from) : '', $statement_to !== '' ? validateDate($statement_to) : '', !empty($_POST['include_paid']));
     if (!$statement['client']) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect();
     }
     if (!$statement['invoices']) {
-        flashAlert("No invoices to report for that period - nothing sent", 'error');
+        flashAlert(__('No invoices to report for that period - nothing sent'), 'error');
         redirect();
     }
 
     $recipients = billingEmailRecipients($client_id, (array) ($_POST['contacts'] ?? []));
     if (!$recipients) {
-        flashAlert(empty($_POST['contacts']) ? "Select at least one contact to send to" : "None of the selected contacts have a usable email address", 'error');
+        flashAlert(empty($_POST['contacts']) ? __('Select at least one contact to send to') : __('None of the selected contacts have a usable email address'), 'error');
         redirect();
     }
 
@@ -467,10 +467,10 @@ if (isset($_POST['send_statement'])) {
     ]);
 
     $client_name = escapeSql($statement['client']['client_name']);
-    logAudit("Client", "Statement", "$session_name emailed a statement (" . escapeSql(billingStatementPeriod($statement)) . ", " . count($statement['invoices']) . " invoices, "
+    logAudit("Client", "Statement", "$session_name emailed a statement (" . escapeSql(i18nEnglish(fn () => billingStatementPeriod($statement))) . ", " . count($statement['invoices']) . " invoices, "
         . escapeSql(billingMoney($statement['total'], $statement['currency'])) . " due) to " . escapeSql(implode(', ', $sent)), $client_id);
 
-    flashAlert("Statement queued to " . count($sent) . " " . (count($sent) === 1 ? "recipient" : "recipients") . " - " . count($statement['invoices']) . " " . (count($statement['invoices']) === 1 ? "invoice" : "invoices") . ", <strong>" . escapeHtml(billingMoney($statement['total'], $statement['currency'])) . "</strong> due");
+    flashAlert(_n('Statement queued to %d recipient', 'Statement queued to %d recipients', count($sent)) . ' - ' . _n('%1$d invoice, %2$s due', '%1$d invoices, %2$s due', count($statement['invoices']), count($statement['invoices']), '<strong>' . escapeHtml(billingMoney($statement['total'], $statement['currency'])) . '</strong>'));
 
     redirect();
 
@@ -490,7 +490,7 @@ if (isset($_GET['export_client_statement_pdf'])) {
     $statement_from = trim((string) ($_GET['dtf'] ?? ''));
     $statement = billingStatement($client_id, $statement_from !== '' ? validateDate($statement_from) : '', $statement_to !== '' ? validateDate($statement_to) : '', !empty($_GET['include_paid']));
     if (!$statement['client']) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect();
     }
 
@@ -511,7 +511,7 @@ if (isExportRequest('export_invoices')) {
 
     if (!empty($_POST['client_id'])) {
         $client_id = intval($_POST['client_id']);
-        $client_query = "AND invoice_client_id = $client_id";
+        $client_query = "AND invoice_client_id = $client_id"; // i18n-ignore
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
         $filter_summary[__('Client')] = $client_name;
@@ -533,7 +533,7 @@ if (isExportRequest('export_invoices')) {
         $filter_summary[__('Status')] = _x('Unpaid', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Overdue') {
         $status_query = "invoice_status = 'Sent' OR invoice_status = 'Viewed' OR invoice_status = 'Partial'";
-        $overdue_query = "AND (invoice_due < CURDATE())";
+        $overdue_query = "AND (invoice_due < CURDATE())"; // i18n-ignore
         $filter_summary[__('Status')] = _x('Overdue', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Paid') {
         $status_query = "invoice_status = 'Paid'";
@@ -549,7 +549,7 @@ if (isExportRequest('export_invoices')) {
     // Category Filter
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
-        $category_query = "AND (category_id = $filter_category_id)";
+        $category_query = "AND (category_id = $filter_category_id)"; // i18n-ignore
         $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     } else {
         // Default - any
@@ -652,7 +652,7 @@ if (isset($_POST['add_ticket_to_invoice'])) {
     $invoice_id = intval($_POST['invoice_id']);
     $invoice = billingRow('invoice', $invoice_id);
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($invoice['client_id']);
@@ -679,10 +679,12 @@ if (isset($_POST['add_ticket_to_invoice'])) {
     }
 
     $count = count($result['tickets']);
-    $what = $count === 1 ? 'Ticket <strong>' . escapeHtml($result['tickets'][0]) . '</strong>' : "<strong>$count tickets</strong>";
+    $what = $count === 1 ? __('Ticket %s', '<strong>' . escapeHtml($result['tickets'][0]) . '</strong>') : '<strong>' . _n('%d ticket', '%d tickets', $count) . '</strong>';
     flashAlert($bill_time
-        ? "$what billed - " . billingQuantity($result['hours']) . ' h' . ($result['lines'] ? ' on ' . $result['lines'] . ' line' . ($result['lines'] === 1 ? '' : 's') : ', with no charge')
-        : "$what added to the invoice, without lines");
+        ? ($result['lines']
+            ? _n('%1$s billed - %2$s h on %3$d line', '%1$s billed - %2$s h on %3$d lines', $result['lines'], $what, billingQuantity($result['hours']), $result['lines'])
+            : __('%1$s billed - %2$s h, with no charge', $what, billingQuantity($result['hours'])))
+        : __('%s added to the invoice, without lines', $what));
 
     redirect("invoice.php?invoice_id=$invoice_id" . ($bill_time && $result['lines'] ? '#items' : ''));
 
@@ -703,7 +705,7 @@ if (isset($_POST['invoice_add_expenses'])) {
     $invoice_id = intval($_POST['invoice_id'] ?? 0);
     $invoice = billingRow('invoice', $invoice_id);
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($invoice['client_id']);
@@ -724,8 +726,8 @@ if (isset($_POST['invoice_add_expenses'])) {
         redirect("invoice.php?invoice_id=$invoice_id");
     }
 
-    flashAlert(($result['expenses'] === 1 ? '<strong>1 expense</strong>' : "<strong>{$result['expenses']} expenses</strong>") . ' billed - '
-        . escapeHtml(billingMoney($result['amount'], $invoice['invoice_currency_code'])) . ' on ' . escapeHtml(billingMoney($result['cost'], $invoice['invoice_currency_code'])) . ' of cost');
+    flashAlert(_n('%1$s billed - %2$s on %3$s of cost', '%1$s billed - %2$s on %3$s of cost', $result['expenses'], '<strong>' . _n('%d expense', '%d expenses', $result['expenses']) . '</strong>',
+        escapeHtml(billingMoney($result['amount'], $invoice['invoice_currency_code'])), escapeHtml(billingMoney($result['cost'], $invoice['invoice_currency_code']))));
 
     redirect("invoice.php?invoice_id=$invoice_id#items");
 
@@ -743,7 +745,7 @@ if (isset($_GET['remove_ticket_from_invoice'])) {
     $invoice = billingRow('invoice', $invoice_id);
     $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_prefix, ticket_number, ticket_client_id FROM tickets WHERE ticket_id = $ticket_id AND ticket_invoice_id = $invoice_id"));
     if (!$invoice || !$ticket) {
-        flashAlert('That ticket is not on this invoice.', 'error');
+        flashAlert(__('That ticket is not on this invoice.'), 'error');
         redirect();
     }
     $client_id = intval($invoice['client_id']);
@@ -754,10 +756,10 @@ if (isset($_GET['remove_ticket_from_invoice'])) {
 
     $ticket_number = $ticket['ticket_prefix'] . $ticket['ticket_number'];
     logTicketHistory($ticket_id, escapeSql('Taken off invoice ' . billingNumber('invoice', $invoice) . " by $session_name - unbilled again"));
-    billingLog('invoice', $invoice_id, $invoice['invoice_status'], "Ticket $ticket_number taken off by $session_name");
+    billingLog('invoice', $invoice_id, $invoice['invoice_status'], "Ticket $ticket_number taken off by $session_name"); // i18n-ignore
     logAudit("Invoice", "Edit", escapeSql("$session_name took ticket $ticket_number off invoice " . billingNumber('invoice', $invoice)), $client_id, $invoice_id);
 
-    flashAlert("Ticket <strong>" . escapeHtml($ticket_number) . "</strong> taken off the invoice - it is unbilled again");
+    flashAlert(__('Ticket %s taken off the invoice - it is unbilled again', '<strong>' . escapeHtml($ticket_number) . '</strong>'));
 
     redirect("invoice.php?invoice_id=$invoice_id");
 
@@ -772,7 +774,7 @@ if (isset($_POST['invoice_assets_save'])) {
 
     $invoice = billingRow('invoice', intval($_POST['invoice_id'] ?? 0));
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect('invoices.php');
     }
     $invoice_id = intval($invoice['invoice_id']);
@@ -792,12 +794,12 @@ if (isset($_POST['invoice_assets_save'])) {
 
     $parts = [];
     if ($done['added']) {
-        $parts[] = "<strong>{$done['added']}</strong> added";
+        $parts[] = __('%s added', "<strong>{$done['added']}</strong>");
     }
     if ($done['linked']) {
-        $parts[] = "<strong>{$done['linked']}</strong> linked";
+        $parts[] = __('%s linked', "<strong>{$done['linked']}</strong>");
     }
-    flashAlert(escapeHtml(billingNumber('invoice', $invoice)) . " hardware on " . escapeHtml($invoice['client_name']) . "'s assets - " . implode(', ', $parts));
+    flashAlert(__("%1\$s hardware on %2\$s's assets - %3\$s", escapeHtml(billingNumber('invoice', $invoice)), escapeHtml($invoice['client_name']), implode(', ', $parts)));
 
     redirect();
 
@@ -811,7 +813,7 @@ if (isset($_GET['export_invoice_pdf'])) {
 
     $invoice = billingRow('invoice', intval($_GET['export_invoice_pdf']));
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect('invoices.php');
     }
     $client_id = intval($invoice['client_id']);
@@ -830,7 +832,7 @@ if (isset($_GET['export_invoice_packing_slip'])) {
 
     $invoice = billingRow('invoice', intval($_GET['export_invoice_packing_slip']));
     if (!$invoice) {
-        flashAlert('That invoice no longer exists.', 'error');
+        flashAlert(__('That invoice no longer exists.'), 'error');
         redirect('invoices.php');
     }
     $client_id = intval($invoice['client_id']);
@@ -879,7 +881,7 @@ if (isset($_POST['bulk_edit_invoice_category'])) {
 
         logAudit("Invoice", "Bulk Edit", "$session_name assigned $count invoices to category $category_name");
 
-        flashAlert("Assigned income category <strong>$category_name</strong> to <strong>$count</strong> invoice(s)");
+        flashAlert(_n('Assigned income category %1$s to %2$s invoice', 'Assigned income category %1$s to %2$s invoices', $count, "<strong>$category_name</strong>", "<strong>$count</strong>"));
     }
 
     redirect();
