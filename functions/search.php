@@ -112,7 +112,7 @@ function globalSearchGroups($terms, $deep) {
     $groups = [];
 
     $groups[] = [
-        'key' => 'clients', 'label' => 'Clients', 'icon' => 'users', 'module' => 'module_client',
+        'key' => 'clients', 'label' => __('Clients'), 'icon' => 'users', 'module' => 'module_client',
         'select' => 'client_id, client_name, client_type, client_abbreviation',
         'from' => 'clients',
         'where' => "client_archived_at IS NULL
@@ -134,7 +134,7 @@ function globalSearchGroups($terms, $deep) {
     $ticket_number_match = $ticket_number !== null ? "OR ticket_number = $ticket_number" : '';
     $ticket_deep_match = $deep ? "OR ticket_details LIKE '%$like%'" : '';
     $groups[] = [
-        'key' => 'tickets', 'label' => 'Tickets', 'icon' => 'life-ring', 'module' => 'module_support', 'enabled' => $ticketing,
+        'key' => 'tickets', 'label' => __('Tickets'), 'icon' => 'life-ring', 'module' => 'module_support', 'enabled' => $ticketing,
         'select' => 'ticket_id, ticket_prefix, ticket_number, ticket_subject, ticket_client_id, ticket_closed_at,
             client_name, ticket_status_name, ticket_status_color',
         'from' => 'tickets
@@ -163,7 +163,7 @@ function globalSearchGroups($terms, $deep) {
     $project_number_match = $project_number !== null ? "OR project_number = $project_number" : '';
     $project_deep_match = $deep ? "OR project_description LIKE '%$like%'" : '';
     $groups[] = [
-        'key' => 'projects', 'label' => 'Projects', 'icon' => 'project-diagram', 'module' => 'module_support', 'enabled' => $ticketing,
+        'key' => 'projects', 'label' => __('Projects'), 'icon' => 'project-diagram', 'module' => 'module_support', 'enabled' => $ticketing,
         'select' => 'project_id, project_prefix, project_number, project_name, project_client_id, project_completed_at, project_archived_at, client_name',
         'from' => 'projects LEFT JOIN clients ON project_client_id = client_id',
         'where' => "(project_name LIKE '%$like%' OR CONCAT(project_prefix, project_number) LIKE '%$like%' $project_number_match $project_deep_match)",
@@ -188,7 +188,7 @@ function globalSearchGroups($terms, $deep) {
         ? "OR REGEXP_REPLACE(contact_phone, '[^0-9]', '') LIKE '%$phone%' OR REGEXP_REPLACE(contact_mobile, '[^0-9]', '') LIKE '%$phone%'"
         : '';
     $groups[] = [
-        'key' => 'contacts', 'label' => 'Contacts', 'icon' => 'address-book', 'module' => 'module_client',
+        'key' => 'contacts', 'label' => __('Contacts'), 'icon' => 'address-book', 'module' => 'module_client',
         'select' => 'contact_id, contact_name, contact_title, contact_email, contact_photo, contact_client_id, client_name',
         'from' => 'contacts LEFT JOIN clients ON contact_client_id = client_id',
         'where' => "contact_archived_at IS NULL
@@ -213,7 +213,7 @@ function globalSearchGroups($terms, $deep) {
     // Sites - by name, street, town or postcode, or the site's phone number
     $location_phone_match = $phone ? "OR location_phone LIKE '%$phone%'" : '';
     $groups[] = [
-        'key' => 'locations', 'label' => 'Locations', 'icon' => 'map-marker-alt', 'module' => 'module_client',
+        'key' => 'locations', 'label' => __('Locations'), 'icon' => 'map-marker-alt', 'module' => 'module_client',
         'select' => 'location_id, location_name, location_address, location_city, location_state, location_zip, location_primary, location_client_id, client_name',
         'from' => 'locations LEFT JOIN clients ON location_client_id = client_id',
         'where' => "location_archived_at IS NULL
@@ -239,7 +239,7 @@ function globalSearchGroups($terms, $deep) {
     $asset_mac = normalizeMacAddress($q);
     $asset_mac_match = $asset_mac ? "OR REPLACE(REPLACE(REPLACE(UPPER(interface_mac), ':', ''), '-', ''), '.', '') = '" . str_replace(':', '', $asset_mac) . "'" : '';
     $groups[] = [
-        'key' => 'assets', 'label' => 'Assets', 'icon' => 'desktop', 'module' => 'module_support',
+        'key' => 'assets', 'label' => __('Assets'), 'icon' => 'desktop', 'module' => 'module_support',
         'select' => 'asset_id, asset_name, asset_type, asset_make, asset_model, asset_client_id, client_name,
             primary_interface.interface_ip AS asset_ip',
         'from' => 'assets
@@ -281,7 +281,7 @@ function globalSearchGroups($terms, $deep) {
             = (INET_ATON(SUBSTRING_INDEX(network, '/', 1)) >> (32 - CAST(SUBSTRING_INDEX(network, '/', -1) AS UNSIGNED))))";
     $vlan_match = ctype_digit($q) ? "OR network_vlan = " . intval($q) : '';
     $groups[] = [
-        'key' => 'networks', 'label' => 'Networks', 'icon' => 'network-wired', 'module' => 'module_support',
+        'key' => 'networks', 'label' => __('Networks'), 'icon' => 'network-wired', 'module' => 'module_support',
         'select' => "network_id, network_name, network_description, network_type, network, network_vlan, network_client_id, client_name, location_name, $contains AS q_contains",
         'from' => 'networks
             LEFT JOIN clients ON network_client_id = client_id
@@ -300,7 +300,7 @@ function globalSearchGroups($terms, $deep) {
                 'title' => $row['network_name'],
                 'subtitle' => implode(' · ', array_filter([$row['network'], $row['network_vlan'] ? 'VLAN ' . $row['network_vlan'] : '', networkType($row), $row['location_name']])),
                 'context' => $row['client_name'],
-                'badge' => intval($row['q_contains']) ? ['text' => 'In this subnet', 'variant' => 'info'] : null,
+                'badge' => intval($row['q_contains']) ? ['text' => __('In this subnet'), 'variant' => 'info'] : null,
                 'url' => '/agent/' . networkUrl($row['network_id'], $row['network_client_id']),
             ];
         },
@@ -311,7 +311,7 @@ function globalSearchGroups($terms, $deep) {
     $mac = normalizeMacAddress($q);
     $mac_match = $mac ? "OR ip_mac = '$mac'" : '';
     $groups[] = [
-        'key' => 'network_ips', 'label' => 'IP Addresses', 'icon' => 'map-pin', 'module' => 'module_support',
+        'key' => 'network_ips', 'label' => __('IP Addresses'), 'icon' => 'map-pin', 'module' => 'module_support',
         'select' => 'ip_id, ip_address, ip_type, ip_hostname, ip_description, network_id, network_name, network_client_id, client_name',
         'from' => 'network_ips
             JOIN networks ON network_id = ip_network_id
@@ -334,7 +334,7 @@ function globalSearchGroups($terms, $deep) {
     // Licenses by name, vendor and order reference - and by key, so a key read
     // off a sticker or a screen finds the license it belongs to
     $groups[] = [
-        'key' => 'licenses', 'label' => 'Licenses', 'icon' => 'cube', 'module' => 'module_support',
+        'key' => 'licenses', 'label' => __('Licenses'), 'icon' => 'cube', 'module' => 'module_support',
         'select' => 'software.software_id, software_name, software_version, software_license_type, software_expire, software_client_id, client_name, vendor_name',
         'from' => 'software
             LEFT JOIN clients ON software_client_id = client_id
@@ -362,7 +362,7 @@ function globalSearchGroups($terms, $deep) {
     // What a client runs on - by name, category and description, and its notes in a deep search
     $service_deep_match = $deep ? "OR service_notes LIKE '%$like%' OR service_backup LIKE '%$like%'" : '';
     $groups[] = [
-        'key' => 'services', 'label' => 'Services', 'icon' => 'stream', 'module' => 'module_support',
+        'key' => 'services', 'label' => __('Services'), 'icon' => 'stream', 'module' => 'module_support',
         'select' => 'service_id, service_name, service_description, service_category, service_importance, service_client_id, client_name',
         'from' => 'services LEFT JOIN clients ON service_client_id = client_id',
         'where' => "service_archived_at IS NULL
@@ -377,7 +377,7 @@ function globalSearchGroups($terms, $deep) {
                 'title' => $row['service_name'],
                 'subtitle' => implode(' · ', array_filter([$row['service_category'], $row['service_description']])),
                 'context' => $row['client_name'],
-                'badge' => $row['service_importance'] === 'High' ? ['text' => 'High', 'variant' => 'danger'] : null,
+                'badge' => $row['service_importance'] === 'High' ? ['text' => _x('High', 'service importance'), 'variant' => 'danger'] : null,
                 'url' => '/agent/' . serviceUrl($row['service_id'], $row['service_client_id']),
             ];
         },
@@ -387,7 +387,7 @@ function globalSearchGroups($terms, $deep) {
     // and the results page reveals passwords through the audited endpoint, never
     // in the markup.
     $groups[] = [
-        'key' => 'credentials', 'label' => 'Credentials', 'icon' => 'key', 'module' => 'module_credential',
+        'key' => 'credentials', 'label' => __('Credentials'), 'icon' => 'key', 'module' => 'module_credential',
         'select' => 'credential_id, credential_name, credential_description, credential_client_id, client_name',
         'from' => 'credentials LEFT JOIN clients ON credential_client_id = client_id',
         'where' => "credential_archived_at IS NULL
@@ -410,7 +410,7 @@ function globalSearchGroups($terms, $deep) {
     ];
 
     $groups[] = [
-        'key' => 'domains', 'label' => 'Domains', 'icon' => 'globe', 'module' => 'module_support',
+        'key' => 'domains', 'label' => __('Domains'), 'icon' => 'globe', 'module' => 'module_support',
         'select' => 'domain_id, domain_name, domain_description, domain_expire, domain_auto_renew, domain_client_id, client_name',
         'from' => 'domains LEFT JOIN clients ON domain_client_id = client_id',
         'where' => "domain_archived_at IS NULL AND (domain_name LIKE '%$like%' OR domain_description LIKE '%$like%' " . tagSearchSql('domain', $like, 'domains.domain_id') . ")",
@@ -430,7 +430,7 @@ function globalSearchGroups($terms, $deep) {
     ];
 
     $groups[] = [
-        'key' => 'certificates', 'label' => 'Certificates', 'icon' => 'lock', 'module' => 'module_support',
+        'key' => 'certificates', 'label' => __('Certificates'), 'icon' => 'lock', 'module' => 'module_support',
         'select' => 'certificate_id, certificate_name, certificate_description, certificate_domain, certificate_expire, certificate_issued_at, certificate_check_status, certificate_client_id, client_name',
         'from' => 'certificates LEFT JOIN clients ON certificate_client_id = client_id',
         'where' => "certificate_archived_at IS NULL AND (certificate_name LIKE '%$like%' OR certificate_domain LIKE '%$like%' OR certificate_names LIKE '%$like%'
@@ -458,7 +458,7 @@ function globalSearchGroups($terms, $deep) {
 
     $document_deep_match = $deep ? "OR MATCH(document_content_raw) AGAINST ('$eq')" : '';
     $groups[] = [
-        'key' => 'documents', 'label' => 'Documents', 'icon' => 'file-alt', 'module' => 'module_support',
+        'key' => 'documents', 'label' => __('Documents'), 'icon' => 'file-alt', 'module' => 'module_support',
         'select' => 'document_id, document_name, document_description, document_client_id, client_name',
         'from' => 'documents LEFT JOIN clients ON document_client_id = client_id',
         'where' => "document_archived_at IS NULL
@@ -474,13 +474,13 @@ function globalSearchGroups($terms, $deep) {
                 'subtitle' => $row['document_description'],
                 'context' => $row['client_name'],
                 'url' => globalSearchClientUrl('document.php', $row['document_client_id'], ['document_id' => intval($row['document_id'])]),
-                'tile' => ['tone' => 'document', 'icon' => 'file-alt', 'label' => 'Document'],
+                'tile' => ['tone' => 'document', 'icon' => 'file-alt', 'label' => __('Document')],
             ];
         },
     ];
 
     $groups[] = [
-        'key' => 'files', 'label' => 'Files', 'icon' => 'paperclip', 'module' => 'module_support',
+        'key' => 'files', 'label' => __('Files'), 'icon' => 'paperclip', 'module' => 'module_support',
         'select' => 'file_id, file_name, file_ext, file_description, file_client_id, file_folder_id, client_name, folder_name',
         'from' => 'files
             LEFT JOIN clients ON file_client_id = client_id
@@ -504,7 +504,7 @@ function globalSearchGroups($terms, $deep) {
     $invoice_number = globalSearchNumber($q, $config_invoice_prefix);
     $invoice_number_match = $invoice_number !== null ? "OR invoice_number = $invoice_number" : '';
     $groups[] = [
-        'key' => 'invoices', 'label' => 'Invoices', 'icon' => 'file-invoice-dollar', 'module' => 'module_sales', 'enabled' => $accounting,
+        'key' => 'invoices', 'label' => __('Invoices'), 'icon' => 'file-invoice-dollar', 'module' => 'module_sales', 'enabled' => $accounting,
         'select' => 'invoice_id, invoice_prefix, invoice_number, invoice_scope, invoice_status, invoice_amount,
             invoice_currency_code, invoice_client_id, client_name',
         'from' => 'invoices LEFT JOIN clients ON invoice_client_id = client_id',
@@ -517,7 +517,7 @@ function globalSearchGroups($terms, $deep) {
         'item' => function ($row) {
             return [
                 'ref' => $row['invoice_prefix'] . $row['invoice_number'],
-                'title' => $row['invoice_scope'] ?: 'Invoice',
+                'title' => $row['invoice_scope'] ?: __('Invoice'),
                 'subtitle' => globalSearchMoney($row['invoice_amount'], $row['invoice_currency_code']),
                 'context' => $row['client_name'],
                 'badge' => ['text' => $row['invoice_status'], 'variant' => getInvoiceBadgeColor($row['invoice_status'])],
@@ -529,7 +529,7 @@ function globalSearchGroups($terms, $deep) {
     $quote_number = globalSearchNumber($q, $config_quote_prefix);
     $quote_number_match = $quote_number !== null ? "OR quote_number = $quote_number" : '';
     $groups[] = [
-        'key' => 'quotes', 'label' => 'Quotes', 'icon' => 'comment-dollar', 'module' => 'module_sales', 'enabled' => $accounting,
+        'key' => 'quotes', 'label' => __('Quotes'), 'icon' => 'comment-dollar', 'module' => 'module_sales', 'enabled' => $accounting,
         'select' => 'quote_id, quote_prefix, quote_number, quote_scope, quote_status, quote_amount, quote_monthly_amount,
             quote_currency_code, quote_client_id, client_name',
         'from' => 'quotes LEFT JOIN clients ON quote_client_id = client_id',
@@ -543,7 +543,7 @@ function globalSearchGroups($terms, $deep) {
             $quote_badge_variants = ['Sent' => 'warning', 'Viewed' => 'primary', 'Accepted' => 'success', 'Declined' => 'danger', 'Invoiced' => 'info'];
             return [
                 'ref' => $row['quote_prefix'] . $row['quote_number'],
-                'title' => $row['quote_scope'] ?: 'Quote',
+                'title' => $row['quote_scope'] ?: __('Quote'),
                 'subtitle' => globalSearchMoney($row['quote_amount'], $row['quote_currency_code'])
                     . (floatval($row['quote_monthly_amount']) != 0 ? ' + ' . globalSearchMoney($row['quote_monthly_amount'], $row['quote_currency_code']) . '/mo' : ''),
                 'context' => $row['client_name'],
@@ -558,7 +558,7 @@ function globalSearchGroups($terms, $deep) {
     $expense_amount = preg_match('/^-?\d+(\.\d{1,2})?$/', $expense_amount_text) ? abs(round(floatval($expense_amount_text), 2)) : 0;
     $expense_amount_match = $expense_amount > 0 ? "OR ABS(expense_amount) = $expense_amount" : '';
     $groups[] = [
-        'key' => 'expenses', 'label' => 'Expenses', 'icon' => 'shopping-cart', 'module' => 'module_financial', 'enabled' => $accounting,
+        'key' => 'expenses', 'label' => __('Expenses'), 'icon' => 'shopping-cart', 'module' => 'module_financial', 'enabled' => $accounting,
         'select' => 'expense_id, expense_date, expense_amount, expense_currency_code, expense_description, expense_reference, vendor_name, client_name',
         'from' => 'expenses LEFT JOIN vendors ON expense_vendor_id = vendor_id LEFT JOIN clients ON expense_client_id = client_id',
         'where' => "expense_vendor_id > 0
@@ -569,7 +569,7 @@ function globalSearchGroups($terms, $deep) {
         'item' => function ($row) {
             $description = trim((string) $row['expense_description']);
             return [
-                'title' => $description !== '' ? mb_strimwidth($description, 0, 80, '...') : ($row['vendor_name'] ?: 'Expense'),
+                'title' => $description !== '' ? mb_strimwidth($description, 0, 80, '...') : ($row['vendor_name'] ?: __('Expense')),
                 'subtitle' => globalSearchMoney($row['expense_amount'], $row['expense_currency_code']) . ' · ' . $row['expense_date']
                     . ($row['expense_reference'] ? ' · #' . $row['expense_reference'] : ''),
                 'context' => implode(' · ', array_filter([$row['vendor_name'], $row['client_name']])),
@@ -582,7 +582,7 @@ function globalSearchGroups($terms, $deep) {
     // transaction number), either by the amount. The union is already in the agent's client scope.
     $income_amount_match = $expense_amount > 0 ? "OR ABS(income.income_amount) = $expense_amount" : '';
     $groups[] = [
-        'key' => 'income', 'label' => 'Income', 'icon' => 'hand-holding-usd', 'module' => 'module_financial', 'enabled' => $accounting,
+        'key' => 'income', 'label' => __('Income'), 'icon' => 'hand-holding-usd', 'module' => 'module_financial', 'enabled' => $accounting,
         'select' => 'income.*',
         'from' => '(' . incomeUnionSql() . ') AS income',
         'where' => "((income.income_type = 'revenue' AND income.income_description LIKE '%$like%') OR income.income_reference LIKE '%$like%' $income_amount_match)",
@@ -593,8 +593,8 @@ function globalSearchGroups($terms, $deep) {
             $payment = $row['income_type'] === 'payment';
             $what = trim(strtok((string) $row['income_description'], "\n"));
             return [
-                'title' => $payment ? 'Payment on ' . ($row['invoice_number'] !== null ? $row['invoice_prefix'] . $row['invoice_number'] : 'an invoice since deleted')
-                    : ($what !== '' ? mb_strimwidth($what, 0, 80, '...') : ($row['category_name'] ?: 'Other income')),
+                'title' => $payment ? ($row['invoice_number'] !== null ? _x('Payment on %s', 'invoice', $row['invoice_prefix'] . $row['invoice_number']) : __('Payment on an invoice since deleted'))
+                    : ($what !== '' ? mb_strimwidth($what, 0, 80, '...') : ($row['category_name'] ?: __('Other income'))),
                 'subtitle' => globalSearchMoney($row['income_amount'], $row['income_currency_code']) . ' · ' . $row['income_date']
                     . ($row['income_reference'] ? ' · #' . $row['income_reference'] : ''),
                 'context' => implode(' · ', array_filter([$row['client_name'], $payment ? '' : (string) $row['category_name']])),
@@ -605,7 +605,7 @@ function globalSearchGroups($terms, $deep) {
 
     $vendor_phone_match = $phone ? "OR REGEXP_REPLACE(vendor_phone, '[^0-9]', '') LIKE '%$phone%'" : '';
     $groups[] = [
-        'key' => 'vendors', 'label' => 'Vendors', 'icon' => 'building', 'module' => 'module_client',
+        'key' => 'vendors', 'label' => __('Vendors'), 'icon' => 'building', 'module' => 'module_client',
         'select' => 'vendor_id, vendor_name, vendor_description, vendor_phone, vendor_phone_country_code, vendor_client_id, client_name',
         'from' => 'vendors LEFT JOIN clients ON vendor_client_id = client_id',
         'where' => "vendor_archived_at IS NULL
@@ -620,7 +620,7 @@ function globalSearchGroups($terms, $deep) {
             return [
                 'title' => $row['vendor_name'],
                 'subtitle' => implode(' · ', array_filter([$row['vendor_description'], $row['vendor_phone'] ? formatPhoneNumber($row['vendor_phone'], $row['vendor_phone_country_code']) : ''])),
-                'context' => intval($row['vendor_client_id']) ? $row['client_name'] : 'Our vendor',
+                'context' => intval($row['vendor_client_id']) ? $row['client_name'] : __('Our vendor'),
                 'url' => globalSearchClientUrl('vendor.php', $row['vendor_client_id'], ['vendor_id' => intval($row['vendor_id'])]),
             ];
         },
@@ -628,7 +628,7 @@ function globalSearchGroups($terms, $deep) {
 
     $recurring_deep_match = $deep ? "OR recurring_ticket_details LIKE '%$like%'" : '';
     $groups[] = [
-        'key' => 'recurring_tickets', 'label' => 'Recurring Tickets', 'icon' => 'redo-alt', 'module' => 'module_support', 'enabled' => $ticketing,
+        'key' => 'recurring_tickets', 'label' => __('Recurring Tickets'), 'icon' => 'redo-alt', 'module' => 'module_support', 'enabled' => $ticketing,
         'select' => 'recurring_ticket_id, recurring_ticket_subject, recurring_ticket_frequency, recurring_ticket_next_run,
             recurring_ticket_client_id, client_name',
         'from' => 'recurring_tickets LEFT JOIN clients ON recurring_ticket_client_id = client_id',
@@ -647,7 +647,7 @@ function globalSearchGroups($terms, $deep) {
     ];
 
     $groups[] = [
-        'key' => 'products', 'label' => 'Products', 'icon' => 'box-open', 'module' => 'module_sales', 'enabled' => $accounting,
+        'key' => 'products', 'label' => __('Products'), 'icon' => 'box-open', 'module' => 'module_sales', 'enabled' => $accounting,
         'select' => 'product_id, product_name, product_type, product_code, product_vendor_part, product_price, product_currency_code, product_frequency, product_seat_source',
         'from' => 'products',
         'where' => "product_archived_at IS NULL
@@ -668,7 +668,7 @@ function globalSearchGroups($terms, $deep) {
     // Ticket conversations: matched inside reply bodies, so results page only.
     if ($deep) {
         $groups[] = [
-            'key' => 'ticket_replies', 'label' => 'Ticket Conversations', 'icon' => 'comments', 'module' => 'module_support', 'enabled' => $ticketing,
+            'key' => 'ticket_replies', 'label' => __('Ticket Conversations'), 'icon' => 'comments', 'module' => 'module_support', 'enabled' => $ticketing,
             'select' => 'ticket_reply_id, ticket_reply, ticket_reply_created_at, ticket_id, ticket_prefix, ticket_number,
                 ticket_subject, ticket_client_id, client_name',
             'from' => 'ticket_replies
@@ -699,7 +699,7 @@ function globalSearchGroups($terms, $deep) {
         }
     }
     $groups[] = [
-        'key' => 'tags', 'label' => 'Tags', 'icon' => 'tags', 'module' => null, 'enabled' => (bool) $tag_types,
+        'key' => 'tags', 'label' => __('Tags'), 'icon' => 'tags', 'module' => null, 'enabled' => (bool) $tag_types,
         'select' => 'tag_id, tag_name, tag_description, tag_type, tag_color, tag_icon',
         'from' => 'tags',
         'where' => "tag_archived_at IS NULL AND tag_type IN (" . implode(',', $tag_types ?: [0]) . ")
@@ -884,30 +884,30 @@ function globalSearchPages($raw_query) {
     $financial = lookupUserPermission('module_financial') >= 1;
 
     $pages = [
-        ['Dashboard', '/agent/dashboard.php', true],
-        ['Clients', '/agent/clients.php', $client],
-        ['All Client Docs', '/agent/contacts.php', $client],
-        ['Services', '/agent/services.php', $support],
-        ['Vendors', '/agent/vendors.php', true],
-        ['Calendar', '/agent/calendar.php', true],
-        ['Tickets', '/agent/tickets.php', $support && $ticketing],
-        ['Recurring Tickets', '/agent/recurring_tickets.php', $support && $ticketing],
-        ['Projects', '/agent/projects.php', $support && $ticketing],
-        ['Quotes', '/agent/quotes.php', $sales && $accounting],
-        ['Invoices', '/agent/invoices.php', $sales && $accounting],
-        ['Recurring Invoices', '/agent/recurring_invoices.php', $sales && $accounting],
-        ['Products', '/agent/products.php', $sales && $accounting],
-        ['Income', '/agent/income.php', $financial && $accounting],
-        ['Expenses', '/agent/expenses.php', $financial && $accounting],
-        ['Recurring Expenses', '/agent/recurring_expenses.php', $financial && $accounting],
-        ['Trips', '/agent/trips.php', $accounting],
-        ['Accounts', '/agent/accounts.php', $financial && $accounting],
-        ['Transactions', '/agent/transactions.php', $financial && $accounting],
-        ['Transfers', '/agent/transactions.php?show=transfers', $financial && $accounting],
-        ['Reports', '/agent/reports/', lookupUserPermission('module_reporting') >= 1],
-        ['Administration', '/admin/', (bool) $session_is_admin],
-        ['Mail Queue', '/admin/mail_queue.php', (bool) $session_is_admin],
-        ['My Account', '/agent/user/user_details.php', true],
+        [__('Dashboard'), '/agent/dashboard.php', true],
+        [__('Clients'), '/agent/clients.php', $client],
+        [__('All Client Docs'), '/agent/contacts.php', $client],
+        [__('Services'), '/agent/services.php', $support],
+        [__('Vendors'), '/agent/vendors.php', true],
+        [__('Calendar'), '/agent/calendar.php', true],
+        [__('Tickets'), '/agent/tickets.php', $support && $ticketing],
+        [__('Recurring Tickets'), '/agent/recurring_tickets.php', $support && $ticketing],
+        [__('Projects'), '/agent/projects.php', $support && $ticketing],
+        [__('Quotes'), '/agent/quotes.php', $sales && $accounting],
+        [__('Invoices'), '/agent/invoices.php', $sales && $accounting],
+        [__('Recurring Invoices'), '/agent/recurring_invoices.php', $sales && $accounting],
+        [__('Products'), '/agent/products.php', $sales && $accounting],
+        [__('Income'), '/agent/income.php', $financial && $accounting],
+        [__('Expenses'), '/agent/expenses.php', $financial && $accounting],
+        [__('Recurring Expenses'), '/agent/recurring_expenses.php', $financial && $accounting],
+        [__('Trips'), '/agent/trips.php', $accounting],
+        [__('Accounts'), '/agent/accounts.php', $financial && $accounting],
+        [__('Transactions'), '/agent/transactions.php', $financial && $accounting],
+        [__('Transfers'), '/agent/transactions.php?show=transfers', $financial && $accounting],
+        [__('Reports'), '/agent/reports/', lookupUserPermission('module_reporting') >= 1],
+        [__('Administration'), '/admin/', (bool) $session_is_admin],
+        [__('Mail Queue'), '/admin/mail_queue.php', (bool) $session_is_admin],
+        [__('My Account'), '/agent/user/user_details.php', true],
     ];
 
     $items = [];

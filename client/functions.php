@@ -602,7 +602,7 @@ function portalContactInvite($contact_id, $method, $by) {
         FROM contacts JOIN clients ON client_id = contact_client_id LEFT JOIN users ON user_id = contact_user_id
         WHERE contact_id = $contact_id AND contact_client_id = $client_id AND contact_archived_at IS NULL LIMIT 1"));
     if (!$contact) {
-        return ['ok' => false, 'error' => "That person isn't here", 'emailed' => false];
+        return ['ok' => false, 'error' => __("That person isn't here"), 'emailed' => false];
     }
     if (!isset(portalSignInMethods()[$method])) {
         $method = 'local';

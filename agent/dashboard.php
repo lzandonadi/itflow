@@ -49,21 +49,26 @@ if ($access['financial']) {
 }
 
 $hour = intval(date('G'));
-$greeting = $hour < 12 ? 'Good morning' : ($hour < 18 ? 'Good afternoon' : 'Good evening');
+$greeting = $hour < 12 ? __('Good morning') : ($hour < 18 ? __('Good afternoon') : __('Good evening'));
 $first_name = explode(' ', trim(stripslashes($session_name)))[0];
 
 $priority_colors = ['Urgent' => 'dark', 'High' => 'danger', 'Medium' => 'warning', 'Low' => 'info'];
 
 // One plain sentence on the state of the day, under the greeting
-$summary = 'It\'s ' . date('l, F j') . '.';
+$summary = __('It\'s %s.', formatDate('now', 'day_long'));
 if ($my_tickets !== null) {
     $open = $my_tickets['total'];
     if ($open === 0) {
-        $summary .= ' No open tickets are assigned to you.';
+        $summary .= ' ' . __('No open tickets are assigned to you.');
     } else {
-        $summary .= " You have $open open ticket" . ($open === 1 ? '' : 's');
         $breached = $my_tickets['breached'];
-        $summary .= $breached ? ', ' . ($breached === $open ? ($open === 1 ? 'and it is' : 'all') : "$breached of them") . ' past SLA.' : '.';
+        if (!$breached) {
+            $summary .= ' ' . _n('You have %d open ticket.', 'You have %d open tickets.', $open);
+        } elseif ($breached === $open) {
+            $summary .= ' ' . _n('You have %d open ticket, and it is past SLA.', 'You have %d open tickets, all past SLA.', $open);
+        } else {
+            $summary .= ' ' . _n('You have %1$d open ticket, %2$d of them past SLA.', 'You have %1$d open tickets, %2$d of them past SLA.', $open, $open, $breached);
+        }
     }
 }
 
@@ -81,7 +86,7 @@ $tone_text = ['danger' => 'text-danger-emphasis', 'warning' => 'text-warning-emp
     </div>
     <?php if ($access['financial']) { ?>
         <form class="d-flex align-items-center gap-2">
-            <label for="dashboardPeriod" class="small text-body-secondary mb-0">Period</label>
+            <label for="dashboardPeriod" class="small text-body-secondary mb-0"><?= __('Period') ?></label>
             <select id="dashboardPeriod" name="period" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                 <?php foreach ($period_options as $option_key => $option_label) { ?>
                     <option value="<?= escapeHtml($option_key) ?>" <?php if ($option_key === $period['key']) { echo 'selected'; } ?>><?= escapeHtml($option_label) ?></option>
@@ -102,15 +107,15 @@ if ($getting_started) {
             <div class="d-flex align-items-start gap-3">
                 <span class="itflow-gs-card-icon" aria-hidden="true"><i class="fas fa-flag-checkered"></i></span>
                 <div class="min-w-0 flex-grow-1">
-                    <h2 id="dashGettingStarted" class="h6 fw-semibold mb-1">Finish setting up <span class="text-body-secondary fw-normal">· <?= $gs_card_progress['done'] ?> of <?= $gs_card_progress['total'] ?></span></h2>
-                    <div class="progress itflow-gs-progress mb-2" role="progressbar" aria-label="How far setting up has got" aria-valuenow="<?= $gs_card_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $gs_card_progress['total'] ?>">
+                    <h2 id="dashGettingStarted" class="h6 fw-semibold mb-1"><?= __('Finish setting up') ?> <span class="text-body-secondary fw-normal">· <?= $gs_card_progress['done'] ?> of <?= $gs_card_progress['total'] ?></span></h2>
+                    <div class="progress itflow-gs-progress mb-2" role="progressbar" aria-label="<?= escapeHtml(__('How far setting up has got')) ?>" aria-valuenow="<?= $gs_card_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $gs_card_progress['total'] ?>">
                         <div class="progress-bar" style="width: <?= round($gs_card_progress['done'] * 100 / max(1, $gs_card_progress['total'])) ?>%"></div>
                     </div>
-                    <div class="small text-body-secondary">Next: <strong class="text-body"><?= escapeHtml($gs_card_next['title']) ?></strong> - <?= escapeHtml($gs_card_next['status']) ?></div>
+                    <div class="small text-body-secondary"><?= __('Next:') ?> <strong class="text-body"><?= escapeHtml($gs_card_next['title']) ?></strong> - <?= escapeHtml($gs_card_next['status']) ?></div>
                 </div>
                 <form action="/admin/post.php" method="post" class="m-0 flex-shrink-0">
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <button type="submit" name="getting_started_dismiss" value="1" class="btn-close" aria-label="Don't show this on the dashboard" title="Don't show this on the dashboard" data-gs-card-dismiss></button>
+                    <button type="submit" name="getting_started_dismiss" value="1" class="btn-close" aria-label="<?= escapeHtml(__('Don\'t show this on the dashboard')) ?>" title="<?= escapeHtml(__('Don\'t show this on the dashboard')) ?>" data-gs-card-dismiss></button>
                 </form>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
@@ -124,7 +129,7 @@ if ($getting_started) {
                         </li>
                     <?php } ?>
                 </ul>
-                <a href="<?= gettingStartedUrl($gs_card_progress['next']) ?>" class="btn btn-primary btn-sm" data-gs-card-continue>Carry on<i class="fas fa-arrow-right ms-2"></i></a>
+                <a href="<?= gettingStartedUrl($gs_card_progress['next']) ?>" class="btn btn-primary btn-sm" data-gs-card-continue><?= __('Carry on') ?><i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -133,7 +138,7 @@ if ($getting_started) {
 <?php if ($attention !== null) { ?>
 
     <section class="mb-4" aria-labelledby="dashAttentionHeading">
-        <h2 id="dashAttentionHeading" class="itflow-dash-section mb-2">Needs attention</h2>
+        <h2 id="dashAttentionHeading" class="itflow-dash-section mb-2"><?= __('Needs attention') ?></h2>
         <div class="card mb-0 overflow-hidden">
             <div class="itflow-dash-rail">
                 <?php if ($attention) { ?>
@@ -152,9 +157,9 @@ if ($getting_started) {
                 <?php } else { ?>
                     <div class="itflow-dash-rail-item itflow-dash-rail-clear" style="--itflow-dash-tone: var(--bs-success)">
                         <span class="itflow-dash-rail-label text-body fw-semibold">
-                            <i class="fas fa-fw fa-check-circle text-success-emphasis" aria-hidden="true"></i>Nothing needs attention
+                            <i class="fas fa-fw fa-check-circle text-success-emphasis" aria-hidden="true"></i><?= __('Nothing needs attention') ?>
                         </span>
-                        <span class="itflow-dash-rail-detail">No breached SLAs, unassigned tickets, overdue invoices, or anything expiring in the next 30 days.</span>
+                        <span class="itflow-dash-rail-detail"><?= __('No breached SLAs, unassigned tickets, overdue invoices, or anything expiring in the next 30 days.') ?></span>
                     </div>
                 <?php } ?>
             </div>
@@ -165,15 +170,15 @@ if ($getting_started) {
 
 <?php if ($my_tickets !== null) { ?>
 
-    <h2 class="itflow-dash-section mb-2">Your day</h2>
+    <h2 class="itflow-dash-section mb-2"><?= __('Your day') ?></h2>
 
     <div class="row g-3 mb-3">
         <div class="col-xl-8">
             <div class="card h-100 mb-0 bg-dark">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Open and assigned to you</h3>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Open and assigned to you') ?></h3>
                     <?php if ($my_tickets['total']) { ?>
-                        <a class="small text-light" href="/agent/tickets.php?assigned=<?= intval($session_user_id) ?>">View all <?= $my_tickets['total'] ?></a>
+                        <a class="small text-light" href="/agent/tickets.php?assigned=<?= intval($session_user_id) ?>"><?= __('View all %d', $my_tickets['total']) ?></a>
                     <?php } ?>
                 </div>
 
@@ -188,15 +193,15 @@ if ($getting_started) {
                             $last_activity = $ticket['ticket_updated_at'] ?: $ticket['ticket_created_at'];
                             ?>
                             <a href="<?= escapeHtml($ticket_url) ?>" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-2">
-                                <span class="itflow-dash-dot bg-<?= $priority_colors[$ticket_priority] ?? 'secondary' ?>" title="<?= escapeHtml($ticket_priority) ?> priority"></span>
+                                <span class="itflow-dash-dot bg-<?= $priority_colors[$ticket_priority] ?? 'secondary' ?>" title="<?= escapeHtml(__('%s priority', ticketPriorityLabel($ticket_priority))) ?>"></span>
                                 <span class="flex-grow-1 overflow-hidden">
                                     <span class="d-block text-truncate">
                                         <span class="small text-body-secondary me-2"><?= escapeHtml($ticket['ticket_prefix'] . $ticket['ticket_number']) ?></span><?= escapeHtml($ticket['ticket_subject']) ?>
                                     </span>
-                                    <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml($ticket['client_name'] ?: 'No client') ?></span>
+                                    <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml($ticket['client_name'] ?: __('No client')) ?></span>
                                 </span>
                                 <?php if ($ticket['sla_breached']) { ?>
-                                    <span class="badge rounded-pill text-bg-danger" title="SLA breached"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span>
+                                    <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('SLA breached')) ?>"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span>
                                 <?php } ?>
                                 <span class="d-none d-sm-inline"><?= ticketStatusHtml($ticket['ticket_status_name'], $ticket['ticket_status_color'], 'detail') ?></span>
                                 <span class="small text-body-secondary text-nowrap d-none d-md-inline" title="Last activity <?= escapeHtml($last_activity) ?>"><?= escapeHtml(timeAgo($last_activity)) ?></span>
@@ -206,7 +211,7 @@ if ($getting_started) {
                 <?php } else { ?>
                     <div class="card-body text-center text-body-secondary py-5">
                         <i class="fas fa-mug-hot fa-2x mb-2 d-block" aria-hidden="true"></i>
-                        No open tickets assigned to you.
+                        <?= __('No open tickets assigned to you.') ?>
                     </div>
                 <?php } ?>
             </div>
@@ -215,11 +220,11 @@ if ($getting_started) {
         <div class="col-xl-4">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Your schedule</h3>
-                    <a class="small" href="/agent/calendar.php">Open calendar</a>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Your schedule') ?></h3>
+                    <a class="small" href="/agent/calendar.php"><?= __('Open calendar') ?></a>
                 </div>
                 <?php if ($schedule['items']) { ?>
-                    <div class="itflow-dash-schedule" tabindex="0" aria-label="Your schedule for the next 7 days">
+                    <div class="itflow-dash-schedule" tabindex="0" aria-label="<?= escapeHtml(__('Your schedule for the next 7 days')) ?>">
                         <?php
                         $schedule_day = null;
                         foreach ($schedule['items'] as $item) {
@@ -230,7 +235,7 @@ if ($getting_started) {
                             <?php } ?>
                             <a class="itflow-dash-schedule-item<?= (!$item['all_day'] && !$item['ongoing'] && strtotime($item['when']) < time()) ? ' is-past' : '' ?><?= !empty($item['modal']) ? ' ajax-modal' : '' ?>" href="<?= escapeHtml($item['url']) ?>"<?php if (!empty($item['modal'])) { ?> data-modal-size="lg" data-modal-url="<?= escapeHtml($item['modal']) ?>"<?php } ?>>
                                 <span class="itflow-dash-schedule-time">
-                                    <?= $item['ongoing'] ? 'Ongoing' : ($item['all_day'] ? 'All day' : escapeHtml(date('g:i A', strtotime($item['when'])))) ?>
+                                    <?= $item['ongoing'] ? 'Ongoing' : ($item['all_day'] ? __('All day') : escapeHtml(date('g:i A', strtotime($item['when'])))) ?>
                                 </span>
                                 <span class="itflow-dash-schedule-mark" style="background-color: <?= $item['color'] ? escapeHtml($item['color']) : 'var(--itflow-accent)' ?>"></span>
                                 <span class="flex-grow-1 overflow-hidden">
@@ -239,7 +244,7 @@ if ($getting_started) {
                                     </span>
                                     <?php if ($item['detail'] || $item['onsite']) { ?>
                                         <span class="d-block small text-body-secondary text-truncate">
-                                            <?php if ($item['onsite']) { ?><span class="badge rounded-pill text-bg-secondary me-1">Onsite</span><?php } ?><?= escapeHtml($item['detail']) ?>
+                                            <?php if ($item['onsite']) { ?><span class="badge rounded-pill text-bg-secondary me-1"><?= __('Onsite') ?></span><?php } ?><?= escapeHtml($item['detail']) ?>
                                         </span>
                                     <?php } ?>
                                 </span>
@@ -252,7 +257,7 @@ if ($getting_started) {
                 <?php } else { ?>
                     <div class="card-body text-center text-body-secondary py-5">
                         <i class="far fa-calendar-check fa-2x mb-2 d-block" aria-hidden="true"></i>
-                        Nothing scheduled in the next 7 days.
+                        <?= __('Nothing scheduled in the next 7 days.') ?>
                     </div>
                 <?php } ?>
             </div>
@@ -263,22 +268,22 @@ if ($getting_started) {
         <div class="col-md-6 col-xl-4">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Your time this week</h3>
-                    <span class="small text-body-secondary">Last week <?= dashboardDuration($time_week['last_week']) ?></span>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Your time this week') ?></h3>
+                    <span class="small text-body-secondary"><?= __('Last week %s', dashboardDuration($time_week['last_week'])) ?></span>
                 </div>
                 <?php if ($time_week['total'] > 0) { ?>
                 <div class="card-body pt-2 d-flex flex-column">
                     <span class="d-block itflow-dash-money-value mb-0"><?= dashboardDuration($time_week['total']) ?></span>
                     <span class="d-flex flex-wrap column-gap-3 small text-body-secondary mb-2">
-                        <span><span class="itflow-dash-legend-swatch d-inline-block me-1" style="background-color: var(--itflow-accent)"></span>Billable <?= dashboardDuration($time_week['billable']) ?></span>
-                        <span><span class="itflow-dash-legend-swatch d-inline-block me-1" style="background-color: var(--bs-tertiary-color)"></span>Not billable <?= dashboardDuration($time_week['total'] - $time_week['billable']) ?></span>
+                        <span><span class="itflow-dash-legend-swatch d-inline-block me-1" style="background-color: var(--itflow-accent)"></span><?= __('Billable %s', dashboardDuration($time_week['billable'])) ?></span>
+                        <span><span class="itflow-dash-legend-swatch d-inline-block me-1" style="background-color: var(--bs-tertiary-color)"></span><?= __('Not billable %s', dashboardDuration($time_week['total'] - $time_week['billable'])) ?></span>
                     </span>
-                    <div class="itflow-dash-chart itflow-dash-chart-sm flex-grow-1"><canvas id="dashTimeWeek" aria-label="Hours logged per day this week"></canvas></div>
+                    <div class="itflow-dash-chart itflow-dash-chart-sm flex-grow-1"><canvas id="dashTimeWeek" aria-label="<?= escapeHtml(__('Hours logged per day this week')) ?>"></canvas></div>
                 </div>
                 <?php } else { ?>
                     <div class="card-body text-center text-body-secondary py-5">
                         <i class="far fa-clock fa-2x mb-2 d-block" aria-hidden="true"></i>
-                        No time logged on tickets yet this week.
+                        <?= __('No time logged on tickets yet this week.') ?>
                     </div>
                 <?php } ?>
             </div>
@@ -289,7 +294,7 @@ if ($getting_started) {
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Open tickets by tech</h3>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Open tickets by tech') ?></h3>
                     </div>
                     <div class="card-body pt-2">
                         <?php if ($team['techs'] || $team['unassigned']) { ?>
@@ -309,14 +314,14 @@ if ($getting_started) {
                                 <?php } ?>
                                 <?php if ($team['unassigned']) { ?>
                                     <a class="itflow-dash-bar" href="/agent/tickets.php?assigned=unassigned">
-                                        <span class="itflow-dash-bar-label fst-italic">Unassigned</span>
+                                        <span class="itflow-dash-bar-label fst-italic"><?= __('Unassigned') ?></span>
                                         <span class="itflow-dash-bar-value"><?= intval($team['unassigned']) ?></span>
                                         <span class="itflow-dash-bar-track"><span class="itflow-dash-bar-fill bg-warning" style="width: <?= round($team['unassigned'] / $team_max * 100, 1) ?>%"></span></span>
                                     </a>
                                 <?php } ?>
                             </div>
                         <?php } else { ?>
-                            <div class="text-center text-body-secondary py-5">No open tickets.</div>
+                            <div class="text-center text-body-secondary py-5"><?= __('No open tickets.') ?></div>
                         <?php } ?>
                     </div>
                 </div>
@@ -326,11 +331,11 @@ if ($getting_started) {
         <div class="<?= $team !== null ? 'col-xl-4' : 'col-md-6 col-xl-8' ?>">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Opened and resolved</h3>
-                    <span class="small text-body-secondary">Last 12 weeks</span>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Opened and resolved') ?></h3>
+                    <span class="small text-body-secondary"><?= __('Last 12 weeks') ?></span>
                 </div>
                 <div class="card-body d-flex flex-column">
-                    <div class="itflow-dash-chart flex-grow-1"><canvas id="dashTicketTrend" aria-label="Tickets opened and resolved per week"></canvas></div>
+                    <div class="itflow-dash-chart flex-grow-1"><canvas id="dashTicketTrend" aria-label="<?= escapeHtml(__('Tickets opened and resolved per week')) ?>"></canvas></div>
                 </div>
             </div>
         </div>
@@ -341,7 +346,7 @@ if ($getting_started) {
 <?php if ($show_money) { ?>
 
     <div class="d-flex flex-wrap align-items-baseline gap-2 mb-2">
-        <h2 class="itflow-dash-section mb-0"><?= $access['financial'] ? 'Finance' : 'Billing' ?></h2>
+        <h2 class="itflow-dash-section mb-0"><?= $access['financial'] ? __('Finance') : __('Billing') ?></h2>
         <?php if ($access['financial']) { ?>
             <span class="small text-body-secondary"><?= escapeHtml($period['label']) ?>, <?= escapeHtml($period['compare_long']) ?></span>
         <?php } ?>
@@ -373,7 +378,7 @@ if ($getting_started) {
                                             <span class="text-body-tertiary"><?= escapeHtml($period['compare']) ?></span>
                                         </span>
                                     <?php } else { ?>
-                                        <span class="d-block small text-body-tertiary text-truncate">No earlier data to compare</span>
+                                        <span class="d-block small text-body-tertiary text-truncate"><?= __('No earlier data to compare') ?></span>
                                     <?php } ?>
                                 </a>
                             </div>
@@ -394,11 +399,11 @@ if ($getting_started) {
                 <?php }
             } elseif ($now_cards) { ?>
                 <div class="col-lg-4 itflow-dash-now">
-                    <div class="px-3 pt-3 pb-1 small fw-semibold text-body-secondary">Right now</div>
+                    <div class="px-3 pt-3 pb-1 small fw-semibold text-body-secondary"><?= __('Right now') ?></div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($now_cards as $card) { ?>
                             <a href="<?= escapeHtml($card['url']) ?>" class="list-group-item list-group-item-action border-0 d-flex justify-content-between align-items-baseline gap-3 py-1">
-                                <span class="text-truncate"><?= escapeHtml($card['label']) ?> <span class="small text-body-tertiary"><?= escapeHtml(strtolower($card['note'] ?? '')) ?></span></span>
+                                <span class="text-truncate"><?= escapeHtml($card['label']) ?> <span class="small text-body-tertiary"><?= escapeHtml(mb_strtolower($card['note'] ?? '')) ?></span></span>
                                 <span class="fw-semibold text-nowrap"><?= escapeHtml(dashboardMoney($card['value'])) ?></span>
                             </a>
                         <?php } ?>
@@ -414,14 +419,14 @@ if ($getting_started) {
             <div class="col-xl-8">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Cash flow</h3>
-                        <span class="small text-body-secondary"><?= escapeHtml($chart_data['cash_flow']['extended'] ? 'Last 12 months and next 3' : $period['chart_label']) ?></span>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Cash flow') ?></h3>
+                        <span class="small text-body-secondary"><?= escapeHtml($chart_data['cash_flow']['extended'] ? __('Last 12 months and next 3') : $period['chart_label']) ?></span>
                     </div>
                     <div class="card-body">
-                        <div class="itflow-dash-chart itflow-dash-chart-lg"><canvas id="dashCashFlow" aria-label="Income and expenses per month, with what is expected in the months ahead"></canvas></div>
+                        <div class="itflow-dash-chart itflow-dash-chart-lg"><canvas id="dashCashFlow" aria-label="<?= escapeHtml(__('Income and expenses per month, with what is expected in the months ahead')) ?>"></canvas></div>
                         <?php if (array_sum($chart_data['cash_flow']['expected_income']) + array_sum($chart_data['cash_flow']['expected_expenses']) > 0) { ?>
                             <p class="small text-body-tertiary mt-2 mb-0">
-                                Lighter bars are expected: what's still owed on unpaid invoices, by due date, plus recurring invoices and expenses in the month they next run. Overdue invoices aren't counted.
+                                <?= __('Lighter bars are expected: what\'s still owed on unpaid invoices, by due date, plus recurring invoices and expenses in the month they next run. Overdue invoices aren\'t counted.') ?>
                             </p>
                         <?php } ?>
                     </div>
@@ -430,13 +435,13 @@ if ($getting_started) {
             <div class="col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Accounts</h3>
-                        <a class="small" href="/agent/accounts.php">View accounts</a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Accounts') ?></h3>
+                        <a class="small" href="/agent/accounts.php"><?= __('View accounts') ?></a>
                     </div>
                     <?php if ($accounts) {
                         $accounts_total = array_sum(array_map('floatval', array_column($accounts, 'balance'))); ?>
                         <div class="card-body flex-grow-0 pt-2 pb-3">
-                            <span class="d-block small text-body-secondary">Total balance</span>
+                            <span class="d-block small text-body-secondary"><?= __('Total balance') ?></span>
                             <span class="d-block itflow-dash-money-value mb-0 <?= $accounts_total < 0 ? 'text-danger' : '' ?>"><?= escapeHtml(dashboardMoney($accounts_total)) ?></span>
                         </div>
                         <ul class="list-group list-group-flush">
@@ -448,7 +453,7 @@ if ($getting_started) {
                             <?php } ?>
                         </ul>
                     <?php } else { ?>
-                        <div class="card-body text-center text-body-secondary">No accounts yet.</div>
+                        <div class="card-body text-center text-body-secondary"><?= __('No accounts yet.') ?></div>
                     <?php } ?>
                 </div>
             </div>
@@ -463,16 +468,16 @@ if ($getting_started) {
                 <div class="<?= $top_clients !== null ? 'col-lg-6' : 'col-12' ?>">
                     <div class="card h-100 mb-0">
                         <div class="card-header d-flex align-items-center">
-                            <h3 class="card-title mb-0 me-auto">Receivables aging</h3>
-                            <a class="small" href="/agent/invoices.php?status=Unpaid">View unpaid invoices</a>
+                            <h3 class="card-title mb-0 me-auto"><?= __('Receivables aging') ?></h3>
+                            <a class="small" href="/agent/invoices.php?status=Unpaid"><?= __('View unpaid invoices') ?></a>
                         </div>
                         <?php if ($aging['total'] > 0) { ?>
                             <div class="card-body flex-grow-0 pt-2">
                                 <div class="d-flex flex-wrap align-items-baseline column-gap-2 mb-2">
                                     <span class="itflow-dash-money-value mb-0"><?= escapeHtml(dashboardMoney($aging['total'])) ?></span>
-                                    <span class="small text-body-secondary">owed on <?= $aging['count'] ?> invoice<?= $aging['count'] === 1 ? '' : 's' ?></span>
+                                    <span class="small text-body-secondary"><?= _n('owed on %d invoice', 'owed on %d invoices', $aging['count']) ?></span>
                                 </div>
-                                <div class="itflow-dash-aging mb-3" role="img" aria-label="Receivables by days past due">
+                                <div class="itflow-dash-aging mb-3" role="img" aria-label="<?= escapeHtml(__('Receivables by days past due')) ?>">
                                     <?php foreach ($aging['buckets'] as $bucket_key => $bucket) {
                                         if ($bucket['amount'] > 0) { ?>
                                             <span class="itflow-dash-age-<?= str_replace('+', 'plus', $bucket_key) ?>" style="width: <?= round($bucket['amount'] / $aging['total'] * 100, 2) ?>%"
@@ -489,7 +494,7 @@ if ($getting_started) {
                                     <?php } ?>
                                 </div>
                             </div>
-                            <div class="px-3 pb-1 small fw-semibold text-body-secondary">Owe the most</div>
+                            <div class="px-3 pb-1 small fw-semibold text-body-secondary"><?= __('Owe the most') ?></div>
                             <div class="list-group list-group-flush">
                                 <?php foreach ($aging['clients'] as $row) {
                                     $days_late = intval($row['days_late']); ?>
@@ -498,8 +503,8 @@ if ($getting_started) {
                                         <span class="overflow-hidden">
                                             <span class="d-block text-truncate"><?= escapeHtml($row['client_name']) ?></span>
                                             <span class="d-block small <?= $days_late > 0 ? 'text-danger-emphasis' : 'text-body-secondary' ?>">
-                                                <?= intval($row['n']) ?> invoice<?= intval($row['n']) === 1 ? '' : 's' ?>,
-                                                <?= $days_late > 0 ? "oldest $days_late day" . ($days_late === 1 ? '' : 's') . ' late' : 'none late' ?>
+                                                <?= _n('%d invoice,', '%d invoices,', intval($row['n'])) ?>
+                                                <?= $days_late > 0 ? _n('oldest %d day late', 'oldest %d days late', $days_late) : __('none late') ?>
                                             </span>
                                         </span>
                                         <span class="text-nowrap fw-semibold"><?= escapeHtml(dashboardMoney($row['v'])) ?></span>
@@ -509,7 +514,7 @@ if ($getting_started) {
                         <?php } else { ?>
                             <div class="card-body text-center text-body-secondary py-5">
                                 <i class="fas fa-check-circle fa-2x mb-2 d-block text-success" aria-hidden="true"></i>
-                                Nothing is owed on unpaid invoices.
+                                <?= __('Nothing is owed on unpaid invoices.') ?>
                             </div>
                         <?php } ?>
                     </div>
@@ -521,8 +526,8 @@ if ($getting_started) {
                 <div class="<?= $aging !== null ? 'col-lg-6' : 'col-12' ?>">
                     <div class="card h-100 mb-0">
                         <div class="card-header d-flex align-items-center">
-                            <h3 class="card-title mb-0 me-auto">Top clients</h3>
-                            <span class="small text-body-secondary">Paid, <?= escapeHtml(strtolower($period['label'])) ?></span>
+                            <h3 class="card-title mb-0 me-auto"><?= __('Top clients') ?></h3>
+                            <span class="small text-body-secondary"><?= escapeHtml(__('Paid, %s', mb_strtolower($period['label']))) ?></span>
                         </div>
                         <div class="card-body pt-2">
                             <?php if ($top_clients['clients']) { ?>
@@ -539,7 +544,7 @@ if ($getting_started) {
                                     <?php } ?>
                                 </div>
                             <?php } else { ?>
-                                <div class="text-center text-body-secondary py-5">No client payments in this period.</div>
+                                <div class="text-center text-body-secondary py-5"><?= __('No client payments in this period.') ?></div>
                             <?php } ?>
                         </div>
                     </div>
@@ -553,28 +558,28 @@ if ($getting_started) {
 
         <div class="row g-3 mb-3">
             <?php foreach ([
-                ['dashIncomeByCategory', 'Income by category', 'income_by_category'],
-                ['dashExpensesByCategory', 'Expenses by category', 'expenses_by_category'],
-                ['dashExpensesByVendor', 'Expenses by vendor', 'expenses_by_vendor'],
+                ['dashIncomeByCategory', __('Income by category'), 'income_by_category'],
+                ['dashExpensesByCategory', __('Expenses by category'), 'expenses_by_category'],
+                ['dashExpensesByVendor', __('Expenses by vendor'), 'expenses_by_vendor'],
             ] as [$canvas_id, $title, $key]) { ?>
                 <div class="col-lg-4">
                     <div class="card h-100 mb-0">
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0 me-auto"><?= $title ?></h3>
-                            <span class="small text-body-secondary">Top 5</span>
+                            <span class="small text-body-secondary"><?= __('Top 5') ?></span>
                         </div>
                         <div class="card-body">
                             <?php if ($chart_data['breakdowns'][$key]['values']) { ?>
                                 <div class="itflow-dash-chart itflow-dash-chart-donut">
                                     <canvas id="<?= $canvas_id ?>" aria-label="<?= $title ?>"></canvas>
                                     <div class="itflow-dash-donut-total" aria-hidden="true">
-                                        <span class="small text-body-secondary">Total</span>
+                                        <span class="small text-body-secondary"><?= __('Total') ?></span>
                                         <span class="fw-semibold" data-donut-total="<?= $canvas_id ?>"></span>
                                     </div>
                                 </div>
                                 <ul class="itflow-dash-legend list-unstyled mb-0 mt-3" data-donut-legend="<?= $canvas_id ?>"></ul>
                             <?php } else { ?>
-                                <div class="text-center text-body-secondary py-5">Nothing in this period.</div>
+                                <div class="text-center text-body-secondary py-5"><?= __('Nothing in this period.') ?></div>
                             <?php } ?>
                         </div>
                     </div>
@@ -586,8 +591,8 @@ if ($getting_started) {
             <div class="col-lg-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Latest income</h3>
-                        <a class="small" href="/agent/income.php">View all income</a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Latest income') ?></h3>
+                        <a class="small" href="/agent/income.php"><?= __('View all income') ?></a>
                     </div>
                     <?php if ($latest_income) { ?>
                         <div class="list-group list-group-flush">
@@ -596,22 +601,22 @@ if ($getting_started) {
                                     href="/agent/invoice.php?client_id=<?= intval($row['invoice_client_id']) ?>&invoice_id=<?= intval($row['invoice_id']) ?>">
                                     <span class="overflow-hidden">
                                         <span class="d-block text-truncate"><?= escapeHtml($row['client_name']) ?></span>
-                                        <span class="d-block small text-body-secondary"><?= escapeHtml($row['invoice_prefix'] . $row['invoice_number']) ?> · <?= escapeHtml(date('M j', strtotime($row['payment_date']))) ?></span>
+                                        <span class="d-block small text-body-secondary"><?= escapeHtml($row['invoice_prefix'] . $row['invoice_number']) ?> · <?= escapeHtml(formatDate($row['payment_date'], 'date_short')) ?></span>
                                     </span>
                                     <span class="text-nowrap text-success"><?= escapeHtml(dashboardMoney($row['payment_amount'])) ?></span>
                                 </a>
                             <?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="card-body text-center text-body-secondary">No payments yet.</div>
+                        <div class="card-body text-center text-body-secondary"><?= __('No payments yet.') ?></div>
                     <?php } ?>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Latest expenses</h3>
-                        <a class="small" href="/agent/expenses.php">View all expenses</a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Latest expenses') ?></h3>
+                        <a class="small" href="/agent/expenses.php"><?= __('View all expenses') ?></a>
                     </div>
                     <?php if ($latest_expenses) { ?>
                         <ul class="list-group list-group-flush">
@@ -619,22 +624,22 @@ if ($getting_started) {
                                 <li class="list-group-item d-flex justify-content-between align-items-center gap-3">
                                     <span class="overflow-hidden">
                                         <span class="d-block text-truncate"><?= escapeHtml($row['vendor_name']) ?></span>
-                                        <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml($row['category_name'] ?: 'Uncategorised') ?> · <?= escapeHtml(date('M j', strtotime($row['expense_date']))) ?></span>
+                                        <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml($row['category_name'] ?: __('Uncategorised')) ?> · <?= escapeHtml(formatDate($row['expense_date'], 'date_short')) ?></span>
                                     </span>
                                     <span class="text-nowrap"><?= escapeHtml(dashboardMoney($row['expense_amount'])) ?></span>
                                 </li>
                             <?php } ?>
                         </ul>
                     <?php } else { ?>
-                        <div class="card-body text-center text-body-secondary">No expenses yet.</div>
+                        <div class="card-body text-center text-body-secondary"><?= __('No expenses yet.') ?></div>
                     <?php } ?>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Trips</h3>
-                        <span class="small text-body-secondary"><?= number_format($chart_data['trips']['period_total'], 1) ?> <?= tripUnit(true) ?> <?= escapeHtml(strtolower($period['label'])) ?></span>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Trips') ?></h3>
+                        <span class="small text-body-secondary"><?= number_format($chart_data['trips']['period_total'], 1) ?> <?= tripUnit(true) ?> <?= escapeHtml(mb_strtolower($period['label'])) ?></span>
                     </div>
                     <div class="card-body">
                         <div class="itflow-dash-chart"><canvas id="dashTrips" aria-label="<?= ucfirst(tripUnit()) ?> per month"></canvas></div>
@@ -651,7 +656,7 @@ if ($getting_started) {
     <div class="card">
         <div class="card-body text-center text-body-secondary py-5">
             <i class="fas fa-compass fa-3x mb-3 d-block" aria-hidden="true"></i>
-            Your role has no dashboard sections. Use the menu or <kbd>Ctrl</kbd> + <kbd>K</kbd> to find what you need.
+            <?= __('Your role has no dashboard sections. Use the menu or') ?> <kbd><?= __('Ctrl') ?></kbd> + <kbd>K</kbd> <?= __('to find what you need.') ?>
         </div>
     </div>
 <?php } ?>

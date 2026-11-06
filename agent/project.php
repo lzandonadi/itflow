@@ -126,7 +126,7 @@ $project_tabs = [
     'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'count' => count($tickets), 'badge' => $stats['open']],
     'tasks' => ['label' => __('Tasks'), 'icon' => 'fa-tasks', 'count' => $stats['tasks']],
     'activity' => ['label' => 'Activity', 'icon' => 'fa-comments', 'count' => count($activity)],
-    'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+    'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
 ];
 
 $new_ticket_url = "modals/ticket/ticket_add.php?" . ($project_client_id ? "client_id=$project_client_id&" : '') . "project_id=$project_id";

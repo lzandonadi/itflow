@@ -234,7 +234,7 @@
 
         const body = el('span', 'itflow-notify-body');
         const top = el('span', 'itflow-notify-top');
-        top.append(el('span', 'itflow-notify-type', item.type));
+        top.append(el('span', 'itflow-notify-type', item.type_label || item.type));
         if (item.time) {
             const time = el('time', 'itflow-notify-time');
             time.setAttribute('datetime', item.time);

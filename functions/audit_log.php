@@ -156,11 +156,23 @@ function auditLogActionStyle($action) {
     return ['tone' => $style[0], 'icon' => $style[1]];
 }
 
+/*
+ * An action or a type as shown - the log keeps them in English, the screen
+ * shows them in the interface language where there is a translation.
+ */
+function auditLogActionLabel($action) {
+    return _x((string) $action, 'audit action'); // i18n-dynamic - log_action, entries in lang/pt_BR/dashboard.php
+}
+
+function auditLogTypeLabel($type) {
+    return _x((string) $type, 'audit type'); // i18n-dynamic - log_type, entries in lang/pt_BR/dashboard.php
+}
+
 /** An action as a soft pill, in its tone. */
 function auditLogActionPill($action) {
     $style = auditLogActionStyle($action);
     $tone = $style['tone'];
-    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal text-nowrap"><i class="fas ' . $style['icon'] . ' me-1"></i>' . escapeHtml($action) . '</span>';
+    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal text-nowrap"><i class="fas ' . $style['icon'] . ' me-1"></i>' . escapeHtml(auditLogActionLabel($action)) . '</span>';
 }
 
 /*
@@ -326,7 +338,7 @@ function auditLogDescription(array $row) {
 function auditLogWho(array $row) {
     $user_id = intval($row['log_user_id']);
     if (!$user_id || $row['user_name'] === null) {
-        $name = $user_id ? 'A user no longer here' : 'ITFlow';
+        $name = $user_id ? __('A user no longer here') : 'ITFlow';
         return ['name' => $name, 'kind' => 'system', 'html' => '<span class="d-inline-flex align-items-center gap-2 text-body-secondary"><span class="itflow-asset-icon itflow-asset-icon-xs itflow-asset-tone-other" aria-hidden="true"><i class="fas fa-fw ' . ($user_id ? 'fa-user-slash' : 'fa-cog') . '"></i></span>' . escapeHtml($name) . '</span>'];
     }
     $portal = intval($row['user_type'] ?? 1) === 2;
@@ -334,8 +346,8 @@ function auditLogWho(array $row) {
     $against = in_array($row['log_type'] ?? '', SIGN_IN_TYPES, true) && in_array($row['log_action'] ?? '', SIGN_IN_FAILED, true);
     $html = '<span class="d-inline-flex align-items-center gap-2 text-nowrap">' . userAvatar($user_id, $row['user_name'], (string) ($row['user_avatar'] ?? ''), 'xs')
         . '<span class="text-truncate">' . escapeHtml($row['user_name']) . '</span>'
-        . ($portal ? '<span class="badge rounded-pill text-bg-light border fw-normal" title="A client contact, in the client portal">Portal</span>' : '')
-        . ($against ? '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="A failed sign in to their account - not necessarily by them" data-their-account>Their account</span>' : '') . '</span>';
+        . ($portal ? '<span class="badge rounded-pill text-bg-light border fw-normal" title="' . escapeHtml(__('A client contact, in the client portal')) . '">' . __('Portal') . '</span>' : '')
+        . ($against ? '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="' . escapeHtml(__('A failed sign in to their account - not necessarily by them')) . '" data-their-account>' . __('Their account') . '</span>' : '') . '</span>';
     return ['name' => (string) $row['user_name'], 'kind' => $portal ? 'portal' : 'agent', 'html' => $html];
 }
 
@@ -438,7 +450,7 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
         $who = auditLogWho($row);
         $ip = trim((string) $row['log_ip']);
         $html .= '<li class="list-group-item d-flex gap-3 py-2" data-log-id="' . intval($row['log_id']) . '">'
-            . '<span class="itflow-asset-icon itflow-asset-icon-sm bg-' . $style['tone'] . '-subtle text-' . $style['tone'] . '-emphasis" title="' . escapeHtml($row['log_action']) . '"><i class="fas fa-fw ' . $style['icon'] . '"></i></span>'
+            . '<span class="itflow-asset-icon itflow-asset-icon-sm bg-' . $style['tone'] . '-subtle text-' . $style['tone'] . '-emphasis" title="' . escapeHtml(auditLogActionLabel($row['log_action'])) . '"><i class="fas fa-fw ' . $style['icon'] . '"></i></span>'
             . '<div class="flex-grow-1 min-w-0">'
             . '<div class="text-break">' . escapeHtml(auditLogDescription($row)) . '</div>'
             . '<div class="small text-body-secondary d-flex flex-wrap align-items-center column-gap-2 row-gap-1 mt-1">' . $who['html']
@@ -463,7 +475,7 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
 function auditLogHistoryCard(array $history, array $opts = []) {
     $opts += ['compact' => true];
     return '<div class="card mb-3" data-audit-history-card>'
-        . '<div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-history me-2 text-secondary"></i>' . escapeHtml($opts['title'] ?? 'History')
+        . '<div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-history me-2 text-secondary"></i>' . escapeHtml($opts['title'] ?? __('History'))
         . ($history['count'] ? ' <span class="text-body-secondary fw-normal">(' . number_format($history['count']) . ')</span>' : '') . '</h3></div>'
         . auditLogHistoryHtml($history, $opts)
         . '</div>';
@@ -480,7 +492,7 @@ function auditLogHistorySection(array $history, array $opts = []) {
     $id = 'auditHistory' . bin2hex(random_bytes(4));
     return '<div class="mt-3" data-audit-history-section>'
         . '<button class="btn btn-link btn-sm p-0 text-decoration-none small fw-semibold text-uppercase text-body-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#' . $id . '" aria-expanded="false" aria-controls="' . $id . '">'
-        . '<i class="fas fa-fw fa-history me-1"></i>History <span class="badge rounded-pill text-bg-light border fw-normal ms-1">' . number_format($history['count']) . '</span><i class="fas fa-chevron-down ms-2 small"></i></button>'
+        . '<i class="fas fa-fw fa-history me-1"></i>' . __('History') . ' <span class="badge rounded-pill text-bg-light border fw-normal ms-1">' . number_format($history['count']) . '</span><i class="fas fa-chevron-down ms-2 small"></i></button>'
         . '<div class="collapse mt-2" id="' . $id . '">' . auditLogHistoryHtml($history, ['flush' => false] + $opts) . '</div>'
         . '</div>';
 }

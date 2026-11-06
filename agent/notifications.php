@@ -56,12 +56,12 @@ function notificationsPageUrl($changes) {
 function notificationsDayLabel($timestamp) {
     $day = date('Y-m-d', $timestamp);
     if ($day === date('Y-m-d')) {
-        return 'Today';
+        return __('Today');
     }
     if ($day === date('Y-m-d', strtotime('-1 day'))) {
-        return 'Yesterday';
+        return __('Yesterday');
     }
-    return date('l, F j' . (date('Y', $timestamp) === date('Y') ? '' : ', Y'), $timestamp);
+    return formatDate($timestamp, date('Y', $timestamp) === date('Y') ? 'day_long' : 'date_weekday');
 }
 
 $notifications_date_filtered = $dtf !== '1970-01-01' || $dtt !== '2099-12-31';
@@ -74,10 +74,10 @@ $empty_state_skip = true;
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-bell me-2"></i>Notifications</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-bell me-2"></i><?= __('Notifications') ?></h3>
         <div class="card-tools">
             <button type="button" class="btn btn-light" data-notify-all data-notify-reload <?= $unread_count ? '' : 'disabled' ?>>
-                <i class="fas fa-check-double me-2"></i>Mark all as read
+                <i class="fas fa-check-double me-2"></i><?= __('Mark all as read') ?>
             </button>
         </div>
     </div>
@@ -88,33 +88,33 @@ $empty_state_skip = true;
             <div class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?= escapeHtml(stripslashes($q)) ?>" placeholder="Search notifications">
-                        <button class="btn btn-primary" title="Search"><i class="fa fa-search"></i></button>
-                        <button class="btn btn-secondary" title="More filters" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter"><i class="fas fa-filter"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?= escapeHtml(stripslashes($q)) ?>" placeholder="<?= escapeHtml(__('Search notifications')) ?>">
+                        <button class="btn btn-primary" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-secondary" title="<?= escapeHtml(__('More filters')) ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter"><i class="fas fa-filter"></i></button>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select" name="type" onchange="this.form.submit()" aria-label="Notification type">
-                        <option value="">All types</option>
+                    <select class="form-select" name="type" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Notification type')) ?>">
+                        <option value=""><?= __('All types') ?></option>
                         <?php while ($row = mysqli_fetch_assoc($sql_types)) {
                             $type_option = escapeHtml($row['notification_type']); ?>
-                            <option <?php if ($type_filter === $row['notification_type']) { echo "selected"; } ?>><?= $type_option ?></option>
+                            <option value="<?= $type_option ?>" <?php if ($type_filter === $row['notification_type']) { echo "selected"; } ?>><?= escapeHtml(notificationTypeLabel($row['notification_type'])) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <div class="btn-group d-flex d-md-inline-flex" role="group" aria-label="Show">
+                    <div class="btn-group d-flex d-md-inline-flex" role="group" aria-label="<?= escapeHtml(__('Show')) ?>">
                         <a href="<?= escapeHtml(notificationsPageUrl(['view' => null])) ?>" class="btn flex-fill <?= $view === 'unread' ? 'btn-primary' : 'btn-outline-primary' ?>">
-                            Unread <span class="badge rounded-pill text-bg-light ms-1" data-notify-count <?= $unread_count ? '' : 'hidden' ?>><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
+                            <?= __('Unread') ?> <span class="badge rounded-pill text-bg-light ms-1" data-notify-count <?= $unread_count ? '' : 'hidden' ?>><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
                         </a>
-                        <a href="<?= escapeHtml(notificationsPageUrl(['view' => 'all'])) ?>" class="btn flex-fill <?= $view === 'all' ? 'btn-primary' : 'btn-outline-primary' ?>">All</a>
+                        <a href="<?= escapeHtml(notificationsPageUrl(['view' => 'all'])) ?>" class="btn flex-fill <?= $view === 'all' ? 'btn-primary' : 'btn-outline-primary' ?>"><?= __('All') ?></a>
                     </div>
                 </div>
             </div>
             <div class="collapse mt-3 <?php if ($notifications_date_filtered) { echo "show"; } ?>" id="advancedFilter">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">Date range</label>
+                        <label class="form-label"><?= __('Date range') ?></label>
                         <input type="text" id="dateFilter" class="form-control" autocomplete="off">
                         <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                         <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
@@ -133,16 +133,16 @@ $empty_state_skip = true;
             'filtered' => $notifications_filtered,
             'clear_url' => 'notifications.php' . ($view === 'all' ? '?view=all' : ''),
             'view' => $view === 'unread' ? [
-                'title' => "You're all caught up",
-                'text' => 'Nothing new since you last looked.',
+                'title' => __('You\'re all caught up'),
+                'text' => __('Nothing new since you last looked.'),
                 'icon' => 'fa-check',
-                'actions' => [['label' => 'See all notifications', 'href' => 'notifications.php?view=all', 'icon' => 'fa-bell']],
+                'actions' => [['label' => __('See all notifications'), 'href' => 'notifications.php?view=all', 'icon' => 'fa-bell']],
             ] : null,
         ]) ?>
 
     <?php } else { ?>
 
-        <div class="itflow-notify-page" role="list" aria-label="Notifications">
+        <div class="itflow-notify-page" role="list" aria-label="<?= escapeHtml(__('Notifications')) ?>">
             <?php
             $notification_day = null;
             while ($row = mysqli_fetch_assoc($sql)) {
@@ -161,7 +161,7 @@ $empty_state_skip = true;
                         <span class="itflow-notify-icon bg-<?= $item_tone ?>-subtle text-<?= $item_tone ?>-emphasis"><i class="fas fa-fw fa-<?= escapeHtml($item['icon']) ?>" aria-hidden="true"></i></span>
                         <span class="itflow-notify-body">
                             <span class="itflow-notify-top">
-                                <span class="itflow-notify-type"><?= escapeHtml($item['type']) ?></span>
+                                <span class="itflow-notify-type"><?= escapeHtml($item['type_label']) ?></span>
                                 <time class="itflow-notify-time" datetime="<?= escapeHtml($item['time']) ?>" title="<?= escapeHtml($item['time_full']) ?>"><?= date('g:i A', $item_timestamp) ?></time>
                             </span>
                             <span class="itflow-notify-text"><?= escapeHtml($item['text']) ?></span>
@@ -170,7 +170,7 @@ $empty_state_skip = true;
                             <?php } ?>
                         </span>
                     </a>
-                    <button type="button" class="btn btn-sm itflow-notify-toggle" title="<?= $item['unread'] ? 'Mark as read' : 'Mark as unread' ?>" aria-label="<?= $item['unread'] ? 'Mark as read' : 'Mark as unread' ?>">
+                    <button type="button" class="btn btn-sm itflow-notify-toggle" title="<?= $item['unread'] ? __('Mark as read') : __('Mark as unread') ?>" aria-label="<?= $item['unread'] ? __('Mark as read') : __('Mark as unread') ?>">
                         <i class="fas fa-fw fa-<?= $item['unread'] ? 'check' : 'undo' ?>" aria-hidden="true"></i>
                     </button>
                 </div>

@@ -118,7 +118,7 @@ function documentsUrl(array $changes) {
         </ul>
         <?php if ($pages > 1) { ?>
             <div class="itflow-portal-pager">
-                <span><?= $offset + 1 ?>-<?= min($offset + $per_page, $total) ?> of <?= $total ?></span>
+                <span><?= __('%1$d-%2$d of %3$d', $offset + 1, min($offset + $per_page, $total), $total) ?></span>
                 <div class="btn-group">
                     <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="<?= escapeHtml(__('Previous page')) ?>"><i class="fas fa-chevron-left"></i></a>
                     <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page + 1])) ?>" aria-label="<?= escapeHtml(__('Next page')) ?>"><i class="fas fa-chevron-right"></i></a>

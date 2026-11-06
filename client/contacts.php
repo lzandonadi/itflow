@@ -44,21 +44,21 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Contacts</h1>
-        <p>The people at <?= escapeHtml($session_client_name) ?><?= $manage ? ', and who can sign in here' : '' ?></p>
+        <h1><?= __('Contacts') ?></h1>
+        <p><?= $manage ? __('The people at %s, and who can sign in here', escapeHtml($session_client_name)) : __('The people at %s', escapeHtml($session_client_name)) ?></p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
         <form method="get" class="d-flex" role="search">
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="Name, email, title or phone" aria-label="Search contacts" maxlength="200">
+                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="<?= escapeHtml(__('Name, email, title or phone')) ?>" aria-label="<?= escapeHtml(__('Search contacts')) ?>" maxlength="200">
             </div>
         </form>
         <?php if ($can_invite) { ?>
-            <a class="btn btn-outline-primary" href="invite.php"><i class="fas fa-paper-plane me-2"></i>Invite people</a>
+            <a class="btn btn-outline-primary" href="invite.php"><i class="fas fa-paper-plane me-2"></i><?= __('Invite people') ?></a>
         <?php } ?>
         <?php if ($manage) { ?>
-            <a class="btn btn-primary" href="contact.php?new=1"><i class="fas fa-user-plus me-2"></i>Add a person</a>
+            <a class="btn btn-primary" href="contact.php?new=1"><i class="fas fa-user-plus me-2"></i><?= __('Add a person') ?></a>
         <?php } ?>
     </div>
 </div>
@@ -66,11 +66,11 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
 <?php if ($waiting || $signup_domains) { ?>
     <section class="itflow-portal-panel mb-4" data-portal-invites>
         <div class="itflow-portal-panel-head">
-            <h2><i class="fas fa-paper-plane"></i>Waiting to join<?= $waiting ? ' <span class="badge rounded-pill text-bg-secondary ms-1">' . count($waiting) . '</span>' : '' ?></h2>
+            <h2><i class="fas fa-paper-plane"></i><?= __('Waiting to join') ?><?= $waiting ? ' <span class="badge rounded-pill text-bg-secondary ms-1">' . count($waiting) . '</span>' : '' ?></h2>
         </div>
         <?php if ($signup_domains) { ?>
             <div class="itflow-portal-panel-body pb-0">
-                <p class="small text-body-secondary mb-<?= $waiting ? '2' : '3' ?>"><i class="fas fa-door-open me-1"></i>Anyone with an address at <strong><?= escapeHtml(implode(', ', $signup_domains)) ?></strong> can also make their own account from the sign-in page - we email you when they do.</p>
+                <p class="small text-body-secondary mb-<?= $waiting ? '2' : '3' ?>"><i class="fas fa-door-open me-1"></i><?= __('Anyone with an address at %s can also make their own account from the sign-in page - we email you when they do.', '<strong>' . escapeHtml(implode(', ', $signup_domains)) . '</strong>') ?></p>
             </div>
         <?php } ?>
         <?php if ($waiting) { ?>
@@ -85,7 +85,7 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
                             <span class="itflow-portal-ticket-subject d-block text-break"><?= escapeHtml($invite_name !== '' ? $invite_name : $invite['invite_email']) ?></span>
                             <span class="itflow-portal-ticket-meta">
                                 <?php if ($invite_name !== '') { ?><span><i class="fas fa-envelope me-1"></i><?= escapeHtml($invite['invite_email']) ?></span><?php } ?>
-                                <span>Invited <?= escapeHtml(timeAgo($invite['invite_created_at'])) ?><?= $invite_by !== '' ? ' by ' . escapeHtml($invite_by) : '' ?></span>
+                                <span><?= $invite_by !== '' ? __('Invited %1$s by %2$s', escapeHtml(timeAgo($invite['invite_created_at'])), escapeHtml($invite_by)) : __('Invited %s', escapeHtml(timeAgo($invite['invite_created_at']))) ?></span>
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">
@@ -93,9 +93,9 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
                             <form action="post.php" method="post" class="d-flex gap-1">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                 <input type="hidden" name="invite_id" value="<?= intval($invite['invite_id']) ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-primary" name="portal_invite_resend" value="1" title="Email it again, with a new link"><i class="fas fa-paper-plane"></i><span class="d-none d-md-inline ms-1">Send again</span></button>
-                                <button type="submit" class="btn btn-sm btn-outline-danger confirm-link" name="portal_invite_cancel" value="1" title="Cancel the invite"
-                                    data-confirm-title="Cancel the invite to <?= escapeHtml($invite['invite_email']) ?>?" data-confirm-text="Its link stops working. You can invite them again later." data-confirm-button="Cancel invite"><i class="fas fa-times"></i><span class="d-none d-md-inline ms-1">Cancel</span></button>
+                                <button type="submit" class="btn btn-sm btn-outline-primary" name="portal_invite_resend" value="1" title="<?= escapeHtml(__('Email it again, with a new link')) ?>"><i class="fas fa-paper-plane"></i><span class="d-none d-md-inline ms-1"><?= __('Send again') ?></span></button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger confirm-link" name="portal_invite_cancel" value="1" title="<?= escapeHtml(__('Cancel the invite')) ?>"
+                                    data-confirm-title="Cancel the invite to <?= escapeHtml($invite['invite_email']) ?>?" data-confirm-text="<?= escapeHtml(__('Its link stops working. You can invite them again later.')) ?>" data-confirm-button="<?= escapeHtml(__('Cancel invite')) ?>"><i class="fas fa-times"></i><span class="d-none d-md-inline ms-1"><?= __('Cancel') ?></span></button>
                             </form>
                         </span>
                     </li>
@@ -108,9 +108,9 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
 <section class="itflow-portal-panel">
     <?php if (!mysqli_num_rows($contacts)) { ?>
         <?php if ($q !== '') { ?>
-            <?= emptyStateHtml(['thing' => 'people', 'filtered' => true, 'match_text' => 'Nobody here matches &ldquo;' . escapeHtml($q) . '&rdquo;.', 'clear_url' => 'contacts.php']) ?>
+            <?= emptyStateHtml(['thing' => __('people'), 'filtered' => true, 'match_text' => __('Nobody here matches &ldquo;%s&rdquo;.', escapeHtml($q)), 'clear_url' => 'contacts.php']) ?>
         <?php } else { ?>
-            <?= emptyStateHtml(['title' => 'No contacts yet', 'text' => '', 'icon' => 'fa-address-book', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No contacts yet'), 'text' => '', 'icon' => 'fa-address-book', 'filtered' => false]) ?>
         <?php } ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">

@@ -472,7 +472,7 @@ if (isset($_POST['bulk_edit_project_due'])) {
         $done++;
     }
 
-    flashAlert(($due === 'NULL' ? _n('Due date of <strong>%d</strong> project cleared', 'Due date of <strong>%d</strong> projects cleared', $done) : _n('Due date of <strong>%1$d</strong> project set to <strong>%2$s</strong>', 'Due date of <strong>%1$d</strong> projects set to <strong>%2$s</strong>', $done, $done, escapeHtml(formatDate(trim($due, "'")))))
+    flashAlert((!$done ? __('No open projects were changed') : ($due === 'NULL' ? _n('Due date of <strong>%d</strong> project cleared', 'Due date of <strong>%d</strong> projects cleared', $done) : _n('Due date of <strong>%1$d</strong> project set to <strong>%2$s</strong>', 'Due date of <strong>%1$d</strong> projects set to <strong>%2$s</strong>', $done, $done, escapeHtml(formatDate(trim($due, "'"))))))
         . ($skipped ? ', ' . __('<strong>%d</strong> skipped - they start after it', $skipped) : ''));
 
     redirect();

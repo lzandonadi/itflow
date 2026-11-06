@@ -689,7 +689,7 @@ if (isset($_POST['portal_contact_save'])) {
             LEFT JOIN users ON user_id = contact_user_id
             WHERE contact_id = $contact_id AND contact_client_id = $session_client_id AND contact_archived_at IS NULL LIMIT 1"));
         if (!$existing || intval($existing['contact_primary']) || $contact_id === $session_contact_id) {
-            flashAlert("That contact can't be changed here", 'error');
+            flashAlert(__("That contact can't be changed here"), 'error');
             redirect('contacts.php');
         }
     }
@@ -724,9 +724,9 @@ if (isset($_POST['portal_contact_save'])) {
 
     $error = '';
     if ($in['contact_name'] === '') {
-        $error = 'A contact needs a name';
+        $error = __('A contact needs a name');
     } elseif (!filter_var($in['contact_email'], FILTER_VALIDATE_EMAIL)) {
-        $error = ($in['contact_email'] === '' ? 'Nothing' : escapeHtml($in['contact_email'])) . ' is not an email address';
+        $error = __('%s is not an email address', $in['contact_email'] === '' ? __('Nothing') : escapeHtml($in['contact_email']));
     } elseif (($in['invite'] || intval($existing['user_id'] ?? 0)) && userCheckIdentity(['name' => $in['contact_name'], 'email' => $in['contact_email']], intval($existing['user_id'] ?? 0), $identity_error) === null) {
         $error = rtrim($identity_error, '.');
     }
@@ -752,24 +752,24 @@ if (isset($_POST['portal_contact_save'])) {
         }
         logAudit("Contact", "Edit", "Client contact $session_contact_name changed contact $name_sql in the client portal", $session_client_id, $contact_id);
         triggerCustomAction('contact_update', $contact_id);
-        flashAlert("Saved <strong>" . escapeHtml($in['contact_name']) . "</strong>");
+        flashAlert(__('Saved <strong>%s</strong>', escapeHtml($in['contact_name'])));
         redirect("contact.php?id=$contact_id");
     }
 
     mysqli_query($mysqli, "INSERT INTO contacts SET $set, contact_client_id = $session_client_id, contact_user_id = 0");
     $contact_id = intval(mysqli_insert_id($mysqli));
     logAudit("Contact", "Create", "Client contact $session_contact_name added contact $name_sql in the client portal", $session_client_id, $contact_id);
-    appNotify("Contact", "$session_contact_name added $name_sql as a contact for $session_client_name in the client portal", "/agent/contact.php?client_id=$session_client_id&contact_id=$contact_id", $session_client_id, $contact_id);
+    appNotify("Contact", __('%1$s added %2$s as a contact for %3$s in the client portal', $session_contact_name, $name_sql, $session_client_name), "/agent/contact.php?client_id=$session_client_id&contact_id=$contact_id", $session_client_id, $contact_id);
     triggerCustomAction('contact_create', $contact_id);
 
-    $message = "Added <strong>" . escapeHtml($in['contact_name']) . "</strong>";
+    $message = __('Added <strong>%s</strong>', escapeHtml($in['contact_name']));
     if ($in['invite']) {
         $invite = portalContactInvite($contact_id, $in['method'], (string) ($contact['contact_name'] ?? ''));
         if (!$invite['ok']) {
-            $message .= ' - but their portal access could not be set up: ' . escapeHtml($invite['error']);
+            $message .= ' ' . __('- but their portal access could not be set up: %s', escapeHtml($invite['error']));
         } else {
             logAudit("Contact", "Edit", "Client contact $session_contact_name gave $name_sql portal access in the client portal", $session_client_id, $contact_id);
-            $message .= $invite['emailed'] ? ' and emailed them an invite to the portal' : ' and gave them portal access - email is not set up here, so ask us to send them how to sign in';
+            $message .= ' ' . ($invite['emailed'] ? __('and emailed them an invite to the portal') : __('and gave them portal access - email is not set up here, so ask us to send them how to sign in'));
         }
     }
     flashAlert($message);
@@ -789,7 +789,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     $target = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_email, contact_primary FROM contacts
         WHERE contact_id = $contact_id AND contact_client_id = $session_client_id AND contact_archived_at IS NULL LIMIT 1"));
     if (!$target || intval($target['contact_primary']) || $contact_id === $session_contact_id) {
-        flashAlert("That contact's access can't be changed here", 'error');
+        flashAlert(__("That contact's access can't be changed here"), 'error');
         redirect('contacts.php');
     }
     $name = (string) $target['contact_name'];
@@ -799,7 +799,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     if (isset($_POST['portal_contact_left'])) {
         portalContactAccessOff($contact_id);
         logAudit("Contact", "Edit", "Client contact $session_contact_name said $name_sql has left and turned off their portal access", $session_client_id, $contact_id);
-        appNotify("Contact", "$session_contact_name says $name_sql has left $session_client_name - their portal access is off", $agent_link, $session_client_id, $contact_id);
+        appNotify("Contact", __('%1$s says %2$s has left %3$s - their portal access is off', $session_contact_name, $name_sql, $session_client_name), $agent_link, $session_client_id, $contact_id);
         flashAlert(escapeHtml($name) . "'s portal access is off. Tell us below what else to close down - their email, accounts and devices - and their last day.");
         redirect('ticket_add.php?' . http_build_query(['subject' => "Offboarding: $name has left"]));
     }
@@ -807,7 +807,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     if ($_POST['portal_contact_access'] === 'off') {
         portalContactAccessOff($contact_id);
         logAudit("Contact", "Edit", "Client contact $session_contact_name turned off portal access for $name_sql", $session_client_id, $contact_id);
-        appNotify("Contact", "$session_contact_name turned off client portal access for $name_sql", $agent_link, $session_client_id, $contact_id);
+        appNotify("Contact", __('%1$s turned off client portal access for %2$s', $session_contact_name, $name_sql), $agent_link, $session_client_id, $contact_id);
         flashAlert(escapeHtml($name) . "'s portal access is off");
         redirect("contact.php?id=$contact_id");
     }
@@ -818,8 +818,8 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
         redirect("contact.php?id=$contact_id");
     }
     logAudit("Contact", "Edit", "Client contact $session_contact_name gave $name_sql portal access and sent an invite", $session_client_id, $contact_id);
-    appNotify("Contact", "$session_contact_name gave $name_sql client portal access", $agent_link, $session_client_id, $contact_id);
-    flashAlert($invite['emailed'] ? "Invite emailed to <strong>" . escapeHtml($target['contact_email']) . "</strong>" : escapeHtml($name) . " can sign in now - email is not set up here, so ask us to send them how");
+    appNotify("Contact", __('%1$s gave %2$s client portal access', $session_contact_name, $name_sql), $agent_link, $session_client_id, $contact_id);
+    flashAlert($invite['emailed'] ? __('Invite emailed to <strong>%s</strong>', escapeHtml($target['contact_email'])) : __('%s can sign in now - email is not set up here, so ask us to send them how', escapeHtml($name)));
     redirect("contact.php?id=$contact_id");
 
 }
@@ -832,15 +832,15 @@ if (isset($_POST['portal_invites_send'])) {
     enforceContactCan('contacts_manage');
 
     if (!portalInvitesReady() || !portalMailReady()) {
-        flashAlert("Invites can't be sent just now - add the person instead, or ask us", 'error');
+        flashAlert(__("Invites can't be sent just now - add the person instead, or ask us"), 'error');
         redirect('contacts.php');
     }
     $typed = mb_substr((string) ($_POST['emails'] ?? ''), 0, 20000);
     $parsed = portalInviteParse($typed);
     if (!$parsed['people'] || count($parsed['people']) > PORTAL_INVITE_MAX) {
         $_SESSION['portal_invite_form'] = $typed;
-        flashAlert(!$parsed['people'] ? ($parsed['bad'] ? escapeHtml($parsed['bad'][0]) . ' is not an email address' : 'Put in an email address to invite')
-            : 'That is ' . count($parsed['people']) . ' addresses - invite up to ' . PORTAL_INVITE_MAX . ' at a time', 'error');
+        flashAlert(!$parsed['people'] ? ($parsed['bad'] ? __('%s is not an email address', escapeHtml($parsed['bad'][0])) : __('Put in an email address to invite'))
+            : __('That is %1$d addresses - invite up to %2$d at a time', count($parsed['people']), PORTAL_INVITE_MAX), 'error');
         redirect('invite.php');
     }
 
@@ -855,10 +855,10 @@ if (isset($_POST['portal_invites_send'])) {
     }
     $lines = [];
     if ($sent) {
-        $lines[] = 'Invited <strong>' . (count($sent) === 1 ? escapeHtml($sent[0]) : count($sent) . ' people') . '</strong> - we email you when they join';
+        $lines[] = count($sent) === 1 ? __('Invited <strong>%s</strong> - we email you when they join', escapeHtml($sent[0])) : __('Invited <strong>%d people</strong> - we email you when they join', count($sent));
     }
     if ($left_out) {
-        $lines[] = 'Left out: ' . implode(', ', $left_out);
+        $lines[] = __('Left out: %s', implode(', ', $left_out));
     }
     flashAlert(implode('<br>', $lines), $sent ? 'success' : 'error');
     redirect('contacts.php');
@@ -875,24 +875,24 @@ if (isset($_POST['portal_invite_resend']) || isset($_POST['portal_invite_cancel'
     $invite = portalInvitesReady() ? portalInviteRow($_POST['invite_id'] ?? 0) : null;
     if (!$invite || intval($invite['invite_client_id']) !== $session_client_id || $invite['invite_kind'] !== 'invite'
         || !in_array(portalInviteState($invite), ['pending', 'expired'], true)) {
-        flashAlert("That invite isn't waiting any more - they may have joined already", 'error');
+        flashAlert(__("That invite isn't waiting any more - they may have joined already"), 'error');
         redirect('contacts.php');
     }
     $email = (string) $invite['invite_email'];
 
     if (isset($_POST['portal_invite_resend'])) {
         if (!portalInviteResend($invite['invite_id'], $session_client_id)) {
-            flashAlert("The invite couldn't be sent just now - try again later, or ask us", 'error');
+            flashAlert(__("The invite couldn't be sent just now - try again later, or ask us"), 'error');
             redirect('contacts.php');
         }
         logAudit("Contact", "Invite", "Client contact $session_contact_name sent the client portal invite to " . escapeSql($email) . " again", $session_client_id);
-        flashAlert('Sent the invite to <strong>' . escapeHtml($email) . '</strong> again, with a new link');
+        flashAlert(__('Sent the invite to <strong>%s</strong> again, with a new link', escapeHtml($email)));
         redirect('contacts.php');
     }
 
     portalInviteCancel($invite['invite_id'], $session_client_id);
     logAudit("Contact", "Cancel", "Client contact $session_contact_name cancelled the client portal invite to " . escapeSql($email), $session_client_id);
-    flashAlert('Cancelled the invite to <strong>' . escapeHtml($email) . '</strong>');
+    flashAlert(__('Cancelled the invite to <strong>%s</strong>', escapeHtml($email)));
     redirect('contacts.php');
 
 }
@@ -1571,7 +1571,7 @@ if (isset($_POST['client_add_document'])) {
     $name = trim(mb_substr((string) ($_POST['document_name'] ?? ''), 0, 200));
     $description = trim(mb_substr((string) ($_POST['document_description'] ?? ''), 0, 255));
     if ($name === '' || portalHtmlIsEmpty($raw_content)) {
-        flashAlert('Give the document a name and write something in it', 'error');
+        flashAlert(__('Give the document a name and write something in it'), 'error');
         redirect('document_add.php');
     }
 
@@ -1596,9 +1596,9 @@ if (isset($_POST['client_add_document'])) {
     mysqli_query($mysqli, "UPDATE documents SET document_content = '$processed_content' WHERE document_id = $document_id");
 
     logAudit("Document", "Create", "Client contact $session_contact_name created document $document_name in the client portal", $session_client_id, $document_id);
-    appNotify("Document", "$session_contact_name added the document $document_name in the client portal", "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
+    appNotify("Document", __('%1$s added the document %2$s in the client portal', $session_contact_name, $document_name), "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($name) . "</strong> saved");
+    flashAlert(__('Document <strong>%s</strong> saved', escapeHtml($name)));
 
     redirect("document.php?id=$document_id");
 
@@ -1614,13 +1614,13 @@ if (isset($_POST['client_upload_document'])) {
     $name = trim(mb_substr((string) ($_POST['document_name'] ?? ''), 0, 200));
     $description = trim(mb_substr((string) ($_POST['document_description'] ?? ''), 0, 255));
     if ($name === '' || empty($_FILES['document_file']) || intval($_FILES['document_file']['error']) !== 0) {
-        flashAlert('Give the document a name and choose a file', 'error');
+        flashAlert(__('Give the document a name and choose a file'), 'error');
         redirect('document_add.php?upload=1');
     }
 
     $file_reference_name = checkFileUpload($_FILES['document_file'], ['pdf', 'doc', 'docx', 'txt', 'md', 'odt', 'rtf']);
     if (!$file_reference_name) {
-        flashAlert('That file could not be taken - upload a PDF, Word, OpenDocument, RTF or text file', 'error');
+        flashAlert(__('That file could not be taken - upload a PDF, Word, OpenDocument, RTF or text file'), 'error');
         redirect('document_add.php?upload=1');
     }
 
@@ -1629,7 +1629,7 @@ if (isset($_POST['client_upload_document'])) {
         mkdir($client_dir, 0755, true);
     }
     if (!move_uploaded_file($_FILES['document_file']['tmp_name'], "$client_dir/$file_reference_name")) {
-        flashAlert('Something went wrong uploading the file - please try again', 'error');
+        flashAlert(__('Something went wrong uploading the file - please try again'), 'error');
         redirect('document_add.php?upload=1');
     }
 
@@ -1669,9 +1669,9 @@ if (isset($_POST['client_upload_document'])) {
     mysqli_query($mysqli, "INSERT INTO document_files SET document_id = $document_id, file_id = $file_id");
 
     logAudit("Document", "Upload", "Client contact $session_contact_name uploaded document $document_name with file $file_name in the client portal", $session_client_id, $document_id);
-    appNotify("Document", "$session_contact_name uploaded the document $document_name in the client portal", "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
+    appNotify("Document", __('%1$s uploaded the document %2$s in the client portal', $session_contact_name, $document_name), "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($name) . "</strong> uploaded");
+    flashAlert(__('Document <strong>%s</strong> uploaded', escapeHtml($name)));
 
     redirect("document.php?id=$document_id");
 }

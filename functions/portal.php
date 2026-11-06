@@ -107,13 +107,13 @@ function portalContactLastSignIn($user_id) {
  */
 function portalContactAccess(array $row) {
     if (empty($row['user_id'])) {
-        return ['key' => 'none', 'label' => 'No portal access', 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'none', 'label' => __('No portal access'), 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
     }
     $method = (string) ($row['user_auth_method'] ?? '');
     if (!in_array($method, ['local', 'azure'], true) || intval($row['user_status'] ?? 0) !== 1 || !empty($row['user_archived_at'])) {
-        return ['key' => 'off', 'label' => 'Portal access off', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'off', 'label' => __('Portal access off'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
     }
-    return ['key' => $method, 'label' => $method === 'azure' ? 'Signs in with Microsoft' : 'Signs in with a password', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+    return ['key' => $method, 'label' => $method === 'azure' ? __('Signs in with Microsoft') : __('Signs in with a password'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
 }
 
 /** The ways a portal user can sign in here - a password, and Microsoft when it is set up. method => label. */
