@@ -29,7 +29,7 @@ $location = locationRow($location_id);
 
 if (!$location || ($client_url && intval($location['location_client_id']) !== intval($client_id))) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
 
 } else {
 
@@ -114,15 +114,15 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
     $history = auditLogHistory('Location', $location_id);
 
     $location_tabs = [
-        'people' => ['label' => 'People', 'icon' => 'fa-users', 'count' => count($people)],
-        'assets' => ['label' => 'Assets', 'icon' => 'fa-desktop', 'count' => count($assets)],
-        'networks' => ['label' => 'Networks', 'icon' => 'fa-network-wired', 'count' => count($networks)],
-        'racks' => ['label' => 'Racks', 'icon' => 'fa-server', 'count' => count($racks)],
-        'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'count' => $ticket_count, 'badge' => $ticket_open_count],
-        'trips' => ['label' => 'Trips', 'icon' => 'fa-route', 'count' => $trip_count],
-        'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'count' => count($documents)],
-        'files' => ['label' => 'Files', 'icon' => 'fa-paperclip', 'count' => count($files)],
-        'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+        'people' => ['label' => __('People'), 'icon' => 'fa-users', 'count' => count($people)],
+        'assets' => ['label' => __('Assets'), 'icon' => 'fa-desktop', 'count' => count($assets)],
+        'networks' => ['label' => __('Networks'), 'icon' => 'fa-network-wired', 'count' => count($networks)],
+        'racks' => ['label' => __('Racks'), 'icon' => 'fa-server', 'count' => count($racks)],
+        'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'count' => $ticket_count, 'badge' => $ticket_open_count],
+        'trips' => ['label' => __('Trips'), 'icon' => 'fa-route', 'count' => $trip_count],
+        'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'count' => count($documents)],
+        'files' => ['label' => __('Files'), 'icon' => 'fa-paperclip', 'count' => count($files)],
+        'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
     ];
     if (!$show_trips) {
         unset($location_tabs['trips']);
@@ -144,7 +144,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
             <a href="client_overview.php?client_id=<?= $client_id ?>"><?= $client_name ?></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="locations.php?client_id=<?= $client_id ?>">Locations</a>
+            <a href="locations.php?client_id=<?= $client_id ?>"><?= __('Locations') ?></a>
         </li>
         <li class="breadcrumb-item active"><?= $location_name ?></li>
     </ol>
@@ -153,7 +153,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
     <div class="card mb-3">
         <div class="card-body d-flex flex-wrap align-items-center gap-3">
             <?php if ($location['location_photo']) { ?>
-                <a href="<?= "../uploads/clients/$client_id/" . escapeHtml($location['location_photo']) ?>" target="_blank" rel="noopener" title="Open photo"><?= locationTile($location, 'lg') ?></a>
+                <a href="<?= "../uploads/clients/$client_id/" . escapeHtml($location['location_photo']) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open photo')) ?>"><?= locationTile($location, 'lg') ?></a>
             <?php } else { ?>
                 <?= locationTile($location, 'lg') ?>
             <?php } ?>
@@ -161,12 +161,12 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
             <div class="flex-grow-1 min-w-0">
                 <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                     <span><?= $location_name ?></span>
-                    <?php if ($location_primary) { ?><span class="badge rounded-pill text-bg-primary fw-normal fs-6">Primary</span><?php } ?>
-                    <?php if ($location_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                    <?php if ($location_primary) { ?><span class="badge rounded-pill text-bg-primary fw-normal fs-6"><?= __('Primary') ?></span><?php } ?>
+                    <?php if ($location_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                 </h1>
                 <div class="text-body-secondary small d-flex flex-wrap column-gap-3 row-gap-1">
                     <?php if ($location_address_text !== '') { ?>
-                        <span class="d-inline-flex align-items-center"><i class="fas fa-fw fa-map-marker-alt me-1"></i><?= escapeHtml($location_address_text) ?><button type="button" class="itflow-copy clipboardjs" title="Copy address" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button></span>
+                        <span class="d-inline-flex align-items-center"><i class="fas fa-fw fa-map-marker-alt me-1"></i><?= escapeHtml($location_address_text) ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy address')) ?>" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button></span>
                     <?php } ?>
                     <?php if ($location_hours) { ?><span><i class="fas fa-fw fa-clock me-1"></i><?= $location_hours ?></span><?php } ?>
                     <?php if ($location_description) { ?><span><?= $location_description ?></span><?php } ?>
@@ -178,50 +178,50 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
 
             <div class="d-flex flex-wrap gap-2 d-print-none">
                 <?php if ($location_directions_url) { ?>
-                    <a class="btn btn-outline-primary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-2"></i>Directions</a>
+                    <a class="btn btn-outline-primary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-2"></i><?= __('Directions') ?></a>
                 <?php } ?>
                 <?php if ($location_phone_dial !== '') { ?>
-                    <a class="btn btn-outline-primary" href="tel:<?= escapeHtml(($location['location_phone_country_code'] ? '+' . preg_replace('/[^0-9]/', '', $location['location_phone_country_code']) : '') . $location_phone_dial) ?>"><i class="fas fa-phone me-2"></i>Call</a>
+                    <a class="btn btn-outline-primary" href="tel:<?= escapeHtml(($location['location_phone_country_code'] ? '+' . preg_replace('/[^0-9]/', '', $location['location_phone_country_code']) : '') . $location_phone_dial) ?>"><i class="fas fa-phone me-2"></i><?= __('Call') ?></a>
                 <?php } ?>
                 <?php if ($can_edit || $can_support_edit) { ?>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i>New</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i><?= __('New') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <?php if ($can_support_edit) { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-life-ring text-secondary me-2"></i>Ticket here
+                                    <i class="fa fa-fw fa-life-ring text-secondary me-2"></i><?= __('Ticket here') ?>
                                 </a>
                             <?php } ?>
                             <?php if ($can_edit) { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/calendar/calendar_event_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>&lock_client=1&title=Onsite+visit">
-                                    <i class="far fa-fw fa-calendar-plus text-secondary me-2"></i>Visit here
+                                    <i class="far fa-fw fa-calendar-plus text-secondary me-2"></i><?= __('Visit here') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-user text-secondary me-2"></i>Contact
+                                    <i class="fa fa-fw fa-user text-secondary me-2"></i><?= __('Contact') ?>
                                 </a>
                             <?php } ?>
                             <?php if ($can_support_edit) { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-desktop text-secondary me-2"></i>Asset
+                                    <i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Asset') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/network/network_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-network-wired text-secondary me-2"></i>Network
+                                    <i class="fa fa-fw fa-network-wired text-secondary me-2"></i><?= __('Network') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/rack/rack_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-server text-secondary me-2"></i>Rack
+                                    <i class="fa fa-fw fa-server text-secondary me-2"></i><?= __('Rack') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document
+                                    <i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-upload text-secondary me-2"></i>Upload File(s)
+                                    <i class="fa fa-fw fa-upload text-secondary me-2"></i><?= __('Upload File(s)') ?>
                                 </a>
                             <?php } ?>
                             <?php if (!empty($config_module_enable_accounting)) { ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                    <i class="fa fa-fw fa-route text-secondary me-2"></i>Trip here
+                                    <i class="fa fa-fw fa-route text-secondary me-2"></i><?= __('Trip here') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -229,53 +229,53 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                 <?php } ?>
                 <?php if ($can_move && !$location_archived_at) { ?>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-dolly me-2"></i>Move here</button>
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <?php foreach (LOCATION_KINDS as $kind => $k) {
                                 if (lookupUserPermission($k['module']) < 2) {
                                     continue;
                                 } ?>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $move_url . $kind ?>"><i class="fa fa-fw <?= $k['icon'] ?> text-secondary me-2"></i><?= $k['plural'] ?></a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $move_url . $kind ?>"><i class="fa fa-fw <?= $k['icon'] ?> text-secondary me-2"></i><?= locationKindText($kind, 'plural') ?></a>
                             <?php } ?>
                             <?php if ($can_support_edit) { ?>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-link text-secondary me-2"></i>Link a document or file</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-link text-secondary me-2"></i><?= __('Link a document or file') ?></a>
                             <?php } ?>
                         </div>
                     </div>
                 <?php } ?>
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($location_map_url) { ?>
-                                <a class="dropdown-item" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-map text-secondary me-2"></i>Open in maps</a>
+                                <a class="dropdown-item" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-map text-secondary me-2"></i><?= __('Open in maps') ?></a>
                             <?php } ?>
                             <?php if (!$location_primary && !$location_archived_at) { ?>
                                 <a class="dropdown-item" href="post.php?make_location_primary=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-building text-secondary me-2"></i>Make primary
+                                    <i class="fas fa-fw fa-building text-secondary me-2"></i><?= __('Make primary') ?>
                                 </a>
                             <?php } ?>
                             <?php if (!$location_primary) { ?>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($location_archived_at) { ?>
                                     <a class="dropdown-item" href="post.php?restore_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                     <?php if ($can_delete) { ?>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                             data-confirm-text="<?= $location_name ?> goes for good. Its people, assets, networks, racks and tickets stay, with no location.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </a>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <a class="dropdown-item text-danger confirm-link" href="post.php?archive_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                             <?php } ?>
@@ -293,40 +293,40 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-map-marker-alt text-secondary me-2"></i>Getting there</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-map-marker-alt text-secondary me-2"></i><?= __('Getting there') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-asset-dl mb-0">
-                        <dt>Address</dt>
+                        <dt><?= __('Address') ?></dt>
                         <dd>
                             <?php if ($location_address_lines !== '') { ?>
-                                <?php if ($location_map_url) { ?><a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="Open in maps"><?php } ?>
+                                <?php if ($location_map_url) { ?><a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open in maps')) ?>"><?php } ?>
                                 <?= nl2br($location_address_lines) ?>
                                 <?php if ($location_map_url) { ?></a><?php } ?>
-                                <button type="button" class="itflow-copy clipboardjs" title="Copy address" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
+                                <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy address')) ?>" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
                                 <?php if ($location_directions_url) { ?>
-                                    <div class="mt-1"><a class="small" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-1"></i>Directions</a></div>
+                                    <div class="mt-1"><a class="small" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-1"></i><?= __('Directions') ?></a></div>
                                 <?php } ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary">Not recorded</span>
+                                <span class="text-body-secondary"><?= __('Not recorded') ?></span>
                             <?php } ?>
                         </dd>
                         <?php if ($location_phone) { ?>
-                            <dt>Phone</dt><dd><?= $location_phone ?></dd>
+                            <dt><?= __('Phone') ?></dt><dd><?= $location_phone ?></dd>
                         <?php } ?>
                         <?php if ($location_fax) { ?>
-                            <dt>Fax</dt><dd><?= $location_fax ?></dd>
+                            <dt><?= __('Fax') ?></dt><dd><?= $location_fax ?></dd>
                         <?php } ?>
-                        <dt>Hours</dt>
-                        <dd><?= $location_hours ?: '<span class="text-body-secondary">Not recorded</span>' ?></dd>
-                        <dt>Added</dt><dd title="<?= $location_created_at ?>"><?= timeAgo($location_created_at) ?></dd>
+                        <dt><?= __('Hours') ?></dt>
+                        <dd><?= $location_hours ?: '<span class="text-body-secondary">' . __('Not recorded') . '</span>' ?></dd>
+                        <dt><?= __('Added') ?></dt><dd title="<?= $location_created_at ?>"><?= timeAgo($location_created_at) ?></dd>
                     </dl>
                 </div>
             </div>
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-user text-secondary me-2"></i>Ask for</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-user text-secondary me-2"></i><?= __('Ask for') ?></h3>
                 </div>
                 <div class="card-body">
                     <?php if ($location['contact_id']) {
@@ -343,11 +343,11 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                         <div class="itflow-contact-reach small mt-2">
                             <?php if ($onsite_phone) { ?><div><i class="fas fa-fw fa-phone text-body-secondary me-1"></i><?= $onsite_phone ?></div><?php } ?>
                             <?php if ($onsite_mobile) { ?><div><i class="fas fa-fw fa-mobile-alt text-body-secondary me-1"></i><?= $onsite_mobile ?></div><?php } ?>
-                            <?php if ($onsite_email) { ?><div><i class="fas fa-fw fa-envelope text-body-secondary me-1"></i><a href="mailto:<?= $onsite_email ?>"><?= $onsite_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $onsite_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
+                            <?php if ($onsite_email) { ?><div><i class="fas fa-fw fa-envelope text-body-secondary me-1"></i><a href="mailto:<?= $onsite_email ?>"><?= $onsite_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $onsite_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="text-body-secondary small">Nobody set.
-                            <?php if ($can_edit) { ?><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>">Pick who to ask for on site</a>.<?php } ?>
+                        <div class="text-body-secondary small"><?= __('Nobody set.') ?>
+                            <?php if ($can_edit) { ?><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>"><?= __('Pick who to ask for on site') ?></a>.<?php } ?>
                         </div>
                     <?php } ?>
                 </div>
@@ -355,9 +355,9 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-door-open text-secondary me-2"></i>Access notes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-door-open text-secondary me-2"></i><?= __('Access notes') ?></h3>
                 </div>
-                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-location-notes" rows="7" placeholder="Parking, which door, who has the keys, alarm and door codes, where the comms cupboard is - saves when you click away"
+                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-location-notes" rows="7" placeholder="<?= escapeHtml(__('Parking, which door, who has the keys, alarm and door codes, where the comms cupboard is - saves when you click away')) ?>"
                     data-location-id="<?= $location_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token']) ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $location_notes ?></textarea>
             </div>
 
@@ -374,7 +374,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                     <i class="fas fa-fw <?= $tab['icon'] ?> me-1 d-none d-xxl-inline"></i><?= $tab['label'] ?>
                                     <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
                                     <?php if (!empty($tab['badge'])) { ?>
-                                        <span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span>
+                                        <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= __('%d open', intval($tab['badge'])) ?></span>
                                     <?php } ?>
                                 </button>
                             </li>
@@ -386,11 +386,11 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                     <!-- People based here -->
                     <div class="tab-pane fade" id="location-pane-people" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">People based at this site.</span>
+                            <span class="text-body-secondary small"><?= __('People based at this site.') ?></span>
                             <?php if ($can_edit && !$location_archived_at) { ?>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>contact"><i class="fas fa-dolly me-2"></i>Move here</button>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>New Contact</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>contact"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Contact') ?></button>
                                 </div>
                             <?php } ?>
                         </div>
@@ -412,11 +412,11 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                             <td class="small">
                                                 <?php if ($person_phone) { ?><div class="text-nowrap"><i class="fas fa-fw fa-phone text-body-secondary me-1"></i><?= $person_phone ?></div><?php } ?>
                                                 <?php if ($person_mobile) { ?><div class="text-nowrap"><i class="fas fa-fw fa-mobile-alt text-body-secondary me-1"></i><?= $person_mobile ?></div><?php } ?>
-                                                <?php if ($person_email) { ?><div class="text-truncate itflow-location-email"><i class="fas fa-fw fa-envelope text-body-secondary me-1"></i><a href="mailto:<?= $person_email ?>"><?= $person_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $person_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
+                                                <?php if ($person_email) { ?><div class="text-truncate itflow-location-email"><i class="fas fa-fw fa-envelope text-body-secondary me-1"></i><a href="mailto:<?= $person_email ?>"><?= $person_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $person_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
                                             </td>
                                             <td class="text-end">
                                                 <?php if ($can_edit) { ?>
-                                                    <a href="<?= $unset_url('contact', $person_id) ?>" class="btn btn-sm btn-light" title="Not based here"><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= $unset_url('contact', $person_id) ?>" class="btn btn-sm btn-light" title="<?= escapeHtml(__('Not based here')) ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -425,7 +425,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">Nobody is based here.</div>
+                            <div class="itflow-asset-empty"><?= __('Nobody is based here.') ?></div>
                         <?php } ?>
                     </div>
 
@@ -433,18 +433,18 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                     <!-- Assets on site -->
                     <div class="tab-pane fade" id="location-pane-assets" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Everything on site, by kind.</span>
+                            <span class="text-body-secondary small"><?= __('Everything on site, by kind.') ?></span>
                             <?php if ($can_support_edit && !$location_archived_at) { ?>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>asset"><i class="fas fa-dolly me-2"></i>Move here</button>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>New Asset</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>asset"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Asset') ?></button>
                                 </div>
                             <?php } ?>
                         </div>
                         <?php if ($assets) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Asset</th><th>IP</th><th>Assigned</th><th>Status</th><th></th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Asset') ?></th><th><?= __('IP') ?></th><th><?= __('Assigned') ?></th><th><?= __('Status') ?></th><th></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($assets as $asset) {
                                         $asset_id = intval($asset['asset_id']);
@@ -459,12 +459,12 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-nowrap"><?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
+                                            <td class="text-nowrap"><?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
                                             <td><?= $asset['contact_name'] ? contactLink($client_id, $asset['contact_id'], $asset['contact_name'], $asset['contact_photo'], ['archived' => !empty($asset['contact_archived_at'])]) : '<span class="text-body-secondary">-</span>' ?></td>
                                             <td><?= assetStatusPill($asset['asset_status']) ?: '<span class="text-body-secondary">-</span>' ?></td>
                                             <td class="text-end">
                                                 <?php if ($can_support_edit) { ?>
-                                                    <a href="<?= $unset_url('asset', $asset_id) ?>" class="btn btn-sm btn-light" title="Not at this location"><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= $unset_url('asset', $asset_id) ?>" class="btn btn-sm btn-light" title="<?= escapeHtml(__('Not at this location')) ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -473,25 +473,25 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No assets here.</div>
+                            <div class="itflow-asset-empty"><?= __('No assets here.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Networks -->
                     <div class="tab-pane fade" id="location-pane-networks" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Subnets and VLANs at this site.</span>
+                            <span class="text-body-secondary small"><?= __('Subnets and VLANs at this site.') ?></span>
                             <?php if ($can_support_edit && !$location_archived_at) { ?>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>network"><i class="fas fa-dolly me-2"></i>Move here</button>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/network/network_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>New Network</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>network"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/network/network_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Network') ?></button>
                                 </div>
                             <?php } ?>
                         </div>
                         <?php if ($networks) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Network</th><th>Subnet</th><th class="d-none d-md-table-cell">Gateway</th><th>In use</th><th></th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Network') ?></th><th><?= __('Subnet') ?></th><th class="d-none d-md-table-cell"><?= __('Gateway') ?></th><th><?= __('In use') ?></th><th></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($networks as $network_id => $network) {
                                         $network_subnet = escapeHtml($network['network']);
@@ -502,17 +502,17 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                                     <?= networkTile(networkType($network), 'sm') ?>
                                                     <div class="min-w-0">
                                                         <a class="fw-semibold" href="<?= escapeHtml(networkUrl($network_id, $client_id)) ?>"><?= escapeHtml($network['network_name']) ?></a>
-                                                        <?php if (intval($network['network_vlan'])) { ?><span class="itflow-net-vlan ms-1">VLAN <?= intval($network['network_vlan']) ?></span><?php } ?>
+                                                        <?php if (intval($network['network_vlan'])) { ?><span class="itflow-net-vlan ms-1"><?= __('VLAN %d', intval($network['network_vlan'])) ?></span><?php } ?>
                                                         <?php if ($network['network_description']) { ?><div class="small text-body-secondary"><?= escapeHtml($network['network_description']) ?></div><?php } ?>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-nowrap"><span class="font-monospace"><?= $network_subnet ?></span><?php if ($network_subnet) { ?><button type="button" class="itflow-copy clipboardjs" title="Copy subnet" data-clipboard-text="<?= $network_subnet ?>"><i class="far fa-copy"></i></button><?php } ?></td>
-                                            <td class="text-nowrap d-none d-md-table-cell"><?php if ($network_gateway) { ?><span class="font-monospace"><?= $network_gateway ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy gateway" data-clipboard-text="<?= $network_gateway ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
+                                            <td class="text-nowrap"><span class="font-monospace"><?= $network_subnet ?></span><?php if ($network_subnet) { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy subnet')) ?>" data-clipboard-text="<?= $network_subnet ?>"><i class="far fa-copy"></i></button><?php } ?></td>
+                                            <td class="text-nowrap d-none d-md-table-cell"><?php if ($network_gateway) { ?><span class="font-monospace"><?= $network_gateway ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy gateway')) ?>" data-clipboard-text="<?= $network_gateway ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
                                             <td><?= networkUsageBar($network_usage[$network_id]) ?></td>
                                             <td class="text-end">
                                                 <?php if ($can_support_edit) { ?>
-                                                    <a href="<?= $unset_url('network', $network_id) ?>" class="btn btn-sm btn-light" title="Not at this location"><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= $unset_url('network', $network_id) ?>" class="btn btn-sm btn-light" title="<?= escapeHtml(__('Not at this location')) ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -521,18 +521,18 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No networks here.</div>
+                            <div class="itflow-asset-empty"><?= __('No networks here.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Racks -->
                     <div class="tab-pane fade" id="location-pane-racks" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Racks and cabinets at this site.</span>
+                            <span class="text-body-secondary small"><?= __('Racks and cabinets at this site.') ?></span>
                             <?php if ($can_support_edit && !$location_archived_at) { ?>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>rack"><i class="fas fa-dolly me-2"></i>Move here</button>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/rack/rack_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>New Rack</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $move_url ?>rack"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/rack/rack_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Rack') ?></button>
                                 </div>
                             <?php } ?>
                         </div>
@@ -547,52 +547,52 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                             <div class="small text-body-secondary text-truncate"><?= escapeHtml(implode(' · ', array_filter([intval($rack['rack_units']) . 'U', $rack['rack_type'], $rack['rack_model'], $rack['rack_physical_location']]))) ?></div>
                                         </div>
                                         <?php if ($can_support_edit) { ?>
-                                            <a class="itflow-link-remove" href="<?= $unset_url('rack', $rack_id) ?>" title="Not at this location"><i class="fas fa-unlink"></i></a>
+                                            <a class="itflow-link-remove" href="<?= $unset_url('rack', $rack_id) ?>" title="<?= escapeHtml(__('Not at this location')) ?>"><i class="fas fa-unlink"></i></a>
                                         <?php } ?>
                                     </li>
                                 <?php } ?>
                             </ul>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No racks here.</div>
+                            <div class="itflow-asset-empty"><?= __('No racks here.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Tickets for this site -->
                     <div class="tab-pane fade" id="location-pane-tickets" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Tickets logged against this site, open first.</span>
+                            <span class="text-body-secondary small"><?= __('Tickets logged against this site, open first.') ?></span>
                             <?php if ($can_support_edit) { ?>
-                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>New Ticket</button>
+                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Ticket') ?></button>
                             <?php } ?>
                         </div>
                         <?php if ($tickets) { ?>
                             <?= ticketTableHtml($tickets) ?>
                             <?php if ($ticket_count > count($tickets)) { ?>
-                                <div class="small text-body-secondary px-3 py-2 border-top">Showing every open ticket and the <?= count($tickets) - $ticket_open_count ?> most recent closed of <?= $ticket_count ?>.</div>
+                                <div class="small text-body-secondary px-3 py-2 border-top"><?= __('Showing every open ticket and the %1$d most recent closed of %2$d.', count($tickets) - $ticket_open_count, $ticket_count) ?></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No tickets for this site.</div>
+                            <div class="itflow-asset-empty"><?= __('No tickets for this site.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Documents and files -->
-                    <?php foreach (['documents' => ['document', $documents, 'Floor plans, site runbooks, cabling and access guides.', 'No documents linked.'],
-                                    'files' => ['file', $files, 'Photos of the cupboard and the patch panel, plans, leases.', 'No files linked.']] as $pane => [$to, $linked, $hint, $empty]) { ?>
+                    <?php foreach (['documents' => ['document', $documents, __('Floor plans, site runbooks, cabling and access guides.'), __('No documents linked.')],
+                                    'files' => ['file', $files, __('Photos of the cupboard and the patch panel, plans, leases.'), __('No files linked.')]] as $pane => [$to, $linked, $hint, $empty]) { ?>
                         <div class="tab-pane fade" id="location-pane-<?= $pane ?>" role="tabpanel">
                             <div class="itflow-asset-pane-bar">
                                 <span class="text-body-secondary small"><?= $hint ?></span>
                                 <?php if ($can_support_edit && !$location_archived_at) { ?>
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url . $to ?>">
-                                            <i class="fas fa-link me-2"></i>Link
+                                            <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                         </button>
                                         <?php if ($to === 'document') { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                                <i class="fas fa-plus me-2"></i>New Document
+                                                <i class="fas fa-plus me-2"></i><?= __('New Document') ?>
                                             </button>
                                         <?php } else { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>">
-                                                <i class="fas fa-upload me-2"></i>Upload
+                                                <i class="fas fa-upload me-2"></i><?= __('Upload') ?>
                                             </button>
                                         <?php } ?>
                                     </div>
@@ -620,18 +620,18 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                     <?php if ($show_trips) { ?>
                         <div class="tab-pane fade" id="location-pane-trips" role="tabpanel">
                             <div class="itflow-asset-pane-bar">
-                                <span class="text-body-secondary small"><?= $trip_count ? escapeHtml(tripMilesText($trip_miles)) . ' driven out here, newest first.' : 'The driving out here, once it is logged.' ?></span>
+                                <span class="text-body-secondary small"><?= $trip_count ? __('%s driven out here, newest first.', escapeHtml(tripMilesText($trip_miles))) : __('The driving out here, once it is logged.') ?></span>
                                 <?php if (!$location_archived_at) { ?>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/trip/trip_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i>Log Trip</button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/trip/trip_add.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><i class="fas fa-plus me-2"></i><?= __('Log Trip') ?></button>
                                 <?php } ?>
                             </div>
                             <?php if ($trips) { ?>
                                 <?= tripTableHtml($trips) ?>
                                 <?php if ($trip_count > count($trips)) { ?>
-                                    <div class="small text-body-secondary px-3 py-2 border-top">The <?= count($trips) ?> most recent of <?= $trip_count ?> - <a href="trips.php?client_id=<?= $client_id ?>&amp;location_id=<?= $location_id ?>">all of them in Trips</a>.</div>
+                                    <div class="small text-body-secondary px-3 py-2 border-top"><?= __('The %1$d most recent of %2$d - %3$s.', count($trips), $trip_count, '<a href="trips.php?client_id=' . $client_id . '&amp;location_id=' . $location_id . '">' . __('all of them in Trips') . '</a>') ?></div>
                                 <?php } ?>
                             <?php } else { ?>
-                                <div class="itflow-asset-empty">No trips to this site.</div>
+                                <div class="itflow-asset-empty"><?= __('No trips to this site.') ?></div>
                             <?php } ?>
                         </div>
                     <?php } ?>
@@ -639,7 +639,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                     <!-- History, from the audit log -->
                     <div class="tab-pane fade" id="location-pane-history" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Edits, moves and notes - newest first.</span>
+                            <span class="text-body-secondary small"><?= __('Edits, moves and notes - newest first.') ?></span>
                         </div>
                         <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                     </div>

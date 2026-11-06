@@ -66,7 +66,7 @@ $location_map_query = rawurlencode(html_entity_decode(trim("$location_address $l
             <a class="text-truncate" href="<?= $client_website_url ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-globe text-body-secondary me-2" aria-hidden="true"></i><?= $client_website_label ?></a>
         <?php } ?>
         <?php if ($client_since) { ?>
-            <span><i class="far fa-fw fa-calendar text-body-secondary me-2" aria-hidden="true"></i><?= $client_is_lead ? 'Lead' : 'Client' ?> since <?= $client_since ?></span>
+            <span><i class="far fa-fw fa-calendar text-body-secondary me-2" aria-hidden="true"></i><?= $client_is_lead ? __('Lead') : __('Client') ?> since <?= $client_since ?></span>
         <?php } ?>
         <?php if ($client_referral) { ?>
             <span><i class="fas fa-fw fa-handshake text-body-secondary me-2" aria-hidden="true"></i><?= __('Referred by %s', $client_referral) ?></span>

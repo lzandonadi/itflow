@@ -34,7 +34,7 @@ if (empty($client_top_head_skip)) {
 <div class="card mb-3 d-print-none itflow-client-head">
     <div class="card-body d-flex align-items-start align-items-md-center gap-2 px-3 py-2">
         <div class="d-flex flex-wrap align-items-center column-gap-2 row-gap-2 row-gap-md-1 flex-grow-1 itflow-client-head-main">
-            <a href="#" class="itflow-client-head-toggle client-header-toggle<?= $client_header_open ? '' : ' collapsed' ?>" data-bs-toggle="collapse" data-bs-target="#clientHeader" aria-controls="clientHeader" aria-expanded="<?= $client_header_open ? 'true' : 'false' ?>" title="Client ID: <?= $client_id ?>">
+            <a href="#" class="itflow-client-head-toggle client-header-toggle<?= $client_header_open ? '' : ' collapsed' ?>" data-bs-toggle="collapse" data-bs-target="#clientHeader" aria-controls="clientHeader" aria-expanded="<?= $client_header_open ? 'true' : 'false' ?>" title="<?= escapeHtml(__('Client ID: %d', $client_id)) ?>">
                 <i class="fas fa-fw fa-chevron-<?= $client_header_open ? 'down' : 'right' ?> client-header-chevron" aria-hidden="true"></i>
                 <span class="itflow-client-avatar itflow-client-avatar-sm text-bg-<?= $client_initials_tone ?>" aria-hidden="true"><?= $client_initials ?></span>
                 <span class="itflow-client-head-title">
@@ -53,13 +53,13 @@ if (empty($client_top_head_skip)) {
             <?php if ($client_head_glance_tickets || $client_head_glance_due) { ?>
             <div class="itflow-client-head-glance d-flex align-items-center gap-3 ms-md-auto">
                 <?php if ($client_head_glance_tickets) { ?>
-                    <a class="text-body-secondary" href="tickets.php?client_id=<?= $client_id ?>"><i class="fas fa-fw fa-life-ring me-1" aria-hidden="true"></i><?= number_format($num_active_tickets) ?> open</a>
+                    <a class="text-body-secondary" href="tickets.php?client_id=<?= $client_id ?>"><i class="fas fa-fw fa-life-ring me-1" aria-hidden="true"></i><?= __('%s open', number_format($num_active_tickets)) ?></a>
                 <?php } ?>
                 <?php if ($client_head_glance_due) { ?>
                     <?php if ($client_head_invoices) { ?>
-                        <a class="text-danger-emphasis fw-semibold" href="invoices.php?client_id=<?= $client_id ?>&status=Unpaid"><?= $client_head_money($balance) ?> due</a>
+                        <a class="text-danger-emphasis fw-semibold" href="invoices.php?client_id=<?= $client_id ?>&status=Unpaid"><?= __('%s due', $client_head_money($balance)) ?></a>
                     <?php } else { ?>
-                        <span class="text-danger-emphasis fw-semibold"><?= $client_head_money($balance) ?> due</span>
+                        <span class="text-danger-emphasis fw-semibold"><?= __('%s due', $client_head_money($balance)) ?></span>
                     <?php } ?>
                 <?php } ?>
             </div>

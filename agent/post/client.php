@@ -92,9 +92,9 @@ if (isset($_POST['add_client'])) {
     // A contract started from a template picked on the Billing tab - its rates, net terms and SLAs are the client's (functions/contract.php)
     [$contract_id, $contract_name, $contract_error] = contractFromClientForm($client_id, $_POST);
     if ($contract_error !== '') {
-        flashAlert("Client <strong>" . stripslashes($name) . "</strong> created - its contract wasn't added: " . escapeHtml($contract_error) . " Add it from the client's Contracts.", 'warning');
+        flashAlert(__('Client <strong>%1$s</strong> created - its contract wasn\'t added: %2$s Add it from the client\'s Contracts.', stripslashes($name), escapeHtml($contract_error)), 'warning');
     } else {
-        flashAlert("Client <strong>" . stripslashes($name) . "</strong> created" . ($contract_id ? ", with contract <strong>" . escapeHtml($contract_name) . "</strong>" : ''));
+        flashAlert($contract_id ? __('Client <strong>%1$s</strong> created, with contract <strong>%2$s</strong>', stripslashes($name), escapeHtml($contract_name)) : __('Client <strong>%s</strong> created', stripslashes($name)));
     }
 
     redirect();
@@ -135,9 +135,9 @@ if (isset($_POST['edit_client'])) {
     // Another contract, started from a template picked on the Billing tab (functions/contract.php)
     [$contract_id, $contract_name, $contract_error] = contractFromClientForm($client_id, $_POST);
     if ($contract_error !== '') {
-        flashAlert("Client <strong>" . stripslashes($name) . "</strong> updated - the contract wasn't added: " . escapeHtml($contract_error), 'warning');
+        flashAlert(__('Client <strong>%1$s</strong> updated - the contract wasn\'t added: %2$s', stripslashes($name), escapeHtml($contract_error)), 'warning');
     } else {
-        flashAlert("Client <strong>" . stripslashes($name) . "</strong> updated" . ($contract_id ? ", with new contract <strong>" . escapeHtml($contract_name) . "</strong>" : ''));
+        flashAlert($contract_id ? __('Client <strong>%1$s</strong> updated, with new contract <strong>%2$s</strong>', stripslashes($name), escapeHtml($contract_name)) : __('Client <strong>%s</strong> updated', stripslashes($name)));
     }
 
     redirect();
@@ -158,12 +158,12 @@ if (isset($_POST['set_client_portal_signup'])) {
     $on = !empty($_POST['portal_signup']);
     $client = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT client_name, client_archived_at FROM clients WHERE client_id = $client_id LIMIT 1"));
     if (!$client || !portalInvitesReady() || ($on && $client['client_archived_at'])) {
-        flashAlert("Signing up can't be changed for this client", 'error');
+        flashAlert(__('Signing up can\'t be changed for this client'), 'error');
         redirect();
     }
     $domains = portalSignupDomains($client_id);
     if ($on && !$domains) {
-        flashAlert("Add the client's email domain under Domains first - people sign up with an address at one of them", 'error');
+        flashAlert(__('Add the client\'s email domain under Domains first - people sign up with an address at one of them'), 'error');
         redirect();
     }
     if (!portalSignupSet($client_id, $on)) {
@@ -172,9 +172,9 @@ if (isset($_POST['set_client_portal_signup'])) {
     $client_name = escapeSql($client['client_name']);
     logAudit("Client", "Edit", "$session_name " . ($on ? 'let people at ' . escapeSql(implode(', ', $domains)) . " sign up for the client portal for $client_name" : "stopped people signing up for the client portal for $client_name"), $client_id, $client_id);
     if ($on) {
-        flashAlert('People with an address at <strong>' . escapeHtml(implode(', ', $domains)) . '</strong> can sign up now' . (portalSignupOn() ? '' : ' - once signing up is turned on in Admin > Settings > Client portal'));
+        flashAlert(portalSignupOn() ? __('People with an address at <strong>%s</strong> can sign up now', escapeHtml(implode(', ', $domains))) : __('People with an address at <strong>%s</strong> can sign up now - once signing up is turned on in Admin > Settings > Client portal', escapeHtml(implode(', ', $domains))));
     } else {
-        flashAlert('Signing up is off for <strong>' . escapeHtml($client['client_name']) . '</strong> - invite people instead');
+        flashAlert(__('Signing up is off for <strong>%s</strong> - invite people instead', escapeHtml($client['client_name'])));
     }
     redirect();
 
@@ -209,7 +209,7 @@ if (isset($_GET['archive_client'])) {
 
     logAudit("Client", "Archive", "$session_name archived client $client_name" . ($contracts_withdrawn ? " - $contracts_withdrawn contract signing request" . ($contracts_withdrawn === 1 ? '' : 's') . " withdrawn" : ''), $client_id, $client_id);
 
-    flashAlert("Client <strong>" . stripslashes($client_name) . "</strong> archived" . ($contracts_withdrawn ? " - contract signing requests to them were withdrawn" : ''), 'error');
+    flashAlert($contracts_withdrawn ? __('Client <strong>%s</strong> archived - contract signing requests to them were withdrawn', stripslashes($client_name)) : __('Client <strong>%s</strong> archived', stripslashes($client_name)), 'error');
 
     redirect();
 
@@ -232,7 +232,7 @@ if (isset($_GET['restore_client'])) {
 
     logAudit("Client", "Restore", "$session_name restored client $client_name", $client_id);
 
-    flashAlert("Client <strong>" . stripslashes($client_name) . "</strong> restored");
+    flashAlert(__('Client <strong>%s</strong> restored', stripslashes($client_name)));
 
     redirect();
 
@@ -254,7 +254,7 @@ if (isset($_GET['delete_client'])) {
     // Their payments and other income go with them - not once any has cleared on a reconciled statement
     $lock = reconcileClientLock($client_id);
     if ($lock) {
-        flashAlert(escapeHtml('Money from ' . stripslashes($client_name) . " cleared on the {$lock['account_name']} statement to " . date('M j, Y', strtotime($lock['reconciliation_statement_date'])) . ' - keep the client archived instead, or undo that reconciliation to delete them'), 'error');
+        flashAlert(escapeHtml(__('Money from %1$s cleared on the %2$s statement to %3$s - keep the client archived instead, or undo that reconciliation to delete them', stripslashes($client_name), $lock['account_name'], formatDate($lock['reconciliation_statement_date'], 'date'))), 'error');
         redirect();
     }
 
@@ -353,7 +353,7 @@ if (isset($_GET['delete_client'])) {
 
     logAudit("Client", "Delete", "$session_name deleted Client $client_name and all associated data");
 
-    flashAlert("Client <strong>" . stripslashes($client_name) . "</strong> deleted, with everything that was theirs", 'error');
+    flashAlert(__('Client <strong>%s</strong> deleted, with everything that was theirs', stripslashes($client_name)), 'error');
 
     redirect('clients.php');
 
@@ -502,7 +502,7 @@ if (isset($_POST["import_clients_csv"])) {
     if (!empty($_FILES["file"]["tmp_name"])) {
         $file_name = $_FILES["file"]["tmp_name"];
     } else {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
 
@@ -511,13 +511,13 @@ if (isset($_POST["import_clients_csv"])) {
     $allowed_file_extensions = array('csv');
     if (in_array($file_extension,$allowed_file_extensions) === false) {
         $error = true;
-        flashAlert("Bad file extension", 'error');
+        flashAlert(__('Bad file extension'), 'error');
     }
 
     //Check file isn't empty
     elseif ($_FILES["file"]["size"] < 1) {
         $error = true;
-        flashAlert("Bad file size (empty?)", 'error');
+        flashAlert(__('Bad file size (empty?)'), 'error');
     }
 
     //(Else)Check column count
@@ -525,7 +525,7 @@ if (isset($_POST["import_clients_csv"])) {
     $f_columns = fgetcsv($f, 1000, ",");
     if (!$error & count($f_columns) != 22) {
         $error = true;
-        flashAlert("Bad column count.", 'error');
+        flashAlert(__('Bad column count.'), 'error');
     }
 
     //Else, parse the file
@@ -672,7 +672,7 @@ if (isset($_POST["import_clients_csv"])) {
                 mysqli_query($mysqli, "INSERT INTO contacts SET contact_name = '$contact_name', contact_title = '$title', contact_phone = '$contact_phone', contact_extension = '$contact_extension', contact_mobile = '$contact_mobile', contact_email = '$contact_email', contact_primary = 1, contact_important = 1, contact_client_id = $client_id");
 
                 // Its rate and terms, where they aren't the defaults (functions/contract.php)
-                if (function_exists('contractsReady') && contractsReady() && contractStandardTermsAdd($client_id, $hourly_rate, $payment_terms, [], null, 'Made by the client import from its Hourly Rate and Payment Terms.')) {
+                if (function_exists('contractsReady') && contractsReady() && contractStandardTermsAdd($client_id, $hourly_rate, $payment_terms, [], null, __('Made by the client import from its Hourly Rate and Payment Terms.'))) {
                     $terms_count = ($terms_count ?? 0) + 1;
                 }
 
@@ -689,7 +689,7 @@ if (isset($_POST["import_clients_csv"])) {
 
         logAudit("Client", "Import", "$session_name imported $row_count client(s) via CSV file, $duplicate_count duplicate(s) found");
 
-        flashAlert("<strong>$row_count</strong> Client(s) added, <strong>$duplicate_count</strong> duplicate(s) found" . (!empty($terms_count) ? ", <strong>$terms_count</strong> with a Standard terms contract for their own rate or payment terms" : ''));
+        flashAlert(!empty($terms_count) ? __('<strong>%1$d</strong> Client(s) added, <strong>%2$d</strong> duplicate(s) found, <strong>%3$d</strong> with a Standard terms contract for their own rate or payment terms', $row_count, $duplicate_count, $terms_count) : __('<strong>%1$d</strong> Client(s) added, <strong>%2$d</strong> duplicate(s) found', $row_count, $duplicate_count));
 
         redirect();
 
@@ -766,7 +766,7 @@ if (isset($_POST['bulk_add_client_ticket'])) {
         }
     }
     if ($subject_input === '') {
-        flashAlert('The tickets need a subject.', 'error');
+        flashAlert(__('The tickets need a subject.'), 'error');
         redirect();
     }
     $subject = escapeSql(mb_substr($subject_input, 0, 500));
@@ -821,7 +821,7 @@ if (isset($_POST['bulk_add_client_ticket'])) {
 
     logAudit("Ticket", "Bulk Create", "$session_name created $count ticket(s) for the clients picked");
 
-    flashAlert("Created <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " for the clients picked");
+    flashAlert(_n('Created <strong>%d</strong> ticket for the clients picked', 'Created <strong>%d</strong> tickets for the clients picked', $count));
 
     redirect();
 
@@ -859,7 +859,7 @@ if (isset($_POST['bulk_edit_client_industry'])) {
 
         logAudit("Client", "Bulk Edit", "$session_name set the industry $industry for $count client(s)", $client_id);
 
-        flashAlert("Industry set to <strong>" . stripslashes($industry) . "</strong> on <strong>$count</strong> client" . ($count === 1 ? '' : 's'));
+        flashAlert(_n('Industry set to <strong>%2$s</strong> on <strong>%1$d</strong> client', 'Industry set to <strong>%2$s</strong> on <strong>%1$d</strong> clients', $count, $count, stripslashes($industry)));
     }
 
     redirect();
@@ -898,7 +898,7 @@ if (isset($_POST['bulk_edit_client_referral'])) {
 
         logAudit("Client", "Bulk Edit", "$session_name set the referral $referral for $count client(s)", $client_id);
 
-        flashAlert("Referral set to <strong>" . stripslashes($referral) . "</strong> on <strong>$count</strong> client" . ($count === 1 ? '' : 's'));
+        flashAlert(_n('Referral set to <strong>%2$s</strong> on <strong>%1$d</strong> client', 'Referral set to <strong>%2$s</strong> on <strong>%1$d</strong> clients', $count, $count, stripslashes($referral)));
     }
 
     redirect();
@@ -916,7 +916,7 @@ if (isset($_POST['bulk_add_client_contract'])) {
     $client_ids = array_values(array_unique(array_filter(array_map('intval', (array) ($_POST['client_ids'] ?? [])))));
     $template = contractTemplateRow(intval($_POST['contract_template_id'] ?? 0));
     if (!contractClientPickReady() || !$template || !empty($template['contract_template_archived_at'])) {
-        flashAlert("Pick a contract template.", 'error');
+        flashAlert(__('Pick a contract template.'), 'error');
         redirect();
     }
 
@@ -939,8 +939,8 @@ if (isset($_POST['bulk_add_client_contract'])) {
     if ($made) {
         logAudit("Contract", "Bulk Create", "$session_name started contract " . escapeSql($template['contract_template_name']) . " from its template for $made client(s)", 0);
     }
-    flashAlert("Contract <strong>" . escapeHtml($template['contract_template_name']) . "</strong> started for <strong>$made</strong> client" . ($made === 1 ? '' : 's')
-        . ($not_made ? " - not for " . escapeHtml(implode(', ', $not_made)) : ''), $not_made ? 'warning' : 'success');
+    flashAlert(_n('Contract <strong>%2$s</strong> started for <strong>%1$d</strong> client', 'Contract <strong>%2$s</strong> started for <strong>%1$d</strong> clients', $made, $made, escapeHtml($template['contract_template_name']))
+        . ($not_made ? ' - ' . __('not for %s', escapeHtml(implode(', ', $not_made))) : ''), $not_made ? 'warning' : 'success');
 
     redirect();
 
@@ -995,7 +995,7 @@ if (isset($_POST['bulk_send_client_email']) && isset($_POST['client_ids'])) {
     $company_name = (string) (billingCompany()['company_name'] ?? '');
     while ($row = mysqli_fetch_assoc($result)) {
         $recipients[] = ['email' => trim((string) $row['contact_email']), 'name' => (string) $row['contact_name'],
-            'footnote' => "You received this as a contact for {$row['client_name']} with $company_name."];
+            'footnote' => __('You received this as a contact for %1$s with %2$s.', $row['client_name'], $company_name)];
     }
 
     emailBulkPost($recipients, count($recipients));
@@ -1036,7 +1036,7 @@ if (isset($_POST['bulk_archive_clients'])) {
 
         logAudit("Client", "Bulk Archive", "$session_name archived $count clients", $client_id);
 
-        flashAlert("Archived $count client(s)", 'error');
+        flashAlert(__('Archived %s client(s)', $count), 'error');
 
     }
 
@@ -1075,7 +1075,7 @@ if (isset($_POST['bulk_unarchive_clients'])) {
 
         logAudit("Client", "Bulk Restore", "$session_name restored $count client(s)", $client_id);
 
-        flashAlert("You restored <strong>$count</strong> client(s)");
+        flashAlert(__('You restored <strong>%s</strong> client(s)', $count));
 
     }
 
@@ -1100,7 +1100,7 @@ if (isset($_POST['export_client_pdf']) || isset($_POST['export_client_archive'])
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT client_name FROM clients WHERE client_id = $client_id"));
     if (!$row) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect('clients.php');
     }
     $client_name = $row['client_name'];
@@ -1122,7 +1122,7 @@ if (isset($_POST['export_client_pdf']) || isset($_POST['export_client_archive'])
             $pdf = clientExportPdf($client_id, $options);
         } catch (Exception $exception) {
             error_log('ITFlow client export PDF: ' . $exception->getMessage());
-            flashAlert('The PDF could not be made. Try again with fewer sections, or use the full export.', 'error');
+            flashAlert(__('The PDF could not be made. Try again with fewer sections, or use the full export.'), 'error');
             redirect();
         }
 

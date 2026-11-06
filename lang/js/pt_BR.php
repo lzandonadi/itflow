@@ -287,4 +287,9 @@ return [
     'archived' => 'arquivado',
     'Each answer goes in wherever its [Name] is, and stays on the ticket. Leave one blank to answer it later.' => 'Cada resposta entra onde estiver o [Nome] dela e fica no chamado. Deixe uma em branco para responder depois.',
 
+    // clients
+    'Not saved - try again' => 'Não salvo - tente de novo',
+    'Invoiced' => 'Faturado',
+    'Paid' => 'Pago',
+
 ];

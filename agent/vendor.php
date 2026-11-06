@@ -29,7 +29,7 @@ $vendor_client_id = $vendor ? intval($vendor['vendor_client_id']) : 0;
 
 if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($client_id)) || !vendorCan($vendor_client_id, 1)) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
 
 } else {
 
@@ -177,12 +177,12 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
 
     if ($is_ours) {
         $vendor_tabs = [
-            'expenses' => ['label' => 'Expenses', 'icon' => 'fa-receipt', 'count' => $spend ? $spend['count'] : 0],
-            'recurring' => ['label' => 'Recurring', 'icon' => 'fa-redo-alt', 'count' => count($recurring)],
-            'products' => ['label' => 'Products', 'icon' => 'fa-box-open', 'count' => count($vendor_products)],
-            'cases' => ['label' => 'Cases', 'icon' => 'fa-life-ring', 'count' => $case_count, 'badge' => $case_open_count],
-            'domains' => ['label' => 'Client domains', 'icon' => 'fa-globe', 'count' => count($domains)],
-            'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+            'expenses' => ['label' => __('Expenses'), 'icon' => 'fa-receipt', 'count' => $spend ? $spend['count'] : 0],
+            'recurring' => ['label' => __('Recurring'), 'icon' => 'fa-redo-alt', 'count' => count($recurring)],
+            'products' => ['label' => __('Products'), 'icon' => 'fa-box-open', 'count' => count($vendor_products)],
+            'cases' => ['label' => __('Cases'), 'icon' => 'fa-life-ring', 'count' => $case_count, 'badge' => $case_open_count],
+            'domains' => ['label' => __('Client domains'), 'icon' => 'fa-globe', 'count' => count($domains)],
+            'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
         ];
         if (!$domains) {
             unset($vendor_tabs['domains']);
@@ -198,15 +198,15 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
         }
     } else {
         $vendor_tabs = [
-            'cases' => ['label' => 'Cases', 'icon' => 'fa-life-ring', 'count' => $case_count, 'badge' => $case_open_count],
-            'licenses' => ['label' => 'Licenses', 'icon' => 'fa-cube', 'count' => count($licenses)],
-            'assets' => ['label' => 'Assets', 'icon' => 'fa-desktop', 'count' => count($assets)],
-            'domains' => ['label' => 'Domains', 'icon' => 'fa-globe', 'count' => count($domains)],
-            'services' => ['label' => 'Services', 'icon' => 'fa-stream', 'count' => count($services)],
-            'logins' => ['label' => 'Logins', 'icon' => 'fa-key', 'count' => count($logins)],
-            'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'count' => count($documents)],
-            'files' => ['label' => 'Files', 'icon' => 'fa-paperclip', 'count' => count($files)],
-            'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+            'cases' => ['label' => __('Cases'), 'icon' => 'fa-life-ring', 'count' => $case_count, 'badge' => $case_open_count],
+            'licenses' => ['label' => __('Licenses'), 'icon' => 'fa-cube', 'count' => count($licenses)],
+            'assets' => ['label' => __('Assets'), 'icon' => 'fa-desktop', 'count' => count($assets)],
+            'domains' => ['label' => __('Domains'), 'icon' => 'fa-globe', 'count' => count($domains)],
+            'services' => ['label' => __('Services'), 'icon' => 'fa-stream', 'count' => count($services)],
+            'logins' => ['label' => __('Logins'), 'icon' => 'fa-key', 'count' => count($logins)],
+            'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'count' => count($documents)],
+            'files' => ['label' => __('Files'), 'icon' => 'fa-paperclip', 'count' => count($files)],
+            'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
         ];
         if (!$can_support) {
             unset($vendor_tabs['cases'], $vendor_tabs['licenses'], $vendor_tabs['assets'], $vendor_tabs['domains'], $vendor_tabs['services'], $vendor_tabs['documents'], $vendor_tabs['files']);
@@ -227,10 +227,10 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
 
     <ol class="breadcrumb d-print-none">
         <?php if ($is_ours) { ?>
-            <li class="breadcrumb-item"><a href="vendors.php">Vendors</a></li>
+            <li class="breadcrumb-item"><a href="vendors.php"><?= __('Vendors') ?></a></li>
         <?php } else { ?>
             <li class="breadcrumb-item"><a href="client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($vendor['client_name']) ?></a></li>
-            <li class="breadcrumb-item"><a href="vendors.php?client_id=<?= $client_id ?>">Vendors</a></li>
+            <li class="breadcrumb-item"><a href="vendors.php?client_id=<?= $client_id ?>"><?= __('Vendors') ?></a></li>
         <?php } ?>
         <li class="breadcrumb-item active"><?= $vendor_name ?></li>
     </ol>
@@ -244,23 +244,23 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                 <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                     <span><?= $vendor_name ?></span>
                     <?php if ($can_edit && !$vendor_archived_at) { ?>
-                        <a class="text-decoration-none fs-6" href="post.php?<?= $vendor_favorite ? 'unfavorite_vendor' : 'favorite_vendor' ?>=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= $vendor_favorite ? 'Unstar' : 'Star - starred vendors come first' ?>">
+                        <a class="text-decoration-none fs-6" href="post.php?<?= $vendor_favorite ? 'unfavorite_vendor' : 'favorite_vendor' ?>=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= $vendor_favorite ? __('Unstar') : __('Star - starred vendors come first') ?>">
                             <i class="<?= $vendor_favorite ? 'fas text-warning' : 'far text-body-secondary' ?> fa-star"></i>
                         </a>
                     <?php } elseif ($vendor_favorite) { ?>
-                        <i class="fas fa-star text-warning fs-6" title="Starred"></i>
+                        <i class="fas fa-star text-warning fs-6" title="<?= escapeHtml(__('Starred')) ?>"></i>
                     <?php } ?>
-                    <?php if ($is_ours) { ?><span class="badge rounded-pill text-bg-dark fw-normal fs-6">Our vendor</span><?php } ?>
-                    <?php if ($vendor_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                    <?php if ($is_ours) { ?><span class="badge rounded-pill text-bg-dark fw-normal fs-6"><?= __('Our vendor') ?></span><?php } ?>
+                    <?php if ($vendor_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                 </h1>
                 <div class="text-body-secondary small d-flex flex-wrap column-gap-3 row-gap-1">
                     <?php if ($vendor_description) { ?><span><?= $vendor_description ?></span><?php } ?>
                     <?php if ($vendor_hours) { ?><span><i class="fas fa-fw fa-clock me-1"></i><?= $vendor_hours ?></span><?php } ?>
                     <?php if ($vendor['vendor_template_name']) { ?>
                         <?php if (!empty($session_is_admin)) { ?>
-                            <a class="text-reset" href="/admin/vendor_template.php?vendor_template_id=<?= intval($vendor['vendor_template_id']) ?>" title="Made from this template - open it" data-vendor-template-link><i class="fas fa-fw fa-puzzle-piece me-1"></i><?= escapeHtml($vendor['vendor_template_name']) ?></a>
+                            <a class="text-reset" href="/admin/vendor_template.php?vendor_template_id=<?= intval($vendor['vendor_template_id']) ?>" title="<?= escapeHtml(__('Made from this template - open it')) ?>" data-vendor-template-link><i class="fas fa-fw fa-puzzle-piece me-1"></i><?= escapeHtml($vendor['vendor_template_name']) ?></a>
                         <?php } else { ?>
-                            <span title="Made from this template"><i class="fas fa-fw fa-puzzle-piece me-1"></i><?= escapeHtml($vendor['vendor_template_name']) ?></span>
+                            <span title="<?= escapeHtml(__('Made from this template')) ?>"><i class="fas fa-fw fa-puzzle-piece me-1"></i><?= escapeHtml($vendor['vendor_template_name']) ?></span>
                         <?php } ?>
                     <?php } ?>
                 </div>
@@ -271,52 +271,52 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
 
             <div class="d-flex flex-wrap gap-2 d-print-none">
                 <?php if ($vendor_dial) { ?>
-                    <a class="btn btn-outline-primary" href="tel:<?= escapeHtml($vendor_dial) ?><?= $vendor['vendor_extension'] ? ',' . escapeHtml($vendor['vendor_extension']) : '' ?>" title="<?= escapeHtml($vendor_phone_text) ?>"><i class="fas fa-phone me-2"></i>Call support</a>
+                    <a class="btn btn-outline-primary" href="tel:<?= escapeHtml($vendor_dial) ?><?= $vendor['vendor_extension'] ? ',' . escapeHtml($vendor['vendor_extension']) : '' ?>" title="<?= escapeHtml($vendor_phone_text) ?>"><i class="fas fa-phone me-2"></i><?= __('Call support') ?></a>
                 <?php } ?>
                 <?php if ($vendor_email) { ?>
-                    <a class="btn btn-outline-primary" href="mailto:<?= $vendor_email ?>"><i class="fas fa-envelope me-2"></i>Email</a>
+                    <a class="btn btn-outline-primary" href="mailto:<?= $vendor_email ?>"><i class="fas fa-envelope me-2"></i><?= __('Email') ?></a>
                 <?php } ?>
                 <?php if ($vendor_website_url) { ?>
-                    <a class="btn btn-outline-primary" href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt me-2"></i>Support site</a>
+                    <a class="btn btn-outline-primary" href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt me-2"></i><?= __('Support site') ?></a>
                 <?php } ?>
                 <?php if ($vendor_status_url) { ?>
-                    <a class="btn btn-outline-primary" href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener" title="Whether they have an outage" data-vendor-status-page><i class="fas fa-heartbeat me-2"></i>Status page</a>
+                    <a class="btn btn-outline-primary" href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Whether they have an outage')) ?>" data-vendor-status-page><i class="fas fa-heartbeat me-2"></i><?= __('Status page') ?></a>
                 <?php } ?>
                 <?php if ($can_new) { ?>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i>New</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i><?= __('New') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <?php if ($is_ours) { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_add.php?vendor_id=<?= $vendor_id ?>">
-                                    <i class="fa fa-fw fa-receipt text-secondary me-2"></i>Expense
+                                    <i class="fa fa-fw fa-receipt text-secondary me-2"></i><?= __('Expense') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_add.php?vendor_id=<?= $vendor_id ?>">
-                                    <i class="fa fa-fw fa-redo-alt text-secondary me-2"></i>Recurring expense
+                                    <i class="fa fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Recurring expense') ?>
                                 </a>
                             <?php } else { ?>
                                 <?php if ($can_support_edit) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $new_case_url ?>">
-                                        <i class="fa fa-fw fa-life-ring text-secondary me-2"></i>Case with them
+                                        <i class="fa fa-fw fa-life-ring text-secondary me-2"></i><?= __('Case with them') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/software/software_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                        <i class="fa fa-fw fa-cube text-secondary me-2"></i>License from them
+                                        <i class="fa fa-fw fa-cube text-secondary me-2"></i><?= __('License from them') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                        <i class="fa fa-fw fa-desktop text-secondary me-2"></i>Asset bought from them
+                                        <i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Asset bought from them') ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($can_credentials_edit) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/credential/credential_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                        <i class="fa fa-fw fa-key text-secondary me-2"></i>Portal login
+                                        <i class="fa fa-fw fa-key text-secondary me-2"></i><?= __('Portal login') ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($can_support_edit) { ?>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                        <i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document
+                                        <i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                        <i class="fa fa-fw fa-upload text-secondary me-2"></i>Upload File(s)
+                                        <i class="fa fa-fw fa-upload text-secondary me-2"></i><?= __('Upload File(s)') ?>
                                     </a>
                                 <?php } ?>
                             <?php } ?>
@@ -325,44 +325,44 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                 <?php } ?>
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/vendor/vendor_edit.php?id=<?= $vendor_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($template_row) { ?>
                                 <?php if ($template_differences) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/vendor/vendor_template_update.php?vendor_id=<?= $vendor_id ?>">
-                                        <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Update from template
+                                        <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i><?= __('Update from template') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item confirm-link" href="post.php?unlink_vendor_template=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                    data-confirm-title="Unlink from <?= escapeHtml($template_row['vendor_template_name']) ?>?" data-confirm-text="<?= $vendor_name ?> stays as it is, and is no longer kept in step with the template." data-confirm-button="Unlink">
-                                    <i class="fas fa-fw fa-unlink text-secondary me-2"></i>Unlink from template
+                                    data-confirm-title="Unlink from <?= escapeHtml($template_row['vendor_template_name']) ?>?" data-confirm-text="<?= $vendor_name ?> stays as it is, and is no longer kept in step with the template." data-confirm-button="<?= escapeHtml(__('Unlink')) ?>">
+                                    <i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink from template') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                             <?php } ?>
                             <?php if (!empty($session_is_admin) && !$vendor['vendor_template_name'] && !$vendor_archived_at) { ?>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="/admin/modals/vendor_template/vendor_template_add.php?from_vendor=<?= $vendor_id ?>" title="A vendor template starting from this vendor, so other clients can have it">
-                                    <i class="fas fa-fw fa-puzzle-piece text-secondary me-2"></i>Make a template from it
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="/admin/modals/vendor_template/vendor_template_add.php?from_vendor=<?= $vendor_id ?>" title="<?= escapeHtml(__('A vendor template starting from this vendor, so other clients can have it')) ?>">
+                                    <i class="fas fa-fw fa-puzzle-piece text-secondary me-2"></i><?= __('Make a template from it') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                             <?php } ?>
                             <?php if ($vendor_archived_at) { ?>
                                 <a class="dropdown-item" href="post.php?restore_vendor=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                 </a>
                                 <?php if ($can_delete) { ?>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_vendor=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                         data-confirm-text="<?= $vendor_name ?> goes for good. Its cases, licenses, assets and domains stay, with no vendor.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             <?php } else { ?>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_vendor=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -376,9 +376,9 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
         <!-- Says something other than the template it was made from -->
         <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 py-2 d-print-none" data-vendor-template-differs="<?= escapeHtml(implode(',', array_keys($template_differences))) ?>">
             <i class="fas fa-fw fa-not-equal"></i>
-            <span class="flex-grow-1 small">Differs from the <strong><?= escapeHtml($template_row['vendor_template_name']) ?></strong> template it was made from in its <?= escapeHtml(vendorTemplateLabelsText($template_differences)) ?> - its own, or the template changed since.</span>
+            <span class="flex-grow-1 small"><?= __('Differs from the %1$s template it was made from in its %2$s - its own, or the template changed since.', '<strong>' . escapeHtml($template_row['vendor_template_name']) . '</strong>', escapeHtml(vendorTemplateLabelsText($template_differences))) ?></span>
             <?php if ($can_edit) { ?>
-                <button type="button" class="btn btn-sm btn-warning ajax-modal" data-modal-size="lg" data-modal-url="modals/vendor/vendor_template_update.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-sync-alt me-1"></i>Update from template</button>
+                <button type="button" class="btn btn-sm btn-warning ajax-modal" data-modal-size="lg" data-modal-url="modals/vendor/vendor_template_update.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-sync-alt me-1"></i><?= __('Update from template') ?></button>
             <?php } ?>
         </div>
     <?php } elseif ($template_match) { ?>
@@ -388,8 +388,8 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
             <input type="hidden" name="vendor_template_id" value="<?= intval($template_match['vendor_template_id']) ?>">
             <input type="hidden" name="vendor_ids[]" value="<?= $vendor_id ?>">
             <i class="fas fa-fw fa-puzzle-piece"></i>
-            <span class="flex-grow-1 small">Looks like the <strong><?= escapeHtml($template_match['vendor_template_name']) ?></strong> vendor template. Link it, and it counts as made from it and is kept in step with it - nothing here changes unless you say so.</span>
-            <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-info"><i class="fas fa-link me-1"></i>Link to template</button>
+            <span class="flex-grow-1 small"><?= __('Looks like the %s vendor template. Link it, and it counts as made from it and is kept in step with it - nothing here changes unless you say so.', '<strong>' . escapeHtml($template_match['vendor_template_name']) . '</strong>') ?></span>
+            <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-info"><i class="fas fa-link me-1"></i><?= __('Link to template') ?></button>
         </form>
     <?php } ?>
 
@@ -400,38 +400,38 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-headset text-secondary me-2"></i>Support</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-headset text-secondary me-2"></i><?= __('Support') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-asset-dl mb-0">
-                        <dt>Phone</dt>
+                        <dt><?= __('Phone') ?></dt>
                         <dd>
                             <?php if ($vendor_phone) { ?>
-                                <?= $vendor_phone ?><button type="button" class="itflow-copy clipboardjs" title="Copy phone number" data-clipboard-text="<?= escapeHtml($vendor_phone_text) ?>"><i class="far fa-copy"></i></button>
+                                <?= $vendor_phone ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy phone number')) ?>" data-clipboard-text="<?= escapeHtml($vendor_phone_text) ?>"><i class="far fa-copy"></i></button>
                             <?php } else { ?>
-                                <span class="text-body-secondary">Not recorded</span>
+                                <span class="text-body-secondary"><?= __('Not recorded') ?></span>
                             <?php } ?>
                         </dd>
-                        <dt>Hours</dt>
-                        <dd><?= $vendor_hours ?: '<span class="text-body-secondary">Not recorded</span>' ?></dd>
+                        <dt><?= __('Hours') ?></dt>
+                        <dd><?= $vendor_hours ?: '<span class="text-body-secondary">' . __('Not recorded') . '</span>' ?></dd>
                         <?php if ($vendor_sla) { ?>
-                            <dt>SLA</dt><dd><?= $vendor_sla ?></dd>
+                            <dt><?= __('SLA') ?></dt><dd><?= $vendor_sla ?></dd>
                         <?php } ?>
                         <?php if ($vendor_email) { ?>
-                            <dt>Email</dt>
-                            <dd class="text-break"><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></dd>
+                            <dt><?= __('Email') ?></dt>
+                            <dd class="text-break"><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></dd>
                         <?php } ?>
                         <?php if ($vendor_website_url) { ?>
-                            <dt>Site</dt>
+                            <dt><?= __('Site') ?></dt>
                             <dd class="text-break"><a href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><?= $vendor_website_label ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
                         <?php } ?>
                         <?php if ($vendor_status_url) { ?>
-                            <dt>Status</dt>
+                            <dt><?= __('Status') ?></dt>
                             <dd class="text-break"><a href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_status_page'])) ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
                         <?php } ?>
                         <?php if ($vendor_portal_url) { ?>
-                            <dt>Portal</dt>
-                            <dd class="text-break"><a href="<?= escapeHtml($vendor_portal_url) ?>" target="_blank" rel="noopener" title="Support portal - where cases are opened"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_portal'])) ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
+                            <dt><?= __('Portal') ?></dt>
+                            <dd class="text-break"><a href="<?= escapeHtml($vendor_portal_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Support portal - where cases are opened')) ?>"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_portal'])) ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
                         <?php } ?>
                     </dl>
                 </div>
@@ -439,52 +439,52 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-id-card text-secondary me-2"></i>Account</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-id-card text-secondary me-2"></i><?= __('Account') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-asset-dl mb-0">
-                        <dt>Account</dt>
-                        <dd><?= $vendor_account ? '<span class="font-monospace">' . $vendor_account . '</span><button type="button" class="itflow-copy clipboardjs" title="Copy account number" data-clipboard-text="' . $vendor_account . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">Not recorded</span>' ?></dd>
-                        <dt>PIN</dt>
-                        <dd><?= $vendor_pin ?: '<span class="text-body-secondary">Not recorded</span>' ?></dd>
-                        <dt>Manager</dt>
+                        <dt><?= __('Account') ?></dt>
+                        <dd><?= $vendor_account ? '<span class="font-monospace">' . $vendor_account . '</span><button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy account number')) . '" data-clipboard-text="' . $vendor_account . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">' . __('Not recorded') . '</span>' ?></dd>
+                        <dt><?= __('PIN') ?></dt>
+                        <dd><?= $vendor_pin ?: '<span class="text-body-secondary">' . __('Not recorded') . '</span>' ?></dd>
+                        <dt><?= __('Manager') ?></dt>
                         <dd>
                             <?php if ($manager_name || $manager_phone || $manager_email) { ?>
                                 <?php if ($manager_name) { ?><div class="fw-semibold"><?= $manager_name ?></div><?php } ?>
                                 <?php if ($manager_phone) { ?><div class="d-flex align-items-baseline"><i class="fas fa-fw fa-phone text-body-secondary me-1 flex-shrink-0"></i><span><?= $manager_phone ?></span></div><?php } ?>
-                                <?php if ($manager_email) { ?><div class="d-flex align-items-baseline min-w-0"><i class="fas fa-fw fa-envelope text-body-secondary me-1 flex-shrink-0"></i><a class="text-truncate" href="mailto:<?= $manager_email ?>" title="<?= $manager_email ?>"><?= $manager_email ?></a><button type="button" class="itflow-copy clipboardjs flex-shrink-0" title="Copy email" data-clipboard-text="<?= $manager_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
+                                <?php if ($manager_email) { ?><div class="d-flex align-items-baseline min-w-0"><i class="fas fa-fw fa-envelope text-body-secondary me-1 flex-shrink-0"></i><a class="text-truncate" href="mailto:<?= $manager_email ?>" title="<?= $manager_email ?>"><?= $manager_email ?></a><button type="button" class="itflow-copy clipboardjs flex-shrink-0" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $manager_email ?>"><i class="far fa-copy"></i></button></div><?php } ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary">Not recorded</span>
+                                <span class="text-body-secondary"><?= __('Not recorded') ?></span>
                             <?php } ?>
                         </dd>
-                        <dt>Added</dt><dd title="<?= $vendor_created_at ?>"><?= timeAgo($vendor_created_at) ?></dd>
+                        <dt><?= __('Added') ?></dt><dd title="<?= $vendor_created_at ?>"><?= timeAgo($vendor_created_at) ?></dd>
                     </dl>
                 </div>
             </div>
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-sticky-note text-secondary me-2"></i>Notes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-sticky-note text-secondary me-2"></i><?= __('Notes') ?></h3>
                 </div>
-                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-vendor-notes" rows="7" placeholder="Escalation path, who is authorised to call them, circuit IDs, contract renewal - saves when you click away"
+                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-vendor-notes" rows="7" placeholder="<?= escapeHtml(__('Escalation path, who is authorised to call them, circuit IDs, contract renewal - saves when you click away')) ?>"
                     data-vendor-id="<?= $vendor_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token']) ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $vendor_notes ?></textarea>
             </div>
 
             <?php if ($elsewhere) { ?>
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-users text-secondary me-2"></i>Also used by <span class="badge rounded-pill text-bg-secondary ms-1"><?= count($elsewhere) ?></span></h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Also used by') ?> <span class="badge rounded-pill text-bg-secondary ms-1"><?= count($elsewhere) ?></span></h3>
                     </div>
                     <ul class="list-group list-group-flush">
                         <?php foreach ($elsewhere as $other) {
                             $other_client_id = intval($other['vendor_client_id']); ?>
                             <li class="list-group-item d-flex align-items-center gap-2 py-2">
                                 <a class="text-truncate flex-grow-1" href="vendor.php?client_id=<?= $other_client_id ?>&vendor_id=<?= intval($other['vendor_id']) ?>"><?= escapeHtml($other['client_name']) ?></a>
-                                <?php if ($other['vendor_account_number']) { ?><span class="small text-body-secondary font-monospace text-nowrap" title="Their account number"><?= escapeHtml($other['vendor_account_number']) ?></span><?php } ?>
+                                <?php if ($other['vendor_account_number']) { ?><span class="small text-body-secondary font-monospace text-nowrap" title="<?= escapeHtml(__('Their account number')) ?>"><?= escapeHtml($other['vendor_account_number']) ?></span><?php } ?>
                             </li>
                         <?php } ?>
                     </ul>
-                    <div class="card-footer small text-body-secondary">Clients with a vendor of the same name or template - who else an outage hits.</div>
+                    <div class="card-footer small text-body-secondary"><?= __('Clients with a vendor of the same name or template - who else an outage hits.') ?></div>
                 </div>
             <?php } ?>
 
@@ -501,7 +501,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                     <i class="fas fa-fw <?= $tab['icon'] ?> me-1 d-none d-xxl-inline"></i><?= $tab['label'] ?>
                                     <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
                                     <?php if (!empty($tab['badge'])) { ?>
-                                        <span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span>
+                                        <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= __('%d open', intval($tab['badge'])) ?></span>
                                     <?php } ?>
                                 </button>
                             </li>
@@ -514,18 +514,18 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- Cases - tickets logged with this vendor, open first -->
                     <div class="tab-pane fade" id="vendor-pane-cases" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Tickets waiting on or worked with them, open first - with their reference.</span>
+                            <span class="text-body-secondary small"><?= __('Tickets waiting on or worked with them, open first - with their reference.') ?></span>
                             <?php if ($can_support_edit && !$vendor_archived_at) { ?>
-                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $new_case_url ?>"><i class="fas fa-plus me-2"></i>New Case</button>
+                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $new_case_url ?>"><i class="fas fa-plus me-2"></i><?= __('New Case') ?></button>
                             <?php } ?>
                         </div>
                         <?php if ($cases) { ?>
                             <?= ticketTableHtml($cases, ['vendor_ref' => true]) ?>
                             <?php if ($case_count > count($cases)) { ?>
-                                <div class="small text-body-secondary px-3 py-2 border-top">Showing every open case and the <?= count($cases) - $case_open_count ?> most recent closed of <?= $case_count ?>.</div>
+                                <div class="small text-body-secondary px-3 py-2 border-top"><?= __('Showing every open case and the %1$d most recent closed of %2$d.', count($cases) - $case_open_count, $case_count) ?></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No cases with them. Set the vendor on a ticket, with their reference, when you log a call with them.</div>
+                            <div class="itflow-asset-empty"><?= __('No cases with them. Set the vendor on a ticket, with their reference, when you log a call with them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -534,9 +534,9 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- Licenses bought through them - soonest renewal first -->
                     <div class="tab-pane fade" id="vendor-pane-licenses" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Licenses and subscriptions bought through them, soonest renewal first.</span>
+                            <span class="text-body-secondary small"><?= __('Licenses and subscriptions bought through them, soonest renewal first.') ?></span>
                             <?php if ($can_support_edit && !$vendor_archived_at) { ?>
-                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software/software_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i>New License</button>
+                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software/software_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i><?= __('New License') ?></button>
                             <?php } ?>
                         </div>
                         <?php if ($licenses) { ?>
@@ -550,7 +550,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 <?php } ?>
                             </ul>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No licenses from them.</div>
+                            <div class="itflow-asset-empty"><?= __('No licenses from them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -559,15 +559,15 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- Assets bought from them - for warranty claims -->
                     <div class="tab-pane fade" id="vendor-pane-assets" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Bought from them, warranty ending soonest first - what to have to hand for a claim.</span>
+                            <span class="text-body-secondary small"><?= __('Bought from them, warranty ending soonest first - what to have to hand for a claim.') ?></span>
                             <?php if ($can_support_edit && !$vendor_archived_at) { ?>
-                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i>New Asset</button>
+                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Asset') ?></button>
                             <?php } ?>
                         </div>
                         <?php if ($assets) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Asset</th><th>Serial</th><th>Order ref</th><th>Purchased</th><th>Warranty</th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Asset') ?></th><th><?= __('Serial') ?></th><th><?= __('Order ref') ?></th><th><?= __('Purchased') ?></th><th><?= __('Warranty') ?></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($assets as $asset) {
                                         $asset_id = intval($asset['asset_id']);
@@ -584,14 +584,14 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-nowrap"><?php if ($serial) { ?><span class="font-monospace small"><?= $serial ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy serial" data-clipboard-text="<?= $serial ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
+                                            <td class="text-nowrap"><?php if ($serial) { ?><span class="font-monospace small"><?= $serial ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy serial')) ?>" data-clipboard-text="<?= $serial ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
                                             <td class="text-nowrap small"><?= $order_ref ?: '<span class="text-body-secondary">-</span>' ?></td>
                                             <td class="text-nowrap small"><?= escapeHtml($asset['asset_purchase_date']) ?: '<span class="text-body-secondary">-</span>' ?></td>
                                             <td class="text-nowrap">
                                                 <?php if ($warranty) {
                                                     $tone = $warranty['tone']; ?>
                                                     <span class="badge rounded-pill bg-<?= $tone ?>-subtle text-<?= $tone ?>-emphasis border border-<?= $tone ?>-subtle fw-normal" title="<?= escapeHtml($warranty['date']) ?>">
-                                                        <?= $warranty['state'] === 'expired' ? 'Expired' : ($warranty['state'] === 'soon' ? 'Ends in ' . intval($warranty['days']) . ' days' : 'To ' . escapeHtml($warranty['date'])) ?>
+                                                        <?= $warranty['state'] === 'expired' ? __('Expired') : ($warranty['state'] === 'soon' ? _n('Ends in %d day', 'Ends in %d days', intval($warranty['days'])) : __('To %s', escapeHtml($warranty['date']))) ?>
                                                     </span>
                                                 <?php } else { ?>
                                                     <span class="text-body-secondary">-</span>
@@ -603,7 +603,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No assets bought from them.</div>
+                            <div class="itflow-asset-empty"><?= __('No assets bought from them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -612,23 +612,23 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- Domains they register or host -->
                     <div class="tab-pane fade" id="vendor-pane-domains" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small"><?= $is_ours ? "Clients' domains we register or host with them, and for what." : 'Domains they register or host, and for what.' ?></span>
+                            <span class="text-body-secondary small"><?= $is_ours ? __("Clients' domains we register or host with them, and for what.") : __('Domains they register or host, and for what.') ?></span>
                             <?php if (!$is_ours && $can_support_edit && !$vendor_archived_at) { ?>
                                 <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/domain/domain_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                    <i class="fas fa-plus me-2"></i>New Domain
+                                    <i class="fas fa-plus me-2"></i><?= __('New Domain') ?>
                                 </button>
                             <?php } ?>
                         </div>
                         <?php if ($domains) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Domain</th><th>They are</th><th>Expires</th><?= $is_ours ? '<th>Client</th>' : '' ?></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Domain') ?></th><th><?= __('They are') ?></th><th><?= __('Expires') ?></th><?= $is_ours ? '<th>' . __('Client') . '</th>' : '' ?></tr></thead>
                                     <tbody>
                                     <?php foreach ($domains as $domain) {
                                         $roles = [];
                                         foreach (VENDOR_DOMAIN_ROLES as $column => $role) {
                                             if (intval($domain[$column]) === $vendor_id) {
-                                                $roles[] = $role;
+                                                $roles[] = vendorDomainRoleLabel($column);
                                             }
                                         }
                                         $expiry = domainExpiry($domain['domain_expire'], $domain['domain_auto_renew']); ?>
@@ -653,7 +653,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No domains with them.</div>
+                            <div class="itflow-asset-empty"><?= __('No domains with them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -662,10 +662,10 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- Services they are part of -->
                     <div class="tab-pane fade" id="vendor-pane-services" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">The client's services that depend on them - who gets the call when one breaks.</span>
+                            <span class="text-body-secondary small"><?= __('The client\'s services that depend on them - who gets the call when one breaks.') ?></span>
                             <?php if ($can_link_services) { ?>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/link/link.php?from=vendor&id=<?= $vendor_id ?>&to=service">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                             <?php } ?>
                         </div>
@@ -674,15 +674,15 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 return "post.php?unlink_item&from=vendor&id=$vendor_id&to=service&other=" . intval($row['service_id']) . "&csrf_token=" . $_SESSION['csrf_token'];
                             } : null) ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No services depend on them.</div>
+                            <div class="itflow-asset-empty"><?= __('No services depend on them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
 
                     <!-- Portal logins, documents and files -->
-                    <?php foreach (['logins' => ['credential', $logins, 'Their portal and support logins - linked from the client\'s credentials.', 'No logins linked.', $can_credentials_edit],
-                                    'documents' => ['document', $documents, 'The contract, the escalation sheet, how to raise a case with them.', 'No documents linked.', $can_support_edit],
-                                    'files' => ['file', $files, 'Quotes, invoices, the signed agreement.', 'No files linked.', $can_support_edit]] as $pane => [$to, $linked, $hint, $empty, $can_link]) {
+                    <?php foreach (['logins' => ['credential', $logins, __('Their portal and support logins - linked from the client\'s credentials.'), __('No logins linked.'), $can_credentials_edit],
+                                    'documents' => ['document', $documents, __('The contract, the escalation sheet, how to raise a case with them.'), __('No documents linked.'), $can_support_edit],
+                                    'files' => ['file', $files, __('Quotes, invoices, the signed agreement.'), __('No files linked.'), $can_support_edit]] as $pane => [$to, $linked, $hint, $empty, $can_link]) {
                         if (!isset($vendor_tabs[$pane])) {
                             continue;
                         } ?>
@@ -692,19 +692,19 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 <?php if ($can_link && !$vendor_archived_at) { ?>
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url . $to ?>">
-                                            <i class="fas fa-link me-2"></i>Link
+                                            <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                         </button>
                                         <?php if ($to === 'credential') { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/credential/credential_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                                <i class="fas fa-plus me-2"></i>New Login
+                                                <i class="fas fa-plus me-2"></i><?= __('New Login') ?>
                                             </button>
                                         <?php } elseif ($to === 'document') { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                                <i class="fas fa-plus me-2"></i>New Document
+                                                <i class="fas fa-plus me-2"></i><?= __('New Document') ?>
                                             </button>
                                         <?php } else { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>">
-                                                <i class="fas fa-upload me-2"></i>Upload
+                                                <i class="fas fa-upload me-2"></i><?= __('Upload') ?>
                                             </button>
                                         <?php } ?>
                                     </div>
@@ -744,25 +744,25 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 <span><?= numfmt_format_currency($currency_format, $spend['total'], $session_company_currency) ?> in all</span>
                             </span>
                             <div class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-secondary" href="expenses.php?vendor=<?= $vendor_id ?>"><i class="fas fa-list me-2"></i>All</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="expenses.php?vendor=<?= $vendor_id ?>"><i class="fas fa-list me-2"></i><?= __('All') ?></a>
                                 <?php if ($can_financial_edit && !$vendor_archived_at) { ?>
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_add.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i>New Expense</button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_add.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Expense') ?></button>
                                 <?php } ?>
                             </div>
                         </div>
                         <?php if ($expenses) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Date</th><th>What for</th><th>Account</th><th class="text-end">Amount</th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Date') ?></th><th><?= __('What for') ?></th><th><?= __('Account') ?></th><th class="text-end"><?= __('Amount') ?></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($expenses as $expense) { ?>
                                         <tr>
-                                            <td class="text-nowrap"><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($expense['expense_id']) ?>"><?= escapeHtml($expense['expense_date']) ?></a><?php if ($expense['expense_receipt']) { ?><i class="fas fa-paperclip text-success small ms-1" title="Receipt attached"></i><?php } ?></td>
+                                            <td class="text-nowrap"><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($expense['expense_id']) ?>"><?= escapeHtml($expense['expense_date']) ?></a><?php if ($expense['expense_receipt']) { ?><i class="fas fa-paperclip text-success small ms-1" title="<?= escapeHtml(__('Receipt attached')) ?>"></i><?php } ?></td>
                                             <td class="w-100">
                                                 <div><?= escapeHtml(truncate((string) $expense['expense_description'], 90)) ?: '<span class="text-body-secondary">-</span>' ?></div>
                                                 <div class="small text-body-secondary"><?= escapeHtml(implode(' · ', array_filter([$expense['category_name'], $expense['expense_reference']]))) ?></div>
                                             </td>
-                                            <td class="text-nowrap small"><?= intval($expense['expense_paid_by']) ? '<i class="fas fa-hand-holding-usd text-body-secondary me-1" title="Paid personally"></i>' . escapeHtml($expense['paid_by_name'] ?: 'An agent') : escapeHtml($expense['account_name']) ?></td>
+                                            <td class="text-nowrap small"><?= intval($expense['expense_paid_by']) ? '<i class="fas fa-hand-holding-usd text-body-secondary me-1" title="' . escapeHtml(__('Paid personally')) . '"></i>' . escapeHtml($expense['paid_by_name'] ?: __('An agent')) : escapeHtml($expense['account_name']) ?></td>
                                             <td class="text-end text-nowrap font-monospace"><?= numfmt_format_currency($currency_format, floatval($expense['expense_amount']), $expense['expense_currency_code']) ?></td>
                                         </tr>
                                     <?php } ?>
@@ -770,31 +770,31 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 </table>
                             </div>
                             <?php if ($spend['count'] > count($expenses)) { ?>
-                                <div class="small text-body-secondary px-3 py-2 border-top">The <?= count($expenses) ?> most recent of <?= $spend['count'] ?> - <a href="expenses.php?vendor=<?= $vendor_id ?>">see them all</a>.</div>
+                                <div class="small text-body-secondary px-3 py-2 border-top"><?= __('The %1$d most recent of %2$d - %3$s.', count($expenses), $spend['count'], '<a href="expenses.php?vendor=' . $vendor_id . '">' . __('see them all') . '</a>') ?></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">Nothing spent with them yet.</div>
+                            <div class="itflow-asset-empty"><?= __('Nothing spent with them yet.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- What is booked to them every month or year -->
                     <div class="tab-pane fade" id="vendor-pane-recurring" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Subscriptions and contracts booked automatically.</span>
+                            <span class="text-body-secondary small"><?= __('Subscriptions and contracts booked automatically.') ?></span>
                             <?php if ($can_financial_edit && !$vendor_archived_at) { ?>
-                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_add.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i>New Recurring</button>
+                                <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_add.php?vendor_id=<?= $vendor_id ?>"><i class="fas fa-plus me-2"></i><?= __('New Recurring') ?></button>
                             <?php } ?>
                         </div>
                         <?php if ($recurring) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Next</th><th>Every</th><th>What for</th><th class="text-end">Amount</th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Next') ?></th><th><?= __('Every') ?></th><th><?= __('What for') ?></th><th class="text-end"><?= __('Amount') ?></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($recurring as $recurring_expense) {
                                         $active = recurringExpenseState($recurring_expense) === 'active'; ?>
                                         <tr class="<?= $active ? '' : 'text-body-secondary' ?>">
                                             <td class="text-nowrap"><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense.php?id=<?= intval($recurring_expense['recurring_expense_id']) ?>"><?= escapeHtml($recurring_expense['recurring_expense_next_date']) ?></a><?php if (!$active) { ?> <?= recurringExpenseNextPill($recurring_expense) ?><?php } ?></td>
-                                            <td class="text-nowrap"><?= ['month' => 'Month', 'quarter' => 'Quarter', 'year' => 'Year'][$recurring_expense['recurring_expense_frequency']] ?? 'Month' ?></td>
+                                            <td class="text-nowrap"><?= ['month' => 'Month', 'quarter' => 'Quarter', 'year' => 'Year'][$recurring_expense['recurring_expense_frequency']] ?? __('Month') ?></td>
                                             <td class="w-100">
                                                 <div><?= escapeHtml(truncate((string) $recurring_expense['recurring_expense_description'], 90)) ?: '<span class="text-body-secondary">-</span>' ?></div>
                                                 <div class="small text-body-secondary"><?= escapeHtml($recurring_expense['category_name']) ?></div>
@@ -806,7 +806,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">Nothing recurring with them.</div>
+                            <div class="itflow-asset-empty"><?= __('Nothing recurring with them.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -815,13 +815,13 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- What we buy from them - catalog items -->
                     <div class="tab-pane fade" id="vendor-pane-products" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Products and services in the catalog bought from them, with their part number.</span>
-                            <a class="btn btn-sm btn-outline-secondary" href="products.php?vendor=<?= $vendor_id ?>"><i class="fas fa-box-open me-2"></i>In Products</a>
+                            <span class="text-body-secondary small"><?= __('Products and services in the catalog bought from them, with their part number.') ?></span>
+                            <a class="btn btn-sm btn-outline-secondary" href="products.php?vendor=<?= $vendor_id ?>"><i class="fas fa-box-open me-2"></i><?= __('In Products') ?></a>
                         </div>
                         <?php if ($vendor_products) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="text-nowrap table-light"><tr><th>Item</th><th class="d-none d-md-table-cell">Part #</th><th class="text-end">Cost</th><th class="text-end">Price</th><th class="text-end d-none d-sm-table-cell">Stock</th></tr></thead>
+                                    <thead class="text-nowrap table-light"><tr><th><?= __('Item') ?></th><th class="d-none d-md-table-cell"><?= __('Part #') ?></th><th class="text-end"><?= __('Cost') ?></th><th class="text-end"><?= __('Price') ?></th><th class="text-end d-none d-sm-table-cell"><?= __('Stock') ?></th></tr></thead>
                                     <tbody>
                                     <?php foreach ($vendor_products as $vendor_product) { ?>
                                         <tr>
@@ -847,7 +847,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">Nothing in the catalog comes from them. Pick them as the vendor on a product to list it here.</div>
+                            <div class="itflow-asset-empty"><?= __('Nothing in the catalog comes from them. Pick them as the vendor on a product to list it here.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -855,7 +855,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                     <!-- History, from the audit log -->
                     <div class="tab-pane fade" id="vendor-pane-history" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Edits, links and notes - newest first.</span>
+                            <span class="text-body-secondary small"><?= __('Edits, links and notes - newest first.') ?></span>
                         </div>
                         <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                     </div>

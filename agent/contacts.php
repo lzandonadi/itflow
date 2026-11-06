@@ -54,10 +54,10 @@ $can_support = lookupUserPermission('module_support') >= 1;
 
 // The roles an MSP reaches for
 $contact_role_tabs = [
-    'important' => ['label' => 'Important', 'icon' => 'fa-star', 'query' => "contact_important = 1"],
-    'billing' => ['label' => 'Billing', 'icon' => 'fa-file-invoice-dollar', 'query' => "contact_billing = 1"],
-    'technical' => ['label' => 'Technical', 'icon' => 'fa-tools', 'query' => "contact_technical = 1"],
-    'portal' => ['label' => 'Portal', 'icon' => 'fa-user-circle', 'query' => "contact_user_id > 0 AND COALESCE(user_auth_method, '') != ''"],
+    'important' => ['label' => __('Important'), 'icon' => 'fa-star', 'query' => "contact_important = 1"],
+    'billing' => ['label' => __('Billing'), 'icon' => 'fa-file-invoice-dollar', 'query' => "contact_billing = 1"],
+    'technical' => ['label' => __('Technical'), 'icon' => 'fa-tools', 'query' => "contact_technical = 1"],
+    'portal' => ['label' => __('Portal'), 'icon' => 'fa-user-circle', 'query' => "contact_user_id > 0 AND COALESCE(user_auth_method, '') != ''"],
 ];
 // Invites to the portal waiting to be accepted - their own tab, with its own list
 $invites_on = portalInvitesReady() && intval($config_client_portal_enable) === 1;
@@ -222,38 +222,37 @@ if ($contacts) {
     }
 }
 
-$search_noun = $role_filter ? strtolower($contact_role_tabs[$role_filter]['label']) . ' contacts' : 'contacts';
-$search_placeholder = $invites_view ? 'Search invites by email, name or client' : "Search $search_noun, phones, emails...";
+$search_placeholder = $invites_view ? __('Search invites by email, name or client') : ($role_filter ? __('Search %s contacts, phones, emails...', mb_strtolower($contact_role_tabs[$role_filter]['label'])) : __('Search contacts, phones, emails...'));
 
 ?>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-address-book me-2"></i>Contacts</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-address-book me-2"></i><?= __('Contacts') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit) { ?>
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?<?= $client_url ?>">
-                    <i class="fas fa-plus me-2"></i>New Contact
+                    <i class="fas fa-plus me-2"></i><?= __('New Contact') ?>
                 </button>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <?php if ($client_url && $invites_on) { ?>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="modals/contact/contact_invite.php?<?= $client_url ?>">
-                        <i class="fa fa-fw fa-user-plus me-2"></i>Invite to the portal
+                        <i class="fa fa-fw fa-user-plus me-2"></i><?= __('Invite to the portal') ?>
                     </a>
                     <?php } ?>
                     <?php if ($client_url) { ?>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="modals/contact/contact_import.php?<?= $client_url ?>">
-                        <i class="fa fa-fw fa-upload me-2"></i>Import
+                        <i class="fa fa-fw fa-upload me-2"></i><?= __('Import') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <?php } ?>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="<?= buildExportModalUrl('modals/contact/contact_export.php', ['client_id', 'client', 'location', 'tags', 'archived', 'q']) ?>">
-                        <i class="fa fa-fw fa-download me-2"></i>Export
+                        <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                     </a>
                 </div>
             </div>
@@ -266,7 +265,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
         <div class="card-header py-2 itflow-asset-tabs">
             <nav class="nav nav-pills flex-nowrap overflow-auto">
                 <a class="nav-link text-nowrap <?= $role_filter === '' && !$invites_view ? 'active' : '' ?>" href="?<?= $url_query_strings_sort ?>&role=">
-                    All <span class="badge rounded-pill ms-1"><?= $tab_counts[''] ?></span>
+                    <?= __('All') ?> <span class="badge rounded-pill ms-1"><?= $tab_counts[''] ?></span>
                 </a>
                 <?php foreach ($contact_role_tabs as $tab_key => $tab) {
                     if (!$tab_counts[$tab_key] && $role_filter !== $tab_key) {
@@ -278,7 +277,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 <?php } ?>
                 <?php if ($show_invites_tab) { ?>
                     <a class="nav-link text-nowrap <?= $invites_view ? 'active' : '' ?>" href="?<?= $url_query_strings_sort ?>&role=invites" data-contacts-invites-tab>
-                        <i class="fas fa-fw fa-paper-plane me-1"></i>Invites <span class="badge rounded-pill ms-1"><?= $invites_count ?></span>
+                        <i class="fas fa-fw fa-paper-plane me-1"></i><?= __('Invites') ?> <span class="badge rounded-pill ms-1"><?= $invites_count ?></span>
                     </a>
                 <?php } ?>
             </nav>
@@ -290,16 +289,16 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
         $signup_on = $signup['on'] && $signup_ready; ?>
         <!-- Signing up - whether people at the client can make their own account -->
         <div class="card-header py-2 d-flex flex-wrap flex-md-nowrap align-items-center gap-2 gap-md-3" data-contacts-signup="<?= $signup['on'] ? 'on' : 'off' ?>">
-            <span class="badge rounded-pill text-nowrap <?= $signup_on ? 'text-bg-success' : 'text-bg-secondary' ?>"><i class="fas <?= $signup_on ? 'fa-door-open' : 'fa-door-closed' ?> me-1"></i>Signing up <?= $signup_on ? 'on' : 'off' ?></span>
+            <span class="badge rounded-pill text-nowrap <?= $signup_on ? 'text-bg-success' : 'text-bg-secondary' ?>"><i class="fas <?= $signup_on ? 'fa-door-open' : 'fa-door-closed' ?> me-1"></i><?= $signup_on ? __('Signing up on') : __('Signing up off') ?></span>
             <span class="small text-body-secondary flex-grow-1 min-w-0">
                 <?php if (!$signup['domains']) { ?>
-                    People here can sign up themselves with an address at one of the client's <a href="domains.php?<?= $client_url ?>">Domains</a> - it has none yet.
+                    <?= __("People here can sign up themselves with an address at one of the client's %s - it has none yet.", '<a href="domains.php?' . $client_url . '">' . __('Domains') . '</a>') ?>
                 <?php } elseif ($signup_on) { ?>
-                    Anyone with an address at <strong><?= escapeHtml(implode(', ', $signup['domains'])) ?></strong> can make an account from the sign-in page, and joins as a plain contact. You're told when they do.
+                    <?= __("Anyone with an address at %s can make an account from the sign-in page, and joins as a plain contact. You're told when they do.", '<strong>' . escapeHtml(implode(', ', $signup['domains'])) . '</strong>') ?>
                 <?php } elseif ($signup['on']) { ?>
-                    On for <?= escapeHtml(implode(', ', $signup['domains'])) ?>, but signing up is off for every client in <?= !empty($session_is_admin) ? '<a href="/admin/settings_client_portal.php#section-sign-up">Admin &gt; Settings &gt; Client portal</a>' : 'Admin &gt; Settings &gt; Client portal' ?>.
+                    <?= __('On for %1$s, but signing up is off for every client in %2$s.', escapeHtml(implode(', ', $signup['domains'])), !empty($session_is_admin) ? '<a href="/admin/settings_client_portal.php#section-sign-up">' . __('Admin &gt; Settings &gt; Client portal') . '</a>' : __('Admin &gt; Settings &gt; Client portal')) ?>
                 <?php } else { ?>
-                    Let anyone with an address at <?= escapeHtml(implode(', ', $signup['domains'])) ?> make their own account, instead of being invited.
+                    <?= __('Let anyone with an address at %s make their own account, instead of being invited.', escapeHtml(implode(', ', $signup['domains']))) ?>
                 <?php } ?>
             </span>
             <?php if ($can_edit && ($signup['on'] || $signup['domains'])) { ?>
@@ -307,7 +306,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <input type="hidden" name="client_id" value="<?= $client_id ?>">
                     <input type="hidden" name="portal_signup" value="<?= $signup['on'] ? 0 : 1 ?>">
-                    <button type="submit" name="set_client_portal_signup" class="btn btn-sm text-nowrap <?= $signup['on'] ? 'btn-outline-secondary' : 'btn-outline-primary' ?>"><i class="fas <?= $signup['on'] ? 'fa-door-closed' : 'fa-door-open' ?> me-2"></i><?= $signup['on'] ? 'Turn off' : 'Let them sign up' ?></button>
+                    <button type="submit" name="set_client_portal_signup" class="btn btn-sm text-nowrap <?= $signup['on'] ? 'btn-outline-secondary' : 'btn-outline-primary' ?>"><i class="fas <?= $signup['on'] ? 'fa-door-closed' : 'fa-door-open' ?> me-2"></i><?= $signup['on'] ? __('Turn off') : __('Let them sign up') ?></button>
                 </form>
             <?php } ?>
         </div>
@@ -325,14 +324,14 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
                         <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= $search_placeholder ?>">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
 
                 <?php if ($client_url && !$invites_view) { ?>
                 <div class="col-lg-3 col-md-6">
                     <select class="form-select select2" name="location" onchange="this.form.submit()">
-                        <option value="">- All Locations -</option>
+                        <option value=""><?= __('- All Locations -') ?></option>
                         <?php
                         $sql_locations_filter = mysqli_query($mysqli, "
                             SELECT location_id, location_name
@@ -350,7 +349,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 <?php } elseif (!$client_url) { ?>
                 <div class="col-lg-3 col-md-6">
                     <select class="form-select select2" name="client" onchange="this.form.submit()">
-                        <option value="" <?php if ($client == "") { echo "selected"; } ?>>- All Clients -</option>
+                        <option value="" <?php if ($client == "") { echo "selected"; } ?>><?= __('- All Clients -') ?></option>
                         <?php
                         $sql_clients_filter = mysqli_query($mysqli, "
                             SELECT DISTINCT client_id, client_name, client_abbreviation
@@ -370,7 +369,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
 
                 <?php if (!$invites_view) { ?>
                 <div class="col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Tags -')) ?>" multiple>
                         <?php
                         // Tags in use on contacts in this scope, plus any already picked
                         $sql_tags_filter = mysqli_query($mysqli, "
@@ -394,63 +393,63 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 <div class="col-lg-2 col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="?<?= $client_url ?>archived=<?= $archived ? 0 : 1 ?>"
-                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active contacts' : 'Show archived contacts' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-xl-none ms-2">Archived</span>
+                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Back to active contacts') : __('Show archived contacts') ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-xl-none ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <?php if ($client_url) { ?>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/contact/contact_bulk_assign_location.php?<?= $client_url ?>"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-map-marker-alt me-2"></i>Assign Location
+                                    <i class="fas fa-fw fa-map-marker-alt me-2"></i><?= __('Assign Location') ?>
                                 </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/contact/contact_bulk_edit_phone.php"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-phone-alt me-2"></i>Set Phone Number
+                                    <i class="fas fa-fw fa-phone-alt me-2"></i><?= __('Set Phone Number') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/contact/contact_bulk_edit_department.php"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-users me-2"></i>Set Department
+                                    <i class="fas fa-fw fa-users me-2"></i><?= __('Set Department') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/contact/contact_bulk_edit_role.php"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-user-shield me-2"></i>Set Roles
+                                    <i class="fas fa-fw fa-user-shield me-2"></i><?= __('Set Roles') ?>
                                 </a>
                                 <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="contact" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/contact/contact_bulk_email.php"
                                     data-modal-size="lg"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-paper-plane me-2"></i>Send Email
+                                    <i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Send Email') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
                                     <button class="dropdown-item text-info"
                                         type="submit" form="bulkActions" name="bulk_restore_contacts">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                         <button class="dropdown-item text-danger text-bold confirm-link"
                                             type="submit" form="bulkActions" name="bulk_delete_contacts">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <button class="dropdown-item text-danger confirm-link"
                                         type="submit" form="bulkActions" name="bulk_archive_contacts">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -460,7 +459,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 </div>
                 <?php } elseif ($client_url && $can_edit) { ?>
                 <div class="col-lg col-md-6 text-md-end">
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/contact/contact_invite.php?<?= $client_url ?>"><i class="fas fa-user-plus me-2"></i>Invite people</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/contact/contact_invite.php?<?= $client_url ?>"><i class="fas fa-user-plus me-2"></i><?= __('Invite people') ?></button>
                 </div>
                 <?php } ?>
 
@@ -474,24 +473,24 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
             <tr>
                 <th class="ps-3">
                     <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=invite_email&order=<?= $disp ?>">
-                        Invited <?php if ($sort == 'invite_email') { echo $order_icon; } ?>
+                        <?= __('Invited') ?> <?php if ($sort == 'invite_email') { echo $order_icon; } ?>
                     </a>
                 </th>
-                <th class="d-none d-md-table-cell">Sees</th>
+                <th class="d-none d-md-table-cell"><?= __('Sees') ?></th>
                 <th class="d-none d-sm-table-cell">
                     <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=invite_created_at&order=<?= $disp ?>">
-                        Sent <?php if ($sort == 'invite_created_at') { echo $order_icon; } ?>
+                        <?= __('Sent') ?> <?php if ($sort == 'invite_created_at') { echo $order_icon; } ?>
                     </a>
                 </th>
-                <th>Link</th>
+                <th><?= __('Link') ?></th>
                 <?php if (!$client_url) { ?>
                 <th>
                     <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                        Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                        <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                     </a>
                 </th>
                 <?php } ?>
-                <th class="position-relative"><span class="visually-hidden">Actions</span></th>
+                <th class="position-relative"><span class="visually-hidden"><?= __('Actions') ?></span></th>
             </tr>
             </thead>
             <tbody>
@@ -509,17 +508,17 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                             <div class="min-w-0">
                                 <div class="fw-semibold text-break"><?= escapeHtml($row['invite_email']) ?></div>
                                 <?php if ($invite_name !== '') { ?><div class="small text-body-secondary"><?= escapeHtml($invite_name) ?></div><?php } ?>
-                                <div class="small text-body-secondary d-sm-none">Sent <?= escapeHtml(timeAgo($row['invite_created_at'])) ?></div>
+                                <div class="small text-body-secondary d-sm-none"><?= __('Sent %s', escapeHtml(timeAgo($row['invite_created_at']))) ?></div>
                             </div>
                         </div>
                     </td>
                     <td class="d-none d-md-table-cell small">
-                        <?= $invite_sees ? escapeHtml(implode(', ', $invite_sees)) : '<span class="text-body-secondary">Their own tickets</span>' ?>
+                        <?= $invite_sees ? escapeHtml(implode(', ', $invite_sees)) : '<span class="text-body-secondary">' . __('Their own tickets') . '</span>' ?>
                     </td>
                     <td class="small d-none d-sm-table-cell">
                         <div title="<?= escapeHtml($row['invite_created_at']) ?>"><?= escapeHtml(timeAgo($row['invite_created_at'])) ?></div>
                         <div class="text-body-secondary">
-                            <?= $invite_by !== '' ? 'by ' . escapeHtml($invite_by) . (intval($row['invite_created_by_contact_id']) ? ' in the portal' : '') : '' ?><?= intval($row['invite_sent_count']) > 1 ? ' &middot; sent ' . intval($row['invite_sent_count']) . ' times' : '' ?>
+                            <?= $invite_by !== '' ? (intval($row['invite_created_by_contact_id']) ? __('by %s in the portal', escapeHtml($invite_by)) : __('by %s', escapeHtml($invite_by))) : '' ?><?= intval($row['invite_sent_count']) > 1 ? ' &middot; ' . __('sent %d times', intval($row['invite_sent_count'])) : '' ?>
                         </div>
                     </td>
                     <td><span class="badge rounded-pill text-bg-<?= $invite_state['tone'] ?>" title="<?= escapeHtml($invite_state['title']) ?>"><?= escapeHtml($invite_state['label']) ?></span></td>
@@ -529,14 +528,14 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                     <td class="text-end">
                         <?php if ($can_edit) { ?>
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="post.php?resend_portal_invite=<?= $invite_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i>Send again
+                                        <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i><?= __('Send again') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger confirm-link" href="post.php?cancel_portal_invite=<?= $invite_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-ban me-2"></i>Cancel invite
+                                        <i class="fas fa-fw fa-ban me-2"></i><?= __('Cancel invite') ?>
                                     </a>
                                 </div>
                             </div>
@@ -557,33 +556,33 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                 <tr>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=contact_name&order=<?= $disp ?>">
-                            Name <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
+                            <?= __('Name') ?> <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=contact_email&order=<?= $disp ?>">
-                            Reach <?php if ($sort == 'contact_email') { echo $order_icon; } ?>
+                            <?= __('Reach') ?> <?php if ($sort == 'contact_email') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=location_name&order=<?= $disp ?>">
-                            Location <?php if ($sort == 'location_name') { echo $order_icon; } ?>
+                            <?= __('Location') ?> <?php if ($sort == 'location_name') { echo $order_icon; } ?>
                         </a>
                     </th>
-                    <th class="d-none d-lg-table-cell">Linked</th>
+                    <th class="d-none d-lg-table-cell"><?= __('Linked') ?></th>
                     <?php if (!$client_url) { ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                            Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                            <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php } ?>
-                    <th class="position-relative"><span class="visually-hidden">Actions</span></th>
+                    <th class="position-relative"><span class="visually-hidden"><?= __('Actions') ?></span></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -614,7 +613,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                     <tr>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="contact_ids[]" value="<?= $contact_id ?>" aria-label="Select <?= $contact_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="contact_ids[]" value="<?= $contact_id ?>" aria-label="<?= __('Select %s', $contact_name) ?>">
                             </div>
                         </td>
                         <!-- The whole cell opens the contact (stretched-link); the tag pills sit above it -->
@@ -625,7 +624,7 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                                     <div class="d-flex flex-wrap align-items-center column-gap-2">
                                         <a class="fw-semibold text-body stretched-link" href="<?= $contact_url ?>"><?= $contact_name ?></a>
                                         <?= contactFlagPills($row) ?>
-                                        <?php if ($contact_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal">Archived</span><?php } ?>
+                                        <?php if ($contact_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal"><?= __('Archived') ?></span><?php } ?>
                                     </div>
                                     <?php if ($contact_role_line) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-contact-role"><?= $contact_role_line ?></div>
@@ -638,13 +637,13 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                         </td>
                         <td class="small itflow-contact-reach">
                             <?php if ($contact_phone_link) { ?>
-                                <div class="text-nowrap"><i class="fas fa-fw fa-phone text-body-secondary me-1" title="Phone"></i><?= $contact_phone_link ?></div>
+                                <div class="text-nowrap"><i class="fas fa-fw fa-phone text-body-secondary me-1" title="<?= escapeHtml(__('Phone')) ?>"></i><?= $contact_phone_link ?></div>
                             <?php } ?>
                             <?php if ($contact_mobile_link) { ?>
-                                <div class="text-nowrap"><i class="fas fa-fw fa-mobile-alt text-body-secondary me-1" title="Mobile"></i><?= $contact_mobile_link ?></div>
+                                <div class="text-nowrap"><i class="fas fa-fw fa-mobile-alt text-body-secondary me-1" title="<?= escapeHtml(__('Mobile')) ?>"></i><?= $contact_mobile_link ?></div>
                             <?php } ?>
                             <?php if ($contact_email) { ?>
-                                <div class="text-nowrap"><i class="far fa-fw fa-envelope text-body-secondary me-1" title="Email"></i><a class="text-reset" href="mailto:<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></div>
+                                <div class="text-nowrap"><i class="far fa-fw fa-envelope text-body-secondary me-1" title="<?= escapeHtml(__('Email')) ?>"></i><a class="text-reset" href="mailto:<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></div>
                             <?php } ?>
                             <?php if (!$contact_phone_link && !$contact_mobile_link && !$contact_email) { ?>
                                 <span class="text-body-secondary">-</span>
@@ -662,16 +661,16 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                         <td class="d-none d-lg-table-cell">
                             <div class="d-flex flex-wrap gap-1">
                                 <?php if ($assets_n) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#assets" title="<?= $assets_n ?> asset<?= $assets_n === 1 ? '' : 's' ?>"><i class="fas fa-desktop"></i><?= $assets_n ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#assets" title="<?= _n('%d asset', '%d assets', $assets_n) ?>"><i class="fas fa-desktop"></i><?= $assets_n ?></a>
                                 <?php } ?>
                                 <?php if ($credentials_n) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#credentials" title="<?= $credentials_n ?> credential<?= $credentials_n === 1 ? '' : 's' ?>"><i class="fas fa-key"></i><?= $credentials_n ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#credentials" title="<?= _n('%d credential', '%d credentials', $credentials_n) ?>"><i class="fas fa-key"></i><?= $credentials_n ?></a>
                                 <?php } ?>
                                 <?php if ($licenses_n) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#licenses" title="<?= $licenses_n ?> license<?= $licenses_n === 1 ? '' : 's' ?>"><i class="fas fa-cube"></i><?= $licenses_n ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $contact_url ?>#licenses" title="<?= _n('%d license', '%d licenses', $licenses_n) ?>"><i class="fas fa-cube"></i><?= $licenses_n ?></a>
                                 <?php } ?>
                                 <?php if ($tickets_n) { ?>
-                                    <a class="itflow-contact-chip <?= $open_tickets_n ? 'is-alert' : '' ?>" href="<?= $contact_url ?>#tickets" title="<?= $tickets_n ?> ticket<?= $tickets_n === 1 ? '' : 's' ?><?= $open_tickets_n ? ", $open_tickets_n open" : '' ?>"><i class="fas fa-life-ring"></i><?= $open_tickets_n ? "$open_tickets_n open" : $tickets_n ?></a>
+                                    <a class="itflow-contact-chip <?= $open_tickets_n ? 'is-alert' : '' ?>" href="<?= $contact_url ?>#tickets" title="<?= _n('%d ticket', '%d tickets', $tickets_n) ?><?= $open_tickets_n ? ', ' . __('%d open', $open_tickets_n) : '' ?>"><i class="fas fa-life-ring"></i><?= $open_tickets_n ? __('%d open', $open_tickets_n) : $tickets_n ?></a>
                                 <?php } ?>
                                 <?php if (!$assets_n && !$credentials_n && !$licenses_n && !$tickets_n) { ?>
                                     <span class="text-body-secondary">-</span>
@@ -684,33 +683,33 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
                         <td class="text-end">
                             <?php if ($can_edit) { ?>
                                 <div class="dropdown dropstart">
-                                    <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                    <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/contact/contact_edit.php?id=<?= $contact_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_note_add.php?id=<?= $contact_id ?>">
-                                            <i class="fas fa-fw fa-sticky-note text-secondary me-2"></i>Add Note
+                                            <i class="fas fa-fw fa-sticky-note text-secondary me-2"></i><?= __('Add Note') ?>
                                         </a>
                                         <?php if (!$contact_primary) { ?>
                                             <div class="dropdown-divider"></div>
                                             <?php if ($contact_archived_at) { ?>
                                                 <a class="dropdown-item confirm-link" href="post.php?restore_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                                 </a>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                                 <?php if ($can_delete) { ?>
                                                     <a class="dropdown-item text-danger confirm-link" href="post.php?anonymize_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                        <i class="fas fa-fw fa-user-secret me-2"></i>Anonymize &amp; Archive
+                                                        <i class="fas fa-fw fa-user-secret me-2"></i><?= __('Anonymize &amp; Archive') ?>
                                                     </a>
                                                 <?php } ?>
                                             <?php } ?>
                                             <?php if ($can_delete && $config_destructive_deletes_enable) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } ?>
@@ -732,18 +731,18 @@ $search_placeholder = $invites_view ? 'Search invites by email, name or client' 
         'thing' => 'invites',
         'icon' => 'fa-paper-plane',
         'views' => ['role'],
-        'title' => 'No invites waiting',
-        'text' => 'Invite people to the client portal by email - they put in their own name, phone and password when they accept, and are added to the contacts then.',
-        'actions' => $can_edit && $client_url ? [['label' => 'Invite people', 'modal' => "modals/contact/contact_invite.php?$client_url", 'icon' => 'fa-user-plus']] : [],
+        'title' => __('No invites waiting'),
+        'text' => __('Invite people to the client portal by email - they put in their own name, phone and password when they accept, and are added to the contacts then.'),
+        'actions' => $can_edit && $client_url ? [['label' => __('Invite people'), 'modal' => "modals/contact/contact_invite.php?$client_url", 'icon' => 'fa-user-plus']] : [],
     ] : [
         'thing' => 'contacts',
         'icon' => 'fa-address-book',
         'views' => ['role'],
         'view' => emptyStatePill($contact_role_tabs, $role_filter),
-        'text' => 'The people at the client - who to call, and who gets the invoices.',
+        'text' => __('The people at the client - who to call, and who gets the invoices.'),
         'actions' => $can_edit ? array_merge(
-            [['label' => 'New Contact', 'modal' => "modals/contact/contact_add.php?$client_url", 'size' => 'lg']],
-            $client_url ? [['label' => 'Import', 'modal' => "modals/contact/contact_import.php?$client_url", 'icon' => 'fa-upload']] : []
+            [['label' => __('New Contact'), 'modal' => "modals/contact/contact_add.php?$client_url", 'size' => 'lg']],
+            $client_url ? [['label' => __('Import'), 'modal' => "modals/contact/contact_import.php?$client_url", 'icon' => 'fa-upload']] : []
         ) : [],
     ];
     ?>

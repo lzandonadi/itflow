@@ -41,7 +41,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class='fa fa-fw fa-user-edit me-2'></i>Editing Client: <strong><?= $client_name ?></strong></h5>
+    <h5 class="modal-title"><i class='fa fa-fw fa-user-edit me-2'></i><?= __('Editing Client:') ?> <strong><?= $client_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -51,15 +51,15 @@ ob_start();
 
     <ul class="modal-header nav nav-pills nav-justified mb-3">
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="pill" href="#pills-client-details<?= $client_id ?>">Details</a>
+            <a class="nav-link active" data-bs-toggle="pill" href="#pills-client-details<?= $client_id ?>"><?= __('Details') ?></a>
         </li>
         <?php if ($config_module_enable_accounting) { ?>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#pills-client-billing<?= $client_id ?>">Billing</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#pills-client-billing<?= $client_id ?>"><?= __('Billing') ?></a>
             </li>
         <?php } ?>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="pill" href="#pills-client-notes<?= $client_id ?>">Notes</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#pills-client-notes<?= $client_id ?>"><?= __('Notes') ?></a>
         </li>
     </ul>
 
@@ -70,10 +70,10 @@ ob_start();
             <div class="tab-pane fade show active" id="pills-client-details<?= $client_id ?>">
 
                 <div class="mb-3">
-                    <label>Name <strong class="text-danger">*</strong> / <span class="text-secondary">Is Lead</span></label>
+                    <label><?= __('Name') ?> <strong class="text-danger">*</strong> / <span class="text-secondary"><?= __('Is Lead') ?></span></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-id-badge"></i></span>
-                        <input type="text" class="form-control" name="name" placeholder="Name or Company" maxlength="200"
+                        <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Name or Company')) ?>" maxlength="200"
                                value="<?= $client_name ?>" required>
                             <div class="input-group-text">
                                 <input class="form-check-input" type="checkbox" name="lead" value="1" <?php if($client_is_lead == 1){ echo "checked"; } ?>>
@@ -81,34 +81,34 @@ ob_start();
                     </div>
                     <?php if ($client_is_lead == 1 && $client_archived_at === "" && clientOnboardingCan()) { ?>
                         <div class="form-text" data-onboard-lead>
-                            Taking them on? <a href="<?= clientOnboardingUrl($client_id) ?>">Onboard them</a> instead - a step at a time, with their locations, people, agreement and the rest.
+                            <?= __('Taking them on?') ?> <a href="<?= clientOnboardingUrl($client_id) ?>"><?= __('Onboard them') ?></a> instead - a step at a time, with their locations, people, agreement and the rest.
                         </div>
                     <?php } ?>
                 </div>
 
                 <div class="mb-3">
-                    <label>Shortened Name</label>
+                    <label><?= __('Shortened Name') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-id-badge"></i></span>
-                        <input type="text" class="form-control" name="abbreviation" placeholder="Shortened name for client - Max chars 6" value="<?= $client_abbreviation ?>" maxlength="6" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" name="abbreviation" placeholder="<?= escapeHtml(__('Shortened name for client - Max chars 6')) ?>" value="<?= $client_abbreviation ?>" maxlength="6" oninput="this.value = this.value.toUpperCase()">
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label>Industry</label>
+                    <label><?= __('Industry') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-briefcase"></i></span>
-                        <input type="text" class="form-control" name="type" placeholder="Industry" maxlength="200"
+                        <input type="text" class="form-control" name="type" placeholder="<?= escapeHtml(__('Industry')) ?>" maxlength="200"
                                value="<?= $client_type ?>">
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label>Referral</label>
+                    <label><?= __('Referral') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-link"></i></span>
                         <select class="form-select select2" data-tags="true" name="referral">
-                            <option value="">- Select Referral -</option>
+                            <option value=""><?= __('- Select Referral -') ?></option>
                             <?= categoryOptionsHtml('Referral', $row_referral) ?>
                         </select>
                         <?= categoryAddButtonHtml('Referral', 'btn btn-secondary') ?>
@@ -116,19 +116,19 @@ ob_start();
                 </div>
 
                 <div class="mb-3">
-                    <label>Website</label>
+                    <label><?= __('Website') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-globe"></i></span>
-                        <input type="text" class="form-control" name="website" placeholder="ex. google.com" maxlength="200"
+                        <input type="text" class="form-control" name="website" placeholder="<?= escapeHtml(__('ex. google.com')) ?>" maxlength="200"
                                value="<?= $client_website ?>">
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label>Tags</label>
+                    <label><?= __('Tags') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-tags"></i></span>
-                        <select class="form-select select2" name="tags[]" data-placeholder="Add some tags" multiple<?= !empty($session_is_admin) ? ' data-tags="true"' : '' ?>>
+                        <select class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('Add some tags')) ?>" multiple<?= !empty($session_is_admin) ? ' data-tags="true"' : '' ?>>
                             <?= tagOptionsHtml('client', $client_tag_id_array) ?>
                         </select>
                     </div>
@@ -145,11 +145,11 @@ ob_start();
                     <?php $contract_pick_edit = true; require __DIR__ . '/client_contract_pick.php'; ?>
 
                     <div class="mb-3">
-                        <label>Tax ID</label>
+                        <label><?= __('Tax ID') ?></label>
                         <div class="input-group">
                                 <span class="input-group-text"><i class="fa fa-fw fa-balance-scale"></i></span>
                             <input type="text" class="form-control" name="tax_id_number" maxlength="255"
-                                   placeholder="Tax ID Number" value="<?= $client_tax_id_number ?>">
+                                   placeholder="<?= escapeHtml(__('Tax ID Number')) ?>" value="<?= $client_tax_id_number ?>">
                         </div>
                     </div>
 
@@ -163,9 +163,9 @@ ob_start();
                         <input type="hidden" name="reminders_field" value="1">
                         <div class="form-check form-switch">
                             <input type="checkbox" class="form-check-input" name="reminders" value="1" id="clientReminders<?= $client_id ?>" <?= $client_reminders ? 'checked' : '' ?>>
-                            <label class="form-check-label" for="clientReminders<?= $client_id ?>">Payment reminders and statements</label>
+                            <label class="form-check-label" for="clientReminders<?= $client_id ?>"><?= __('Payment reminders and statements') ?></label>
                         </div>
-                        <small class="text-secondary">Emailed as set in Invoice Settings. Off, this client gets neither - invoices can still be sent by hand.</small>
+                        <small class="text-secondary"><?= __('Emailed as set in Invoice Settings. Off, this client gets neither - invoices can still be sent by hand.') ?></small>
                     </div>
 
 
@@ -176,7 +176,7 @@ ob_start();
             <div class="tab-pane fade" id="pills-client-notes<?= $client_id ?>">
 
                 <div class="mb-3">
-                    <textarea class="form-control" rows="10" placeholder="Enter some notes" name="notes"><?= $client_notes ?></textarea>
+                    <textarea class="form-control" rows="10" placeholder="<?= escapeHtml(__('Enter some notes')) ?>" name="notes"><?= $client_notes ?></textarea>
                 </div>
 
             </div>
@@ -184,8 +184,8 @@ ob_start();
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_client" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_client" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

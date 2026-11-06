@@ -37,13 +37,13 @@ $co_portal_mail = $co_portal && portalMailReady();
                 <?= contactAvatar($client_id, $co_person['contact_id'], $co_person['contact_name'], $co_person['contact_photo']) ?>
                 <div class="min-w-0 flex-grow-1">
                     <div class="fw-semibold text-truncate"><?= escapeHtml($co_person['contact_name']) ?><?php if (trim((string) $co_person['contact_title']) !== '') { ?> <span class="small fw-normal text-body-secondary">· <?= escapeHtml($co_person['contact_title']) ?></span><?php } ?></div>
-                    <div class="small text-body-secondary text-truncate"><?= escapeHtml($co_person['contact_email'] ?: 'No email') ?></div>
+                    <div class="small text-body-secondary text-truncate"><?= escapeHtml($co_person['contact_email'] ?: __('No email')) ?></div>
                 </div>
                 <span class="d-flex flex-wrap justify-content-end gap-1"><?= contactFlagPills($co_person) ?></span>
             </li>
         <?php } ?>
     </ul>
-    <h2 class="h6 fw-semibold">Add someone else</h2>
+    <h2 class="h6 fw-semibold"><?= __('Add someone else') ?></h2>
 <?php } ?>
 
 <form action="post.php" method="post" autocomplete="off" data-gs-form data-co-form="contact">
@@ -51,17 +51,17 @@ $co_portal_mail = $co_portal && portalMailReady();
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
-            <?= settingsInput('name', '', ['id' => 'coPersonName', 'icon' => 'fa-user', 'label' => 'Name', 'required' => true, 'maxlength' => 200, 'placeholder' => 'First and last name']) ?>
+            <?= settingsInput('name', '', ['id' => 'coPersonName', 'icon' => 'fa-user', 'label' => __('Name'), 'required' => true, 'maxlength' => 200, 'placeholder' => __('First and last name')]) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('title', '', ['id' => 'coPersonTitle', 'icon' => 'fa-id-badge', 'label' => 'Job title', 'maxlength' => 200, 'placeholder' => 'Office manager']) ?>
+            <?= settingsInput('title', '', ['id' => 'coPersonTitle', 'icon' => 'fa-id-badge', 'label' => __('Job title'), 'maxlength' => 200, 'placeholder' => __('Office manager')]) ?>
         </div>
         <div class="col-12">
-            <?= settingsInput('email', '', ['id' => 'coPersonEmail', 'icon' => 'fa-envelope', 'type' => 'email', 'label' => 'Email', 'maxlength' => 200, 'placeholder' => 'name@example.com']) ?>
+            <?= settingsInput('email', '', ['id' => 'coPersonEmail', 'icon' => 'fa-envelope', 'type' => 'email', 'label' => __('Email'), 'maxlength' => 200, 'placeholder' => 'name@example.com']) ?>
         </div>
         <div class="col-sm-6">
             <div class="itflow-settings-field">
-                <label class="form-label" for="coPersonPhone">Phone</label>
+                <label class="form-label" for="coPersonPhone"><?= __('Phone') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-phone"></i></span>
                     <input type="hidden" name="phone_country_code" value="<?= escapeHtml((string) settingsValue('phone_country_code', '')) ?>">
@@ -71,7 +71,7 @@ $co_portal_mail = $co_portal && portalMailReady();
         </div>
         <div class="col-sm-6">
             <div class="itflow-settings-field">
-                <label class="form-label" for="coPersonMobile">Mobile</label>
+                <label class="form-label" for="coPersonMobile"><?= __('Mobile') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-mobile-alt"></i></span>
                     <input type="hidden" name="mobile_country_code" value="<?= escapeHtml((string) settingsValue('mobile_country_code', '')) ?>">
@@ -81,16 +81,16 @@ $co_portal_mail = $co_portal && portalMailReady();
         </div>
         <?php if ($co_locations) { ?>
             <div class="col-12">
-                <?= settingsSelect('location', (string) array_key_first($co_locations), ['0' => '- None -'] + $co_locations, ['id' => 'coPersonLocation', 'icon' => 'fa-map-marker-alt', 'label' => 'Where they work']) ?>
+                <?= settingsSelect('location', (string) array_key_first($co_locations), ['0' => __('- None -')] + $co_locations, ['id' => 'coPersonLocation', 'icon' => 'fa-map-marker-alt', 'label' => __('Where they work')]) ?>
             </div>
         <?php } ?>
         <div class="col-12">
-            <label class="form-label d-block">What they are for</label>
+            <label class="form-label d-block"><?= __('What they are for') ?></label>
             <div class="d-flex flex-wrap column-gap-4 row-gap-2">
-                <?php foreach (['primary' => ['Primary contact', !$co_has_primary, 'Who you go to first - the client\'s overview and its portal show them'],
-                    'billing' => ['Billing', false, 'Gets the invoices, quotes and statements'],
-                    'technical' => ['Technical', false, 'Who to call about technical things'],
-                    'important' => ['Important', false, 'Kept at the top of the contacts']] as $co_flag => [$co_flag_label, $co_flag_on, $co_flag_title]) { ?>
+                <?php foreach (['primary' => [__('Primary contact'), !$co_has_primary, __('Who you go to first - the client\'s overview and its portal show them')],
+                    'billing' => [__('Billing'), false, __('Gets the invoices, quotes and statements')],
+                    'technical' => [__('Technical'), false, __('Who to call about technical things')],
+                    'important' => [__('Important'), false, __('Kept at the top of the contacts')]] as $co_flag => [$co_flag_label, $co_flag_on, $co_flag_title]) { ?>
                     <div class="form-check form-switch mb-0" title="<?= escapeHtml($co_flag_title) ?>">
                         <input class="form-check-input" type="checkbox" role="switch" name="contact_<?= $co_flag ?>" value="1" id="coPerson<?= ucfirst($co_flag) ?>"<?= settingsChecked("contact_$co_flag", $co_flag_on) ? ' checked' : '' ?>>
                         <label class="form-check-label" for="coPerson<?= ucfirst($co_flag) ?>"><?= $co_flag_label ?></label>
@@ -101,12 +101,12 @@ $co_portal_mail = $co_portal && portalMailReady();
         <?php if ($co_portal) { ?>
             <div class="col-12">
                 <div class="itflow-gs-optional">
-                    <?= settingsSwitch('portal', '', ['id' => 'coPersonPortal', 'label' => 'Give them client portal access', 'disabled' => !$co_portal_mail,
-                        'help' => $co_portal_mail ? 'They are emailed a link to set their own password, good for ' . PORTAL_INVITE_LINK_DAYS . ' days - the email never has the password in it. They need an email address.'
-                            : 'Mail isn\'t set up, so the email with their link can\'t go - give them access from their contact page once it is.']) ?>
+                    <?= settingsSwitch('portal', '', ['id' => 'coPersonPortal', 'label' => __('Give them client portal access'), 'disabled' => !$co_portal_mail,
+                        'help' => $co_portal_mail ? __('They are emailed a link to set their own password, good for %d days - the email never has the password in it. They need an email address.', PORTAL_INVITE_LINK_DAYS)
+                            : __('Mail isn\'t set up, so the email with their link can\'t go - give them access from their contact page once it is.')]) ?>
                 </div>
             </div>
         <?php } ?>
     </div>
-    <button type="submit" name="client_onboarding_contact" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-user-plus me-2"></i>Add <?= $co_people ? 'them' : 'the contact' ?></button>
+    <button type="submit" name="client_onboarding_contact" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-user-plus me-2"></i><?= $co_people ? __('Add them') : __('Add the contact') ?></button>
 </form>

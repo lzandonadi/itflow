@@ -106,26 +106,26 @@ $locations_counts = locationCounts(array_keys($locations));
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-map-marker-alt me-2"></i>Locations</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-map-marker-alt me-2"></i><?= __('Locations') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit) { ?>
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/location/location_add.php?<?= $client_url ?>">
-                    <i class="fas fa-plus me-2"></i>New Location
+                    <i class="fas fa-plus me-2"></i><?= __('New Location') ?>
                 </button>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <?php if ($client_url) { ?>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="modals/location/location_import.php?<?= $client_url ?>">
-                        <i class="fa fa-fw fa-upload me-2"></i>Import
+                        <i class="fa fa-fw fa-upload me-2"></i><?= __('Import') ?>
                     </a>
                     <?php } ?>
                     <?php if ($num_rows[0] > 0) { ?>
                         <?php if ($client_url) { ?><div class="dropdown-divider"></div><?php } ?>
                         <a class="dropdown-item text-dark ajax-modal" href="#"
                             data-modal-url="<?= buildExportModalUrl('modals/location/location_export.php', ['client_id', 'client', 'tags', 'archived', 'q']) ?>">
-                            <i class="fa fa-fw fa-download me-2"></i>Export
+                            <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                         </a>
                     <?php } ?>
                 </div>
@@ -142,14 +142,14 @@ $locations_counts = locationCounts(array_keys($locations));
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search name, address, phone, notes...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search name, address, phone, notes...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <?php if (!$client_url) { ?>
                 <div class="col-lg-3 col-md-6">
                     <select class="form-select select2" name="client" onchange="this.form.submit()">
-                        <option value="" <?php if ($client == "") { echo "selected"; } ?>>- All Clients -</option>
+                        <option value="" <?php if ($client == "") { echo "selected"; } ?>><?= __('- All Clients -') ?></option>
                         <?php
                         $sql_clients_filter = mysqli_query($mysqli, "
                             SELECT DISTINCT client_id, client_name, client_abbreviation
@@ -167,7 +167,7 @@ $locations_counts = locationCounts(array_keys($locations));
                 </div>
                 <?php } ?>
                 <div class="col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Tags -')) ?>" multiple>
                         <?php
                         // Tags in use on locations in this scope, plus any already picked
                         $sql_tags_filter = mysqli_query($mysqli, "
@@ -189,32 +189,32 @@ $locations_counts = locationCounts(array_keys($locations));
                 <div class="<?= $client_url ? 'col-lg-5' : 'col-lg-2' ?> col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="?<?= $client_url ?>archived=<?= $archived ? 0 : 1 ?>"
-                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active locations' : 'Show archived locations' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2">Archived</span>
+                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Back to active locations') : __('Show archived locations') ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="location" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
                                     <button class="dropdown-item text-info" type="submit" form="bulkActions" name="bulk_restore_locations">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                         <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_locations"
-                                            data-confirm-text="The locations go for good. Their people, assets, networks, racks and tickets stay, with no location.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The locations go for good. Their people, assets, networks, racks and tickets stay, with no location.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_locations">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -235,35 +235,35 @@ $locations_counts = locationCounts(array_keys($locations));
                     <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=location_name&order=<?= $disp ?>">
-                            Location <?php if ($sort == 'location_name') { echo $order_icon; } ?>
+                            <?= __('Location') ?> <?php if ($sort == 'location_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=location_city&order=<?= $disp ?>">
-                            Address <?php if ($sort == 'location_city') { echo $order_icon; } ?>
+                            <?= __('Address') ?> <?php if ($sort == 'location_city') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=location_phone&order=<?= $disp ?>">
-                            Phone &amp; hours <?php if ($sort == 'location_phone') { echo $order_icon; } ?>
+                            <?= __('Phone &amp; hours') ?> <?php if ($sort == 'location_phone') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=contact_name&order=<?= $disp ?>">
-                            Ask for <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
+                            <?= __('Ask for') ?> <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
                         </a>
                     </th>
-                    <th>On site</th>
+                    <th><?= __('On site') ?></th>
                     <?php if (!$client_url) { ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                            Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                            <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php } ?>
@@ -296,7 +296,7 @@ $locations_counts = locationCounts(array_keys($locations));
                         <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="location_ids[]" value="<?= $location_id ?>" aria-label="Select <?= $location_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="location_ids[]" value="<?= $location_id ?>" aria-label="<?= __('Select %s', $location_name) ?>">
                             </div>
                         </td>
                         <?php } ?>
@@ -306,8 +306,8 @@ $locations_counts = locationCounts(array_keys($locations));
                                 <?= locationTile($row) ?>
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body stretched-link" href="<?= $location_url ?>"><?= $location_name ?></a>
-                                    <?php if ($location_primary) { ?><span class="badge rounded-pill text-bg-primary fw-normal ms-1">Primary</span><?php } ?>
-                                    <?php if ($location_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($location_primary) { ?><span class="badge rounded-pill text-bg-primary fw-normal ms-1"><?= __('Primary') ?></span><?php } ?>
+                                    <?php if ($location_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($location_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $location_description ?>"><?= $location_description ?></div>
                                     <?php } ?>
@@ -319,13 +319,13 @@ $locations_counts = locationCounts(array_keys($locations));
                         </td>
                         <td class="itflow-location-address-cell">
                             <?php if ($location_address_text !== '') { ?>
-                                <a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="Open in maps">
+                                <a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open in maps')) ?>">
                                     <?php if ($location_street) { ?><div><?= $location_street ?></div><?php } ?>
                                     <div class="<?= $location_street ? 'small text-body-secondary' : '' ?>"><?= $location_place ?></div>
                                 </a>
                                 <div class="mt-1 d-flex align-items-center gap-1">
-                                    <a class="btn btn-xs btn-outline-secondary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener" title="Directions"><i class="fas fa-directions me-1"></i>Directions</a>
-                                    <button type="button" class="itflow-copy clipboardjs" title="Copy address" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
+                                    <a class="btn btn-xs btn-outline-secondary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Directions')) ?>"><i class="fas fa-directions me-1"></i><?= __('Directions') ?></a>
+                                    <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy address')) ?>" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
                                 </div>
                             <?php } else { ?>
                                 <span class="text-body-secondary">-</span>
@@ -349,18 +349,18 @@ $locations_counts = locationCounts(array_keys($locations));
                                     <a class="itflow-contact-chip" href="<?= $location_url ?>#people" title="<?= $counts['contact'] ?> people based here"><i class="fas fa-users"></i><?= $counts['contact'] ?></a>
                                 <?php } ?>
                                 <?php if ($can_support && $counts['asset']) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#assets" title="<?= $counts['asset'] ?> asset<?= $counts['asset'] === 1 ? '' : 's' ?>"><i class="fas fa-desktop"></i><?= $counts['asset'] ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#assets" title="<?= _n('%d asset', '%d assets', $counts['asset']) ?>"><i class="fas fa-desktop"></i><?= $counts['asset'] ?></a>
                                 <?php } ?>
                                 <?php if ($can_support && $counts['network']) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#networks" title="<?= $counts['network'] ?> network<?= $counts['network'] === 1 ? '' : 's' ?>"><i class="fas fa-network-wired"></i><?= $counts['network'] ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#networks" title="<?= _n('%d network', '%d networks', $counts['network']) ?>"><i class="fas fa-network-wired"></i><?= $counts['network'] ?></a>
                                 <?php } ?>
                                 <?php if ($can_support && $counts['rack']) { ?>
-                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#racks" title="<?= $counts['rack'] ?> rack<?= $counts['rack'] === 1 ? '' : 's' ?>"><i class="fas fa-server"></i><?= $counts['rack'] ?></a>
+                                    <a class="itflow-contact-chip" href="<?= $location_url ?>#racks" title="<?= _n('%d rack', '%d racks', $counts['rack']) ?>"><i class="fas fa-server"></i><?= $counts['rack'] ?></a>
                                 <?php } ?>
                                 <?php if ($can_support && $counts['ticket']) { ?>
-                                    <a class="itflow-contact-chip is-alert" href="<?= $location_url ?>#tickets" title="<?= $counts['ticket'] ?> open ticket<?= $counts['ticket'] === 1 ? '' : 's' ?>"><i class="fas fa-life-ring"></i><?= $counts['ticket'] ?></a>
+                                    <a class="itflow-contact-chip is-alert" href="<?= $location_url ?>#tickets" title="<?= _n('%d open ticket', '%d open tickets', $counts['ticket']) ?>"><i class="fas fa-life-ring"></i><?= $counts['ticket'] ?></a>
                                 <?php } ?>
-                                <?php if (!array_filter($counts)) { ?><span class="text-body-secondary small">Nothing yet</span><?php } ?>
+                                <?php if (!array_filter($counts)) { ?><span class="text-body-secondary small"><?= __('Nothing yet') ?></span><?php } ?>
                             </div>
                         </td>
                         <?php if (!$client_url) { ?>
@@ -368,35 +368,35 @@ $locations_counts = locationCounts(array_keys($locations));
                         <?php } ?>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=<?= $location_id ?>">
-                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                     </a>
                                     <?php if ($can_edit) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <?php if (!$location_primary && !$location_archived_at) { ?>
                                             <a class="dropdown-item" href="post.php?make_location_primary=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-building text-secondary me-2"></i>Make primary
+                                                <i class="fas fa-fw fa-building text-secondary me-2"></i><?= __('Make primary') ?>
                                             </a>
                                         <?php } ?>
                                         <?php if (!$location_primary) { ?>
                                             <div class="dropdown-divider"></div>
                                             <?php if ($location_archived_at) { ?>
                                                 <a class="dropdown-item" href="post.php?restore_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                                 </a>
                                                 <?php if ($can_delete) { ?>
                                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                                         data-confirm-text="<?= $location_name ?> goes for good. Its people, assets, networks, racks and tickets stay, with no location.">
-                                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                     </a>
                                                 <?php } ?>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_location=<?= $location_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } ?>
@@ -417,10 +417,10 @@ $locations_counts = locationCounts(array_keys($locations));
         'thing' => 'locations',
         'icon' => 'fa-map-marker-alt',
         'filtered' => $q || $tag_query,
-        'text' => 'Their offices and sites, with the address and phone of each.',
+        'text' => __('Their offices and sites, with the address and phone of each.'),
         'actions' => $can_edit ? array_merge(
-            [['label' => 'New Location', 'modal' => "modals/location/location_add.php?$client_url", 'size' => 'lg']],
-            $client_url ? [['label' => 'Import', 'modal' => "modals/location/location_import.php?$client_url", 'icon' => 'fa-upload']] : []
+            [['label' => __('New Location'), 'modal' => "modals/location/location_add.php?$client_url", 'size' => 'lg']],
+            $client_url ? [['label' => __('Import'), 'modal' => "modals/location/location_import.php?$client_url", 'icon' => 'fa-upload']] : []
         ) : [],
     ];
     require_once "../includes/filter_footer.php";

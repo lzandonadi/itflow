@@ -56,7 +56,7 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
 
     <?php if ($co_support) { ?>
-        <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-globe text-body-secondary me-1"></i>Domains</h2>
+        <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-globe text-body-secondary me-1"></i><?= __('Domains') ?></h2>
         <?php if ($co_domains) { ?>
             <ul class="list-unstyled itflow-gs-people mb-3" data-co-domains="<?= count($co_domains) ?>">
                 <?php foreach ($co_domains as $co_domain) { ?>
@@ -64,7 +64,7 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
                         <span class="itflow-gs-person-initials" aria-hidden="true"><i class="fas fa-globe"></i></span>
                         <div class="min-w-0 flex-grow-1">
                             <div class="fw-semibold text-truncate"><?= escapeHtml($co_domain['domain_name']) ?></div>
-                            <div class="small text-body-secondary text-truncate"><?= escapeHtml(trim((string) $co_domain['domain_description']) !== '' ? $co_domain['domain_description'] : 'Domain') ?>
+                            <div class="small text-body-secondary text-truncate"><?= escapeHtml(trim((string) $co_domain['domain_description']) !== '' ? $co_domain['domain_description'] : __('Domain')) ?>
                                 <?= !empty($co_domain['domain_expire']) ? ' - renews ' . escapeHtml(date('M j, Y', strtotime($co_domain['domain_expire']))) : '' ?></div>
                         </div>
                     </li>
@@ -72,12 +72,12 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
             </ul>
         <?php } ?>
         <div class="mb-4">
-            <?= settingsTextarea('domains', '', ['id' => 'coDomains', 'label' => $co_domains ? 'Add more' : 'Their domains', 'rows' => 3, 'placeholder' => "example.com\nexample-mail.com",
-                'help' => 'One to a line. Each is looked up as it is added - its registrar, renewal date and DNS - and its website certificate added, to watch for renewals.']) ?>
+            <?= settingsTextarea('domains', '', ['id' => 'coDomains', 'label' => $co_domains ? __('Add more') : __('Their domains'), 'rows' => 3, 'placeholder' => "example.com\nexample-mail.com",
+                'help' => __('One to a line. Each is looked up as it is added - its registrar, renewal date and DNS - and its website certificate added, to watch for renewals.')]) ?>
         </div>
     <?php } ?>
 
-    <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-building text-body-secondary me-1"></i>Vendors</h2>
+    <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-building text-body-secondary me-1"></i><?= __('Vendors') ?></h2>
     <?php if ($co_vendor_templates) {
         $co_listed = array_filter($co_vendor_templates, function ($t) use ($co_vendor_should) {
             return intval($t['has_it']) > 0 || isset($co_vendor_should[intval($t['vendor_template_id'])]);
@@ -95,9 +95,9 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
                             <?php if (trim((string) $co_template['vendor_template_description']) !== '') { ?><span class="small text-body-secondary d-block text-truncate"><?= escapeHtml($co_template['vendor_template_description']) ?></span><?php } ?>
                         </span>
                         <?php if ($co_has) { ?>
-                            <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal">They have it</span>
+                            <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><?= __('They have it') ?></span>
                         <?php } else { ?>
-                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="Admin &gt; Vendor Templates says clients like this should have it">Should have</span>
+                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="<?= escapeHtml(__('Admin > Vendor Templates says clients like this should have it')) ?>"><?= __('Should have') ?></span>
                         <?php } ?>
                     </label>
                 <?php } ?>
@@ -105,10 +105,10 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
         <?php } ?>
         <?php if ($co_others) { ?>
             <div class="itflow-settings-field mb-4">
-                <label class="form-label" for="coVendorOthers"><?= $co_listed ? 'And others' : 'From your templates' ?></label>
+                <label class="form-label" for="coVendorOthers"><?= $co_listed ? __('And others') : __('From your templates') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
-                    <select class="form-select select2" id="coVendorOthers" name="vendor_templates[]" multiple data-placeholder="Their ISP, software makers, suppliers...">
+                    <select class="form-select select2" id="coVendorOthers" name="vendor_templates[]" multiple data-placeholder="<?= escapeHtml(__('Their ISP, software makers, suppliers...')) ?>">
                         <?php foreach ($co_others as $co_id => $co_template) { ?>
                             <option value="<?= $co_id ?>"<?= $co_ticked('vendor_templates', $co_id, false) ? ' selected' : '' ?><?= selectOptionVendor($co_template['vendor_template_name'], (string) $co_template['vendor_template_description']) ?>><?= escapeHtml($co_template['vendor_template_name']) ?></option>
                         <?php } ?>
@@ -119,11 +119,11 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
             <div class="mb-4"></div>
         <?php } ?>
     <?php } else { ?>
-        <p class="small text-body-secondary mb-4">No vendor templates yet - the ISPs, software makers and suppliers your clients use, set up once in Admin &gt; Vendor Templates. Add the client's own on its Vendors.</p>
+        <p class="small text-body-secondary mb-4"><?= __('No vendor templates yet - the ISPs, software makers and suppliers your clients use, set up once in Admin &gt; Vendor Templates. Add the client\'s own on its Vendors.') ?></p>
     <?php } ?>
 
     <?php if ($co_support) { ?>
-        <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-key text-body-secondary me-1"></i>Licenses</h2>
+        <h2 class="h6 fw-semibold"><i class="fas fa-fw fa-key text-body-secondary me-1"></i><?= __('Licenses') ?></h2>
         <?php if ($co_license_templates) {
             $co_listed = array_filter($co_license_templates, function ($t) use ($co_license_should) {
                 return intval($t['has_it']) > 0 || isset($co_license_should[intval($t['software_template_id'])]);
@@ -140,9 +140,9 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
                                 <span class="small text-body-secondary d-block text-truncate"><?= escapeHtml(implode(' - ', array_filter([$co_template['software_template_type'], $co_template['software_template_license_type'], $co_template['vendor_template_name'] ? 'from ' . $co_template['vendor_template_name'] : '']))) ?></span>
                             </span>
                             <?php if ($co_has) { ?>
-                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal">They have it</span>
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><?= __('They have it') ?></span>
                             <?php } else { ?>
-                                <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="Admin &gt; License Templates says clients like this should have it">Should have</span>
+                                <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="<?= escapeHtml(__('Admin > License Templates says clients like this should have it')) ?>"><?= __('Should have') ?></span>
                             <?php } ?>
                         </label>
                     <?php } ?>
@@ -150,10 +150,10 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
             <?php } ?>
             <?php if ($co_others) { ?>
                 <div class="itflow-settings-field mb-2">
-                    <label class="form-label" for="coLicenseOthers"><?= $co_listed ? 'And others' : 'From your templates' ?></label>
+                    <label class="form-label" for="coLicenseOthers"><?= $co_listed ? __('And others') : __('From your templates') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-key"></i></span>
-                        <select class="form-select select2" id="coLicenseOthers" name="license_templates[]" multiple data-placeholder="Microsoft 365, antivirus, backup...">
+                        <select class="form-select select2" id="coLicenseOthers" name="license_templates[]" multiple data-placeholder="<?= escapeHtml(__('Microsoft 365, antivirus, backup...')) ?>">
                             <?php foreach ($co_others as $co_id => $co_template) { ?>
                                 <option value="<?= $co_id ?>"<?= $co_ticked('license_templates', $co_id, false) ? ' selected' : '' ?>><?= escapeHtml($co_template['software_template_name']) ?></option>
                             <?php } ?>
@@ -161,12 +161,12 @@ $co_ticked = function ($name, $id, $should) use ($settings_kept) {
                     </div>
                 </div>
             <?php } ?>
-            <p class="small text-body-secondary mb-4">Each with the template's seats, renewal and vendor - the vendor added for them too, when they haven't got it. Put devices and users on them from the license afterwards.</p>
+            <p class="small text-body-secondary mb-4"><?= __('Each with the template\'s seats, renewal and vendor - the vendor added for them too, when they haven\'t got it. Put devices and users on them from the license afterwards.') ?></p>
         <?php } else { ?>
-            <p class="small text-body-secondary mb-4">No license templates yet - Microsoft 365, antivirus and the rest, set up once in Admin &gt; License Templates. Add the client's own on its Licenses.</p>
+            <p class="small text-body-secondary mb-4"><?= __('No license templates yet - Microsoft 365, antivirus and the rest, set up once in Admin &gt; License Templates. Add the client\'s own on its Licenses.') ?></p>
         <?php } ?>
     <?php } ?>
 
-    <button type="submit" name="client_onboarding_it" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-check me-2"></i>Add them</button>
+    <button type="submit" name="client_onboarding_it" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-check me-2"></i><?= __('Add them') ?></button>
 </form>
 <?php unset($_SESSION['co_kept_it']); ?>

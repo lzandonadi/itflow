@@ -17,7 +17,7 @@ function vendorForRequest($vendor_id, $level) {
     global $client_id;
     $row = vendorRow($vendor_id);
     if (!$row) {
-        flashAlert('That vendor no longer exists.', 'error');
+        flashAlert(__('That vendor no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['vendor_client_id']);
@@ -51,13 +51,13 @@ if (isset($_POST['add_vendor'])) {
     $client_id = intval($_POST['client_id'] ?? 0);
     vendorEnforce($client_id, 2);
     if ($client_id && !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect();
     }
 
     $vendor_id = vendorCreate($_POST, $client_id);
     if (!$vendor_id) {
-        flashAlert('A vendor needs a name.', 'error');
+        flashAlert(__('A vendor needs a name.'), 'error');
         redirect();
     }
 
@@ -67,7 +67,7 @@ if (isset($_POST['add_vendor'])) {
     $template_note = intval($_POST['vendor_template_id'] ?? 0) ? ' from a template' : '';
     logAudit("Vendor", "Create", "$session_name created vendor " . escapeSql($name) . $template_note, $client_id, $vendor_id);
 
-    flashAlert("Vendor <strong>$name</strong> created");
+    flashAlert(__('Vendor <strong>%s</strong> created', $name));
 
     redirect();
 
@@ -83,7 +83,7 @@ if (isset($_POST['add_vendor_from_template'])) {
 
     $template = vendorTemplateRow($_POST['vendor_template_id'] ?? 0);
     if (!$template) {
-        flashAlert('That template no longer exists.', 'error');
+        flashAlert(__('That template no longer exists.'), 'error');
         redirect();
     }
 
@@ -91,7 +91,7 @@ if (isset($_POST['add_vendor_from_template'])) {
 
     logAudit("Vendor", "Create", "$session_name created vendor " . escapeSql($template['vendor_template_name']) . " from a template", $client_id, $vendor_id);
 
-    flashAlert("Vendor <strong>{$template['vendor_template_name']}</strong> created from template");
+    flashAlert(__('Vendor <strong>%s</strong> created from template', $template['vendor_template_name']));
 
     redirect();
 
@@ -110,7 +110,7 @@ if (isset($_POST['add_vendor_template_to_clients'])) {
 
     $template = vendorTemplateRow($_POST['vendor_template_id'] ?? 0);
     if (!$template) {
-        flashAlert('That template no longer exists.', 'error');
+        flashAlert(__('That template no longer exists.'), 'error');
         redirect();
     }
     $template_id = intval($template['vendor_template_id']);
@@ -130,7 +130,7 @@ if (isset($_POST['add_vendor_template_to_clients'])) {
         $added++;
     }
 
-    flashAlert("Added <strong>{$template['vendor_template_name']}</strong> to <strong>$added</strong> client" . ($added === 1 ? '' : 's') . ($already ? " - $already already had it" : ''));
+    flashAlert(_n('Added <strong>%2$s</strong> to <strong>%1$d</strong> client', 'Added <strong>%2$s</strong> to <strong>%1$d</strong> clients', $added, $added, $template['vendor_template_name']) . ($already ? ' - ' . _n('%d already had it', '%d already had it', $already) : ''));
 
     redirect();
 
@@ -160,13 +160,13 @@ if (isset($_POST['update_vendors_from_template'])) {
 
     $template = vendorTemplateInfo($_POST['vendor_template_id'] ?? 0);
     if (!$template) {
-        flashAlert('That template no longer exists.', 'error');
+        flashAlert(__('That template no longer exists.'), 'error');
         redirect();
     }
     $vendors = vendorsForRequest((array) ($_POST['vendor_ids'] ?? []));
     $keys = array_map('strval', array_filter((array) ($_POST['fields'] ?? []), 'is_scalar'));
     if (!$vendors || !$keys) {
-        flashAlert(!$vendors ? 'Pick the vendors to bring in line.' : 'Tick the fields to take from the template.', 'error');
+        flashAlert(!$vendors ? __('Pick the vendors to bring in line.') : __('Tick the fields to take from the template.'), 'error');
         redirect();
     }
 
@@ -175,7 +175,7 @@ if (isset($_POST['update_vendors_from_template'])) {
         logAudit("Vendor", "Edit", "$session_name brought vendor " . escapeSql($vendor['name']) . " in line with template " . escapeSql($template['vendor_template_name']) . " - " . escapeSql(mb_strtolower(implode(', ', $vendor['fields']))), $vendor['client_id'], $vendor_id);
     }
 
-    flashAlert($changed ? "Brought " . count($changed) . " vendor" . (count($changed) === 1 ? '' : 's') . " in line with <strong>" . escapeHtml($template['vendor_template_name']) . "</strong>" : 'Nothing to change - they already say what the template says.', $changed ? 'success' : 'warning');
+    flashAlert($changed ? _n('Brought %1$d vendor in line with <strong>%2$s</strong>', 'Brought %1$d vendors in line with <strong>%2$s</strong>', count($changed), count($changed), escapeHtml($template['vendor_template_name'])) : __('Nothing to change - they already say what the template says.'), $changed ? 'success' : 'warning');
 
     redirect();
 
@@ -192,7 +192,7 @@ if (isset($_POST['link_vendors_to_template'])) {
 
     $template = vendorTemplateInfo($_POST['vendor_template_id'] ?? 0);
     if (!$template || $template['vendor_template_archived_at']) {
-        flashAlert($template ? 'That template is archived - restore it to link vendors to it.' : 'That template no longer exists.', 'error');
+        flashAlert($template ? __('That template is archived - restore it to link vendors to it.') : __('That template no longer exists.'), 'error');
         redirect();
     }
     $vendors = vendorsForRequest((array) ($_POST['vendor_ids'] ?? []));
@@ -205,8 +205,8 @@ if (isset($_POST['link_vendors_to_template'])) {
         logAudit("Vendor", "Edit", "$session_name brought vendor " . escapeSql($vendor['name']) . " in line with template " . escapeSql($template['vendor_template_name']) . " - " . escapeSql(mb_strtolower(implode(', ', $vendor['fields']))), $vendor['client_id'], $vendor_id);
     }
 
-    flashAlert($linked ? "Linked " . count($linked) . " vendor" . (count($linked) === 1 ? '' : 's') . " to <strong>" . escapeHtml($template['vendor_template_name']) . "</strong>" . ($changed ? ", bringing " . count($changed) . " in line" : '')
-        : 'Nothing to link - they are made from a template already.', $linked ? 'success' : 'warning');
+    flashAlert($linked ? _n('Linked %1$d vendor to <strong>%2$s</strong>', 'Linked %1$d vendors to <strong>%2$s</strong>', count($linked), count($linked), escapeHtml($template['vendor_template_name'])) . ($changed ? ', ' . __('bringing %d in line', count($changed)) : '')
+        : __('Nothing to link - they are made from a template already.'), $linked ? 'success' : 'warning');
 
     redirect();
 
@@ -222,7 +222,7 @@ if (isset($_GET['unlink_vendor_template'])) {
     if (intval($row['vendor_template_id'])) {
         mysqli_query($mysqli, "UPDATE vendors SET vendor_template_id = 0 WHERE vendor_id = $vendor_id");
         logAudit("Vendor", "Edit", "$session_name unlinked vendor " . escapeSql($row['vendor_name']) . " from template " . escapeSql((string) $row['vendor_template_name']), $client_id, $vendor_id);
-        flashAlert("<strong>" . escapeHtml($row['vendor_name']) . "</strong> is no longer linked to <strong>" . escapeHtml((string) $row['vendor_template_name']) . "</strong>");
+        flashAlert(__('<strong>%1$s</strong> is no longer linked to <strong>%2$s</strong>', escapeHtml($row['vendor_name']), escapeHtml((string) $row['vendor_template_name'])));
     }
 
     redirect();
@@ -238,7 +238,7 @@ if (isset($_POST['edit_vendor'])) {
 
     $set = vendorFormSet($_POST);
     if ($set === null) {
-        flashAlert('A vendor needs a name.', 'error');
+        flashAlert(__('A vendor needs a name.'), 'error');
         redirect();
     }
 
@@ -252,7 +252,7 @@ if (isset($_POST['edit_vendor'])) {
     $name = trim($_POST['name']);
     logAudit("Vendor", "Edit", "$session_name edited vendor " . escapeSql($name), $client_id, $vendor_id);
 
-    flashAlert("Vendor <strong>$name</strong> updated");
+    flashAlert(__('Vendor <strong>%s</strong> updated', $name));
 
     redirect();
 
@@ -285,7 +285,7 @@ if (isset($_GET['archive_vendor'])) {
 
     logAudit("Vendor", "Archive", "$session_name archived vendor " . escapeSql($row['vendor_name']), $client_id, $vendor_id);
 
-    flashAlert("Vendor <strong>{$row['vendor_name']}</strong> archived", 'error');
+    flashAlert(__('Vendor <strong>%s</strong> archived', $row['vendor_name']), 'error');
 
     redirect();
 
@@ -302,7 +302,7 @@ if (isset($_GET['restore_vendor'])) {
 
     logAudit("Vendor", "Restore", "$session_name restored vendor " . escapeSql($row['vendor_name']), $client_id, $vendor_id);
 
-    flashAlert("Vendor <strong>{$row['vendor_name']}</strong> restored");
+    flashAlert(__('Vendor <strong>%s</strong> restored', $row['vendor_name']));
 
     redirect();
 
@@ -317,7 +317,7 @@ if (isset($_GET['delete_vendor'])) {
 
     $blocker = vendorDeleteBlocker($vendor_id);
     if ($blocker) {
-        flashAlert("<strong>{$row['vendor_name']}</strong> was not deleted - $blocker.", 'error');
+        flashAlert(__('<strong>%s</strong> was not deleted - %s.', $row['vendor_name'], $blocker), 'error');
         redirect();
     }
 
@@ -327,7 +327,7 @@ if (isset($_GET['delete_vendor'])) {
 
     logAudit("Vendor", "Delete", "$session_name deleted vendor " . escapeSql($row['vendor_name']), $client_id);
 
-    flashAlert("Vendor <strong>{$row['vendor_name']}</strong> deleted", 'error');
+    flashAlert(__('Vendor <strong>%s</strong> deleted', $row['vendor_name']), 'error');
 
     vendorRedirectAfterDelete($client_id);
 
@@ -350,7 +350,7 @@ if (isset($_POST['bulk_archive_vendors'])) {
         $count++;
     }
 
-    flashAlert("Archived <strong>$count</strong> vendor" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived <strong>%d</strong> vendor', 'Archived <strong>%d</strong> vendors', $count), 'error');
 
     redirect();
 
@@ -373,7 +373,7 @@ if (isset($_POST['bulk_restore_vendors'])) {
         $count++;
     }
 
-    flashAlert("Restored <strong>$count</strong> vendor" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored <strong>%d</strong> vendor', 'Restored <strong>%d</strong> vendors', $count));
 
     redirect();
 
@@ -402,7 +402,7 @@ if (isset($_POST['bulk_delete_vendors'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> vendor" . ($count === 1 ? '' : 's') . ($kept ? ' - kept <strong>' . implode(', ', $kept) . '</strong>, which have expenses booked to them' : ''), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> vendor', 'Deleted <strong>%d</strong> vendors', $count) . ($kept ? ' - ' . __('kept <strong>%s</strong>, which have expenses booked to them', implode(', ', $kept)) : ''), 'error');
 
     redirect();
 

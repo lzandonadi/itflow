@@ -17,7 +17,7 @@ $client_id = intval($_GET['client_id'] ?? 0);
 enforceClientAccess();
 $client_name = getFieldById('clients', $client_id, 'client_name');
 if ($client_name === null) {
-    echo json_encode(['error' => 'That client no longer exists.']);
+    echo json_encode(['error' => __('That client no longer exists.')]);
     exit;
 }
 
@@ -33,7 +33,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-magic me-2"></i>Briefing on <?= escapeHtml($client_name) ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-magic me-2"></i><?= __('Briefing on %s', escapeHtml($client_name)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-ai-briefing-form data-client-id="<?= $client_id ?>">
@@ -44,26 +44,26 @@ ob_start();
     <input type="hidden" name="content" value="" data-ai-briefing-content>
     <input type="hidden" name="folder" value="0">
     <div class="modal-body">
-        <div class="btn-group btn-group-sm mb-3" role="group" aria-label="Looking back over">
+        <div class="btn-group btn-group-sm mb-3" role="group" aria-label="<?= escapeHtml(__('Looking back over')) ?>">
             <?php foreach (aiBriefingPeriods() as $days => $label) { ?>
                 <input type="radio" class="btn-check" name="days" id="aiBriefing<?= $days ?>" value="<?= $days ?>" autocomplete="off" <?= $days === 90 ? 'checked' : '' ?> data-ai-briefing-days>
-                <label class="btn btn-outline-secondary" for="aiBriefing<?= $days ?>" title="<?= escapeHtml(ucfirst($label)) ?>"><?= $days === 30 ? 'Last 30 days' : ($days === 90 ? 'Last quarter' : 'Last year') ?></label>
+                <label class="btn btn-outline-secondary" for="aiBriefing<?= $days ?>" title="<?= escapeHtml(ucfirst($label)) ?>"><?= $days === 30 ? __('Last 30 days') : ($days === 90 ? __('Last quarter') : __('Last year')) ?></label>
             <?php } ?>
         </div>
         <div class="itflow-ai-summary" data-ai-briefing aria-live="polite">
-            <div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>Reading what ITFlow has on them...</div>
+            <div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i><?= __('Reading what ITFlow has on them...') ?></div>
         </div>
-        <div class="small text-body-secondary mt-3 d-none" data-ai-briefing-said><i class="fas fa-fw fa-robot me-1"></i>Written by AI from what ITFlow has on them<?= lookupUserPermission('module_sales') >= 1 ? '' : ' - their invoices left out, as your role can\'t see them' ?>. Check it before relying on it.</div>
+        <div class="small text-body-secondary mt-3 d-none" data-ai-briefing-said><i class="fas fa-fw fa-robot me-1"></i><?= lookupUserPermission('module_sales') >= 1 ? __('Written by AI from what ITFlow has on them. Check it before relying on it.') : __('Written by AI from what ITFlow has on them - their invoices left out, as your role can\'t see them. Check it before relying on it.') ?></div>
     </div>
     <div class="modal-footer">
         <?php if ($can_keep) { ?>
-            <button type="submit" name="add_document" class="btn btn-primary text-bold" data-ai-briefing-save disabled title="Keep it in their documents">
-                <i class="fas fa-fw fa-file-alt me-2"></i>Save as a document
+            <button type="submit" name="add_document" class="btn btn-primary text-bold" data-ai-briefing-save disabled title="<?= escapeHtml(__('Keep it in their documents')) ?>">
+                <i class="fas fa-fw fa-file-alt me-2"></i><?= __('Save as a document') ?>
             </button>
         <?php } ?>
-        <button type="button" class="btn btn-light border" data-ai-briefing-copy disabled><i class="fas fa-fw fa-copy me-2"></i>Copy</button>
-        <button type="button" class="btn btn-light border" data-ai-briefing-again disabled><i class="fas fa-fw fa-redo me-2"></i>Again</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+        <button type="button" class="btn btn-light border" data-ai-briefing-copy disabled><i class="fas fa-fw fa-copy me-2"></i><?= __('Copy') ?></button>
+        <button type="button" class="btn btn-light border" data-ai-briefing-again disabled><i class="fas fa-fw fa-redo me-2"></i><?= __('Again') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
     </div>
 </form>
 
@@ -100,7 +100,7 @@ ob_start();
         ready(false);
         content.value = '';
         said.classList.add('d-none');
-        target.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>Reading what ITFlow has on them...</div>';
+        target.innerHTML = '<div class="text-body-secondary"><i class="fas fa-spinner fa-spin me-2"></i>' + <?= json_encode(escapeHtml(__('Reading what ITFlow has on them...'))) ?> + '</div>';
         fetch('/agent/ajax.php?ai_client_briefing', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -128,7 +128,7 @@ ob_start();
                 var p = document.createElement('p');
                 p.className = 'text-danger-emphasis mb-0';
                 p.setAttribute('data-ai-briefing-error', '');
-                p.textContent = error && error.message ? error.message : 'Could not brief you - try again.';
+                p.textContent = error && error.message ? error.message : <?= json_encode(__('Could not brief you - try again.')) ?>;
                 target.appendChild(p);
                 again.disabled = false;
             });
@@ -145,13 +145,13 @@ ob_start();
                 'text/html': new Blob([content.value], { type: 'text/html' }),
                 'text/plain': new Blob([text], { type: 'text/plain' })
             })]).then(function () {
-                itflowToast('Briefing copied', 'success');
+                itflowToast(<?= json_encode(__('Briefing copied')) ?>, 'success');
             }, function () {
                 navigator.clipboard.writeText(text);
             });
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(function () {
-                itflowToast('Briefing copied', 'success');
+                itflowToast(<?= json_encode(__('Briefing copied')) ?>, 'success');
             });
         }
     });

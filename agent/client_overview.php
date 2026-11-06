@@ -61,10 +61,10 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 <div class="flex-grow-1 overflow-hidden itflow-ov-hero-name">
                     <h1 class="itflow-dash-greeting mb-1">
                         <?= $client_name ?>
-                        <?php if ($client_is_lead) { ?><span class="badge rounded-pill text-bg-info align-middle fs-6 fw-normal ms-1">Lead</span><?php } ?>
-                        <?php if ($client_archived_at) { ?><span class="badge rounded-pill text-bg-secondary align-middle fs-6 fw-normal ms-1">Archived</span><?php } ?>
+                        <?php if ($client_is_lead) { ?><span class="badge rounded-pill text-bg-info align-middle fs-6 fw-normal ms-1"><?= __('Lead') ?></span><?php } ?>
+                        <?php if ($client_archived_at) { ?><span class="badge rounded-pill text-bg-secondary align-middle fs-6 fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                         <?php if (!empty($config_module_enable_accounting) && ($ov_tax = taxClient($client_id))['exempt']) { ?>
-                            <span class="badge rounded-pill align-middle fs-6 fw-normal ms-1 <?= $ov_tax['expired'] ? 'bg-warning-subtle text-warning-emphasis' : 'bg-success-subtle text-success-emphasis' ?>" title="<?= escapeHtml(taxExemptText($ov_tax)) ?>"><?= $ov_tax['expired'] ? 'Tax exempt - certificate expired' : 'Tax exempt' ?></span>
+                            <span class="badge rounded-pill align-middle fs-6 fw-normal ms-1 <?= $ov_tax['expired'] ? 'bg-warning-subtle text-warning-emphasis' : 'bg-success-subtle text-success-emphasis' ?>" title="<?= escapeHtml(taxExemptText($ov_tax)) ?>"><?= $ov_tax['expired'] ? __('Tax exempt - certificate expired') : __('Tax exempt') ?></span>
                         <?php } ?>
                     </h1>
                     <div class="d-flex flex-wrap align-items-center gap-1">
@@ -76,18 +76,18 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 </div>
                 <div class="d-flex gap-2 ms-auto itflow-ov-hero-actions">
                     <?php if (aiReady('General')) { ?>
-                        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/client/client_briefing.php?client_id=<?= $client_id ?>" data-modal-size="lg" title="How things stand with them, by AI - before a call, a visit or a quarterly review">
-                            <i class="fas fa-magic"></i><span class="d-none d-sm-inline ms-2">Briefing</span>
+                        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/client/client_briefing.php?client_id=<?= $client_id ?>" data-modal-size="lg" title="<?= escapeHtml(__('How things stand with them, by AI - before a call, a visit or a quarterly review')) ?>">
+                            <i class="fas fa-magic"></i><span class="d-none d-sm-inline ms-2"><?= __('Briefing') ?></span>
                         </button>
                     <?php } ?>
                     <?php if ($access['add_ticket'] && !$client_archived_at) { ?>
                         <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>" data-modal-size="lg">
-                            <i class="fas fa-plus me-2"></i>New Ticket
+                            <i class="fas fa-plus me-2"></i><?= __('New Ticket') ?>
                         </button>
                     <?php } ?>
                     <?php if ($access['edit']) { ?>
                         <div class="dropdown dropstart">
-                            <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-fw fa-ellipsis-v"></i>
                             </button>
                             <?php require 'includes/client_actions_menu.php'; ?>
@@ -111,16 +111,16 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 <div class="d-flex align-items-start gap-3">
                     <span class="itflow-gs-card-icon" aria-hidden="true"><i class="fas fa-route"></i></span>
                     <div class="min-w-0 flex-grow-1">
-                        <h2 id="ovOnboarding" class="h6 fw-semibold mb-1">Finish onboarding <span class="text-body-secondary fw-normal">· <?= $ob_progress['done'] ?> of <?= $ob_progress['total'] ?></span></h2>
-                        <div class="progress itflow-gs-progress mb-2" role="progressbar" aria-label="How far onboarding has got" aria-valuenow="<?= $ob_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $ob_progress['total'] ?>">
+                        <h2 id="ovOnboarding" class="h6 fw-semibold mb-1"><?= __('Finish onboarding') ?> <span class="text-body-secondary fw-normal">· <?= __('%1$d of %2$d', $ob_progress['done'], $ob_progress['total']) ?></span></h2>
+                        <div class="progress itflow-gs-progress mb-2" role="progressbar" aria-label="<?= escapeHtml(__('How far onboarding has got')) ?>" aria-valuenow="<?= $ob_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $ob_progress['total'] ?>">
                             <div class="progress-bar" style="width: <?= round($ob_progress['done'] * 100 / max(1, $ob_progress['total'])) ?>%"></div>
                         </div>
-                        <div class="small text-body-secondary">Next: <strong class="text-body"><?= escapeHtml($ob_next['title']) ?></strong> - <?= escapeHtml($ob_next['status']) ?></div>
+                        <div class="small text-body-secondary"><?= __('Next:') ?> <strong class="text-body"><?= escapeHtml($ob_next['title']) ?></strong> - <?= escapeHtml($ob_next['status']) ?></div>
                     </div>
                     <form action="post.php" method="post" class="m-0 flex-shrink-0">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <input type="hidden" name="client_id" value="<?= $client_id ?>">
-                        <button type="submit" name="client_onboarding_dismiss" value="1" class="btn-close" aria-label="Don't show this here" title="Don't show this here - Onboarding stays in the client's menu" data-co-card-dismiss></button>
+                        <button type="submit" name="client_onboarding_dismiss" value="1" class="btn-close" aria-label="<?= escapeHtml(__('Don\'t show this here')) ?>" title="<?= escapeHtml(__('Don\'t show this here - Onboarding stays in the client\'s menu')) ?>" data-co-card-dismiss></button>
                     </form>
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
@@ -134,7 +134,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                             </li>
                         <?php } ?>
                     </ul>
-                    <a href="<?= clientOnboardingUrl($client_id, $ob_progress['next']) ?>" class="btn btn-primary btn-sm" data-co-card-continue>Carry on<i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="<?= clientOnboardingUrl($client_id, $ob_progress['next']) ?>" class="btn btn-primary btn-sm" data-co-card-continue><?= __('Carry on') ?><i class="fas fa-arrow-right ms-2"></i></a>
                 </div>
             </div>
         </section>
@@ -142,7 +142,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
 
     <?php if ($attention) { ?>
         <section class="mb-4" aria-labelledby="ovAttention">
-            <h2 id="ovAttention" class="itflow-dash-section mb-2">Needs attention</h2>
+            <h2 id="ovAttention" class="itflow-dash-section mb-2"><?= __('Needs attention') ?></h2>
             <div class="card mb-0 overflow-hidden">
                 <div class="itflow-dash-rail">
                     <?php foreach ($attention as $item) {
@@ -158,31 +158,31 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
         </section>
     <?php } ?>
 
-    <h2 class="itflow-dash-section mb-2">Technical</h2>
+    <h2 class="itflow-dash-section mb-2"><?= __('Technical') ?></h2>
 
     <div class="row g-3 mb-3">
         <?php if ($open_tickets !== null) { ?>
             <div class="col-xl-8">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                        <h3 class="card-title mb-0 me-auto">Open tickets</h3>
-                        <span class="small text-body-secondary"><?= $open_tickets['opened_30'] ?> opened, <?= $open_tickets['resolved_30'] ?> resolved in the last 30 days</span>
-                        <?php if ($open_tickets['total']) { ?><a class="small ms-2" href="tickets.php?client_id=<?= $client_id ?>">View all <?= $open_tickets['total'] ?></a><?php } ?>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Open tickets') ?></h3>
+                        <span class="small text-body-secondary"><?= __('%1$d opened, %2$d resolved in the last 30 days', $open_tickets['opened_30'], $open_tickets['resolved_30']) ?></span>
+                        <?php if ($open_tickets['total']) { ?><a class="small ms-2" href="tickets.php?client_id=<?= $client_id ?>"><?= __('View all %d', $open_tickets['total']) ?></a><?php } ?>
                     </div>
                     <?php if ($open_tickets['tickets']) { ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($open_tickets['tickets'] as $ticket) {
                                 $last_activity = $ticket['ticket_updated_at'] ?: $ticket['ticket_created_at'];
-                                $ticket_who = trim(implode(', ', array_filter([$ticket['contact_name'], $ticket['user_name'] ? 'assigned to ' . $ticket['user_name'] : 'unassigned'])));
+                                $ticket_who = trim(implode(', ', array_filter([$ticket['contact_name'], $ticket['user_name'] ? __('assigned to %s', $ticket['user_name']) : __('unassigned')])));
                                 ?>
                                 <a href="ticket.php?client_id=<?= $client_id ?>&ticket_id=<?= intval($ticket['ticket_id']) ?>" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-2">
-                                    <span class="itflow-dash-dot bg-<?= $priority_colors[$ticket['ticket_priority']] ?? 'secondary' ?>" title="<?= escapeHtml($ticket['ticket_priority']) ?> priority"></span>
+                                    <span class="itflow-dash-dot bg-<?= $priority_colors[$ticket['ticket_priority']] ?? 'secondary' ?>" title="<?= escapeHtml(__('%s priority', ticketPriorityLabel($ticket['ticket_priority']))) ?>"></span>
                                     <span class="flex-grow-1 overflow-hidden">
                                         <span class="d-block text-truncate"><span class="small text-body-secondary me-2"><?= escapeHtml($ticket['ticket_prefix'] . $ticket['ticket_number']) ?></span><?= escapeHtml($ticket['ticket_subject']) ?></span>
                                         <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml(ucfirst($ticket_who)) ?></span>
                                     </span>
                                     <?php if ($ticket['sla_breached']) { ?>
-                                        <span class="badge rounded-pill text-bg-danger" title="Past SLA"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span>
+                                        <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Past SLA')) ?>"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i><?= __('SLA') ?></span>
                                     <?php } ?>
                                     <span class="d-none d-sm-inline"><?= ticketStatusHtml($ticket['ticket_status_name'], $ticket['ticket_status_color'], 'detail') ?></span>
                                     <span class="small text-body-secondary text-nowrap d-none d-md-inline" title="Last activity <?= escapeHtml($last_activity) ?>"><?= escapeHtml(timeAgo($last_activity)) ?></span>
@@ -192,7 +192,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                     <?php } else { ?>
                         <div class="card-body text-center text-body-secondary py-5">
                             <i class="fas fa-check-circle fa-2x mb-2 d-block text-success" aria-hidden="true"></i>
-                            No open tickets.
+                            <?= __('No open tickets.') ?>
                         </div>
                     <?php } ?>
                 </div>
@@ -202,12 +202,12 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
         <div class="<?= $open_tickets !== null ? 'col-xl-4' : 'col-md-6 col-xl-4' ?>">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Quick notes</h3>
-                    <span class="small text-body-secondary" data-notes-status><?= $access['edit'] ? 'Saves when you click away' : '' ?></span>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Quick notes') ?></h3>
+                    <span class="small text-body-secondary" data-notes-status><?= $access['edit'] ? __('Saves when you click away') : '' ?></span>
                 </div>
                 <div class="card-body pt-2 d-flex">
-                    <textarea class="form-control itflow-ov-notes" id="clientNotes" rows="8" placeholder="<?= $access['edit'] ? 'Gate codes, quirks, who to ask for - anything the next person should know' : 'No notes' ?>"
-                        data-client-id="<?= $client_id ?>" data-csrf="<?= $_SESSION['csrf_token'] ?>" aria-label="Quick notes" <?= $access['edit'] ? '' : 'readonly' ?>><?= $client_notes ?></textarea>
+                    <textarea class="form-control itflow-ov-notes" id="clientNotes" rows="8" placeholder="<?= $access['edit'] ? __('Gate codes, quirks, who to ask for - anything the next person should know') : __('No notes') ?>"
+                        data-client-id="<?= $client_id ?>" data-csrf="<?= $_SESSION['csrf_token'] ?>" aria-label="<?= escapeHtml(__('Quick notes')) ?>" <?= $access['edit'] ? '' : 'readonly' ?>><?= $client_notes ?></textarea>
                 </div>
             </div>
         </div>
@@ -215,8 +215,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
         <div class="col-md-6 col-xl-4">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Key contacts</h3>
-                    <a class="small" href="contacts.php?client_id=<?= $client_id ?>">All contacts</a>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Key contacts') ?></h3>
+                    <a class="small" href="contacts.php?client_id=<?= $client_id ?>"><?= __('All contacts') ?></a>
                 </div>
                 <?php if ($overview_contacts) { ?>
                     <div class="list-group list-group-flush">
@@ -240,7 +240,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                     <?php if ($person_email) { ?>
                                         <div class="small d-flex align-items-center">
                                             <a class="text-reset text-decoration-none text-truncate" href="mailto:<?= $person_email ?>"><i class="far fa-fw fa-envelope text-body-secondary me-1" aria-hidden="true"></i><?= $person_email ?></a>
-                                            <button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $person_email ?>"><i class="far fa-copy"></i></button>
+                                            <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $person_email ?>"><i class="far fa-copy"></i></button>
                                         </div>
                                     <?php } ?>
                                 </div>
@@ -249,7 +249,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                     </div>
                 <?php } else { ?>
                     <div class="card-body text-center text-body-secondary py-4 small">
-                        Mark contacts as primary, billing, technical or important and they show here.
+                        <?= __('Mark contacts as primary, billing, technical or important and they show here.') ?>
                     </div>
                 <?php } ?>
             </div>
@@ -259,7 +259,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Favorites</h3>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Favorites') ?></h3>
                         <i class="fas fa-star text-warning" aria-hidden="true"></i>
                     </div>
                     <div class="list-group list-group-flush">
@@ -272,14 +272,14 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                     <span class="d-block small text-body-secondary text-truncate"><?= escapeHtml(trim($asset['asset_make'] . ' ' . $asset['asset_model'])) ?></span>
                                 </span>
                                 <?php if ($asset_ip) { ?>
-                                    <span class="small text-nowrap"><?= $asset_ip ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button></span>
+                                    <span class="small text-nowrap"><?= $asset_ip ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button></span>
                                 <?php } ?>
                             </div>
                         <?php } ?>
                         <?php foreach ($favorites['licenses'] as $favorite_license) {
                             $favorite_renewal = softwareRenewal($favorite_license['software_expire']); ?>
                             <div class="list-group-item d-flex align-items-center gap-2 py-2">
-                                <i class="fas fa-fw <?= softwareTypeStyle($favorite_license['software_type'])['icon'] ?> text-body-secondary" title="License"></i>
+                                <i class="fas fa-fw <?= softwareTypeStyle($favorite_license['software_type'])['icon'] ?> text-body-secondary" title="<?= escapeHtml(__('License')) ?>"></i>
                                 <span class="flex-grow-1 overflow-hidden">
                                     <a class="ajax-modal d-block text-truncate" href="#" data-modal-url="modals/software/software.php?id=<?= intval($favorite_license['software_id']) ?>" data-modal-size="lg"><?= escapeHtml($favorite_license['software_name']) ?></a>
                                     <span class="d-block small text-truncate text-<?= $favorite_renewal && $favorite_renewal['state'] !== 'active' ? $favorite_renewal['tone'] . '-emphasis' : 'body-secondary' ?>"><?= escapeHtml(implode(' · ', array_filter([$favorite_license['software_license_type'], $favorite_renewal ? $favorite_renewal['text'] : '']))) ?></span>
@@ -316,8 +316,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Coming up <span class="small text-body-secondary fw-normal ms-1">14 days</span></h3>
-                        <a class="small" href="calendar.php?client_id=<?= $client_id ?>">Calendar</a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Coming up') ?> <span class="small text-body-secondary fw-normal ms-1"><?= _n('%d day', '%d days', 14) ?></span></h3>
+                        <a class="small" href="calendar.php?client_id=<?= $client_id ?>"><?= __('Calendar') ?></a>
                     </div>
                     <div class="itflow-dash-schedule">
                         <?php
@@ -329,7 +329,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                 <div class="itflow-dash-schedule-day"><?= escapeHtml($item_day) ?></div>
                             <?php } ?>
                             <a class="itflow-dash-schedule-item<?= !empty($item['modal']) ? ' ajax-modal' : '' ?>" href="<?= escapeHtml($item['url']) ?>"<?php if (!empty($item['modal'])) { ?> data-modal-size="lg" data-modal-url="<?= escapeHtml($item['modal']) ?>"<?php } ?>>
-                                <span class="itflow-dash-schedule-time"><?= $item['all_day'] ? 'All day' : escapeHtml(date('g:i A', strtotime($item['when']))) ?></span>
+                                <span class="itflow-dash-schedule-time"><?= $item['all_day'] ? __('All day') : escapeHtml(date('g:i A', strtotime($item['when']))) ?></span>
                                 <span class="itflow-dash-schedule-mark bg-<?= ['ticket' => 'primary', 'recurring' => 'info', 'event' => 'success', 'project' => 'warning', 'service' => 'secondary'][$item['kind']] ?>"></span>
                                 <span class="flex-grow-1 overflow-hidden">
                                     <span class="d-block text-truncate"><?php if ($item['ref']) { ?><span class="small text-body-secondary me-2"><?= escapeHtml($item['ref']) ?></span><?php } ?><?= escapeHtml($item['title']) ?></span>
@@ -346,8 +346,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Projects</h3>
-                        <a class="small" href="projects.php?client_id=<?= $client_id ?>">View all <?= $open_projects['total'] ?></a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Projects') ?></h3>
+                        <a class="small" href="projects.php?client_id=<?= $client_id ?>"><?= __('View all %d', $open_projects['total']) ?></a>
                     </div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($open_projects['projects'] as $project_id => $project) {
@@ -369,8 +369,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Services</h3>
-                        <a class="small" href="services.php?client_id=<?= $client_id ?>">View all <?= $client_services['total'] ?></a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Services') ?></h3>
+                        <a class="small" href="services.php?client_id=<?= $client_id ?>"><?= __('View all %d', $client_services['total']) ?></a>
                     </div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($client_services['services'] as $service_id => $service) {
@@ -401,8 +401,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4" id="clientRenewals">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Renewals</h3>
-                        <span class="small text-body-secondary">Expired or due in <?= $renewals['days'] ?> days</span>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Renewals') ?></h3>
+                        <span class="small text-body-secondary"><?= __('Expired or due in %d days', $renewals['days']) ?></span>
                     </div>
                     <?php if ($renewals['items']) { ?>
                         <div class="list-group list-group-flush">
@@ -426,7 +426,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                     <?php } else { ?>
                         <div class="card-body text-center text-body-secondary py-4">
                             <i class="fas fa-check-circle fa-2x mb-2 d-block text-success" aria-hidden="true"></i>
-                            Nothing expired or due in the next <?= $renewals['days'] ?> days.
+                            <?= __('Nothing expired or due in the next %d days.', $renewals['days']) ?>
                         </div>
                     <?php } ?>
                 </div>
@@ -437,8 +437,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Assets</h3>
-                        <a class="small" href="assets.php?client_id=<?= $client_id ?>">View all <?= $asset_summary['total'] ?></a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Assets') ?></h3>
+                        <a class="small" href="assets.php?client_id=<?= $client_id ?>"><?= __('View all %d', $asset_summary['total']) ?></a>
                     </div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($asset_summary['groups'] as $group_key => $group) {
@@ -453,7 +453,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                         <?php } ?>
                     </div>
                     <div class="card-footer small text-body-secondary py-2">
-                        Warranty: <?= $asset_summary['warranty_active'] ?> covered<?php if ($asset_summary['warranty_expired']) { ?>, <span class="text-danger-emphasis"><?= $asset_summary['warranty_expired'] ?> expired</span><?php } ?><?php if ($asset_summary['warranty_unknown']) { ?>, <?= $asset_summary['warranty_unknown'] ?> not recorded<?php } ?>
+                        <?= __('Warranty: %d covered', $asset_summary['warranty_active']) ?><?php if ($asset_summary['warranty_expired']) { ?>, <span class="text-danger-emphasis"><?= __('%d expired', $asset_summary['warranty_expired']) ?></span><?php } ?><?php if ($asset_summary['warranty_unknown']) { ?>, <?= __('%d not recorded', $asset_summary['warranty_unknown']) ?><?php } ?>
                     </div>
                 </div>
             </div>
@@ -463,8 +463,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 mb-0">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto">Shared links</h3>
-                        <a class="small" href="shares.php?client_id=<?= $client_id ?>">All shared links</a>
+                        <h3 class="card-title mb-0 me-auto"><?= __('Shared links') ?></h3>
+                        <a class="small" href="shares.php?client_id=<?= $client_id ?>"><?= __('All shared links') ?></a>
                     </div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($shared_items as $item) {
@@ -489,13 +489,13 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                     <a class="d-block text-truncate ajax-modal" href="#" data-modal-url="modals/share/share.php?id=<?= intval($item['item_id']) ?>"><?= $item_label ?></a>
                                     <span class="d-block small text-body-secondary text-truncate">
                                         <?php if ($item_received) { ?>
-                                            <span class="text-warning-emphasis"><i class="fas fa-inbox me-1"></i>Sent back <?= escapeHtml(timeAgo($item['item_received_at'])) ?> - save it</span>
+                                            <span class="text-warning-emphasis"><i class="fas fa-inbox me-1"></i><?= __('Sent back %s - save it', escapeHtml(timeAgo($item['item_received_at']))) ?></span>
                                         <?php } else { ?>
                                             <?= escapeHtml(ucfirst(($item['item_recipient'] ? $item['item_recipient'] . ', ' : '') . strtolower(shareViewsText($item)) . ', expires ' . timeAgo($item['item_expire_at']))) ?>
                                         <?php } ?>
                                     </span>
                                 </span>
-                                <?php if (!$item_received && shareCanMake($item['item_type'])) { ?><a class="btn btn-sm btn-link text-danger confirm-link" href="post.php?share_revoke=<?= intval($item['item_id']) ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="Turn off this link"><i class="fas fa-fw fa-unlink" aria-hidden="true"></i></a><?php } ?>
+                                <?php if (!$item_received && shareCanMake($item['item_type'])) { ?><a class="btn btn-sm btn-link text-danger confirm-link" href="post.php?share_revoke=<?= intval($item['item_id']) ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= escapeHtml(__('Turn off this link')) ?>"><i class="fas fa-fw fa-unlink" aria-hidden="true"></i></a><?php } ?>
                             </div>
                         <?php } ?>
                     </div>
@@ -506,8 +506,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
         <div class="col-md-6 col-xl-4">
             <div class="card h-100 mb-0">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto">Recent activity</h3>
-                    <a class="small" href="audit_log.php?client_id=<?= $client_id ?>">Audit log</a>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Recent activity') ?></h3>
+                    <a class="small" href="audit_log.php?client_id=<?= $client_id ?>"><?= __('Audit log') ?></a>
                 </div>
                 <?php if ($activity) { ?>
                     <div class="list-group list-group-flush">
@@ -519,7 +519,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                         <?php } ?>
                     </div>
                 <?php } else { ?>
-                    <div class="card-body text-center text-body-secondary py-4 small">Nothing recorded yet.</div>
+                    <div class="card-body text-center text-body-secondary py-4 small"><?= __('Nothing recorded yet.') ?></div>
                 <?php } ?>
             </div>
         </div>
@@ -527,37 +527,37 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
 
     <?php if ($money !== null || $open_invoices !== null) { ?>
 
-        <h2 class="itflow-dash-section mt-4 mb-2">Financial</h2>
+        <h2 class="itflow-dash-section mt-4 mb-2"><?= __('Financial') ?></h2>
 
         <?php if ($money !== null) { ?>
             <div class="card mb-3 overflow-hidden">
                 <div class="itflow-dash-rail itflow-ov-stats">
                     <a href="invoices.php?client_id=<?= $client_id ?>&status=Unpaid" class="itflow-dash-rail-item">
-                        <span class="small text-body-secondary">Balance</span>
+                        <span class="small text-body-secondary"><?= __('Balance') ?></span>
                         <span class="itflow-dash-money-value <?= $money['overdue'] > 0.004 ? 'text-danger-emphasis' : '' ?>"><?= $money_format($money['balance']) ?></span>
-                        <span class="small <?= $money['overdue'] > 0.004 ? 'text-danger-emphasis' : 'text-body-tertiary' ?>"><?= $money['overdue'] > 0.004 ? $money_format($money['overdue']) . ' overdue' : 'Nothing overdue' ?></span>
+                        <span class="small <?= $money['overdue'] > 0.004 ? 'text-danger-emphasis' : 'text-body-tertiary' ?>"><?= $money['overdue'] > 0.004 ? $money_format($money['overdue']) . ' overdue' : __('Nothing overdue') ?></span>
                     </a>
                     <a href="income.php?client_id=<?= $client_id ?>" class="itflow-dash-rail-item">
-                        <span class="small text-body-secondary">Paid this year</span>
+                        <span class="small text-body-secondary"><?= __('Paid this year') ?></span>
                         <span class="itflow-dash-money-value"><?= $money_format($money['paid_ytd']) ?></span>
                         <?php if ($money['paid_change'] !== null) { ?>
                             <span class="small"><span class="fw-semibold <?= $money['paid_change'] >= 0 ? 'text-success-emphasis' : 'text-danger-emphasis' ?>"><i class="fas fa-arrow-<?= $money['paid_change'] >= 0 ? 'up' : 'down' ?> me-1" aria-hidden="true"></i><?= abs($money['paid_change']) ?>%</span> <span class="text-body-tertiary">vs last year</span></span>
                         <?php } else { ?>
-                            <span class="small text-body-tertiary">Nothing last year to compare</span>
+                            <span class="small text-body-tertiary"><?= __('Nothing last year to compare') ?></span>
                         <?php } ?>
                     </a>
                     <a href="recurring_invoices.php?client_id=<?= $client_id ?>" class="itflow-dash-rail-item">
-                        <span class="small text-body-secondary">Recurring</span>
+                        <span class="small text-body-secondary"><?= __('Recurring') ?></span>
                         <span class="itflow-dash-money-value"><?= $money_format($money['recurring']) ?><span class="fs-6 fw-normal text-body-secondary">/mo</span></span>
-                        <span class="small text-body-tertiary"><?= $num_recurring_invoices ?> recurring invoice<?= $num_recurring_invoices === 1 ? '' : 's' ?></span>
+                        <span class="small text-body-tertiary"><?= _n('%d recurring invoice', '%d recurring invoices', $num_recurring_invoices) ?></span>
                     </a>
                     <?php if ($access['tickets'] || $money['unbilled_expenses']) {
                         $unbilled_total = $money['unbilled_value'] + $money['unbilled_expense_value']; ?>
                         <a href="unbilled_time.php?client_id=<?= $client_id ?>" class="itflow-dash-rail-item">
-                            <span class="small text-body-secondary">Not yet invoiced</span>
+                            <span class="small text-body-secondary"><?= __('Not yet invoiced') ?></span>
                             <span class="itflow-dash-money-value <?= $unbilled_total > 0 ? 'text-info-emphasis' : '' ?>"><?= $money_format($unbilled_total) ?></span>
                             <span class="small text-body-tertiary">
-                                <?php if ($access['tickets']) { ?><?= $money['unbilled_tickets'] ?> ticket<?= $money['unbilled_tickets'] === 1 ? '' : 's' ?><?= $money['unbilled_seconds'] && !$money['unbilled_expenses'] ? ', ' . dashboardDuration($money['unbilled_seconds']) . ' logged' : '' ?><?php } ?><?= $access['tickets'] && $money['unbilled_expenses'] ? ', ' : '' ?><?= $money['unbilled_expenses'] ? $money['unbilled_expenses'] . ' expense' . ($money['unbilled_expenses'] === 1 ? '' : 's') : '' ?>
+                                <?php if ($access['tickets']) { ?><?= _n('%d ticket', '%d tickets', $money['unbilled_tickets']) ?><?= $money['unbilled_seconds'] && !$money['unbilled_expenses'] ? ', ' . __('%s logged', dashboardDuration($money['unbilled_seconds'])) : '' ?><?php } ?><?= $access['tickets'] && $money['unbilled_expenses'] ? ', ' : '' ?><?= $money['unbilled_expenses'] ? _n('%d expense', '%d expenses', $money['unbilled_expenses']) : '' ?>
                             </span>
                         </a>
                     <?php } ?>
@@ -568,7 +568,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                         $overview_hours = contractHoursLeftFor(array_column($overview_contracts, 'contract_id'));
                         $overview_hours_left = round(array_sum(array_column($overview_hours, 'left')), 2); ?>
                         <a href="<?= $overview_contract && count($overview_contracts) === 1 ? 'contract.php?client_id=' . $client_id . '&contract_id=' . intval($overview_contract['contract_id']) : 'contracts.php?client_id=' . $client_id ?>" class="itflow-dash-rail-item" data-overview-contract>
-                            <span class="small text-body-secondary">Contract</span>
+                            <span class="small text-body-secondary"><?= __('Contract') ?></span>
                             <?php if ($overview_contract) {
                                 $overview_state = contractState($overview_contract); ?>
                                 <span class="fs-5 fw-semibold text-truncate" title="<?= escapeHtml($overview_contract['contract_name']) ?>"><?= escapeHtml($overview_contract['contract_name']) ?></span>
@@ -577,8 +577,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                     <span class="small <?= $overview_hours_left > 0 ? 'text-body-tertiary' : 'text-warning-emphasis' ?>" data-overview-hours><i class="fas fa-hourglass-half me-1" aria-hidden="true"></i><?= escapeHtml(contractHoursText($overview_hours_left)) ?> prepaid left</span>
                                 <?php } ?>
                             <?php } else { ?>
-                                <span class="fs-5 fw-semibold text-body-tertiary">None</span>
-                                <span class="small text-body-tertiary">No contract in force</span>
+                                <span class="fs-5 fw-semibold text-body-tertiary"><?= __('None') ?></span>
+                                <span class="small text-body-tertiary"><?= __('No contract in force') ?></span>
                             <?php } ?>
                         </a>
                     <?php } ?>
@@ -591,20 +591,20 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                         [$overview_after, $overview_after_from] = $overview_terms['after_hours'];
                         $overview_from = $overview_rate['contract_name'] ?: ($overview_net_from ?: $overview_after_from);
                         ?>
-                        <span class="small text-body-secondary">Terms</span>
+                        <span class="small text-body-secondary"><?= __('Terms') ?></span>
                         <span class="itflow-dash-money-value"><?= $money_format($overview_rate['rate']) ?><span class="fs-6 fw-normal text-body-secondary">/hr</span></span>
-                        <span class="small text-body-tertiary"><?= $overview_net ? "Net $overview_net" : 'Due on receipt' ?><?= $overview_after > 0 ? ', ' . $money_format($overview_after) . '/hr after hours' : '' ?><?= $client_tax_id_number ? ", tax ID $client_tax_id_number" : '' ?></span>
+                        <span class="small text-body-tertiary"><?= $overview_net ? "Net $overview_net" : __('Due on receipt') ?><?= $overview_after > 0 ? ', ' . $money_format($overview_after) . '/hr after hours' : '' ?><?= $client_tax_id_number ? ", tax ID $client_tax_id_number" : '' ?></span>
                         <?php if ($overview_from !== '') { ?>
-                            <span class="small text-body-tertiary text-truncate" data-overview-terms-contract title="While it is in force, the contract's rates and net terms apply - the defaults for what it leaves empty"><i class="fas fa-file-contract me-1" aria-hidden="true"></i>From <?= escapeHtml($overview_from) ?></span>
+                            <span class="small text-body-tertiary text-truncate" data-overview-terms-contract title="<?= escapeHtml(__('While it is in force, the contract\'s rates and net terms apply - the defaults for what it leaves empty')) ?>"><i class="fas fa-file-contract me-1" aria-hidden="true"></i><?= __('From %s', escapeHtml($overview_from)) ?></span>
                         <?php } else { ?>
-                            <span class="small text-body-tertiary text-truncate" data-overview-terms-default title="No contract in force sets them - the defaults in Admin > Settings > Defaults apply"><i class="fas fa-sliders-h me-1" aria-hidden="true"></i>The defaults</span>
+                            <span class="small text-body-tertiary text-truncate" data-overview-terms-default title="<?= escapeHtml(__('No contract in force sets them - the defaults in Admin > Settings > Defaults apply')) ?>"><i class="fas fa-sliders-h me-1" aria-hidden="true"></i><?= __('The defaults') ?></span>
                         <?php } ?>
                         <?php
                         $overview_tax = taxClient($client_id);
                         $overview_rate = taxRow(taxDefaultFor($client_id));
                         ?>
                         <span class="small <?= $overview_tax['exempt'] && $overview_tax['expired'] ? 'text-warning-emphasis' : 'text-body-tertiary' ?>"<?= $overview_tax['exempt'] ? ' title="' . escapeHtml(taxExemptText($overview_tax)) . '"' : '' ?>>
-                            <?= $overview_tax['exempt'] ? ($overview_tax['expired'] ? 'Tax exempt - certificate expired' : 'Tax exempt') : ($overview_rate ? 'Tax: ' . escapeHtml(taxLabel($overview_rate)) : 'No tax rate') ?>
+                            <?= $overview_tax['exempt'] ? ($overview_tax['expired'] ? __('Tax exempt - certificate expired') : __('Tax exempt')) : ($overview_rate ? 'Tax: ' . escapeHtml(taxLabel($overview_rate)) : __('No tax rate')) ?>
                         </span>
                     </div>
                 </div>
@@ -616,8 +616,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 <div class="col-xl-8">
                     <div class="card h-100 mb-0">
                         <div class="card-header d-flex align-items-center">
-                            <h3 class="card-title mb-0 me-auto">Unpaid invoices</h3>
-                            <a class="small" href="invoices.php?client_id=<?= $client_id ?>">All invoices</a>
+                            <h3 class="card-title mb-0 me-auto"><?= __('Unpaid invoices') ?></h3>
+                            <a class="small" href="invoices.php?client_id=<?= $client_id ?>"><?= __('All invoices') ?></a>
                         </div>
                         <?php if ($open_invoices['invoices']) { ?>
                             <div class="list-group list-group-flush">
@@ -628,8 +628,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                         <span class="flex-grow-1 overflow-hidden">
                                             <span class="d-block text-truncate"><span class="fw-semibold me-2"><?= escapeHtml($invoice['invoice_prefix'] . $invoice['invoice_number']) ?></span><span class="text-body-secondary"><?= escapeHtml($invoice['invoice_scope']) ?></span></span>
                                             <span class="d-block small <?= $days_over > 0 ? 'text-danger-emphasis' : 'text-body-secondary' ?>">
-                                                <?= $days_over > 0 ? "$days_over day" . ($days_over === 1 ? '' : 's') . ' overdue' : 'Due ' . escapeHtml(date('M j', strtotime($invoice['invoice_due']))) ?>
-                                                <?= $invoice['invoice_status'] === 'Partial' ? ', part paid' : '' ?>
+                                                <?= $days_over > 0 ? _n('%d day overdue', '%d days overdue', $days_over) : __('Due %s', escapeHtml(formatDate($invoice['invoice_due'], 'date_short'))) ?>
+                                                <?= $invoice['invoice_status'] === 'Partial' ? ', ' . __('part paid') : '' ?>
                                             </span>
                                         </span>
                                         <span class="fw-semibold text-nowrap"><?= $money_format($invoice['balance']) ?></span>
@@ -642,7 +642,7 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                         <?php } else { ?>
                             <div class="card-body text-center text-body-secondary py-4">
                                 <i class="fas fa-check-circle fa-2x mb-2 d-block text-success" aria-hidden="true"></i>
-                                All invoices are paid.
+                                <?= __('All invoices are paid.') ?>
                             </div>
                         <?php } ?>
                     </div>
@@ -651,8 +651,8 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 <div class="col-xl-4">
                     <div class="card h-100 mb-0">
                         <div class="card-header d-flex align-items-center">
-                            <h3 class="card-title mb-0 me-auto">Recurring invoices</h3>
-                            <a class="small" href="recurring_invoices.php?client_id=<?= $client_id ?>">View all</a>
+                            <h3 class="card-title mb-0 me-auto"><?= __('Recurring invoices') ?></h3>
+                            <a class="small" href="recurring_invoices.php?client_id=<?= $client_id ?>"><?= __('View all') ?></a>
                         </div>
                         <?php if ($recurring_invoices) { ?>
                             <div class="list-group list-group-flush">
@@ -660,14 +660,14 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                                     <a href="recurring_invoice.php?client_id=<?= $client_id ?>&recurring_invoice_id=<?= intval($recurring['recurring_invoice_id']) ?>" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-2">
                                         <span class="flex-grow-1 overflow-hidden">
                                             <span class="d-block text-truncate"><?= escapeHtml($recurring['recurring_invoice_scope'] ?: $recurring['recurring_invoice_prefix'] . $recurring['recurring_invoice_number']) ?></span>
-                                            <span class="d-block small text-body-secondary"><?= recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? 'Monthly' ?>, next <?= escapeHtml(date('M j', strtotime($recurring['recurring_invoice_next_date']))) ?></span>
+                                            <span class="d-block small text-body-secondary"><?= recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? __('Monthly') ?>, next <?= escapeHtml(date('M j', strtotime($recurring['recurring_invoice_next_date']))) ?></span>
                                         </span>
                                         <span class="fw-semibold text-nowrap"><?= $money_format($recurring['recurring_invoice_amount']) ?></span>
                                     </a>
                                 <?php } ?>
                             </div>
                         <?php } else { ?>
-                            <div class="card-body text-center text-body-secondary py-4 small">No recurring invoices.</div>
+                            <div class="card-body text-center text-body-secondary py-4 small"><?= __('No recurring invoices.') ?></div>
                         <?php } ?>
                     </div>
                 </div>
@@ -677,15 +677,15 @@ $money_format = function ($amount) use ($currency_format, $client_currency_code,
                 <div class="col-12">
                     <div class="card mb-0">
                         <div class="card-header d-flex align-items-center">
-                            <h3 class="card-title mb-0 me-auto">Invoiced and paid</h3>
-                            <span class="small text-body-secondary">Last 12 months</span>
+                            <h3 class="card-title mb-0 me-auto"><?= __('Invoiced and paid') ?></h3>
+                            <span class="small text-body-secondary"><?= __('Last 12 months') ?></span>
                         </div>
                         <?php if (array_sum($chart_data['monthly']['invoiced']) + array_sum($chart_data['monthly']['paid']) > 0) { ?>
                             <div class="card-body">
-                                <div class="itflow-dash-chart"><canvas id="clientMonthly" aria-label="Invoiced and paid per month"></canvas></div>
+                                <div class="itflow-dash-chart"><canvas id="clientMonthly" aria-label="<?= escapeHtml(__('Invoiced and paid per month')) ?>"></canvas></div>
                             </div>
                         <?php } else { ?>
-                            <div class="card-body text-center text-body-secondary py-4 small">Nothing invoiced or paid in the last 12 months.</div>
+                            <div class="card-body text-center text-body-secondary py-4 small"><?= __('Nothing invoiced or paid in the last 12 months.') ?></div>
                         <?php } ?>
                     </div>
                 </div>

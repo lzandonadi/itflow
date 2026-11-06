@@ -43,7 +43,7 @@ $sql = mysqli_query($mysqli, "SELECT client_id, client_name, contact_archived_at
 ");
 
 if (mysqli_num_rows($sql) == 0) {
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
     require_once "../includes/footer.php";
     exit();
 }
@@ -177,16 +177,16 @@ while ($row = mysqli_fetch_assoc($sql_note_type_icons)) {
 $history = auditLogHistory('Contact', $contact_id);
 
 $contact_tabs = [
-    'assets' => ['label' => 'Assets', 'icon' => 'fa-desktop', 'count' => $asset_count],
-    'credentials' => ['label' => 'Credentials', 'icon' => 'fa-key', 'count' => $credential_count],
-    'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'count' => $ticket_count, 'badge' => $ticket_open_count],
-    'recurring' => ['label' => 'Recurring', 'icon' => 'fa-redo-alt', 'count' => $recurring_ticket_count],
-    'licenses' => ['label' => 'Licenses', 'icon' => 'fa-cube', 'count' => $software_count],
-    'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'count' => $document_count],
-    'files' => ['label' => 'Files', 'icon' => 'fa-paperclip', 'count' => $file_count],
-    'services' => ['label' => 'Services', 'icon' => 'fa-stream', 'count' => $service_count],
-    'notes' => ['label' => 'Notes', 'icon' => 'fa-sticky-note', 'count' => $note_count],
-    'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+    'assets' => ['label' => __('Assets'), 'icon' => 'fa-desktop', 'count' => $asset_count],
+    'credentials' => ['label' => __('Credentials'), 'icon' => 'fa-key', 'count' => $credential_count],
+    'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'count' => $ticket_count, 'badge' => $ticket_open_count],
+    'recurring' => ['label' => __('Recurring'), 'icon' => 'fa-redo-alt', 'count' => $recurring_ticket_count],
+    'licenses' => ['label' => __('Licenses'), 'icon' => 'fa-cube', 'count' => $software_count],
+    'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'count' => $document_count],
+    'files' => ['label' => __('Files'), 'icon' => 'fa-paperclip', 'count' => $file_count],
+    'services' => ['label' => __('Services'), 'icon' => 'fa-stream', 'count' => $service_count],
+    'notes' => ['label' => __('Notes'), 'icon' => 'fa-sticky-note', 'count' => $note_count],
+    'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
 ];
 if (!$can_credentials) {
     unset($contact_tabs['credentials']);
@@ -204,7 +204,7 @@ if (!$can_support) {
         <a href="client_overview.php?client_id=<?= $client_id ?>"><?= $client_name ?></a>
     </li>
     <li class="breadcrumb-item">
-        <a href="contacts.php?client_id=<?= $client_id ?>">Contacts</a>
+        <a href="contacts.php?client_id=<?= $client_id ?>"><?= __('Contacts') ?></a>
     </li>
     <li class="breadcrumb-item active"><?= $contact_name ?></li>
 </ol>
@@ -213,7 +213,7 @@ if (!$can_support) {
 <div class="card mb-3">
     <div class="card-body d-flex flex-wrap align-items-center gap-3">
         <?php if ($contact_row['contact_photo']) { ?>
-            <a href="<?= "../uploads/clients/$client_id/" . escapeHtml($contact_row['contact_photo']) ?>" target="_blank" rel="noopener" title="Open photo">
+            <a href="<?= "../uploads/clients/$client_id/" . escapeHtml($contact_row['contact_photo']) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open photo')) ?>">
                 <?= contactAvatar($client_id, $contact_id, $contact_row['contact_name'], $contact_row['contact_photo'], 'lg') ?>
             </a>
         <?php } else { ?>
@@ -224,7 +224,7 @@ if (!$can_support) {
             <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                 <span><?= $contact_name ?></span>
                 <span class="fs-6 fw-normal d-inline-flex flex-wrap gap-1"><?= contactFlagPills($contact_row) ?></span>
-                <?php if ($contact_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if ($contact_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h1>
             <?php if ($contact_role_line) { ?>
                 <div class="text-body-secondary"><?= $contact_role_line ?></div>
@@ -237,113 +237,113 @@ if (!$can_support) {
         <div class="d-flex flex-wrap gap-2 d-print-none">
             <?php if ($contact_dial === 'phone') { ?>
                 <a class="btn btn-outline-primary" href="tel:<?= escapeHtml(preg_replace('/[^0-9+]/', '', ($contact_row['contact_phone_country_code'] ? '+' . $contact_row['contact_phone_country_code'] : '') . $contact_row['contact_phone']) . ($contact_row['contact_extension'] ? ',' . preg_replace('/[^0-9]/', '', $contact_row['contact_extension']) : '')) ?>" title="Call <?= $contact_phone_copy ?>">
-                    <i class="fas fa-phone me-2"></i>Call
+                    <i class="fas fa-phone me-2"></i><?= __('Call') ?>
                 </a>
             <?php } elseif ($contact_dial === 'mobile') { ?>
                 <a class="btn btn-outline-primary" href="tel:<?= escapeHtml(preg_replace('/[^0-9+]/', '', ($contact_row['contact_mobile_country_code'] ? '+' . $contact_row['contact_mobile_country_code'] : '') . $contact_row['contact_mobile'])) ?>" title="Call <?= $contact_mobile_copy ?>">
-                    <i class="fas fa-mobile-alt me-2"></i>Call
+                    <i class="fas fa-mobile-alt me-2"></i><?= __('Call') ?>
                 </a>
             <?php } ?>
             <?php if ($contact_email) { ?>
-                <a class="btn btn-outline-primary" href="mailto:<?= $contact_email ?>" title="Email <?= $contact_email ?>">
-                    <i class="far fa-envelope me-2"></i>Email
+                <a class="btn btn-outline-primary" href="mailto:<?= $contact_email ?>" title="<?= __('Email %s', $contact_email) ?>">
+                    <i class="far fa-envelope me-2"></i><?= __('Email') ?>
                 </a>
             <?php } ?>
             <?php if ($can_edit) { ?>
                 <div class="dropdown">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i>New</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i><?= __('New') ?></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <?php if ($can_support_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>" data-modal-size="lg">
-                                <i class="fa fa-fw fa-life-ring text-secondary me-2"></i>Ticket
+                                <i class="fa fa-fw fa-life-ring text-secondary me-2"></i><?= __('Ticket') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/recurring_ticket/recurring_ticket_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>" data-modal-size="lg">
-                                <i class="fa fa-fw fa-redo-alt text-secondary me-2"></i>Recurring Ticket
+                                <i class="fa fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Recurring Ticket') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/calendar/calendar_event_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>&lock_client=1" data-modal-size="lg">
-                                <i class="far fa-fw fa-calendar-plus text-secondary me-2"></i>Meeting
+                                <i class="far fa-fw fa-calendar-plus text-secondary me-2"></i><?= __('Meeting') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-desktop text-secondary me-2"></i>Asset
+                                <i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Asset') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_credentials_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/credential/credential_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-key text-secondary me-2"></i>Credential
+                                <i class="fa fa-fw fa-key text-secondary me-2"></i><?= __('Credential') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_support_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/document/document_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>" data-modal-size="xl">
-                                <i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document
+                                <i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/file/file_upload.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-upload text-secondary me-2"></i>Upload File(s)
+                                <i class="fa fa-fw fa-upload text-secondary me-2"></i><?= __('Upload File(s)') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/software/software_add.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-cube text-secondary me-2"></i>License
+                                <i class="fa fa-fw fa-cube text-secondary me-2"></i><?= __('License') ?>
                             </a>
                         <?php } ?>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_note_add.php?id=<?= $contact_id ?>">
-                            <i class="fas fa-fw fa-sticky-note text-secondary me-2"></i>Note
+                            <i class="fas fa-fw fa-sticky-note text-secondary me-2"></i><?= __('Note') ?>
                         </a>
                     </div>
                 </div>
                 <div class="dropdown">
-                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i>Link</button>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_link_asset.php?id=<?= $contact_id ?>">
-                            <i class="fa fa-fw fa-desktop text-secondary me-2"></i>Asset
+                            <i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Asset') ?>
                         </a>
                         <?php if ($can_credentials_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_link_credential.php?id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-key text-secondary me-2"></i>Credential
+                                <i class="fa fa-fw fa-key text-secondary me-2"></i><?= __('Credential') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_support_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/link/link.php?from=contact&id=<?= $contact_id ?>&to=software">
-                                <i class="fa fa-fw fa-cube text-secondary me-2"></i>License
+                                <i class="fa fa-fw fa-cube text-secondary me-2"></i><?= __('License') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_support_edit) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_link_service.php?id=<?= $contact_id ?>">
-                                <i class="fa fa-fw fa-stream text-secondary me-2"></i>Service
+                                <i class="fa fa-fw fa-stream text-secondary me-2"></i><?= __('Service') ?>
                             </a>
                         <?php } ?>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_link_document.php?id=<?= $contact_id ?>">
-                            <i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document
+                            <i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?>
                         </a>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contact/contact_link_file.php?id=<?= $contact_id ?>">
-                            <i class="fa fa-fw fa-paperclip text-secondary me-2"></i>File
+                            <i class="fa fa-fw fa-paperclip text-secondary me-2"></i><?= __('File') ?>
                         </a>
                     </div>
                 </div>
                 <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_edit.php?id=<?= $contact_id ?>">
-                    <i class="fas fa-user-edit me-2"></i>Edit
+                    <i class="fas fa-user-edit me-2"></i><?= __('Edit') ?>
                 </button>
                 <?php if (!$contact_primary) { ?>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($contact_archived_at) { ?>
                                 <a class="dropdown-item confirm-link" href="post.php?restore_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                 </a>
                             <?php } else { ?>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                                 <?php if ($can_delete) { ?>
                                     <a class="dropdown-item text-danger confirm-link" href="post.php?anonymize_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-user-secret me-2"></i>Anonymize &amp; Archive
+                                        <i class="fas fa-fw fa-user-secret me-2"></i><?= __('Anonymize &amp; Archive') ?>
                                     </a>
                                 <?php } ?>
                             <?php } ?>
                             <?php if ($can_delete && $config_destructive_deletes_enable) { ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_contact=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -361,37 +361,37 @@ if (!$can_support) {
 
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-phone-alt text-secondary me-2"></i>Reach</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-phone-alt text-secondary me-2"></i><?= __('Reach') ?></h3>
             </div>
             <div class="card-body">
                 <?php if ($contact_phone_link || $contact_mobile_link || $contact_email) { ?>
                     <dl class="itflow-asset-dl mb-0">
                         <?php if ($contact_phone_link) { ?>
-                            <dt>Phone</dt>
-                            <dd><?= $contact_phone_link ?><button type="button" class="itflow-copy clipboardjs" title="Copy phone" data-clipboard-text="<?= $contact_phone_copy ?>"><i class="far fa-copy"></i></button></dd>
+                            <dt><?= __('Phone') ?></dt>
+                            <dd><?= $contact_phone_link ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy phone')) ?>" data-clipboard-text="<?= $contact_phone_copy ?>"><i class="far fa-copy"></i></button></dd>
                         <?php } ?>
                         <?php if ($contact_mobile_link) { ?>
-                            <dt>Mobile</dt>
-                            <dd><?= $contact_mobile_link ?><button type="button" class="itflow-copy clipboardjs" title="Copy mobile" data-clipboard-text="<?= $contact_mobile_copy ?>"><i class="far fa-copy"></i></button></dd>
+                            <dt><?= __('Mobile') ?></dt>
+                            <dd><?= $contact_mobile_link ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy mobile')) ?>" data-clipboard-text="<?= $contact_mobile_copy ?>"><i class="far fa-copy"></i></button></dd>
                         <?php } ?>
                         <?php if ($contact_email) { ?>
-                            <dt>Email</dt>
-                            <dd class="d-flex align-items-center min-w-0"><a class="text-truncate" href="mailto:<?= $contact_email ?>" title="<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></dd>
+                            <dt><?= __('Email') ?></dt>
+                            <dd class="d-flex align-items-center min-w-0"><a class="text-truncate" href="mailto:<?= $contact_email ?>" title="<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></dd>
                         <?php } ?>
                     </dl>
                 <?php } else { ?>
-                    <span class="text-body-secondary">No phone or email recorded.</span>
+                    <span class="text-body-secondary"><?= __('No phone or email recorded.') ?></span>
                 <?php } ?>
             </div>
         </div>
 
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-id-card text-secondary me-2"></i>Details</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-id-card text-secondary me-2"></i><?= __('Details') ?></h3>
             </div>
             <div class="card-body">
                 <dl class="itflow-asset-dl mb-0">
-                    <dt>Location</dt>
+                    <dt><?= __('Location') ?></dt>
                     <dd>
                         <?php if ($can_edit && !$contact_archived_at) { ?>
                             <?= quickPick('contact_location', $contact_id, (string) intval($contact_row['contact_location_id']), contactLocationHtml($contact_row, 'detail'), 'detail', 0, $client_id) ?>
@@ -400,39 +400,39 @@ if (!$can_support) {
                         <?php } ?>
                     </dd>
                     <?php if ($contact_pin) { ?>
-                        <dt>PIN</dt>
+                        <dt><?= __('PIN') ?></dt>
                         <dd><span class="font-monospace"><?= $contact_pin ?></span> <span class="small text-body-secondary">to verify them on a call</span></dd>
                     <?php } ?>
-                    <dt>Portal</dt>
+                    <dt><?= __('Portal') ?></dt>
                     <dd>
-                        <?= $contact_portal ? "Can log in &middot; <span class='text-body-secondary'>$contact_portal" . ($contact_portal_mfa ? ' and a code' : '') . "</span>" : '<span class="text-body-secondary">No access</span>' ?>
+                        <?= $contact_portal ? __('Can log in &middot; %s', "<span class='text-body-secondary'>" . contactPortalAccessLabel($contact_portal, $contact_portal_mfa) . '</span>') : '<span class="text-body-secondary">' . __('No access') . '</span>' ?>
                         <?php if ($contact_portal) { ?>
-                            <div class="small text-body-secondary"><?= $contact_portal_last ? 'Last signed in <span title="' . escapeHtml($contact_portal_last) . '">' . timeAgo($contact_portal_last) . '</span>' : 'Has not signed in yet' ?></div>
+                            <div class="small text-body-secondary"><?= $contact_portal_last ? __('Last signed in %s', '<span title="' . escapeHtml($contact_portal_last) . '">' . timeAgo($contact_portal_last) . '</span>') : __('Has not signed in yet') ?></div>
                         <?php } ?>
                         <?php if ($contact_portal_joined) { ?>
-                            <div class="small text-body-secondary" data-contact-joined><?= $contact_portal_joined['kind'] === 'signup' ? 'Signed up themselves' : 'Joined from ' . ($contact_portal_joined['by'] !== '' ? escapeHtml($contact_portal_joined['by']) . "'s invite" : 'an invite') ?> on <?= date('M j, Y', strtotime($contact_portal_joined['at'])) ?></div>
+                            <div class="small text-body-secondary" data-contact-joined><?php $joined_on = formatDate($contact_portal_joined['at'], 'date'); ?><?= $contact_portal_joined['kind'] === 'signup' ? __('Signed up themselves on %s', $joined_on) : ($contact_portal_joined['by'] !== '' ? __('Joined from %1$s\'s invite on %2$s', escapeHtml($contact_portal_joined['by']), $joined_on) : __('Joined from an invite on %s', $joined_on)) ?></div>
                         <?php } ?>
                         <?php if ($can_view_as || ($contact_portal_mfa && $can_edit)) { ?>
                             <div class="d-flex flex-wrap gap-2 mt-1 small d-print-none">
                                 <?php if ($can_view_as) { ?>
-                                    <a href="post.php?portal_view_as=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" target="_blank" rel="noopener" title="Open the client portal as <?= $contact_name ?> sees it - read only, in a new tab"><i class="fas fa-eye me-1"></i>View portal as them</a>
+                                    <a href="post.php?portal_view_as=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" target="_blank" rel="noopener" title="<?= __('Open the client portal as %s sees it - read only, in a new tab', $contact_name) ?>"><i class="fas fa-eye me-1"></i><?= __('View portal as them') ?></a>
                                 <?php } ?>
                                 <?php if ($contact_portal_mfa && $can_edit) { ?>
-                                    <a class="text-danger confirm-link" href="post.php?reset_contact_portal_mfa=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $contact_name ?> will sign in with their password alone until they set it up again. For a lost phone." title="For a lost phone - they can set it up again from Your account"><i class="fas fa-mobile-alt me-1"></i>Turn off two-step sign-in</a>
+                                    <a class="text-danger confirm-link" href="post.php?reset_contact_portal_mfa=<?= $contact_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $contact_name ?> will sign in with their password alone until they set it up again. For a lost phone." title="<?= escapeHtml(__('For a lost phone - they can set it up again from Your account')) ?>"><i class="fas fa-mobile-alt me-1"></i><?= __('Turn off two-step sign-in') ?></a>
                                 <?php } ?>
                             </div>
                         <?php } ?>
                     </dd>
                     <?php if ($contact_portal || $contact_row['contact_ticket_emails'] !== 'all' || $contact_row['contact_company_ticket_emails'] !== 'none') { ?>
-                        <dt>Ticket emails</dt>
+                        <dt><?= __('Ticket emails') ?></dt>
                         <dd>
-                            <?= escapeHtml(PORTAL_TICKET_EMAILS[$contact_row['contact_ticket_emails']]['label'] ?? 'Every email') ?>
+                            <?= escapeHtml(__(PORTAL_TICKET_EMAILS[$contact_row['contact_ticket_emails']]['label'] ?? 'Every email')) /* i18n-dynamic: PORTAL_TICKET_EMAILS labels */ ?>
                             <?php if (($contact_primary || intval($contact_row['contact_technical'])) && $contact_row['contact_company_ticket_emails'] !== 'none') { ?>
-                                <div class="small text-body-secondary">And about the company's tickets: <?= escapeHtml(strtolower(PORTAL_COMPANY_TICKET_EMAILS[$contact_row['contact_company_ticket_emails']]['label'] ?? '')) ?></div>
+                                <div class="small text-body-secondary"><?= __("And about the company's tickets: %s", escapeHtml(mb_strtolower(__(PORTAL_COMPANY_TICKET_EMAILS[$contact_row['contact_company_ticket_emails']]['label'] ?? '')))) /* i18n-dynamic: PORTAL_COMPANY_TICKET_EMAILS */ ?></div>
                             <?php } ?>
                         </dd>
                     <?php } ?>
-                    <dt>Added</dt>
+                    <dt><?= __('Added') ?></dt>
                     <dd title="<?= $contact_created_at ?>"><?= timeAgo($contact_created_at) ?></dd>
                 </dl>
             </div>
@@ -440,9 +440,9 @@ if (!$can_support) {
 
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i>Quick notes</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i><?= __('Quick notes') ?></h3>
             </div>
-            <textarea class="form-control border-0 rounded-0 rounded-bottom" rows="5" id="contactNotes" placeholder="Personal tidbits, how they like to be contacted - saves when you click away" onblur="updateContactNotes(<?= $contact_id ?>)" <?= $can_edit ? '' : 'readonly' ?>><?= $contact_notes ?></textarea>
+            <textarea class="form-control border-0 rounded-0 rounded-bottom" rows="5" id="contactNotes" placeholder="<?= escapeHtml(__('Personal tidbits, how they like to be contacted - saves when you click away')) ?>" onblur="updateContactNotes(<?= $contact_id ?>)" <?= $can_edit ? '' : 'readonly' ?>><?= $contact_notes ?></textarea>
         </div>
 
     </div>
@@ -458,7 +458,7 @@ if (!$can_support) {
                                 <i class="fas fa-fw <?= $tab['icon'] ?> me-1 d-none d-xxl-inline"></i><?= $tab['label'] ?>
                                 <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
                                 <?php if (!empty($tab['badge'])) { ?>
-                                    <span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span>
+                                    <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= __('%d open', intval($tab['badge'])) ?></span>
                                 <?php } ?>
                             </button>
                         </li>
@@ -471,15 +471,15 @@ if (!$can_support) {
                 <!-- Assets -->
                 <div class="tab-pane fade" id="contact-pane-assets" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Assets assigned to <?= $contact_name ?>.</span>
+                        <span class="text-body-secondary small"><?= __('Assets assigned to %s.', $contact_name) ?></span>
                         <?php if ($can_edit) { ?>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/contact/contact_link_asset.php?id=<?= $contact_id ?>">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                                 <?php if ($can_support_edit) { ?>
                                     <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                        <i class="fas fa-plus me-2"></i>New Asset
+                                        <i class="fas fa-plus me-2"></i><?= __('New Asset') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -489,7 +489,7 @@ if (!$can_support) {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="text-nowrap table-light">
-                                <tr><th>Asset</th><th>Model / Serial</th><th>IP</th><th>Status</th><th></th></tr>
+                                <tr><th><?= __('Asset') ?></th><th><?= __('Model / Serial') ?></th><th><?= __('IP') ?></th><th><?= __('Status') ?></th><th></th></tr>
                                 </thead>
                                 <tbody>
                                 <?php while ($row = mysqli_fetch_assoc($sql_related_assets)) {
@@ -503,35 +503,35 @@ if (!$can_support) {
                                                 <span class="itflow-asset-icon itflow-asset-icon-sm itflow-asset-tone-<?= assetTypeTone($row['asset_type']) ?>" aria-hidden="true"><i class="fas fa-fw fa-<?= getAssetIcon($row['asset_type']) ?>"></i></span>
                                                 <div class="min-w-0">
                                                     <a class="fw-semibold text-body ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= $asset_id ?>"><?= escapeHtml($row['asset_name']) ?></a>
-                                                    <?php if ($row['asset_favorite']) { ?><i class="fas fa-star text-warning ms-1" title="Favorite"></i><?php } ?>
+                                                    <?php if ($row['asset_favorite']) { ?><i class="fas fa-star text-warning ms-1" title="<?= escapeHtml(__('Favorite')) ?>"></i><?php } ?>
                                                     <div class="small text-body-secondary"><?= escapeHtml($row['asset_type']) ?></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div><?= $asset_make_model ?: '<span class="text-body-secondary">-</span>' ?></div>
-                                            <?php if ($asset_serial) { ?><div class="small text-body-secondary text-nowrap"><span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy serial" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button></div><?php } ?>
+                                            <?php if ($asset_serial) { ?><div class="small text-body-secondary text-nowrap"><span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy serial')) ?>" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button></div><?php } ?>
                                         </td>
                                         <td class="text-nowrap">
-                                            <?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?>
+                                            <?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?>
                                         </td>
                                         <td><?= assetStatusPill($row['asset_status']) ?: '<span class="text-body-secondary">-</span>' ?></td>
                                         <td class="text-end">
                                             <div class="dropdown dropstart">
-                                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item" href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>">
-                                                        <i class="fas fa-fw fa-arrow-right text-secondary me-2"></i>Open
+                                                        <i class="fas fa-fw fa-arrow-right text-secondary me-2"></i><?= __('Open') ?>
                                                     </a>
                                                     <?php if ($can_support_edit) { ?>
                                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_edit.php?id=<?= $asset_id ?>">
-                                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                                         </a>
                                                     <?php } ?>
                                                     <?php if ($can_edit) { ?>
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="post.php?unlink_asset_from_contact&contact_id=<?= $contact_id ?>&asset_id=<?= $asset_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                            <i class="fas fa-fw fa-unlink text-secondary me-2"></i>Unlink
+                                                            <i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink') ?>
                                                         </a>
                                                     <?php } ?>
                                                 </div>
@@ -543,7 +543,7 @@ if (!$can_support) {
                             </table>
                         </div>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No assets assigned.</div>
+                        <div class="itflow-asset-empty"><?= __('No assets assigned.') ?></div>
                     <?php } ?>
                 </div>
                 <?php } ?>
@@ -552,14 +552,14 @@ if (!$can_support) {
                 <!-- Credentials -->
                 <div class="tab-pane fade" id="contact-pane-credentials" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Their logins. Passwords and codes are fetched only when you ask for them.</span>
+                        <span class="text-body-secondary small"><?= __('Their logins. Passwords and codes are fetched only when you ask for them.') ?></span>
                         <?php if ($can_edit && $can_credentials_edit) { ?>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/contact/contact_link_credential.php?id=<?= $contact_id ?>">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/credential/credential_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                    <i class="fas fa-plus me-2"></i>New Credential
+                                    <i class="fas fa-plus me-2"></i><?= __('New Credential') ?>
                                 </button>
                             </div>
                         <?php } ?>
@@ -571,7 +571,7 @@ if (!$can_support) {
                             },
                         ]) ?>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No credentials for <?= $contact_name ?>.</div>
+                        <div class="itflow-asset-empty"><?= __('No credentials for %s.', $contact_name) ?></div>
                     <?php } ?>
                 </div>
                 <?php } ?>
@@ -580,27 +580,27 @@ if (!$can_support) {
                 <!-- Tickets -->
                 <div class="tab-pane fade" id="contact-pane-tickets" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Tickets they are the contact on. Open ones first.</span>
+                        <span class="text-body-secondary small"><?= __('Tickets they are the contact on. Open ones first.') ?></span>
                         <?php if ($can_support_edit) { ?>
                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fas fa-plus me-2"></i>New Ticket
+                                <i class="fas fa-plus me-2"></i><?= __('New Ticket') ?>
                             </button>
                         <?php } ?>
                     </div>
                     <?php if ($related_tickets) { ?>
                         <?= ticketTableHtml($related_tickets) ?>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No tickets yet.</div>
+                        <div class="itflow-asset-empty"><?= __('No tickets yet.') ?></div>
                     <?php } ?>
                 </div>
 
                 <!-- Recurring tickets -->
                 <div class="tab-pane fade" id="contact-pane-recurring" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Tickets that open on a schedule with them as the contact.</span>
+                        <span class="text-body-secondary small"><?= __('Tickets that open on a schedule with them as the contact.') ?></span>
                         <?php if ($can_support_edit) { ?>
                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_ticket/recurring_ticket_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                <i class="fas fa-plus me-2"></i>New Recurring Ticket
+                                <i class="fas fa-plus me-2"></i><?= __('New Recurring Ticket') ?>
                             </button>
                         <?php } ?>
                     </div>
@@ -608,7 +608,7 @@ if (!$can_support) {
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="text-nowrap table-light">
-                                <tr><th>Subject</th><th>Priority</th><th>Frequency</th><th>Next run</th><th></th></tr>
+                                <tr><th><?= __('Subject') ?></th><th><?= __('Priority') ?></th><th><?= __('Frequency') ?></th><th><?= __('Next run') ?></th><th></th></tr>
                                 </thead>
                                 <tbody>
                                 <?php while ($row = mysqli_fetch_assoc($sql_related_recurring_tickets)) {
@@ -627,19 +627,19 @@ if (!$can_support) {
                                         <td class="text-end">
                                             <?php if ($can_support_edit) { ?>
                                                 <div class="dropdown dropstart">
-                                                    <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                                    <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                                     <div class="dropdown-menu">
                                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_ticket/recurring_ticket_edit.php?id=<?= $recurring_ticket_id ?>">
-                                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                                         </a>
                                                         <a class="dropdown-item confirm-link" href="post.php?force_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                            data-confirm-text="A ticket is raised now, and the next run moves on a step - this takes its place.">
-                                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i>Raise now
+                                                            data-confirm-text="<?= escapeHtml(__('A ticket is raised now, and the next run moves on a step - this takes its place.')) ?>">
+                                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i><?= __('Raise now') ?>
                                                         </a>
                                                         <?php if (lookupUserPermission('module_support') >= 3) { ?>
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_recurring_ticket=<?= $recurring_ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                                <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                                <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                             </a>
                                                         <?php } ?>
                                                     </div>
@@ -652,7 +652,7 @@ if (!$can_support) {
                             </table>
                         </div>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No recurring tickets.</div>
+                        <div class="itflow-asset-empty"><?= __('No recurring tickets.') ?></div>
                     <?php } ?>
                 </div>
                 <?php } ?>
@@ -661,14 +661,14 @@ if (!$can_support) {
                 <!-- Licenses -->
                 <div class="tab-pane fade" id="contact-pane-licenses" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Licenses they hold a seat on, and the key they were given.</span>
+                        <span class="text-body-secondary small"><?= __('Licenses they hold a seat on, and the key they were given.') ?></span>
                         <?php if ($can_support_edit) { ?>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/link/link.php?from=contact&id=<?= $contact_id ?>&to=software">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software/software_add.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>">
-                                    <i class="fas fa-plus me-2"></i>New License
+                                    <i class="fas fa-plus me-2"></i><?= __('New License') ?>
                                 </button>
                             </div>
                         <?php } ?>
@@ -676,7 +676,7 @@ if (!$can_support) {
                     <?php if ($software_count) { ?>
                         <?= softwareHeldTable($held_software, 'contact', $contact_id, $can_support_edit) ?>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No licenses.</div>
+                        <div class="itflow-asset-empty"><?= __('No licenses.') ?></div>
                     <?php } ?>
                 </div>
                 <?php } ?>
@@ -685,15 +685,15 @@ if (!$can_support) {
                 <!-- Documents -->
                 <div class="tab-pane fade" id="contact-pane-documents" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Documentation about or for them.</span>
+                        <span class="text-body-secondary small"><?= __('Documentation about or for them.') ?></span>
                         <?php if ($can_edit) { ?>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/contact/contact_link_document.php?id=<?= $contact_id ?>">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                                 <?php if ($can_support_edit) { ?>
                                     <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="xl" data-modal-url="modals/document/document_add.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                        <i class="fas fa-plus me-2"></i>New Document
+                                        <i class="fas fa-plus me-2"></i><?= __('New Document') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -711,30 +711,30 @@ if (!$can_support) {
                                         <?php if ($row['document_description']) { ?><div class="small text-body-secondary text-truncate"><?= escapeHtml($row['document_description']) ?></div><?php } ?>
                                     </div>
                                     <span class="small text-body-secondary text-nowrap" title="<?= escapeHtml($document_last) ?>"><?= escapeHtml($row['user_name']) ?> &middot; <?= timeAgo($document_last) ?></span>
-                                    <a class="btn btn-sm btn-light ajax-modal" href="#" title="View" data-modal-size="lg" data-modal-url="modals/document/document_view.php?id=<?= $document_id ?>"><i class="fas fa-fw fa-eye"></i></a>
+                                    <a class="btn btn-sm btn-light ajax-modal" href="#" title="<?= escapeHtml(__('View')) ?>" data-modal-size="lg" data-modal-url="modals/document/document_view.php?id=<?= $document_id ?>"><i class="fas fa-fw fa-eye"></i></a>
                                     <?php if ($can_support_edit) { ?>
-                                        <a class="btn btn-sm btn-light" title="Unlink" href="post.php?unlink_contact_from_document&contact_id=<?= $contact_id ?>&document_id=<?= $document_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-unlink"></i></a>
+                                        <a class="btn btn-sm btn-light" title="<?= escapeHtml(__('Unlink')) ?>" href="post.php?unlink_contact_from_document&contact_id=<?= $contact_id ?>&document_id=<?= $document_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                     <?php } ?>
                                 </div>
                             <?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No documents.</div>
+                        <div class="itflow-asset-empty"><?= __('No documents.') ?></div>
                     <?php } ?>
                 </div>
 
                 <!-- Files -->
                 <div class="tab-pane fade" id="contact-pane-files" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Files linked to them.</span>
+                        <span class="text-body-secondary small"><?= __('Files linked to them.') ?></span>
                         <?php if ($can_edit) { ?>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/contact/contact_link_file.php?id=<?= $contact_id ?>">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                                 <?php if ($can_support_edit) { ?>
                                     <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/file/file_upload.php?<?= $client_url ?>&contact_id=<?= $contact_id ?>">
-                                        <i class="fas fa-upload me-2"></i>Upload
+                                        <i class="fas fa-upload me-2"></i><?= __('Upload') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -752,23 +752,23 @@ if (!$can_support) {
                                     </div>
                                     <span class="small text-body-secondary text-nowrap" title="<?= escapeHtml($row['file_created_at']) ?>"><?= formatBytes($row['file_size']) ?> &middot; <?= timeAgo($row['file_created_at']) ?></span>
                                     <?php if ($can_edit) { ?>
-                                        <a class="btn btn-sm btn-light" title="Unlink" href="post.php?unlink_contact_from_file&contact_id=<?= $contact_id ?>&file_id=<?= $file_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-unlink"></i></a>
+                                        <a class="btn btn-sm btn-light" title="<?= escapeHtml(__('Unlink')) ?>" href="post.php?unlink_contact_from_file&contact_id=<?= $contact_id ?>&file_id=<?= $file_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                     <?php } ?>
                                 </div>
                             <?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No files.</div>
+                        <div class="itflow-asset-empty"><?= __('No files.') ?></div>
                     <?php } ?>
                 </div>
 
                 <!-- Services -->
                 <div class="tab-pane fade" id="contact-pane-services" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Services they own or are the contact for at the client.</span>
+                        <span class="text-body-secondary small"><?= __('Services they own or are the contact for at the client.') ?></span>
                         <?php if ($can_support_edit) { ?>
                             <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/contact/contact_link_service.php?id=<?= $contact_id ?>">
-                                <i class="fas fa-link me-2"></i>Link Service
+                                <i class="fas fa-link me-2"></i><?= __('Link Service') ?>
                             </button>
                         <?php } ?>
                     </div>
@@ -777,7 +777,7 @@ if (!$can_support) {
                             return "post.php?unlink_item&from=contact&id=$contact_id&to=service&other=" . intval($row['service_id']) . "&csrf_token=" . $_SESSION['csrf_token'];
                         } : null) ?>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">Not a contact for any service.</div>
+                        <div class="itflow-asset-empty"><?= __('Not a contact for any service.') ?></div>
                     <?php } ?>
                 </div>
                 <?php } ?>
@@ -785,7 +785,7 @@ if (!$can_support) {
                 <!-- History, from the audit log -->
                 <div class="tab-pane fade" id="contact-pane-history" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Changes to them, their portal access and notes - newest first.</span>
+                        <span class="text-body-secondary small"><?= __('Changes to them, their portal access and notes - newest first.') ?></span>
                     </div>
                     <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                 </div>
@@ -793,10 +793,10 @@ if (!$can_support) {
                 <!-- Notes -->
                 <div class="tab-pane fade" id="contact-pane-notes" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">A dated log - calls, meetings, anything worth remembering.</span>
+                        <span class="text-body-secondary small"><?= __('A dated log - calls, meetings, anything worth remembering.') ?></span>
                         <?php if ($can_edit) { ?>
                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/contact/contact_note_add.php?id=<?= $contact_id ?>">
-                                <i class="fas fa-plus me-2"></i>New Note
+                                <i class="fas fa-plus me-2"></i><?= __('New Note') ?>
                             </button>
                         <?php } ?>
                     </div>
@@ -818,14 +818,14 @@ if (!$can_support) {
                                     </div>
                                     <?php if ($can_edit) { ?>
                                         <div class="dropdown dropstart">
-                                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item text-danger" href="post.php?archive_contact_note=<?= $contact_note_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                                 <?php if ($can_delete) { ?>
                                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_contact_note=<?= $contact_note_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                     </a>
                                                 <?php } ?>
                                             </div>
@@ -835,7 +835,7 @@ if (!$can_support) {
                             <?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="itflow-asset-empty">No notes yet.</div>
+                        <div class="itflow-asset-empty"><?= __('No notes yet.') ?></div>
                     <?php } ?>
                 </div>
 

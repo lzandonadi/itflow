@@ -84,7 +84,7 @@ if (isset($_POST['add_contact'])) {
 
     triggerCustomAction('contact_create', $contact_id);
 
-    flashAlert("Contact <strong>" . stripslashes($name) . "</strong> created" . ($invited ? ' and invited to the client portal' : ($invited === false ? ' - the portal invite was not sent, as ' . (portalMailReady() ? 'their email address is not valid' : 'outgoing mail is not set up') : '')), $invited === false ? 'warning' : 'success');
+    flashAlert(contactSavedMessage('created', stripslashes($name), $invited), $invited === false ? 'warning' : 'success');
 
     redirect();
 
@@ -105,7 +105,7 @@ if (isset($_POST['edit_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_photo, contact_user_id, contact_client_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert("That contact no longer exists", 'error');
+        flashAlert(__('That contact no longer exists'), 'error');
         redirect();
     }
     $existing_file_name = basename((string) $row['contact_photo']);
@@ -198,7 +198,7 @@ if (isset($_POST['edit_contact'])) {
 
     triggerCustomAction('contact_update', $contact_id);
 
-    flashAlert("Contact <strong>" . stripslashes($name) . "</strong> updated" . ($invited ? ' and invited to the client portal' : ($invited === false ? ' - the portal invite was not sent, as ' . (portalMailReady() ? 'their email address is not valid' : 'outgoing mail is not set up') : '')), $invited === false ? 'warning' : 'success');
+    flashAlert(contactSavedMessage('updated', stripslashes($name), $invited), $invited === false ? 'warning' : 'success');
 
     redirect();
 
@@ -218,7 +218,7 @@ if (isset($_POST['add_contact_note'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_client_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That contact no longer exists.', 'error');
+        flashAlert(__('That contact no longer exists.'), 'error');
         redirect();
     }
     $contact_name = escapeSql($row['contact_name']);
@@ -233,7 +233,7 @@ if (isset($_POST['add_contact_note'])) {
     //Logging
     logAudit("Contact", "Edit", "$session_name created a $type note for contact $contact_name", $client_id, $contact_id);
 
-    $_SESSION['alert_message'] = "Note <strong>$type</strong> created for <strong>$contact_name</strong>";
+    $_SESSION['alert_message'] = __('Note <strong>%1$s</strong> created for <strong>%2$s</strong>', $type, $contact_name);
 
     redirect();
 
@@ -251,7 +251,7 @@ if (isset($_GET['archive_contact_note'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_note_type, contact_id, contact_name, contact_client_id FROM contact_notes LEFT JOIN contacts ON contact_id = contact_note_contact_id WHERE contact_note_id = $contact_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $contact_note_type = escapeSql($row['contact_note_type']);
@@ -265,7 +265,7 @@ if (isset($_GET['archive_contact_note'])) {
 
     logAudit("Contact", "Edit", "$session_name archived note $contact_note_type for $contact_name", $client_id, $contact_id);
 
-    flashAlert("Note <strong>$contact_note_type</strong> archived", 'error');
+    flashAlert(__('Note <strong>%s</strong> archived', $contact_note_type), 'error');
 
     redirect();
 
@@ -283,7 +283,7 @@ if (isset($_GET['restore_contact_note'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_note_type, contact_id, contact_name, contact_client_id FROM contact_notes LEFT JOIN contacts ON contact_id = contact_note_contact_id WHERE contact_note_id = $contact_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $contact_note_type = escapeSql($row['contact_note_type']);
@@ -297,7 +297,7 @@ if (isset($_GET['restore_contact_note'])) {
 
     logAudit("Contact", "Edit", "$session_name restored note $contact_note_type for $contact_name", $client_id, $contact_id);
 
-    flashAlert("Note <strong>$contact_note_type</strong> restored");
+    flashAlert(__('Note <strong>%s</strong> restored', $contact_note_type));
 
     redirect();
 
@@ -315,7 +315,7 @@ if (isset($_GET['delete_contact_note'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_note_type, contact_id, contact_name, contact_client_id FROM contact_notes LEFT JOIN contacts ON contact_id = contact_note_contact_id WHERE contact_note_id = $contact_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $contact_note_type = escapeSql($row['contact_note_type']);
@@ -329,7 +329,7 @@ if (isset($_GET['delete_contact_note'])) {
 
     logAudit("Contact", "Edit", "$session_name deleted $contact_note_type note for $contact_name", $client_id, $contact_id);
 
-    flashAlert("Note <strong>$contact_note_type</strong> deleted", 'error');
+    flashAlert(__('Note <strong>%s</strong> deleted', $contact_note_type), 'error');
 
     redirect();
 
@@ -377,7 +377,7 @@ if (isset($_POST['bulk_assign_contact_location'])) {
 
         logAudit("Contact", "Bulk Edit", "$session_name assigned $contact_count contacts to location $location_name", $client_id);
 
-        flashAlert("<strong>$contact_count</strong> contact" . ($contact_count === 1 ? '' : 's') . " assigned to location <strong>" . stripslashes($location_name) . "</strong>");
+        flashAlert(_n('<strong>%d</strong> contact assigned to location <strong>%s</strong>', '<strong>%d</strong> contacts assigned to location <strong>%s</strong>', $contact_count, $contact_count, stripslashes($location_name)));
     }
 
     redirect();
@@ -417,7 +417,7 @@ if (isset($_POST['bulk_edit_contact_phone'])) {
 
         logAudit("Contact", "Bulk Edit", "$session_name set the Phone Number $phone for $contact_count contacts", $client_id);
 
-        flashAlert("Phone number set to <strong>" . formatPhoneNumber($phone) . "</strong> on <strong>$contact_count</strong> contact" . ($contact_count === 1 ? '' : 's'));
+        flashAlert(_n('Phone number set to <strong>%2$s</strong> on <strong>%1$d</strong> contact', 'Phone number set to <strong>%2$s</strong> on <strong>%1$d</strong> contacts', $contact_count, $contact_count, formatPhoneNumber($phone)));
     }
 
     redirect();
@@ -457,7 +457,7 @@ if (isset($_POST['bulk_edit_contact_department'])) {
 
         logAudit("Contact", "Bulk Edit", "$session_name set the department $department for $contact_count contacts", $client_id);
 
-        flashAlert("Department set to <strong>" . stripslashes($department) . "</strong> on <strong>$contact_count</strong> contact" . ($contact_count === 1 ? '' : 's'));
+        flashAlert(_n('Department set to <strong>%2$s</strong> on <strong>%1$d</strong> contact', 'Department set to <strong>%2$s</strong> on <strong>%1$d</strong> contacts', $contact_count, $contact_count, stripslashes($department)));
     }
 
     redirect();
@@ -501,7 +501,7 @@ if (isset($_POST['bulk_edit_contact_role'])) {
 
         logAudit("Contact", "Bulk Edit", "$session_name edited the contact role for $contact_count contacts", $client_id);
 
-        flashAlert("Roles updated on <strong>$contact_count</strong> contact" . ($contact_count === 1 ? '' : 's'));
+        flashAlert(_n('Roles updated on <strong>%d</strong> contact', 'Roles updated on <strong>%d</strong> contacts', $contact_count));
     }
 
     redirect();
@@ -527,7 +527,7 @@ if (isset($_POST['send_bulk_mail_now'])) {
         }
         enforceClientAccess(intval($row['contact_client_id']));
         $recipients[] = ['email' => trim((string) $row['contact_email']), 'name' => (string) $row['contact_name'],
-            'footnote' => "You received this as a contact for {$row['client_name']} with $company_name."];
+            'footnote' => __('You received this as a contact for %1$s with %2$s.', $row['client_name'], $company_name)];
     }
 
     emailBulkPost($recipients, count($contact_ids));
@@ -577,7 +577,7 @@ if (isset($_POST['bulk_archive_contacts'])) {
 
         logAudit("Contact", "Bulk Archive", "$session_name archived $count contacts", $client_id);
 
-        flashAlert("Archived $count contact(s)", 'error');
+        flashAlert(__('Archived %s contact(s)', $count), 'error');
 
     }
 
@@ -622,7 +622,7 @@ if (isset($_POST['bulk_restore_contacts'])) {
 
         logAudit("Contact", "Bulk Restore", "$session_name restored $count contacts", $client_id);
 
-        flashAlert("Restored <strong>$count</strong> contact(s)");
+        flashAlert(__('Restored <strong>%s</strong> contact(s)', $count));
 
     }
 
@@ -668,7 +668,7 @@ if (isset($_POST['bulk_delete_contacts'])) {
 
         logAudit("Contact", "Bulk Delete", "$session_name deleted $count contacts", $client_id);
 
-        flashAlert("Deleted <strong>$count</strong> contact(s)", 'error');
+        flashAlert(__('Deleted <strong>%s</strong> contact(s)', $count), 'error');
 
     }
 
@@ -688,7 +688,7 @@ if (isset($_GET['anonymize_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_email, contact_phone, contact_client_id, contact_user_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That contact no longer exists.', 'error');
+        flashAlert(__('That contact no longer exists.'), 'error');
         redirect();
     }
 
@@ -780,7 +780,7 @@ if (isset($_GET['anonymize_contact'])) {
 
     logAudit("Contact", "Archive", "$session_name archived and anonymized contact", $client_id, $contact_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> anonymized and archived", 'error');
+    flashAlert(__('Contact <strong>%s</strong> anonymized and archived', stripslashes($contact_name)), 'error');
 
     redirect();
 
@@ -800,7 +800,7 @@ if (isset($_GET['portal_view_as'])) {
     $contact_id = intval($_GET['portal_view_as']);
     $access = portalViewAsAccess($session_user_id, $contact_id);
     if (!$access) {
-        flashAlert("You can't view the portal as that contact - it needs the client portal on, read access to clients and support, and the client", 'error');
+        flashAlert(__('You can\'t view the portal as that contact - it needs the client portal on, read access to clients and support, and the client'), 'error');
         redirect();
     }
 
@@ -828,7 +828,7 @@ if (isset($_GET['reset_contact_portal_mfa'])) {
     enforceClientAccess();
 
     if (!$row || !intval($row['contact_user_id'])) {
-        flashAlert("That contact has no client portal account", 'error');
+        flashAlert(__('That contact has no client portal account'), 'error');
         redirect();
     }
 
@@ -836,7 +836,7 @@ if (isset($_GET['reset_contact_portal_mfa'])) {
     logAudit("Contact", "Edit", "$session_name turned off two-step sign-in for " . escapeSql($row['contact_name']) . " in the client portal", $client_id, $contact_id);
     portalMailAccountChange($row['contact_email'], $row['contact_name'], 'mfa_off_by_us');
 
-    flashAlert("Two-step sign-in is off for <strong>" . escapeHtml($row['contact_name']) . "</strong> - they sign in with their password alone until they set it up again");
+    flashAlert(__('Two-step sign-in is off for <strong>%s</strong> - they sign in with their password alone until they set it up again', escapeHtml($row['contact_name'])));
 
     redirect();
 
@@ -856,21 +856,21 @@ if (isset($_POST['send_portal_invites'])) {
     $client = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT client_name, client_archived_at FROM clients WHERE client_id = $client_id LIMIT 1"));
     $back = "contacts.php?client_id=$client_id&role=invites";
     if (!$client || $client['client_archived_at'] || !portalInvitesReady() || intval($config_client_portal_enable) !== 1) {
-        flashAlert("People can't be invited to this client's portal", 'error');
+        flashAlert(__('People can\'t be invited to this client\'s portal'), 'error');
         redirect($back);
     }
     if (!portalMailReady()) {
-        flashAlert("Outgoing mail isn't set up, so an invite can't be sent", 'error');
+        flashAlert(__('Outgoing mail isn\'t set up, so an invite can\'t be sent'), 'error');
         redirect($back);
     }
 
     $parsed = portalInviteParse($_POST['emails'] ?? '');
     if (!$parsed['people']) {
-        flashAlert($parsed['bad'] ? '<strong>' . escapeHtml($parsed['bad'][0]) . '</strong> is not an email address' : 'Put in an email address to invite', 'error');
+        flashAlert($parsed['bad'] ? __('<strong>%s</strong> is not an email address', escapeHtml($parsed['bad'][0])) : __('Put in an email address to invite'), 'error');
         redirect($back);
     }
     if (count($parsed['people']) > PORTAL_INVITE_MAX) {
-        flashAlert('That is ' . count($parsed['people']) . ' addresses - invite up to ' . PORTAL_INVITE_MAX . ' at a time', 'error');
+        flashAlert(__('That is %1$s addresses - invite up to %2$s at a time', count($parsed['people']), PORTAL_INVITE_MAX), 'error');
         redirect($back);
     }
 
@@ -882,17 +882,17 @@ if (isset($_POST['send_portal_invites'])) {
 
     $lines = [];
     if ($done['invited']) {
-        $lines[] = 'Invited <strong>' . (count($done['invited']) === 1 ? escapeHtml($done['invited'][0]) : count($done['invited']) . ' people') . '</strong> to the portal';
+        $lines[] = count($done['invited']) === 1 ? __('Invited <strong>%s</strong> to the portal', escapeHtml($done['invited'][0])) : __('Invited <strong>%d people</strong> to the portal', count($done['invited']));
     }
     if ($done['resent']) {
-        $lines[] = 'Sent the invite again to <strong>' . (count($done['resent']) === 1 ? escapeHtml($done['resent'][0]) : count($done['resent']) . ' people') . '</strong>, with a new link';
+        $lines[] = count($done['resent']) === 1 ? __('Sent the invite again to <strong>%s</strong>, with a new link', escapeHtml($done['resent'][0])) : __('Sent the invite again to <strong>%d people</strong>, with a new link', count($done['resent']));
     }
-    $left_out = $parsed['bad'] ? array_map(function ($bad) { return escapeHtml($bad) . ' (not an email address)'; }, $parsed['bad']) : [];
+    $left_out = $parsed['bad'] ? array_map(function ($bad) { return escapeHtml($bad) . ' (' . __('not an email address') . ')'; }, $parsed['bad']) : [];
     foreach ($done['skipped'] as $email => $why) {
         $left_out[] = escapeHtml($email) . ' (' . escapeHtml($why) . ')';
     }
     if ($left_out) {
-        $lines[] = 'Left out: ' . implode(', ', $left_out);
+        $lines[] = __('Left out: %s', implode(', ', $left_out));
     }
     flashAlert(implode('<br>', $lines), $sent ? ($left_out ? 'warning' : 'success') : 'error');
 
@@ -914,24 +914,24 @@ if (isset($_GET['resend_portal_invite']) || isset($_GET['cancel_portal_invite'])
     enforceClientAccess();
 
     if (!$invite || $invite['invite_kind'] !== 'invite' || !in_array(portalInviteState($invite), ['pending', 'expired'], true)) {
-        flashAlert("That invite isn't waiting any more - it may have been accepted or cancelled", 'error');
+        flashAlert(__('That invite isn\'t waiting any more - it may have been accepted or cancelled'), 'error');
         redirect();
     }
     $email = escapeSql($invite['invite_email']);
 
     if ($resend) {
         if (!portalInviteResend($invite['invite_id'], $client_id)) {
-            flashAlert("The invite couldn't be sent - check outgoing mail in Admin > Settings > Mail", 'error');
+            flashAlert(__('The invite couldn\'t be sent - check outgoing mail in Admin > Settings > Mail'), 'error');
             redirect();
         }
         logAudit("Contact", "Invite", "$session_name sent the client portal invite to $email again", $client_id);
-        flashAlert("Sent the invite to <strong>" . escapeHtml($invite['invite_email']) . "</strong> again - the link in the last one no longer works");
+        flashAlert(__('Sent the invite to <strong>%s</strong> again - the link in the last one no longer works', escapeHtml($invite['invite_email'])));
         redirect();
     }
 
     portalInviteCancel($invite['invite_id'], $client_id);
     logAudit("Contact", "Cancel", "$session_name cancelled the client portal invite to $email", $client_id);
-    flashAlert("Cancelled the invite to <strong>" . escapeHtml($invite['invite_email']) . "</strong> - its link no longer works");
+    flashAlert(__('Cancelled the invite to <strong>%s</strong> - its link no longer works', escapeHtml($invite['invite_email'])));
     redirect();
 
 }
@@ -948,7 +948,7 @@ if (isset($_GET['archive_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_client_id, contact_user_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That contact no longer exists.', 'error');
+        flashAlert(__('That contact no longer exists.'), 'error');
         redirect();
     }
     $contact_name = escapeSql($row['contact_name']);
@@ -966,7 +966,7 @@ if (isset($_GET['archive_contact'])) {
 
     logAudit("Contact", "Archive", "$session_name archived contact $contact_name", $client_id, $contact_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> archived", 'error');
+    flashAlert(__('Contact <strong>%s</strong> archived', stripslashes($contact_name)), 'error');
 
     redirect();
 
@@ -984,7 +984,7 @@ if (isset($_GET['restore_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_client_id, contact_user_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That contact no longer exists.', 'error');
+        flashAlert(__('That contact no longer exists.'), 'error');
         redirect();
     }
     $contact_name = escapeSql($row['contact_name']);
@@ -1002,7 +1002,7 @@ if (isset($_GET['restore_contact'])) {
 
     logAudit("Contact", "Restore", "$session_name restored contact $contact_name", $client_id, $contact_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> restored");
+    flashAlert(__('Contact <strong>%s</strong> restored', stripslashes($contact_name)));
 
     redirect();
 
@@ -1020,7 +1020,7 @@ if (isset($_GET['delete_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_client_id, contact_user_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That contact no longer exists.', 'error');
+        flashAlert(__('That contact no longer exists.'), 'error');
         redirect();
     }
     $contact_name = escapeSql($row['contact_name']);
@@ -1041,7 +1041,7 @@ if (isset($_GET['delete_contact'])) {
 
     logAudit("Contact", "Delete", "$session_name deleted contact $contact_name", $client_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> deleted", 'error');
+    flashAlert(__('Contact <strong>%s</strong> deleted', stripslashes($contact_name)), 'error');
 
     redirect();
 
@@ -1060,7 +1060,7 @@ if (isset($_POST['link_contact_to_asset'])) {
     $sql_asset = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql_asset);
     if (!$row) {
-        flashAlert('Pick an asset to link.', 'error');
+        flashAlert(__('Pick an asset to link.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -1070,7 +1070,7 @@ if (isset($_POST['link_contact_to_asset'])) {
 
     // Only one of the same client's people - another client's contact would show on this client's asset
     if (!assetClientOwnedId('contact', $contact_id, $client_id)) {
-        flashAlert("That contact isn't one of this client's", 'error');
+        flashAlert(__('That contact isn\'t one of this client\'s'), 'error');
         redirect();
     }
 
@@ -1081,7 +1081,7 @@ if (isset($_POST['link_contact_to_asset'])) {
 
     logAudit("Asset", "Link", "$session_name linked asset $asset_name to contact $contact_name", $client_id, $asset_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> linked with asset <strong>" . stripslashes($asset_name) . "</strong>");
+    flashAlert(__('Contact <strong>%1$s</strong> linked with asset <strong>%2$s</strong>', stripslashes($contact_name), stripslashes($asset_name)));
 
     redirect();
 
@@ -1100,7 +1100,7 @@ if (isset($_GET['unlink_asset_from_contact'])) {
     $sql_asset = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql_asset);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -1116,7 +1116,7 @@ if (isset($_GET['unlink_asset_from_contact'])) {
 
     logAudit("Asset", "Unlink", "$session_name unlinked contact $contact_name from asset $asset_name", $client_id, $asset_id);
 
-    flashAlert("Asset <strong>" . stripslashes($asset_name) . "</strong> unlinked from contact <strong>" . stripslashes($contact_name) . "</strong>", 'error');
+    flashAlert(__('Asset <strong>%1$s</strong> unlinked from contact <strong>%2$s</strong>', stripslashes($asset_name), stripslashes($contact_name)), 'error');
 
     redirect();
 
@@ -1139,7 +1139,7 @@ if (isset($_POST['link_contact_to_credential'])) {
     $sql_credential = mysqli_query($mysqli,"SELECT credential_name, credential_client_id FROM credentials WHERE credential_id = $credential_id");
     $row = mysqli_fetch_assoc($sql_credential);
     if (!$row) {
-        flashAlert("That credential no longer exists", 'error');
+        flashAlert(__('That credential no longer exists'), 'error');
         redirect();
     }
     $credential_name = escapeSql($row['credential_name']);
@@ -1149,7 +1149,7 @@ if (isset($_POST['link_contact_to_credential'])) {
 
     // Only to one of the same client's people
     if (!assetClientOwnedId('contact', $contact_id, $client_id)) {
-        flashAlert("That contact isn't one of this client's", 'error');
+        flashAlert(__('That contact isn\'t one of this client\'s'), 'error');
         redirect();
     }
 
@@ -1160,7 +1160,7 @@ if (isset($_POST['link_contact_to_credential'])) {
 
     logAudit("Credential", "Link", "$session_name linked credential $credential_name to contact $contact_name", $client_id, $credential_id);
 
-    flashAlert("Contact <strong>" . stripslashes($contact_name) . "</strong> linked with credential <strong>" . stripslashes($credential_name) . "</strong>");
+    flashAlert(__('Contact <strong>%1$s</strong> linked with credential <strong>%2$s</strong>', stripslashes($contact_name), stripslashes($credential_name)));
 
     redirect();
 
@@ -1180,7 +1180,7 @@ if (isset($_GET['unlink_credential_from_contact'])) {
     $sql_credential = mysqli_query($mysqli,"SELECT credential_name, credential_client_id FROM credentials WHERE credential_id = $credential_id");
     $row = mysqli_fetch_assoc($sql_credential);
     if (!$row) {
-        flashAlert('That credential no longer exists.', 'error');
+        flashAlert(__('That credential no longer exists.'), 'error');
         redirect();
     }
     $credential_name = escapeSql($row['credential_name']);
@@ -1196,7 +1196,7 @@ if (isset($_GET['unlink_credential_from_contact'])) {
 
     logAudit("Credential", "Unlink", "$session_name unlinked contact $contact_name from credential $credential_name", $client_id, $credential_id);
 
-    flashAlert("Credential <strong>" . stripslashes($credential_name) . "</strong> unlinked from contact <strong>" . stripslashes($contact_name) . "</strong>", 'error');
+    flashAlert(__('Credential <strong>%1$s</strong> unlinked from contact <strong>%2$s</strong>', stripslashes($credential_name), stripslashes($contact_name)), 'error');
 
     redirect();
 
@@ -1334,7 +1334,7 @@ if (isset($_POST["import_contacts_csv"])) {
     if (!empty($_FILES["file"]["tmp_name"])) {
         $file_name = $_FILES["file"]["tmp_name"];
     } else {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
 
@@ -1343,13 +1343,13 @@ if (isset($_POST["import_contacts_csv"])) {
     $allowed_file_extensions = array('csv');
     if (in_array($file_extension,$allowed_file_extensions) === false) {
         $error = true;
-        flashAlert("Bad file extension", 'error');
+        flashAlert(__('Bad file extension'), 'error');
     }
 
     //Check file isn't empty
     elseif ($_FILES["file"]["size"] < 1) {
         $error = true;
-        flashAlert("Bad file size (empty?)", 'error');
+        flashAlert(__('Bad file size (empty?)'), 'error');
     }
 
     //(Else)Check column count
@@ -1357,7 +1357,7 @@ if (isset($_POST["import_contacts_csv"])) {
     $f_columns = fgetcsv($f, 1000, ",");
     if (!$error & count($f_columns) != 8) {
         $error = true;
-        flashAlert("Bad column count.", 'error');
+        flashAlert(__('Bad column count.'), 'error');
     }
 
     //Else, parse the file
@@ -1413,7 +1413,7 @@ if (isset($_POST["import_contacts_csv"])) {
 
         logAudit("Contact", "Import", "$session_name imported $row_count contact(s) via CSV file", $client_id);
 
-        flashAlert("$row_count Contact(s) added, $duplicate_count duplicate(s) detected", 'warning');
+        flashAlert(__('%s Contact(s) added, %s duplicate(s) detected', $row_count, $duplicate_count), 'warning');
 
         redirect();
 

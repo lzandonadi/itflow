@@ -13,7 +13,7 @@ require_once '../../../includes/modal_header.php';
 $vendor_id = intval($_GET['id'] ?? 0);
 $vendor = vendorRow($vendor_id);
 if (!$vendor) {
-    echo json_encode(['error' => 'That vendor no longer exists.']);
+    echo json_encode(['error' => __('That vendor no longer exists.')]);
     exit;
 }
 $client_id = intval($vendor['vendor_client_id']);
@@ -67,10 +67,10 @@ if ($can_credentials && $client_id) {
 $spend = !$client_id && $can_financial ? vendorSpend($vendor_id) : null;
 
 $quick_tabs = array_filter([
-    'cases' => ['label' => 'Open cases', 'count' => count($cases)],
-    'licenses' => ['label' => 'Licenses', 'count' => count($licenses)],
-    'assets' => ['label' => 'Assets', 'count' => count($assets)],
-    'logins' => ['label' => 'Logins', 'count' => count($logins)],
+    'cases' => ['label' => __('Open cases'), 'count' => count($cases)],
+    'licenses' => ['label' => __('Licenses'), 'count' => count($licenses)],
+    'assets' => ['label' => __('Assets'), 'count' => count($assets)],
+    'logins' => ['label' => __('Logins'), 'count' => count($logins)],
 ], function ($tab) {
     return $tab['count'] > 0;
 });
@@ -88,16 +88,16 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $vendor_name ?></span>
-                <?php if (intval($vendor['vendor_favorite'])) { ?><i class="fas fa-star text-warning small" title="Starred"></i><?php } ?>
-                <?php if ($vendor_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if (intval($vendor['vendor_favorite'])) { ?><i class="fas fa-star text-warning small" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                <?php if ($vendor_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
-                <span><?= $client_id ? escapeHtml($vendor['client_name']) : 'Our vendor' ?></span>
+                <span><?= $client_id ? escapeHtml($vendor['client_name']) : __('Our vendor') ?></span>
                 <?php if ($vendor['vendor_description']) { ?><span><?= escapeHtml($vendor['vendor_description']) ?></span><?php } ?>
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -105,64 +105,64 @@ ob_start();
     <!-- Calling them - the icons say what each line is -->
     <div class="row g-2 itflow-asset-glance">
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Support line">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Support line')) ?>">
                 <i class="fas fa-fw fa-headset"></i>
-                <span><?= $vendor_phone ?: '<span class="text-body-secondary">No support line</span>' ?></span>
+                <span><?= $vendor_phone ?: '<span class="text-body-secondary">' . __('No support line') . '</span>' ?></span>
             </div>
             <?php if ($vendor['vendor_hours'] || $vendor['vendor_sla']) { ?>
-                <div class="itflow-glance-item" title="Hours and SLA">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Hours and SLA')) ?>">
                     <i class="fas fa-fw fa-clock"></i>
                     <span><?= escapeHtml(implode(' · ', array_filter([$vendor['vendor_hours'], $vendor['vendor_sla']]))) ?></span>
                 </div>
             <?php } ?>
             <?php if ($vendor_email) { ?>
-                <div class="itflow-glance-item" title="Support email">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Support email')) ?>">
                     <i class="fas fa-fw fa-envelope"></i>
-                    <span class="min-w-0 text-truncate"><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></span>
+                    <span class="min-w-0 text-truncate"><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></span>
                 </div>
             <?php } ?>
             <?php if ($vendor_website_url) { ?>
-                <div class="itflow-glance-item" title="Support site">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Support site')) ?>">
                     <i class="fas fa-fw fa-globe"></i>
                     <span class="min-w-0 text-truncate"><a href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_website'])) ?></a></span>
                 </div>
             <?php } ?>
             <?php if ($vendor_status_url) { ?>
-                <div class="itflow-glance-item" title="Status page">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Status page')) ?>">
                     <i class="fas fa-fw fa-heartbeat"></i>
                     <span class="min-w-0 text-truncate"><a href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_status_page'])) ?></a></span>
                 </div>
             <?php } ?>
             <?php if ($vendor_portal_url) { ?>
-                <div class="itflow-glance-item" title="Support portal - where cases are opened">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Support portal - where cases are opened')) ?>">
                     <i class="fas fa-fw fa-door-open"></i>
                     <span class="min-w-0 text-truncate"><a href="<?= escapeHtml($vendor_portal_url) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($vendor['vendor_portal'])) ?></a></span>
                 </div>
             <?php } ?>
         </div>
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Account number">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Account number')) ?>">
                 <i class="fas fa-fw fa-fingerprint"></i>
-                <span><?= $vendor_account ? '<span class="font-monospace">' . $vendor_account . '</span><button type="button" class="itflow-copy clipboardjs" title="Copy account number" data-clipboard-text="' . $vendor_account . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">No account number</span>' ?></span>
+                <span><?= $vendor_account ? '<span class="font-monospace">' . $vendor_account . '</span><button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy account number')) . '" data-clipboard-text="' . $vendor_account . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">' . __('No account number') . '</span>' ?></span>
             </div>
             <?php if ($vendor_pin) { ?>
-                <div class="itflow-glance-item" title="PIN / passcode">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('PIN / passcode')) ?>">
                     <i class="fas fa-fw fa-key"></i>
                     <span><?= $vendor_pin ?></span>
                 </div>
             <?php } ?>
             <?php if ($vendor['vendor_contact_name'] || $manager_phone || $manager_email) { ?>
-                <div class="itflow-glance-item" title="Account manager">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Account manager')) ?>">
                     <i class="fas fa-fw fa-user-tie"></i>
                     <span class="min-w-0">
-                        <?= escapeHtml($vendor['vendor_contact_name'] ?: 'Account manager') ?>
+                        <?= escapeHtml($vendor['vendor_contact_name'] ?: __('Account manager')) ?>
                         <?php if ($manager_phone) { ?><span class="text-body-secondary">&middot;</span> <?= $manager_phone ?><?php } ?>
                         <?php if ($manager_email) { ?><div class="text-truncate"><a href="mailto:<?= $manager_email ?>"><?= $manager_email ?></a></div><?php } ?>
                     </span>
                 </div>
             <?php } ?>
             <?php if ($spend) { ?>
-                <div class="itflow-glance-item" title="Spent with them">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Spent with them')) ?>">
                     <i class="fas fa-fw fa-receipt"></i>
                     <span><?= numfmt_format_currency($currency_format, $spend['year'], $session_company_currency) ?> this year<?php if ($spend['last']) { ?> <span class="text-body-secondary">&middot; last <?= escapeHtml($spend['last']) ?></span><?php } ?></span>
                 </div>
@@ -173,23 +173,23 @@ ob_start();
     <?php if ($vendor_dial || $vendor_email || $vendor_website_url || ($client_id && $can_support_edit && !$vendor_archived)) { ?>
         <div class="d-flex flex-wrap gap-2 mt-3">
             <?php if ($vendor_dial) { ?>
-                <a class="btn btn-sm btn-outline-primary" href="tel:<?= escapeHtml($vendor_dial) ?><?= $vendor['vendor_extension'] ? ',' . escapeHtml($vendor['vendor_extension']) : '' ?>"><i class="fas fa-phone me-1"></i>Call support</a>
+                <a class="btn btn-sm btn-outline-primary" href="tel:<?= escapeHtml($vendor_dial) ?><?= $vendor['vendor_extension'] ? ',' . escapeHtml($vendor['vendor_extension']) : '' ?>"><i class="fas fa-phone me-1"></i><?= __('Call support') ?></a>
             <?php } ?>
             <?php if ($vendor_email) { ?>
-                <a class="btn btn-sm btn-outline-primary" href="mailto:<?= $vendor_email ?>"><i class="fas fa-envelope me-1"></i>Email</a>
+                <a class="btn btn-sm btn-outline-primary" href="mailto:<?= $vendor_email ?>"><i class="fas fa-envelope me-1"></i><?= __('Email') ?></a>
             <?php } ?>
             <?php if ($vendor_website_url) { ?>
-                <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt me-1"></i>Support site</a>
+                <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt me-1"></i><?= __('Support site') ?></a>
             <?php } ?>
             <?php if ($client_id && $can_support_edit && !$vendor_archived) { ?>
-                <a class="btn btn-sm btn-outline-secondary ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-life-ring me-1"></i>New case</a>
+                <a class="btn btn-sm btn-outline-secondary ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>&vendor_id=<?= $vendor_id ?>"><i class="fas fa-life-ring me-1"></i><?= __('New case') ?></a>
             <?php } ?>
         </div>
     <?php } ?>
 
     <?php if ($can_edit || $vendor_notes) { ?>
-        <label class="form-label small text-body-secondary mt-3 mb-1"><i class="fas fa-sticky-note me-1"></i>Notes</label>
-        <textarea class="form-control form-control-sm itflow-vendor-notes" rows="3" placeholder="Escalation path, who may call them, circuit IDs - saves when you click away" aria-label="Notes"
+        <label class="form-label small text-body-secondary mt-3 mb-1"><i class="fas fa-sticky-note me-1"></i><?= __('Notes') ?></label>
+        <textarea class="form-control form-control-sm itflow-vendor-notes" rows="3" placeholder="<?= escapeHtml(__('Escalation path, who may call them, circuit IDs - saves when you click away')) ?>" aria-label="<?= escapeHtml(__('Notes')) ?>"
             data-vendor-id="<?= $vendor_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token'] ?? '') ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $vendor_notes ?></textarea>
     <?php } ?>
 
@@ -233,7 +233,7 @@ ob_start();
                                 <li class="itflow-link-row">
                                     <?= linkRowHtml('asset', $asset, $client_id) ?>
                                     <?php if ($warranty) { ?>
-                                        <span class="small text-nowrap <?= $warranty < time() ? 'text-danger' : 'text-body-secondary' ?>" title="Warranty"><?= $warranty < time() ? 'Out of warranty' : 'Warranty to ' . escapeHtml($asset['asset_warranty_expire']) ?></span>
+                                        <span class="small text-nowrap <?= $warranty < time() ? 'text-danger' : 'text-body-secondary' ?>" title="<?= escapeHtml(__('Warranty')) ?>"><?= $warranty < time() ? __('Out of warranty') : __('Warranty to %s', escapeHtml($asset['asset_warranty_expire'])) ?></span>
                                     <?php } ?>
                                 </li>
                             <?php } ?>
@@ -247,11 +247,11 @@ ob_start();
 </div>
 
 <div class="modal-footer">
-    <a href="<?= $page_url ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i>Open vendor</a>
+    <a href="<?= $page_url ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i><?= __('Open vendor') ?></a>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/vendor/vendor_edit.php?id=<?= $vendor_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/vendor/vendor_edit.php?id=<?= $vendor_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <script>

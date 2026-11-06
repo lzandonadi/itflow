@@ -280,8 +280,8 @@ function assetQuickHtml($field, $row, $style = 'list') {
     if ($field === 'asset_location') {
         if (!intval($row['asset_location_id'] ?? 0) || (string) ($row['location_name'] ?? '') === '') {
             return $style === 'detail'
-                ? '<span class="text-body-secondary">No location</span>'
-                : "<span class=\"$empty\"><i class=\"fas fa-map-marker-alt\"></i>No location</span>";
+                ? '<span class="text-body-secondary">' . __('No location') . '</span>'
+                : "<span class=\"$empty\"><i class=\"fas fa-map-marker-alt\"></i>" . __('No location') . '</span>';
         }
         $archived = !empty($row['location_archived_at']);
         $name = '<span class="text-truncate' . ($archived ? ' text-decoration-line-through' : '') . '"' . ($archived ? ' title="Archived location"' : '') . '>' . escapeHtml($row['location_name']) . '</span>';
@@ -358,7 +358,7 @@ function assetQuickOptions($field, $client_id) {
     }
 
     if ($field === 'asset_location') {
-        $options = [['value' => '0', 'label' => 'No location', 'icon' => 'fas fa-ban', 'none' => true]];
+        $options = [['value' => '0', 'label' => __('No location'), 'icon' => 'fas fa-ban', 'none' => true]];
         $sql = mysqli_query($mysqli, "SELECT location_id, location_name, location_primary, location_city, location_state FROM locations
             WHERE location_client_id = $client_id AND location_archived_at IS NULL
             ORDER BY location_primary DESC, location_name ASC");

@@ -55,7 +55,7 @@ if (isset($_GET['leads']) && $_GET['leads'] == 1) {
 
 // Archived - filter_header.php has already turned ?archived into $archive_query
 if ($archived) {
-    $active_filters[] = ['label' => 'Showing', 'value' => 'Archived', 'drop' => 'archived'];
+    $active_filters[] = ['label' => __('Showing'), 'value' => 'Archived', 'drop' => 'archived'];
 }
 
 // Tags Filter
@@ -68,7 +68,7 @@ if (isset($_GET['tags']) && is_array($_GET['tags']) && !empty($_GET['tags'])) {
     while ($row = mysqli_fetch_assoc($sql_tag_names)) {
         $tag_names[] = escapeHtml($row['tag_name']);
     }
-    $active_filters[] = ['label' => 'Tags', 'value' => implode(', ', $tag_names), 'drop' => 'tags'];
+    $active_filters[] = ['label' => __('Tags'), 'value' => implode(', ', $tag_names), 'drop' => 'tags'];
 } else {
     $tag_filter = 0;
     $tag_query = '';
@@ -78,7 +78,7 @@ if (isset($_GET['tags']) && is_array($_GET['tags']) && !empty($_GET['tags'])) {
 if (!empty($_GET['industry'])) {
     $industry_query = "AND clients.client_type = '" . escapeSql($_GET['industry']) . "'";
     $industry_filter = escapeHtml($_GET['industry']);
-    $active_filters[] = ['label' => 'Industry', 'value' => $industry_filter, 'drop' => 'industry'];
+    $active_filters[] = ['label' => __('Industry'), 'value' => $industry_filter, 'drop' => 'industry'];
 } else {
     $industry_query = '';
     $industry_filter = '';
@@ -88,7 +88,7 @@ if (!empty($_GET['industry'])) {
 if (!empty($_GET['referral'])) {
     $referral_query = "AND clients.client_referral = '" . escapeSql($_GET['referral']) . "'";
     $referral_filter = escapeHtml($_GET['referral']);
-    $active_filters[] = ['label' => 'Referral', 'value' => $referral_filter, 'drop' => 'referral'];
+    $active_filters[] = ['label' => __('Referral'), 'value' => $referral_filter, 'drop' => 'referral'];
 } else {
     $referral_query = '';
     $referral_filter = '';
@@ -101,29 +101,29 @@ if ($contract_filter !== '') {
     $contract_in_force = contractInForceSql('cf');
     if ($contract_filter === 'none') {
         $contract_query = "AND NOT EXISTS (SELECT 1 FROM contracts cf WHERE cf.contract_client_id = clients.client_id AND $contract_in_force)";
-        $contract_filter_label = 'None in force';
+        $contract_filter_label = __('None in force');
     } elseif ($contract_filter === 'any') {
         $contract_query = "AND EXISTS (SELECT 1 FROM contracts cf WHERE cf.contract_client_id = clients.client_id AND $contract_in_force)";
-        $contract_filter_label = 'One in force';
+        $contract_filter_label = __('One in force');
     } elseif (ctype_digit($contract_filter) && ($contract_filter_template = contractTemplateRow(intval($contract_filter)))) {
         $contract_query = "AND EXISTS (SELECT 1 FROM contracts cf WHERE cf.contract_client_id = clients.client_id AND cf.contract_template_id = " . intval($contract_filter) . " AND $contract_in_force)";
-        $contract_filter_label = 'From ' . $contract_filter_template['contract_template_name'];
+        $contract_filter_label = __('From %s', $contract_filter_template['contract_template_name']);
     } else {
         $contract_filter = '';
     }
     if ($contract_query !== '') {
-        $active_filters[] = ['label' => 'Contract', 'value' => escapeHtml($contract_filter_label), 'drop' => 'contract'];
+        $active_filters[] = ['label' => __('Contract'), 'value' => escapeHtml($contract_filter_label), 'drop' => 'contract'];
     }
 }
 
 // Created date
 $date_filter_active = $dtf !== '1970-01-01' || $dtt !== '2099-12-31';
 if ($date_filter_active) {
-    $active_filters[] = ['label' => 'Created', 'value' => escapeHtml("$dtf to $dtt"), 'drop' => ['canned_date', 'dtf', 'dtt']];
+    $active_filters[] = ['label' => __('Created'), 'value' => escapeHtml("$dtf to $dtt"), 'drop' => ['canned_date', 'dtf', 'dtt']];
 }
 
 if ($q !== '') {
-    $active_filters[] = ['label' => 'Search', 'value' => stripslashes(escapeHtml($q)), 'drop' => 'q'];
+    $active_filters[] = ['label' => __('Search'), 'value' => stripslashes(escapeHtml($q)), 'drop' => 'q'];
 }
 
 // How many of the collapsed panel's filters are set - shown on the filter button
@@ -302,7 +302,7 @@ if ($clients) {
                     AND (contract_end_date IS NULL OR contract_end_date >= '$rate_today' OR (contract_status = 'Active' AND contract_auto_renew = 1))
                 ORDER BY contract_start_date DESC, contract_id DESC");
             while ($row = mysqli_fetch_assoc($sql_rates)) {
-                $client_rates[intval($row['id'])] = $client_rates[intval($row['id'])] ?? [floatval($row['rate']), contractPossessive($row['contract_name']) . ' rate'];
+                $client_rates[intval($row['id'])] = $client_rates[intval($row['id'])] ?? [floatval($row['rate']), __('Rate from %s', $row['contract_name'])];
             }
         }
         // Else the client's own, before the 3.5.0 update - else the default rate
@@ -313,9 +313,9 @@ if ($clients) {
             }
             $legacy = billingClientLegacyTerms($id);
             if ($legacy && $legacy['rate'] !== null) {
-                $client_rates[$id] = [$legacy['rate'], "The client's rate"];
+                $client_rates[$id] = [$legacy['rate'], __("The client's rate")];
             } elseif ($default_rate > 0) {
-                $client_rates[$id] = [$default_rate, 'The default rate, from Admin > Settings > Defaults - no contract in force sets one', true];
+                $client_rates[$id] = [$default_rate, __('The default rate, from Admin > Settings > Defaults - no contract in force sets one'), true];
             }
         }
     }
@@ -370,32 +370,32 @@ $total_leads = intval($row['leads']);
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-user-friends me-2"></i>Clients
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-user-friends me-2"></i><?= __('Clients') ?>
             <small class="ms-3">
-                <a href="<?= clientsFilterUrl(['leads' => null, 'industry' => null, 'referral' => null]) ?>" class="badge rounded-pill p-1 <?= $leads_filter ? 'text-light' : 'bg-light text-dark' ?>"><strong><?= $total_clients ?></strong> Client<?= $total_clients === 1 ? '' : 's' ?></a> |
-                <a href="<?= clientsFilterUrl(['leads' => 1, 'industry' => null, 'referral' => null]) ?>" class="badge rounded-pill p-1 <?= $leads_filter ? 'bg-light text-dark' : 'text-light' ?>"><strong><?= $total_leads ?></strong> Lead<?= $total_leads === 1 ? '' : 's' ?></a>
+                <a href="<?= clientsFilterUrl(['leads' => null, 'industry' => null, 'referral' => null]) ?>" class="badge rounded-pill p-1 <?= $leads_filter ? 'text-light' : 'bg-light text-dark' ?>"><?= _n('<strong>%d</strong> Client', '<strong>%d</strong> Clients', $total_clients) ?></a> |
+                <a href="<?= clientsFilterUrl(['leads' => 1, 'industry' => null, 'referral' => null]) ?>" class="badge rounded-pill p-1 <?= $leads_filter ? 'bg-light text-dark' : 'text-light' ?>"><?= _n('<strong>%d</strong> Lead', '<strong>%d</strong> Leads', $total_leads) ?></a>
             </small>
         </h3>
         <?php if ($can_edit) { ?>
             <div class="card-tools">
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/client/client_add.php<?php if ($leads_filter) { echo "?lead=1"; } ?>">
-                        <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New <?= $leads_filter ? 'Lead' : 'Client' ?></span>
+                        <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= $leads_filter ? __('New Lead') : __('New Client') ?></span>
                     </button>
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" title="More"></button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More')) ?>"></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <?php if ($can_onboard) { ?>
                             <a class="dropdown-item" href="<?= clientOnboardingUrl() ?>" data-onboard-new>
-                                <i class="fa fa-fw fa-route me-2"></i>Onboard a client
+                                <i class="fa fa-fw fa-route me-2"></i><?= __('Onboard a client') ?>
                             </a>
                             <div class="dropdown-divider"></div>
                         <?php } ?>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_import.php">
-                            <i class="fa fa-fw fa-upload me-2"></i>Import
+                            <i class="fa fa-fw fa-upload me-2"></i><?= __('Import') ?>
                         </a>
                         <a class="dropdown-item ajax-modal" href="#"
                             data-modal-url="<?= buildExportModalUrl('modals/client/client_export.php', ['leads', 'tags', 'industry', 'referral', 'q', 'archived'], ['dtf' => $dtf, 'dtt' => $dtt]) ?>">
-                            <i class="fa fa-fw fa-download me-2"></i>Export
+                            <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                         </a>
                     </div>
                 </div>
@@ -414,10 +414,10 @@ $total_leads = intval($row['leads']);
                 <div class="col-sm-6 col-lg-5">
                     <div class="input-group">
                         <input type="search" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q)) ?>" placeholder="Search <?= $leads_filter ? 'leads' : 'clients' ?>, contacts, addresses, tags" autofocus>
-                        <button class="btn <?= $hidden_filter_count ? 'btn-warning' : 'btn-secondary' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" title="Filters">
+                        <button class="btn <?= $hidden_filter_count ? 'btn-warning' : 'btn-secondary' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" title="<?= escapeHtml(__('Filters')) ?>">
                             <i class="fas fa-filter"></i><?php if ($hidden_filter_count) { ?><span class="ms-1"><?= $hidden_filter_count ?></span><?php } ?>
                         </button>
-                        <button class="btn btn-primary" title="Search" type="submit"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-primary" title="<?= escapeHtml(__('Search')) ?>" type="submit"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
 
@@ -425,48 +425,48 @@ $total_leads = intval($row['leads']);
                     <div class="d-flex justify-content-sm-end gap-2">
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-sm-inline ms-2">Action</span> (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-sm-inline ms-2"><?= __('Action') ?></span> (<span id="selectedCount">0</span>)
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <?php if ($can_add_ticket) { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_bulk_add_ticket.php" data-modal-size="lg" data-bulk="true">
-                                    <i class="fas fa-fw fa-life-ring me-2"></i>Open Tickets
+                                    <i class="fas fa-fw fa-life-ring me-2"></i><?= __('Open Tickets') ?>
                                 </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_bulk_email.php" data-modal-size="lg" data-bulk="true">
-                                    <i class="fas fa-fw fa-paper-plane me-2"></i>Send Email
+                                    <i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Send Email') ?>
                                 </a>
                                 <?php if ($can_edit) { ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="client" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_bulk_edit_industry.php" data-bulk="true">
-                                    <i class="fas fa-fw fa-briefcase me-2"></i>Set Industry
+                                    <i class="fas fa-fw fa-briefcase me-2"></i><?= __('Set Industry') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_bulk_edit_referral.php" data-bulk="true">
-                                    <i class="fas fa-fw fa-link me-2"></i>Set Referral
+                                    <i class="fas fa-fw fa-link me-2"></i><?= __('Set Referral') ?>
                                 </a>
                                 <?php if ($can_add_contract) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_bulk_add_contract.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-file-contract me-2"></i>Start Contract
+                                        <i class="fas fa-fw fa-file-contract me-2"></i><?= __('Start Contract') ?>
                                     </a>
                                 <?php } ?>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
                                     <button class="dropdown-item text-info" type="submit" form="bulkActions" name="bulk_unarchive_clients">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                 <?php } else { ?>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_clients">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                                 <?php } // can_edit ?>
                             </div>
                         </div>
-                        <a href="<?= clientsFilterUrl(['archived' => $archived ? null : 1]) ?>" class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active ' . ($leads_filter ? 'leads' : 'clients') : 'Show archived ' . ($leads_filter ? 'leads' : 'clients') ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-none d-xl-inline ms-2">Archived</span>
+                        <a href="<?= clientsFilterUrl(['archived' => $archived ? null : 1]) ?>" class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= escapeHtml($archived ? ($leads_filter ? __('Back to active leads') : __('Back to active clients')) : ($leads_filter ? __('Show archived leads') : __('Show archived clients'))) ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-none d-xl-inline ms-2"><?= __('Archived') ?></span>
                         </a>
                     </div>
                 </div>
@@ -475,8 +475,8 @@ $total_leads = intval($row['leads']);
             <div class="collapse mt-3 <?php if ($hidden_filter_count) { echo "show"; } ?>" id="advancedFilter">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">Tags</label>
-                        <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="Any tag" multiple>
+                        <label class="form-label"><?= __('Tags') ?></label>
+                        <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('Any tag')) ?>" multiple>
                             <?php
                             $sql_tags_filter = mysqli_query($mysqli, "
                                 SELECT tags.tag_id, tags.tag_name, MAX(tags.tag_color) AS tag_color, MAX(tags.tag_icon) AS tag_icon
@@ -495,9 +495,9 @@ $total_leads = intval($row['leads']);
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Industry</label>
+                        <label class="form-label"><?= __('Industry') ?></label>
                         <select class="form-select select2" name="industry" onchange="this.form.submit()">
-                            <option value="">Any industry</option>
+                            <option value=""><?= __('Any industry') ?></option>
                             <?php
                             $sql_industries_filter = mysqli_query($mysqli, "SELECT DISTINCT client_type FROM clients WHERE client_$archive_query AND client_type != '' $leads_query ORDER BY client_type ASC");
                             while ($row = mysqli_fetch_assoc($sql_industries_filter)) {
@@ -507,27 +507,27 @@ $total_leads = intval($row['leads']);
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Referral</label>
+                        <label class="form-label"><?= __('Referral') ?></label>
                         <select class="form-select select2" name="referral" onchange="this.form.submit()">
-                            <option value="">Any referral</option>
+                            <option value=""><?= __('Any referral') ?></option>
                             <?= categoryFilterOptionsHtml('Referral', (string) ($_GET['referral'] ?? ''), "SELECT DISTINCT client_referral FROM clients WHERE client_$archive_query AND client_referral != '' $leads_query") ?>
                         </select>
                     </div>
                     <?php if ($show_contracts) { ?>
                         <div class="col-md-3">
-                            <label class="form-label">Contract</label>
+                            <label class="form-label"><?= __('Contract') ?></label>
                             <select class="form-select select2" name="contract" onchange="this.form.submit()" data-client-contract-filter>
-                                <option value="">Any contract or none</option>
-                                <option value="any"<?= $contract_filter === 'any' ? ' selected' : '' ?>>One in force</option>
-                                <option value="none"<?= $contract_filter === 'none' ? ' selected' : '' ?>>None in force - billed on the defaults</option>
+                                <option value=""><?= __('Any contract or none') ?></option>
+                                <option value="any"<?= $contract_filter === 'any' ? ' selected' : '' ?>><?= __('One in force') ?></option>
+                                <option value="none"<?= $contract_filter === 'none' ? ' selected' : '' ?>><?= __('None in force - billed on the defaults') ?></option>
                                 <?php foreach (contractTemplates() as $filter_template_id => $filter_template) { ?>
-                                    <option value="<?= intval($filter_template_id) ?>"<?= $contract_filter === (string) $filter_template_id ? ' selected' : '' ?>>From <?= escapeHtml($filter_template['contract_template_name']) ?></option>
+                                    <option value="<?= intval($filter_template_id) ?>"<?= $contract_filter === (string) $filter_template_id ? ' selected' : '' ?>><?= __('From %s', escapeHtml($filter_template['contract_template_name'])) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
                     <?php } ?>
                     <div class="col-md-3">
-                        <label class="form-label">Created</label>
+                        <label class="form-label"><?= __('Created') ?></label>
                         <input type="text" id="dateFilter" class="form-control" autocomplete="off">
                         <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                         <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
@@ -546,10 +546,10 @@ $total_leads = intval($row['leads']);
                     ?>
                     <span class="badge rounded-pill bg-light border p-2 me-1 fw-normal">
                         <span class="text-secondary"><?= $filter['label'] ?>:</span> <?= $filter['value'] ?>
-                        <a href="<?= clientsFilterUrl($drop) ?>" class="text-danger ms-1" title="Remove this filter"><i class="fas fa-times"></i></a>
+                        <a href="<?= clientsFilterUrl($drop) ?>" class="text-danger ms-1" title="<?= escapeHtml(__('Remove this filter')) ?>"><i class="fas fa-times"></i></a>
                     </span>
                 <?php } ?>
-                <a href="<?= $leads_filter ? '?leads=1' : '?' ?>" class="small text-danger ms-1">Clear all</a>
+                <a href="<?= $leads_filter ? '?leads=1' : '?' ?>" class="small text-danger ms-1"><?= __('Clear all') ?></a>
             </div>
         <?php } ?>
     </div>
@@ -563,24 +563,24 @@ $total_leads = intval($row['leads']);
                 <tr>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
-                    <th><?= clientsSortLink('client_name', $leads_filter ? 'Lead' : 'Client') ?></th>
-                    <th class="d-none d-md-table-cell"><?= clientsSortLink('contact_name', 'Primary contact') ?></th>
-                    <th class="d-none d-xl-table-cell"><?= clientsSortLink('location_city', 'Location') ?></th>
+                    <th><?= clientsSortLink('client_name', $leads_filter ? __('Lead') : __('Client')) ?></th>
+                    <th class="d-none d-md-table-cell"><?= clientsSortLink('contact_name', __('Primary contact')) ?></th>
+                    <th class="d-none d-xl-table-cell"><?= clientsSortLink('location_city', __('Location')) ?></th>
                     <?php if ($show_tickets) { ?>
-                        <th class="text-center d-none d-sm-table-cell"><?= clientsSortLink('open_tickets', 'Tickets') ?></th>
+                        <th class="text-center d-none d-sm-table-cell"><?= clientsSortLink('open_tickets', __('Tickets')) ?></th>
                     <?php } ?>
                     <?php if ($show_contracts) { ?>
-                        <th class="d-none d-lg-table-cell"><?= clientsSortLink('contract', 'Contract') ?></th>
+                        <th class="d-none d-lg-table-cell"><?= clientsSortLink('contract', __('Contract')) ?></th>
                     <?php } ?>
                     <?php if ($show_billing) { ?>
-                        <th class="text-end"><?= clientsSortLink('balance', 'Balance') ?></th>
-                        <th class="text-end d-none d-lg-table-cell">Recurring</th>
+                        <th class="text-end"><?= clientsSortLink('balance', __('Balance')) ?></th>
+                        <th class="text-end d-none d-lg-table-cell"><?= __('Recurring') ?></th>
                     <?php } ?>
                     <?php if ($can_edit) { ?>
-                        <th class="text-end"><span class="visually-hidden">Actions</span></th>
+                        <th class="text-end"><span class="visually-hidden"><?= __('Actions') ?></span></th>
                     <?php } ?>
                 </tr>
                 </thead>
@@ -619,7 +619,7 @@ $total_leads = intval($row['leads']);
                     <tr>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="client_ids[]" value="<?= $client_id ?>" aria-label="Select <?= $client_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="client_ids[]" value="<?= $client_id ?>" aria-label="<?= __('Select %s', $client_name) ?>">
                             </div>
                         </td>
 
@@ -652,14 +652,14 @@ $total_leads = intval($row['leads']);
                                         <?php if (!$contact_phone && !$contact_mobile) { ?>
                                             <a class="text-reset text-decoration-none text-truncate" href="mailto:<?= $contact_email ?>"><i class="far fa-fw fa-envelope me-1" aria-hidden="true"></i><?= $contact_email ?></a>
                                         <?php } else { ?>
-                                            <a class="text-reset" href="mailto:<?= $contact_email ?>" title="Email <?= $contact_email ?>"><i class="far fa-fw fa-envelope" aria-hidden="true"></i><span class="visually-hidden">Email <?= $contact_email ?></span></a>
+                                            <a class="text-reset" href="mailto:<?= $contact_email ?>" title="<?= __('Email %s', $contact_email) ?>"><i class="far fa-fw fa-envelope" aria-hidden="true"></i><span class="visually-hidden"><?= __('Email %s', $contact_email) ?></span></a>
                                         <?php } ?>
-                                        <button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button>
+                                        <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button>
                                     <?php } ?>
                                 </div>
                             <?php } elseif ($can_edit) { ?>
                                 <a class="ajax-modal small text-body-secondary" href="#" data-modal-size="lg" data-modal-url="modals/contact/contact_add.php?client_id=<?= $client_id ?>&primary=1">
-                                    <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i>Add primary contact
+                                    <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i><?= __('Add primary contact') ?>
                                 </a>
                             <?php } else { ?>
                                 <span class="text-body-tertiary">-</span>
@@ -676,7 +676,7 @@ $total_leads = intval($row['leads']);
                                 </div>
                             <?php } elseif (!$location_id && $can_edit) { ?>
                                 <a class="ajax-modal small text-body-secondary" href="#" data-modal-url="modals/location/location_add.php?client_id=<?= $client_id ?>&primary=1">
-                                    <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i>Add primary location
+                                    <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i><?= __('Add primary location') ?>
                                 </a>
                             <?php } else { ?>
                                 <span class="text-body-tertiary">-</span>
@@ -687,9 +687,9 @@ $total_leads = intval($row['leads']);
                             <td class="text-center d-none d-sm-table-cell">
                                 <?php if ($tickets_open) { ?>
                                     <a href="tickets.php?client_id=<?= $client_id ?>" class="badge rounded-pill <?= $tickets_breached ? 'text-bg-danger' : 'text-bg-primary' ?>"
-                                        title="<?= $tickets_open ?> open ticket<?= $tickets_open === 1 ? '' : 's' ?><?= $tickets_breached ? ", $tickets_breached past SLA" : '' ?>"><?= $tickets_open ?></a>
+                                        title="<?= _n('%d open ticket', '%d open tickets', $tickets_open) ?><?= $tickets_breached ? ', ' . __('%d past SLA', $tickets_breached) : '' ?>"><?= $tickets_open ?></a>
                                 <?php } else { ?>
-                                    <span class="text-body-tertiary" title="No open tickets">-</span>
+                                    <span class="text-body-tertiary" title="<?= escapeHtml(__('No open tickets')) ?>">-</span>
                                 <?php } ?>
                             </td>
                         <?php } ?>
@@ -703,10 +703,10 @@ $total_leads = intval($row['leads']);
                                     $contract_state = contractState($contract_current); ?>
                                     <a href="contract.php?client_id=<?= $client_id ?>&contract_id=<?= intval($contract_current['contract_id']) ?>" class="text-reset fw-semibold" title="<?= escapeHtml(contractTypeLabel($contract_current['contract_type'])) ?> - in force now"><?= escapeHtml($contract_current['contract_name']) ?></a>
                                     <div class="small <?= $contract_state['key'] === 'ending' ? 'text-warning-emphasis' : 'text-body-secondary' ?>">
-                                        <span class="text-nowrap"><?= escapeHtml($contract_state['when']) ?></span><?php if ($contract_info['more']) { ?> · <a href="contracts.php?client_id=<?= $client_id ?>" class="text-reset text-nowrap" title="More contracts in force - the one that started last comes first">+<?= intval($contract_info['more']) ?> more</a><?php } ?>
+                                        <span class="text-nowrap"><?= escapeHtml($contract_state['when']) ?></span><?php if ($contract_info['more']) { ?> · <a href="contracts.php?client_id=<?= $client_id ?>" class="text-reset text-nowrap" title="<?= escapeHtml(__('More contracts in force - the one that started last comes first')) ?>">+<?= intval($contract_info['more']) ?> more</a><?php } ?>
                                     </div>
                                 <?php } else { ?>
-                                    <span class="text-body-tertiary" title="No contract in force - the client is billed on the defaults">None</span>
+                                    <span class="text-body-tertiary" title="<?= escapeHtml(__('No contract in force - the client is billed on the defaults')) ?>"><?= __('None') ?></span>
                                     <?php if ($contract_next) {
                                         $contract_state = contractState($contract_next); ?>
                                         <div class="small text-body-secondary">
@@ -716,7 +716,7 @@ $total_leads = intval($row['leads']);
                                     <?php } elseif ($can_start_contract) { ?>
                                         <div>
                                             <a class="ajax-modal small text-body-secondary" href="#" data-modal-size="lg" data-modal-url="modals/contract/contract_add.php?client_id=<?= $client_id ?>">
-                                                <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i>Start a contract
+                                                <i class="fas fa-fw fa-plus me-1" aria-hidden="true"></i><?= __('Start a contract') ?>
                                             </a>
                                         </div>
                                     <?php } ?>
@@ -750,31 +750,31 @@ $total_leads = intval($row['leads']);
                         <?php if ($can_edit) { ?>
                             <td class="text-end">
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-link text-body-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                                    <button class="btn btn-sm btn-link text-body-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                         <i class="fas fa-fw fa-ellipsis-v"></i>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_edit.php?id=<?= $client_id ?>">
-                                            <i class="fas fa-fw fa-edit me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <?php if ($can_add_ticket && !$client_archived_at) { ?>
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_add.php?client_id=<?= $client_id ?>" data-modal-size="lg">
-                                                <i class="fas fa-fw fa-life-ring me-2"></i>New Ticket
+                                                <i class="fas fa-fw fa-life-ring me-2"></i><?= __('New Ticket') ?>
                                             </a>
                                         <?php } ?>
                                         <?php if ($can_onboard && !$client_archived_at && (intval($row['client_lead']) || isset($client_onboarding_open[$client_id]))) { ?>
                                             <a class="dropdown-item" href="<?= clientOnboardingUrl($client_id) ?>" data-onboard="<?= $client_id ?>">
-                                                <i class="fas fa-fw fa-route me-2"></i><?= isset($client_onboarding_open[$client_id]) ? 'Carry on onboarding' : 'Onboard' ?>
+                                                <i class="fas fa-fw fa-route me-2"></i><?= isset($client_onboarding_open[$client_id]) ? __('Carry on onboarding') : __('Onboard') ?>
                                             </a>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($client_archived_at) { ?>
                                             <a class="dropdown-item text-info confirm-link" href="post.php?restore_client=<?= $client_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                             </a>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_client=<?= $client_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     </div>
@@ -793,11 +793,11 @@ $total_leads = intval($row['leads']);
         'thing' => $leads_filter ? 'leads' : 'clients',
         'icon' => 'fa-user-friends',
         'views' => ['leads'],
-        'text' => $leads_filter ? 'Prospects you are talking to, kept apart from your clients.' : 'Add the companies you look after, or import them all at once.',
+        'text' => $leads_filter ? __('Prospects you are talking to, kept apart from your clients.') : __('Add the companies you look after, or import them all at once.'),
         'actions' => $can_edit ? array_merge(
-            [['label' => $leads_filter ? 'New Lead' : 'New Client', 'modal' => 'modals/client/client_add.php' . ($leads_filter ? '?lead=1' : '')]],
-            $leads_filter || !$can_onboard ? [] : [['label' => 'Onboard a client', 'href' => clientOnboardingUrl(), 'icon' => 'fa-route']],
-            $leads_filter ? [] : [['label' => 'Import', 'modal' => 'modals/client/client_import.php', 'icon' => 'fa-upload']]
+            [['label' => $leads_filter ? __('New Lead') : __('New Client'), 'modal' => 'modals/client/client_add.php' . ($leads_filter ? '?lead=1' : '')]],
+            $leads_filter || !$can_onboard ? [] : [['label' => __('Onboard a client'), 'href' => clientOnboardingUrl(), 'icon' => 'fa-route']],
+            $leads_filter ? [] : [['label' => __('Import'), 'modal' => 'modals/client/client_import.php', 'icon' => 'fa-upload']]
         ) : [],
     ];
     ?>
