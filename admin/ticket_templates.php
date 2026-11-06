@@ -82,26 +82,26 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-life-ring me-2"></i>Ticket Templates</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-life-ring me-2"></i><?= __('Ticket Templates') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket_template/ticket_template_add.php">
-                    <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Ticket Template</span>
+                    <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Ticket Template') ?></span>
                 </button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket_template/ticket_template_import.php">
-                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i>Import
+                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i><?= __('Import') ?>
                     </a>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket_template/ticket_template_export.php">
-                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="/agent/reports/ticket_templates.php">
-                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>How they are used
+                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('How they are used') ?>
                     </a>
                     <a class="dropdown-item" href="starter_content.php">
-                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i>Starter templates
+                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i><?= __('Starter templates') ?>
                     </a>
                 </div>
             </div>
@@ -113,15 +113,15 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search ticket templates..." title="Name, description or subject">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search ticket templates...')) ?>" title="<?= escapeHtml(__('Name, description or subject')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs mt-2">
-            <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-life-ring me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>" title="Not offered for new tickets - recurring tickets and project templates that use them keep them"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-life-ring me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>" title="<?= escapeHtml(__('Not offered for new tickets - recurring tickets and project templates that use them keep them')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
@@ -129,10 +129,10 @@ $csrf = $_SESSION['csrf_token'];
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
                 <th class="ps-3"><?= $sort_link('ticket_template_name', 'Template') ?></th>
-                <th class="d-none d-lg-table-cell">Sets up</th>
-                <th class="d-none d-sm-table-cell text-center"><?= $sort_link('task_count', 'Tasks') ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('Sets up') ?></th>
+                <th class="d-none d-sm-table-cell text-center"><?= $sort_link('task_count', __('Tasks')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', 'Last used') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -147,19 +147,19 @@ $csrf = $_SESSION['csrf_token'];
                 $defaults = ticketTemplateDefaultsHtml($row);
                 $fill_in_count = count(ticketTemplateFillIns($row, $template_tasks[$template_id] ?? [], $template_fill_in_rows[$template_id] ?? []));
                 if ($fill_in_count) {
-                    $defaults .= ($defaults !== '' ? ' ' : '') . '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i>Asks for ' . $fill_in_count . ' thing' . ($fill_in_count === 1 ? '' : 's') . '</span>';
+                    $defaults .= ($defaults !== '' ? ' ' : '') . '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i>' . _n('Asks for %d thing', 'Asks for %d things', $fill_in_count) . '</span>';
                 }
                 if (intval($row['ticket_template_portal'])) {
-                    $defaults .= ($defaults !== '' ? ' ' : '') . '<span class="badge rounded-pill text-bg-light border fw-normal" title="Offered in the client portal as ' . escapeHtml(ticketTemplatePortalTitle($row)) . '"><i class="fas fa-fw fa-door-open text-secondary me-1"></i>In the portal</span>';
+                    $defaults .= ($defaults !== '' ? ' ' : '') . '<span class="badge rounded-pill text-bg-light border fw-normal" title="' . escapeHtml(__('Offered in the client portal as %s', ticketTemplatePortalTitle($row))) . '"><i class="fas fa-fw fa-door-open text-secondary me-1"></i>' . __('In the portal') . '</span>';
                 }
                 $tags_html = $tags ? '<span class="d-inline-flex flex-wrap gap-1">' . implode('', array_map('tagPill', $tags)) . '</span>' : '';
                 $set_up = trim($defaults . ($defaults !== '' && $tags_html !== '' ? ' ' : '') . $tags_html);
                 $linked = [];
                 if (intval($row['recurring_count'])) {
-                    $linked[] = intval($row['recurring_count']) . ' recurring ticket' . (intval($row['recurring_count']) === 1 ? '' : 's');
+                    $linked[] = _n('%d recurring ticket', '%d recurring tickets', intval($row['recurring_count']));
                 }
                 if (intval($row['project_count'])) {
-                    $linked[] = intval($row['project_count']) . ' project template' . (intval($row['project_count']) === 1 ? '' : 's');
+                    $linked[] = _n('%d project template', '%d project templates', intval($row['project_count']));
                 }
                 $used_text = $used_count . ' ticket' . ($used_count === 1 ? '' : 's');
                 ?>
@@ -175,15 +175,15 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="small text-body-secondary"><?= escapeHtml($row['ticket_template_subject']) ?></div>
                                 <?php } ?>
                                 <?php if ($row['ticket_template_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['ticket_template_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['ticket_template_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                                 <!-- On smaller screens what it sets up and its use come along under the name -->
                                 <?php if ($set_up !== '') { ?><div class="d-lg-none mt-1"><?= $set_up ?></div><?php } ?>
-                                <div class="d-md-none small text-body-secondary mt-1"><?= $used_count ? $used_text . ' · last ' . timeAgo($row['last_used']) : 'Not used yet' ?></div>
+                                <div class="d-md-none small text-body-secondary mt-1"><?= $used_count ? $used_text . ' · last ' . timeAgo($row['last_used']) : __('Not used yet') ?></div>
                             </div>
                         </div>
                     </td>
-                    <td class="d-none d-lg-table-cell"><?= $set_up !== '' ? $set_up : '<span class="small text-body-secondary">Just the subject and details</span>' ?></td>
+                    <td class="d-none d-lg-table-cell"><?= $set_up !== '' ? $set_up : __('<span class="small text-body-secondary">Just the subject and details</span>') ?></td>
                     <td class="d-none d-sm-table-cell text-center text-nowrap">
                         <?php if ($task_count) { ?>
                             <div><?= $task_count ?></div>
@@ -196,39 +196,39 @@ $csrf = $_SESSION['csrf_token'];
                         <?php if ($used_count) { ?>
                             <div class="small text-nowrap"><?= $used_text ?><?= $open_count ? ' <span class="text-body-secondary">· ' . $open_count . ' open</span>' : '' ?></div>
                         <?php } else { ?>
-                            <span class="small text-body-secondary">Not yet</span>
+                            <span class="small text-body-secondary"><?= __('Not yet') ?></span>
                         <?php } ?>
                         <?php if ($linked) { ?><div class="small text-body-secondary"><i class="fas fa-fw fa-link me-1"></i><?= escapeHtml(implode(', ', $linked)) ?></div><?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-body-secondary text-nowrap"<?= $row['last_used'] ? ' title="' . escapeHtml($row['last_used']) . '"' : '' ?>><?= $row['last_used'] ? timeAgo($row['last_used']) : '-' ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket_template/ticket_template_edit.php?id=<?= $template_id ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if (!$row['ticket_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="/agent/tickets.php?new_from_template=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i>New ticket from it
+                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i><?= __('New ticket from it') ?>
                                     </a>
                                 <?php } ?>
-                                <a class="dropdown-item" href="post.php?copy_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A new template starting from this one">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                <a class="dropdown-item" href="post.php?copy_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new template starting from this one')) ?>">
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['ticket_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="post.php?restore_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="Not offered for new tickets - recurring tickets and project templates that use it keep it">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <a class="dropdown-item text-danger" href="post.php?archive_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Not offered for new tickets - recurring tickets and project templates that use it keep it')) ?>">
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_ticket_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="Its tasks go with it<?= $linked ? ', and ' . escapeHtml(implode(' and ', $linked)) . ' stop using it' : '' ?>. Tickets raised from it stay as they are." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml($linked ? __('Its tasks go with it, and %s stop using it. Tickets raised from it stay as they are.', implode(__(' and '), $linked)) : __('Its tasks go with it. Tickets raised from it stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -245,8 +245,8 @@ $csrf = $_SESSION['csrf_token'];
         'filtered' => $q !== '',
         'archived' => $show_archived,
         'views' => ['show'],
-        'text' => 'A ticket ready to raise - its subject, details and tasks, and how it is set up. <span class="font-monospace">[Client]</span>, <span class="font-monospace">[Contact]</span>, <span class="font-monospace">[Month]</span> and the like are filled in when a ticket is raised.',
-        'actions' => [['label' => 'New Ticket Template', 'modal' => 'modals/ticket_template/ticket_template_add.php', 'size' => 'lg']],
+        'text' => __('A ticket ready to raise - its subject, details and tasks, and how it is set up. <span class="font-monospace">[Client]</span>, <span class="font-monospace">[Contact]</span>, <span class="font-monospace">[Month]</span> and the like are filled in when a ticket is raised.'),
+        'actions' => [['label' => __('New Ticket Template'), 'modal' => 'modals/ticket_template/ticket_template_add.php', 'size' => 'lg']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

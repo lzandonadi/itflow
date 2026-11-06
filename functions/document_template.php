@@ -82,16 +82,16 @@ function documentTemplateFields(array $post, &$error = '') {
     $error = '';
     $name = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($post['name'] ?? ''))));
     if ($name === '') {
-        $error = 'A document template needs a name';
+        $error = __('A document template needs a name');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'Keep the name to 200 characters';
+        $error = __('Keep the name to 200 characters');
         return null;
     }
     $description = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($post['description'] ?? ''))));
     if (mb_strlen($description) > 500) {
-        $error = 'Keep the summary to 500 characters';
+        $error = __('Keep the summary to 500 characters');
         return null;
     }
     return ['name' => $name, 'description' => $description, 'content' => (string) ($post['content'] ?? '')];
@@ -492,7 +492,7 @@ function documentTemplateTableData($table, $client_id) {
             LEFT JOIN locations ON location_id = asset_location_id AND asset_location_id > 0
             LEFT JOIN contacts ON contact_id = asset_contact_id AND asset_contact_id > 0
             WHERE asset_client_id = $client_id AND asset_archived_at IS NULL$where ORDER BY asset_name ASC");
-        $labels = ['name' => 'Name', 'type' => 'Type', 'model' => 'Make and model', 'serial' => 'Serial', 'os' => 'Operating system', 'ip' => 'IP address', 'site' => 'Site', 'who' => 'Assigned to'];
+        $labels = ['name' => 'Name', 'type' => 'Type', 'model' => __('Make and model'), 'serial' => 'Serial', 'os' => __('Operating system'), 'ip' => __('IP address'), 'site' => 'Site', 'who' => __('Assigned to')];
         $data = ['head' => array_map(function ($column) use ($labels) {
             return $labels[$column];
         }, $columns), 'rows' => [], 'names' => []];
@@ -630,6 +630,21 @@ const DOCUMENT_TEMPLATE_REQUIRED_TAGGED = 2;
 /** How often the documents made from a template are reviewed - months => what it says; 0 never. */
 const DOCUMENT_TEMPLATE_REVIEW_MONTHS = [0 => 'Never', 3 => 'Every 3 months', 6 => 'Every 6 months', 12 => 'Every year', 24 => 'Every 2 years'];
 
+/** How often a template's documents are reviewed (DOCUMENT_TEMPLATE_REVIEW_MONTHS), in the interface language - lower case to go in a sentence, with $lower. */
+function documentTemplateReviewLabel($months, $lower = false) {
+    $label = DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($months)] ?? '';
+    if ($label === '') {
+        return '';
+    }
+    $label = __($label); // i18n-dynamic - DOCUMENT_TEMPLATE_REVIEW_MONTHS, entries in lang/pt_BR/catalogs.php
+    return $lower ? lcfirst($label) : $label;
+}
+
+/** What a placeholder or table word (DOCUMENT_TEMPLATE_PLACEHOLDERS, DOCUMENT_TEMPLATE_TABLES) becomes, in the interface language. */
+function documentTemplateWordHelp($text) {
+    return __((string) $text); // i18n-dynamic - DOCUMENT_TEMPLATE_PLACEHOLDERS / TABLES, entries in lang/pt_BR/catalogs.php
+}
+
 /** The client tags templates are required by - [template id => [tag id => tag name]], in name order. */
 function documentTemplateRequiredTags(array $document_template_ids) {
     global $mysqli;
@@ -689,12 +704,12 @@ function documentTemplateScopeSql($required, array $tag_ids) {
 /** Who a template is required of, in words - '' when it isn't. */
 function documentTemplateScopeText($required, array $tags) {
     if (intval($required) === DOCUMENT_TEMPLATE_REQUIRED_EVERY) {
-        return 'Every client';
+        return __('Every client');
     }
     if (intval($required) !== DOCUMENT_TEMPLATE_REQUIRED_TAGGED) {
         return '';
     }
-    return $tags ? 'Clients tagged ' . implode(' or ', $tags) : 'Clients with a tag - none picked';
+    return $tags ? __('Clients tagged %s', implode(__(' or '), $tags)) : __('Clients with a tag - none picked');
 }
 
 /*

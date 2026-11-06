@@ -739,7 +739,7 @@ function expenseImportSave(array $import, array $picks, &$error = '') {
             if ($existing) {
                 $by_name[$name_key] = intval($existing[0]);
             } else {
-                mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => $item['new_vendor'], 'description' => 'Added from a statement import'] /* i18n-ignore - stored */) . ", vendor_client_id = 0");
+                mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => $item['new_vendor'], 'description' => __('Added from a statement import')]) . ", vendor_client_id = 0");
                 $by_name[$name_key] = mysqli_insert_id($mysqli);
                 logAudit('Vendor', 'Create', escapeSql(stripslashes((string) ($GLOBALS['session_name'] ?? 'ITFlow')) . " created vendor {$item['new_vendor']} from a statement import"), 0, $by_name[$name_key]);
                 $made++;

@@ -16,7 +16,7 @@ function ticketTemplateWhenSql($when) {
 function ticketTemplateForRequest($ticket_template_id) {
     $row = ticketTemplateRow($ticket_template_id);
     if (!$row) {
-        flashAlert('That ticket template no longer exists.', 'error');
+        flashAlert(__('That ticket template no longer exists.'), 'error');
         redirect('ticket_templates.php');
     }
     return $row;
@@ -49,7 +49,7 @@ if (isset($_POST['add_ticket_template']) || isset($_POST['edit_ticket_template']
 
     logAudit("Ticket Template", $editing ? "Edit" : "Create", "$session_name " . ($editing ? 'edited' : 'created') . " ticket template $name", 0, $ticket_template_id);
 
-    flashAlert("Ticket template <strong>" . escapeHtml($fields['name']) . "</strong> " . ($editing ? 'saved' : 'created'));
+    flashAlert(($editing ? __('Ticket template <strong>%s</strong> saved', escapeHtml($fields['name'])) : __('Ticket template <strong>%s</strong> created', escapeHtml($fields['name']))));
 
     // A new one opens, to add its tasks
     redirect($editing ? null : "ticket_template.php?ticket_template_id=$ticket_template_id");
@@ -65,7 +65,7 @@ if (isset($_GET['copy_ticket_template'])) {
 
     logAudit("Ticket Template", "Create", "$session_name copied ticket template " . escapeSql($row['ticket_template_name']), 0, $new_id);
 
-    flashAlert("Ticket template <strong>" . escapeHtml($row['ticket_template_name']) . "</strong> copied - this is the copy");
+    flashAlert(__('Ticket template <strong>%s</strong> copied - this is the copy', escapeHtml($row['ticket_template_name'])));
 
     redirect("ticket_template.php?ticket_template_id=$new_id");
 
@@ -85,7 +85,7 @@ if (isset($_GET['archive_ticket_template']) || isset($_GET['restore_ticket_templ
 
     logAudit("Ticket Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " ticket template $name", 0, $ticket_template_id);
 
-    flashAlert("Ticket template <strong>" . escapeHtml($row['ticket_template_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Ticket template <strong>%s</strong> archived', escapeHtml($row['ticket_template_name'])) : __('Ticket template <strong>%s</strong> restored', escapeHtml($row['ticket_template_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -114,7 +114,7 @@ if (isset($_GET['delete_ticket_template'])) {
 
     logAudit("Ticket Template", "Delete", "$session_name deleted ticket template $ticket_template_name");
 
-    flashAlert("Ticket template <strong>" . escapeHtml($row['ticket_template_name']) . "</strong> and its tasks deleted", 'error');
+    flashAlert(__('Ticket template <strong>%s</strong> and its tasks deleted', escapeHtml($row['ticket_template_name'])), 'error');
 
     redirect(isset($_GET['from_page']) ? 'ticket_templates.php' : null);
 
@@ -128,7 +128,7 @@ if (isset($_POST['add_ticket_template_task'])) {
     $ticket_template_id = intval($row['ticket_template_id']);
     $task_name = trim(mb_substr(strip_tags((string) ($_POST['task_name'] ?? '')), 0, 200));
     if ($task_name === '') {
-        flashAlert('Give the task a name.', 'error');
+        flashAlert(__('Give the task a name.'), 'error');
         redirect();
     }
     $estimate = max(0, min(100000, intval($_POST['task_estimate'] ?? 0)));
@@ -140,7 +140,7 @@ if (isset($_POST['add_ticket_template_task'])) {
 
     logAudit("Ticket Template", "Edit", "$session_name added task $task_name_sql to ticket template " . escapeSql($row['ticket_template_name']), 0, $ticket_template_id);
 
-    flashAlert("Task <strong>" . escapeHtml($task_name) . "</strong> added");
+    flashAlert(__('Task <strong>%s</strong> added', escapeHtml($task_name)));
 
     redirect();
 
@@ -155,7 +155,7 @@ if (isset($_POST['edit_ticket_template_task'])) {
     $row = ticketTemplateForRequest($task['task_template_ticket_template_id'] ?? 0);
     $task_name = trim(mb_substr(strip_tags((string) ($_POST['name'] ?? '')), 0, 200));
     if ($task_name === '') {
-        flashAlert('Give the task a name.', 'error');
+        flashAlert(__('Give the task a name.'), 'error');
         redirect();
     }
     $task_name_sql = escapeSql($task_name);
@@ -168,7 +168,7 @@ if (isset($_POST['edit_ticket_template_task'])) {
 
     logAudit("Ticket Template", "Edit", "$session_name edited task $task_name_sql on ticket template " . escapeSql($row['ticket_template_name']), 0, intval($row['ticket_template_id']));
 
-    flashAlert("Task <strong>" . escapeHtml($task_name) . "</strong> saved");
+    flashAlert(__('Task <strong>%s</strong> saved', escapeHtml($task_name)));
 
     redirect();
 
@@ -186,7 +186,7 @@ if (isset($_GET['delete_task_template'])) {
 
     logAudit("Ticket Template", "Edit", "$session_name deleted task " . escapeSql($task['task_template_name']) . " from ticket template " . escapeSql($row['ticket_template_name']), 0, intval($row['ticket_template_id']));
 
-    flashAlert("Task <strong>" . escapeHtml($task['task_template_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Task <strong>%s</strong> deleted', escapeHtml($task['task_template_name'])), 'error');
 
     redirect();
 
@@ -204,13 +204,13 @@ if (isset($_POST['save_ticket_template_fill_in'])) {
 
     $name = ticketFillInName($_POST['name'] ?? '');
     if ($name === '') {
-        flashAlert("A fill-in's name is what goes in square brackets - a letter first, then letters, digits, spaces, _ - or /, up to 41 in all. [Client] and the others filled in from the ticket are taken.", 'error');
+        flashAlert(__('A fill-in\'s name is what goes in square brackets - a letter first, then letters, digits, spaces, _ - or /, up to 41 in all. [Client] and the others filled in from the ticket are taken.'), 'error');
         redirect();
     }
     $type = isset(TICKET_FILL_IN_TYPES[$_POST['type'] ?? '']) ? $_POST['type'] : 'text';
     $options = $type === 'list' ? ticketFillInOptions($_POST['options'] ?? '') : [];
     if ($type === 'list' && count($options) < 2) {
-        flashAlert('A list needs at least two choices - one per line.', 'error');
+        flashAlert(__('A list needs at least two choices - one per line.'), 'error');
         redirect();
     }
     $required = intval($_POST['required'] ?? 0) ? 1 : 0;
@@ -224,7 +224,7 @@ if (isset($_POST['save_ticket_template_fill_in'])) {
             continue;
         }
         if (strtolower($fill_in['name']) === strtolower($name) && strtolower($fill_in['name']) !== strtolower($original)) {
-            flashAlert("<strong>" . escapeHtml($row['ticket_template_name']) . "</strong> already asks for <strong>" . escapeHtml($fill_in['name']) . "</strong>.", 'error');
+            flashAlert(__('<strong>%1$s</strong> already asks for <strong>%2$s</strong>.', escapeHtml($row['ticket_template_name']), escapeHtml($fill_in['name'])), 'error');
             redirect();
         }
     }
@@ -250,7 +250,7 @@ if (isset($_POST['save_ticket_template_fill_in'])) {
 
     logAudit("Ticket Template", "Edit", "$session_name " . ($original === '' ? 'added' : 'changed') . " fill-in " . escapeSql($name) . " on ticket template $template_name", 0, $ticket_template_id);
 
-    flashAlert("Fill-in <strong>" . escapeHtml($name) . "</strong> saved" . ($original === '' ? " - put <code>[" . escapeHtml($name) . "]</code> in the text where the answer goes" : ''));
+    flashAlert($original === '' ? __('Fill-in <strong>%1$s</strong> saved - put <code>[%1$s]</code> in the text where the answer goes', escapeHtml($name)) : __('Fill-in <strong>%s</strong> saved', escapeHtml($name)));
 
     redirect();
 
@@ -278,8 +278,8 @@ if (isset($_GET['delete_ticket_template_fill_in'])) {
     logAudit("Ticket Template", "Edit", "$session_name removed fill-in " . escapeSql($name) . " from ticket template " . escapeSql($row['ticket_template_name']), 0, $ticket_template_id);
 
     flashAlert($still_asked
-        ? "Fill-in <strong>" . escapeHtml($name) . "</strong> reset - <code>[" . escapeHtml($name) . "]</code> is still in the text, so it is asked for as plain, optional text"
-        : "Fill-in <strong>" . escapeHtml($name) . "</strong> removed", 'error');
+        ? __('Fill-in <strong>%1$s</strong> reset - <code>[%1$s]</code> is still in the text, so it is asked for as plain, optional text', escapeHtml($name))
+        : __('Fill-in <strong>%s</strong> removed', escapeHtml($name)), 'error');
 
     redirect();
 
@@ -291,12 +291,12 @@ if (isset($_POST['reorder_ticket_template_fill_ins'])) {
     // Every one dragged keeps its place from now on, so each gets a row.
     header('Content-Type: application/json');
     if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => 'The page is out of date - reload it']);
+        echo json_encode(['ok' => false, 'error' => __('The page is out of date - reload it')]);
         exit;
     }
     $row = ticketTemplateRow($_POST['ticket_template_id'] ?? 0);
     if (!$row) {
-        echo json_encode(['ok' => false, 'error' => 'That ticket template no longer exists']);
+        echo json_encode(['ok' => false, 'error' => __('That ticket template no longer exists')]);
         exit;
     }
     $ticket_template_id = intval($row['ticket_template_id']);
@@ -336,7 +336,7 @@ if (isset($_POST['export_ticket_templates']) || isset($_GET['export_ticket_templ
         $export = ticketTemplatesExport((array) ($_POST['ticket_template_ids'] ?? []), !empty($_POST['archived']));
     }
     if (!$export['templates']) {
-        flashAlert('There are no ticket templates to export.', 'error');
+        flashAlert(__('There are no ticket templates to export.'), 'error');
         redirect();
     }
 
@@ -358,11 +358,11 @@ if (isset($_POST['import_ticket_templates'])) {
 
     $file = $_FILES['file'] ?? null;
     if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert('Pick the file to import.', 'error');
+        flashAlert(__('Pick the file to import.'), 'error');
         redirect('ticket_templates.php');
     }
     if ($file['size'] > 5 * 1024 * 1024) {
-        flashAlert('That file is too big to be ticket templates.', 'error');
+        flashAlert(__('That file is too big to be ticket templates.'), 'error');
         redirect('ticket_templates.php');
     }
     $templates = ticketTemplatesImportRead(file_get_contents($file['tmp_name']), $import_error);

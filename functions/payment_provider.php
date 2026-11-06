@@ -62,17 +62,17 @@ function paymentProviderTies($provider_id) {
 function paymentProviderTiesText(array $ties) {
     $parts = [];
     if ($ties['cards']) {
-        $parts[] = $ties['cards'] . ' saved card' . ($ties['cards'] === 1 ? '' : 's');
+        $parts[] = _n('%d saved card', '%d saved cards', $ties['cards']);
     }
     if ($ties['autopay']) {
-        $parts[] = 'autopay on ' . $ties['autopay'] . ' recurring invoice' . ($ties['autopay'] === 1 ? '' : 's');
+        $parts[] = _n('autopay on %d recurring invoice', 'autopay on %d recurring invoices', $ties['autopay']);
     }
     if ($ties['clients']) {
-        $parts[] = 'the link to ' . $ties['clients'] . ' client' . ($ties['clients'] === 1 ? '' : 's') . ' as its customers';
+        $parts[] = _n('the link to %d client as its customers', 'the link to %d clients as its customers', $ties['clients']);
     }
     if (count($parts) > 1) {
         $last = array_pop($parts);
-        return implode(', ', $parts) . ' and ' . $last;
+        return __('%1$s and %2$s', implode(', ', $parts), $last);
     }
     return $parts[0] ?? '';
 }
@@ -80,7 +80,7 @@ function paymentProviderTiesText(array $ties) {
 /* A card limit as it reads - "Under $1,000.00", or "No limit". */
 function paymentProviderLimitText($threshold) {
     $threshold = round(floatval($threshold), 2);
-    return $threshold > 0 ? 'Under ' . billingMoney($threshold) : 'No limit';
+    return $threshold > 0 ? __('Under %s', billingMoney($threshold)) : __('No limit');
 }
 
 /*
@@ -98,15 +98,15 @@ function paymentProviderCheck(array $post, $before = null) {
     $kind = $kinds[$name] ?? null;
     if (!$before) {
         if (!$kind) {
-            $errors['provider'] = 'Pick one of these.';
+            $errors['provider'] = __('Pick one of these.');
         } elseif (mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM payment_providers WHERE payment_provider_name = '" . escapeSql($name) . "' LIMIT 1"))) {
-            $errors['provider'] = "$name is set up already - edit it instead.";
+            $errors['provider'] = __('%s is set up already - edit it instead.', $name);
         }
     }
 
     $description = trim(preg_replace('/\s+/u', ' ', (string) ($post['description'] ?? '')));
     if (mb_strlen($description) > 250) {
-        $errors['description'] = 'Up to 250 characters.';
+        $errors['description'] = __('Up to 250 characters.');
     }
 
     // The keys - the secret one left empty stays as saved
@@ -115,19 +115,19 @@ function paymentProviderCheck(array $post, $before = null) {
     $secret_key = $secret_typed !== '' ? $secret_typed : (string) ($before['payment_provider_private_key'] ?? '');
     if ($kind) {
         if ($public_key === '') {
-            $errors['public_key'] = "The publishable key - it starts {$kind['public_example']}";
+            $errors['public_key'] = __('The publishable key - it starts %s', $kind['public_example']);
         } elseif (mb_strlen($public_key) > 250 || !preg_match($kind['public'], $public_key)) {
-            $errors['public_key'] = "That isn't a publishable key - it starts {$kind['public_example']}";
+            $errors['public_key'] = __("That isn't a publishable key - it starts %s", $kind['public_example']);
         }
         if ($secret_key === '') {
-            $errors['private_key'] = "The secret key - it starts {$kind['secret_example']}";
+            $errors['private_key'] = __('The secret key - it starts %s', $kind['secret_example']);
         } elseif ($secret_typed !== '' && (mb_strlen($secret_typed) > 250 || !preg_match($kind['secret'], $secret_typed))) {
-            $errors['private_key'] = "That isn't a secret key - it starts {$kind['secret_example']}, or rk_ for a restricted key.";
+            $errors['private_key'] = __("That isn't a secret key - it starts %s, or rk_ for a restricted key.", $kind['secret_example']);
         }
         if (!isset($errors['public_key']) && !isset($errors['private_key']) && paymentProviderMode($secret_key) === '') {
-            $errors['private_key'] = "The saved secret key doesn't say whether it is live or test - type it in again.";
+            $errors['private_key'] = __("The saved secret key doesn't say whether it is live or test - type it in again.");
         } elseif (!isset($errors['public_key']) && !isset($errors['private_key']) && paymentProviderMode($public_key) !== paymentProviderMode($secret_key)) {
-            $errors['private_key'] = 'One key is a ' . paymentProviderMode($public_key) . ' key and the other a ' . paymentProviderMode($secret_key) . ' one - both have to be live, or both test.';
+            $errors['private_key'] = paymentProviderMode($public_key) === 'live' ? __('One key is a live key and the other a test one - both have to be live, or both test.') : __('One key is a test key and the other a live one - both have to be live, or both test.');
         }
     }
 
@@ -135,7 +135,7 @@ function paymentProviderCheck(array $post, $before = null) {
     $account_id = intval($post['account'] ?? 0);
     $account = $account_id ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT account_id, account_archived_at FROM accounts WHERE account_id = $account_id LIMIT 1")) : null;
     if (!$account || ($account['account_archived_at'] && $account_id !== intval($before['payment_provider_account'] ?? 0))) {
-        $errors['account'] = 'Pick the account its payments go into.';
+        $errors['account'] = __('Pick the account its payments go into.');
     }
 
     // The card limit - empty, or 0, for none
@@ -143,7 +143,7 @@ function paymentProviderCheck(array $post, $before = null) {
     $threshold = 0.0;
     if ($threshold_text !== '') {
         if (!preg_match('/^\d{1,13}(\.\d{1,2})?$/', $threshold_text)) {
-            $errors['threshold'] = 'A sum of money, as 1000 or 1000.50 - or empty for no limit.';
+            $errors['threshold'] = __('A sum of money, as 1000 or 1000.50 - or empty for no limit.');
         } else {
             $threshold = round(floatval($threshold_text), 2);
         }
@@ -157,11 +157,11 @@ function paymentProviderCheck(array $post, $before = null) {
         $category_id = intval($post['expense_category'] ?? 0);
         $vendor = $vendor_id ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT vendor_id, vendor_archived_at FROM vendors WHERE vendor_id = $vendor_id AND vendor_client_id = 0 LIMIT 1")) : null;
         if (!$vendor || ($vendor['vendor_archived_at'] && $vendor_id !== intval($before['payment_provider_expense_vendor'] ?? 0))) {
-            $errors['expense_vendor'] = 'Pick the vendor its fees are paid to - one of your own, as ' . ($name !== '' ? $name : 'Stripe') . '.';
+            $errors['expense_vendor'] = __('Pick the vendor its fees are paid to - one of your own, as %s.', $name !== '' ? $name : 'Stripe');
         }
         $category = $category_id ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT category_id, category_archived_at FROM categories WHERE category_id = $category_id AND category_type = 'Expense' LIMIT 1")) : null;
         if (!$category || ($category['category_archived_at'] && $category_id !== intval($before['payment_provider_expense_category'] ?? 0))) {
-            $errors['expense_category'] = 'Pick the expense category they go under, as Processing Fee.';
+            $errors['expense_category'] = __('Pick the expense category they go under, as Processing Fee.');
         }
     }
 
@@ -199,13 +199,13 @@ function paymentProviderAsk($name, $secret_key) {
         $stripe = new \Stripe\StripeClient((string) $secret_key);
         $account = $stripe->accounts->retrieve();
     } catch (\Stripe\Exception\AuthenticationException $e) {
-        return ['ok' => false, 'error' => 'Stripe doesn\'t know that secret key - copy it again from Developers > API keys.', 'account' => []];
+        return ['ok' => false, 'error' => __('Stripe doesn\'t know that secret key - copy it again from Developers > API keys.'), 'account' => []];
     } catch (\Stripe\Exception\PermissionException $e) {
-        return ['ok' => false, 'error' => 'That restricted key can\'t read the account - give it Read on Account, or use the secret key.', 'account' => []];
+        return ['ok' => false, 'error' => __('That restricted key can\'t read the account - give it Read on Account, or use the secret key.'), 'account' => []];
     } catch (\Stripe\Exception\ApiConnectionException $e) {
-        return ['ok' => false, 'error' => 'Stripe couldn\'t be reached to check the key - ' . $e->getMessage(), 'account' => []];
+        return ['ok' => false, 'error' => __("Stripe couldn't be reached to check the key - %s", $e->getMessage()), 'account' => []];
     } catch (\Throwable $e) {
-        return ['ok' => false, 'error' => 'Stripe turned the key away - ' . $e->getMessage(), 'account' => []];
+        return ['ok' => false, 'error' => __('Stripe turned the key away - %s', $e->getMessage()), 'account' => []];
     }
     $display = (string) ($account->settings->dashboard->display_name ?? '');
     if ($display === '') {
@@ -353,7 +353,7 @@ function paymentCardRemove($saved_payment_id, $by, &$error = '') {
         LEFT JOIN clients ON client_id = saved_payment_client_id
         WHERE saved_payment_id = $saved_payment_id LIMIT 1"));
     if (!$row) {
-        $error = 'That card is no longer saved - it may have been removed already.';
+        $error = __('That card is no longer saved - it may have been removed already.');
         return null;
     }
     $card = billingCardParts($row['saved_payment_description']);
@@ -554,17 +554,17 @@ function paymentProviderProblems() {
         $name = $provider['payment_provider_name'];
         if (intval($provider['payment_provider_active'])) {
             if (paymentProviderMode($provider['payment_provider_private_key']) === 'test') {
-                $problems[] = ['warning', 'fa-credit-card', "Card payments are in test mode", "$name has test keys, so card payments move no real money. Put in its live keys when you are ready.", 'payment_providers.php', 'Payment Providers'];
+                $problems[] = ['warning', 'fa-credit-card', __('Card payments are in test mode'), __('%s has test keys, so card payments move no real money. Put in its live keys when you are ready.', $name), 'payment_providers.php', __('Payment Providers')];
             }
             if (!$provider['account_name'] || $provider['account_archived_at']) {
-                $problems[] = ['danger', 'fa-piggy-bank', "Card payments go into an account that is " . ($provider['account_name'] ? 'archived' : 'gone'),
-                    "$name's payments are recorded into " . ($provider['account_name'] ? $provider['account_name'] . ', which is archived' : 'an account that no longer exists') . ' - pick another for them.', 'payment_providers.php', 'Payment Providers'];
+                $problems[] = ['danger', 'fa-piggy-bank', $provider['account_name'] ? __('Card payments go into an account that is archived') : __('Card payments go into an account that is gone'),
+                    $provider['account_name'] ? __('%1$s\'s payments are recorded into %2$s, which is archived - pick another for them.', $name, $provider['account_name']) : __("%s's payments are recorded into an account that no longer exists - pick another for them.", $name), 'payment_providers.php', __('Payment Providers')];
             }
         }
         $activity = paymentProviderActivity($provider);
         if ($activity['stale']) {
-            $problems[] = ['warning', 'fa-receipt', "$name's fees aren't being recorded",
-                $activity['stale'] . ' card payment' . ($activity['stale'] === 1 ? '' : 's') . ' more than two days old ' . ($activity['stale'] === 1 ? 'has' : 'have') . ' no fee recorded. The Payment Provider Fees job in Maintenance > Cron records them - check it is on, or record them now.', 'payment_providers.php', 'Payment Providers'];
+            $problems[] = ['warning', 'fa-receipt', __("%s's fees aren't being recorded", $name),
+                _n('%d card payment more than two days old has no fee recorded. The Payment Provider Fees job in Maintenance > Cron records them - check it is on, or record them now.', '%d card payments more than two days old have no fee recorded. The Payment Provider Fees job in Maintenance > Cron records them - check it is on, or record them now.', $activity['stale']), 'payment_providers.php', __('Payment Providers')];
         }
     }
     return $problems;
@@ -579,20 +579,20 @@ function paymentProviderSummaryHtml() {
     global $mysqli;
     $id = mysqli_fetch_row(mysqli_query($mysqli, "SELECT payment_provider_id FROM payment_providers ORDER BY payment_provider_active DESC, payment_provider_name ASC LIMIT 1"));
     if (!$id) {
-        return '<i class="fas fa-fw fa-info-circle me-1"></i>No payment provider is set up, so clients can\'t pay by card. <a href="payment_providers.php">Set up Stripe</a>.';
+        return __('<i class="fas fa-fw fa-info-circle me-1"></i>No payment provider is set up, so clients can\'t pay by card. <a href="payment_providers.php">Set up Stripe</a>.');
     }
     $provider = paymentProviderRow($id[0]);
     $name = escapeHtml($provider['payment_provider_name']);
     if (!intval($provider['payment_provider_active'])) {
-        return '<i class="fas fa-fw fa-toggle-off me-1"></i>' . $name . ' is turned off, so clients can\'t pay by card. <a href="payment_providers.php">Payment Providers</a>.';
+        return '<i class="fas fa-fw fa-toggle-off me-1"></i>' . __("%s is turned off, so clients can't pay by card.", $name) . ' <a href="payment_providers.php">' . __('Payment Providers') . '</a>.';
     }
     $mode = paymentProviderMode($provider['payment_provider_private_key']);
     $activity = paymentProviderActivity($provider);
     $limit = round(floatval($provider['payment_provider_threshold']), 2);
     return ($mode === 'test' ? '<i class="fas fa-fw fa-exclamation-triangle text-warning me-1"></i>' : '<i class="fas fa-fw fa-check-circle text-success me-1"></i>')
-        . $name . ' is on, with ' . ($mode === 'test' ? '<strong>test keys</strong> - no real money moves' : 'live keys')
-        . ' - payments go into ' . escapeHtml((string) ($provider['account_name'] ?? 'no account'))
-        . ($limit > 0 ? ', for invoices under ' . escapeHtml(billingMoney($limit)) : '') . '. '
-        . ($activity['payments'] ? $activity['payments'] . ' card payment' . ($activity['payments'] === 1 ? '' : 's') . ' in the last 30 days.' : 'No card payments in the last 30 days.')
-        . ' <a href="payment_providers.php">Payment Providers</a>.';
+        . ($mode === 'test' ? __('%s is on, with <strong>test keys</strong> - no real money moves', $name) : __('%s is on, with live keys', $name))
+        . __(' - payments go into %s', escapeHtml((string) ($provider['account_name'] ?? __('no account'))))
+        . ($limit > 0 ? __(', for invoices under %s', escapeHtml(billingMoney($limit))) : '') . '. '
+        . ($activity['payments'] ? _n('%d card payment in the last 30 days.', '%d card payments in the last 30 days.', $activity['payments']) : __('No card payments in the last 30 days.'))
+        . ' <a href="payment_providers.php">' . __('Payment Providers') . '</a>.';
 }

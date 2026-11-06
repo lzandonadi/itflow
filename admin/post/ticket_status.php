@@ -16,14 +16,14 @@ if (isset($_POST['add_ticket_status']) || isset($_POST['edit_ticket_status'])) {
 
     $row = isset($_POST['edit_ticket_status']) ? ticketStatusRow($_POST['ticket_status_id'] ?? 0) : null;
     if (isset($_POST['edit_ticket_status']) && !$row) {
-        flashAlert("That status is gone - it may have been deleted.", 'error');
+        flashAlert(__('That status is gone - it may have been deleted.'), 'error');
         redirect();
     }
 
     $fields = ticketStatusFromInput($_POST, $row);
     $problem = ticketStatusProblem($fields, $row ? $row['ticket_status_id'] : 0);
     if ($problem !== '') {
-        flashAlert(escapeHtml($problem) . ' The status was not saved.', 'error');
+        flashAlert(__('%s The status was not saved.', escapeHtml($problem)), 'error');
         redirect();
     }
 
@@ -33,11 +33,11 @@ if (isset($_POST['add_ticket_status']) || isset($_POST['edit_ticket_status'])) {
         if ($changes) {
             logAudit("Ticket Status", "Edit", "$session_name changed ticket status " . escapeSql($row['ticket_status_name']) . ": " . escapeSql(implode('; ', $changes)), 0, $ticket_status_id);
         }
-        flashAlert("Status <strong>" . escapeHtml($fields['name']) . "</strong> saved");
+        flashAlert(__('Status <strong>%s</strong> saved', escapeHtml($fields['name'])));
     } else {
         $ticket_status_id = ticketStatusCreate($fields);
         logAudit("Ticket Status", "Create", "$session_name added ticket status " . escapeSql($fields['name']) . ($fields['pauses_sla'] ? ' (pauses the resolution clock)' : ''), 0, $ticket_status_id);
-        flashAlert("Status <strong>" . escapeHtml($fields['name']) . "</strong> added - at the end of the order");
+        flashAlert(__('Status <strong>%s</strong> added - at the end of the order', escapeHtml($fields['name'])));
     }
 
     redirect();
@@ -72,7 +72,7 @@ if (isset($_POST['reorder_ticket_statuses'])) {
     // Dragged into order on Admin > Ticket Statuses - answers with JSON, as the page saves it in the background
     header('Content-Type: application/json');
     if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => 'The page is out of date - reload it']);
+        echo json_encode(['ok' => false, 'error' => __('The page is out of date - reload it')]);
         exit;
     }
 
@@ -100,7 +100,7 @@ if (isset($_GET['switch_on_ticket_status'])) {
     if ($row && intval($row['ticket_status_active']) !== 1) {
         ticketStatusSetActive($row, true);
         logAudit("Ticket Status", "Edit", "$session_name switched on ticket status " . escapeSql($row['ticket_status_name']), 0, intval($row['ticket_status_id']));
-        flashAlert("Status <strong>" . escapeHtml($row['ticket_status_name']) . "</strong> switched on - it can be picked again");
+        flashAlert(__('Status <strong>%s</strong> switched on - it can be picked again', escapeHtml($row['ticket_status_name'])));
     }
 
     redirect();
@@ -113,25 +113,25 @@ if (isset($_POST['switch_off_ticket_status'])) {
 
     $row = ticketStatusRow($_POST['ticket_status_id'] ?? 0);
     if (!$row) {
-        flashAlert("That status is gone - it may have been deleted.", 'error');
+        flashAlert(__('That status is gone - it may have been deleted.'), 'error');
         redirect();
     }
     $name = $row['ticket_status_name'];
     $move_to = intval($_POST['move_to'] ?? 0);
     if ($move_to && !isset(ticketStatusMoveTargets($row['ticket_status_id'])[$move_to])) {
-        flashAlert("Its tickets can't be moved there. Nothing was changed.", 'error');
+        flashAlert(__('Its tickets can\'t be moved there. Nothing was changed.'), 'error');
         redirect();
     }
 
     [$ok, $moved] = ticketStatusSetActive($row, false, $move_to);
     if (!$ok) {
-        flashAlert("ITFlow's own statuses can't be switched off.", 'error');
+        flashAlert(__('ITFlow\'s own statuses can\'t be switched off.'), 'error');
         redirect();
     }
 
     $to_name = $moved ? ticketStatusesAll()[$move_to]['ticket_status_name'] : '';
     logAudit("Ticket Status", "Edit", "$session_name switched off ticket status " . escapeSql($name) . ($moved ? ", moving $moved tickets to " . escapeSql($to_name) : ''), 0, intval($row['ticket_status_id']));
-    flashAlert("Status <strong>" . escapeHtml($name) . "</strong> switched off" . ($moved ? " - $moved " . ($moved === 1 ? 'ticket' : 'tickets') . " moved to <strong>" . escapeHtml($to_name) . "</strong>" : ''));
+    flashAlert($moved ? _n('Status <strong>%1$s</strong> switched off - %2$d ticket moved to <strong>%3$s</strong>', 'Status <strong>%1$s</strong> switched off - %2$d tickets moved to <strong>%3$s</strong>', $moved, escapeHtml($name), $moved, escapeHtml($to_name)) : __('Status <strong>%s</strong> switched off', escapeHtml($name)));
 
     redirect();
 
@@ -143,11 +143,11 @@ if (isset($_POST['delete_ticket_status'])) {
 
     $row = ticketStatusRow($_POST['ticket_status_id'] ?? 0);
     if (!$row) {
-        flashAlert("That status is gone - it may have been deleted.", 'error');
+        flashAlert(__('That status is gone - it may have been deleted.'), 'error');
         redirect();
     }
     if (ticketStatusIsBuiltIn($row['ticket_status_id'])) {
-        flashAlert("ITFlow's own statuses can't be deleted.", 'error');
+        flashAlert(__('ITFlow\'s own statuses can\'t be deleted.'), 'error');
         redirect();
     }
 
@@ -155,13 +155,13 @@ if (isset($_POST['delete_ticket_status'])) {
     $move_to = intval($_POST['move_to'] ?? 0);
     [$ok, $moved, $canned] = ticketStatusDelete($row, $move_to);
     if (!$ok) {
-        flashAlert("Pick where its tickets go. Nothing was deleted.", 'error');
+        flashAlert(__('Pick where its tickets go. Nothing was deleted.'), 'error');
         redirect();
     }
 
     $to_name = $moved ? (ticketStatusesAll()[$move_to]['ticket_status_name'] ?? '') : '';
     logAudit("Ticket Status", "Delete", "$session_name deleted ticket status " . escapeSql($name) . ($moved ? ", moving $moved tickets to " . escapeSql($to_name) : '') . ($canned ? "; $canned canned responses no longer set a status" : ''), 0, intval($row['ticket_status_id']));
-    flashAlert("Status <strong>" . escapeHtml($name) . "</strong> deleted" . ($moved ? " - $moved " . ($moved === 1 ? 'ticket' : 'tickets') . " moved to <strong>" . escapeHtml($to_name) . "</strong>" : ''), 'error');
+    flashAlert($moved ? _n('Status <strong>%1$s</strong> deleted - %2$d ticket moved to <strong>%3$s</strong>', 'Status <strong>%1$s</strong> deleted - %2$d tickets moved to <strong>%3$s</strong>', $moved, escapeHtml($name), $moved, escapeHtml($to_name)) : __('Status <strong>%s</strong> deleted', escapeHtml($name)), 'error');
 
     redirect();
 

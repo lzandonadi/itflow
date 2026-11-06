@@ -545,7 +545,7 @@ function contractSetSql(array $f) {
  */
 function contractStandardTermsAdd($client_id, $rate, $net_terms, array $slas = [], $start = null, $notes = '') {
     $defaults = billingDefaults();
-    $in = ['name' => 'Standard terms', 'type' => 'other', 'term_months' => 12, 'auto_renew' => 1, 'notice_days' => 0,
+    $in = ['name' => __('Standard terms'), 'type' => 'other', 'term_months' => 12, 'auto_renew' => 1, 'notice_days' => 0,
         'client_id' => intval($client_id), 'status' => 'Active', 'notes' => $notes, 'rate_standard' => '', 'net_terms' => ''];
     $set = false;
     if ($rate !== null && round(floatval($rate), 2) > 0 && round(floatval($rate), 2) != $defaults['rate']) {

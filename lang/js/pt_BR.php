@@ -441,4 +441,12 @@ return [
     'Sees all but %s clients' => 'Vê todos menos %s clientes',
     'Sees every client' => 'Vê todos os clientes',
 
+    // Admin catalogs and templates (categories, custom links, ticket statuses, document templates, payment providers)
+    'Not saved' => 'Não salvo',
+    '<i class="fa fa-spinner fa-spin me-1"></i>Drafting...' => '<i class="fa fa-spinner fa-spin me-1"></i>Redigindo...',
+    'Could not draft it - try again.' => 'Não foi possível redigir - tente de novo.',
+    '<i class="fas fa-spinner fa-spin me-2"></i>Checking' => '<i class="fas fa-spinner fa-spin me-2"></i>Verificando',
+    'Connected to %s - saving' => 'Conectado a %s - salvando',
+    '<i class="fas fa-spinner fa-spin me-2"></i>Saving' => '<i class="fas fa-spinner fa-spin me-2"></i>Salvando',
+
 ];

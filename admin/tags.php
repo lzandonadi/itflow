@@ -88,16 +88,16 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-tags me-2"></i>Tags</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?></h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tag/tag_add.php?type=<?= $type ?>"><i class="fas fa-plus me-2"></i>New <?= $kind['title'] ?> Tag</button>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tag/tag_add.php?type=<?= $type ?>"><i class="fas fa-plus me-2"></i><?= __('New %s Tag', $kind['title']) ?></button>
         </div>
     </div>
 
     <div class="row g-0">
         <!-- Kinds -->
         <div class="col-md-3 col-xl-2 border-end">
-            <nav class="nav nav-pills flex-nowrap flex-md-column overflow-auto p-2 gap-1 itflow-tag-kinds" aria-label="Kinds of tag">
+            <nav class="nav nav-pills flex-nowrap flex-md-column overflow-auto p-2 gap-1 itflow-tag-kinds" aria-label="<?= escapeHtml(__('Kinds of tag')) ?>">
                 <?php foreach ($kinds as $kind_type => $kind_config) { ?>
                     <a class="nav-link d-flex align-items-center gap-2 text-nowrap<?= $kind_type === $type ? ' active' : '' ?>" href="tags.php?type=<?= $kind_type ?>"<?= $kind_type === $type ? ' aria-current="page"' : '' ?>>
                         <i class="fas fa-fw <?= $kind_config['icon'] ?>"></i><?= ucfirst($kind_config['plural']) ?>
@@ -116,35 +116,35 @@ $csrf = $_SESSION['csrf_token'];
                     <div class="row g-2 align-items-center">
                         <div class="col-lg-6 col-md-8">
                             <div class="input-group">
-                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= $kind_word ?> tags..." title="Name or description">
-                                <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= $kind_word ?> tags..." title="<?= escapeHtml(__('Name or description')) ?>">
+                                <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-4">
                             <div class="d-flex justify-content-end gap-2">
                                 <div class="dropdown" id="bulkActionButton" hidden>
                                     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                        <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action') ?> (<span id="selectedCount">0</span>)
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/tag/tag_merge.php" data-bulk="true">
-                                            <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i>Merge into one...
+                                            <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i><?= __('Merge into one...') ?>
                                         </a>
                                         <?php if ($show_archived) { ?>
                                             <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_restore_tags">
-                                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                             </button>
                                         <?php } else { ?>
                                             <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_archive_tags">
-                                                <i class="fas fa-fw fa-archive text-secondary me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive text-secondary me-2"></i><?= __('Archive') ?>
                                             </button>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_tags"
-                                            data-confirm-title="Delete these tags?"
+                                            data-confirm-title="<?= escapeHtml(__('Delete these tags?')) ?>"
                                             data-confirm-text="They come off every <?= $kind_word ?> that has them. Any that a recurring invoice line counts by are kept."
-                                            data-confirm-button="Delete">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     </div>
                                 </div>
@@ -153,8 +153,8 @@ $csrf = $_SESSION['csrf_token'];
                     </div>
                 </form>
                 <nav class="nav nav-pills itflow-asset-tabs mt-2">
-                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="<?= escapeHtml($pill_url(false)) ?>"><i class="fas fa-fw fa-tags me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url(true)) ?>" title="They stay on their records, but aren't offered for tagging or in the filters"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="<?= escapeHtml($pill_url(false)) ?>"><i class="fas fa-fw fa-tags me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url(true)) ?>" title="<?= escapeHtml(__('They stay on their records, but aren\'t offered for tagging or in the filters')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
                 </nav>
             </div>
 
@@ -166,7 +166,7 @@ $csrf = $_SESSION['csrf_token'];
                         <tr>
                             <th class="checkbox-column border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="Select all on this page">
+                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                                 </div>
                             </th>
                             <th><?= $sort_link('tag_name', 'Tag') ?></th>
@@ -184,15 +184,15 @@ $csrf = $_SESSION['csrf_token'];
                             $edit_url = "modals/tag/tag_edit.php?id=$tag_id";
                             $list_url = tagListUrl(tagKinds()[$type], $tag);
                             $used_html = $used
-                                ? '<a href="' . escapeHtml($list_url) . '" title="Show the ' . $kind['plural'] . ' tagged ' . $name . '">' . $records_text($used) . '</a>'
-                                    . ($used_archived ? ' <span class="text-body-secondary">(' . number_format($used_archived) . ' archived)</span>' : '')
-                                : '<span class="text-body-secondary">' . ($tag['tag_archived_at'] ? 'Nothing has it' : 'Nothing yet') . '</span>';
+                                ? '<a href="' . escapeHtml($list_url) . '" title="' . __('Show the %1$s tagged %2$s', $kind['plural'], $name) . '">' . $records_text($used) . '</a>'
+                                    . ($used_archived ? ' <span class="text-body-secondary">(' . __('%s archived', number_format($used_archived)) . ')</span>' : '')
+                                : '<span class="text-body-secondary">' . ($tag['tag_archived_at'] ? __('Nothing has it') : __('Nothing yet')) . '</span>';
                             $lines_html = $lines
-                                ? '<div class="small text-body-secondary" title="Recurring invoice lines that count the ' . ($type === 3 ? 'users' : 'devices') . ' with this tag"><i class="fas fa-fw fa-redo-alt me-1"></i>Counted on ' . $lines . ' recurring invoice ' . ($lines === 1 ? 'line' : 'lines') . '</div>'
+                                ? '<div class="small text-body-secondary" title="' . escapeHtml($type === 3 ? __('Recurring invoice lines that count the users with this tag') : __('Recurring invoice lines that count the devices with this tag')) . '"><i class="fas fa-fw fa-redo-alt me-1"></i>' . _n('Counted on %d recurring invoice line', 'Counted on %d recurring invoice lines', $lines) . '</div>'
                                 : '';
                             $delete_text = $used
-                                ? 'It comes off the ' . $records_text($used) . ' that ' . ($used === 1 ? 'has' : 'have') . ' it. To keep it on them but stop offering it, archive it instead.'
-                                : 'Nothing has it, so no record changes.';
+                                ? _n('It comes off the %s that has it. To keep it on them but stop offering it, archive it instead.', 'It comes off the %s that have it. To keep it on them but stop offering it, archive it instead.', $used, $records_text($used))
+                                : __('Nothing has it, so no record changes.');
                             ?>
                             <tr>
                                 <td class="checkbox-column bg-light border-end">
@@ -201,13 +201,13 @@ $csrf = $_SESSION['csrf_token'];
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="ajax-modal text-decoration-none" href="#" data-modal-url="<?= $edit_url ?>" title="Edit <?= $name ?>"><?= tagPill($tag) ?></a>
+                                    <a class="ajax-modal text-decoration-none" href="#" data-modal-url="<?= $edit_url ?>" title="<?= __('Edit %s', $name) ?>"><?= tagPill($tag) ?></a>
                                     <?php if (trim((string) $tag['tag_description']) !== '') { ?>
                                         <div class="small text-body-secondary mt-1"><?= escapeHtml($tag['tag_description']) ?></div>
                                     <?php } ?>
                                     <div class="small d-sm-none mt-1"><?= $used_html ?><?= $lines_html ?></div>
                                     <?php if ($tag['tag_archived_at']) { ?>
-                                        <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($tag['tag_archived_at'])) ?></div>
+                                        <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($tag['tag_archived_at'], 'date')) ?></div>
                                     <?php } ?>
                                 </td>
                                 <td class="d-none d-sm-table-cell small">
@@ -216,34 +216,34 @@ $csrf = $_SESSION['csrf_token'];
                                 </td>
                                 <td class="text-end">
                                     <div class="dropdown dropstart">
-                                        <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                        <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                                <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                                <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                             </a>
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/tag/tag_merge.php?tag_ids[]=<?= $tag_id ?>">
-                                                <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i>Merge into...
+                                                <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i><?= __('Merge into...') ?>
                                             </a>
                                             <?php if ($used) { ?>
                                                 <a class="dropdown-item" href="<?= escapeHtml($list_url) ?>">
-                                                    <i class="fas fa-fw <?= $kind['icon'] ?> text-secondary me-2"></i>Show the <?= $kind['plural'] ?>
+                                                    <i class="fas fa-fw <?= $kind['icon'] ?> text-secondary me-2"></i><?= __('Show the %s', $kind['plural']) ?>
                                                 </a>
                                             <?php } ?>
                                             <div class="dropdown-divider"></div>
                                             <?php if ($tag['tag_archived_at']) { ?>
                                                 <a class="dropdown-item" href="post.php?restore_tag=<?= $tag_id ?>&csrf_token=<?= $csrf ?>">
-                                                    <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                                    <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                                 </a>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger" href="post.php?archive_tag=<?= $tag_id ?>&csrf_token=<?= $csrf ?>" title="It stays on its <?= $kind['plural'] ?>, but isn't offered for tagging or in the filters">
-                                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                             <?php } ?>
                                             <?php if ($lines) { ?>
-                                                <span class="dropdown-item disabled" title="Recurring invoice lines count by it - archive it, or merge it into another tag"><i class="fas fa-fw fa-trash me-2"></i>Delete</span>
+                                                <span class="dropdown-item disabled" title="<?= escapeHtml(__('Recurring invoice lines count by it - archive it, or merge it into another tag')) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></span>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_tag=<?= $tag_id ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="<?= escapeHtml($delete_text) ?>" data-confirm-button="Delete"><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml($delete_text) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                                             <?php } ?>
                                         </div>
                                     </div>
@@ -262,8 +262,8 @@ $csrf = $_SESSION['csrf_token'];
                 'filtered' => $q !== '',
                 'archived' => $show_archived,
                 'views' => ['type', 'show'],
-                'text' => 'Tags sort and filter ' . $kind['plural'] . ' - "VIP", "Managed", "Retiring soon".',
-                'actions' => [['label' => "New {$kind['title']} Tag", 'modal' => "modals/tag/tag_add.php?type=$type"]],
+                'text' => __('Tags sort and filter %s - "VIP", "Managed", "Retiring soon".', $kind['plural']),
+                'actions' => [['label' => __('New %s Tag', $kind['title']), 'modal' => "modals/tag/tag_add.php?type=$type"]],
             ];
             require_once "../includes/filter_footer.php";
             ?>

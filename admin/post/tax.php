@@ -25,7 +25,7 @@ if (isset($_POST['add_tax'])) {
 
     logAudit("Tax", "Create", "$session_name created tax " . escapeSql($label), 0, $tax_id);
 
-    flashAlert("Tax <strong>" . escapeHtml($label) . "</strong> created");
+    flashAlert(__('Tax <strong>%s</strong> created', escapeHtml($label)));
 
     redirect();
 
@@ -38,7 +38,7 @@ if (isset($_POST['edit_tax'])) {
     $tax_id = intval($_POST['tax_id'] ?? 0);
     $row = taxRow($tax_id);
     if (!$row) {
-        flashAlert("That tax is gone", 'error');
+        flashAlert(__('That tax is gone'), 'error');
         redirect();
     }
 
@@ -48,7 +48,7 @@ if (isset($_POST['edit_tax'])) {
         redirect();
     }
     if ($row['tax_archived_at'] && !taxSameRate($row, $fields) && taxBilled($tax_id)) {
-        flashAlert("An archived tax keeps the rate it was billed at - restore it, or make a new tax", 'error');
+        flashAlert(__('An archived tax keeps the rate it was billed at - restore it, or make a new tax'), 'error');
         redirect();
     }
 
@@ -60,10 +60,10 @@ if (isset($_POST['edit_tax'])) {
 
     if ($saved['replaced']) {
         logAudit("Tax", "Edit", "$session_name changed tax " . escapeSql($before) . " to " . escapeSql($after) . " - a new rate, the old one archived", 0, $saved['id']);
-        flashAlert("<strong>" . escapeHtml($after) . "</strong> takes over from " . escapeHtml($before) . " from now on" . ($moved !== '' ? " - $moved moved to it" : '') . ". What was already billed keeps the old rate.");
+        flashAlert(($moved !== '' ? __('<strong>%1$s</strong> takes over from %2$s from now on - %3$s moved to it. What was already billed keeps the old rate.', escapeHtml($after), escapeHtml($before), $moved) : __('<strong>%1$s</strong> takes over from %2$s from now on. What was already billed keeps the old rate.', escapeHtml($after), escapeHtml($before))));
     } else {
         logAudit("Tax", "Edit", "$session_name edited tax " . escapeSql($after), 0, $tax_id);
-        flashAlert("Tax <strong>" . escapeHtml($after) . "</strong> saved" . ($moved !== '' ? " - $moved worked out again" : ''));
+        flashAlert(($moved !== '' ? __('Tax <strong>%1$s</strong> saved - %2$s worked out again', escapeHtml($after), $moved) : __('Tax <strong>%s</strong> saved', escapeHtml($after))));
     }
 
     redirect();
@@ -88,9 +88,9 @@ if (isset($_POST['archive_tax'])) {
 
     logAudit("Tax", "Archive", "$session_name archived tax " . escapeSql($label) . ($to !== '' ? ", moving what used it to " . escapeSql($to) : ''), 0, $tax_id);
 
-    flashAlert("Tax <strong>" . escapeHtml($label) . "</strong> archived"
-        . ($moved !== '' ? " - $moved moved to " . escapeHtml($to) : '')
-        . ($done['was_default'] ? ". There is no default rate now" : ''), 'error');
+    flashAlert(__('Tax <strong>%s</strong> archived', escapeHtml($label))
+        . ($moved !== '' ? __(' - %1$s moved to %2$s', $moved, escapeHtml($to)) : '')
+        . ($done['was_default'] ? __('. There is no default rate now') : ''), 'error');
 
     redirect();
 
@@ -111,7 +111,7 @@ if (isset($_GET['restore_tax'])) {
 
     logAudit("Tax", "Restore", "$session_name restored tax " . escapeSql($label), 0, $tax_id);
 
-    flashAlert("Tax <strong>" . escapeHtml($label) . "</strong> restored");
+    flashAlert(__('Tax <strong>%s</strong> restored', escapeHtml($label)));
 
     redirect();
 
@@ -123,14 +123,14 @@ if (isset($_GET['default_tax'])) {
 
     $tax_id = intval($_GET['default_tax']);
     if (!taxSetDefault($tax_id)) {
-        flashAlert("Only a current tax can be the default", 'error');
+        flashAlert(__('Only a current tax can be the default'), 'error');
         redirect();
     }
     $label = taxLabel(taxRow($tax_id));
 
     logAudit("Tax", "Edit", "$session_name made " . escapeSql($label) . " the default tax", 0, $tax_id);
 
-    flashAlert("<strong>" . escapeHtml($label) . "</strong> is the default for new lines");
+    flashAlert(__('<strong>%s</strong> is the default for new lines', escapeHtml($label)));
 
     redirect();
 
@@ -148,13 +148,13 @@ if (isset($_GET['delete_tax'])) {
     $label = taxLabel($row);
 
     if (!taxDelete($tax_id)) {
-        flashAlert("<strong>" . escapeHtml($label) . "</strong> has been used, so it stays - archive it instead", 'error');
+        flashAlert(__('<strong>%s</strong> has been used, so it stays - archive it instead', escapeHtml($label)), 'error');
         redirect();
     }
 
     logAudit("Tax", "Delete", "$session_name deleted tax " . escapeSql($label));
 
-    flashAlert("Tax <strong>" . escapeHtml($label) . "</strong> deleted", 'error');
+    flashAlert(__('Tax <strong>%s</strong> deleted', escapeHtml($label)), 'error');
 
     redirect();
 
@@ -178,7 +178,7 @@ if (isset($_POST['edit_tax_settings'])) {
 
     logAudit("Settings", "Edit", "$session_name edited the tax settings");
 
-    flashAlert("Tax settings saved");
+    flashAlert(__('Tax settings saved'));
 
     redirect();
 

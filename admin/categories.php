@@ -90,7 +90,7 @@ $pill_url = function ($archived) use ($kind) {
     return '?' . http_build_query(array_filter(['category' => $kind, 'q' => $_GET['q'] ?? '', 'show' => $archived ? 'archived' : '']));
 };
 
-$new_label = 'New ' . ucwords($config['one']);
+$new_label = __('New %s', i18nLocale() === 'en_US' ? ucwords($config['one']) : $config['one']);
 $add_url = 'modals/category/category_add.php?category=' . urlencode($kind);
 $csrf = $_SESSION['csrf_token'];
 
@@ -98,7 +98,7 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-list-ul me-2"></i>Categories</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-list-ul me-2"></i><?= __('Categories') ?></h3>
         <div class="card-tools">
             <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= escapeHtml($add_url) ?>"><i class="fas fa-plus me-2"></i><?= escapeHtml($new_label) ?></button>
         </div>
@@ -107,7 +107,7 @@ $csrf = $_SESSION['csrf_token'];
     <div class="row g-0">
         <!-- Kinds -->
         <div class="col-md-4 col-lg-3 border-end">
-            <nav class="nav nav-pills flex-nowrap flex-md-column overflow-auto p-2 gap-1 itflow-category-kinds" aria-label="Kinds of category">
+            <nav class="nav nav-pills flex-nowrap flex-md-column overflow-auto p-2 gap-1 itflow-category-kinds" aria-label="<?= escapeHtml(__('Kinds of category')) ?>">
                 <?php foreach ($kinds as $kind_key => $kind_config) { ?>
                     <a class="nav-link d-flex align-items-center gap-2 text-nowrap<?= $kind_key === $kind ? ' active' : '' ?>" href="categories.php?category=<?= urlencode($kind_key) ?>" title="<?= escapeHtml($kind_config['about']) ?>"<?= $kind_key === $kind ? ' aria-current="page"' : '' ?>>
                         <i class="fas fa-fw <?= $kind_config['icon'] ?>"></i><span class="text-truncate"><?= escapeHtml($kind_config['label']) ?></span>
@@ -126,35 +126,35 @@ $csrf = $_SESSION['csrf_token'];
                     <div class="row g-2 align-items-center">
                         <div class="col-lg-6 col-md-8">
                             <div class="input-group">
-                                <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="Search <?= escapeHtml($config['many']) ?>..." title="Name or description">
-                                <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                                <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="Search <?= escapeHtml($config['many']) ?>..." title="<?= escapeHtml(__('Name or description')) ?>">
+                                <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-4">
                             <div class="d-flex justify-content-end gap-2">
                                 <div class="dropdown" id="bulkActionButton" hidden>
                                     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                        <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action') ?> (<span id="selectedCount">0</span>)
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/category/category_merge.php" data-bulk="true">
-                                            <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i>Merge into one...
+                                            <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i><?= __('Merge into one...') ?>
                                         </a>
                                         <?php if ($show_archived) { ?>
                                             <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_restore_categories">
-                                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                             </button>
                                         <?php } else { ?>
                                             <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_archive_categories">
-                                                <i class="fas fa-fw fa-archive text-secondary me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive text-secondary me-2"></i><?= __('Archive') ?>
                                             </button>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_categories"
                                             data-confirm-title="Delete these <?= escapeHtml($config['many']) ?>?"
-                                            data-confirm-text="Only the ones nothing uses are deleted - the rest are kept, to merge into another or archive."
-                                            data-confirm-button="Delete">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('Only the ones nothing uses are deleted - the rest are kept, to merge into another or archive.')) ?>"
+                                            data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     </div>
                                 </div>
@@ -163,8 +163,8 @@ $csrf = $_SESSION['csrf_token'];
                     </div>
                 </form>
                 <nav class="nav nav-pills itflow-asset-tabs mt-2">
-                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="<?= escapeHtml($pill_url(false)) ?>"><i class="fas fa-fw <?= $config['icon'] ?> me-1"></i>Active <span class="badge rounded-pill ms-1"><?= $counts[0] ?></span></a>
-                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url(true)) ?>" title="They stay on their records, but aren't offered for new ones"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= $counts[1] ?></span></a>
+                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="<?= escapeHtml($pill_url(false)) ?>"><i class="fas fa-fw <?= $config['icon'] ?> me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= $counts[0] ?></span></a>
+                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url(true)) ?>" title="<?= escapeHtml(__('They stay on their records, but aren\'t offered for new ones')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= $counts[1] ?></span></a>
                 </nav>
             </div>
 
@@ -176,15 +176,15 @@ $csrf = $_SESSION['csrf_token'];
                         <tr>
                             <th class="checkbox-column border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="Select all on this page">
+                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                                 </div>
                             </th>
-                            <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden">Order</span></th><?php } ?>
+                            <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden"><?= __('Order') ?></span></th><?php } ?>
                             <th>
                                 <?= $sort_link('category_name', escapeHtml(ucfirst($config['one']))) ?>
-                                <?php if ($config['ordered']) { ?><span class="fw-normal text-body-secondary small ms-2" title="The order they are offered in"><?= $sort_link('category_order', 'in order') ?></span><?php } ?>
+                                <?php if ($config['ordered']) { ?><span class="fw-normal text-body-secondary small ms-2" title="<?= escapeHtml(__('The order they are offered in')) ?>"><?= $sort_link('category_order', 'in order') ?></span><?php } ?>
                             </th>
-                            <th class="d-none d-sm-table-cell"><?= $sort_link('used', 'Used on') ?></th>
+                            <th class="d-none d-sm-table-cell"><?= $sort_link('used', __('Used on')) ?></th>
                             <th></th>
                         </tr>
                         </thead>
@@ -196,7 +196,7 @@ $csrf = $_SESSION['csrf_token'];
                             $name = escapeHtml($row['category_name']);
                             $used = $row['used'];
                             $edit_url = "modals/category/category_edit.php?id=$category_id";
-                            $used_html = $used['all'] ? categoryUsageHtml($row, $used) : '<span class="text-body-secondary">' . ($row['category_archived_at'] ? 'Nothing uses it' : 'Nothing yet') . '</span>';
+                            $used_html = $used['all'] ? categoryUsageHtml($row, $used) : '<span class="text-body-secondary">' . ($row['category_archived_at'] ? __('Nothing uses it') : __('Nothing yet')) . '</span>';
                             $blocker = categoryDeleteBlocker($row, $used);
                             ?>
                             <tr data-category-id="<?= $category_id ?>">
@@ -206,57 +206,57 @@ $csrf = $_SESSION['csrf_token'];
                                     </div>
                                 </td>
                                 <?php if ($can_reorder) { ?>
-                                    <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="Drag to move" data-category-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
+                                    <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="<?= escapeHtml(__('Drag to move')) ?>" data-category-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
                                 <?php } ?>
                                 <td>
-                                    <a class="ajax-modal text-decoration-none text-reset" href="#" data-modal-url="<?= $edit_url ?>" title="Edit <?= $name ?>"><?= categoryChip($row) ?></a>
+                                    <a class="ajax-modal text-decoration-none text-reset" href="#" data-modal-url="<?= $edit_url ?>" title="<?= __('Edit %s', $name) ?>"><?= categoryChip($row) ?></a>
                                     <?php if (trim((string) $row['category_description']) !== '') { ?>
                                         <div class="small text-body-secondary mt-1"><?= escapeHtml($row['category_description']) ?></div>
                                     <?php } ?>
                                     <div class="small d-sm-none mt-1"><?= $used_html ?></div>
                                     <?php if ($row['category_archived_at']) { ?>
-                                        <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['category_archived_at'])) ?></div>
+                                        <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['category_archived_at'], 'date')) ?></div>
                                     <?php } ?>
                                 </td>
                                 <td class="d-none d-sm-table-cell small"><?= $used_html ?></td>
                                 <td class="text-end">
                                     <div class="dropdown dropstart">
-                                        <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                        <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                                <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                                <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                             </a>
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/category/category_merge.php?category_ids[]=<?= $category_id ?>">
-                                                <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i>Merge into...
+                                                <i class="fas fa-fw fa-compress-alt text-secondary me-2"></i><?= __('Merge into...') ?>
                                             </a>
                                             <?php if ($can_reorder) { ?>
                                                 <?php if ($position > 0) { ?>
                                                     <a class="dropdown-item" href="post.php?move_category=<?= $category_id ?>&direction=up&csrf_token=<?= $csrf ?>">
-                                                        <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i>Move up
+                                                        <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i><?= __('Move up') ?>
                                                     </a>
                                                 <?php } ?>
                                                 <?php if ($position < $num_rows[0] - 1) { ?>
                                                     <a class="dropdown-item" href="post.php?move_category=<?= $category_id ?>&direction=down&csrf_token=<?= $csrf ?>">
-                                                        <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i>Move down
+                                                        <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i><?= __('Move down') ?>
                                                     </a>
                                                 <?php } ?>
                                             <?php } ?>
                                             <div class="dropdown-divider"></div>
                                             <?php if ($row['category_archived_at']) { ?>
                                                 <a class="dropdown-item" href="post.php?restore_category=<?= $category_id ?>&csrf_token=<?= $csrf ?>">
-                                                    <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                                    <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                                 </a>
                                             <?php } else { ?>
-                                                <a class="dropdown-item text-danger" href="post.php?archive_category=<?= $category_id ?>&csrf_token=<?= $csrf ?>" title="It stays on its records, but isn't offered for new ones">
-                                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                <a class="dropdown-item text-danger" href="post.php?archive_category=<?= $category_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('It stays on its records, but isn\'t offered for new ones')) ?>">
+                                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                             <?php } ?>
                                             <?php if ($blocker !== '') { ?>
-                                                <span class="dropdown-item disabled" title="<?= escapeHtml($blocker) ?>"><i class="fas fa-fw fa-trash me-2"></i>Delete</span>
+                                                <span class="dropdown-item disabled" title="<?= escapeHtml($blocker) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></span>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_category=<?= $category_id ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="Nothing uses it, so no record changes." data-confirm-button="Delete">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('Nothing uses it, so no record changes.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         </div>
@@ -270,9 +270,9 @@ $csrf = $_SESSION['csrf_token'];
             </form>
 
             <?php if ($can_reorder) { ?>
-                <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i>Drag them into the order they're offered in.</div>
+                <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i><?= __('Drag them into the order they\'re offered in.') ?></div>
             <?php } elseif ($config['ordered'] && $sort === 'category_order' && !$show_archived && $search !== '') { ?>
-                <div class="small text-body-secondary px-3 py-2 border-top">Clear the search to drag them into order.</div>
+                <div class="small text-body-secondary px-3 py-2 border-top"><?= __('Clear the search to drag them into order.') ?></div>
             <?php } ?>
 
             <?php
@@ -290,8 +290,8 @@ $csrf = $_SESSION['csrf_token'];
 
             <?php if ($loose) { ?>
                 <div class="border-top px-3 py-2 itflow-category-loose">
-                    <div class="fw-semibold"><i class="fas fa-fw fa-question-circle text-secondary me-1"></i>In use, but not set up here</div>
-                    <p class="small text-body-secondary mb-1">Records have these, but they aren't <?= escapeHtml($config['many']) ?> - so they can't be picked again, and have no color or icon. Add one to make it <?= escapeHtml(categoryKindPhrase($kind)) ?>; to fold it into another, add it, then merge it.</p>
+                    <div class="fw-semibold"><i class="fas fa-fw fa-question-circle text-secondary me-1"></i><?= __('In use, but not set up here') ?></div>
+                    <p class="small text-body-secondary mb-1"><?= __('Records have these, but they aren\'t %1$s - so they can\'t be picked again, and have no color or icon. Add one to make it %2$s; to fold it into another, add it, then merge it.', escapeHtml($config['many']), escapeHtml(categoryKindPhrase($kind))) ?></p>
                     <ul class="list-unstyled mb-0">
                         <?php foreach ($loose as $loose_name => $loose_used) { ?>
                             <li class="d-flex flex-wrap align-items-center gap-2 py-1">
@@ -301,7 +301,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="type" value="<?= escapeHtml($kind) ?>">
                                     <input type="hidden" name="name" value="<?= escapeHtml($loose_name) ?>">
-                                    <button type="submit" name="add_category" class="btn btn-sm btn-outline-secondary" title="Make it <?= escapeHtml(categoryKindPhrase($kind)) ?>"><i class="fas fa-plus me-1"></i>Add</button>
+                                    <button type="submit" name="add_category" class="btn btn-sm btn-outline-secondary" title="Make it <?= escapeHtml(categoryKindPhrase($kind)) ?>"><i class="fas fa-plus me-1"></i><?= __('Add') ?></button>
                                 </form>
                             </li>
                         <?php } ?>
@@ -334,9 +334,9 @@ $csrf = $_SESSION['csrf_token'];
                         .then(function (text) {
                             const result = JSON.parse(text);
                             if (!result.ok) {
-                                throw new Error(result.error || 'Not saved');
+                                throw new Error(result.error || __('Not saved'));
                             }
-                            itflowToast('Order saved', 'success');
+                            itflowToast(__('Order saved'), 'success');
                         })
                         .catch(function () {
                             window.location.reload();

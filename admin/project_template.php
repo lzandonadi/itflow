@@ -15,8 +15,8 @@ $template = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT project_template_na
 
 if (!$template) { ?>
     <div class="text-center mt-5">
-        <h1 class="h3 text-secondary">Nothing to see here</h1>
-        <a class="btn btn-secondary mt-3" href="project_templates.php"><i class="fa fa-fw fa-arrow-left me-2"></i>Project templates</a>
+        <h1 class="h3 text-secondary"><?= __('Nothing to see here') ?></h1>
+        <a class="btn btn-secondary mt-3" href="project_templates.php"><i class="fa fa-fw fa-arrow-left me-2"></i><?= __('Project templates') ?></a>
     </div>
     <?php
     require_once "../includes/footer.php";
@@ -47,8 +47,8 @@ $archived = !empty($template['project_template_archived_at']);
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="users.php">Admin</a></li>
-    <li class="breadcrumb-item"><a href="project_templates.php">Project Templates</a></li>
+    <li class="breadcrumb-item"><a href="users.php"><?= __('Admin') ?></a></li>
+    <li class="breadcrumb-item"><a href="project_templates.php"><?= __('Project Templates') ?></a></li>
     <li class="breadcrumb-item active"><?= escapeHtml($template['project_template_name']) ?></li>
 </ol>
 
@@ -58,8 +58,8 @@ $archived = !empty($template['project_template_archived_at']);
         <div class="flex-grow-1 min-w-0">
             <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                 <span><?= escapeHtml($template['project_template_name']) ?></span>
-                <span class="badge rounded-pill text-bg-info fw-normal fs-6">Template</span>
-                <?php if ($archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <span class="badge rounded-pill text-bg-info fw-normal fs-6"><?= __('Template') ?></span>
+                <?php if ($archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h1>
             <div class="text-body-secondary small d-flex flex-wrap column-gap-3 row-gap-1">
                 <span><i class="fas fa-fw fa-life-ring me-1"></i><?= count($ticket_templates) ?> ticket<?= count($ticket_templates) === 1 ? '' : 's' ?></span>
@@ -69,30 +69,30 @@ $archived = !empty($template['project_template_archived_at']);
         </div>
         <div class="d-flex flex-wrap gap-2 d-print-none">
             <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/project_template/project_template_ticket_template_add.php?project_template_id=<?= $project_template_id ?>">
-                <i class="fas fa-plus me-2"></i>Add ticket templates
+                <i class="fas fa-plus me-2"></i><?= __('Add ticket templates') ?>
             </button>
             <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/project_template/project_template_edit.php?project_template_id=<?= $project_template_id ?>">
-                <i class="fas fa-edit me-2"></i>Edit
+                <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
             </button>
             <div class="dropdown dropstart">
-                <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="post.php?duplicate_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>Duplicate
+                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Duplicate') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <?php if ($archived) { ?>
                         <a class="dropdown-item" href="post.php?restore_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                         </a>
                     <?php } else { ?>
                         <a class="dropdown-item text-danger" href="post.php?archive_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                         </a>
                     <?php } ?>
                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                        data-confirm-text="The template goes for good. Its ticket templates stay, and so do projects started from it.">
-                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                        data-confirm-text="<?= escapeHtml(__('The template goes for good. Its ticket templates stay, and so do projects started from it.')) ?>">
+                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                     </a>
                 </div>
             </div>
@@ -104,8 +104,8 @@ $archived = !empty($template['project_template_archived_at']);
     <div class="col-xl-8">
         <div class="card mb-3">
             <div class="card-header d-flex align-items-center">
-                <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-list-ol text-secondary me-2"></i>Tickets it raises</h3>
-                <?php if (count($ticket_templates) > 1) { ?><span class="small text-body-secondary">Drag to change the order</span><?php } ?>
+                <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-list-ol text-secondary me-2"></i><?= __('Tickets it raises') ?></h3>
+                <?php if (count($ticket_templates) > 1) { ?><span class="small text-body-secondary"><?= __('Drag to change the order') ?></span><?php } ?>
             </div>
             <?php if ($ticket_templates) { ?>
                 <ol class="list-group list-group-flush list-group-numbered" id="projectTemplateTickets">
@@ -115,11 +115,11 @@ $archived = !empty($template['project_template_archived_at']);
                                 <div class="d-flex align-items-center gap-2">
                                     <a class="fw-semibold" href="ticket_template.php?ticket_template_id=<?= $ticket_template_id ?>"><?= escapeHtml($row['ticket_template_name']) ?></a>
                                     <?php if ($row['tasks']) { ?>
-                                        <a class="small text-body-secondary text-decoration-none" data-bs-toggle="collapse" href="#ptTasks<?= $ticket_template_id ?>" role="button"><i class="fas fa-tasks me-1"></i><?= count($row['tasks']) ?> task<?= count($row['tasks']) === 1 ? '' : 's' ?> <i class="fas fa-caret-down"></i></a>
+                                        <a class="small text-body-secondary text-decoration-none" data-bs-toggle="collapse" href="#ptTasks<?= $ticket_template_id ?>" role="button"><i class="fas fa-tasks me-1"></i><?= _n('%d task', '%d tasks', count($row['tasks'])) ?> <i class="fas fa-caret-down"></i></a>
                                     <?php } ?>
                                 </div>
                                 <?php if ($row['ticket_template_subject'] && $row['ticket_template_subject'] !== $row['ticket_template_name']) { ?>
-                                    <div class="small text-body-secondary">Raised as "<?= escapeHtml($row['ticket_template_subject']) ?>"</div>
+                                    <div class="small text-body-secondary"><?= __('Raised as "%s"', escapeHtml($row['ticket_template_subject'])) ?></div>
                                 <?php } ?>
                                 <?php if ($row['tasks']) { ?>
                                     <ul class="collapse small text-body-secondary mt-1 mb-0 ps-3" id="ptTasks<?= $ticket_template_id ?>">
@@ -127,13 +127,13 @@ $archived = !empty($template['project_template_archived_at']);
                                     </ul>
                                 <?php } ?>
                             </div>
-                            <span class="drag-handle text-body-secondary px-1" title="Drag to move" role="button"><i class="fas fa-grip-vertical"></i></span>
+                            <span class="drag-handle text-body-secondary px-1" title="<?= escapeHtml(__('Drag to move')) ?>" role="button"><i class="fas fa-grip-vertical"></i></span>
                             <form action="post.php" method="post" class="m-0">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                 <input type="hidden" name="project_template_id" value="<?= $project_template_id ?>">
                                 <input type="hidden" name="ticket_template_id" value="<?= $ticket_template_id ?>">
-                                <button type="submit" class="btn btn-sm btn-light confirm-link" title="Take it out of this template" name="remove_ticket_template_from_project_template"
-                                    data-confirm-text="The ticket template stays - it just won't be raised by this project template.">
+                                <button type="submit" class="btn btn-sm btn-light confirm-link" title="<?= escapeHtml(__('Take it out of this template')) ?>" name="remove_ticket_template_from_project_template"
+                                    data-confirm-text="<?= escapeHtml(__('The ticket template stays - it just won\'t be raised by this project template.')) ?>">
                                     <i class="fas fa-fw fa-times"></i>
                                 </button>
                             </form>
@@ -143,7 +143,7 @@ $archived = !empty($template['project_template_archived_at']);
             <?php } else { ?>
                 <div class="itflow-asset-empty">
                     <i class="fas fa-life-ring fa-2x mb-2 opacity-50"></i>
-                    <div>No ticket templates in it yet. Add one per step of the work - each brings its own task checklist.</div>
+                    <div><?= __('No ticket templates in it yet. Add one per step of the work - each brings its own task checklist.') ?></div>
                 </div>
             <?php } ?>
         </div>
@@ -151,17 +151,17 @@ $archived = !empty($template['project_template_archived_at']);
     <div class="col-xl-4">
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle text-secondary me-2"></i>How it is used</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle text-secondary me-2"></i><?= __('How it is used') ?></h3>
             </div>
             <div class="card-body small">
-                <p>Pick it on <strong>New Project</strong>, or <strong>Add tickets &gt; From a project template</strong> on a project, and these tickets are raised on the project in this order, each with its tasks.</p>
-                <p class="text-body-secondary">They go to the project's client contact, and to its manager when asked. The client isn't emailed - it's planned work.</p>
-                <p class="mb-0 text-body-secondary"><code>[Client]</code>, <code>[Project]</code>, <code>[Month]</code>, <code>[Quarter]</code> and <code>[Year]</code> in a ticket template's subject are filled in. Anything else in brackets is left for the agent.</p>
+                <p><?= __('Pick it on') ?> <strong><?= __('New Project') ?></strong>, <?= __('or') ?> <strong><?= escapeHtml(__('Add tickets > From a project template')) ?></strong> <?= __('on a project, and these tickets are raised on the project in this order, each with its tasks.') ?></p>
+                <p class="text-body-secondary"><?= __('They go to the project\'s client contact, and to its manager when asked. The client isn\'t emailed - it\'s planned work.') ?></p>
+                <p class="mb-0 text-body-secondary"><code>[Client]</code>, <code>[Project]</code>, <code>[Month]</code>, <code>[Quarter]</code> <?= __('and') ?> <code>[Year]</code> <?= __('in a ticket template\'s subject are filled in. Anything else in brackets is left for the agent.') ?></p>
             </div>
         </div>
 
         <!-- History, from the audit log -->
-        <?= auditLogHistoryCard(auditLogHistory('Project Template', $project_template_id, 10)) ?>
+        <?= auditLogHistoryCard(auditLogHistory(__('Project Template'), $project_template_id, 10)) ?>
 
     </div>
 </div>

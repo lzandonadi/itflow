@@ -1564,7 +1564,7 @@ function expenseReimburse($user_id, array $expense_ids, array $opts, &$error = '
     }
 
     // The money out of the account - an expense with no vendor, like a transfer's
-    $description = "Reimbursement to {$waiting['user_name']} - " . ($count === 1 ? '1 expense' : "$count expenses"); // i18n-ignore - stored description
+    $description = _n('Reimbursement to %1$s - %2$d expense', 'Reimbursement to %1$s - %2$d expenses', $count, $waiting['user_name'], $count);
     mysqli_query($mysqli, "INSERT INTO expenses SET expense_date = '$date', expense_amount = $amount, expense_currency_code = '" . escapeSql($currency) . "',
         expense_vendor_id = 0, expense_category_id = 0, expense_account_id = $account, expense_client_id = 0,
         expense_payment_method = " . ($method === '' ? 'NULL' : "'" . escapeSql($method) . "'") . ", expense_reference = '" . escapeSql($reference) . "',

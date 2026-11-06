@@ -45,43 +45,43 @@ while ($row = mysqli_fetch_assoc($sql)) {
 
 <div class="row g-3">
     <div class="col-md-8">
-        <label class="form-label">Name <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-cube"></i></span>
-            <input type="text" class="form-control" name="name" placeholder="Microsoft 365 Business Premium" maxlength="200" value="<?= escapeHtml($t['software_template_name'] ?? '') ?>" required autofocus>
+            <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Microsoft 365 Business Premium')) ?>" maxlength="200" value="<?= escapeHtml($t['software_template_name'] ?? '') ?>" required autofocus>
         </div>
     </div>
     <div class="col-md-4">
-        <label class="form-label">Version</label>
+        <label class="form-label"><?= __('Version') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-code-branch"></i></span>
             <input type="text" class="form-control" name="version" placeholder="2024" maxlength="200" value="<?= escapeHtml($t['software_template_version'] ?? '') ?>">
         </div>
     </div>
     <div class="col-12">
-        <label class="form-label">Summary</label>
+        <label class="form-label"><?= __('Summary') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-            <input type="text" class="form-control" name="description" placeholder="One line on what it is - shown when an agent picks a template" maxlength="500" value="<?= escapeHtml($t['software_template_description'] ?? '') ?>">
+            <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('One line on what it is - shown when an agent picks a template')) ?>" maxlength="500" value="<?= escapeHtml($t['software_template_description'] ?? '') ?>">
         </div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Type <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Type') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
             <select class="form-select select2" name="type" required>
-                <option value="">- Pick a type -</option>
+                <option value=""><?= __('- Pick a type -') ?></option>
                 <?= categoryOptionsHtml('software_type', $type) ?>
             </select>
             <?= categoryAddButtonHtml('software_type', 'btn btn-outline-secondary') ?>
         </div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">License type</label>
+        <label class="form-label"><?= __('License type') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-certificate"></i></span>
             <select class="form-select select2" name="license_type">
-                <option value="">- None -</option>
+                <option value=""><?= __('- None -') ?></option>
                 <?php foreach ($license_types as $option) { ?>
                     <option value="<?= escapeHtml($option) ?>" <?= $option === $license_type ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . softwareLicenseTypeIcon($option)]) ?>><?= escapeHtml($option) ?></option>
                 <?php } ?>
@@ -89,45 +89,45 @@ while ($row = mysqli_fetch_assoc($sql)) {
         </div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Seats</label>
+        <label class="form-label"><?= __('Seats') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-            <input type="number" class="form-control" name="seats" min="0" max="1000000" step="1" placeholder="No limit" value="<?= $seats === null ? '' : intval($seats) ?>">
+            <input type="number" class="form-control" name="seats" min="0" max="1000000" step="1" placeholder="<?= escapeHtml(__('No limit')) ?>" value="<?= $seats === null ? '' : intval($seats) ?>">
         </div>
-        <div class="form-text">What a license starts with - change it for each client.</div>
+        <div class="form-text"><?= __('What a license starts with - change it for each client.') ?></div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Renews every</label>
+        <label class="form-label"><?= __('Renews every') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-redo-alt"></i></span>
             <select class="form-select" name="term">
-                <option value="">- Doesn't renew -</option>
+                <option value=""><?= __('- Doesn\'t renew -') ?></option>
                 <?php foreach (SOFTWARE_RENEWAL_TERMS as $value => $label) { ?>
                     <option value="<?= escapeHtml($value) ?>" <?= $value === $term ? 'selected' : '' ?>><?= escapeHtml($label) ?></option>
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">Its renewal date is worked out from when it was bought.</div>
+        <div class="form-text"><?= __('Its renewal date is worked out from when it was bought.') ?></div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Vendor</label>
+        <label class="form-label"><?= __('Vendor') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
             <select class="form-select select2" name="vendor_template_id">
-                <option value="0">- None -</option>
+                <option value="0"><?= __('- None -') ?></option>
                 <?php foreach ($vendor_templates as $row) { ?>
                     <option value="<?= intval($row['vendor_template_id']) ?>" <?= intval($row['vendor_template_id']) === $vendor_template_id ? 'selected' : '' ?><?= selectOptionVendor($row['vendor_template_name'], $row['vendor_template_archived_at'] ? 'Archived' : (string) $row['vendor_template_description']) ?>><?= escapeHtml($row['vendor_template_name']) ?></option>
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">From the vendor templates - the client's own vendor made from it, or one made for them.</div>
+        <div class="form-text"><?= __('From the vendor templates - the client\'s own vendor made from it, or one made for them.') ?></div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Sold as</label>
+        <label class="form-label"><?= __('Sold as') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-box-open"></i></span>
             <select class="form-select select2" name="product_id">
-                <option value="0">- None -</option>
+                <option value="0"><?= __('- None -') ?></option>
                 <?php foreach ($products as $row) {
                     $type_icon = productTypes()[$row['product_type']]['icon'] ?? 'fa-wrench';
                     $line = $row['product_archived_at'] ? 'Archived' : billingMoney($row['product_price'], $row['product_currency_code']) . ' · ' . productBilledText($row['product_frequency'], $row['product_seat_source']); ?>
@@ -135,14 +135,14 @@ while ($row = mysqli_fetch_assoc($sql)) {
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">From Products &amp; Services - what you charge for it.</div>
+        <div class="form-text"><?= escapeHtml(__('From Products & Services - what you charge for it.')) ?></div>
     </div>
     <div class="col-12">
-        <label class="form-label">Notes</label>
+        <label class="form-label"><?= __('Notes') ?></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-sticky-note"></i></span>
-            <textarea class="form-control" name="notes" rows="6" placeholder="What every license from it should say - where to download it, how it is installed, who to call"><?= escapeHtml($t['software_template_notes'] ?? '') ?></textarea>
+            <textarea class="form-control" name="notes" rows="6" placeholder="<?= escapeHtml(__('What every license from it should say - where to download it, how it is installed, who to call')) ?>"><?= escapeHtml($t['software_template_notes'] ?? '') ?></textarea>
         </div>
-        <div class="form-text">A license made from it starts with all of this - change anything there after.</div>
+        <div class="form-text"><?= __('A license made from it starts with all of this - change anything there after.') ?></div>
     </div>
 </div>

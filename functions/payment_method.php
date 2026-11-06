@@ -22,6 +22,17 @@ const PAYMENT_METHOD_USES = [
     2 => ['label' => 'Money out - expenses', 'short' => 'Money out', 'icon' => 'fa-arrow-up', 'about' => 'Offered for expenses, recurring expenses, reimbursements and mileage claims'],
 ];
 
+/** A use (PAYMENT_METHOD_USES) with its words in the interface language - the constant stays English for the audit log. */
+function paymentMethodUseLabel($use) {
+    $info = PAYMENT_METHOD_USES[intval($use)] ?? PAYMENT_METHOD_USES[0];
+    return [
+        'label' => __($info['label']), // i18n-dynamic - PAYMENT_METHOD_USES, entries in lang/pt_BR/catalogs.php
+        'short' => __($info['short']), // i18n-dynamic
+        'about' => __($info['about']), // i18n-dynamic
+        'icon' => $info['icon'],
+    ];
+}
+
 /** The name online card payments are recorded under. */
 const PAYMENT_METHOD_ONLINE = 'Stripe';
 
@@ -225,11 +236,11 @@ function paymentMethodFromInput(array $in, $row = null) {
 function paymentMethodProblem(array $f, $id = 0) {
     global $mysqli;
     if ($f['name'] === '') {
-        return 'A payment method needs a name.';
+        return __('A payment method needs a name.');
     }
     $taken = mysqli_fetch_row(mysqli_query($mysqli, "SELECT payment_method_name FROM payment_methods WHERE payment_method_name = '" . escapeSql($f['name']) . "' AND payment_method_id <> " . intval($id) . " LIMIT 1"));
     if ($taken) {
-        return 'There is already a payment method called "' . $taken[0] . '".';
+        return __('There is already a payment method called "%s".', $taken[0]);
     }
     return '';
 }

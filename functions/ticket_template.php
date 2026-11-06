@@ -148,13 +148,13 @@ function ticketTemplateDueAt($hours) {
 function ticketTemplateFields(array $post, &$error = '') {
     $name = trim(mb_substr(preg_replace('/\s+/', ' ', strip_tags((string) ($post['name'] ?? ''))), 0, 200));
     if ($name === '') {
-        $error = 'A template needs a name.';
+        $error = __('A template needs a name.');
         return null;
     }
     $priority = (string) ($post['priority'] ?? '');
     $billable = (string) ($post['billable'] ?? '');
     if (intval($post['portal'] ?? 0) && ($post['portal_all_clients'] ?? '1') === '0' && !array_filter(array_map('intval', (array) ($post['portal_clients'] ?? [])))) {
-        $error = 'Pick the clients that see it in the portal, or offer it at every client.';
+        $error = __('Pick the clients that see it in the portal, or offer it at every client.');
         return null;
     }
     $amount = max(0, intval($post['due_amount'] ?? 0));
@@ -254,7 +254,7 @@ function ticketTemplateCopy($ticket_template_id) {
         return 0;
     }
     $new_id = ticketTemplateSave(0, [
-        'name' => mb_substr('Copy of ' . $row['ticket_template_name'], 0, 200), 'description' => (string) $row['ticket_template_description'],
+        'name' => mb_substr(__('Copy of %s', $row['ticket_template_name']), 0, 200), 'description' => (string) $row['ticket_template_description'],
         'subject' => (string) $row['ticket_template_subject'], 'details' => (string) $row['ticket_template_details'],
         'category_id' => intval($row['ticket_template_category_id']), 'priority' => $row['ticket_template_priority'],
         'billable' => $row['ticket_template_billable'] === null ? null : intval($row['ticket_template_billable']),

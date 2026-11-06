@@ -15,7 +15,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function cannedResponseForRequest($canned_response_id) {
     $row = cannedResponseRow($canned_response_id);
     if (!$row) {
-        flashAlert('That canned response no longer exists.', 'error');
+        flashAlert(__('That canned response no longer exists.'), 'error');
         redirect('canned_responses.php');
     }
     return $row;
@@ -42,8 +42,8 @@ if (isset($_POST['add_canned_response']) || isset($_POST['edit_canned_response']
 
     logAudit("Canned Response", $editing ? "Edit" : "Create", "$session_name " . ($editing ? 'edited' : 'created') . " canned response $name", 0, $canned_response_id);
 
-    flashAlert("Canned response <strong>" . escapeHtml($fields['name']) . "</strong> " . ($editing ? 'saved' : 'created')
-        . ($refused ? " - but not <strong>" . escapeHtml(implode(', ', $refused)) . "</strong>, a kind a ticket doesn't take or more than " . CANNED_RESPONSE_MAX_FILES . " files" : ''), $refused ? 'error' : 'success');
+    flashAlert(($editing ? __('Canned response <strong>%s</strong> saved', escapeHtml($fields['name'])) : __('Canned response <strong>%s</strong> created', escapeHtml($fields['name'])))
+        . ($refused ? __(' - but not <strong>%1$s</strong>, a kind a ticket doesn\'t take or more than %2$d files', escapeHtml(implode(', ', $refused)), CANNED_RESPONSE_MAX_FILES) : ''), $refused ? 'error' : 'success');
 
     redirect();
 
@@ -60,7 +60,7 @@ if (isset($_GET['copy_canned_response'])) {
 
     logAudit("Canned Response", "Create", "$session_name copied canned response " . escapeSql($row['canned_response_name']) . " as " . escapeSql($new_name), 0, $new_id);
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>");
+    flashAlert(__('Canned response <strong>%1$s</strong> copied as <strong>%2$s</strong>', escapeHtml($row['canned_response_name']), escapeHtml($new_name)));
 
     redirect();
 
@@ -80,7 +80,7 @@ if (isset($_GET['archive_canned_response']) || isset($_GET['restore_canned_respo
 
     logAudit("Canned Response", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " canned response $name", 0, $canned_response_id);
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Canned response <strong>%s</strong> archived', escapeHtml($row['canned_response_name'])) : __('Canned response <strong>%s</strong> restored', escapeHtml($row['canned_response_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -99,7 +99,7 @@ if (isset($_GET['delete_canned_response'])) {
 
     logAudit("Canned Response", "Delete", "$session_name deleted canned response " . escapeSql($row['canned_response_name']));
 
-    flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Canned response <strong>%s</strong> deleted', escapeHtml($row['canned_response_name'])), 'error');
 
     redirect();
 
@@ -116,7 +116,7 @@ if (isset($_GET['share_canned_response'])) {
         $owner_name = (string) getFieldById('users', $owner, 'user_name');
         mysqli_query($mysqli, "UPDATE canned_responses SET canned_response_user_id = 0 WHERE canned_response_id = " . intval($row['canned_response_id']));
         logAudit("Canned Response", "Edit", "$session_name shared " . escapeSql(($owner_name !== '' ? "$owner_name's" : "a removed agent's") . " canned response " . $row['canned_response_name']) . " with everyone", 0, intval($row['canned_response_id']));
-        flashAlert("Canned response <strong>" . escapeHtml($row['canned_response_name']) . "</strong> is shared with everyone now");
+        flashAlert(__('Canned response <strong>%s</strong> is shared with everyone now', escapeHtml($row['canned_response_name'])));
     }
 
     redirect();
@@ -135,7 +135,7 @@ if (isset($_POST['export_canned_responses']) || isset($_GET['export_canned_respo
         $export = cannedResponsesExport((array) ($_POST['canned_response_ids'] ?? []), !empty($_POST['archived']), !empty($_POST['files']));
     }
     if (!$export['responses']) {
-        flashAlert('There are no canned responses to export.', 'error');
+        flashAlert(__('There are no canned responses to export.'), 'error');
         redirect();
     }
 
@@ -157,15 +157,15 @@ if (isset($_POST['import_canned_responses'])) {
 
     $file = $_FILES['file'] ?? null;
     if ($file && in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
-        flashAlert('That file is bigger than this server takes in an upload - export them without their files, or a few at a time.', 'error');
+        flashAlert(__('That file is bigger than this server takes in an upload - export them without their files, or a few at a time.'), 'error');
         redirect('canned_responses.php');
     }
     if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert('Pick the file to import.', 'error');
+        flashAlert(__('Pick the file to import.'), 'error');
         redirect('canned_responses.php');
     }
     if ($file['size'] > 200 * 1024 * 1024) {
-        flashAlert('That file is too big to be canned responses.', 'error');
+        flashAlert(__('That file is too big to be canned responses.'), 'error');
         redirect('canned_responses.php');
     }
     $responses = cannedResponsesImportRead(file_get_contents($file['tmp_name']), $import_error);

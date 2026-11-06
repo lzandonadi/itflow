@@ -26,11 +26,11 @@ $l_description = (string) ($l['custom_link_description'] ?? '');
 <div data-custom-link-form>
 
     <div class="itflow-link-preview mb-3" data-custom-link-preview data-location="<?= $l_location ?>">
-        <span class="small text-secondary">Looks like</span>
+        <span class="small text-secondary"><?= __('Looks like') ?></span>
         <div class="itflow-link-preview-stage">
             <span class="itflow-link-preview-item" data-custom-link-preview-item title="<?= escapeHtml($l_description) ?>">
                 <i class="fas fa-fw fa-<?= escapeHtml(customLinkIcon($l_icon)) ?>" data-custom-link-preview-icon aria-hidden="true"></i>
-                <span data-custom-link-preview-name><?= escapeHtml($l_name !== '' ? $l_name : 'New link') ?></span>
+                <span data-custom-link-preview-name><?= escapeHtml($l_name !== '' ? $l_name : __('New link')) ?></span>
                 <i class="fas fa-external-link-alt itflow-link-preview-tab" data-custom-link-preview-tab aria-hidden="true"<?= $l_new_tab ? '' : ' hidden' ?>></i>
             </span>
         </div>
@@ -38,15 +38,15 @@ $l_description = (string) ($l['custom_link_description'] ?? '');
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Name <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-            <input type="text" class="form-control" name="name" maxlength="200" placeholder="What the menu says - RMM, Documentation, Book a call" value="<?= escapeHtml($l_name) ?>" required<?= $l ? '' : ' autofocus' ?> data-custom-link-name>
+            <input type="text" class="form-control" name="name" maxlength="200" placeholder="<?= escapeHtml(__('What the menu says - RMM, Documentation, Book a call')) ?>" value="<?= escapeHtml($l_name) ?>" required<?= $l ? '' : ' autofocus' ?> data-custom-link-name>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Goes to <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Goes to') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group has-validation">
             <span class="input-group-text"><i class="fa fa-fw fa-link"></i></span>
             <input type="text" class="form-control" name="uri" maxlength="500" placeholder="https://..., /agent/page.php, mailto: or tel:" value="<?= escapeHtml($l['custom_link_uri'] ?? '') ?>" required data-custom-link-uri>
@@ -54,12 +54,12 @@ $l_description = (string) ($l['custom_link_description'] ?? '');
         </div>
         <div class="form-check form-switch mt-2">
             <input class="form-check-input" type="checkbox" role="switch" name="new_tab" value="1" id="customLinkNewTab"<?= $l_new_tab ? ' checked' : '' ?> data-custom-link-new-tab<?= $l ? ' data-touched="1"' : '' ?>>
-            <label class="form-check-label" for="customLinkNewTab">Open it in a new tab</label>
+            <label class="form-check-label" for="customLinkNewTab"><?= __('Open it in a new tab') ?></label>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Shows in <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Shows in') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-bars"></i></span>
             <select class="form-select" name="location" required data-custom-link-location>
@@ -70,32 +70,32 @@ $l_description = (string) ($l['custom_link_description'] ?? '');
         </div>
         <small class="text-secondary" data-custom-link-location-about><?= escapeHtml($l_locations[$l_location]['about']) ?></small>
         <?php if ($l_stray) { ?>
-            <small class="text-warning d-block">It was in a menu ITFlow no longer has - pick where it should show.</small>
+            <small class="text-warning d-block"><?= __('It was in a menu ITFlow no longer has - pick where it should show.') ?></small>
         <?php } ?>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Description</label>
+        <label class="form-label"><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-            <input type="text" class="form-control" name="description" maxlength="500" placeholder="Shown when the link is hovered - what it's for" value="<?= escapeHtml($l_description) ?>" data-custom-link-description>
+            <input type="text" class="form-control" name="description" maxlength="500" placeholder="<?= escapeHtml(__('Shown when the link is hovered - what it\'s for')) ?>" value="<?= escapeHtml($l_description) ?>" data-custom-link-description>
         </div>
     </div>
 
     <div class="mb-1">
-        <label class="form-label">Icon</label>
+        <label class="form-label"><?= __('Icon') ?></label>
         <input type="hidden" name="icon" value="<?= escapeHtml($l_icon) ?>" data-custom-link-icon>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-            <input type="search" class="form-control" placeholder="Search icons - or type any Font Awesome icon's name" aria-label="Search icons" data-custom-link-icon-search>
+            <input type="search" class="form-control" placeholder="<?= escapeHtml(__('Search icons - or type any Font Awesome icon\'s name')) ?>" aria-label="<?= escapeHtml(__('Search icons')) ?>" data-custom-link-icon-search>
         </div>
-        <div class="itflow-tag-icons border rounded p-1" role="group" aria-label="Icons">
-            <button type="button" class="btn btn-sm itflow-tag-icon<?= $l_icon === '' ? ' active' : '' ?>" data-custom-link-icon-choice="" title="None - the link arrow" aria-label="No icon of its own" aria-pressed="<?= $l_icon === '' ? 'true' : 'false' ?>"><i class="fas fa-fw fa-ban" aria-hidden="true"></i></button>
+        <div class="itflow-tag-icons border rounded p-1" role="group" aria-label="<?= escapeHtml(__('Icons')) ?>">
+            <button type="button" class="btn btn-sm itflow-tag-icon<?= $l_icon === '' ? ' active' : '' ?>" data-custom-link-icon-choice="" title="<?= escapeHtml(__('None - the link arrow')) ?>" aria-label="<?= escapeHtml(__('No icon of its own')) ?>" aria-pressed="<?= $l_icon === '' ? 'true' : 'false' ?>"><i class="fas fa-fw fa-ban" aria-hidden="true"></i></button>
             <?php foreach ($l_icons as $icon) { ?>
                 <button type="button" class="btn btn-sm itflow-tag-icon<?= $icon === $l_icon ? ' active' : '' ?>" data-custom-link-icon-choice="<?= escapeHtml($icon) ?>" title="<?= escapeHtml($icon) ?>" aria-label="<?= escapeHtml($icon) ?>" aria-pressed="<?= $icon === $l_icon ? 'true' : 'false' ?>"><i class="fas fa-fw fa-<?= escapeHtml($icon) ?>" aria-hidden="true"></i></button>
             <?php } ?>
             <button type="button" class="btn btn-sm btn-outline-secondary itflow-tag-icon-custom" data-custom-link-icon-custom hidden><i class="fas fa-fw" aria-hidden="true"></i><span></span></button>
-            <div class="small text-secondary p-2" data-custom-link-icon-none hidden>No icon by that name here - type its whole name to use it</div>
+            <div class="small text-secondary p-2" data-custom-link-icon-none hidden><?= __('No icon by that name here - type its whole name to use it') ?></div>
         </div>
     </div>
 </div>

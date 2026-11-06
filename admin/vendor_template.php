@@ -17,8 +17,8 @@ require_once "includes/inc_all_admin.php";
 
 $template = vendorTemplateInfo($_GET['vendor_template_id'] ?? 0);
 if (!$template) {
-    echo emptyStateHtml(['thing' => 'vendor templates', 'title' => 'That vendor template is gone', 'text' => 'It may have been deleted.', 'icon' => 'fa-building', 'filtered' => false,
-        'actions' => [['label' => 'Vendor Templates', 'href' => 'vendor_templates.php']]]);
+    echo emptyStateHtml(['thing' => 'vendor templates', 'title' => __('That vendor template is gone'), 'text' => __('It may have been deleted.'), 'icon' => 'fa-building', 'filtered' => false,
+        'actions' => [['label' => __('Vendor Templates'), 'href' => 'vendor_templates.php']]]);
     require_once "../includes/footer.php";
     exit();
 }
@@ -50,13 +50,13 @@ $license_templates = vendorTemplateLicenseTemplates($vendor_template_id);
 
 // ...seen all at once, the ones out of step, or the ones without the client's account number
 $views = [
-    '' => ['label' => 'All', 'icon' => 'fa-list', 'title' => 'Every current vendor made from it', 'test' => function ($vendor) {
+    '' => ['label' => __('All'), 'icon' => 'fa-list', 'title' => __('Every current vendor made from it'), 'test' => function ($vendor) {
         return true;
     }],
-    'out' => ['label' => 'Out of step', 'icon' => 'fa-not-equal', 'title' => 'Saying something other than the template does', 'test' => function ($vendor) {
+    'out' => ['label' => __('Out of step'), 'icon' => 'fa-not-equal', 'title' => __('Saying something other than the template does'), 'test' => function ($vendor) {
         return (bool) $vendor['differences'];
     }],
-    'account' => ['label' => 'No account number', 'icon' => 'fa-fingerprint', 'title' => "Without the client's account number", 'test' => function ($vendor) {
+    'account' => ['label' => __('No account number'), 'icon' => 'fa-fingerprint', 'title' => __("Without the client's account number"), 'test' => function ($vendor) {
         return $vendor['client_id'] && $vendor['account_number'] === '';
     }],
 ];
@@ -79,7 +79,7 @@ $required_tags = vendorTemplateRequiredTags([$vendor_template_id])[$vendor_templ
 $scope_text = vendorTemplateScopeText($required, $required_tags);
 $coverage = $required && !$archived ? vendorTemplateCoverage($vendor_template_id, $required, array_keys($required_tags)) : null;
 $list_limit = 8;
-$missing_text = $coverage && $coverage['missing'] ? (count($coverage['missing']) === 1 ? 'the client missing it' : 'the ' . count($coverage['missing']) . ' clients missing it') : '';
+$missing_text = $coverage && $coverage['missing'] ? (count($coverage['missing']) === 1 ? __('the client missing it') : __('the %d clients missing it', count($coverage['missing']))) : '';
 
 $edit_url = "modals/vendor_template/vendor_template_edit.php?id=$vendor_template_id";
 $clients_url = "/agent/modals/vendor/vendor_template_clients.php?template_id=$vendor_template_id";
@@ -122,9 +122,9 @@ foreach (vendorTemplateFieldLabels() as $field) {
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="../index.php">Home</a></li>
-    <li class="breadcrumb-item"><a href="users.php">Admin</a></li>
-    <li class="breadcrumb-item"><a href="vendor_templates.php">Vendor Templates</a></li>
+    <li class="breadcrumb-item"><a href="../index.php"><?= __('Home') ?></a></li>
+    <li class="breadcrumb-item"><a href="users.php"><?= __('Admin') ?></a></li>
+    <li class="breadcrumb-item"><a href="vendor_templates.php"><?= __('Vendor Templates') ?></a></li>
     <li class="breadcrumb-item active"><?= $name ?></li>
 </ol>
 
@@ -137,39 +137,39 @@ foreach (vendorTemplateFieldLabels() as $field) {
                 <div class="text-secondary"><?= escapeHtml($template['vendor_template_description']) ?></div>
             <?php } ?>
             <?php if ($archived) { ?>
-                <div class="small text-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($template['vendor_template_archived_at'])) ?> - not offered for new vendors</div>
+                <div class="small text-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($template['vendor_template_archived_at'], 'date')) ?> - not offered for new vendors</div>
             <?php } ?>
         </div>
         <div class="d-flex flex-wrap gap-2 d-print-none">
             <?php if (!$archived) { ?>
                 <?php if ($missing_text) { ?>
                     <div class="btn-group">
-                        <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-fw fa-users me-2"></i>Add to clients</button>
-                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More ways to add it"></button>
+                        <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-fw fa-users me-2"></i><?= __('Add to clients') ?></button>
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More ways to add it')) ?>"></button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $clients_url ?>&missing=1"><i class="fas fa-fw fa-clipboard-check me-2"></i>To <?= $missing_text ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $clients_url ?>&missing=1"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('To %s', $missing_text) ?></a>
                         </div>
                     </div>
                 <?php } else { ?>
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-fw fa-users me-2"></i>Add to clients</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-fw fa-users me-2"></i><?= __('Add to clients') ?></button>
                 <?php } ?>
             <?php } ?>
-            <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-fw fa-edit me-2"></i>Edit</button>
+            <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-fw fa-edit me-2"></i><?= __('Edit') ?></button>
             <div class="dropdown">
-                <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-h"></i></button>
+                <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-h"></i></button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $required_url ?>"><i class="fas fa-fw fa-clipboard-check me-2"></i>Who should have it</a>
-                    <a class="dropdown-item" href="post.php?copy_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-copy me-2"></i>Copy</a>
-                    <a class="dropdown-item" href="post.php?export_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>" title="A file to import into another ITFlow - without account numbers or PINs"><i class="fas fa-fw fa-file-download me-2"></i>Export</a>
-                    <a class="dropdown-item" href="/agent/reports/vendor_templates.php" title="Reports > Vendor Templates"><i class="fas fa-fw fa-chart-bar me-2"></i>How they are used</a>
+                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $required_url ?>"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Who should have it') ?></a>
+                    <a class="dropdown-item" href="post.php?copy_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-copy me-2"></i><?= __('Copy') ?></a>
+                    <a class="dropdown-item" href="post.php?export_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A file to import into another ITFlow - without account numbers or PINs')) ?>"><i class="fas fa-fw fa-file-download me-2"></i><?= __('Export') ?></a>
+                    <a class="dropdown-item" href="/agent/reports/vendor_templates.php" title="<?= escapeHtml(__('Reports > Vendor Templates')) ?>"><i class="fas fa-fw fa-chart-bar me-2"></i><?= __('How they are used') ?></a>
                     <?php if ($archived) { ?>
-                        <a class="dropdown-item" href="post.php?restore_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-redo me-2"></i>Restore</a>
+                        <a class="dropdown-item" href="post.php?restore_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?></a>
                     <?php } else { ?>
-                        <a class="dropdown-item" href="post.php?archive_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-archive me-2"></i>Archive</a>
+                        <a class="dropdown-item" href="post.php?archive_vendor_template=<?= $vendor_template_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?></a>
                     <?php } ?>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger confirm-link" href="post.php?delete_vendor_template=<?= $vendor_template_id ?>&from_page=1&csrf_token=<?= $csrf ?>"
-                        data-confirm-title="Delete <?= $name ?>?" data-confirm-text="The vendors made from it stay as they are." data-confirm-button="Delete"><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                        data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('The vendors made from it stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                 </div>
             </div>
         </div>
@@ -181,48 +181,48 @@ foreach (vendorTemplateFieldLabels() as $field) {
 
         <div class="card mb-3">
             <div class="card-header d-flex align-items-center">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-building me-2"></i>What a vendor starts with</h3>
-                <button type="button" class="btn btn-sm btn-link ms-auto ajax-modal" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-edit me-1"></i>Edit</button>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-building me-2"></i><?= __('What a vendor starts with') ?></h3>
+                <button type="button" class="btn btn-sm btn-link ms-auto ajax-modal" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-edit me-1"></i><?= __('Edit') ?></button>
             </div>
             <div class="card-body">
                 <dl class="row mb-0" data-vendor-template-facts>
-                    <dt class="col-sm-3 fw-normal text-secondary"><i class="fas fa-fw fa-building me-1"></i>Name</dt>
+                    <dt class="col-sm-3 fw-normal text-secondary"><i class="fas fa-fw fa-building me-1"></i><?= __('Name') ?></dt>
                     <dd class="col-sm-9"><?= $name ?></dd>
                     <?php foreach ($facts as $label => $value) { ?>
                         <dt class="col-sm-3 fw-normal text-secondary"><i class="fas fa-fw <?= $icons[$label] ?? 'fa-circle' ?> me-1"></i><?= $label ?></dt>
                         <dd class="col-sm-9"><?= $value ?></dd>
                     <?php } ?>
-                    <dt class="col-sm-3 fw-normal text-secondary"><i class="fas fa-fw fa-sticky-note me-1"></i>Notes</dt>
+                    <dt class="col-sm-3 fw-normal text-secondary"><i class="fas fa-fw fa-sticky-note me-1"></i><?= __('Notes') ?></dt>
                     <dd class="col-sm-9 mb-0">
                         <?php if (trim((string) $template['vendor_template_notes']) !== '') { ?>
                             <div style="white-space: pre-wrap;"><?= escapeHtml($template['vendor_template_notes']) ?></div>
                         <?php } else { ?>
-                            <span class="text-secondary">None - what every client's vendor should say: the escalation path, what they ask for before they help, how to open a case online.</span>
+                            <span class="text-secondary"><?= __('None - what every client\'s vendor should say: the escalation path, what they ask for before they help, how to open a case online.') ?></span>
                         <?php } ?>
                     </dd>
                 </dl>
-                <?php if (!isset($facts['Support line']) && !isset($facts['Support site']) && !isset($facts['Support email']) && !isset($facts['Support portal'])) { ?>
-                    <div class="small text-warning-emphasis mt-3"><i class="fas fa-fw fa-exclamation-triangle me-1"></i>No way to reach their support yet - give it their support line, email, site or portal, so every client's vendor has it.</div>
+                <?php if (!isset($facts[__('Support line')]) && !isset($facts[__('Support site')]) && !isset($facts[__('Support email')]) && !isset($facts[__('Support portal')])) { ?>
+                    <div class="small text-warning-emphasis mt-3"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('No way to reach their support yet - give it their support line, email, site or portal, so every client\'s vendor has it.') ?></div>
                 <?php } ?>
             </div>
         </div>
 
         <div class="card mb-3" id="vendorTemplateVendors">
             <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-users me-2"></i>Clients with it</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-users me-2"></i><?= __('Clients with it') ?></h3>
                 <div class="ms-auto d-flex flex-wrap align-items-center gap-2">
                 <?php if ($current) { ?>
                     <div class="dropdown" id="bulkActionButton" hidden>
                         <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-fw fa-layer-group me-1"></i>Bulk Action (<span id="selectedCount"></span>)
+                            <i class="fas fa-fw fa-layer-group me-1"></i><?= __('Bulk Action') ?> (<span id="selectedCount"></span>)
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $in_line_url ?>" data-bulk="true"><i class="fas fa-fw fa-sync-alt me-2"></i>Bring in line</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $in_line_url ?>" data-bulk="true"><i class="fas fa-fw fa-sync-alt me-2"></i><?= __('Bring in line') ?></a>
                         </div>
                     </div>
                 <?php } ?>
                 <?php if (!$archived) { ?>
-                    <button type="button" class="btn btn-sm btn-link ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-plus me-1"></i>Add to clients</button>
+                    <button type="button" class="btn btn-sm btn-link ajax-modal" data-modal-url="<?= $clients_url ?>"><i class="fas fa-plus me-1"></i><?= __('Add to clients') ?></button>
                 <?php } ?>
                 </div>
             </div>
@@ -242,11 +242,11 @@ foreach (vendorTemplateFieldLabels() as $field) {
                 </div>
                 <?php if ($view === 'out' && $vendors) { ?>
                     <div class="card-header py-2 d-flex flex-wrap align-items-center gap-2 bg-body-tertiary">
-                        <span class="small text-secondary">Saying something other than the template does - it may be the client's own, or the template changed since.</span>
+                        <span class="small text-secondary"><?= __('Saying something other than the template does - it may be the client\'s own, or the template changed since.') ?></span>
                         <button type="button" class="btn btn-sm btn-primary ms-auto ajax-modal" data-modal-size="lg" data-view-action
                             data-modal-url="<?= escapeHtml($in_line_url . '&' . implode('&', array_map(function ($id) {
                                 return 'vendor_ids[]=' . $id;
-                            }, array_keys($vendors)))) ?>"><i class="fas fa-fw fa-sync-alt me-1"></i>Bring these in line</button>
+                            }, array_keys($vendors)))) ?>"><i class="fas fa-fw fa-sync-alt me-1"></i><?= __('Bring these in line') ?></button>
                     </div>
                 <?php } ?>
             <?php } ?>
@@ -255,8 +255,8 @@ foreach (vendorTemplateFieldLabels() as $field) {
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-nowrap">
                             <tr>
-                                <td class="ps-3 pe-0" style="width: 1rem;"><input class="form-check-input" type="checkbox" id="selectAllCheckbox" aria-label="Tick them all"></td>
-                                <th>Client</th><th class="d-none d-md-table-cell">Their vendor</th><th>In step</th><th class="d-none d-sm-table-cell">Account</th><th class="d-none d-lg-table-cell">Added</th><th></th>
+                                <td class="ps-3 pe-0" style="width: 1rem;"><input class="form-check-input" type="checkbox" id="selectAllCheckbox" aria-label="<?= escapeHtml(__('Tick them all')) ?>"></td>
+                                <th><?= __('Client') ?></th><th class="d-none d-md-table-cell"><?= __('Their vendor') ?></th><th><?= __('In step') ?></th><th class="d-none d-sm-table-cell"><?= __('Account') ?></th><th class="d-none d-lg-table-cell"><?= __('Added') ?></th><th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -272,7 +272,7 @@ foreach (vendorTemplateFieldLabels() as $field) {
                                     <?php if ($client_id) { ?>
                                         <a class="fw-semibold text-body" href="/agent/vendors.php?client_id=<?= $client_id ?>"><?= escapeHtml($vendor['client_name']) ?></a>
                                     <?php } else { ?>
-                                        <span class="text-body-secondary"><i class="fas fa-fw fa-briefcase me-1"></i>Ours</span>
+                                        <span class="text-body-secondary"><i class="fas fa-fw fa-briefcase me-1"></i><?= __('Ours') ?></span>
                                     <?php } ?>
                                     <?php if ($vendor['vendor_name'] !== $template['vendor_template_name']) { ?><div class="d-md-none small text-secondary"><?= escapeHtml($vendor['vendor_name']) ?></div><?php } ?>
                                 </td>
@@ -282,15 +282,15 @@ foreach (vendorTemplateFieldLabels() as $field) {
                                         <a href="#" class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal text-decoration-none ajax-modal" data-modal-size="lg"
                                             data-modal-url="<?= $update_url ?>?vendor_id=<?= $vendor_id ?>" title="Differs in <?= escapeHtml(vendorTemplateLabelsText($differences)) ?> - bring it in line" data-out-of-step="<?= escapeHtml(implode(',', array_keys($differences))) ?>"><i class="fas fa-not-equal me-1"></i><?= escapeHtml($differs_text) ?></a>
                                     <?php } else { ?>
-                                        <span class="text-success text-nowrap" data-in-step><i class="fas fa-check me-1"></i>In step</span>
+                                        <span class="text-success text-nowrap" data-in-step><i class="fas fa-check me-1"></i><?= __('In step') ?></span>
                                     <?php } ?>
                                 </td>
                                 <td class="d-none d-sm-table-cell small">
                                     <?php if ($vendor['account_number'] !== '') { ?>
                                         <span class="font-monospace"><?= escapeHtml($vendor['account_number']) ?></span>
-                                        <?php if ($vendor['code'] !== '') { ?><span class="text-body-secondary ms-1" title="Has a PIN"><i class="fas fa-key"></i></span><?php } ?>
+                                        <?php if ($vendor['code'] !== '') { ?><span class="text-body-secondary ms-1" title="<?= escapeHtml(__('Has a PIN')) ?>"><i class="fas fa-key"></i></span><?php } ?>
                                     <?php } elseif ($client_id) { ?>
-                                        <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="Add the client's account number on their vendor, so support can find them" data-no-account>No account number</span>
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="<?= escapeHtml(__('Add the client\'s account number on their vendor, so support can find them')) ?>" data-no-account><?= __('No account number') ?></span>
                                     <?php } else { ?>
                                         <span class="text-body-secondary">-</span>
                                     <?php } ?>
@@ -298,15 +298,15 @@ foreach (vendorTemplateFieldLabels() as $field) {
                                 <td class="d-none d-lg-table-cell small text-body-secondary text-nowrap" title="<?= escapeHtml($vendor['created_at']) ?>"><?= date('M j, Y', strtotime($vendor['created_at'])) ?></td>
                                 <td class="text-end pe-3">
                                     <div class="dropdown dropstart">
-                                        <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                        <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="<?= $vendor_url ?>"><i class="fas fa-fw fa-building text-secondary me-2"></i>Open their vendor</a>
+                                            <a class="dropdown-item" href="<?= $vendor_url ?>"><i class="fas fa-fw fa-building text-secondary me-2"></i><?= __('Open their vendor') ?></a>
                                             <?php if ($differences) { ?>
-                                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $update_url ?>?vendor_id=<?= $vendor_id ?>"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Bring in line</a>
+                                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $update_url ?>?vendor_id=<?= $vendor_id ?>"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i><?= __('Bring in line') ?></a>
                                             <?php } ?>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item confirm-link" href="/agent/post.php?unlink_vendor_template=<?= $vendor_id ?>&amp;csrf_token=<?= $csrf ?>"
-                                                data-confirm-title="Unlink <?= escapeHtml($client_id ? $vendor['client_name'] . "'s" : 'our') ?> <?= escapeHtml($vendor['vendor_name']) ?>?" data-confirm-text="It stays as it is, and is no longer kept in step with the template." data-confirm-button="Unlink"><i class="fas fa-fw fa-unlink text-secondary me-2"></i>Unlink</a>
+                                                data-confirm-title="Unlink <?= escapeHtml($client_id ? $vendor['client_name'] . "'s" : 'our') ?> <?= escapeHtml($vendor['vendor_name']) ?>?" data-confirm-text="<?= escapeHtml(__('It stays as it is, and is no longer kept in step with the template.')) ?>" data-confirm-button="<?= escapeHtml(__('Unlink')) ?>"><i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink') ?></a>
                                         </div>
                                     </div>
                                 </td>
@@ -316,12 +316,12 @@ foreach (vendorTemplateFieldLabels() as $field) {
                     </table>
                 </div>
                 <?php if ($others) { ?>
-                    <div class="card-footer small text-secondary">And <?= $others ?> archived, or for an archived client.</div>
+                    <div class="card-footer small text-secondary"><?= __('And %d archived, or for an archived client.', $others) ?></div>
                 <?php } ?>
             <?php } elseif ($current) { ?>
-                <div class="card-body small text-secondary">None of them - <a href="<?= escapeHtml($view_url('')) ?>">see them all</a>.</div>
+                <div class="card-body small text-secondary"><?= __('None of them -') ?> <a href="<?= escapeHtml($view_url('')) ?>"><?= __('see them all') ?></a>.</div>
             <?php } else { ?>
-                <div class="card-body small text-secondary">No client has a vendor made from it yet<?= $others ? " - $others archived, or for an archived client" : '' ?>. Agents add one from <strong>New Vendor</strong> on a client's Vendors<?= $archived ? '' : ', or add it to several clients from here' ?>.</div>
+                <div class="card-body small text-secondary"><?= __('No client has a vendor made from it yet') ?><?= $others ? __(' - %d archived, or for an archived client', $others) : '' ?>. <?= __("Agents add one from <strong>%s</strong> on a client's Vendors", __('New Vendor')) ?><?= $archived ? '' : __(', or add it to several clients from here') ?>.</div>
             <?php } ?>
         </div>
 
@@ -329,27 +329,27 @@ foreach (vendorTemplateFieldLabels() as $field) {
             <!-- Vendors made by hand that look like it -->
             <div class="card mb-3" id="vendorTemplateMatches">
                 <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-link me-2"></i>Not linked yet <span class="badge rounded-pill text-bg-light border fw-normal ms-1"><?= count($matches) ?></span></h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-link me-2"></i><?= __('Not linked yet') ?> <span class="badge rounded-pill text-bg-light border fw-normal ms-1"><?= count($matches) ?></span></h3>
                 </div>
-                <div class="card-body small text-secondary pb-2">Vendors made by hand with its name or support site, at clients without one from it. Linked, they count as made from it and are kept in step with it - nothing on them changes unless you say so.</div>
+                <div class="card-body small text-secondary pb-2"><?= __('Vendors made by hand with its name or support site, at clients without one from it. Linked, they count as made from it and are kept in step with it - nothing on them changes unless you say so.') ?></div>
                 <div class="list-group list-group-flush">
                     <?php foreach ($matches as $match_id => $match) {
                         $match_client = $match['client_id'];
                         $match_url = '/agent/vendor.php?' . ($match_client ? "client_id=$match_client&amp;" : '') . "vendor_id=$match_id"; ?>
                         <div class="list-group-item d-flex flex-wrap align-items-center gap-2" data-match-vendor-id="<?= $match_id ?>">
                             <div class="min-w-0 flex-grow-1">
-                                <span class="fw-semibold"><?= $match_client ? escapeHtml($match['client_name']) : '<i class="fas fa-fw fa-briefcase me-1 text-secondary"></i>Ours' ?></span>
+                                <span class="fw-semibold"><?= $match_client ? escapeHtml($match['client_name']) : __('<i class="fas fa-fw fa-briefcase me-1 text-secondary"></i>Ours') ?></span>
                                 <a class="text-reset ms-1" href="<?= $match_url ?>"><?= escapeHtml($match['vendor_name']) ?></a>
                                 <div class="small text-secondary">
-                                    <?= $match['how'] === 'name' ? 'Same name' : 'Same support site' ?>
-                                    - <?= $match['differences'] ? 'differs in ' . escapeHtml(vendorTemplateLabelsText($match['differences'])) : 'says what the template says' ?>
+                                    <?= $match['how'] === 'name' ? __('Same name') : __('Same support site') ?>
+                                    - <?= $match['differences'] ? 'differs in ' . escapeHtml(vendorTemplateLabelsText($match['differences'])) : __('says what the template says') ?>
                                 </div>
                             </div>
                             <form action="/agent/post.php" method="post" class="m-0">
                                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                 <input type="hidden" name="vendor_template_id" value="<?= $vendor_template_id ?>">
                                 <input type="hidden" name="vendor_ids[]" value="<?= $match_id ?>">
-                                <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-light"><i class="fas fa-link me-1"></i>Link</button>
+                                <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-light"><i class="fas fa-link me-1"></i><?= __('Link') ?></button>
                             </form>
                         </div>
                     <?php } ?>
@@ -363,9 +363,9 @@ foreach (vendorTemplateFieldLabels() as $field) {
                         <?php } ?>
                         <div class="form-check form-switch mb-0">
                             <input class="form-check-input" type="checkbox" role="switch" name="bring" value="1" id="vendorTemplateLinkBring">
-                            <label class="form-check-label small" for="vendorTemplateLinkBring">and take the template's support details, notes and name</label>
+                            <label class="form-check-label small" for="vendorTemplateLinkBring"><?= __('and take the template\'s support details, notes and name') ?></label>
                         </div>
-                        <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-outline-primary ms-auto"><i class="fas fa-link me-1"></i>Link <?= count($matches) === 1 ? 'it' : 'all ' . count($matches) ?></button>
+                        <button type="submit" name="link_vendors_to_template" class="btn btn-sm btn-outline-primary ms-auto"><i class="fas fa-link me-1"></i><?= count($matches) === 1 ? __('Link it') : __('Link all %d', count($matches)) ?></button>
                     </form>
                 <?php } ?>
             </div>
@@ -376,50 +376,50 @@ foreach (vendorTemplateFieldLabels() as $field) {
     <div class="col-lg-4 d-print-none">
 
         <div class="card mb-3">
-            <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-chart-line me-2"></i>Used</h3></div>
+            <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-chart-line me-2"></i><?= __('Used') ?></h3></div>
             <div class="card-body" data-vendor-template-used>
                 <?php if ($usage['clients'] || $usage['ours']) { ?>
                     <div class="mb-2">
                         <?php if ($usage['clients']) { ?><strong><?= $usage['clients'] ?></strong> client<?= $usage['clients'] === 1 ? ' has' : 's have' ?> a vendor from it<?php } ?>
-                        <?php if ($usage['ours']) { ?><?= $usage['clients'] ? ', and it is one of ours' : 'It is one of our own vendors' ?><?php } ?>
+                        <?php if ($usage['ours']) { ?><?= $usage['clients'] ? __(', and it is one of ours') : __('It is one of our own vendors') ?><?php } ?>
                         <span class="small text-secondary">- last added <?= timeAgo($usage['last']) ?></span>
                     </div>
                     <?php if ($current) { ?>
-                        <div class="small mb-1 <?= $out_of_step ? 'text-warning-emphasis' : 'text-success' ?>" data-vendor-template-in-step><i class="fas fa-fw <?= $out_of_step ? 'fa-not-equal' : 'fa-check' ?> me-1"></i><?= $out_of_step ? "$out_of_step out of step with it" : (count($current) === 1 ? 'In step with it' : 'Every one in step with it') ?></div>
+                        <div class="small mb-1 <?= $out_of_step ? 'text-warning-emphasis' : 'text-success' ?>" data-vendor-template-in-step><i class="fas fa-fw <?= $out_of_step ? 'fa-not-equal' : 'fa-check' ?> me-1"></i><?= $out_of_step ? __('%d out of step with it', $out_of_step) : (count($current) === 1 ? __('In step with it') : __('Every one in step with it')) ?></div>
                     <?php } ?>
                     <?php if ($client_vendors) { ?>
-                        <div class="small <?= $set_up < $client_vendors ? 'text-warning-emphasis' : 'text-success' ?>"><i class="fas fa-fw fa-fingerprint me-1"></i><?= $set_up < $client_vendors ? ($client_vendors - $set_up) . ' without the client\'s account number' : 'Every one has the client\'s account number' ?></div>
+                        <div class="small <?= $set_up < $client_vendors ? 'text-warning-emphasis' : 'text-success' ?>"><i class="fas fa-fw fa-fingerprint me-1"></i><?= $set_up < $client_vendors ? __("%d without the client's account number", $client_vendors - $set_up) : __('Every one has the client\'s account number') ?></div>
                     <?php } ?>
                 <?php } else { ?>
-                    <div class="small text-secondary">No vendors made from it yet.</div>
+                    <div class="small text-secondary"><?= __('No vendors made from it yet.') ?></div>
                 <?php } ?>
             </div>
         </div>
 
         <?php if ($license_templates) { ?>
             <div class="card mb-3">
-                <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-cube me-2"></i>License templates</h3></div>
+                <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-cube me-2"></i><?= __('License templates') ?></h3></div>
                 <div class="list-group list-group-flush small" data-vendor-template-licenses>
                     <?php foreach ($license_templates as $software_template_id => $license_template) { ?>
                         <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="software_template.php?software_template_id=<?= $software_template_id ?>">
                             <i class="fas fa-fw fa-cube text-secondary"></i>
                             <span class="min-w-0 text-truncate <?= $license_template['archived'] ? 'text-body-secondary' : '' ?>"><?= escapeHtml($license_template['name']) ?></span>
-                            <?php if ($license_template['archived']) { ?><span class="badge text-bg-light border fw-normal ms-auto">Archived</span><?php } ?>
+                            <?php if ($license_template['archived']) { ?><span class="badge text-bg-light border fw-normal ms-auto"><?= __('Archived') ?></span><?php } ?>
                         </a>
                     <?php } ?>
                 </div>
-                <div class="card-footer small text-secondary">Licenses made from these get the client's vendor from this template.</div>
+                <div class="card-footer small text-secondary"><?= __('Licenses made from these get the client\'s vendor from this template.') ?></div>
             </div>
         <?php } ?>
 
         <div class="card mb-3" id="vendorTemplateCoverage">
             <div class="card-header d-flex align-items-center">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-clipboard-check me-2"></i>Who should have it</h3>
-                <button type="button" class="btn btn-sm btn-link ms-auto ajax-modal" data-modal-url="<?= $required_url ?>"><i class="fas fa-edit me-1"></i>Set up</button>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Who should have it') ?></h3>
+                <button type="button" class="btn btn-sm btn-link ms-auto ajax-modal" data-modal-url="<?= $required_url ?>"><i class="fas fa-edit me-1"></i><?= __('Set up') ?></button>
             </div>
             <div class="card-body">
                 <?php if (!$required) { ?>
-                    <div class="small text-secondary">No one in particular. Set it up to see which clients are missing it - every client, or the ones with a tag.</div>
+                    <div class="small text-secondary"><?= __('No one in particular. Set it up to see which clients are missing it - every client, or the ones with a tag.') ?></div>
                 <?php } elseif ($archived) { ?>
                     <div class="small text-secondary"><?= escapeHtml($scope_text) ?> - not counted while it is archived.</div>
                 <?php } else {
@@ -429,41 +429,41 @@ foreach (vendorTemplateFieldLabels() as $field) {
                         <span class="fw-semibold min-w-0 text-truncate" title="<?= escapeHtml($scope_text) ?>"><?= escapeHtml($scope_text) ?></span>
                         <span class="ms-auto small text-nowrap"><strong><?= $coverage['covered'] ?></strong> of <?= $coverage['clients'] ?> have it</span>
                     </div>
-                    <div class="progress mb-2" role="progressbar" aria-label="Clients with it" aria-valuenow="<?= $percent ?>" aria-valuemin="0" aria-valuemax="100" style="height: 6px;">
+                    <div class="progress mb-2" role="progressbar" aria-label="<?= escapeHtml(__('Clients with it')) ?>" aria-valuenow="<?= $percent ?>" aria-valuemin="0" aria-valuemax="100" style="height: 6px;">
                         <div class="progress-bar <?= $coverage['missing'] ? 'bg-warning' : 'bg-success' ?>" style="width: <?= $percent ?>%"></div>
                     </div>
                     <?php if ($coverage['missing']) { ?>
-                        <div class="small text-secondary mb-1">Missing it</div>
+                        <div class="small text-secondary mb-1"><?= __('Missing it') ?></div>
                         <div class="list-group list-group-flush small mb-2">
                             <?php foreach (array_slice($coverage['missing'], 0, $list_limit, true) as $client_id => $client_name) { ?>
                                 <div class="list-group-item px-0 d-flex align-items-center gap-2" data-missing-client-id="<?= $client_id ?>">
                                     <i class="fas fa-fw fa-user text-secondary"></i>
                                     <a class="min-w-0 flex-grow-1 text-truncate text-reset" href="/agent/vendors.php?client_id=<?= $client_id ?>"><?= escapeHtml($client_name) ?></a>
-                                    <button type="button" class="btn btn-sm btn-light py-0 ajax-modal" data-modal-url="<?= $clients_url ?>&client_ids[]=<?= $client_id ?>"><i class="fas fa-plus me-1"></i>Add</button>
+                                    <button type="button" class="btn btn-sm btn-light py-0 ajax-modal" data-modal-url="<?= $clients_url ?>&client_ids[]=<?= $client_id ?>"><i class="fas fa-plus me-1"></i><?= __('Add') ?></button>
                                 </div>
                             <?php } ?>
                         </div>
                         <?php if (count($coverage['missing']) > $list_limit) { ?>
                             <div class="small text-secondary mb-2">and <?= count($coverage['missing']) - $list_limit ?> more</div>
                         <?php } ?>
-                        <button type="button" class="btn btn-sm btn-outline-primary ajax-modal" data-modal-url="<?= $clients_url ?>&missing=1"><i class="fas fa-users me-1"></i>Add to <?= $missing_text ?></button>
+                        <button type="button" class="btn btn-sm btn-outline-primary ajax-modal" data-modal-url="<?= $clients_url ?>&missing=1"><i class="fas fa-users me-1"></i><?= __('Add to %s', $missing_text) ?></button>
                     <?php } elseif ($coverage['clients']) { ?>
-                        <div class="small text-success"><i class="fas fa-fw fa-check me-1"></i>Every one of them has it.</div>
+                        <div class="small text-success"><i class="fas fa-fw fa-check me-1"></i><?= __('Every one of them has it.') ?></div>
                     <?php } else { ?>
-                        <div class="small text-secondary"><?= $required === VENDOR_TEMPLATE_REQUIRED_TAGGED ? ($required_tags ? 'No clients have ' . (count($required_tags) === 1 ? 'that tag' : 'those tags') : 'No tags picked, so no clients') : 'No clients yet' ?>.</div>
+                        <div class="small text-secondary"><?= $required === VENDOR_TEMPLATE_REQUIRED_TAGGED ? ($required_tags ? (count($required_tags) === 1 ? __('No clients have that tag') : __('No clients have those tags')) : __('No tags picked, so no clients')) : __('No clients yet') ?>.</div>
                     <?php } ?>
                 <?php } ?>
             </div>
         </div>
 
         <div class="card mb-3">
-            <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle me-2"></i>Details</h3></div>
+            <div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle me-2"></i><?= __('Details') ?></h3></div>
             <div class="card-body">
                 <dl class="row mb-0 small">
-                    <dt class="col-5 fw-normal text-secondary">Made</dt>
+                    <dt class="col-5 fw-normal text-secondary"><?= __('Made') ?></dt>
                     <dd class="col-7 mb-2" title="<?= escapeHtml($template['vendor_template_created_at']) ?>"><?= date('M j, Y', strtotime($template['vendor_template_created_at'])) ?><?= $template['created_by_name'] !== null ? '<div class="text-secondary">' . escapeHtml($template['created_by_name']) . '</div>' : '' ?></dd>
                     <?php if ($template['vendor_template_updated_at']) { ?>
-                        <dt class="col-5 fw-normal text-secondary">Last changed</dt>
+                        <dt class="col-5 fw-normal text-secondary"><?= __('Last changed') ?></dt>
                         <dd class="col-7 mb-0" title="<?= escapeHtml($template['vendor_template_updated_at']) ?>"><?= timeAgo($template['vendor_template_updated_at']) ?><?= $template['updated_by_name'] !== null ? '<div class="text-secondary">' . escapeHtml($template['updated_by_name']) . '</div>' : '' ?></dd>
                     <?php } ?>
                 </dl>
@@ -471,7 +471,7 @@ foreach (vendorTemplateFieldLabels() as $field) {
         </div>
 
         <!-- History, from the audit log -->
-        <?= auditLogHistoryCard(auditLogHistory('Vendor Template', $vendor_template_id, 10)) ?>
+        <?= auditLogHistoryCard(auditLogHistory(__('Vendor Template'), $vendor_template_id, 10)) ?>
 
     </div>
 </div>

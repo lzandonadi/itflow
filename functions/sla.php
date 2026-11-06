@@ -117,20 +117,20 @@ function usFederalHolidays($year)
     };
 
     $fixed = [
-        "$year-01-01" => "New Year's Day",
-        "$year-06-19" => 'Juneteenth',
-        "$year-07-04" => 'Independence Day',
-        "$year-11-11" => 'Veterans Day',
-        "$year-12-25" => 'Christmas Day',
+        "$year-01-01" => __("New Year's Day"),
+        "$year-06-19" => __('Juneteenth'),
+        "$year-07-04" => __('Independence Day'),
+        "$year-11-11" => __('Veterans Day'),
+        "$year-12-25" => __('Christmas Day'),
     ];
 
     $floating = [
-        "third monday of january $year"    => 'Martin Luther King Jr. Day',
-        "third monday of february $year"   => "Presidents' Day",
-        "last monday of may $year"         => 'Memorial Day',
-        "first monday of september $year"  => 'Labor Day',
-        "second monday of october $year"   => 'Columbus Day',
-        "fourth thursday of november $year" => 'Thanksgiving Day',
+        "third monday of january $year"    => __('Martin Luther King Jr. Day'),
+        "third monday of february $year"   => __("Presidents' Day"),
+        "last monday of may $year"         => __('Memorial Day'),
+        "first monday of september $year"  => __('Labor Day'),
+        "second monday of october $year"   => __('Columbus Day'),
+        "fourth thursday of november $year" => __('Thanksgiving Day'),
     ];
 
     $holidays = [];

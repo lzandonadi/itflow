@@ -94,15 +94,15 @@ function documentTemplateFileText($value, $max) {
 function documentTemplatesImportRead($contents, &$error = '') {
     $data = is_array($contents) ? $contents : json_decode((string) $contents, true);
     if (!is_array($data) || ($data['format'] ?? '') !== DOCUMENT_TEMPLATE_FILE_FORMAT || !isset($data['templates']) || !is_array($data['templates'])) {
-        $error = "That isn't a document templates file - export one from Admin > Document Templates.";
+        $error = __("That isn't a document templates file - export one from Admin > Document Templates.");
         return null;
     }
     if (intval($data['version'] ?? 0) > DOCUMENT_TEMPLATE_FILE_VERSION) {
-        $error = 'That file was made by a newer version of ITFlow - update this one first.';
+        $error = __('That file was made by a newer version of ITFlow - update this one first.');
         return null;
     }
     if (count($data['templates']) > 500) {
-        $error = 'That file holds more than 500 document templates - split it up.';
+        $error = __('That file holds more than 500 document templates - split it up.');
         return null;
     }
 
@@ -146,7 +146,7 @@ function documentTemplatesImportRead($contents, &$error = '') {
         ];
     }
     if (!$templates) {
-        $error = 'There are no document templates in that file.';
+        $error = __('There are no document templates in that file.');
         return null;
     }
     return $templates;
@@ -211,12 +211,12 @@ function documentTemplatesImport(array $templates, $existing = 'skip', $only_exi
 /* What an import did, in words - for its message. HTML. */
 function documentTemplatesImportSummary(array $counts) {
     $parts = [];
-    foreach (['added' => 'added', 'replaced' => 'replaced', 'skipped' => 'already here, left as they were'] as $key => $word) {
+    foreach (['added' => _x('added', 'import count'), 'replaced' => _x('replaced', 'import count'), 'skipped' => __('already here, left as they were')] as $key => $word) {
         if ($counts[$key]) {
             $parts[] = '<strong>' . $counts[$key] . '</strong> ' . $word;
         }
     }
-    return ucfirst(implode(', ', $parts) ?: 'nothing brought in')
-        . ($counts['images'] ? '. Left out <strong>' . $counts['images'] . '</strong> image' . ($counts['images'] === 1 ? '' : 's') . " the file only pointed at, without carrying - too big, or gone where it came from" : '')
+    return ucfirst(implode(', ', $parts) ?: __('nothing brought in'))
+        . ($counts['images'] ? _n('. Left out <strong>%d</strong> image the file only pointed at, without carrying - too big, or gone where it came from', '. Left out <strong>%d</strong> images the file only pointed at, without carrying - too big, or gone where it came from', $counts['images']) : '')
         . '.';
 }

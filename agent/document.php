@@ -220,7 +220,7 @@ $page_title = $row['document_name'];
                             <span class="d-block"><?= $review['due'] ? __('<strong>Review due</strong> since %s', formatDate($review['next'], 'date')) : __('Next review %s', formatDate($review['next'], 'date')) ?></span>
                             <span class="d-block small text-body-secondary">
                                 <?php if ($review['reviewed']) { echo $row['reviewed_by_name'] !== null ? __('Reviewed %1$s by %2$s', timeAgo($review['last']), escapeHtml($row['reviewed_by_name'])) : __('Reviewed %s', timeAgo($review['last'])); } else { echo strtotime($review['last']) === strtotime($row['document_created_at']) ? __('Made %s', timeAgo($review['last'])) : __('Edited %s', timeAgo($review['last'])); } ?>
-                                &middot; <?= lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($row['document_template_review_months'])] ?? '') ?>
+                                &middot; <?= escapeHtml(documentTemplateReviewLabel($row['document_template_review_months'], true)) ?>
                             </span>
                             <?php if ($can_edit) { ?>
                                 <a class="btn btn-sm <?= $review['due'] ? 'btn-warning' : 'btn-light border' ?> mt-2" href="post.php?mark_document_reviewed=<?= $document_id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-check me-1"></i><?= __('Mark reviewed') ?></a>

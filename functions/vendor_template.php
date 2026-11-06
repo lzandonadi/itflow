@@ -43,21 +43,21 @@
  */
 function vendorTemplateFieldLabels() {
     return [
-        'name' => ['label' => 'Name', 'icon' => 'fa-building'],
-        'description' => ['label' => 'What they are', 'icon' => 'fa-align-left'],
-        'phone' => ['label' => 'Support line', 'icon' => 'fa-phone'],
-        'hours' => ['label' => 'Support hours', 'icon' => 'fa-clock'],
+        'name' => ['label' => __('Name'), 'icon' => 'fa-building'],
+        'description' => ['label' => __('What they are'), 'icon' => 'fa-align-left'],
+        'phone' => ['label' => __('Support line'), 'icon' => 'fa-phone'],
+        'hours' => ['label' => __('Support hours'), 'icon' => 'fa-clock'],
         'sla' => ['label' => 'SLA', 'icon' => 'fa-handshake'],
-        'email' => ['label' => 'Support email', 'icon' => 'fa-envelope'],
-        'website' => ['label' => 'Support site', 'icon' => 'fa-globe'],
-        'status_page' => ['label' => 'Status page', 'icon' => 'fa-heartbeat'],
-        'portal' => ['label' => 'Support portal', 'icon' => 'fa-door-open'],
-        'account_number' => ['label' => 'Account number', 'icon' => 'fa-fingerprint'],
+        'email' => ['label' => __('Support email'), 'icon' => 'fa-envelope'],
+        'website' => ['label' => __('Support site'), 'icon' => 'fa-globe'],
+        'status_page' => ['label' => __('Status page'), 'icon' => 'fa-heartbeat'],
+        'portal' => ['label' => __('Support portal'), 'icon' => 'fa-door-open'],
+        'account_number' => ['label' => __('Account number'), 'icon' => 'fa-fingerprint'],
         'code' => ['label' => 'PIN', 'icon' => 'fa-key'],
-        'contact_name' => ['label' => 'Account manager', 'icon' => 'fa-user-tie'],
-        'contact_phone' => ['label' => "Account manager's line", 'icon' => 'fa-phone-alt'],
-        'contact_email' => ['label' => "Account manager's email", 'icon' => 'fa-at'],
-        'notes' => ['label' => 'Notes', 'icon' => 'fa-sticky-note'],
+        'contact_name' => ['label' => __('Account manager'), 'icon' => 'fa-user-tie'],
+        'contact_phone' => ['label' => __("Account manager's line"), 'icon' => 'fa-phone-alt'],
+        'contact_email' => ['label' => __("Account manager's email"), 'icon' => 'fa-at'],
+        'notes' => ['label' => __('Notes'), 'icon' => 'fa-sticky-note'],
     ];
 }
 
@@ -143,21 +143,21 @@ function vendorTemplateFields(array $post, &$error = '') {
     };
     $name = is_scalar($post['name'] ?? null) ? trim(preg_replace('/\s+/u', ' ', (string) $post['name'])) : '';
     if ($name === '') {
-        $error = 'A vendor template needs a name';
+        $error = __('A vendor template needs a name');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'Keep the name to 200 characters';
+        $error = __('Keep the name to 200 characters');
         return null;
     }
     $email = $line('email');
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "The support email isn't an email address";
+        $error = __("The support email isn't an email address");
         return null;
     }
     $contact_email = $line('contact_email');
     if ($contact_email !== '' && !filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
-        $error = "The account manager's email isn't an email address";
+        $error = __("The account manager's email isn't an email address");
         return null;
     }
     $site = function ($key) use ($line) {
@@ -241,7 +241,7 @@ function vendorTemplateCopy($vendor_template_id) {
         return 0;
     }
     $fields = vendorTemplateRowFields($row);
-    $fields['name'] = mb_substr('Copy of ' . $fields['name'], 0, 200);
+    $fields['name'] = mb_substr(__('Copy of %s', $fields['name']), 0, 200);
     return vendorTemplateSave(0, $fields);
 }
 
@@ -464,7 +464,7 @@ function vendorTemplateFollow($vendor_template_id, array $before, array $after) 
     if (!$changed) {
         return $followed;
     }
-    $labels = vendorTemplateFieldLabels();
+    $labels = i18nEnglish(fn () => vendorTemplateFieldLabels()); // for the audit log
     $sql = mysqli_query($mysqli, "SELECT * FROM vendors WHERE vendor_template_id = $vendor_template_id");
     while ($vendor = mysqli_fetch_assoc($sql)) {
         $keys = [];
@@ -509,7 +509,7 @@ function vendorTemplateBringInLine($vendor_template_id, array $vendor_ids, array
     }
     $sql = mysqli_query($mysqli, "SELECT * FROM vendors WHERE vendor_template_id = " . intval($template['vendor_template_id']) . " AND vendor_id IN (" . implode(',', $vendor_ids) . ")");
     while ($vendor = mysqli_fetch_assoc($sql)) {
-        $differences = array_intersect_key(vendorTemplateDifferences($template, $vendor), array_flip($keys));
+        $differences = array_intersect_key(i18nEnglish(fn () => vendorTemplateDifferences($template, $vendor)), array_flip($keys)); // English, for the audit log
         if ($differences) {
             vendorTemplateApply($vendor['vendor_id'], $template, array_keys($differences));
             $changed[intval($vendor['vendor_id'])] = ['name' => $vendor['vendor_name'], 'client_id' => intval($vendor['vendor_client_id']), 'fields' => array_values($differences)];
@@ -698,12 +698,12 @@ function vendorTemplateScopeSql($required, array $tag_ids) {
 /** Who a template is required of, in words - '' when it isn't. */
 function vendorTemplateScopeText($required, array $tags) {
     if (intval($required) === VENDOR_TEMPLATE_REQUIRED_EVERY) {
-        return 'Every client';
+        return __('Every client');
     }
     if (intval($required) !== VENDOR_TEMPLATE_REQUIRED_TAGGED) {
         return '';
     }
-    return $tags ? 'Clients tagged ' . implode(' or ', $tags) : 'Clients with a tag - none picked';
+    return $tags ? __('Clients tagged %s', implode(__(' or '), $tags)) : __('Clients with a tag - none picked');
 }
 
 /*

@@ -23,35 +23,35 @@
 function tagEntity($entity) {
     $entities = [
         'client' => [
-            'title' => 'Client', 'plural' => 'clients', 'icon' => 'fa-users',
+            'title' => __('Client'), 'plural' => __('clients'), 'icon' => 'fa-users',
             'type' => 1, 'label' => 'client', 'module' => 'module_client',
             'link_table' => 'client_tags', 'link_record' => 'client_id', 'link_tag' => 'tag_id',
             'table' => 'clients', 'id' => 'client_id', 'client' => 'client_id', 'name' => 'client_name',
             'log' => 'Client', 'list' => 'clients.php'
         ],
         'location' => [
-            'title' => 'Location', 'plural' => 'locations', 'icon' => 'fa-map-marker-alt',
+            'title' => __('Location'), 'plural' => __('locations'), 'icon' => 'fa-map-marker-alt',
             'type' => 2, 'label' => 'location', 'module' => 'module_client',
             'link_table' => 'location_tags', 'link_record' => 'location_id', 'link_tag' => 'tag_id',
             'table' => 'locations', 'id' => 'location_id', 'client' => 'location_client_id', 'name' => 'location_name',
             'log' => 'Location', 'list' => 'locations.php'
         ],
         'contact' => [
-            'title' => 'Contact', 'plural' => 'contacts', 'icon' => 'fa-address-book',
+            'title' => __('Contact'), 'plural' => __('contacts'), 'icon' => 'fa-address-book',
             'type' => 3, 'label' => 'contact', 'module' => 'module_client',
             'link_table' => 'contact_tags', 'link_record' => 'contact_id', 'link_tag' => 'tag_id',
             'table' => 'contacts', 'id' => 'contact_id', 'client' => 'contact_client_id', 'name' => 'contact_name',
             'log' => 'Contact', 'list' => 'contacts.php'
         ],
         'credential' => [
-            'title' => 'Credential', 'plural' => 'credentials', 'icon' => 'fa-key',
+            'title' => __('Credential'), 'plural' => __('credentials'), 'icon' => 'fa-key',
             'type' => 4, 'label' => 'credential', 'module' => 'module_credential',
             'link_table' => 'credential_tags', 'link_record' => 'credential_id', 'link_tag' => 'tag_id',
             'table' => 'credentials', 'id' => 'credential_id', 'client' => 'credential_client_id', 'name' => 'credential_name',
             'log' => 'Credential', 'list' => 'credentials.php'
         ],
         'asset' => [
-            'title' => 'Asset', 'plural' => 'assets', 'icon' => 'fa-desktop',
+            'title' => __('Asset'), 'plural' => __('assets'), 'icon' => 'fa-desktop',
             'type' => 5, 'label' => 'asset', 'module' => 'module_client',
             'link_table' => 'asset_tags', 'link_record' => 'asset_tag_asset_id', 'link_tag' => 'asset_tag_tag_id',
             'table' => 'assets', 'id' => 'asset_id', 'client' => 'asset_client_id', 'name' => 'asset_name',
@@ -59,14 +59,14 @@ function tagEntity($entity) {
         ],
         // A vendor of no client is one of ours - a supplier, which is the financial module's
         'vendor' => [
-            'title' => 'Vendor', 'plural' => 'vendors', 'icon' => 'fa-building',
+            'title' => __('Vendor'), 'plural' => __('vendors'), 'icon' => 'fa-building',
             'type' => 6, 'label' => 'vendor', 'module' => 'module_client', 'module_ours' => 'module_financial',
             'link_table' => 'vendor_tags', 'link_record' => 'vendor_id', 'link_tag' => 'tag_id',
             'table' => 'vendors', 'id' => 'vendor_id', 'client' => 'vendor_client_id', 'name' => 'vendor_name',
             'log' => 'Vendor', 'list' => 'vendors.php'
         ],
         'domain' => [
-            'title' => 'Domain', 'plural' => 'domains', 'icon' => 'fa-globe',
+            'title' => __('Domain'), 'plural' => __('domains'), 'icon' => 'fa-globe',
             'type' => 7, 'label' => 'domain', 'module' => 'module_support',
             'link_table' => 'domain_tags', 'link_record' => 'domain_id', 'link_tag' => 'tag_id',
             'table' => 'domains', 'id' => 'domain_id', 'client' => 'domain_client_id', 'name' => 'domain_name',
@@ -74,21 +74,21 @@ function tagEntity($entity) {
         ],
         // The software table holds licenses
         'license' => [
-            'title' => 'License', 'plural' => 'licenses', 'icon' => 'fa-cube',
+            'title' => __('License'), 'plural' => __('licenses'), 'icon' => 'fa-cube',
             'type' => 8, 'label' => 'license', 'module' => 'module_support',
             'link_table' => 'software_tags', 'link_record' => 'software_id', 'link_tag' => 'tag_id',
             'table' => 'software', 'id' => 'software_id', 'client' => 'software_client_id', 'name' => 'software_name',
             'log' => 'Software', 'list' => 'software.php'
         ],
         'service' => [
-            'title' => 'Service', 'plural' => 'services', 'icon' => 'fa-stream',
+            'title' => __('Service'), 'plural' => __('services'), 'icon' => 'fa-stream',
             'type' => 9, 'label' => 'service', 'module' => 'module_support',
             'link_table' => 'service_tags', 'link_record' => 'service_id', 'link_tag' => 'tag_id',
             'table' => 'services', 'id' => 'service_id', 'client' => 'service_client_id', 'name' => 'service_name',
             'log' => 'Service', 'list' => 'services.php'
         ],
         'network' => [
-            'title' => 'Network', 'plural' => 'networks', 'icon' => 'fa-network-wired',
+            'title' => __('Network'), 'plural' => __('networks'), 'icon' => 'fa-network-wired',
             'type' => 10, 'label' => 'network', 'module' => 'module_support',
             'link_table' => 'network_tags', 'link_record' => 'network_id', 'link_tag' => 'tag_id',
             'table' => 'networks', 'id' => 'network_id', 'client' => 'network_client_id', 'name' => 'network_name',
@@ -96,14 +96,14 @@ function tagEntity($entity) {
         ],
         // Documents are listed one client at a time, in Files - across clients, search finds them by tag
         'document' => [
-            'title' => 'Document', 'plural' => 'documents', 'icon' => 'fa-file-alt',
+            'title' => __('Document'), 'plural' => __('documents'), 'icon' => 'fa-file-alt',
             'type' => 11, 'label' => 'document', 'module' => 'module_support',
             'link_table' => 'document_tags', 'link_record' => 'document_id', 'link_tag' => 'tag_id',
             'table' => 'documents', 'id' => 'document_id', 'client' => 'document_client_id', 'name' => 'document_name',
             'log' => 'Document', 'list' => 'files.php', 'client_list' => true
         ],
         'ticket' => [
-            'title' => 'Ticket', 'plural' => 'tickets', 'icon' => 'fa-life-ring',
+            'title' => __('Ticket'), 'plural' => __('tickets'), 'icon' => 'fa-life-ring',
             'type' => 12, 'label' => 'ticket', 'module' => 'module_support',
             'link_table' => 'ticket_tags', 'link_record' => 'ticket_id', 'link_tag' => 'tag_id',
             'table' => 'tickets', 'id' => 'ticket_id', 'client' => 'ticket_client_id', 'name' => "CONCAT(ticket_prefix, ticket_number, ' ', ticket_subject)",
@@ -494,7 +494,10 @@ function tagKinds() {
 
 /* "an asset tag", "a client tag" - for messages. */
 function tagKindPhrase($type) {
-    $word = strtolower(tagEntityByType($type)['title'] ?? 'unknown');
+    $word = strtolower(tagEntityByType($type)['title'] ?? __('unknown'));
+    if (i18nLocale() !== 'en_US') {
+        return __('a %s tag', $word);
+    }
     return (in_array($word[0], ['a', 'e', 'i', 'o', 'u'], true) ? 'an ' : 'a ') . $word . ' tag';
 }
 
@@ -590,22 +593,22 @@ function tagFromInput(array $in, $existing = null) {
     $type = $existing ? intval($existing['tag_type']) : intval($in['type'] ?? 0);
     if ($existing && isset($in['type']) && intval($in['type']) !== $type) {
         if (tagUsage($existing['tag_id']) || tagSeatLines($existing['tag_id'])) {
-            return [null, 'A tag can only move to another kind while nothing has it'];
+            return [null, __('A tag can only move to another kind while nothing has it')];
         }
         $type = intval($in['type']);
     }
     if (!tagEntityByType($type)) {
-        return [null, 'Pick what the tag is for'];
+        return [null, __('Pick what the tag is for')];
     }
     if ($name === '') {
-        return [null, 'A tag needs a name'];
+        return [null, __('A tag needs a name')];
     }
     // Unique within its kind - a tag already sharing its name with another can still be saved under it
     $kept_name = $existing && intval($existing['tag_type']) === $type && mb_strtolower($existing['tag_name']) === mb_strtolower($name);
     $exclude = $existing ? 'AND tag_id != ' . intval($existing['tag_id']) : '';
     $same = $kept_name ? null : mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT tag_name FROM tags WHERE tag_type = $type AND LOWER(tag_name) = LOWER('" . escapeSql($name) . "') $exclude LIMIT 1"));
     if ($same) {
-        return [null, 'There is already ' . tagKindPhrase($type) . ' called ' . $same['tag_name']];
+        return [null, __('There is already %1$s called %2$s', tagKindPhrase($type), $same['tag_name'])];
     }
     $color = trim((string) ($in['color'] ?? ''));
     $color = preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $color) ? tagColor($color) : ($existing ? tagColor($existing['tag_color']) : tagNextColor($type));
@@ -652,7 +655,7 @@ function tagDelete($tag_id, &$error = '') {
     global $mysqli;
     $tag_id = intval($tag_id);
     if ($lines = tagSeatLines($tag_id)) {
-        $error = $lines === 1 ? 'A recurring invoice line counts users or devices with it - archive it, or merge it into another tag' : "$lines recurring invoice lines count users or devices with it - archive it, or merge it into another tag";
+        $error = $lines === 1 ? __('A recurring invoice line counts users or devices with it - archive it, or merge it into another tag') : __('%d recurring invoice lines count users or devices with it - archive it, or merge it into another tag', $lines);
         return false;
     }
     mysqli_query($mysqli, "DELETE FROM tags WHERE tag_id = $tag_id");

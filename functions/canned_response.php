@@ -600,7 +600,7 @@ function cannedResponseUnfill($html, $ticket_id, $agent_name) {
         $html = preg_replace('#<a\b[^>]*href="' . preg_quote($form, '#') . '"[^>]*>.*?</a>#is', '[Ticket Link]', $html, -1, $count);
         $html = str_replace($form, '[Ticket Link]', $html, $more);
         if ($count + $more) {
-            $made['Ticket Link'] = true;
+            $made[__('Ticket Link')] = true;
         }
     }
     // The subject first, as it can have the client's or contact's name in it

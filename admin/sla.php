@@ -43,26 +43,26 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
 
 <div class="card card-dark">
     <div class="card-header py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-stopwatch me-2"></i>SLAs</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-stopwatch me-2"></i><?= __('SLAs') ?></h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/sla/sla_add.php"><i class="fas fa-plus me-2"></i>New SLA</button>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/sla/sla_add.php"><i class="fas fa-plus me-2"></i><?= __('New SLA') ?></button>
         </div>
     </div>
 
     <div class="card-body">
 
-        <p class="text-muted">SLAs are optional. A new ticket gets the SLA its client's contract sets for its priority, else the default for the priority below - with nothing assigned, nothing changes.</p>
+        <p class="text-muted"><?= __('SLAs are optional. A new ticket gets the SLA its client\'s contract sets for its priority, else the default for the priority below - with nothing assigned, nothing changes.') ?></p>
 
         <div class="table-responsive-sm">
             <table class="table table-striped table-borderless table-hover">
                 <thead class="text-dark">
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Response</th>
-                    <th>Resolution</th>
-                    <th>Status</th>
-                    <th class="text-center">Action</th>
+                    <th><?= __('Name') ?></th>
+                    <th><?= __('Description') ?></th>
+                    <th><?= __('Response') ?></th>
+                    <th><?= __('Resolution') ?></th>
+                    <th><?= __('Status') ?></th>
+                    <th class="text-center"><?= __('Action') ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -87,28 +87,28 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
                         <td><?= $sla_resolution_minutes ? "$sla_resolution_minutes min" : "-" ?></td>
                         <td>
                             <?php if ($sla_archived_at) { ?>
-                                <div class="text-secondary">Archived</div>
+                                <div class="text-secondary"><?= __('Archived') ?></div>
                             <?php } else { ?>
-                                <div class="text-success text-bold">Active</div>
+                                <div class="text-success text-bold"><?= __('Active') ?></div>
                             <?php } ?>
                         </td>
                         <td>
                             <div class="dropdown dropstart text-center">
-                                <button class="btn btn-secondary btn-sm" title="More actions" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-secondary btn-sm" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-ellipsis-h"></i>
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/sla/sla_edit.php?id=<?= $sla_id ?>">
-                                        <i class="fas fa-fw fa-edit me-2"></i>Edit
+                                        <i class="fas fa-fw fa-edit me-2"></i><?= __('Edit') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($sla_archived_at) { ?>
                                         <a class="dropdown-item" href="post.php?unarchive_sla=<?= $sla_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="fas fa-fw fa-undo me-2"></i>Restore
+                                            <i class="fas fa-fw fa-undo me-2"></i><?= __('Restore') ?>
                                         </a>
                                     <?php } else { ?>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?archive_sla=<?= $sla_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                         </a>
                                     <?php } ?>
                                 </div>
@@ -124,7 +124,7 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
 
 <div class="card card-dark">
     <div class="card-header py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-random me-2"></i>SLA Assignments</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-random me-2"></i><?= __('SLA Assignments') ?></h3>
     </div>
 
     <div class="card-body">
@@ -132,7 +132,7 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
         <form action="post.php" method="post" autocomplete="off">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-            <strong>Default (for a client whose contract sets none)</strong>
+            <strong><?= __('Default (for a client whose contract sets none)') ?></strong>
             <div class="row g-2 mt-2">
                 <?php foreach (['Low', 'Medium', 'High', 'Urgent'] as $priority) {
                     $selected_sla_id = $assignments[0][$priority] ?? 0;
@@ -140,7 +140,7 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
                     <div class="mb-3 col-md-3">
                         <label><?= $priority ?></label>
                         <select class="form-select" name="global_sla_<?= strtolower($priority) ?>">
-                            <option value="0">None</option>
+                            <option value="0"><?= __('None') ?></option>
                             <?php foreach ($active_slas as $active_sla_id => $active_sla_name) { ?>
                                 <option value="<?= $active_sla_id ?>" <?php if ($selected_sla_id == $active_sla_id) { echo "selected"; } ?>><?= escapeHtml($active_sla_name) ?></option>
                             <?php } ?>
@@ -148,16 +148,16 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
                     </div>
                 <?php } ?>
             </div>
-            <button type="submit" name="save_sla_assignments" class="btn btn-primary"><i class="fas fa-check me-2"></i>Save Defaults</button>
+            <button type="submit" name="save_sla_assignments" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= __('Save Defaults') ?></button>
         </form>
 
-        <small class="text-muted d-block mt-2">A client has no SLAs of its own: a contract in force for the client comes first, for the priorities it sets an SLA for, and these defaults cover the rest.</small>
+        <small class="text-muted d-block mt-2"><?= __('A client has no SLAs of its own: a contract in force for the client comes first, for the priorities it sets an SLA for, and these defaults cover the rest.') ?></small>
     </div>
 </div>
 
 <div class="card card-dark">
     <div class="card-header py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-business-time me-2"></i>Business Hours &amp; Notifications</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-business-time me-2"></i><?= escapeHtml(__('Business Hours & Notifications')) ?></h3>
     </div>
 
     <div class="card-body">
@@ -166,7 +166,7 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
             <div class="mb-3">
-                <label>Business days</label>
+                <label><?= __('Business days') ?></label>
                 <div>
                     <?php foreach ([1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'] as $day_number => $day_name) { ?>
                         <div class="form-check form-check-inline">
@@ -175,31 +175,31 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
                         </div>
                     <?php } ?>
                 </div>
-                <small class="text-muted">SLA clocks only run during business hours on these days. Unchecking everything makes SLAs count 24x7.</small>
+                <small class="text-muted"><?= __('SLA clocks only run during business hours on these days. Unchecking everything makes SLAs count 24x7.') ?></small>
             </div>
 
             <div class="row g-2">
                 <div class="mb-3 col-md-3">
-                    <label>Business hours start</label>
+                    <label><?= __('Business hours start') ?></label>
                     <input type="time" class="form-control" name="business_hours_start" value="<?= $config_business_hours_start ?>" required>
                 </div>
                 <div class="mb-3 col-md-3">
-                    <label>Business hours end</label>
+                    <label><?= __('Business hours end') ?></label>
                     <input type="time" class="form-control" name="business_hours_end" value="<?= $config_business_hours_end ?>" required>
                 </div>
                 <div class="mb-3 col-md-3">
-                    <label>Warn at % of target</label>
+                    <label><?= __('Warn at this percent of the target') ?></label>
                     <input type="number" class="form-control" name="warning_percent" min="1" max="99" value="<?= $config_sla_warning_percent ?>" required>
                 </div>
                 <div class="mb-3 col-md-3">
-                    <label>Notification email <small class="text-muted">(optional)</small></label>
-                    <input type="email" class="form-control" name="notification_email" placeholder="dispatch@example.com" maxlength="200" value="<?= $config_sla_notification_email ?>">
+                    <label><?= __('Notification email') ?> <small class="text-muted">(optional)</small></label>
+                    <input type="email" class="form-control" name="notification_email" placeholder="<?= escapeHtml(__('dispatch@example.com')) ?>" maxlength="200" value="<?= $config_sla_notification_email ?>">
                 </div>
             </div>
 
-            <small class="text-muted d-block mb-3">Warnings and breach alerts also notify the assigned agent in-app and by email. Requires cron/ticket_sla.php running every minute.</small>
+            <small class="text-muted d-block mb-3"><?= __('Warnings and breach alerts also notify the assigned agent in-app and by email. Requires cron/ticket_sla.php running every minute.') ?></small>
 
-            <button type="submit" name="edit_sla_settings" class="btn btn-primary"><i class="fas fa-check me-2"></i>Save Settings</button>
+            <button type="submit" name="edit_sla_settings" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= __('Save Settings') ?></button>
         </form>
 
     </div>
@@ -207,38 +207,37 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
 
 <div class="card card-dark">
     <div class="card-header py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-calendar-times me-2"></i>Holidays &amp; Closure Days</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-calendar-times me-2"></i><?= escapeHtml(__('Holidays & Closure Days')) ?></h3>
         <div class="card-tools">
             <form action="post.php" method="post" class="d-inline" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="input-group input-group-sm d-inline-flex w-auto align-middle me-2">
                     <input type="number" class="form-control" name="holiday_year" min="2000" max="2100" value="<?= $holiday_year ?>" required>
-                    <button type="submit" name="generate_holidays" class="btn btn-secondary"><i class="fas fa-magic me-2"></i>Add US Holidays</button>
+                    <button type="submit" name="generate_holidays" class="btn btn-secondary"><i class="fas fa-magic me-2"></i><?= __('Add US Holidays') ?></button>
                 </div>
             </form>
-            <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/sla/holiday_add.php"><i class="fas fa-plus me-2"></i>New Closure Day</button>
+            <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/sla/holiday_add.php"><i class="fas fa-plus me-2"></i><?= __('New Closure Day') ?></button>
         </div>
     </div>
 
     <div class="card-body">
 
         <p class="text-muted">
-            SLA clocks stop completely on these dates, the same as a day outside your business days.
-            Use them for public holidays or any other day the office is shut. Adding or removing one
-            recalculates the targets on every open ticket.
+            <?= __('SLA clocks stop completely on these dates, the same as a day outside your business days.') ?>
+            <?= __('Use them for public holidays or any other day the office is shut. Adding or removing one recalculates the targets on every open ticket.') ?>
         </p>
 
         <?php if (empty($holidays)) { ?>
-            <p class="text-secondary mb-0">No closure days configured - SLA clocks run on every business day.</p>
+            <p class="text-secondary mb-0"><?= __('No closure days configured - SLA clocks run on every business day.') ?></p>
         <?php } else { ?>
             <div class="table-responsive">
                 <table class="table table-borderless table-hover align-middle">
                     <thead class="border-bottom">
                         <tr>
-                            <th>Date</th>
-                            <th>Day</th>
-                            <th>Name</th>
-                            <th class="text-end">Action</th>
+                            <th><?= __('Date') ?></th>
+                            <th><?= __('Day') ?></th>
+                            <th><?= __('Name') ?></th>
+                            <th class="text-end"><?= __('Action') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -258,7 +257,7 @@ while ($assignment_row = mysqli_fetch_assoc($sql_assignments)) {
                                     <form action="post.php" method="post" onsubmit="return confirm('Remove this closure day? Open ticket targets will be recalculated.');">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="holiday_id" value="<?= $holiday_id ?>">
-                                        <button type="submit" name="delete_holiday" class="btn btn-sm btn-light border" title="Delete holiday"><i class="fas fa-fw fa-trash text-danger"></i></button>
+                                        <button type="submit" name="delete_holiday" class="btn btn-sm btn-light border" title="<?= escapeHtml(__('Delete holiday')) ?>"><i class="fas fa-fw fa-trash text-danger"></i></button>
                                     </form>
                                 </td>
                             </tr>

@@ -18,10 +18,10 @@ ob_start();
 
 if (!$template) { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-file-invoice-dollar me-2"></i>Bill seats</h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-file-invoice-dollar me-2"></i><?= __('Bill seats') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
-    <div class="modal-body text-center text-secondary py-5">That license template no longer exists.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That license template no longer exists.') ?></div>
 <?php } else {
     $software_template_id = intval($template['software_template_id']);
     $product_id = intval($template['software_template_product_id']);
@@ -38,7 +38,7 @@ if (!$template) { ?>
     ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-file-invoice-dollar me-2"></i>Bill seats <small class="ms-1 opacity-75"><?= escapeHtml($template['software_template_name']) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-file-invoice-dollar me-2"></i><?= __('Bill seats') ?> <small class="ms-1 opacity-75"><?= escapeHtml($template['software_template_name']) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -48,12 +48,12 @@ if (!$template) { ?>
     <div class="modal-body">
         <?php if (!$sellable) { ?>
             <div class="text-center text-secondary py-4">
-                <?= $template['product_name'] !== null ? 'The product it is sold as, <strong>' . escapeHtml($template['product_name']) . '</strong>, is archived.' : 'It isn\'t sold as a product yet.' ?>
-                Pick the product it is sold as on the template, then bill its licenses from here.
-                <div class="mt-3"><button type="button" class="btn btn-sm btn-outline-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software_template/software_template_edit.php?id=<?= $software_template_id ?>"><i class="fas fa-edit me-1"></i>Edit the template</button></div>
+                <?= $template['product_name'] !== null ? __('The product it is sold as, <strong>%s</strong>, is archived.', escapeHtml($template['product_name'])) : __('It isn\'t sold as a product yet.') ?>
+                <?= __('Pick the product it is sold as on the template, then bill its licenses from here.') ?>
+                <div class="mt-3"><button type="button" class="btn btn-sm btn-outline-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software_template/software_template_edit.php?id=<?= $software_template_id ?>"><i class="fas fa-edit me-1"></i><?= __('Edit the template') ?></button></div>
             </div>
         <?php } elseif (!$licenses) { ?>
-            <div class="text-center text-secondary py-4"><i class="fas fa-check text-success me-1"></i><?= $picked ? 'Every one of them is billed already.' : 'No licenses made from it yet.' ?></div>
+            <div class="text-center text-secondary py-4"><i class="fas fa-check text-success me-1"></i><?= $picked ? __('Every one of them is billed already.') : __('No licenses made from it yet.') ?></div>
         <?php } else { ?>
             <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                 <?= productTile($template['product_name'] !== null ? (string) getFieldById('products', $product_id, 'product_type') : 'service') ?>
@@ -63,20 +63,20 @@ if (!$template) { ?>
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">Count</label>
+                <label class="form-label"><?= __('Count') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
                     <select class="form-select" name="count">
-                        <option value="total" <?= $count === 'total' ? 'selected' : '' ?>>The seats bought</option>
-                        <option value="used" <?= $count === 'used' ? 'selected' : '' ?>>The seats in use - devices and users on it</option>
+                        <option value="total" <?= $count === 'total' ? 'selected' : '' ?>><?= __('The seats bought') ?></option>
+                        <option value="used" <?= $count === 'used' ? 'selected' : '' ?>><?= __('The seats in use - devices and users on it') ?></option>
                     </select>
                 </div>
-                <div class="form-text">The line's quantity follows the license each time an invoice is made. One with no seat limit counts the seats in use.</div>
+                <div class="form-text"><?= __('The line\'s quantity follows the license each time an invoice is made. One with no seat limit counts the seats in use.') ?></div>
             </div>
             <div class="table-responsive border rounded">
                 <table class="table table-sm align-middle mb-0">
                     <thead class="table-light text-nowrap">
-                        <tr><th class="ps-2" style="width: 2rem;"></th><th>Client</th><th class="text-end">Seats</th><th class="pe-2" style="min-width: 14rem;">Recurring invoice</th></tr>
+                        <tr><th class="ps-2" style="width: 2rem;"></th><th><?= __('Client') ?></th><th class="text-end"><?= __('Seats') ?></th><th class="pe-2" style="min-width: 14rem;"><?= __('Recurring invoice') ?></th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($licenses as $software_id => $row) {
@@ -98,7 +98,7 @@ if (!$template) { ?>
                                 <div class="fw-semibold text-truncate"><?= escapeHtml($row['client_name']) ?></div>
                                 <?php if ($row['software_name'] !== $template['software_template_name']) { ?><div class="small text-secondary text-truncate"><?= escapeHtml($row['software_name']) ?></div><?php } ?>
                             </td>
-                            <td class="text-end text-nowrap small"><?= $row['seats']['total'] > 0 ? $row['seats']['total'] . ' bought' : '<span title="No seats bought to count - it counts the seats in use">No limit</span>' ?><div class="text-secondary"><?= $row['seats']['used'] ?> in use</div></td>
+                            <td class="text-end text-nowrap small"><?= $row['seats']['total'] > 0 ? $row['seats']['total'] . ' bought' : __('<span title="No seats bought to count - it counts the seats in use">No limit</span>') ?><div class="text-secondary"><?= $row['seats']['used'] ?> in use</div></td>
                             <td class="pe-2">
                                 <?php if ($options) { ?>
                                     <div class="input-group input-group-sm">
@@ -110,7 +110,7 @@ if (!$template) { ?>
                                         </select>
                                     </div>
                                 <?php } else { ?>
-                                    <span class="small text-secondary">No recurring invoice - <a href="/agent/recurring_invoices.php?client_id=<?= $client_id ?>">make one</a> first</span>
+                                    <span class="small text-secondary"><?= __('No recurring invoice -') ?> <a href="/agent/recurring_invoices.php?client_id=<?= $client_id ?>"><?= __('make one') ?></a> <?= __('first') ?></span>
                                 <?php } ?>
                             </td>
                         </tr>
@@ -119,15 +119,15 @@ if (!$template) { ?>
                 </table>
             </div>
             <?php if ($billed) { ?>
-                <div class="small text-secondary mt-2"><?= count($billed) === 1 ? '1 of the ones picked is' : count($billed) . ' of the ones picked are' ?> billed already, so not here.</div>
+                <div class="small text-secondary mt-2"><?= escapeHtml(_n('%d of the ones picked is billed already, so not here.', '%d of the ones picked are billed already, so not here.', count($billed))) ?></div>
             <?php } ?>
         <?php } ?>
     </div>
     <div class="modal-footer">
         <?php if ($sellable && $licenses) { ?>
-            <button type="submit" name="bill_software_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Add to recurring invoices</button>
+            <button type="submit" name="bill_software_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Add to recurring invoices') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $sellable && $licenses ? 'Cancel' : 'Close' ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $sellable && $licenses ? __('Cancel') : __('Close') ?></button>
     </div>
 </form>
 

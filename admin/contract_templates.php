@@ -16,8 +16,8 @@ $order = "ASC";
 require_once "includes/inc_all_admin.php";
 
 $views = [
-    '' => ['label' => 'In use', 'icon' => 'fa-file-contract', 'where' => 'contract_template_archived_at IS NULL', 'title' => 'Offered on a new contract'],
-    'archived' => ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'contract_template_archived_at IS NOT NULL', 'title' => 'Kept, but not offered'],
+    '' => ['label' => __('In use'), 'icon' => 'fa-file-contract', 'where' => 'contract_template_archived_at IS NULL', 'title' => __('Offered on a new contract')],
+    'archived' => ['label' => __('Archived'), 'icon' => 'fa-archive', 'where' => 'contract_template_archived_at IS NOT NULL', 'title' => __('Kept, but not offered')],
 ];
 $show = (string) ($_GET['show'] ?? '');
 $show = isset($views[$show]) ? $show : '';
@@ -72,10 +72,10 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-file-contract me-2"></i>Contract Templates</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-file-contract me-2"></i><?= __('Contract Templates') ?></h3>
         <div class="card-tools">
             <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/contract_template/contract_template_add.php" data-modal-size="lg">
-                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Template</span>
+                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Template') ?></span>
             </button>
         </div>
     </div>
@@ -85,8 +85,8 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search templates..." title="Name, description or support hours">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search templates...')) ?>" title="<?= escapeHtml(__('Name, description or support hours')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -103,7 +103,7 @@ $csrf = $_SESSION['csrf_token'];
             <tr>
                 <th class="ps-3"><?= $sort_link('contract_template_name', 'Template') ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('contract_template_term_months', 'Term') ?></th>
-                <th class="d-none d-lg-table-cell">Cover</th>
+                <th class="d-none d-lg-table-cell"><?= __('Cover') ?></th>
                 <th class="text-end"><?= $sort_link('contracts', 'Contracts') ?></th>
                 <th></th>
             </tr>
@@ -131,7 +131,7 @@ $csrf = $_SESSION['csrf_token'];
                     }
                 }
                 $net_text = function ($days) {
-                    return intval($days) ? 'Net ' . intval($days) : 'Due on receipt';
+                    return intval($days) ? 'Net ' . intval($days) : __('Due on receipt');
                 };
                 $cover = array_filter([
                     $row['contract_template_support_hours'],
@@ -148,41 +148,41 @@ $csrf = $_SESSION['csrf_token'];
                                 <a class="ajax-modal fw-semibold text-body" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><?= $name ?></a>
                                 <div class="small text-body-secondary"><?= escapeHtml(contractTypeLabel($row['contract_template_type'])) ?><?= trim((string) $row['contract_template_description']) !== '' ? ' - ' . escapeHtml($row['contract_template_description']) : '' ?></div>
                                 <?php if ($archived) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['contract_template_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['contract_template_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                             </div>
                         </div>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap">
                         <?= escapeHtml(contractTermLabel($row['contract_template_term_months'])) ?>
-                        <div class="text-body-secondary"><?= intval($row['contract_template_auto_renew']) ? 'Renews itself' : 'Renewed by hand' ?>, <?= intval($row['contract_template_notice_days']) ?> days notice</div>
+                        <div class="text-body-secondary"><?= intval($row['contract_template_auto_renew']) ? __('Renews itself') : __('Renewed by hand') ?>, <?= intval($row['contract_template_notice_days']) ?> days notice</div>
                     </td>
                     <td class="d-none d-lg-table-cell small">
-                        <?= $cover ? escapeHtml(implode(' · ', $cover)) : '<span class="text-body-tertiary">The default rate and terms</span>' ?>
+                        <?= $cover ? escapeHtml(implode(' · ', $cover)) : __('<span class="text-body-tertiary">The default rate and terms</span>') ?>
                         <div class="text-body-secondary">
                             <?php if ($sla_text) {
                                 echo escapeHtml(implode(' · ', $sla_text));
                             } else { ?>
-                                No SLAs
+                                <?= __('No SLAs') ?>
                             <?php } ?>
                         </div>
                     </td>
                     <td class="text-end"><?= intval($row['n_contracts']) ?: '<span class="text-body-tertiary">0</span>' ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
-                                <a class="dropdown-item" href="post.php?copy_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
+                                <a class="dropdown-item" href="post.php?copy_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?></a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
-                                    <a class="dropdown-item" href="post.php?restore_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore</a>
+                                    <a class="dropdown-item" href="post.php?restore_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>"><i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?></a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>" title="Kept, but not offered on a new contract"><i class="fas fa-fw fa-archive me-2"></i>Archive</a>
+                                    <a class="dropdown-item text-danger" href="post.php?archive_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Kept, but not offered on a new contract')) ?>"><i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?></a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_contract_template=<?= $id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="<?= intval($row['n_contracts']) ? 'The ' . intval($row['n_contracts']) . ' contract' . (intval($row['n_contracts']) === 1 ? '' : 's') . ' started from it keep their terms.' : 'Nothing was started from it.' ?>" data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= intval($row['n_contracts']) ? escapeHtml(_n('The %d contract started from it keeps its terms.', 'The %d contracts started from it keep their terms.', intval($row['n_contracts']))) : __('Nothing was started from it.') ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -199,8 +199,8 @@ $csrf = $_SESSION['csrf_token'];
         'filtered' => $q !== '',
         'archived' => $show === 'archived',
         'views' => ['show'],
-        'text' => 'The agreements you offer - Fully managed, Block hours, Break/fix - to start a client\'s contract from.',
-        'actions' => [['label' => 'New Template', 'modal' => 'modals/contract_template/contract_template_add.php', 'size' => 'lg']],
+        'text' => __('The agreements you offer - Fully managed, Block hours, Break/fix - to start a client\'s contract from.'),
+        'actions' => [['label' => __('New Template'), 'modal' => 'modals/contract_template/contract_template_add.php', 'size' => 'lg']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

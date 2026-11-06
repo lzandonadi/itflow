@@ -95,24 +95,24 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-file-alt me-2"></i>Document Templates</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-file-alt me-2"></i><?= __('Document Templates') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="xl" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Document Template</span></button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="xl" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Document Template') ?></span></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/document_template/document_template_import.php">
-                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i>Import
+                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i><?= __('Import') ?>
                     </a>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/document_template/document_template_export.php">
-                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="/agent/reports/document_templates.php">
-                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>How they are used
+                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('How they are used') ?>
                     </a>
                     <a class="dropdown-item" href="starter_content.php">
-                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i>Starter document templates
+                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i><?= __('Starter document templates') ?>
                     </a>
                 </div>
             </div>
@@ -124,16 +124,16 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search document templates..." title="Name, summary or what it says">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search document templates...')) ?>" title="<?= escapeHtml(__('Name, summary or what it says')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs mt-2">
-            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-file-alt me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="Every client, or the clients with a tag, should have one"><i class="fas fa-fw fa-clipboard-check me-1"></i>Required <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
-            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="Not offered for new documents - the documents made from them stay"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-file-alt me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="<?= escapeHtml(__('Every client, or the clients with a tag, should have one')) ?>"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= __('Required') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="<?= escapeHtml(__('Not offered for new documents - the documents made from them stay')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
@@ -142,7 +142,7 @@ $csrf = $_SESSION['csrf_token'];
             <tr>
                 <th class="ps-3"><?= $sort_link('document_template_name', 'Template') ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', 'Last used') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', 'Changed') ?></th>
                 <th></th>
             </tr>
@@ -166,7 +166,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="small text-body-secondary"><?= escapeHtml($summary) ?></div>
                                 <?php } ?>
                                 <?php if ($row['document_template_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['document_template_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['document_template_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                                 <?php if (isset($coverage[$template_id]) || ($row['document_template_review_months'] && !$row['document_template_archived_at'])) {
                                     $reach = $coverage[$template_id] ?? null;
@@ -181,18 +181,18 @@ $csrf = $_SESSION['csrf_token'];
                                         <?php } ?>
                                         <?php if ($row['document_template_review_months'] && !$row['document_template_archived_at']) { ?>
                                             <a class="badge rounded-pill fw-normal text-decoration-none <?= $due_count ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'text-bg-light border' ?>"
-                                                href="document_template.php?document_template_id=<?= $template_id ?>#documentTemplateCoverage" title="Reviewed <?= lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($row['document_template_review_months'])] ?? '') ?>">
-                                                <i class="fas fa-calendar-check me-1"></i><?= $due_count ? $due_count . ' due a review' : 'Reviews up to date' ?>
+                                                href="document_template.php?document_template_id=<?= $template_id ?>#documentTemplateCoverage" title="<?= escapeHtml(__('Reviewed %s', documentTemplateReviewLabel($row['document_template_review_months'], true))) ?>">
+                                                <i class="fas fa-calendar-check me-1"></i><?= $due_count ? __('%d due a review', $due_count) : __('Reviews up to date') ?>
                                             </a>
                                         <?php } ?>
                                     </div>
                                 <?php } ?>
                                 <!-- On smaller screens its use comes along under the name -->
-                                <div class="d-md-none small text-body-secondary mt-1"><?= $used_count ? $used_text . ' · last ' . timeAgo($row['last_used']) : 'Not used yet' ?></div>
+                                <div class="d-md-none small text-body-secondary mt-1"><?= $used_count ? $used_text . ' · last ' . timeAgo($row['last_used']) : __('Not used yet') ?></div>
                             </div>
                         </div>
                     </td>
-                    <td class="d-none d-md-table-cell small text-nowrap"><?= $used_count ? escapeHtml($used_text) : '<span class="text-body-secondary">Not yet</span>' ?></td>
+                    <td class="d-none d-md-table-cell small text-nowrap"><?= $used_count ? escapeHtml($used_text) : __('<span class="text-body-secondary">Not yet</span>') ?></td>
                     <td class="d-none d-md-table-cell small text-body-secondary text-nowrap"<?= $row['last_used'] ? ' title="' . escapeHtml($row['last_used']) . '"' : '' ?>><?= $row['last_used'] ? timeAgo($row['last_used']) : '-' ?></td>
                     <td class="d-none d-lg-table-cell small text-body-secondary text-nowrap" title="<?= escapeHtml($row['changed_at']) ?>">
                         <?= timeAgo($row['changed_at']) ?>
@@ -200,38 +200,38 @@ $csrf = $_SESSION['csrf_token'];
                     </td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if (!$row['document_template_archived_at']) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/document_template/document_template_use.php?id=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i>New document for a client
+                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i><?= __('New document for a client') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/document_template/document_template_use_several.php?id=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>For several clients
+                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('For several clients') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/document_template/document_template_required.php?id=<?= $template_id ?>">
-                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Who should have one
+                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Who should have one') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?copy_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A new template starting from this one">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                <a class="dropdown-item" href="post.php?copy_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new template starting from this one')) ?>">
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['document_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="post.php?restore_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="Not offered for new documents - the documents made from it stay">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <a class="dropdown-item text-danger" href="post.php?archive_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Not offered for new documents - the documents made from it stay')) ?>">
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_document_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="Its images go with it. Documents made from it stay as they are." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('Its images go with it. Documents made from it stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -248,9 +248,9 @@ $csrf = $_SESSION['csrf_token'];
         'filtered' => $q !== '',
         'archived' => $show_archived,
         'views' => ['show'],
-        'view' => $show === 'required' ? ['title' => 'No required templates', 'text' => 'Set one up from its page - <strong>Who should have one</strong> - to see which clients are missing a document from it.'] : null,
-        'text' => 'A document ready to start a client\'s from - a runbook, a build sheet, a plan. Agents start one from <strong>Document from template</strong> in a client\'s Files. Maintenance > Starter Content has a set for an MSP.',
-        'actions' => [['label' => 'New Document Template', 'modal' => $add_url, 'size' => 'xl']],
+        'view' => $show === 'required' ? ['title' => __('No required templates'), 'text' => __('Set one up from its page - <strong>Who should have one</strong> - to see which clients are missing a document from it.')] : null,
+        'text' => __('A document ready to start a client\'s from - a runbook, a build sheet, a plan. Agents start one from <strong>Document from template</strong> in a client\'s Files. Maintenance > Starter Content has a set for an MSP.'),
+        'actions' => [['label' => __('New Document Template'), 'modal' => $add_url, 'size' => 'xl']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

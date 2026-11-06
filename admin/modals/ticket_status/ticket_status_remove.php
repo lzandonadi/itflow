@@ -17,7 +17,7 @@ $delete = ($_GET['action'] ?? '') === 'delete';
 ob_start();
 
 if (!$ticket_status || ticketStatusIsBuiltIn($ticket_status['ticket_status_id'])) { ?>
-    <div class="modal-body text-center text-secondary py-5"><?= $ticket_status ? 'ITFlow\'s own statuses can\'t be switched off or deleted.' : 'That status is gone - it may have been deleted.' ?></div>
+    <div class="modal-body text-center text-secondary py-5"><?= $ticket_status ? __('ITFlow\'s own statuses can\'t be switched off or deleted.') : __('That status is gone - it may have been deleted.') ?></div>
 <?php } else {
     $ticket_status_id = intval($ticket_status['ticket_status_id']);
     $name = escapeHtml($ticket_status['ticket_status_name']);
@@ -30,7 +30,7 @@ if (!$ticket_status || ticketStatusIsBuiltIn($ticket_status['ticket_status_id'])
     }; ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-<?= $delete ? 'trash' : 'power-off' ?> me-2"></i><?= $delete ? 'Delete' : 'Switch off' ?> <strong><?= $name ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-<?= $delete ? 'trash' : 'power-off' ?> me-2"></i><?= $delete ? 'Delete' : __('Switch off') ?> <strong><?= $name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -41,50 +41,50 @@ if (!$ticket_status || ticketStatusIsBuiltIn($ticket_status['ticket_status_id'])
         <p class="mb-3">
             <?= ticketStatusBadgeHtml($ticket_status['ticket_status_name'], $ticket_status['ticket_status_color'], 'detail') ?>
             <?php if ($delete) { ?>
-                goes for good. Tickets' history keeps its name.
+                <?= __('goes for good. Tickets\' history keeps its name.') ?>
             <?php } else { ?>
-                stays here, switched off - it can't be picked, and comes off the board. You can switch it on again.
+                <?= __('stays here, switched off - it can\'t be picked, and comes off the board. You can switch it on again.') ?>
             <?php } ?>
         </p>
 
         <?php if ($tickets) { ?>
             <div class="alert alert-<?= $delete ? 'warning' : 'secondary' ?> small py-2">
                 <i class="fas fa-fw fa-life-ring me-1"></i><strong><?= $plural($tickets, 'ticket is', 'tickets are') ?></strong> in it<?= $counts['open'] !== $tickets ? ' - ' . $plural($counts['open'], 'open one', 'open ones') : '' ?>.
-                <a href="/agent/tickets.php?status[]=<?= $ticket_status_id ?>" target="_blank">See them</a>
+                <a href="/agent/tickets.php?status[]=<?= $ticket_status_id ?>" target="_blank"><?= __('See them') ?></a>
             </div>
             <div class="mb-3">
-                <label class="form-label">Move <?= $tickets === 1 ? 'it' : 'them' ?> to <?php if ($delete) { ?><strong class="text-danger">*</strong><?php } ?></label>
+                <label class="form-label"><?= $tickets === 1 ? __('Move it to') : __('Move them to') ?> <?php if ($delete) { ?><strong class="text-danger">*</strong><?php } ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-exchange-alt"></i></span>
                     <select class="form-select" name="move_to"<?= $delete ? ' required' : '' ?>>
                         <?php if (!$delete) { ?>
-                            <option value="0">Leave them in <?= $name ?></option>
+                            <option value="0"><?= __('Leave them in %s', $name) ?></option>
                         <?php } ?>
                         <?php foreach ($targets as $target_id => $target) { ?>
                             <option value="<?= $target_id ?>"<?= $target_id === TICKET_STATUS_OPEN && $delete ? ' selected' : '' ?> title="<?= escapeHtml(ticketStatusAbout($target)) ?>"><?= escapeHtml($target['ticket_status_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <small class="text-secondary">Each says so in its history, and its SLA clock follows the status it goes to.</small>
+                <small class="text-secondary"><?= __('Each says so in its history, and its SLA clock follows the status it goes to.') ?></small>
             </div>
         <?php } else { ?>
-            <p class="small text-secondary"><i class="fas fa-fw fa-check me-1"></i>No tickets are in it.</p>
+            <p class="small text-secondary"><i class="fas fa-fw fa-check me-1"></i><?= __('No tickets are in it.') ?></p>
         <?php } ?>
 
         <?php if ($canned) { ?>
             <p class="small text-secondary mb-0">
-                <i class="fas fa-fw fa-comment-dots me-1"></i><?= $plural($canned, 'canned response sets', 'canned responses set') ?> this status.
-                <?= $delete ? 'They will leave the status as it is instead.' : 'Until it is switched on again, they leave the status as it is.' ?>
+                <i class="fas fa-fw fa-comment-dots me-1"></i><?= $plural($canned, __('canned response sets'), __('canned responses set')) ?> this status.
+                <?= $delete ? __('They will leave the status as it is instead.') : __('Until it is switched on again, they leave the status as it is.') ?>
             </p>
         <?php } ?>
     </div>
     <div class="modal-footer">
         <?php if ($delete) { ?>
-            <button type="submit" name="delete_ticket_status" class="btn btn-danger text-bold"><i class="fas fa-trash me-2"></i>Delete</button>
+            <button type="submit" name="delete_ticket_status" class="btn btn-danger text-bold"><i class="fas fa-trash me-2"></i><?= __('Delete') ?></button>
         <?php } else { ?>
-            <button type="submit" name="switch_off_ticket_status" class="btn btn-primary text-bold"><i class="fas fa-power-off me-2"></i>Switch off</button>
+            <button type="submit" name="switch_off_ticket_status" class="btn btn-primary text-bold"><i class="fas fa-power-off me-2"></i><?= __('Switch off') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

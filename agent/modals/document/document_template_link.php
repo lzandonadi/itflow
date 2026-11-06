@@ -50,9 +50,9 @@ ob_start();
                 <option value="0"><?= __('- Not from a template -') ?></option>
                 <?php foreach ($templates as $template_id => $template) {
                     $about = array_filter([
-                        $template['document_template_required'] ? 'required' : '',
-                        $template['document_template_review_months'] ? 'reviewed ' . lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($template['document_template_review_months'])] ?? '') : '',
-                        $template['document_template_archived_at'] ? 'archived' : '',
+                        $template['document_template_required'] ? __('required') : '',
+                        $template['document_template_review_months'] ? __('reviewed %s', documentTemplateReviewLabel($template['document_template_review_months'], true)) : '',
+                        $template['document_template_archived_at'] ? __('archived') : '',
                     ]);
                     ?>
                     <option value="<?= $template_id ?>" <?= $template_id === $current_id ? 'selected' : '' ?> data-description="<?= escapeHtml(trim($template['document_template_description'] . ($about ? ' · ' . implode(', ', $about) : ''), ' ·')) ?>"><?= escapeHtml($template['document_template_name']) ?></option>

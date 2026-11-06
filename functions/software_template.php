@@ -93,16 +93,16 @@ function softwareTemplateFields(array $post, &$error = '') {
     };
     $name = $line('name');
     if ($name === '') {
-        $error = 'A license template needs a name';
+        $error = __('A license template needs a name');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'Keep the name to 200 characters';
+        $error = __('Keep the name to 200 characters');
         return null;
     }
     $type = $line('type');
     if ($type === '') {
-        $error = 'Pick what type of software it is';
+        $error = __('Pick what type of software it is');
         return null;
     }
     $fields = [
@@ -146,7 +146,7 @@ function softwareTemplateCopy($software_template_id) {
         return 0;
     }
     return softwareTemplateSave(0, [
-        'name' => mb_substr('Copy of ' . $row['software_template_name'], 0, 200),
+        'name' => mb_substr(__('Copy of %s', $row['software_template_name']), 0, 200),
         'version' => (string) $row['software_template_version'],
         'description' => (string) $row['software_template_description'],
         'type' => (string) $row['software_template_type'],
@@ -374,12 +374,12 @@ function softwareTemplateScopeSql($required, array $tag_ids) {
 /** Who a template is required of, in words - '' when it isn't. */
 function softwareTemplateScopeText($required, array $tags) {
     if (intval($required) === SOFTWARE_TEMPLATE_REQUIRED_EVERY) {
-        return 'Every client';
+        return __('Every client');
     }
     if (intval($required) !== SOFTWARE_TEMPLATE_REQUIRED_TAGGED) {
         return '';
     }
-    return $tags ? 'Clients tagged ' . implode(' or ', $tags) : 'Clients with a tag - none picked';
+    return $tags ? __('Clients tagged %s', implode(__(' or '), $tags)) : __('Clients with a tag - none picked');
 }
 
 /*
