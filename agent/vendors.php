@@ -352,7 +352,7 @@ $missing_templates = $view === 'client' && !$archived ? vendorTemplatesMissingFo
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body stretched-link" href="<?= $vendor_url ?>"><?= $vendor_name ?></a>
                                     <?php if ($vendor_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
-                                    <?php if ($row['vendor_template_name']) { ?><i class="fas fa-puzzle-piece text-body-secondary small ms-1" title="From template <?= escapeHtml($row['vendor_template_name']) ?>"></i><?php } ?>
+                                    <?php if ($row['vendor_template_name']) { ?><i class="fas fa-puzzle-piece text-body-secondary small ms-1" title="<?= __('From template %s', escapeHtml($row['vendor_template_name'])) ?>"></i><?php } ?>
                                     <?php if ($vendor_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($vendor_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $vendor_description ?>"><?= $vendor_description ?></div>
@@ -372,7 +372,7 @@ $missing_templates = $view === 'client' && !$archived ? vendorTemplatesMissingFo
                                 <div class="small d-flex align-items-center gap-2 mt-1">
                                     <?php if ($vendor_email) { ?><span class="text-truncate itflow-vendor-email"><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></span><?php } ?>
                                     <?php if ($vendor_website_url) { ?><a class="text-body-secondary" href="<?= escapeHtml($vendor_website_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(vendorWebsiteLabel($row['vendor_website'])) ?>"><i class="fas fa-globe"></i></a><?php } ?>
-                                    <?php if ($vendor_status_url) { ?><a class="text-body-secondary" href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener" title="Status page - <?= escapeHtml(vendorWebsiteLabel($row['vendor_status_page'])) ?>"><i class="fas fa-heartbeat"></i></a><?php } ?>
+                                    <?php if ($vendor_status_url) { ?><a class="text-body-secondary" href="<?= escapeHtml($vendor_status_url) ?>" target="_blank" rel="noopener" title="<?= __('Status page - %s', escapeHtml(vendorWebsiteLabel($row['vendor_status_page']))) ?>"><i class="fas fa-heartbeat"></i></a><?php } ?>
                                 </div>
                             <?php } ?>
                             <?php if (!$vendor_phone && !$vendor_support_when && !$vendor_email && !$vendor_website_url && !$vendor_status_url) { ?><span class="text-body-secondary">-</span><?php } ?>

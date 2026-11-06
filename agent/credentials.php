@@ -371,7 +371,7 @@ $filter_url = function ($changes) use ($client_url) {
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="<?= $quick_url ?>"><?= $credential_name ?></a>
                                     <?php if ($credential_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
-                                    <?php if ($credential_shares) { ?><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal ms-1" title="Shared with <?= escapeHtml(implode(', ', array_filter(array_column($credential_shares, 'item_recipient'))) ?: 'a link') ?>"><i class="fas fa-share-alt me-1"></i><?= __('Shared') ?></span><?php } ?>
+                                    <?php if ($credential_shares) { ?><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal ms-1" title="<?= __('Shared with %s', escapeHtml(implode(', ', array_filter(array_column($credential_shares, 'item_recipient'))) ?: __('a link'))) ?>"><i class="fas fa-share-alt me-1"></i><?= __('Shared') ?></span><?php } ?>
                                     <?php if ($credential_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($credential_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $credential_description ?>"><?= $credential_description ?></div>

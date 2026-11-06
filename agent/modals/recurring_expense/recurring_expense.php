@@ -184,7 +184,7 @@ ob_start();
         <?php } ?>
         <?php if ($behind) { ?>
             <a class="btn btn-outline-secondary confirm-link" href="<?= $post_url('recurring_expense_catch_up') ?>"
-                data-confirm-title="<?= escapeHtml(__('Skip the missed runs?')) ?>" data-confirm-text="The next date moves on to <?= escapeHtml(formatDate(recurringExpenseCatchUp($row), 'date')) ?>. Nothing is recorded for the runs it missed." data-confirm-button="<?= escapeHtml(__('Move on')) ?>">
+                data-confirm-title="<?= escapeHtml(__('Skip the missed runs?')) ?>" data-confirm-text="<?= __('The next date moves on to %s. Nothing is recorded for the runs it missed.', escapeHtml(formatDate(recurringExpenseCatchUp($row), 'date'))) ?>" data-confirm-button="<?= escapeHtml(__('Move on')) ?>">
                 <i class="fas fa-forward me-2"></i><?= __('Move On') ?></a>
         <?php } ?>
         <div class="btn-group">

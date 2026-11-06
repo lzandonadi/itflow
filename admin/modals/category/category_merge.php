@@ -88,7 +88,7 @@ ob_start();
                 <label class="form-label"><?= __('Into') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-list-ul"></i></span>
-                    <select class="form-select select2" name="into_category_id" data-placeholder="- Keep which <?= escapeHtml($config['one']) ?> -" required>
+                    <select class="form-select select2" name="into_category_id" data-placeholder="<?= __('- Keep which %s -', escapeHtml($config['one'])) ?>" required>
                         <option value=""></option>
                         <?php foreach ($into as $into_id => $row) { ?>
                             <option value="<?= intval($into_id) ?>"<?= intval($into_id) === $keep_id ? ' selected' : '' ?><?= selectOptionColor(categoryColor($row['category_color']), categoryIcon($row['category_icon'])) ?>><?= escapeHtml($row['category_name']) ?><?= isset($merging[$into_id]) ? ' (one of these)' : '' ?><?= $row['category_archived_at'] ? ' (archived)' : '' ?></option>

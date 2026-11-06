@@ -85,7 +85,7 @@ $c_max = $c_config['max'] ?? 200;
             <div class="d-flex flex-wrap gap-1" role="group" aria-label="<?= escapeHtml(__('Colors')) ?>">
                 <button type="button" class="itflow-tag-swatch itflow-category-swatch-none<?= $c_color === '' ? ' active' : '' ?>" data-category-swatch="" title="<?= escapeHtml(__('No color')) ?>" aria-label="<?= escapeHtml(__('No color')) ?>" aria-pressed="<?= $c_color === '' ? 'true' : 'false' ?>"><i class="fas fa-ban" aria-hidden="true"></i></button>
                 <?php foreach (CATEGORY_COLORS as $swatch) { ?>
-                    <button type="button" class="itflow-tag-swatch<?= $swatch === $c_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-category-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="Color <?= $swatch ?>" aria-pressed="<?= $swatch === $c_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
+                    <button type="button" class="itflow-tag-swatch<?= $swatch === $c_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-category-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="<?= __('Color %s', $swatch) ?>" aria-pressed="<?= $swatch === $c_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
                 <?php } ?>
             </div>
             <div class="input-group input-group-sm w-auto" title="<?= escapeHtml(__('Any other color')) ?>">

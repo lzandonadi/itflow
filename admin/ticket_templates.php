@@ -128,10 +128,10 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('ticket_template_name', 'Template') ?></th>
+                <th class="ps-3"><?= $sort_link('ticket_template_name', __('Template')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('Sets up') ?></th>
                 <th class="d-none d-sm-table-cell text-center"><?= $sort_link('task_count', __('Tasks')) ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', __('Used')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th></th>
             </tr>

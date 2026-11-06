@@ -201,10 +201,10 @@ $edit_url = "modals/ticket_template/ticket_template_edit.php?id=$ticket_template
                                             <div class="dropdown-divider"></div>
                                             <?php if ($fill_in['in_text']) { ?>
                                                 <a class="dropdown-item confirm-link" href="post.php?delete_ticket_template_fill_in=<?= $fill_in['id'] ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Reset <?= escapeHtml($fill_in['name']) ?>?" data-confirm-text="<?= escapeHtml(__('It is still in the text, so it stays asked for - as plain, optional text.')) ?>" data-confirm-button="<?= escapeHtml(__('Reset')) ?>"><i class="fas fa-fw fa-undo me-2"></i><?= __('Reset') ?></a>
+                                                    data-confirm-title="<?= __('Reset %s?', escapeHtml($fill_in['name'])) ?>" data-confirm-text="<?= escapeHtml(__('It is still in the text, so it stays asked for - as plain, optional text.')) ?>" data-confirm-button="<?= escapeHtml(__('Reset')) ?>"><i class="fas fa-fw fa-undo me-2"></i><?= __('Reset') ?></a>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_ticket_template_fill_in=<?= $fill_in['id'] ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Remove <?= escapeHtml($fill_in['name']) ?>?" data-confirm-text="<?= escapeHtml(__('It is no longer asked for. Tickets already raised keep their answers.')) ?>" data-confirm-button="<?= escapeHtml(__('Remove')) ?>"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Remove') ?></a>
+                                                    data-confirm-title="<?= __('Remove %s?', escapeHtml($fill_in['name'])) ?>" data-confirm-text="<?= escapeHtml(__('It is no longer asked for. Tickets already raised keep their answers.')) ?>" data-confirm-button="<?= escapeHtml(__('Remove')) ?>"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Remove') ?></a>
                                             <?php } ?>
                                         <?php } ?>
                                     </div>

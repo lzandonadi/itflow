@@ -154,7 +154,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="network_id" value="<?= $network_id ?>">
                                     <button type="submit" name="document_network_interfaces" class="dropdown-item confirm-link"
-                                        data-confirm-title="Document <?= $undocumented ?> device address<?= $undocumented === 1 ? '' : 'es' ?>?" data-confirm-button="<?= escapeHtml(__('Document them')) ?>"
+                                        data-confirm-title="<?= _n('Document %d device address?', 'Document %d device addresses?', $undocumented) ?>" data-confirm-button="<?= escapeHtml(__('Document them')) ?>"
                                         data-confirm-text="<?= escapeHtml(__('Each address a device has here, and is not documented yet, is added as a fixed address named for the device, with its MAC.')) ?>">
                                         <i class="fas fa-fw fa-clipboard-list text-secondary me-2"></i><?= __('Document device addresses (%d)', $undocumented) ?>
                                     </button>
@@ -387,7 +387,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                                     <td class="small text-body-secondary"><i class="fas fa-fw fa-circle-notch me-1"></i><?= number_format($row['count']) ?> free</td>
                                                     <td class="text-end">
                                                         <?php if ($can_edit) { ?>
-                                                            <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['start']])) ?>" title="Document <?= escapeHtml($row['start']) ?>"><?= __('Use') ?></button>
+                                                            <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['start']])) ?>" title="<?= __('Document %s', escapeHtml($row['start'])) ?>"><?= __('Use') ?></button>
                                                         <?php } ?>
                                                     </td>
                                                 </tr>

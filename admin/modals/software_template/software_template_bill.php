@@ -93,7 +93,7 @@ if (!$template) { ?>
                         $default = $default ?: (int) array_key_first($options);
                         ?>
                         <tr data-bill-id="<?= $software_id ?>">
-                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="Bill <?= escapeHtml($row['client_name']) ?>" <?= $options ? 'checked' : 'disabled' ?>></td>
+                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="<?= __('Bill %s', escapeHtml($row['client_name'])) ?>" <?= $options ? 'checked' : 'disabled' ?>></td>
                             <td class="min-w-0">
                                 <div class="fw-semibold text-truncate"><?= escapeHtml($row['client_name']) ?></div>
                                 <?php if ($row['software_name'] !== $template['software_template_name']) { ?><div class="small text-secondary text-truncate"><?= escapeHtml($row['software_name']) ?></div><?php } ?>

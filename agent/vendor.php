@@ -339,7 +339,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item confirm-link" href="post.php?unlink_vendor_template=<?= $vendor_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                    data-confirm-title="Unlink from <?= escapeHtml($template_row['vendor_template_name']) ?>?" data-confirm-text="<?= $vendor_name ?> stays as it is, and is no longer kept in step with the template." data-confirm-button="<?= escapeHtml(__('Unlink')) ?>">
+                                    data-confirm-title="<?= __('Unlink from %s?', escapeHtml($template_row['vendor_template_name'])) ?>" data-confirm-text="<?= __('%s stays as it is, and is no longer kept in step with the template.', $vendor_name) ?>" data-confirm-button="<?= escapeHtml(__('Unlink')) ?>">
                                     <i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink from template') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -723,7 +723,7 @@ if (!$vendor || (isset($_GET['client_id']) && $vendor_client_id !== intval($clie
                                         <li class="itflow-link-row">
                                             <?= linkRowHtml($to, $linked_row, $client_id) ?>
                                             <?php if ($can_link) { ?>
-                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="Unlink <?= $to ?>"><i class="fas fa-unlink"></i></a>
+                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="<?= __('Unlink') ?>"><i class="fas fa-unlink"></i></a>
                                             <?php } ?>
                                         </li>
                                     <?php } ?>

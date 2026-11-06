@@ -1510,7 +1510,7 @@ if (isset($_GET['ticket_id'])) {
                                     <tr data-task-id="<?= $task_id ?>">
                                         <td class="ps-3 pe-0 ticket-task-check">
                                             <?php if ($task_completed_at) { ?>
-                                                <i class="far fa-fw fa-check-square text-success" title="Completed <?= $task_completed_at ?>"></i>
+                                                <i class="far fa-fw fa-check-square text-success" title="<?= __('Completed %s', $task_completed_at) ?>"></i>
                                             <?php } elseif ($can_edit_ticket && !$task_needs_approval) { ?>
                                                 <a href="post.php?complete_task=<?= $task_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= escapeHtml(__('Mark complete')) ?>">
                                                     <i class="far fa-fw fa-square text-body"></i>
@@ -1732,7 +1732,7 @@ if (isset($_GET['ticket_id'])) {
                                     <div class="mt-1 d-flex align-items-center">
                                         <span class="text-truncate flex-grow-1" title="<?= $ticket_watcher_email ?>"><i class="fa fa-fw fa-envelope text-secondary me-2"></i><?= $ticket_watcher_email ?></span>
                                         <?php if ($can_link) { ?>
-                                            <a class="confirm-link ms-2" href="post.php?delete_ticket_watcher=<?= $watcher_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="Stop copying <?= $ticket_watcher_email ?>">
+                                            <a class="confirm-link ms-2" href="post.php?delete_ticket_watcher=<?= $watcher_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= __('Stop copying %s', $ticket_watcher_email) ?>">
                                                 <i class="fas fa-fw fa-times text-secondary"></i>
                                             </a>
                                         <?php } ?>

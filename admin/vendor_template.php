@@ -267,7 +267,7 @@ foreach (vendorTemplateFieldLabels() as $field) {
                             $differs_text = count($differences) > 2 ? count($differences) . ' fields' : ucfirst(vendorTemplateLabelsText($differences));
                             ?>
                             <tr data-vendor-id="<?= $vendor_id ?>">
-                                <td class="ps-3 pe-0"><input class="form-check-input bulk-select" type="checkbox" name="vendor_ids[]" value="<?= $vendor_id ?>" aria-label="Tick <?= escapeHtml($client_id ? $vendor['client_name'] : 'ours') ?>"></td>
+                                <td class="ps-3 pe-0"><input class="form-check-input bulk-select" type="checkbox" name="vendor_ids[]" value="<?= $vendor_id ?>" aria-label="<?= __('Tick %s', escapeHtml($client_id ? $vendor['client_name'] : __('ours'))) ?>"></td>
                                 <td>
                                     <?php if ($client_id) { ?>
                                         <a class="fw-semibold text-body" href="/agent/vendors.php?client_id=<?= $client_id ?>"><?= escapeHtml($vendor['client_name']) ?></a>
@@ -280,7 +280,7 @@ foreach (vendorTemplateFieldLabels() as $field) {
                                 <td class="small">
                                     <?php if ($differences) { ?>
                                         <a href="#" class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal text-decoration-none ajax-modal" data-modal-size="lg"
-                                            data-modal-url="<?= $update_url ?>?vendor_id=<?= $vendor_id ?>" title="Differs in <?= escapeHtml(vendorTemplateLabelsText($differences)) ?> - bring it in line" data-out-of-step="<?= escapeHtml(implode(',', array_keys($differences))) ?>"><i class="fas fa-not-equal me-1"></i><?= escapeHtml($differs_text) ?></a>
+                                            data-modal-url="<?= $update_url ?>?vendor_id=<?= $vendor_id ?>" title="<?= __('Differs in %s - bring it in line', escapeHtml(vendorTemplateLabelsText($differences))) ?>" data-out-of-step="<?= escapeHtml(implode(',', array_keys($differences))) ?>"><i class="fas fa-not-equal me-1"></i><?= escapeHtml($differs_text) ?></a>
                                     <?php } else { ?>
                                         <span class="text-success text-nowrap" data-in-step><i class="fas fa-check me-1"></i><?= __('In step') ?></span>
                                     <?php } ?>
@@ -306,7 +306,7 @@ foreach (vendorTemplateFieldLabels() as $field) {
                                             <?php } ?>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item confirm-link" href="/agent/post.php?unlink_vendor_template=<?= $vendor_id ?>&amp;csrf_token=<?= $csrf ?>"
-                                                data-confirm-title="Unlink <?= escapeHtml($client_id ? $vendor['client_name'] . "'s" : 'our') ?> <?= escapeHtml($vendor['vendor_name']) ?>?" data-confirm-text="<?= escapeHtml(__('It stays as it is, and is no longer kept in step with the template.')) ?>" data-confirm-button="<?= escapeHtml(__('Unlink')) ?>"><i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink') ?></a>
+                                                data-confirm-title="<?= $client_id ? __('Unlink %1$s\'s %2$s?', escapeHtml($vendor['client_name']), escapeHtml($vendor['vendor_name'])) : __('Unlink our %s?', escapeHtml($vendor['vendor_name'])) ?>" data-confirm-text="<?= escapeHtml(__('It stays as it is, and is no longer kept in step with the template.')) ?>" data-confirm-button="<?= escapeHtml(__('Unlink')) ?>"><i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Unlink') ?></a>
                                         </div>
                                     </div>
                                 </td>

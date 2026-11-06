@@ -101,8 +101,8 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
                     <tr>
-                        <th class="ps-3"><?= $sort_link('tax_name', 'Tax') ?></th>
-                        <th><?= $sort_link('tax_percent', 'Rate') ?></th>
+                        <th class="ps-3"><?= $sort_link('tax_name', __('Tax')) ?></th>
+                        <th><?= $sort_link('tax_percent', __('Rate')) ?></th>
                         <th class="d-none d-sm-table-cell"><?= $sort_link('invoice_count', __('Used on')) ?></th>
                         <th></th>
                     </tr>

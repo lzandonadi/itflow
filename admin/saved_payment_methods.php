@@ -142,11 +142,11 @@ $page_title = __('Saved Cards');
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('client_name', 'Client') ?></th>
-                <th><?= $sort_link('saved_payment_description', 'Card') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('expires', 'Expires') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('autopay', 'Autopay') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('saved_payment_created_at', 'Saved') ?></th>
+                <th class="ps-3"><?= $sort_link('client_name', __('Client')) ?></th>
+                <th><?= $sort_link('saved_payment_description', __('Card')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('expires', __('Expires')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('autopay', __('Autopay')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('saved_payment_created_at', __('Saved')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -173,7 +173,7 @@ $page_title = __('Saved Cards');
                             <span class="text-body-secondary"><?= __('Client #%d', $client_id) ?></span>
                         <?php } ?>
                         <?php if (trim((string) $row['payment_provider_client']) !== '') { ?>
-                            <div class="small text-body-secondary font-monospace" title="Its customer at <?= escapeHtml($row['payment_provider_name']) ?>"><?= escapeHtml($row['payment_provider_client']) ?></div>
+                            <div class="small text-body-secondary font-monospace" title="<?= __('Its customer at %s', escapeHtml($row['payment_provider_name'])) ?>"><?= escapeHtml($row['payment_provider_client']) ?></div>
                         <?php } ?>
                     </td>
                     <td>

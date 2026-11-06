@@ -128,8 +128,8 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('payment_method_name', 'Method') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('payment_method_use', 'For') ?></th>
+                <th class="ps-3"><?= $sort_link('payment_method_name', __('Method')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('payment_method_use', __('For')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= $sort_link('used', __('Used on')) ?></th>
                 <th class="d-none d-sm-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th></th>
@@ -198,7 +198,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php if (!$archived) {
                                     foreach (['in' => __('Make the default for payments'), 'out' => __('Make the default for expenses')] as $way => $label) {
                                         if (!in_array($way, $is_default, true) && !($way === 'in' && $use === 2) && !($way === 'out' && $use === 1)) { ?>
-                                            <a class="dropdown-item" href="post.php?default_payment_method=<?= $payment_method_id ?>&way=<?= $way ?>&csrf_token=<?= $csrf ?>" title="Picked to start with on a new <?= $way === 'in' ? 'payment' : 'expense' ?>">
+                                            <a class="dropdown-item" href="post.php?default_payment_method=<?= $payment_method_id ?>&way=<?= $way ?>&csrf_token=<?= $csrf ?>" title="<?= ($way === 'in' ? __('Picked to start with on a new payment') : __('Picked to start with on a new expense')) ?>">
                                                 <i class="fas fa-fw fa-star text-secondary me-2"></i><?= $label ?>
                                             </a>
                                         <?php }

@@ -101,10 +101,10 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('contract_template_name', 'Template') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('contract_template_term_months', 'Term') ?></th>
+                <th class="ps-3"><?= $sort_link('contract_template_name', __('Template')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('contract_template_term_months', __('Term')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('Cover') ?></th>
-                <th class="text-end"><?= $sort_link('contracts', 'Contracts') ?></th>
+                <th class="text-end"><?= $sort_link('contracts', __('Contracts')) ?></th>
                 <th></th>
             </tr>
             </thead>

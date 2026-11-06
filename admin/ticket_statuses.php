@@ -100,7 +100,7 @@ $csrf = $_SESSION['csrf_token'];
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
                 <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden"><?= __('Order') ?></span></th><?php } ?>
-                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('ticket_status_name', 'Status') ?></th>
+                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('ticket_status_name', __('Status')) ?></th>
                 <th class="text-end"><?= $sort_link('tickets', __('Tickets')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('ticket_status_pauses_sla', __('SLA clock')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('When the client replies') ?></th>
@@ -113,7 +113,7 @@ $csrf = $_SESSION['csrf_token'];
             while ($row = mysqli_fetch_assoc($sql)) {
                 $position++;
                 $ticket_status_id = intval($row['ticket_status_id']);
-                $name = escapeHtml($row['ticket_status_name']);
+                $name = escapeHtml(ticketStatusLabel($row['ticket_status_id'], $row['ticket_status_name']));
                 $builtin = $builtins[$ticket_status_id] ?? null;
                 $about = ticketStatusAbout($row);
                 $active = intval($row['ticket_status_active']) === 1;
@@ -157,7 +157,7 @@ $csrf = $_SESSION['csrf_token'];
                     </td>
                     <td class="text-end text-nowrap">
                         <?php if ($tickets) { ?>
-                            <a href="<?= escapeHtml($tickets_url) ?>" title="See the tickets in <?= $name ?>"><?= number_format($tickets) ?></a>
+                            <a href="<?= escapeHtml($tickets_url) ?>" title="<?= __('See the tickets in %s', $name) ?>"><?= number_format($tickets) ?></a>
                         <?php } else { ?>
                             <span class="text-body-tertiary">0</span>
                         <?php } ?>

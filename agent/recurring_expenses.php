@@ -244,7 +244,7 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                             <?php if ($row['recurring_invoice_number'] !== null) { ?>
                                 <div class="small text-success-emphasis text-truncate" style="max-width: 10rem;" title="<?= escapeHtml(__('Covered by their recurring invoice')) ?>"><i class="fas fa-shield-alt me-1"></i><?= escapeHtml(__('Covered by %s', $row['recurring_invoice_prefix'] . $row['recurring_invoice_number'])) ?></div>
                             <?php } elseif (intval($row['recurring_expense_billable'])) { ?>
-                                <div class="small text-warning-emphasis" title="Each one it records is billed on to them at <?= escapeHtml(rtrim(rtrim(number_format(floatval($row['recurring_expense_markup']), 2, '.', ''), '0'), '.')) ?>% markup"><i class="fas fa-file-invoice-dollar me-1"></i><?= __('Billed on') ?></div>
+                                <div class="small text-warning-emphasis" title="<?= __('Each one it records is billed on to them at %s%% markup', escapeHtml(rtrim(rtrim(number_format(floatval($row['recurring_expense_markup']), 2, '.', ''), '0'), '.'))) ?>"><i class="fas fa-file-invoice-dollar me-1"></i><?= __('Billed on') ?></div>
                             <?php } ?>
                         <?php } else { ?>
                             <span class="text-body-secondary">-</span>
@@ -284,7 +284,7 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                                     <?php } ?>
                                     <?php if ($row_state === 'active' && $row_next < date('Y-m-d')) { ?>
                                         <a class="dropdown-item confirm-link" href="<?= $row_post('recurring_expense_catch_up') ?>"
-                                            data-confirm-title="<?= escapeHtml(__('Skip the missed runs?')) ?>" data-confirm-text="The next date moves on to <?= escapeHtml(recurringExpenseCatchUp($row)) ?>. Nothing is recorded for the runs it missed." data-confirm-button="<?= escapeHtml(__('Move on')) ?>">
+                                            data-confirm-title="<?= escapeHtml(__('Skip the missed runs?')) ?>" data-confirm-text="<?= __('The next date moves on to %s. Nothing is recorded for the runs it missed.', escapeHtml(recurringExpenseCatchUp($row))) ?>" data-confirm-button="<?= escapeHtml(__('Move on')) ?>">
                                             <i class="fas fa-fw fa-forward text-secondary me-2"></i><?= __('Move On to %s', escapeHtml(recurringExpenseCatchUp($row))) ?>
                                         </a>
                                     <?php } ?>

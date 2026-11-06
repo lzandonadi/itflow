@@ -413,7 +413,7 @@ $total_leads = intval($row['leads']);
             <div class="row g-2 align-items-center">
                 <div class="col-sm-6 col-lg-5">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q)) ?>" placeholder="Search <?= $leads_filter ? 'leads' : 'clients' ?>, contacts, addresses, tags" autofocus>
+                        <input type="search" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q)) ?>" placeholder="<?= ($leads_filter ? __('Search leads, contacts, addresses, tags') : __('Search clients, contacts, addresses, tags')) ?>" autofocus>
                         <button class="btn <?= $hidden_filter_count ? 'btn-warning' : 'btn-secondary' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" title="<?= escapeHtml(__('Filters')) ?>">
                             <i class="fas fa-filter"></i><?php if ($hidden_filter_count) { ?><span class="ms-1"><?= $hidden_filter_count ?></span><?php } ?>
                         </button>

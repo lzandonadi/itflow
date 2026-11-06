@@ -604,7 +604,7 @@ if (!$location || ($client_url && intval($location['location_client_id']) !== in
                                         <li class="itflow-link-row">
                                             <?= linkRowHtml($to, $linked_row, $client_id) ?>
                                             <?php if ($can_support_edit) { ?>
-                                                <a class="itflow-link-remove" href="post.php?unlink_item&from=location&id=<?= $location_id ?>&to=<?= $to ?>&other=<?= intval($linked_row['id']) ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="Unlink <?= $to ?>"><i class="fas fa-unlink"></i></a>
+                                                <a class="itflow-link-remove" href="post.php?unlink_item&from=location&id=<?= $location_id ?>&to=<?= $to ?>&other=<?= intval($linked_row['id']) ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= __('Unlink') ?>"><i class="fas fa-unlink"></i></a>
                                             <?php } ?>
                                         </li>
                                     <?php } ?>

@@ -46,7 +46,7 @@ ob_start();
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-lock"></i></span>
                 <input type="password" class="form-control font-monospace" data-toggle="password" name="new_password" id="userRestorePassword<?= $user_id ?>"
-                    placeholder="At least <?= USER_PASSWORD_MIN ?> characters" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required>
+                    placeholder="<?= __('At least %s characters', USER_PASSWORD_MIN) ?>" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required>
                 <span class="input-group-text"><i class="fa fa-fw fa-eye"></i></span>
                 <button class="btn btn-outline-secondary clipboardjs" type="button" title="<?= escapeHtml(__('Copy password')) ?>" data-clipboard-target="#userRestorePassword<?= $user_id ?>"><i class="far fa-fw fa-copy"></i></button>
                 <button class="btn btn-outline-secondary" type="button" title="<?= escapeHtml(__('Make one up - words that are easy to read out')) ?>" data-user-restore-generate><i class="fas fa-fw fa-magic"></i></button>

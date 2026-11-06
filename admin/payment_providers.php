@@ -92,7 +92,7 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('payment_provider_name', 'Provider') ?></th>
+                <th class="ps-3"><?= $sort_link('payment_provider_name', __('Provider')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('account_name', __('Payments go into')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= $sort_link('payment_provider_threshold', __('Card limit')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('Fees') ?></th>
@@ -183,7 +183,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
                                     <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?check_payment_provider_connection=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="Whether <?= escapeHtml($name) ?> still takes its secret key, and whose account it is">
+                                <a class="dropdown-item" href="post.php?check_payment_provider_connection=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="<?= __('Whether %s still takes its secret key, and whose account it is', escapeHtml($name)) ?>">
                                     <i class="fas fa-fw fa-plug text-secondary me-2"></i><?= __('Check connection') ?>
                                 </a>
                                 <?php if ($fees_on && $activity['waiting']) { ?>
@@ -193,7 +193,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php } ?>
                                 <?php if ($on) { ?>
                                     <a class="dropdown-item confirm-link" href="post.php?turn_payment_provider_off=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                        data-confirm-title="Turn <?= escapeHtml($name) ?> off?" data-confirm-text="<?= escapeHtml(__('Clients won\'t be able to pay by card, and autopay with its saved cards is skipped until it is on again. Its cards are kept.')) ?>" data-confirm-button="<?= escapeHtml(__('Turn off')) ?>">
+                                        data-confirm-title="<?= __('Turn %s off?', escapeHtml($name)) ?>" data-confirm-text="<?= escapeHtml(__('Clients won\'t be able to pay by card, and autopay with its saved cards is skipped until it is on again. Its cards are kept.')) ?>" data-confirm-button="<?= escapeHtml(__('Turn off')) ?>">
                                         <i class="fas fa-fw fa-toggle-off text-secondary me-2"></i><?= __('Turn off') ?>
                                     </a>
                                 <?php } else { ?>
@@ -203,7 +203,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php } ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_payment_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
+                                    data-confirm-title="<?= __('Delete %s?', escapeHtml($name)) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
                                     data-confirm-text="<?= escapeHtml($ties !== '' ? __('Its %s go with it. To stop card payments and keep them, turn it off instead.', $ties) : __('Clients will no longer be able to pay by card.')) ?>">
                                     <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>

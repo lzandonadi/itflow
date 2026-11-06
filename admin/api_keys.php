@@ -154,14 +154,14 @@ $csrf = $_SESSION['csrf_token'];
                     <tr data-api-key-id="<?= $api_key_id ?>" class="<?= $expired ? 'text-body-secondary' : '' ?>">
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="api_key_ids[]" value="<?= $api_key_id ?>" aria-label="Select <?= $name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="api_key_ids[]" value="<?= $api_key_id ?>" aria-label="<?= __('Select %s', $name) ?>">
                             </div>
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-3">
                                 <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true"><i class="fas fa-fw fa-key"></i></span>
                                 <div class="min-w-0">
-                                    <a class="ajax-modal fw-semibold <?= $expired ? 'text-body-secondary' : 'text-body' ?>" href="#" data-modal-url="modals/api/api_key_edit.php?id=<?= $api_key_id ?>" title="Edit <?= $name ?>"><?= $name ?></a>
+                                    <a class="ajax-modal fw-semibold <?= $expired ? 'text-body-secondary' : 'text-body' ?>" href="#" data-modal-url="modals/api/api_key_edit.php?id=<?= $api_key_id ?>" title="<?= __('Edit %s', $name) ?>"><?= $name ?></a>
                                     <div class="small text-body-secondary"><span class="font-monospace">••••<?= escapeHtml(substr((string) $row['api_key_secret'], -4)) ?></span> · made <?= date('M j, Y', strtotime($row['api_key_created_at'])) ?></div>
                                     <div class="mt-1"><?= apiKeyStatePill($row, $role) ?></div>
                                     <!-- On a phone, who it acts as and when it was used come along -->
@@ -195,12 +195,12 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="dropdown-divider"></div>
                                     <?php if (!$expired) { // revoked first, then deleted ?>
                                         <a class="dropdown-item text-danger confirm-link" href="post.php?revoke_api_key=<?= $api_key_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Revoke <?= $name ?>?" data-confirm-text="<?= escapeHtml(__('It stops working now. Anything using it is turned away.')) ?>" data-confirm-button="<?= escapeHtml(__('Revoke')) ?>">
+                                            data-confirm-title="<?= __('Revoke %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('It stops working now. Anything using it is turned away.')) ?>" data-confirm-button="<?= escapeHtml(__('Revoke')) ?>">
                                             <i class="fas fa-fw fa-ban me-2"></i><?= __('Revoke') ?>
                                         </a>
                                     <?php } else { ?>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_api_key=<?= $api_key_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Delete <?= $name ?>?" data-confirm-text="<?= escapeHtml(__('It has expired, so nothing can be using it.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                            data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('It has expired, so nothing can be using it.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
                                             <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </a>
                                     <?php } ?>

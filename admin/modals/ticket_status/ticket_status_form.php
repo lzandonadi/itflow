@@ -55,7 +55,7 @@ $s_reply = $s ? (intval($s['ticket_status_client_reply'] ?? 1) === 0 ? 0 : 1) : 
         <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="d-flex flex-wrap gap-1" role="group" aria-label="<?= escapeHtml(__('Colors')) ?>">
                 <?php foreach (CATEGORY_COLORS as $swatch) { ?>
-                    <button type="button" class="itflow-tag-swatch<?= $swatch === $s_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-ticket-status-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="Color <?= $swatch ?>" aria-pressed="<?= $swatch === $s_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
+                    <button type="button" class="itflow-tag-swatch<?= $swatch === $s_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-ticket-status-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="<?= __('Color %s', $swatch) ?>" aria-pressed="<?= $swatch === $s_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
                 <?php } ?>
             </div>
             <div class="input-group input-group-sm w-auto" title="<?= escapeHtml(__('Any other color')) ?>">

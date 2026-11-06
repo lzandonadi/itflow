@@ -555,7 +555,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                         <li class="itflow-link-row">
                                             <?= linkRowHtml($to, $linked_row, $client_id) ?>
                                             <?php if ($can_edit) { ?>
-                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="Unlink <?= $to ?>"><i class="fas fa-unlink"></i></a>
+                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="<?= __('Unlink') ?>"><i class="fas fa-unlink"></i></a>
                                             <?php } ?>
                                         </li>
                                     <?php } ?>

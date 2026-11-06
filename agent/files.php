@@ -595,7 +595,7 @@ $preview = []; // the grid's previewer payload
                                                 <input class="form-check-input bulk-select" type="checkbox" name="<?= $item['kind'] ?>_ids[]" value="<?= $id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                             </div>
                                         <?php } ?>
-                                        <a href="#" class="itflow-file-card-preview" data-files-preview="<?= $preview_index ?>" title="Preview <?= $name ?>">
+                                        <a href="#" class="itflow-file-card-preview" data-files-preview="<?= $preview_index ?>" title="<?= __('Preview %s', $name) ?>">
                                             <?php if ($kind === 'image') { ?>
                                                 <img src="file.php?file_id=<?= $id ?>&thumb=1" alt="" loading="lazy">
                                             <?php } elseif ($kind === 'pdf') { ?>

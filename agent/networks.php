@@ -312,7 +312,7 @@ $csrf = $_SESSION['csrf_token'];
                     <?php } ?>
                     <th><?= $sort_link('network_name', __('Network')) ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('network_type', __('by type')) ?></span></th>
                     <?php if (!$client_url) { ?><th><?= $sort_link('client_name', __('Client')) ?></th><?php } ?>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('network', 'Subnet') ?></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('network', __('Subnet')) ?></th>
                     <th class="d-none <?= $client_url ? 'd-lg-table-cell' : 'd-xxl-table-cell' ?>"><?= __('Gateway, DNS &amp; DHCP') ?></th>
                     <th><?= __('In use') ?></th>
                     <th></th>

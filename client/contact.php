@@ -163,7 +163,7 @@ $value = function ($field, $fallback = '') use ($form, $contact) {
                                 <input type="hidden" name="method" value="<?= escapeHtml($access['key']) ?>">
                                 <button type="submit" class="btn btn-outline-primary" name="portal_contact_access" value="invite"><i class="fas fa-paper-plane me-2"></i><?= __('Email the invite again') ?></button>
                                 <button type="submit" class="btn btn-outline-danger confirm-link" name="portal_contact_access" value="off"
-                                    data-confirm-title="Turn off <?= escapeHtml($contact['contact_name']) ?>'s access?" data-confirm-text="<?= escapeHtml(__('They are signed out straight away and can\'t sign in again until you give them access.')) ?>" data-confirm-button="<?= escapeHtml(__('Turn off')) ?>"><i class="fas fa-ban me-2"></i><?= __('Turn off access') ?></button>
+                                    data-confirm-title="<?= __('Turn off %s\'s access?', escapeHtml($contact['contact_name'])) ?>" data-confirm-text="<?= escapeHtml(__('They are signed out straight away and can\'t sign in again until you give them access.')) ?>" data-confirm-button="<?= escapeHtml(__('Turn off')) ?>"><i class="fas fa-ban me-2"></i><?= __('Turn off access') ?></button>
                             </form>
                         <?php } else { ?>
                             <p class="small text-body-secondary"><?= __('Give them access and we email %s a link to sign in.', '<strong>' . escapeHtml($contact['contact_email'] ?: __('them')) . '</strong>') ?></p>
@@ -201,7 +201,7 @@ $value = function ($field, $fallback = '') use ($form, $contact) {
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             <input type="hidden" name="contact_id" value="<?= intval($contact['contact_id']) ?>">
                             <button type="submit" class="btn btn-outline-danger confirm-link" name="portal_contact_left" value="1"
-                                data-confirm-title="Has <?= escapeHtml($contact['contact_name']) ?> left?" data-confirm-text="<?= escapeHtml(__('Their portal access is turned off, and a new ticket opens for you to tell us what else to close down.')) ?>" data-confirm-button="<?= escapeHtml(__('Yes, they\'ve left')) ?>"><i class="fas fa-user-slash me-2"></i><?= escapeHtml(strtok($contact['contact_name'], ' ')) ?> has left</button>
+                                data-confirm-title="<?= __('Has %s left?', escapeHtml($contact['contact_name'])) ?>" data-confirm-text="<?= escapeHtml(__('Their portal access is turned off, and a new ticket opens for you to tell us what else to close down.')) ?>" data-confirm-button="<?= escapeHtml(__('Yes, they\'ve left')) ?>"><i class="fas fa-user-slash me-2"></i><?= escapeHtml(strtok($contact['contact_name'], ' ')) ?> has left</button>
                         </form>
                     </div>
                 </section>

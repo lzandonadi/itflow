@@ -140,6 +140,10 @@ function i18nCheckHardcodedHtml(string $html, array $lines, int $lines_first, st
             }
         }
     }
+    // An attribute people read whose value a PHP tag cuts (title="Edit " then a PHP echo) - the text before the tag
+    if (preg_match('/\b(?:title|placeholder|aria-label|alt|data-bs-title|data-original-title|data-placeholder|data-empty|data-confirm-title|data-confirm-text|data-confirm-button)\s*=\s*"([^"<]*[A-Za-z]{2,}[^"<]*)$/i', $html, $m, PREG_OFFSET_CAPTURE)) {
+        i18nCheckHardcoded($hardcoded, $lines, $lines_first, $file, $at($m[1][1]), $m[1][0]);
+    }
 }
 
 /*

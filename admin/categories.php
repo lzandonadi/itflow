@@ -126,7 +126,7 @@ $csrf = $_SESSION['csrf_token'];
                     <div class="row g-2 align-items-center">
                         <div class="col-lg-6 col-md-8">
                             <div class="input-group">
-                                <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="Search <?= escapeHtml($config['many']) ?>..." title="<?= escapeHtml(__('Name or description')) ?>">
+                                <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="<?= __('Search %s...', escapeHtml($config['many'])) ?>" title="<?= escapeHtml(__('Name or description')) ?>">
                                 <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
@@ -151,7 +151,7 @@ $csrf = $_SESSION['csrf_token'];
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_categories"
-                                            data-confirm-title="Delete these <?= escapeHtml($config['many']) ?>?"
+                                            data-confirm-title="<?= __('Delete these %s?', escapeHtml($config['many'])) ?>"
                                             data-confirm-text="<?= escapeHtml(__('Only the ones nothing uses are deleted - the rest are kept, to merge into another or archive.')) ?>"
                                             data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
                                             <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
@@ -202,7 +202,7 @@ $csrf = $_SESSION['csrf_token'];
                             <tr data-category-id="<?= $category_id ?>">
                                 <td class="checkbox-column bg-light border-end">
                                     <div class="form-check">
-                                        <input class="form-check-input bulk-select" type="checkbox" name="category_ids[]" value="<?= $category_id ?>" aria-label="Select <?= $name ?>">
+                                        <input class="form-check-input bulk-select" type="checkbox" name="category_ids[]" value="<?= $category_id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                     </div>
                                 </td>
                                 <?php if ($can_reorder) { ?>
@@ -301,7 +301,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="type" value="<?= escapeHtml($kind) ?>">
                                     <input type="hidden" name="name" value="<?= escapeHtml($loose_name) ?>">
-                                    <button type="submit" name="add_category" class="btn btn-sm btn-outline-secondary" title="Make it <?= escapeHtml(categoryKindPhrase($kind)) ?>"><i class="fas fa-plus me-1"></i><?= __('Add') ?></button>
+                                    <button type="submit" name="add_category" class="btn btn-sm btn-outline-secondary" title="<?= __('Make it %s', escapeHtml(categoryKindPhrase($kind))) ?>"><i class="fas fa-plus me-1"></i><?= __('Add') ?></button>
                                 </form>
                             </li>
                         <?php } ?>

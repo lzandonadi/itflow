@@ -16,7 +16,7 @@
                     <u><?= __('This process cannot be undone.') ?></u></h6>
                     <div class="mb-3">
                         <input type="hidden" id="clientName<?= $client_id ?>" value="<?= $client_name ?>">
-                        <input class="form-control" type="text" id="clientNameProvided<?= $client_id ?>" onkeyup="validateClientNameDelete(<?= $client_id ?>)" placeholder="Type '<?= $client_name ?>' to confirm data deletion">
+                        <input class="form-control" type="text" id="clientNameProvided<?= $client_id ?>" onkeyup="validateClientNameDelete(<?= $client_id ?>)" placeholder="<?= __('Type \'%s\' to confirm data deletion', $client_name) ?>">
                     </div>
                     <button type="button" class="btn btn-outline-secondary btn-lg px-5 me-4" data-bs-dismiss="modal"><?= __('Cancel') ?></button>
                     <a class="btn btn-danger btn-lg px-5 disabled" id="clientDeleteButton<?= $client_id ?>" href="post.php?delete_client=<?= $client_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><?= __('Yes, Delete!') ?></a>

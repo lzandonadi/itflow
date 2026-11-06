@@ -105,7 +105,7 @@ $csrf = $_SESSION['csrf_token'];
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
                 <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden"><?= __('Order') ?></span></th><?php } ?>
-                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('custom_link_name', 'Link') ?></th>
+                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('custom_link_name', __('Link')) ?></th>
                 <?php if (!$show_location) { ?>
                     <th class="d-none d-md-table-cell"><?= $sort_link('custom_link_location', __('Shows in')) ?></th>
                 <?php } ?>
@@ -189,7 +189,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php } ?>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['custom_link_archived_at']) { ?>
-                                    <a class="dropdown-item" href="post.php?restore_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="Back at the end of the <?= escapeHtml($location_config['label']) ?>">
+                                    <a class="dropdown-item" href="post.php?restore_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="<?= __('Back at the end of the %s', escapeHtml($location_config['label'])) ?>">
                                         <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
@@ -198,7 +198,7 @@ $csrf = $_SESSION['csrf_token'];
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="It goes from the <?= escapeHtml($location_config['label']) ?> for good. Archive it instead to keep it." data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= __('It goes from the %s for good. Archive it instead to keep it.', escapeHtml($location_config['label'])) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
                                     <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>

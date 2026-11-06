@@ -95,7 +95,7 @@ if ($can_invite && portalSignupOn() && intval(mysqli_fetch_row(mysqli_query($mys
                                 <input type="hidden" name="invite_id" value="<?= intval($invite['invite_id']) ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-primary" name="portal_invite_resend" value="1" title="<?= escapeHtml(__('Email it again, with a new link')) ?>"><i class="fas fa-paper-plane"></i><span class="d-none d-md-inline ms-1"><?= __('Send again') ?></span></button>
                                 <button type="submit" class="btn btn-sm btn-outline-danger confirm-link" name="portal_invite_cancel" value="1" title="<?= escapeHtml(__('Cancel the invite')) ?>"
-                                    data-confirm-title="Cancel the invite to <?= escapeHtml($invite['invite_email']) ?>?" data-confirm-text="<?= escapeHtml(__('Its link stops working. You can invite them again later.')) ?>" data-confirm-button="<?= escapeHtml(__('Cancel invite')) ?>"><i class="fas fa-times"></i><span class="d-none d-md-inline ms-1"><?= __('Cancel') ?></span></button>
+                                    data-confirm-title="<?= __('Cancel the invite to %s?', escapeHtml($invite['invite_email'])) ?>" data-confirm-text="<?= escapeHtml(__('Its link stops working. You can invite them again later.')) ?>" data-confirm-button="<?= escapeHtml(__('Cancel invite')) ?>"><i class="fas fa-times"></i><span class="d-none d-md-inline ms-1"><?= __('Cancel') ?></span></button>
                             </form>
                         </span>
                     </li>

@@ -196,7 +196,7 @@ $csrf = $_SESSION['csrf_token'];
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_ai_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="<?= escapeHtml(__('Delete')) ?>" data-confirm-text="<?= escapeHtml($delete_text) ?>">
+                                    data-confirm-title="<?= __('Delete %s?', escapeHtml($name)) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>" data-confirm-text="<?= escapeHtml($delete_text) ?>">
                                     <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>

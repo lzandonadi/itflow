@@ -43,6 +43,7 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 ### Bug Fixes
 
 - Editing a client's reply on a ticket no longer fills Time worked with the current time of day - a reply with no time worked shows 00:00:00.
+- Portuguese: the built-in ticket statuses' descriptions and the On Hold status now show translated everywhere (they stayed in English when the language was Portuguese), and the tooltips, confirmations, placeholders and sortable column headings that wrap a name ("Delete %s?", "Last activity ...") are translated as whole sentences.
 
 ### Developer Updates
 
@@ -75,6 +76,7 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 - Catalogs and templates: `PAYMENT_METHOD_USES`, `CONTRACT_TYPES`, `TICKET_FILL_IN_TYPES`, `TICKET_PLACEHOLDERS`, `TICKET_TEMPLATE_PORTAL_*`, `TICKET_STATUS_CLIENT_REPLY` and the document template placeholders and tables stay English and are shown through `__()` (new `paymentMethodUseLabel()`, `documentTemplateReviewLabel()`, `documentTemplateWordHelp()`); the change-line builders that feed the audit log (`customLinkUpdate`, `paymentMethodUpdate`, `paymentProviderChangeLines`, the vendor template follow/bring-in-line differences, category and tag kind phrases) are built through `i18nEnglish()`. 'Warn at % of target' on the SLA page is now 'Warn at this percent of the target', since '% o' reads as a placeholder.
 - Maintenance: new `lang/pt_BR/maintenance.php`. Cron job labels/descriptions (`includes/cron_jobs.php`), `GETTING_STARTED_STEPS`, `starterContentPacks()`, the setup extensions and the structure differences stay English and are shown through `__()`; `aiFeatures()`, `aiUseCases()`, `aiTriageModes()` and the mail queue tabs are translated; the Debug support report is built through `i18nEnglish()`, and the getting started / starter content summaries keep an English copy for the audit log. Backup internals (`functions/backup.php`), AI prompts and pack-loaded content stay English.
 - i18n: `scripts/i18n_check.php --hardcoded` now reads `i18n-ignore-file` (a whole file of data or samples) and `i18n-ignore-start` / `i18n-ignore-end` (a block, such as an AI prompt or a registry of constants shown through `__()`), skips `admin/database_updates/`, and leaves out strings inside log, SQL and CSV calls; the scan of `agent admin client guest includes js functions login.php join.php` comes out empty. `includes/page_title.php` has a table of English titles for pages whose file name doesn't make one, and `$page_title` is translated while `$page_title_sanitized` stays English. Literals in `setup/` count as used for the Unused check, since the health checks show setup's requirement texts through `__()`.
+- i18n: `--hardcoded` also reports a readable attribute whose value a PHP tag cuts (`title="Edit "` followed by an echo); such text goes through one `__('Edit %s', $name)`. `ticketStatusAbout()` compares a built-in's stored description with the English text.
 
 ## [26.11.3]
 

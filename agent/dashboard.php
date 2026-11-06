@@ -204,7 +204,7 @@ if ($getting_started) {
                                     <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('SLA breached')) ?>"><i class="fas fa-stopwatch me-1" aria-hidden="true"></i>SLA</span> <?php // i18n-ignore - SLA ?>
                                 <?php } ?>
                                 <span class="d-none d-sm-inline"><?= ticketStatusHtml($ticket['ticket_status_name'], $ticket['ticket_status_color'], 'detail') ?></span>
-                                <span class="small text-body-secondary text-nowrap d-none d-md-inline" title="Last activity <?= escapeHtml($last_activity) ?>"><?= escapeHtml(timeAgo($last_activity)) ?></span>
+                                <span class="small text-body-secondary text-nowrap d-none d-md-inline" title="<?= __('Last activity %s', escapeHtml($last_activity)) ?>"><?= escapeHtml(timeAgo($last_activity)) ?></span>
                             </a>
                         <?php } ?>
                     </div>

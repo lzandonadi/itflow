@@ -154,7 +154,7 @@ $csrf = $_SESSION['csrf_token'];
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($agent_user_limit_reached) { ?>
-                    <button type="button" class="btn btn-primary" disabled title="Every seat is taken - disable or archive a user<?= $agent_invites_holding ? __(', or cancel an invite,') : '' ?> first">
+                    <button type="button" class="btn btn-primary" disabled title="<?= ($agent_invites_holding ? __('Every seat is taken - disable or archive a user, or cancel an invite, first') : __('Every seat is taken - disable or archive a user first')) ?>">
                         <i class="fas fa-user-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New User') ?></span>
                     </button>
                 <?php } else { ?>
@@ -352,7 +352,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php } ?>
                                 <a class="dropdown-item confirm-link" href="post.php?link_user_invite=<?= $invite_id ?>&csrf_token=<?= $csrf ?>"
                                     data-confirm-title="<?= escapeHtml(__('Get a new invite link?')) ?>" data-confirm-icon="info"
-                                    data-confirm-text="A new link is made for you to send <?= $invite_name ?> yourself, shown once. Any link sent before stops working, and it works for <?= USER_INVITE_LINK_DAYS ?> days."
+                                    data-confirm-text="<?= __('A new link is made for you to send %1$s yourself, shown once. Any link sent before stops working, and it works for %2$s days.', $invite_name, USER_INVITE_LINK_DAYS) ?>"
                                     data-confirm-button="<?= escapeHtml(__('Get the link')) ?>">
                                     <i class="fas fa-fw fa-link text-secondary me-2"></i><?= __('Get the link') ?>
                                 </a>
@@ -361,8 +361,8 @@ $csrf = $_SESSION['csrf_token'];
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?cancel_user_invite=<?= $invite_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Cancel <?= $invite_name ?>'s invite?"
-                                    data-confirm-text="The link <?= $invite_name ?> has stops working<?= $agent_user_limit > 0 && !$invite_expired ? __(', and the seat it holds is free again') : '' ?>. Invite them again any time."
+                                    data-confirm-title="<?= __('Cancel %s\'s invite?', $invite_name) ?>"
+                                    data-confirm-text="<?= ($agent_user_limit > 0 && !$invite_expired ? __('The link %s has stops working, and the seat it holds is free again. Invite them again any time.', $invite_name) : __('The link %s has stops working. Invite them again any time.', $invite_name)) ?>"
                                     data-confirm-button="<?= escapeHtml(__('Cancel invite')) ?>">
                                     <i class="fas fa-fw fa-ban me-2"></i><?= __('Cancel invite') ?>
                                 </a>

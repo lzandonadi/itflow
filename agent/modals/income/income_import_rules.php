@@ -55,7 +55,7 @@ ob_start();
                         <td class="text-end"><?= intval($rule['import_rule_used_count']) ?></td>
                         <td class="text-end pe-3">
                             <a class="btn btn-sm btn-link text-danger p-0 confirm-link" title="<?= escapeHtml(__('Forget')) ?>" href="post.php?income_import_rule_delete=<?= intval($rule['import_rule_id']) ?>&amp;csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                data-confirm-text="Deposits starting &quot;<?= escapeHtml($rule['import_rule_match']) ?>&quot; are matched afresh next time."><i class="fas fa-fw fa-times"></i></a>
+                                data-confirm-text="<?= __('Deposits starting &quot;%s&quot; are matched afresh next time.', escapeHtml($rule['import_rule_match'])) ?>"><i class="fas fa-fw fa-times"></i></a>
                         </td>
                     </tr>
                 <?php } ?>

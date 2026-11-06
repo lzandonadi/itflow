@@ -84,7 +84,7 @@ ob_start();
         <span class="me-auto"><?= reconcileLockedButtonHtml($cleared, 'Undo', 'fa-undo-alt', 'undo it') ?></span>
     <?php } elseif ($can_undo) { ?>
         <a class="btn btn-outline-danger confirm-link me-auto" href="post.php?expense_reimbursement_delete=<?= $reimbursement_id ?>&amp;csrf_token=<?= $_SESSION['csrf_token'] ?>"
-            data-confirm-text="The <?= escapeHtml(billingMoney($row['reimbursement_amount'], $currency)) ?> comes back off <?= escapeHtml($row['account_name'] ?: 'the account') ?>, and its expenses are to reimburse again."><i class="fas fa-undo-alt me-2"></i><?= __('Undo') ?></a>
+            data-confirm-text="<?= __('The %1$s comes back off %2$s, and its expenses are to reimburse again.', escapeHtml(billingMoney($row['reimbursement_amount'], $currency)), escapeHtml($row['account_name'] ?: __('the account'))) ?>"><i class="fas fa-undo-alt me-2"></i><?= __('Undo') ?></a>
     <?php } ?>
     <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>

@@ -207,7 +207,7 @@ $hours_text = function ($hours) {
                                     <?php if ($can_bill_expenses) { ?>
                                         <td class="checkbox-column border-end">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="expense_ids[]" value="<?= $expense_id ?>" checked data-unbilled-expense-pick aria-label="Bill <?= escapeHtml(expenseLabel($expense)) ?>">
+                                                <input class="form-check-input" type="checkbox" name="expense_ids[]" value="<?= $expense_id ?>" checked data-unbilled-expense-pick aria-label="<?= __('Bill %s', escapeHtml(expenseLabel($expense))) ?>">
                                             </div>
                                         </td>
                                     <?php } ?>
@@ -272,7 +272,7 @@ $hours_text = function ($hours) {
                                     <?php if ($can_bill_expenses) { ?>
                                         <td class="checkbox-column border-end">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="trip_ids[]" value="<?= $trip_id ?>" checked data-unbilled-trip-pick aria-label="Bill <?= escapeHtml(tripLabel($trip)) ?>">
+                                                <input class="form-check-input" type="checkbox" name="trip_ids[]" value="<?= $trip_id ?>" checked data-unbilled-trip-pick aria-label="<?= __('Bill %s', escapeHtml(tripLabel($trip))) ?>">
                                             </div>
                                         </td>
                                     <?php } ?>
@@ -379,7 +379,7 @@ $hours_text = function ($hours) {
                                     <?php if ($can_edit) { ?>
                                         <td class="checkbox-column border-end">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" checked data-unbilled-pick aria-label="Bill <?= escapeHtml($ticket['ticket_prefix'] . $ticket['ticket_number']) ?>">
+                                                <input class="form-check-input" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" checked data-unbilled-pick aria-label="<?= __('Bill %s', escapeHtml($ticket['ticket_prefix'] . $ticket['ticket_number'])) ?>">
                                             </div>
                                         </td>
                                     <?php } ?>
@@ -424,7 +424,7 @@ $hours_text = function ($hours) {
                                     <?php if ($can_edit) { ?>
                                         <td class="checkbox-column border-end">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="client_ids[]" value="<?= $id ?>" checked data-unbilled-pick aria-label="Bill <?= escapeHtml($c['client_name']) ?>">
+                                                <input class="form-check-input" type="checkbox" name="client_ids[]" value="<?= $id ?>" checked data-unbilled-pick aria-label="<?= __('Bill %s', escapeHtml($c['client_name'])) ?>">
                                             </div>
                                         </td>
                                     <?php } ?>

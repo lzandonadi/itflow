@@ -235,7 +235,7 @@ $facts = array_filter([
                             $billing = $row['billing'];
                             ?>
                             <tr data-software-id="<?= $software_id ?>">
-                                <td class="ps-3 pe-0"><input class="form-check-input bulk-select" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="Tick <?= escapeHtml($row['client_name']) ?>"></td>
+                                <td class="ps-3 pe-0"><input class="form-check-input bulk-select" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="<?= __('Tick %s', escapeHtml($row['client_name'])) ?>"></td>
                                 <td>
                                     <a class="fw-semibold text-body" href="/agent/software.php?client_id=<?= $client_id ?>"><?= escapeHtml($row['client_name']) ?></a>
                                     <?php if ($row['software_name'] !== $template['software_template_name']) { ?><div class="small text-secondary"><?= escapeHtml($row['software_name']) ?></div><?php } ?>

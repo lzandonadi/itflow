@@ -130,7 +130,7 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('canned_response_name', 'Response') ?></th>
+                <th class="ps-3"><?= $sort_link('canned_response_name', __('Response')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('Offered on') ?></th>
                 <th class="d-none d-md-table-cell" title="<?= escapeHtml(__('In your replies')) ?>"><?= $sort_link('use_count', __('You used it')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
@@ -171,7 +171,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="mt-1 d-flex flex-wrap gap-1">
                                         <?php if ($sets_up !== '') { ?><span title="<?= escapeHtml(__('Set on the reply when it is picked')) ?>"><?= $sets_up ?></span><?php } ?>
                                         <?php if ($files) { ?>
-                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="Goes out with the reply: <?= escapeHtml(implode(', ', array_column($files, 'canned_response_file_name'))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
+                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="<?= __('Goes out with the reply: %s', escapeHtml(implode(', ', array_column($files, 'canned_response_file_name')))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
                                         <?php } ?>
                                     </div>
                                 <?php } ?>

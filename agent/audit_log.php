@@ -120,7 +120,7 @@ $view_empty = [
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= $client_name ?>'s audit log" title="<?= escapeHtml(__('What was done, who did it, the IP address or the browser')) ?>">
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= __('Search %s\'s audit log', $client_name) ?>" title="<?= escapeHtml(__('What was done, who did it, the IP address or the browser')) ?>">
                         <button class="btn btn-outline-secondary <?= $more_filters ? 'active' : '' ?>" title="<?= escapeHtml(__('More filters')) ?>" type="button" data-bs-toggle="collapse" data-bs-target="#auditMoreFilters"><i class="fas fa-filter"></i></button>
                         <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
@@ -233,7 +233,7 @@ $view_empty = [
                         <?php if ($link !== '') { ?>
                             <div class="mt-1" data-audit-record><i class="fas fa-fw fa-external-link-alt text-secondary me-1"></i><?= $link ?></div>
                         <?php } elseif ($gone) { ?>
-                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="The <?= escapeHtml(strtolower($type)) ?> this is about has been deleted"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
+                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="<?= __('The %s this is about has been deleted', escapeHtml(strtolower($type))) ?>"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
                         <?php } ?>
                         <?php if ($from !== '') { ?>
                             <div class="d-xl-none text-body-secondary mt-1"><?= escapeHtml($from) ?></div>

@@ -116,7 +116,7 @@ $csrf = $_SESSION['csrf_token'];
                     <div class="row g-2 align-items-center">
                         <div class="col-lg-6 col-md-8">
                             <div class="input-group">
-                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= $kind_word ?> tags..." title="<?= escapeHtml(__('Name or description')) ?>">
+                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= __('Search %s tags...', $kind_word) ?>" title="<?= escapeHtml(__('Name or description')) ?>">
                                 <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ $csrf = $_SESSION['csrf_token'];
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_tags"
                                             data-confirm-title="<?= escapeHtml(__('Delete these tags?')) ?>"
-                                            data-confirm-text="They come off every <?= $kind_word ?> that has them. Any that a recurring invoice line counts by are kept."
+                                            data-confirm-text="<?= __('They come off every %s that has them. Any that a recurring invoice line counts by are kept.', $kind_word) ?>"
                                             data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
                                             <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
@@ -169,8 +169,8 @@ $csrf = $_SESSION['csrf_token'];
                                     <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                                 </div>
                             </th>
-                            <th><?= $sort_link('tag_name', 'Tag') ?></th>
-                            <th class="d-none d-sm-table-cell"><?= $sort_link('used', 'On') ?></th>
+                            <th><?= $sort_link('tag_name', __('Tag')) ?></th>
+                            <th class="d-none d-sm-table-cell"><?= $sort_link('used', _x('On', 'tags column - how many records have it')) ?></th>
                             <th></th>
                         </tr>
                         </thead>
@@ -197,7 +197,7 @@ $csrf = $_SESSION['csrf_token'];
                             <tr>
                                 <td class="checkbox-column bg-light border-end">
                                     <div class="form-check">
-                                        <input class="form-check-input bulk-select" type="checkbox" name="tag_ids[]" value="<?= $tag_id ?>" aria-label="Select <?= $name ?>">
+                                        <input class="form-check-input bulk-select" type="checkbox" name="tag_ids[]" value="<?= $tag_id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                     </div>
                                 </td>
                                 <td>
@@ -235,7 +235,7 @@ $csrf = $_SESSION['csrf_token'];
                                                     <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                                 </a>
                                             <?php } else { ?>
-                                                <a class="dropdown-item text-danger" href="post.php?archive_tag=<?= $tag_id ?>&csrf_token=<?= $csrf ?>" title="It stays on its <?= $kind['plural'] ?>, but isn't offered for tagging or in the filters">
+                                                <a class="dropdown-item text-danger" href="post.php?archive_tag=<?= $tag_id ?>&csrf_token=<?= $csrf ?>" title="<?= __('It stays on its %s, but isn\'t offered for tagging or in the filters', $kind['plural']) ?>">
                                                     <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                 </a>
                                             <?php } ?>

@@ -78,7 +78,7 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('project_template_name', 'Template') ?></th>
+                <th class="ps-3"><?= $sort_link('project_template_name', __('Template')) ?></th>
                 <th class="text-center"><?= $sort_link('ticket_count', __('Tickets')) ?></th>
                 <th class="text-center"><?= $sort_link('task_count', __('Tasks')) ?></th>
                 <th><?= $sort_link('project_template_updated_at', __('Updated')) ?></th>

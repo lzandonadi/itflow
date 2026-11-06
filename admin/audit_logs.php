@@ -249,7 +249,7 @@ $view_empty = [
                         <?php if ($link !== '') { ?>
                             <div class="mt-1" data-audit-record><i class="fas fa-fw fa-external-link-alt text-secondary me-1"></i><?= $link ?></div>
                         <?php } elseif ($gone) { ?>
-                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="The <?= escapeHtml(strtolower($type)) ?> this is about has been deleted"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
+                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="<?= __('The %s this is about has been deleted', escapeHtml(strtolower($type))) ?>"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
                         <?php } ?>
                         <?php if ($from !== '') { ?>
                             <div class="d-xl-none text-body-secondary mt-1"><?= escapeHtml($from) ?></div>

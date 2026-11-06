@@ -160,7 +160,7 @@ $used_meter = function ($spent, $plan) {
                     <h3 class="card-title mb-0 me-auto"><?= __('Plan for %d', $year) ?></h3>
                     <?php if ($has_prev_budget) { ?>
                         <button type="submit" name="copy_budget" value="1" class="btn btn-outline-secondary btn-sm confirm-link"
-                                data-confirm-title="Copy <?= $year - 1 ?>'s budget?" data-confirm-text="Every amount in <?= $year ?> is replaced with <?= $year - 1 ?>'s, month for month." data-confirm-button="<?= escapeHtml(__('Copy it')) ?>">
+                                data-confirm-title="<?= __('Copy %s\'s budget?', $year - 1) ?>" data-confirm-text="<?= __('Every amount in %1$s is replaced with %2$s\'s, month for month.', $year, $year - 1) ?>" data-confirm-button="<?= escapeHtml(__('Copy it')) ?>">
                             <i class="fas fa-fw fa-copy me-1"></i><?= __('Copy %d', $year - 1) ?>
                         </button>
                     <?php } ?>
@@ -186,7 +186,7 @@ $used_meter = function ($spent, $plan) {
                                 <td><?= escapeHtml($line['name']) ?><?php if ($line['archived']) { ?> <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal"><?= __('Archived') ?></span><?php } ?></td>
                                 <td>
                                     <div class="input-group input-group-sm flex-nowrap">
-                                        <input type="text" inputmode="decimal" class="form-control" data-budget-fill-value aria-label="Amount for every month of <?= escapeHtml($line['name']) ?>" placeholder="0.00">
+                                        <input type="text" inputmode="decimal" class="form-control" data-budget-fill-value aria-label="<?= __('Amount for every month of %s', escapeHtml($line['name'])) ?>" placeholder="0.00">
                                         <button type="button" class="btn btn-outline-secondary" data-budget-fill title="<?= escapeHtml(__('Put this amount in every month')) ?>"><?= __('Fill') ?></button>
                                     </div>
                                 </td>

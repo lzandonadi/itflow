@@ -1414,5 +1414,6 @@ Business Premium',
     'The vendors' => 'Os fornecedores',
     'Their account number, PIN and account manager stay their own.' => 'O número da conta, o PIN e o gerente de conta continuam sendo deles.',
     'Take them from the template' => 'Trazer do modelo',
+    'tags column - how many records have it::On' => 'Em uso',
 
 ];

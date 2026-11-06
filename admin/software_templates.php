@@ -155,12 +155,12 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('software_template_name', 'Template') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('software_template_type', 'Type') ?></th>
+                <th class="ps-3"><?= $sort_link('software_template_name', __('Template')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('software_template_type', __('Type')) ?></th>
                 <th class="d-none d-xl-table-cell"><?= $sort_link('software_template_license_type', __('License type')) ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', __('Used')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', 'Changed') ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', __('Changed')) ?></th>
                 <th></th>
             </tr>
             </thead>

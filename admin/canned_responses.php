@@ -153,9 +153,9 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('canned_response_name', 'Response') ?></th>
+                <th class="ps-3"><?= $sort_link('canned_response_name', __('Response')) ?></th>
                 <th class="d-none d-lg-table-cell"><?= __('Offered on') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('use_count', 'Used') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('use_count', __('Used')) ?></th>
                 <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th></th>
             </tr>
@@ -190,7 +190,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="mt-1 d-flex flex-wrap gap-1">
                                         <?php if ($sets_up !== '') { ?><span title="<?= escapeHtml(__('Set on the reply when it is picked')) ?>"><?= $sets_up ?></span><?php } ?>
                                         <?php if ($files) { ?>
-                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="Goes out with the reply: <?= escapeHtml(implode(', ', array_column($files, 'canned_response_file_name'))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
+                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="<?= __('Goes out with the reply: %s', escapeHtml(implode(', ', array_column($files, 'canned_response_file_name')))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
                                         <?php } ?>
                                     </div>
                                 <?php } ?>
@@ -224,7 +224,7 @@ $csrf = $_SESSION['csrf_token'];
                                 </a>
                                 <?php if ($owner_id) { ?>
                                     <a class="dropdown-item confirm-link" href="post.php?share_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>"
-                                        data-confirm-title="Share <?= $name ?> with everyone?" data-confirm-text="It moves to the shared ones and every agent is offered it. <?= escapeHtml($row['owner_name'] ?? __('Its agent')) ?> can't change it after." data-confirm-button="<?= escapeHtml(__('Share')) ?>">
+                                        data-confirm-title="<?= __('Share %s with everyone?', $name) ?>" data-confirm-text="<?= __('It moves to the shared ones and every agent is offered it. %s can\'t change it after.', escapeHtml($row['owner_name'] ?? __('Its agent'))) ?>" data-confirm-button="<?= escapeHtml(__('Share')) ?>">
                                         <i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Share with everyone') ?>
                                     </a>
                                 <?php } ?>

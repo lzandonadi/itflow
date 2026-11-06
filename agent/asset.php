@@ -254,7 +254,7 @@ if (mysqli_num_rows($sql) == 0) {
         <div class="card-body d-flex flex-wrap align-items-center gap-3">
             <?php if ($asset_photo) { ?>
                 <a href="<?= "../uploads/clients/$client_id/$asset_photo" ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open photo')) ?>">
-                    <img class="itflow-asset-icon itflow-asset-icon-lg" src="<?= "../uploads/clients/$client_id/$asset_photo" ?>" alt="Photo of <?= $asset_name ?>">
+                    <img class="itflow-asset-icon itflow-asset-icon-lg" src="<?= "../uploads/clients/$client_id/$asset_photo" ?>" alt="<?= __('Photo of %s', $asset_name) ?>">
                 </a>
             <?php } else { ?>
                 <span class="itflow-asset-icon itflow-asset-icon-lg itflow-asset-tone-<?= $asset_tone ?>" aria-hidden="true"><i class="fas fa-fw fa-<?= $device_icon ?>"></i></span>
@@ -758,8 +758,8 @@ if (mysqli_num_rows($sql) == 0) {
                                                             <?php } ?>
                                                             <?php if ($link) { ?>
                                                                 <a class="dropdown-item confirm-link" href="post.php?disconnect_asset_interface=<?= $interface_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                                    data-confirm-title="Disconnect <?= escapeHtml($row['interface_name']) ?>?" data-confirm-button="<?= escapeHtml(__('Disconnect')) ?>"
-                                                                    data-confirm-text="It is no longer shown as plugged into <?= escapeHtml($link['asset_name'] . ' ' . $link['interface_name']) ?>.">
+                                                                    data-confirm-title="<?= __('Disconnect %s?', escapeHtml($row['interface_name'])) ?>" data-confirm-button="<?= escapeHtml(__('Disconnect')) ?>"
+                                                                    data-confirm-text="<?= __('It is no longer shown as plugged into %s.', escapeHtml($link['asset_name'] . ' ' . $link['interface_name'])) ?>">
                                                                     <i class="fas fa-fw fa-unlink text-secondary me-2"></i><?= __('Disconnect') ?>
                                                                 </a>
                                                             <?php } ?>

@@ -57,7 +57,7 @@ if (!$template) { ?>
                         $to = $seats['total'] > 0 ? (string) $seats['used'] : $now;
                         ?>
                         <tr data-true-up-id="<?= $software_id ?>">
-                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="True up <?= escapeHtml($row['client_name']) ?>" <?= $to !== $now ? 'checked' : '' ?> data-true-up-tick></td>
+                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="<?= __('True up %s', escapeHtml($row['client_name'])) ?>" <?= $to !== $now ? 'checked' : '' ?> data-true-up-tick></td>
                             <td class="min-w-0">
                                 <div class="fw-semibold text-truncate"><?= escapeHtml($row['client_name']) ?></div>
                                 <?php if ($row['software_name'] !== $template['software_template_name']) { ?><div class="small text-secondary text-truncate"><?= escapeHtml($row['software_name']) ?></div><?php } ?>

@@ -310,12 +310,12 @@ $hidden_filter_count = $date_filter_active ? 1 : 0;
                         </th>
                     <?php } ?>
                     <th><?= $sort_link('project_name', __('Project')) ?></th>
-                    <th><?= $client_url ? 'Contact' : $sort_link('client_name', 'Client') ?></th>
+                    <th><?= $client_url ? 'Contact' : $sort_link('client_name', __('Client')) ?></th>
                     <th><?= __('Progress') ?></th>
                     <th><?= $budgets_in_use ? __('Time / budget') : __('Time') ?></th>
                     <th><?= in_array($show, ['completed', 'archived'], true) ? $sort_link('project_completed_at', __('Done')) : $sort_link('project_due', __('Due')) ?></th>
-                    <th><?= $sort_link('user_name', 'Manager') ?></th>
-                    <th class="d-none d-xxl-table-cell"><?= $sort_link('activity', 'Activity') ?></th>
+                    <th><?= $sort_link('user_name', __('Manager')) ?></th>
+                    <th class="d-none d-xxl-table-cell"><?= $sort_link('activity', __('Activity')) ?></th>
                     <th></th>
                 </tr>
                 </thead>

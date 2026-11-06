@@ -191,7 +191,7 @@ $required_url = "modals/document_template/document_template_required.php?id=$doc
                                                 <span class="d-block text-truncate"><?= escapeHtml($due_row['client_name']) ?></span>
                                                 <span class="d-block text-truncate text-secondary"><?= escapeHtml($due_row['document_name']) ?></span>
                                             </span>
-                                            <span class="text-secondary text-nowrap" title="Last edited or reviewed <?= escapeHtml($due_row['reviewed_at']) ?>"><?= timeAgo($due_row['reviewed_at']) ?></span>
+                                            <span class="text-secondary text-nowrap" title="<?= __('Last edited or reviewed %s', escapeHtml($due_row['reviewed_at'])) ?>"><?= timeAgo($due_row['reviewed_at']) ?></span>
                                         </a>
                                     <?php } ?>
                                 </div>
@@ -267,10 +267,10 @@ $required_url = "modals/document_template/document_template_required.php?id=$doc
                                             <div class="dropdown-divider"></div>
                                             <?php if ($fill_in['in_text']) { ?>
                                                 <a class="dropdown-item confirm-link" href="post.php?delete_document_template_fill_in=<?= $fill_in['id'] ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Reset <?= escapeHtml($fill_in['name']) ?>?" data-confirm-text="<?= escapeHtml(__('It is still in what it says, so it stays asked for - as plain, optional text.')) ?>" data-confirm-button="<?= escapeHtml(__('Reset')) ?>"><i class="fas fa-fw fa-undo me-2"></i><?= __('Reset') ?></a>
+                                                    data-confirm-title="<?= __('Reset %s?', escapeHtml($fill_in['name'])) ?>" data-confirm-text="<?= escapeHtml(__('It is still in what it says, so it stays asked for - as plain, optional text.')) ?>" data-confirm-button="<?= escapeHtml(__('Reset')) ?>"><i class="fas fa-fw fa-undo me-2"></i><?= __('Reset') ?></a>
                                             <?php } else { ?>
                                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_document_template_fill_in=<?= $fill_in['id'] ?>&csrf_token=<?= $csrf ?>"
-                                                    data-confirm-title="Remove <?= escapeHtml($fill_in['name']) ?>?" data-confirm-text="<?= escapeHtml(__('It is no longer asked for.')) ?>" data-confirm-button="<?= escapeHtml(__('Remove')) ?>"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Remove') ?></a>
+                                                    data-confirm-title="<?= __('Remove %s?', escapeHtml($fill_in['name'])) ?>" data-confirm-text="<?= escapeHtml(__('It is no longer asked for.')) ?>" data-confirm-button="<?= escapeHtml(__('Remove')) ?>"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Remove') ?></a>
                                             <?php } ?>
                                         <?php } ?>
                                     </div>
