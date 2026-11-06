@@ -2383,23 +2383,23 @@ if (isset($_POST['calendar_move'])) {
 
     $start = ticketScheduleValue($_POST['start'] ?? '');
     if ($start === '') {
-        $fail('That is not a date and time.');
+        $fail(__('That is not a date and time.'));
     }
 
     if (($_POST['kind'] ?? '') === 'ticket') {
 
         if (!calendarCanScheduleTickets()) {
-            $fail('Your role cannot schedule tickets.', 403);
+            $fail(__('Your role cannot schedule tickets.'), 403);
         }
         $row = ticketRow($_POST['id'] ?? 0);
         if (!$row || !empty($row['ticket_archived_at'])) {
-            $fail('That ticket no longer exists.', 404);
+            $fail(__('That ticket no longer exists.'), 404);
         }
         if (intval($row['ticket_client_id']) && !hasClientAccess($row['ticket_client_id'])) {
-            $fail('You do not have access to that client.', 403);
+            $fail(__('You do not have access to that client.'), 403);
         }
         if (!ticketIsOpen($row)) {
-            $fail('Ticket ' . ticketReference($row) . ' is resolved or closed - reopen it to schedule work.');
+            $fail(__('Ticket %s is resolved or closed - reopen it to schedule work.', ticketReference($row)));
         }
         // Dropped on a whole day: the time it already had, or 9:00
         if (!empty($_POST['all_day'])) {
@@ -2408,16 +2408,16 @@ if (isset($_POST['calendar_move'])) {
         $onsite = isset($_POST['onsite']) ? intval($_POST['onsite']) : intval($row['ticket_onsite']);
         $result = ticketSetSchedule($row, $start, $onsite);
 
-        echo json_encode(['ok' => true, 'message' => ticketReference($row) . ' scheduled for ' . $result['when_text'], 'conflicts' => $result['conflicts']]);
+        echo json_encode(['ok' => true, 'message' => __('%1$s scheduled for %2$s', ticketReference($row), $result['when_text']), 'conflicts' => $result['conflicts']]);
         exit;
     }
 
     $event = calendarEventRow($_POST['id'] ?? 0);
     if (!$event) {
-        $fail('That event no longer exists.', 404);
+        $fail(__('That event no longer exists.'), 404);
     }
     if (intval($event['event_client_id']) && !hasClientAccess($event['event_client_id'])) {
-        $fail('You do not have access to that client.', 403);
+        $fail(__('You do not have access to that client.'), 403);
     }
     if (!calendarEventCan($event, 'edit')) {
         $fail(permissionRefusedText('module_client', 2, intval(lookupUserPermission('module_client'))), 403);
@@ -2451,9 +2451,9 @@ if (isset($_POST['calendar_move'])) {
     $event = calendarEventRow($event_id);
     $sent = !empty($_POST['notify']) ? calendarSendInvites($event, 'update', calendarInvitedAttendees($event_id)) : 0;
 
-    logAudit("Calendar Event", "Edit", "$session_name moved the event " . escapeSql($event['event_title']) . " to " . escapeSql(calendarWhenText($event)), intval($event['event_client_id']), $event_id);
+    logAudit("Calendar Event", "Edit", "$session_name moved the event " . escapeSql($event['event_title']) . " to " . escapeSql(i18nEnglish(fn () => calendarWhenText($event))), intval($event['event_client_id']), $event_id);
 
-    echo json_encode(['ok' => true, 'message' => $event['event_title'] . ' moved to ' . calendarWhenText($event) . ($sent ? " - the update was emailed to $sent " . ($sent === 1 ? 'person' : 'people') : '')]);
+    echo json_encode(['ok' => true, 'message' => __('%1$s moved to %2$s', $event['event_title'], calendarWhenText($event)) . ($sent ? ' - ' . _n('the update was emailed to %d person', 'the update was emailed to %d people', $sent) : '')]);
     exit;
 }
 

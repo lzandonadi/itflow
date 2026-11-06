@@ -22,7 +22,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-cubes me-2"></i>Tickets from a template <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($project)) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-cubes me-2"></i><?= __('Tickets from a template') ?> <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($project)) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -30,9 +30,9 @@ ob_start();
     <input type="hidden" name="project_id" value="<?= $project_id ?>">
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Project template <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Project template') ?> <strong class="text-danger">*</strong></label>
             <select class="form-select select2" name="project_template_id" required>
-                <option value="">Pick a template...</option>
+                <option value=""><?= __('Pick a template...') ?></option>
                 <?php while ($row = mysqli_fetch_assoc($sql_templates)) {
                     $ticket_count = intval($row['ticket_count']);
                     $task_count = intval($row['task_count']); ?>
@@ -40,18 +40,18 @@ ob_start();
                         data-description="<?= escapeHtml(trim("$ticket_count ticket" . ($ticket_count === 1 ? '' : 's') . ($task_count ? ", $task_count task" . ($task_count === 1 ? '' : 's') : '') . ($row['project_template_description'] ? ' - ' . $row['project_template_description'] : ''))) ?>"><?= escapeHtml($row['project_template_name']) ?></option>
                 <?php } ?>
             </select>
-            <div class="form-text">Its tickets are raised on this project in the template's order, each with its tasks<?= intval($project['project_contact_id']) ? ', for ' . escapeHtml($project['contact_name']) : '' ?>. The client isn't emailed.</div>
+            <div class="form-text"><?= intval($project['project_contact_id']) ? __('Its tickets are raised on this project in the template\'s order, each with its tasks, for %s. The client isn\'t emailed.', escapeHtml($project['contact_name'])) : __('Its tickets are raised on this project in the template\'s order, each with its tasks. The client isn\'t emailed.') ?></div>
         </div>
         <?php if (intval($project['project_manager'])) { ?>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="assign_to_manager" value="1" id="applyAssignToManager" checked>
-                <label class="form-check-label" for="applyAssignToManager">Assign them to <?= escapeHtml($project['user_name']) ?>, the manager</label>
+                <label class="form-check-label" for="applyAssignToManager"><?= __('Assign them to %s, the manager', escapeHtml($project['user_name'])) ?></label>
             </div>
         <?php } ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="apply_project_template" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Add tickets</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="apply_project_template" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Add tickets') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

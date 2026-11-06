@@ -173,7 +173,7 @@ function calendarEventForRequest($event_id, $action = 'view') {
     global $client_id;
     $row = calendarEventRow($event_id);
     if (!$row) {
-        flashAlert('That event no longer exists.', 'error');
+        flashAlert(__('That event no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['event_client_id']);
@@ -189,12 +189,12 @@ function calendarEventForModal($event_id, $action = 'view') {
     global $client_id;
     $row = calendarEventRow($event_id);
     if (!$row) {
-        echo json_encode(['error' => 'That event no longer exists.']);
+        echo json_encode(['error' => __('That event no longer exists.')]);
         exit;
     }
     $client_id = intval($row['event_client_id']);
     if ($client_id && !hasClientAccess($client_id)) {
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     enforceCalendarEvent($row, $action);
@@ -213,14 +213,14 @@ function calendarWhenText($row, $start = null, $end = null) {
     $e = strtotime($end) ?: $s;
     if (!empty($row['event_all_day'])) {
         if (date('Y-m-d', $s) >= date('Y-m-d', $e)) {
-            return date('D, M j, Y', $s) . ' (all day)';
+            return __('%s (all day)', formatDate($s, 'date_weekday'));
         }
-        return date('D, M j', $s) . ' - ' . date('D, M j, Y', $e) . ' (all day)';
+        return __('%1$s - %2$s (all day)', formatDate($s, 'date_weekday'), formatDate($e, 'date_weekday'));
     }
     if (date('Y-m-d', $s) === date('Y-m-d', $e)) {
-        return date('D, M j, Y, g:i A', $s) . ($e > $s ? ' - ' . date('g:i A', $e) : '');
+        return formatDate($s, 'datetime_weekday') . ($e > $s ? ' - ' . formatDate($e, 'time') : '');
     }
-    return date('D, M j, g:i A', $s) . ' - ' . date('D, M j, Y, g:i A', $e);
+    return formatDate($s, 'datetime_weekday') . ' - ' . formatDate($e, 'datetime_weekday');
 }
 
 /** Where an event is as one line - the site's name and address - or the location typed in. */
@@ -263,10 +263,14 @@ function calendarRepeatText($row) {
         return '';
     }
     $interval = max(1, intval($row['event_repeat_interval'] ?? 1));
-    [, $one, $many] = CALENDAR_REPEATS[(string) $row['event_repeat']];
-    $text = $interval === 1 ? "Every $one" : "Every $interval $many";
+    $text = [
+        'Day' => ($interval === 1 ? __('Every day') : __('Every %d days', $interval)),
+        'Week' => ($interval === 1 ? __('Every week') : __('Every %d weeks', $interval)),
+        'Month' => ($interval === 1 ? __('Every month') : __('Every %d months', $interval)),
+        'Year' => ($interval === 1 ? __('Every year') : __('Every %d years', $interval)),
+    ][(string) $row['event_repeat']];
     if (!empty($row['event_repeat_until'])) {
-        $text .= ' until ' . date('M j, Y', strtotime($row['event_repeat_until']));
+        return __('%1$s until %2$s', $text, formatDate($row['event_repeat_until']));
     }
     return $text;
 }
@@ -501,12 +505,12 @@ function calendarEventFormSet($post, $client_id, &$error = '') {
 
     $title = trim((string) ($post['title'] ?? ''));
     if ($title === '') {
-        $error = 'An event needs a title.';
+        $error = __('An event needs a title.');
         return '';
     }
     $calendar_id = intval($post['calendar'] ?? 0);
     if (!$calendar_id || !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM calendars WHERE calendar_id = $calendar_id AND calendar_archived_at IS NULL"))) {
-        $error = 'Pick the calendar it goes on.';
+        $error = __('Pick the calendar it goes on.');
         return '';
     }
 
@@ -514,7 +518,7 @@ function calendarEventFormSet($post, $client_id, &$error = '') {
     $start_date = (string) ($post['start_date'] ?? '');
     $end_date = !empty($post['end_date']) ? (string) $post['end_date'] : $start_date;
     if (!calendarIsDate($start_date)) {
-        $error = 'Pick the day it starts.';
+        $error = __('Pick the day it starts.');
         return '';
     }
     if (!calendarIsDate($end_date)) {
@@ -530,7 +534,7 @@ function calendarEventFormSet($post, $client_id, &$error = '') {
         $end = $end_time !== '' ? "$end_date $end_time:00" : date('Y-m-d H:i:s', strtotime($start) + 3600);
     }
     if ($end < $start) {
-        $error = 'It has to end after it starts.';
+        $error = __('It has to end after it starts.');
         return '';
     }
 
@@ -571,18 +575,18 @@ function calendarIsDate($value) {
  */
 function calendarSources() {
     $sources = [
-        'tickets' => ['label' => 'Scheduled tickets', 'icon' => 'fa-life-ring', 'color' => '#0d6efd', 'module' => 'module_support', 'default' => true,
-            'title' => 'Onsite and remote work booked on tickets'],
-        'projects' => ['label' => 'Projects', 'icon' => 'fa-project-diagram', 'color' => '#0f9d8a', 'module' => 'module_support', 'default' => true,
-            'title' => 'When open projects start and are due'],
-        'reviews' => ['label' => 'Service reviews', 'icon' => 'fa-clipboard-check', 'color' => '#64748b', 'module' => 'module_support', 'default' => true,
-            'title' => 'When each service is next due for review'],
-        'recurring' => ['label' => 'Recurring tickets', 'icon' => 'fa-redo-alt', 'color' => '#7c3aed', 'module' => 'module_support', 'default' => false,
-            'title' => 'When each recurring ticket is next raised'],
-        'renewals' => ['label' => 'Renewals', 'icon' => 'fa-hourglass-half', 'color' => '#d97706', 'module' => 'module_support', 'default' => false,
-            'title' => 'Domains, certificates, licenses and warranties expiring'],
-        'invoices' => ['label' => 'Invoices due', 'icon' => 'fa-file-invoice-dollar', 'color' => '#15803d', 'module' => 'module_sales', 'default' => false,
-            'title' => 'Unpaid invoices on the day they fall due'],
+        'tickets' => ['label' => __('Scheduled tickets'), 'icon' => 'fa-life-ring', 'color' => '#0d6efd', 'module' => 'module_support', 'default' => true,
+            'title' => __('Onsite and remote work booked on tickets')],
+        'projects' => ['label' => __('Projects'), 'icon' => 'fa-project-diagram', 'color' => '#0f9d8a', 'module' => 'module_support', 'default' => true,
+            'title' => __('When open projects start and are due')],
+        'reviews' => ['label' => __('Service reviews'), 'icon' => 'fa-clipboard-check', 'color' => '#64748b', 'module' => 'module_support', 'default' => true,
+            'title' => __('When each service is next due for review')],
+        'recurring' => ['label' => __('Recurring tickets'), 'icon' => 'fa-redo-alt', 'color' => '#7c3aed', 'module' => 'module_support', 'default' => false,
+            'title' => __('When each recurring ticket is next raised')],
+        'renewals' => ['label' => __('Renewals'), 'icon' => 'fa-hourglass-half', 'color' => '#d97706', 'module' => 'module_support', 'default' => false,
+            'title' => __('Domains, certificates, licenses and warranties expiring')],
+        'invoices' => ['label' => __('Invoices due'), 'icon' => 'fa-file-invoice-dollar', 'color' => '#15803d', 'module' => 'module_sales', 'default' => false,
+            'title' => __('Unpaid invoices on the day they fall due')],
     ];
     return array_filter($sources, function ($source) {
         return lookupUserPermission($source['module']) >= 1;
@@ -591,7 +595,7 @@ function calendarSources() {
 
 /** A scheduled ticket's title on the calendar: "TCK-12 Onsite - Client: subject". */
 function calendarTicketTitle($row, $with_client = true) {
-    return ticketReference($row) . ' ' . (intval($row['ticket_onsite']) ? 'Onsite' : 'Remote') . ' - '
+    return ticketReference($row) . ' ' . (intval($row['ticket_onsite']) ? __('Onsite') : __('Remote')) . ' - '
         . ($with_client && !empty($row['client_name']) ? $row['client_name'] . ': ' : '') . $row['ticket_subject'];
 }
 
@@ -645,7 +649,7 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
                 'extendedProps' => ['kind' => 'ticket', 'ticket_id' => intval($row['ticket_id']), 'client_id' => intval($row['ticket_client_id']),
                     'icon' => intval($row['ticket_onsite']) ? 'fa-car' : 'fa-headset',
                     'modal' => 'modals/ticket/ticket.php?id=' . intval($row['ticket_id']),
-                    'detail' => implode(' · ', array_filter([$row['user_name'] ?: 'Unassigned', $row['ticket_status_name']]))],
+                    'detail' => implode(' · ', array_filter([$row['user_name'] ?: __('Unassigned'), $row['ticket_status_name']]))],
             ] + $base;
         }
     } elseif ($key === 'projects') {
@@ -660,7 +664,7 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
                 if ($row[$column] && $row[$column] >= $from_date && $row[$column] <= $to_date) {
                     $items[] = [
                         'id' => "project-$what-" . intval($row['project_id']),
-                        'title' => projectReference($row) . " $what - " . $client_label($row) . $row['project_name'],
+                        'title' => ($what === 'starts' ? __('%1$s starts - %2$s', projectReference($row), $client_label($row) . $row['project_name']) : __('%1$s due - %2$s', projectReference($row), $client_label($row) . $row['project_name'])),
                         'start' => $row[$column], 'allDay' => true,
                         'extendedProps' => ['kind' => 'project', 'icon' => $icon, 'modal' => 'modals/project/project.php?id=' . intval($row['project_id']),
                             'url' => projectUrl($row['project_id'], $row['project_client_id'])],
@@ -677,7 +681,7 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
         while ($row = mysqli_fetch_assoc($sql)) {
             $items[] = [
                 'id' => 'review-' . intval($row['service_id']),
-                'title' => 'Review - ' . $client_label($row) . $row['service_name'],
+                'title' => __('Review - %s', $client_label($row) . $row['service_name']),
                 'start' => $row['service_review_due'], 'allDay' => true,
                 'extendedProps' => ['kind' => 'review', 'icon' => 'fa-clipboard-check', 'modal' => 'modals/service/service.php?id=' . intval($row['service_id']),
                     'url' => serviceUrl($row['service_id'], $row['service_client_id'])],
@@ -694,7 +698,7 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
             $row_client = intval($row['recurring_ticket_client_id']);
             $items[] = [
                 'id' => 'recurring-' . intval($row['recurring_ticket_id']),
-                'title' => 'Raised - ' . $client_label($row) . $row['recurring_ticket_subject'],
+                'title' => __('Raised - %s', $client_label($row) . $row['recurring_ticket_subject']),
                 'start' => $row['recurring_ticket_next_run'], 'allDay' => true,
                 'extendedProps' => ['kind' => 'recurring', 'icon' => 'fa-redo-alt', 'detail' => $row['recurring_ticket_frequency'],
                     'url' => 'recurring_tickets.php' . ($row_client ? "?client_id=$row_client" : '')],
@@ -704,16 +708,16 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
         $queries = [
             'domain' => ["SELECT domain_id AS id, domain_name AS name, domain_expire AS d, client_name FROM domains LEFT JOIN clients ON client_id = domain_client_id
                 WHERE domain_archived_at IS NULL AND domain_expire BETWEEN '$from_date' AND '$to_date'" . ($client_id ? " AND domain_client_id = $client_id" : '') . clientScopeSql('domain_client_id'),
-                'Domain expires', 'fa-globe', 'modals/domain/domain.php?id='],
+                __('Domain expires'), 'fa-globe', 'modals/domain/domain.php?id='],
             'certificate' => ["SELECT certificate_id AS id, certificate_name AS name, certificate_expire AS d, client_name FROM certificates LEFT JOIN clients ON client_id = certificate_client_id
                 WHERE certificate_archived_at IS NULL AND certificate_expire BETWEEN '$from_date' AND '$to_date'" . ($client_id ? " AND certificate_client_id = $client_id" : '') . clientScopeSql('certificate_client_id'),
-                'Certificate expires', 'fa-lock', 'modals/certificate/certificate.php?id='],
+                __('Certificate expires'), 'fa-lock', 'modals/certificate/certificate.php?id='],
             'software' => ["SELECT software_id AS id, software_name AS name, software_expire AS d, client_name FROM software LEFT JOIN clients ON client_id = software_client_id
                 WHERE software_archived_at IS NULL AND software_expire BETWEEN '$from_date' AND '$to_date'" . ($client_id ? " AND software_client_id = $client_id" : '') . clientScopeSql('software_client_id'),
-                'License renews', 'fa-cube', 'modals/software/software.php?id='],
+                __('License renews'), 'fa-cube', 'modals/software/software.php?id='],
             'warranty' => ["SELECT asset_id AS id, asset_name AS name, asset_warranty_expire AS d, client_name FROM assets LEFT JOIN clients ON client_id = asset_client_id
                 WHERE asset_archived_at IS NULL AND asset_warranty_expire BETWEEN '$from_date' AND '$to_date'" . ($client_id ? " AND asset_client_id = $client_id" : '') . clientScopeSql('asset_client_id'),
-                'Warranty ends', 'fa-shield-alt', 'modals/asset/asset.php?id='],
+                __('Warranty ends'), 'fa-shield-alt', 'modals/asset/asset.php?id='],
         ];
         foreach ($queries as $kind => [$query, $what, $icon, $modal]) {
             $sql = mysqli_query($mysqli, $query);
@@ -735,7 +739,7 @@ function calendarSourceItems($key, $from, $to, array $opts = []) {
         while ($row = mysqli_fetch_assoc($sql)) {
             $items[] = [
                 'id' => 'invoice-' . intval($row['invoice_id']),
-                'title' => $row['invoice_prefix'] . $row['invoice_number'] . ' due - ' . $row['client_name'],
+                'title' => __('%1$s due - %2$s', $row['invoice_prefix'] . $row['invoice_number'], $row['client_name']),
                 'start' => $row['invoice_due'], 'allDay' => true,
                 'extendedProps' => ['kind' => 'invoice', 'icon' => 'fa-file-invoice-dollar',
                     'url' => 'invoice.php?client_id=' . intval($row['invoice_client_id']) . '&invoice_id=' . intval($row['invoice_id'])],
@@ -1292,18 +1296,18 @@ function calendarUserFeedItems(array $feed, $from, $to) {
                 'uid' => "itflow-ticket-$ticket_id@$host",
                 'start' => $row['ticket_schedule'],
                 'end' => date('Y-m-d H:i:s', strtotime($row['ticket_schedule']) + CALENDAR_TICKET_MINUTES * 60),
-                'summary' => calendarTicketTitle($row) . ($everyone && $row['user_name'] ? ' (' . $row['user_name'] . ')' : '') . (ticketIsOpen($row) ? '' : ' [done]'),
+                'summary' => calendarTicketTitle($row) . ($everyone && $row['user_name'] ? ' (' . $row['user_name'] . ')' : '') . (ticketIsOpen($row) ? '' : ' [' . __('done') . ']'),
                 'location' => implode(', ', array_filter([$row['location_address'], $row['location_city'], trim($row['location_state'] . ' ' . $row['location_zip'])])),
                 'description' => implode("\n", array_filter([
-                    $row['client_name'] ? 'Client: ' . $row['client_name'] : '',
-                    $row['location_name'] ? 'Site: ' . $row['location_name'] : '',
-                    $row['contact_name'] ? 'Contact: ' . $row['contact_name'] . ($phone || $mobile ? ' - ' . implode(' / ', array_filter([$phone, $mobile])) : '') : '',
-                    'Assigned: ' . ($row['user_name'] ?: 'Nobody'),
+                    $row['client_name'] ? __('Client: %s', $row['client_name']) : '',
+                    $row['location_name'] ? __('Site: %s', $row['location_name']) : '',
+                    $row['contact_name'] ? __('Contact: %s', $row['contact_name'] . ($phone || $mobile ? ' - ' . implode(' / ', array_filter([$phone, $mobile])) : '')) : '',
+                    __('Assigned: %s', $row['user_name'] ?: __('Nobody')),
                     $link,
                 ])),
                 'url' => $link,
                 'stamp' => $row['ticket_updated_at'] ?: $row['ticket_created_at'],
-                'categories' => intval($row['ticket_onsite']) ? 'Onsite' : 'Remote',
+                'categories' => intval($row['ticket_onsite']) ? __('Onsite') : __('Remote'),
                 'busy' => $busy,
             ];
         }
@@ -1339,8 +1343,8 @@ function calendarUserFeedItems(array $feed, $from, $to) {
                 $items[] = [
                     'uid' => 'itflow-project-' . intval($row['project_id']) . "-$what@$host",
                     'start' => $row[$column] . ' 00:00:00', 'all_day' => true,
-                    'summary' => projectReference($row) . " $what - " . (intval($row['project_client_id']) ? $row['client_name'] . ': ' : '') . $row['project_name'],
-                    'description' => (intval($row['project_client_id']) ? 'Client: ' . $row['client_name'] . "\n" : '') . $link,
+                    'summary' => ($what === 'starts' ? __('%1$s starts - %2$s', projectReference($row), (intval($row['project_client_id']) ? $row['client_name'] . ': ' : '') . $row['project_name']) : __('%1$s due - %2$s', projectReference($row), (intval($row['project_client_id']) ? $row['client_name'] . ': ' : '') . $row['project_name'])),
+                    'description' => (intval($row['project_client_id']) ? __('Client: %s', $row['client_name']) . "\n" : '') . $link,
                     'url' => $link,
                     'stamp' => $row['project_updated_at'] ?: $row['project_created_at'],
                     'busy' => $busy,
@@ -1403,24 +1407,28 @@ function calendarSendInvites(array $event, $kind = 'invite', $attendees = null) 
     $meeting = calendarMeetingUrl($event);
     $description = trim(html_entity_decode(strip_tags((string) $event['event_description']), ENT_QUOTES, 'UTF-8'));
     $intro = [
-        'invite' => 'You are invited to the event below. The invitation is attached, so it can go straight into your calendar.',
-        'update' => 'The event below has changed. The attached invitation updates the one in your calendar.',
-        'cancel' => 'The event below has been cancelled. The attached cancellation takes it off your calendar.',
+        'invite' => __('You are invited to the event below. The invitation is attached, so it can go straight into your calendar.'),
+        'update' => __('The event below has changed. The attached invitation updates the one in your calendar.'),
+        'cancel' => __('The event below has been cancelled. The attached cancellation takes it off your calendar.'),
     ][$kind] ?? '';
-    $subject_prefix = ['invite' => 'Invitation', 'update' => 'Updated', 'cancel' => 'Cancelled'][$kind] ?? 'Invitation';
+    $subject = [
+        'invite' => __('Invitation: %1$s - %2$s', $event['event_title'], $when),
+        'update' => __('Updated: %1$s - %2$s', $event['event_title'], $when),
+        'cancel' => __('Cancelled: %1$s - %2$s', $event['event_title'], $when),
+    ][$kind] ?? __('Invitation: %1$s - %2$s', $event['event_title'], $when);
 
     $recipients = array_map(function ($attendee) use ($cancel) {
-        return ['email' => $attendee['email'], 'name' => (string) $attendee['name'], 'footnote' => $cancel ? 'You get this because you were invited to this event.' : 'You get this because you are invited to this event.'];
+        return ['email' => $attendee['email'], 'name' => (string) $attendee['name'], 'footnote' => $cancel ? __('You get this because you were invited to this event.') : __('You get this because you are invited to this event.')];
     }, $attendees);
-    emailQueue($recipients, mb_substr("$subject_prefix: " . $event['event_title'] . ' - ' . $when, 0, 250), [
-        'kind' => ['invite' => 'Invitation', 'update' => 'Event changed', 'cancel' => 'Event cancelled'][$kind] ?? 'Invitation',
+    emailQueue($recipients, mb_substr($subject, 0, 250), [
+        'kind' => ['invite' => __('Invitation'), 'update' => __('Event changed'), 'cancel' => __('Event cancelled')][$kind] ?? __('Invitation'),
         'tone' => $cancel ? 'secondary' : 'primary',
         'preview' => "$when" . ($where !== '' ? " - $where" : ''),
         'title' => (string) $event['event_title'],
         'intro' => [$intro],
-        'summary' => array_filter(['When' => $when, 'Repeats' => (string) $repeat, 'Where' => $where]),
+        'summary' => array_filter([__('When') => $when, __('Repeats') => (string) $repeat, __('Where') => $where]),
         'note' => !$cancel ? $description : '',
-        'button' => $meeting && !$cancel ? ['label' => 'Join the meeting', 'url' => $meeting, 'show_url' => true] : null,
+        'button' => $meeting && !$cancel ? ['label' => __('Join the meeting'), 'url' => $meeting, 'show_url' => true] : null,
     ], ['from' => $from, 'cal_str' => $ics]);
 
     $ids = array_filter(array_map(function ($attendee) {

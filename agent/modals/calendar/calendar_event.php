@@ -57,27 +57,27 @@ ob_start();
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
 
     <dl class="itflow-asset-dl mb-0">
-        <dt>When</dt>
+        <dt><?= __('When') ?></dt>
         <dd>
             <div class="fw-semibold"><?= escapeHtml(calendarWhenText($event, $start, $end)) ?></div>
             <?php if ($repeats) { ?>
-                <div class="small text-body-secondary"><i class="fas fa-redo fa-fw me-1"></i><?= escapeHtml(calendarRepeatText($event)) ?>, from <?= date('M j, Y', strtotime($event['event_start'])) ?></div>
+                <div class="small text-body-secondary"><i class="fas fa-redo fa-fw me-1"></i><?= escapeHtml(__('%1$s, from %2$s', calendarRepeatText($event), formatDate($event['event_start']))) ?></div>
                 <?php if (calendarSkippedDates($event)) { ?>
-                    <div class="small text-body-secondary"><i class="fas fa-forward fa-fw me-1"></i>Skipped <?= escapeHtml(implode(', ', array_map(function ($date) {
-                        return date('M j', strtotime($date));
+                    <div class="small text-body-secondary"><i class="fas fa-forward fa-fw me-1"></i><?= __('Skipped') ?> <?= escapeHtml(implode(', ', array_map(function ($date) {
+                        return formatDate($date, 'date_short');
                     }, calendarSkippedDates($event)))) ?></div>
                 <?php } ?>
             <?php } ?>
         </dd>
 
         <?php if ($where !== '' || $meeting) { ?>
-            <dt>Where</dt>
+            <dt><?= __('Where') ?></dt>
             <dd class="min-w-0">
                 <?php if (!empty($event['location_name'])) { ?>
                     <div><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=<?= intval($event['event_location_id']) ?>"><i class="fas fa-fw fa-map-marker-alt text-secondary me-1"></i><?= escapeHtml($event['location_name']) ?></a></div>
@@ -88,10 +88,10 @@ ob_start();
                 <?php } ?>
                 <div class="d-flex flex-wrap gap-2 mt-1">
                     <?php if ($meeting) { ?>
-                        <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($meeting) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-video me-1"></i>Join</a>
+                        <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($meeting) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-video me-1"></i><?= __('Join') ?></a>
                     <?php } ?>
                     <?php if ($map) { ?>
-                        <a class="btn btn-sm btn-outline-secondary" href="<?= escapeHtml($map) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt me-1"></i>Map</a>
+                        <a class="btn btn-sm btn-outline-secondary" href="<?= escapeHtml($map) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt me-1"></i><?= __('Map') ?></a>
                     <?php } ?>
                     <?php if (!empty($event['location_phone'])) { ?>
                         <span class="small align-self-center"><i class="fas fa-phone fa-fw text-secondary"></i><?= contactPhoneLink($event['location_phone'], $event['location_phone_country_code']) ?></span>
@@ -101,14 +101,14 @@ ob_start();
         <?php } ?>
 
         <?php if ($client_id) { ?>
-            <dt>Client</dt>
+            <dt><?= __('Client') ?></dt>
             <dd><?php if (lookupUserPermission('module_client') >= 1) { ?><a href="client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($event['client_name']) ?></a><?php } else { ?><?= escapeHtml($event['client_name']) ?><?php } ?></dd>
         <?php } ?>
 
-        <dt>Who</dt>
+        <dt><?= __('Who') ?></dt>
         <dd class="min-w-0">
             <?php if (!$attendees) { ?>
-                <span class="text-body-secondary">Nobody added</span>
+                <span class="text-body-secondary"><?= __('Nobody added') ?></span>
             <?php } ?>
             <?php foreach ($attendees as $attendee) {
                 if ($attendee['kind'] === 'agent') {
@@ -124,22 +124,22 @@ ob_start();
                     <?= $avatar ?>
                     <?php if ($phone) { ?><span class="small"><?= $phone ?></span><?php } ?>
                     <?php if ($attendee['attendee_invited_at']) { ?>
-                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="Sent <?= escapeHtml(date('M j, Y g:i A', strtotime($attendee['attendee_invited_at']))) ?>"><i class="fas fa-check me-1"></i>Invited</span>
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="<?= escapeHtml(__('Sent %s', formatDate($attendee['attendee_invited_at'], 'datetime'))) ?>"><i class="fas fa-check me-1"></i><?= __('Invited') ?></span>
                     <?php } elseif (!filter_var($attendee['email'], FILTER_VALIDATE_EMAIL)) { ?>
-                        <span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal">No email</span>
+                        <span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal"><?= __('No email') ?></span>
                     <?php } ?>
                 </div>
             <?php } ?>
         </dd>
 
         <?php if (!empty($event['organizer_name'])) { ?>
-            <dt>Added by</dt>
+            <dt><?= __('Added by') ?></dt>
             <dd><?= escapeHtml($event['organizer_name']) ?> <span class="small text-body-secondary"><?= escapeHtml(timeAgo($event['event_created_at'])) ?></span></dd>
         <?php } ?>
     </dl>
 
     <?php if (trim((string) $event['event_description']) !== '') { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">Notes</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('Notes') ?></div>
         <div class="itflow-service-text"><?= escapeHtml($event['event_description']) ?></div>
     <?php } ?>
 
@@ -147,22 +147,22 @@ ob_start();
 
 <div class="modal-footer">
     <div class="dropdown dropup me-auto">
-        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" title="More actions"><i class="fas fa-ellipsis-h"></i></button>
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More actions')) ?>"><i class="fas fa-ellipsis-h"></i></button>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="post.php?export_event_ics=<?= $event_id ?>"><i class="fas fa-fw fa-download me-2"></i>Download .ics</a>
+            <a class="dropdown-item" href="post.php?export_event_ics=<?= $event_id ?>"><i class="fas fa-fw fa-download me-2"></i><?= __('Download .ics') ?></a>
             <?php if ($repeats && $can_edit) { ?>
                 <a class="dropdown-item confirm-link" href="post.php?skip_event_occurrence=<?= $event_id ?>&date=<?= escapeHtml($occurrence) ?>&csrf_token=<?= $csrf ?>"
-                    data-confirm-title="Skip <?= date('D, M j', strtotime($occurrence)) ?>?" data-confirm-button="Skip it"
-                    data-confirm-text="Only this one is dropped - the rest of the series stays.<?= $invited ? ' Everyone who has the invitation is sent the update.' : '' ?>">
-                    <i class="fas fa-fw fa-forward me-2"></i>Skip this one
+                    data-confirm-title="<?= escapeHtml(__('Skip %s?', formatDate($occurrence, 'date_weekday'))) ?>" data-confirm-button="<?= escapeHtml(__('Skip it')) ?>"
+                    data-confirm-text="<?= escapeHtml($invited ? __('Only this one is dropped - the rest of the series stays. Everyone who has the invitation is sent the update.') : __('Only this one is dropped - the rest of the series stays.')) ?>">
+                    <i class="fas fa-fw fa-forward me-2"></i><?= __('Skip this one') ?>
                 </a>
             <?php } ?>
             <?php if ($can_delete) { ?>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_event=<?= $event_id ?>&csrf_token=<?= $csrf ?>"
-                    data-confirm-title="Delete <?= escapeHtml($event['event_title']) ?>?" data-confirm-button="Delete"
-                    <?php if ($invited) { ?>data-confirm-text="Everyone who was sent the invitation is emailed the cancellation."<?php } ?>>
-                    <i class="fas fa-fw fa-trash-alt me-2"></i><?= $repeats ? 'Delete series' : 'Delete' ?>
+                    data-confirm-title="<?= escapeHtml(__('Delete %s?', $event['event_title'])) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
+                    <?php if ($invited) { ?>data-confirm-text="<?= escapeHtml(__('Everyone who was sent the invitation is emailed the cancellation.')) ?>"<?php } ?>>
+                    <i class="fas fa-fw fa-trash-alt me-2"></i><?= $repeats ? __('Delete series') : __('Delete') ?>
                 </a>
             <?php } ?>
         </div>
@@ -172,16 +172,16 @@ ob_start();
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
             <input type="hidden" name="event_id" value="<?= $event_id ?>">
             <button type="submit" name="send_event_invites" class="btn btn-outline-secondary confirm-link"
-                data-confirm-title="<?= $invited ? 'Send it again?' : 'Send the invitation?' ?>" data-confirm-button="Send"
-                data-confirm-text="<?= count($emailable) ?> <?= count($emailable) === 1 ? 'person is' : 'people are' ?> emailed the invitation, for their calendar.">
-                <i class="fas fa-paper-plane me-2"></i><?= $invited ? 'Resend' : 'Send invitation' ?>
+                data-confirm-title="<?= escapeHtml($invited ? __('Send it again?') : __('Send the invitation?')) ?>" data-confirm-button="<?= escapeHtml(__('Send')) ?>"
+                data-confirm-text="<?= escapeHtml(_n('%d person is emailed the invitation, for their calendar.', '%d people are emailed the invitation, for their calendar.', count($emailable))) ?>">
+                <i class="fas fa-paper-plane me-2"></i><?= $invited ? __('Resend') : __('Send invitation') ?>
             </button>
         </form>
     <?php } ?>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/calendar/calendar_event_edit.php?id=<?= $event_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/calendar/calendar_event_edit.php?id=<?= $event_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } else { ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Close</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Close') ?></button>
     <?php } ?>
 </div>
 

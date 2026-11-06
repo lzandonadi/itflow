@@ -39,12 +39,12 @@ $not_here = !$project
 
 if ($not_here) { ?>
     <div class="text-center mt-5">
-        <h1 class="h3 text-secondary">Nothing to see here</h1>
+        <h1 class="h3 text-secondary"><?= __('Nothing to see here') ?></h1>
         <?php if ($project && (!intval($project['project_client_id']) || hasClientAccess($project['project_client_id']))) { ?>
             <!-- The right project, the wrong client in the address -->
-            <a class="btn btn-primary mt-3" href="<?= escapeHtml(projectUrl($project['project_id'], $project['project_client_id'])) ?>"><i class="fas fa-fw fa-project-diagram me-2"></i>Open <?= escapeHtml(projectReference($project)) ?></a>
+            <a class="btn btn-primary mt-3" href="<?= escapeHtml(projectUrl($project['project_id'], $project['project_client_id'])) ?>"><i class="fas fa-fw fa-project-diagram me-2"></i><?= escapeHtml(__('Open %s', projectReference($project))) ?></a>
         <?php } ?>
-        <a class="btn btn-secondary mt-3" href="projects.php<?= $client_url ? "?client_id=$page_client_id" : '' ?>"><i class="fa fa-fw fa-arrow-left me-2"></i>Projects</a>
+        <a class="btn btn-secondary mt-3" href="projects.php<?= $client_url ? "?client_id=$page_client_id" : '' ?>"><i class="fa fa-fw fa-arrow-left me-2"></i><?= __('Projects') ?></a>
     </div>
     <?php
     require_once "../includes/footer.php";
@@ -61,7 +61,7 @@ $stats = projectStats([$project_id])[$project_id];
 $flags = projectFlags($project, $stats);
 $due = projectDueState($project);
 $budget_hours = floatval($project['project_budget_hours'] ?? 0);
-$manager = formatAssignee($project['project_manager'], $project['user_name'], $project['user_avatar'], false, 'No manager');
+$manager = formatAssignee($project['project_manager'], $project['user_name'], $project['user_avatar'], false, __('No manager'));
 
 // Override Tab Title // No Sanitizing needed as this var will only be used in the tab title
 $tab_title = projectReference($project);
@@ -123,8 +123,8 @@ $has_templates = $can_edit && $is_open && mysqli_num_rows(mysqli_query($mysqli, 
 $history = auditLogHistory('Project', $project_id);
 
 $project_tabs = [
-    'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'count' => count($tickets), 'badge' => $stats['open']],
-    'tasks' => ['label' => 'Tasks', 'icon' => 'fa-tasks', 'count' => $stats['tasks']],
+    'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'count' => count($tickets), 'badge' => $stats['open']],
+    'tasks' => ['label' => __('Tasks'), 'icon' => 'fa-tasks', 'count' => $stats['tasks']],
     'activity' => ['label' => 'Activity', 'icon' => 'fa-comments', 'count' => count($activity)],
     'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
 ];
@@ -138,7 +138,7 @@ $contact_archived = !empty($project['contact_archived_at']);
     <?php if ($client_url) { ?>
         <li class="breadcrumb-item"><a href="client_overview.php?client_id=<?= $client_id ?>"><?= $client_name ?></a></li>
     <?php } ?>
-    <li class="breadcrumb-item"><a href="projects.php<?= $client_url ? "?client_id=$client_id" : '' ?>">Projects</a></li>
+    <li class="breadcrumb-item"><a href="projects.php<?= $client_url ? "?client_id=$client_id" : '' ?>"><?= __('Projects') ?></a></li>
     <li class="breadcrumb-item active"><?= $reference ?></li>
 </ol>
 
@@ -158,13 +158,13 @@ $contact_archived = !empty($project['contact_archived_at']);
                 <?php if ($project_client_id) { ?>
                     <a class="text-body-secondary" href="client_overview.php?client_id=<?= $project_client_id ?>"><i class="fas fa-fw fa-users me-1"></i><?= escapeHtml($project['client_name']) ?></a>
                 <?php } else { ?>
-                    <span><i class="fas fa-fw fa-building me-1"></i>Internal</span>
+                    <span><i class="fas fa-fw fa-building me-1"></i><?= __('Internal') ?></span>
                 <?php } ?>
-                <span class="d-inline-flex align-items-center" title="Project manager"><i class="fas fa-fw fa-user-tie me-1"></i>
+                <span class="d-inline-flex align-items-center" title="<?= escapeHtml(__('Project manager')) ?>"><i class="fas fa-fw fa-user-tie me-1"></i>
                     <?= $can_edit && $is_open ? quickPick('project_manager', $project_id, (string) intval($project['project_manager']), $manager, 'detail') : $manager ?>
                 </span>
                 <?php if (intval($project['project_contact_id']) && $project['contact_name'] !== null) { ?>
-                    <span class="d-inline-flex align-items-center" title="Client contact"><?= contactLink($project_client_id, $project['project_contact_id'], $project['contact_name'], $project['contact_photo'] ?? '', ['archived' => $contact_archived]) ?></span>
+                    <span class="d-inline-flex align-items-center" title="<?= escapeHtml(__('Client contact')) ?>"><?= contactLink($project_client_id, $project['project_contact_id'], $project['contact_name'], $project['contact_photo'] ?? '', ['archived' => $contact_archived]) ?></span>
                 <?php } ?>
             </div>
         </div>
@@ -172,17 +172,17 @@ $contact_archived = !empty($project['contact_archived_at']);
         <div class="d-flex flex-wrap gap-2 d-print-none">
             <?php if ($can_edit && $is_open) { ?>
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $new_ticket_url ?>">
-                    <i class="fas fa-plus me-2"></i>New Ticket
+                    <i class="fas fa-plus me-2"></i><?= __('New Ticket') ?>
                 </button>
                 <div class="dropdown">
-                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i>Add tickets</button>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i><?= __('Add tickets') ?></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/project/project_link_ticket.php?project_id=<?= $project_id ?>">
-                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i>Tickets already raised
+                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i><?= __('Tickets already raised') ?>
                         </a>
                         <?php if ($has_templates) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/project/project_apply_template.php?project_id=<?= $project_id ?>">
-                                <i class="fas fa-fw fa-cubes text-secondary me-2"></i>From a project template
+                                <i class="fas fa-fw fa-cubes text-secondary me-2"></i><?= __('From a project template') ?>
                             </a>
                         <?php } ?>
                     </div>
@@ -190,47 +190,47 @@ $contact_archived = !empty($project['contact_archived_at']);
             <?php } ?>
             <?php if ($can_edit && !$project['project_archived_at']) { ?>
                 <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/project/project_edit.php?id=<?= $project_id ?>">
-                    <i class="fas fa-edit me-2"></i>Edit
+                    <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                 </button>
             <?php } ?>
             <?php if ($can_edit && $is_open) { ?>
                 <?php if ($stats['open']) { ?>
-                    <button type="button" class="btn btn-outline-success" disabled title="<?= $stats['open'] ?> of its tickets <?= $stats['open'] === 1 ? 'is' : 'are' ?> still open - resolve or close them first">
-                        <i class="fas fa-check me-2"></i>Mark complete
+                    <button type="button" class="btn btn-outline-success" disabled title="<?= escapeHtml(_n('%d of its tickets is still open - resolve or close them first', '%d of its tickets are still open - resolve or close them first', $stats['open'])) ?>">
+                        <i class="fas fa-check me-2"></i><?= __('Mark complete') ?>
                     </button>
                 <?php } else { ?>
                     <a class="btn <?= $stats['tickets'] ? 'btn-success' : 'btn-outline-success' ?> confirm-link" href="post.php?complete_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $reference ?> is marked complete.">
-                        <i class="fas fa-check me-2"></i>Mark complete
+                        <i class="fas fa-check me-2"></i><?= __('Mark complete') ?>
                     </a>
                 <?php } ?>
             <?php } elseif ($can_edit && $state === 'completed') { ?>
                 <a class="btn btn-outline-secondary" href="post.php?reopen_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                    <i class="fas fa-redo me-2"></i>Reopen
+                    <i class="fas fa-redo me-2"></i><?= __('Reopen') ?>
                 </a>
             <?php } ?>
             <?php if ($can_edit) { ?>
                 <div class="dropdown dropstart">
-                    <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-fw fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="tickets.php?<?= $project_client_id ? "client_id=$project_client_id&" : '' ?>project=<?= $project_id ?>&show=all">
-                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i>Its tickets on the ticket list
+                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i><?= __('Its tickets on the ticket list') ?>
                         </a>
                         <div class="dropdown-divider"></div>
                         <?php if ($project['project_archived_at']) { ?>
                             <a class="dropdown-item" href="post.php?restore_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                             </a>
                         <?php } else { ?>
-                            <a class="dropdown-item text-danger confirm-link" href="post.php?archive_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $reference ?> moves to Archived. Its tickets stay as they are.">
-                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                            <a class="dropdown-item text-danger confirm-link" href="post.php?archive_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= escapeHtml(__('%s moves to Archived. Its tickets stay as they are.', $reference)) ?>">
+                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_delete) { ?>
                             <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                data-confirm-text="<?= $reference ?> goes for good. Its tickets stay, no longer part of a project.">
-                                <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                data-confirm-text="<?= escapeHtml(__('%s goes for good. Its tickets stay, no longer part of a project.', $reference)) ?>">
+                                <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                             </a>
                         <?php } ?>
                     </div>
@@ -248,7 +248,7 @@ $contact_archived = !empty($project['contact_archived_at']);
         <i class="fas fa-fw fa-<?= ['overdue' => 'calendar-times', 'over_budget' => 'hourglass-end', 'ready' => 'flag-checkered', 'stalled' => 'hourglass-half'][$flag['key']] ?? 'info-circle' ?>"></i>
         <span class="flex-grow-1"><?= escapeHtml($flag['text']) ?></span>
         <?php if ($flag['key'] === 'ready' && $can_edit) { ?>
-            <a class="btn btn-sm btn-success confirm-link" href="post.php?complete_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $reference ?> is marked complete.">Mark complete</a>
+            <a class="btn btn-sm btn-success confirm-link" href="post.php?complete_project=<?= $project_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= $reference ?> is marked complete."><?= __('Mark complete') ?></a>
         <?php } ?>
     </div>
 <?php } ?>
@@ -258,13 +258,13 @@ $contact_archived = !empty($project['contact_archived_at']);
     <div class="col-sm-6 col-xl-3">
         <div class="card h-100 mb-0 itflow-project-stat">
             <div class="card-body">
-                <div class="itflow-project-stat-label"><i class="fas fa-fw fa-life-ring me-1"></i>Tickets done</div>
+                <div class="itflow-project-stat-label"><i class="fas fa-fw fa-life-ring me-1"></i><?= __('Tickets done') ?></div>
                 <div class="itflow-project-stat-value"><?= $stats['done'] ?><span class="text-body-secondary fs-6 fw-normal"> / <?= $stats['tickets'] ?></span></div>
-                <div class="progress mt-2" role="progressbar" aria-label="Tickets done" aria-valuenow="<?= $stats['tickets'] ? round($stats['done'] / $stats['tickets'] * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress mt-2" role="progressbar" aria-label="<?= escapeHtml(__('Tickets done')) ?>" aria-valuenow="<?= $stats['tickets'] ? round($stats['done'] / $stats['tickets'] * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar <?= $stats['tickets'] && $stats['done'] === $stats['tickets'] ? 'bg-success' : 'bg-primary' ?>" style="width: <?= $stats['tickets'] ? round($stats['done'] / $stats['tickets'] * 100) : 0 ?>%"></div>
                 </div>
                 <div class="small text-body-secondary mt-2">
-                    <?= $stats['tickets'] ? $stats['open'] . ' open' : 'No tickets yet' ?>
+                    <?= $stats['tickets'] ? __('%d open', $stats['open']) : __('No tickets yet') ?>
                     <?php if ($stats['overdue']) { ?><span class="text-danger-emphasis ms-1">· <?= $stats['overdue'] ?> past due</span><?php } ?>
                 </div>
             </div>
@@ -273,19 +273,19 @@ $contact_archived = !empty($project['contact_archived_at']);
     <div class="col-sm-6 col-xl-3">
         <div class="card h-100 mb-0 itflow-project-stat">
             <div class="card-body">
-                <div class="itflow-project-stat-label"><i class="fas fa-fw fa-tasks me-1"></i>Tasks done</div>
+                <div class="itflow-project-stat-label"><i class="fas fa-fw fa-tasks me-1"></i><?= __('Tasks done') ?></div>
                 <div class="itflow-project-stat-value"><?= $stats['tasks_done'] ?><span class="text-body-secondary fs-6 fw-normal"> / <?= $stats['tasks'] ?></span></div>
-                <div class="progress mt-2" role="progressbar" aria-label="Tasks done" aria-valuenow="<?= $stats['tasks'] ? round($stats['tasks_done'] / $stats['tasks'] * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress mt-2" role="progressbar" aria-label="<?= escapeHtml(__('Tasks done')) ?>" aria-valuenow="<?= $stats['tasks'] ? round($stats['tasks_done'] / $stats['tasks'] * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar bg-secondary" style="width: <?= $stats['tasks'] ? round($stats['tasks_done'] / $stats['tasks'] * 100) : 0 ?>%"></div>
                 </div>
-                <div class="small text-body-secondary mt-2"><?= $stats['tasks'] ? ($stats['tasks'] - $stats['tasks_done']) . ' to do' : 'No tasks on its tickets' ?></div>
+                <div class="small text-body-secondary mt-2"><?= $stats['tasks'] ? __('%d to do', $stats['tasks'] - $stats['tasks_done']) : __('No tasks on its tickets') ?></div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
         <div class="card h-100 mb-0 itflow-project-stat">
             <div class="card-body">
-                <div class="itflow-project-stat-label"><i class="far fa-fw fa-clock me-1"></i>Time logged</div>
+                <div class="itflow-project-stat-label"><i class="far fa-fw fa-clock me-1"></i><?= __('Time logged') ?></div>
                 <?php
                 $used = $budget_hours > 0 ? $stats['seconds'] / ($budget_hours * 3600) : 0;
                 $budget_tone = $used > 1 ? 'bg-danger' : ($used >= .8 ? 'bg-warning' : 'bg-info');
@@ -294,17 +294,17 @@ $contact_archived = !empty($project['contact_archived_at']);
                     <?php if ($budget_hours > 0) { ?><span class="text-body-secondary fs-6 fw-normal"> / <?= projectHoursText($budget_hours * 3600) ?></span><?php } ?>
                 </div>
                 <?php if ($budget_hours > 0) { ?>
-                    <div class="progress mt-2" role="progressbar" aria-label="Budget used" aria-valuenow="<?= min(100, round($used * 100)) ?>" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress mt-2" role="progressbar" aria-label="<?= escapeHtml(__('Budget used')) ?>" aria-valuenow="<?= min(100, round($used * 100)) ?>" aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar <?= $budget_tone ?>" style="width: <?= min(100, round($used * 100)) ?>%"></div>
                     </div>
                     <div class="small text-body-secondary mt-2">
-                        <?= $used > 1 ? projectHoursText($stats['seconds'] - $budget_hours * 3600) . ' over budget' : projectHoursText($budget_hours * 3600 - $stats['seconds']) . ' left of the budget' ?>
+                        <?= $used > 1 ? __('%s over budget', projectHoursText($stats['seconds'] - $budget_hours * 3600)) : __('%s left of the budget', projectHoursText($budget_hours * 3600 - $stats['seconds'])) ?>
                     </div>
                 <?php } else { ?>
-                    <div class="small text-body-secondary mt-2">No budget set<?= $can_edit && !$project['project_archived_at'] ? ' - add one in Edit' : '' ?></div>
+                    <div class="small text-body-secondary mt-2"><?= $can_edit && !$project['project_archived_at'] ? __('No budget set - add one in Edit') : __('No budget set') ?></div>
                 <?php } ?>
                 <?php if ($stats['billable_seconds']) { ?>
-                    <div class="small text-body-secondary" title="Time on billable tickets"><?= projectHoursText($stats['billable_seconds']) ?> billable<?= $stats['unbilled_seconds'] ? ', <span class="text-warning-emphasis">' . projectHoursText($stats['unbilled_seconds']) . ' not invoiced</span>' : '' ?></div>
+                    <div class="small text-body-secondary" title="<?= escapeHtml(__('Time on billable tickets')) ?>"><?= projectHoursText($stats['billable_seconds']) ?> billable<?= $stats['unbilled_seconds'] ? ', <span class="text-warning-emphasis">' . projectHoursText($stats['unbilled_seconds']) . ' not invoiced</span>' : '' ?></div>
                 <?php } ?>
             </div>
         </div>
@@ -312,22 +312,22 @@ $contact_archived = !empty($project['contact_archived_at']);
     <div class="col-sm-6 col-xl-3">
         <div class="card h-100 mb-0 itflow-project-stat">
             <div class="card-body">
-                <div class="itflow-project-stat-label"><i class="far fa-fw fa-calendar me-1"></i><?= $due['key'] === 'done' ? 'Completed' : 'Due' ?></div>
+                <div class="itflow-project-stat-label"><i class="far fa-fw fa-calendar me-1"></i><?= $due['key'] === 'done' ? __('Completed') : __('Due') ?></div>
                 <?php if ($due['key'] === 'done') { ?>
-                    <div class="itflow-project-stat-value"><?= escapeHtml(date('M j, Y', strtotime($project['project_completed_at']))) ?></div>
+                    <div class="itflow-project-stat-value"><?= escapeHtml(formatDate($project['project_completed_at'])) ?></div>
                     <div class="small mt-2 <?= $due['late'] ? 'text-warning-emphasis' : 'text-body-secondary' ?>">
-                        <?= $project['project_due'] ? ($due['late'] ? $due['days_late'] . ' day' . ($due['days_late'] === 1 ? '' : 's') . ' after its due date' : 'On time - due ' . escapeHtml(date('M j', strtotime($project['project_due'])))) : 'It had no due date' ?>
+                        <?= escapeHtml($project['project_due'] ? ($due['late'] ? _n('%d day after its due date', '%d days after its due date', $due['days_late']) : __('On time - due %s', formatDate($project['project_due'], 'date_short'))) : __('It had no due date')) ?>
                     </div>
                 <?php } elseif ($project['project_due']) { ?>
-                    <div class="itflow-project-stat-value <?= $due['key'] === 'overdue' ? 'text-danger-emphasis' : '' ?>"><?= escapeHtml(date('M j, Y', strtotime($project['project_due']))) ?></div>
+                    <div class="itflow-project-stat-value <?= $due['key'] === 'overdue' ? 'text-danger-emphasis' : '' ?>"><?= escapeHtml(formatDate($project['project_due'])) ?></div>
                     <div class="small mt-2 <?= ['overdue' => 'text-danger-emphasis', 'soon' => 'text-warning-emphasis'][$due['key']] ?? 'text-body-secondary' ?>">
-                        <?= $due['key'] === 'overdue' ? abs($due['days']) . ' day' . (abs($due['days']) === 1 ? '' : 's') . ' overdue' : 'Due ' . projectDaysText($due['days']) ?>
+                        <?= escapeHtml($due['key'] === 'overdue' ? _n('%d day overdue', '%d days overdue', abs($due['days'])) : __('Due %s', projectDaysText($due['days']))) ?>
                     </div>
                 <?php } else { ?>
-                    <div class="itflow-project-stat-value text-body-secondary">No due date</div>
+                    <div class="itflow-project-stat-value text-body-secondary"><?= __('No due date') ?></div>
                 <?php } ?>
                 <?php if ($project['project_start']) { ?>
-                    <div class="small text-body-secondary"><?= $state === 'upcoming' ? 'Starts' : 'Started' ?> <?= escapeHtml(date('M j, Y', strtotime($project['project_start']))) ?></div>
+                    <div class="small text-body-secondary"><?= escapeHtml($state === 'upcoming' ? __('Starts %s', formatDate($project['project_start'])) : __('Started %s', formatDate($project['project_start']))) ?></div>
                 <?php } ?>
             </div>
         </div>
@@ -347,7 +347,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                                 <i class="fas fa-fw <?= $tab['icon'] ?> me-1"></i><?= $tab['label'] ?>
                                 <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
                                 <?php if (!empty($tab['badge'])) { ?>
-                                    <span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span>
+                                    <span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= __('%d open', intval($tab['badge'])) ?></span>
                                 <?php } ?>
                             </button>
                         </li>
@@ -360,7 +360,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                 <div class="tab-pane fade" id="project-pane-tickets" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
                         <span class="text-body-secondary small">
-                            <?= $tickets ? 'Open ones first.' : 'No tickets on it yet.' ?>
+                            <?= $tickets ? __('Open ones first.') : __('No tickets on it yet.') ?>
                             <?php if ($hidden_tickets > 0) { ?>
                                 <?= $hidden_tickets ?> more belong to clients you can't reach - they still count towards its progress.
                             <?php } ?>
@@ -368,29 +368,29 @@ $contact_archived = !empty($project['contact_archived_at']);
                         <?php if ($can_edit && $tickets) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                    <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_assign.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-user-check me-2"></i>Assign
+                                        <i class="fas fa-fw fa-user-check me-2"></i><?= __('Assign') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_edit_priority.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-thermometer-half me-2"></i>Set priority
+                                        <i class="fas fa-fw fa-thermometer-half me-2"></i><?= __('Set priority') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_edit_category.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-tag me-2"></i>Set category
+                                        <i class="fas fa-fw fa-tag me-2"></i><?= __('Set category') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_reply.php" data-modal-size="lg" data-bulk="true">
-                                        <i class="fas fa-fw fa-paper-plane me-2"></i>Reply or add a note
+                                        <i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Reply or add a note') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_bulk_resolve.php" data-modal-size="lg" data-bulk="true">
-                                        <i class="fas fa-fw fa-check me-2"></i>Resolve
+                                        <i class="fas fa-fw fa-check me-2"></i><?= __('Resolve') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="remove_tickets_from_project"
-                                        data-confirm-text="The tickets stay as they are, just no longer part of this project.">
-                                        <i class="fas fa-fw fa-unlink me-2"></i>Take off the project
+                                        data-confirm-text="<?= escapeHtml(__('The tickets stay as they are, just no longer part of this project.')) ?>">
+                                        <i class="fas fa-fw fa-unlink me-2"></i><?= __('Take off the project') ?>
                                     </button>
                                 </div>
                             </div>
@@ -407,17 +407,17 @@ $contact_archived = !empty($project['contact_archived_at']);
                                         <?php if ($can_edit) { ?>
                                             <th class="checkbox-column border-end">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all">
+                                                    <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all')) ?>">
                                                 </div>
                                             </th>
                                         <?php } ?>
-                                        <th>Ticket</th>
-                                        <?php if (!$project_client_id) { ?><th>Client</th><?php } ?>
-                                        <th>Status</th>
-                                        <th>Assigned</th>
-                                        <th>Due</th>
-                                        <th>Time</th>
-                                        <th>Activity</th>
+                                        <th><?= __('Ticket') ?></th>
+                                        <?php if (!$project_client_id) { ?><th><?= __('Client') ?></th><?php } ?>
+                                        <th><?= __('Status') ?></th>
+                                        <th><?= __('Assigned') ?></th>
+                                        <th><?= __('Due') ?></th>
+                                        <th><?= __('Time') ?></th>
+                                        <th><?= __('Activity') ?></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -436,13 +436,13 @@ $contact_archived = !empty($project['contact_archived_at']);
                                             <?php if ($can_edit) { ?>
                                                 <td class="checkbox-column bg-light border-end">
                                                     <div class="form-check">
-                                                        <input class="form-check-input bulk-select" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" aria-label="Select <?= escapeHtml(ticketReference($row)) ?>">
+                                                        <input class="form-check-input bulk-select" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" aria-label="<?= escapeHtml(__('Select %s', ticketReference($row))) ?>">
                                                     </div>
                                                 </td>
                                             <?php } ?>
                                             <td class="itflow-ticket-main">
                                                 <div class="d-flex align-items-start gap-2">
-                                                    <span class="itflow-ticket-move <?= $move === 'us' ? 'is-ours' : '' ?>" <?= $move === 'us' ? 'title="Needs a reply from us"' : 'aria-hidden="true"' ?>></span>
+                                                    <span class="itflow-ticket-move <?= $move === 'us' ? 'is-ours' : '' ?>" <?= $move === 'us' ? 'title="' . escapeHtml(__('Needs a reply from us')) . '"' : 'aria-hidden="true"' ?>></span>
                                                     <div class="min-w-0">
                                                         <a class="<?= $ticket_open ? 'fw-semibold text-body' : 'text-body-secondary' ?> itflow-ticket-subject" href="<?= $ticket_url ?>"><?= escapeHtml($row['ticket_subject']) ?></a>
                                                         <div class="itflow-ticket-meta small text-body-secondary">
@@ -450,16 +450,16 @@ $contact_archived = !empty($project['contact_archived_at']);
                                                             <?= ticketPriorityHtml($row['ticket_priority'], 'detail') ?>
                                                             <?= ticketSourceIcon($row['ticket_source']) ?>
                                                             <?php if (!empty($row['asset_name'])) { ?>
-                                                                <span class="text-nowrap text-truncate itflow-ticket-asset" title="Asset"><i class="fas fa-desktop me-1"></i><?= escapeHtml($row['asset_name']) ?></span>
+                                                                <span class="text-nowrap text-truncate itflow-ticket-asset" title="<?= escapeHtml(__('Asset')) ?>"><i class="fas fa-desktop me-1"></i><?= escapeHtml($row['asset_name']) ?></span>
                                                             <?php } ?>
                                                             <?= ticketTasksHtml($task_counts[$ticket_id] ?? null) ?>
-                                                            <a class="ajax-modal text-body-secondary" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket.php?id=<?= $ticket_id ?>" title="Quick look"><i class="fas fa-eye"></i></a>
+                                                            <a class="ajax-modal text-body-secondary" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket.php?id=<?= $ticket_id ?>" title="<?= escapeHtml(__('Quick look')) ?>"><i class="fas fa-eye"></i></a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <?php if (!$project_client_id) { ?>
-                                                <td class="small text-truncate itflow-ticket-who-cell"><?= intval($row['ticket_client_id']) ? escapeHtml($row['client_name']) : '<span class="text-body-secondary">Internal</span>' ?></td>
+                                                <td class="small text-truncate itflow-ticket-who-cell"><?= intval($row['ticket_client_id']) ? escapeHtml($row['client_name']) : '<span class="text-body-secondary">' . __('Internal') . '</span>' ?></td>
                                             <?php } ?>
                                             <td class="text-nowrap">
                                                 <?php if ($can_edit && $ticket_open) { ?>
@@ -468,7 +468,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                                                     <?= ticketStatusHtml($row['ticket_status_name'], $row['ticket_status_color'], 'detail') ?>
                                                 <?php } ?>
                                                 <?php if ($move === 'client') { ?>
-                                                    <div class="small text-body-secondary mt-1"><i class="fas fa-hourglass-half me-1"></i>With client</div>
+                                                    <div class="small text-body-secondary mt-1"><i class="fas fa-hourglass-half me-1"></i><?= __('With client') ?></div>
                                                 <?php } ?>
                                             </td>
                                             <td class="text-nowrap">
@@ -488,12 +488,12 @@ $contact_archived = !empty($project['contact_archived_at']);
                     <?php } else { ?>
                         <div class="itflow-asset-empty">
                             <i class="fas fa-life-ring fa-2x mb-2 opacity-50"></i>
-                            <div>Raise its tickets here, or add ones already raised.</div>
+                            <div><?= __('Raise its tickets here, or add ones already raised.') ?></div>
                             <?php if ($can_edit && $is_open) { ?>
                                 <div class="d-flex justify-content-center gap-2 mt-3">
-                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $new_ticket_url ?>"><i class="fas fa-plus me-2"></i>New Ticket</button>
+                                    <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $new_ticket_url ?>"><i class="fas fa-plus me-2"></i><?= __('New Ticket') ?></button>
                                     <?php if ($has_templates) { ?>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/project/project_apply_template.php?project_id=<?= $project_id ?>"><i class="fas fa-cubes me-2"></i>From a template</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/project/project_apply_template.php?project_id=<?= $project_id ?>"><i class="fas fa-cubes me-2"></i><?= __('From a template') ?></button>
                                     <?php } ?>
                                 </div>
                             <?php } ?>
@@ -524,7 +524,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                                             $task_done = !empty($task['task_completed_at']); ?>
                                             <li class="d-flex align-items-start gap-2 <?= $task_done ? 'text-body-secondary' : '' ?>">
                                                 <?php if ($can_edit && !$ticket_closed) { ?>
-                                                    <a href="post.php?<?= $task_done ? 'undo_complete_task' : 'complete_task' ?>=<?= $task_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= $task_done ? 'Mark not done' : 'Mark done' ?>">
+                                                    <a href="post.php?<?= $task_done ? 'undo_complete_task' : 'complete_task' ?>=<?= $task_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= $task_done ? __('Mark not done') : __('Mark done') ?>">
                                                         <i class="far fa-fw fa-<?= $task_done ? 'check-square text-success' : 'square text-secondary' ?>"></i>
                                                     </a>
                                                 <?php } else { ?>
@@ -543,7 +543,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                     <?php } else { ?>
                         <div class="itflow-asset-empty">
                             <i class="fas fa-tasks fa-2x mb-2 opacity-50"></i>
-                            <div>No tasks on its tickets. Tasks added to a ticket, or brought in by a template, show up here.</div>
+                            <div><?= __('No tasks on its tickets. Tasks added to a ticket, or brought in by a template, show up here.') ?></div>
                         </div>
                     <?php } ?>
                 </div>
@@ -551,7 +551,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                 <!-- History, from the audit log -->
                 <div class="tab-pane fade" id="project-pane-history" role="tabpanel">
                     <div class="itflow-asset-pane-bar">
-                        <span class="text-body-secondary small">Changes to the project - newest first.</span>
+                        <span class="text-body-secondary small"><?= __('Changes to the project - newest first.') ?></span>
                     </div>
                     <?= auditLogHistoryHtml($history, ['client_id' => $project_client_id]) ?>
                 </div>
@@ -563,17 +563,17 @@ $contact_archived = !empty($project['contact_archived_at']);
                             <?php foreach ($activity as $reply) {
                                 $type = $reply['ticket_reply_type'];
                                 $who = $type === 'Client' ? ($reply['contact_name'] ?? '') : ($reply['user_name'] ?? '');
-                                [$icon, $label] = ['Client' => ['fa-reply text-warning', 'The client replied'], 'Public' => ['fa-paper-plane text-primary', 'Reply'], 'Internal' => ['fa-sticky-note text-body-secondary', 'Internal note']][$type] ?? ['fa-sticky-note text-body-secondary', 'Note'];
+                                [$icon, $label] = ['Client' => ['fa-reply text-warning', __('The client replied')], 'Public' => ['fa-paper-plane text-primary', __('Reply')], 'Internal' => ['fa-sticky-note text-body-secondary', __('Internal note')]][$type] ?? ['fa-sticky-note text-body-secondary', __('Note')];
                                 $time = $reply['ticket_reply_time_worked'] && $reply['ticket_reply_time_worked'] !== '00:00:00' ? $reply['ticket_reply_time_worked'] : ''; ?>
                                 <div class="list-group-item d-flex gap-3">
                                     <i class="fas fa-fw <?= $icon ?> mt-1" title="<?= $label ?>"></i>
                                     <div class="min-w-0 flex-grow-1">
                                         <div class="d-flex flex-wrap align-items-center column-gap-2 small">
                                             <span class="fw-semibold"><?= escapeHtml($who !== '' ? $who : 'Someone') ?></span>
-                                            <span class="text-body-secondary"><?= $type === 'Internal' ? 'noted on' : 'on' ?></span>
+                                            <span class="text-body-secondary"><?= $type === 'Internal' ? __('noted on') : __('on') ?></span>
                                             <?= ticketLink($reply) ?>
                                             <span class="ms-auto text-body-secondary text-nowrap" title="<?= escapeHtml($reply['ticket_reply_created_at']) ?>">
-                                                <?php if ($time) { ?><span class="me-2" title="Time logged"><i class="far fa-clock me-1"></i><?= escapeHtml(substr($time, 0, 5)) ?></span><?php } ?><?= timeAgo($reply['ticket_reply_created_at']) ?>
+                                                <?php if ($time) { ?><span class="me-2" title="<?= escapeHtml(__('Time logged')) ?>"><i class="far fa-clock me-1"></i><?= escapeHtml(substr($time, 0, 5)) ?></span><?php } ?><?= timeAgo($reply['ticket_reply_created_at']) ?>
                                             </span>
                                         </div>
                                         <div class="small text-body-secondary text-truncate"><?= escapeHtml(projectReplySnippet($reply['ticket_reply'])) ?></div>
@@ -584,7 +584,7 @@ $contact_archived = !empty($project['contact_archived_at']);
                     <?php } else { ?>
                         <div class="itflow-asset-empty">
                             <i class="fas fa-comments fa-2x mb-2 opacity-50"></i>
-                            <div>Nothing said on its tickets yet.</div>
+                            <div><?= __('Nothing said on its tickets yet.') ?></div>
                         </div>
                     <?php } ?>
                 </div>
@@ -597,27 +597,27 @@ $contact_archived = !empty($project['contact_archived_at']);
     <div class="col-xl-4 col-lg-5">
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-align-left text-secondary me-2"></i>Scope</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-align-left text-secondary me-2"></i><?= __('Scope') ?></h3>
             </div>
             <div class="card-body itflow-project-scope">
                 <?php if (trim((string) $project['project_description']) !== '') { ?>
                     <?= nl2br(escapeHtml($project['project_description'])) ?>
                 <?php } else { ?>
-                    <span class="text-body-secondary">No description<?= $can_edit && !$project['project_archived_at'] ? ' - what is in and out of the work, and what "done" looks like, goes here.' : '' ?></span>
+                    <span class="text-body-secondary"><?= escapeHtml($can_edit && !$project['project_archived_at'] ? __('No description - what is in and out of the work, and what "done" looks like, goes here.') : __('No description')) ?></span>
                 <?php } ?>
             </div>
         </div>
 
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle text-secondary me-2"></i>Details</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle text-secondary me-2"></i><?= __('Details') ?></h3>
             </div>
             <div class="card-body">
                 <dl class="itflow-asset-dl mb-0">
-                    <dt>Client</dt>
-                    <dd><?= $project_client_id ? '<a href="client_overview.php?client_id=' . $project_client_id . '">' . escapeHtml($project['client_name']) . '</a>' : '<span class="text-body-secondary">Internal - our own work</span>' ?></dd>
+                    <dt><?= __('Client') ?></dt>
+                    <dd><?= $project_client_id ? '<a href="client_overview.php?client_id=' . $project_client_id . '">' . escapeHtml($project['client_name']) . '</a>' : '<span class="text-body-secondary">' . __('Internal - our own work') . '</span>' ?></dd>
                     <?php if ($project_client_id) { ?>
-                        <dt>Contact</dt>
+                        <dt><?= __('Contact') ?></dt>
                         <dd>
                             <?php if (intval($project['project_contact_id']) && $project['contact_name'] !== null) { ?>
                                 <?= contactLink($project_client_id, $project['project_contact_id'], $project['contact_name'], $project['contact_photo'] ?? '', ['archived' => $contact_archived]) ?>
@@ -628,20 +628,20 @@ $contact_archived = !empty($project['contact_archived_at']);
                                 <?php $contact_phone = $project['contact_phone'] ? formatPhoneNumber($project['contact_phone'], $project['contact_phone_country_code']) : ($project['contact_mobile'] ? formatPhoneNumber($project['contact_mobile'], $project['contact_mobile_country_code']) : ''); ?>
                                 <?php if ($contact_phone) { ?><div class="small"><?= escapeHtml($contact_phone) ?></div><?php } ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary">Nobody named</span>
+                                <span class="text-body-secondary"><?= __('Nobody named') ?></span>
                             <?php } ?>
                         </dd>
                     <?php } ?>
-                    <dt>Manager</dt>
+                    <dt><?= __('Manager') ?></dt>
                     <dd><?= $manager ?></dd>
                     <?php if ($project['project_start']) { ?>
-                        <dt>Start</dt><dd><?= escapeHtml(date('D M j, Y', strtotime($project['project_start']))) ?></dd>
+                        <dt><?= __('Start') ?></dt><dd><?= escapeHtml(formatDate($project['project_start'], 'date_weekday')) ?></dd>
                     <?php } ?>
-                    <dt>Due</dt><dd><?= $project['project_due'] ? escapeHtml(date('D M j, Y', strtotime($project['project_due']))) : '<span class="text-body-secondary">-</span>' ?></dd>
-                    <dt>Budget</dt><dd><?= $budget_hours > 0 ? projectHoursText($budget_hours * 3600) : '<span class="text-body-secondary">-</span>' ?></dd>
-                    <dt>Created</dt><dd title="<?= escapeHtml($project['project_created_at']) ?>"><?= escapeHtml(date('M j, Y', strtotime($project['project_created_at']))) ?></dd>
+                    <dt><?= __('Due') ?></dt><dd><?= $project['project_due'] ? escapeHtml(formatDate($project['project_due'], 'date_weekday')) : '<span class="text-body-secondary">-</span>' ?></dd>
+                    <dt><?= __('Budget') ?></dt><dd><?= $budget_hours > 0 ? projectHoursText($budget_hours * 3600) : '<span class="text-body-secondary">-</span>' ?></dd>
+                    <dt><?= __('Created') ?></dt><dd title="<?= escapeHtml($project['project_created_at']) ?>"><?= escapeHtml(formatDate($project['project_created_at'])) ?></dd>
                     <?php if ($project['project_completed_at']) { ?>
-                        <dt>Completed</dt><dd><?= escapeHtml(date('M j, Y', strtotime($project['project_completed_at']))) ?></dd>
+                        <dt><?= __('Completed') ?></dt><dd><?= escapeHtml(formatDate($project['project_completed_at'])) ?></dd>
                     <?php } ?>
                 </dl>
             </div>
@@ -649,23 +649,23 @@ $contact_archived = !empty($project['contact_archived_at']);
 
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title mb-0"><i class="fas fa-fw fa-users text-secondary me-2"></i>Team</h3>
+                <h3 class="card-title mb-0"><i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Team') ?></h3>
             </div>
             <?php if ($team) { ?>
                 <ul class="list-group list-group-flush">
                     <?php foreach ($team as $user_id => $member) { ?>
                         <li class="list-group-item d-flex align-items-center gap-2">
                             <?= formatAssignee($user_id, $member['user_name'], $member['user_avatar'], false) ?>
-                            <?php if ($user_id === intval($project['project_manager'])) { ?><span class="small text-body-secondary">manager</span><?php } ?>
+                            <?php if ($user_id === intval($project['project_manager'])) { ?><span class="small text-body-secondary"><?= __('manager') ?></span><?php } ?>
                             <span class="ms-auto small text-body-secondary text-nowrap">
-                                <?php if ($member['open']) { ?><span class="me-2" title="Open tickets of this project assigned to them"><i class="fas fa-life-ring me-1"></i><?= $member['open'] ?></span><?php } ?>
-                                <span title="Time logged on its tickets"><i class="far fa-clock me-1"></i><?= projectHoursText($member['seconds']) ?></span>
+                                <?php if ($member['open']) { ?><span class="me-2" title="<?= escapeHtml(__('Open tickets of this project assigned to them')) ?>"><i class="fas fa-life-ring me-1"></i><?= $member['open'] ?></span><?php } ?>
+                                <span title="<?= escapeHtml(__('Time logged on its tickets')) ?>"><i class="far fa-clock me-1"></i><?= projectHoursText($member['seconds']) ?></span>
                             </span>
                         </li>
                     <?php } ?>
                 </ul>
             <?php } else { ?>
-                <div class="card-body small text-body-secondary">Agents who work its tickets show up here, with their time.</div>
+                <div class="card-body small text-body-secondary"><?= __('Agents who work its tickets show up here, with their time.') ?></div>
             <?php } ?>
         </div>
     </div>

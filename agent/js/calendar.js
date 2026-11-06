@@ -148,23 +148,23 @@
             body: new URLSearchParams(data).toString()
         }).then(function (res) {
             return res.json().catch(function () {
-                return {error: 'Something went wrong - reload and try again.'};
+                return {error: __('Something went wrong - reload and try again.')};
             });
         }).then(function (json) {
             if (json && json.ok) {
                 done(json);
             } else {
-                fail(json && json.error ? json.error : 'That could not be saved.');
+                fail(json && json.error ? json.error : __('That could not be saved.'));
             }
         }).catch(function () {
-            fail('That could not be saved - check the connection.');
+            fail(__('That could not be saved - check the connection.'));
         });
     }
 
     function saved(json) {
         itflowToast(json.message, 'success');
         if (json.conflicts && json.conflicts.length) {
-            itflowToast('Same agent, within two hours: ' + json.conflicts.join('; '), 'warning');
+            itflowToast(__('Same agent, within two hours: %s', json.conflicts.join('; ')), 'warning');
         }
     }
 
@@ -178,7 +178,7 @@
             ? {left: 'prev,next', center: 'title', right: 'today'}
             : {left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'},
         footerToolbar: mobile ? {center: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'} : false,
-        noEventsText: 'Nothing on the calendar for these days',
+        noEventsText: __('Nothing on the calendar for these days'),
         firstDay: Number(root.dataset.firstDay) || 0,
         height: mobile ? 'auto' : 'calc(100vh - 11rem)',
         navLinks: true,
@@ -238,7 +238,7 @@
             if ((arg.timeText && !arg.event.allDay) || (arg.event.allDay && view.indexOf('list') === 0)) {
                 const time = document.createElement('span');
                 time.className = 'itflow-cal-time';
-                time.textContent = arg.event.allDay ? 'All day' : arg.timeText;
+                time.textContent = arg.event.allDay ? __('All day') : arg.timeText;
                 wrap.appendChild(time);
             }
             if (props.icon) {
@@ -311,8 +311,8 @@
         if (props.kind === 'ticket') {
             confirmDialog({
                 title: 'Move ' + event.title.split(' ')[0] + ' to ' + words(start, false) + '?',
-                text: 'The agent and the contact are emailed the new time, as when it is rescheduled on the ticket.',
-                confirmButtonText: 'Move it'
+                text: __('The agent and the contact are emailed the new time, as when it is rescheduled on the ticket.'),
+                confirmButtonText: __('Move it')
             }).then(function (result) {
                 if (!result.isConfirmed) {
                     info.revert();
@@ -354,11 +354,11 @@
         // The people who have it in their calendar can be sent the change
         if (props.invited > 0) {
             confirmDialog({
-                title: 'Tell the ' + props.invited + ' invited?',
-                text: event.title + ' is moving to ' + words(start, event.allDay) + '. Send the update to the ' + (props.invited === 1 ? 'person who has' : 'people who have') + ' it in their calendar?',
+                title: props.invited === 1 ? __('Tell the %s invited?', props.invited) : __('Tell the %s invited?', props.invited),
+                text: props.invited === 1 ? __('%1$s is moving to %2$s. Send the update to the person who has it in their calendar?', event.title, words(start, event.allDay)) : __('%1$s is moving to %2$s. Send the update to the people who have it in their calendar?', event.title, words(start, event.allDay)),
                 showDenyButton: true,
-                confirmButtonText: 'Move and send',
-                denyButtonText: 'Just move it'
+                confirmButtonText: __('Move and send'),
+                denyButtonText: __('Just move it')
             }).then(function (result) {
                 if (result.isConfirmed) {
                     send(true);
@@ -381,11 +381,11 @@
         }
         confirmDialog({
             title: 'Book ' + item.dataset.reference + ' for ' + words(start, false) + '?',
-            text: 'The agent and the contact are emailed the time, as when it is scheduled on the ticket.',
+            text: __('The agent and the contact are emailed the time, as when it is scheduled on the ticket.'),
             input: 'radio',
             inputOptions: {1: 'Onsite', 0: 'Remote'},
             inputValue: item.dataset.onsite === '1' ? '1' : '0',
-            confirmButtonText: 'Book it'
+            confirmButtonText: __('Book it')
         }).then(function (result) {
             if (!result.isConfirmed) {
                 return;
@@ -449,8 +449,8 @@
         }
         if (hint) {
             hint.textContent = n
-                ? 'Open tickets with no time booked - drag one onto the calendar to book it.'
-                : 'Nothing waiting - every open ticket ' + (agentId() && agentId() !== myId ? 'they have' : 'you have') + ' is booked or needs no visit.';
+                ? __('Open tickets with no time booked - drag one onto the calendar to book it.')
+                : (agentId() && agentId() !== myId ? __('Nothing waiting - every open ticket they have is booked or needs no visit.') : __('Nothing waiting - every open ticket you have is booked or needs no visit.'));
         }
     }
 
@@ -473,7 +473,7 @@
                 item.dataset.reference = ticket.reference;
                 item.dataset.title = ticket.reference + ' ' + ticket.subject;
                 item.dataset.onsite = ticket.onsite;
-                item.title = 'Drag onto the calendar to book it - click for a quick look';
+                item.title = __('Drag onto the calendar to book it - click for a quick look');
 
                 const dot = document.createElement('span');
                 dot.className = 'itflow-cal-priority bg-' + (priorityTones[ticket.priority] || 'secondary');

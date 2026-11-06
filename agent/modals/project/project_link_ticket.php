@@ -47,7 +47,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-link me-2"></i>Add tickets <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($project) . ' - ' . $project['project_name']) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-link me-2"></i><?= __('Add tickets') ?> <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($project) . ' - ' . $project['project_name']) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -56,8 +56,8 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label">Tickets</label>
-            <select class="form-select select2" data-placeholder="Pick tickets..." multiple name="tickets[]">
+            <label class="form-label"><?= __('Tickets') ?></label>
+            <select class="form-select select2" data-placeholder="<?= escapeHtml(__('Pick tickets...')) ?>" multiple name="tickets[]">
                 <?php if ($open) { ?>
                     <optgroup label="Open">
                         <?php foreach ($open as $row) { echo $option($row); } ?>
@@ -69,20 +69,20 @@ ob_start();
                     </optgroup>
                 <?php } ?>
             </select>
-            <div class="form-text"><?= $project_client_id ? escapeHtml($project['client_name']) . "'s tickets" : "Any client's tickets - this is an internal project" ?>. One on another project moves to this one.</div>
+            <div class="form-text"><?= $project_client_id ? __('%s\'s tickets. One on another project moves to this one.', escapeHtml($project['client_name'])) : __('Any client\'s tickets - this is an internal project. One on another project moves to this one.') ?></div>
         </div>
 
         <div class="mb-0">
-            <label class="form-label">Or by number</label>
+            <label class="form-label"><?= __('Or by number') ?></label>
             <input type="text" class="form-control" name="ticket_numbers" placeholder="<?= escapeHtml($config_ticket_prefix) ?>1042, <?= escapeHtml($config_ticket_prefix) ?>1043">
-            <div class="form-text">For older tickets - separate them with commas or spaces.</div>
+            <div class="form-text"><?= __('For older tickets - separate them with commas or spaces.') ?></div>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="link_ticket_to_project" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Add</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="link_ticket_to_project" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Add') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -42,20 +42,20 @@ ob_start();
 
     <div class="modal-body">
         <?php if ($repeats) { ?>
-            <div class="alert alert-info py-2 small"><i class="fas fa-fw fa-redo me-1"></i>This changes every occurrence. To drop a single one, use <strong>Skip this one</strong> on it.</div>
+            <div class="alert alert-info py-2 small"><i class="fas fa-fw fa-redo me-1"></i><?= __('This changes every occurrence. To drop a single one, use') ?> <strong><?= __('Skip this one') ?></strong> <?= __('on it.') ?></div>
         <?php } ?>
         <?php require 'calendar_event_form.php'; ?>
     </div>
     <div class="modal-footer">
         <?php if (calendarEventCan($form, 'delete')) { ?>
             <a class="btn btn-outline-danger me-auto confirm-link" href="post.php?delete_event=<?= $event_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                data-confirm-title="Delete <?= escapeHtml($form['event_title']) ?>?" data-confirm-button="Delete"
-                <?php if ($form_invited) { ?>data-confirm-text="Everyone who was sent the invitation is emailed the cancellation."<?php } ?>>
-                <i class="fas fa-trash-alt me-2"></i><?= $repeats ? 'Delete series' : 'Delete' ?>
+                data-confirm-title="<?= escapeHtml(__('Delete %s?', $form['event_title'])) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
+                <?php if ($form_invited) { ?>data-confirm-text="<?= escapeHtml(__('Everyone who was sent the invitation is emailed the cancellation.')) ?>"<?php } ?>>
+                <i class="fas fa-trash-alt me-2"></i><?= $repeats ? __('Delete series') : __('Delete') ?>
             </a>
         <?php } ?>
-        <button type="submit" name="edit_event" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_event" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

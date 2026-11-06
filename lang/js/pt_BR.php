@@ -378,4 +378,26 @@ return [
     'Write your full name above' => 'Escreva seu nome completo acima',
     'Draw your signature here first - or choose Type' => 'Desenhe sua assinatura aqui primeiro - ou escolha Digitar',
 
+    // Projects and calendar (task 7.2)
+    'Something went wrong - reload and try again.' => 'Algo deu errado - recarregue e tente de novo.',
+    'That could not be saved.' => 'Não foi possível salvar.',
+    'That could not be saved - check the connection.' => 'Não foi possível salvar - verifique a conexão.',
+    'Same agent, within two hours: %s' => 'Mesmo técnico, em até duas horas: %s',
+    'Nothing on the calendar for these days' => 'Nada no calendário nestes dias',
+    'All day' => 'Dia inteiro',
+    'The agent and the contact are emailed the new time, as when it is rescheduled on the ticket.' => 'O técnico e o contato recebem o novo horário por e-mail, como quando é reagendado no chamado.',
+    'Move it' => 'Mover',
+    'Tell the %s invited?' => 'Avisar os %s convidados?',
+    '%1$s is moving to %2$s. Send the update to the person who has it in their calendar?' => '%1$s vai para %2$s. Enviar a atualização para a pessoa que o tem no calendário?',
+    '%1$s is moving to %2$s. Send the update to the people who have it in their calendar?' => '%1$s vai para %2$s. Enviar a atualização para as pessoas que o têm no calendário?',
+    'Move and send' => 'Mover e enviar',
+    'Just move it' => 'Só mover',
+    'The agent and the contact are emailed the time, as when it is scheduled on the ticket.' => 'O técnico e o contato recebem o horário por e-mail, como quando é agendado no chamado.',
+    'Book it' => 'Agendar',
+    'Open tickets with no time booked - drag one onto the calendar to book it.' => 'Chamados abertos sem horário marcado - arraste um para o calendário para agendá-lo.',
+    'Nothing waiting - every open ticket they have is booked or needs no visit.' => 'Nada aguardando - todo chamado aberto dele está agendado ou não precisa de visita.',
+    'Nothing waiting - every open ticket you have is booked or needs no visit.' => 'Nada aguardando - todo chamado aberto seu está agendado ou não precisa de visita.',
+    'Drag onto the calendar to book it - click for a quick look' => 'Arraste para o calendário para agendar - clique para uma olhada rápida',
+    'No email' => 'Sem e-mail',
+
 ];
