@@ -292,9 +292,9 @@ function aiTriageMode() {
 /* The ways new tickets can be triaged, for Settings > Tickets. */
 function aiTriageModes() {
     return [
-        0 => 'Off',
-        1 => 'Suggest - shown on the ticket, to apply or dismiss',
-        2 => 'Fill in - set as each comes in',
+        0 => __('Off'),
+        1 => __('Suggest - shown on the ticket, to apply or dismiss'),
+        2 => __('Fill in - set as each comes in'),
     ];
 }
 

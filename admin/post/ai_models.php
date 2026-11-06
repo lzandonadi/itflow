@@ -28,9 +28,9 @@ if (isset($_POST['check_ai_model']) || isset($_POST['add_ai_model']) || isset($_
 
     if ($model_id && !$before) {
         if ($checking) {
-            $answer(false, ['model' => 'That model no longer exists - close this and look again.']);
+            $answer(false, ['model' => __('That model no longer exists - close this and look again.')]);
         }
-        flashAlert('That AI model no longer exists.', 'error');
+        flashAlert(__('That AI model no longer exists.'), 'error');
         redirect('ai_models.php');
     }
 
@@ -64,7 +64,7 @@ if (isset($_POST['check_ai_model']) || isset($_POST['add_ai_model']) || isset($_
 
     // Only reached without the window's script - say the first thing wrong
     if ($errors) {
-        flashAlert('Not saved - ' . escapeHtml(reset($errors)), 'error');
+        flashAlert(__('Not saved - %s', escapeHtml(reset($errors))), 'error');
         redirect();
     }
 
@@ -77,21 +77,21 @@ if (isset($_POST['check_ai_model']) || isset($_POST['add_ai_model']) || isset($_
         $model_id = aiModelWrite($after);
         logAudit("AI Model", "Create", "$session_name added AI model " . escapeSql("$name on {$provider['ai_provider_name']}, for $use_case"), 0, $model_id);
         if ($already && $already['ai_model_use_case'] === $use_case) {
-            flashAlert('<strong>' . escapeHtml($name) . '</strong> added - but <strong>' . escapeHtml($already['ai_model_name']) . "</strong> is for $use_case already and is the one used. Delete it, or set it to something else, to use this one", 'warning');
+            flashAlert(__('<strong>%1$s</strong> added - but <strong>%2$s</strong> is for %3$s already and is the one used. Delete it, or set it to something else, to use this one', escapeHtml($name), escapeHtml($already['ai_model_name']), $use_case), 'warning');
         } else {
-            flashAlert('<strong>' . escapeHtml($name) . "</strong> added - it is used for " . ($use_case === 'General' ? 'everything without a model of its own' : $use_case));
+            flashAlert('<strong>' . escapeHtml($name) . "</strong> added - it is used for " . ($use_case === 'General' ? __('everything without a model of its own') : $use_case));
         }
         redirect('ai_models.php');
     }
 
     $lines = aiModelChangeLines($before, $after);
     if (!$lines) {
-        flashAlert('Nothing changed on <strong>' . escapeHtml($name) . '</strong>', 'info');
+        flashAlert(__('Nothing changed on <strong>%s</strong>', escapeHtml($name)), 'info');
         redirect();
     }
     aiModelWrite($after, $model_id);
     logAudit("AI Model", "Edit", "$session_name changed AI model " . escapeSql("$name: " . implode('; ', $lines)), 0, $model_id);
-    flashAlert('<strong>' . escapeHtml($name) . '</strong> saved - ' . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes'));
+    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes')));
     redirect();
 
 }
@@ -103,7 +103,7 @@ if (isset($_GET['delete_ai_model'])) {
 
     $row = aiModelRow($_GET['delete_ai_model']);
     if (!$row) {
-        flashAlert('That AI model no longer exists.', 'error');
+        flashAlert(__('That AI model no longer exists.'), 'error');
         redirect('ai_models.php');
     }
     $model_id = intval($row['ai_model_id']);
@@ -112,7 +112,7 @@ if (isset($_GET['delete_ai_model'])) {
     mysqli_query($mysqli, "DELETE FROM ai_models WHERE ai_model_id = $model_id");
 
     logAudit("AI Model", "Delete", "$session_name deleted AI model " . escapeSql("$name on {$row['ai_provider_name']}, for {$row['ai_model_use_case']}"), 0, $model_id);
-    flashAlert('<strong>' . escapeHtml($name) . '</strong> deleted', 'error');
+    flashAlert(__('<strong>%s</strong> deleted', escapeHtml($name)), 'error');
     redirect('ai_models.php');
 
 }

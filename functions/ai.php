@@ -59,30 +59,30 @@ function aiProviderKind($kind) {
 /* What a model can be for, and the features each covers. A use case with no model of its own uses General. */
 function aiUseCases() {
     return [
-        'General' => 'Everything without a model of its own - Reword and translate in any editor, and client briefings.',
-        'Tickets' => 'Drafting replies, triage, summaries, and Reword and translate in the ticket reply editor.',
-        'Documentation' => 'Drafting and reviewing documents, writing a ticket up as a document, and drafting document templates.',
-        'Billing' => 'Writing quotes and invoices - their lines from your catalog, labor at the client\'s rate - and the work done on a ticket for its invoice line.',
+        'General' => __('Everything without a model of its own - Reword and translate in any editor, and client briefings.'),
+        'Tickets' => __('Drafting replies, triage, summaries, and Reword and translate in the ticket reply editor.'),
+        'Documentation' => __('Drafting and reviewing documents, writing a ticket up as a document, and drafting document templates.'),
+        'Billing' => __('Writing quotes and invoices - their lines from your catalog, labor at the client\'s rate - and the work done on a ticket for its invoice line.'),
     ];
 }
 
 /* Each AI feature - its name as Admin > AI Usage shows it. */
 function aiFeatures() {
     return [
-        'reword' => 'Reword',
-        'reword_ticket' => 'Reword a ticket reply',
-        'translate' => 'Translate',
-        'ticket_draft' => 'Draft a reply',
-        'ticket_triage' => 'Triage',
-        'ticket_summary' => 'Ticket summary',
-        'document_template' => 'Document template draft',
-        'ticket_document' => 'Ticket written up as a document',
-        'document_draft' => 'Document draft',
-        'document_review' => 'Document review',
-        'client_briefing' => 'Client briefing',
-        'billing_draft' => 'Quote or invoice written',
-        'invoice_description' => 'Ticket time described for its invoice',
-        'test' => 'Test',
+        'reword' => __('Reword'),
+        'reword_ticket' => __('Reword a ticket reply'),
+        'translate' => __('Translate'),
+        'ticket_draft' => __('Draft a reply'),
+        'ticket_triage' => __('Triage'),
+        'ticket_summary' => __('Ticket summary'),
+        'document_template' => __('Document template draft'),
+        'ticket_document' => __('Ticket written up as a document'),
+        'document_draft' => __('Document draft'),
+        'document_review' => __('Document review'),
+        'client_briefing' => __('Client briefing'),
+        'billing_draft' => __('Quote or invoice written'),
+        'invoice_description' => __('Ticket time described for its invoice'),
+        'test' => __('Test'),
     ];
 }
 
@@ -568,15 +568,15 @@ function aiProviderTest($kind, $url, $api_key) {
     curl_close($ch);
 
     if ($response === false) {
-        return ['ok' => false, 'models' => [], 'error' => "It couldn't be reached - $transport_error.", 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __("It couldn't be reached - %s.", $transport_error), 'listed' => true];
     }
     $decoded = json_decode($response, true);
     if ($status === 401 || $status === 403) {
-        return ['ok' => false, 'models' => [], 'error' => "It turned the key away (HTTP $status) - check it is right and still active.", 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __('It turned the key away (HTTP %s) - check it is right and still active.', $status), 'listed' => true];
     }
     if ($status < 200 || $status > 299 || !is_array($decoded)) {
         $message = is_array($decoded['error'] ?? null) ? (string) ($decoded['error']['message'] ?? '') : (is_string($decoded['error'] ?? null) ? $decoded['error'] : '');
-        return ['ok' => false, 'models' => [], 'error' => "It answered HTTP $status" . ($message !== '' ? " - " . mb_substr($message, 0, 200) : '') . ' - check the address.', 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __('It answered HTTP %1$s%2$s - check the address.', $status, $message !== '' ? ' - ' . mb_substr($message, 0, 200) : ''), 'listed' => true];
     }
     $models = [];
     foreach ((array) ($decoded['data'] ?? $decoded['models'] ?? []) as $item) {
@@ -645,34 +645,34 @@ function aiProviderCheck(array $post, $before = null) {
     $errors = [];
     $kind = (string) ($post['kind'] ?? ($before['ai_provider_kind'] ?? 'custom'));
     if (!isset($kinds[$kind])) {
-        $errors['kind'] = 'Pick what kind of provider it is.';
+        $errors['kind'] = __('Pick what kind of provider it is.');
         $kind = 'custom';
     }
     $info = $kinds[$kind];
 
     $name = trim(preg_replace('/\s+/', ' ', (string) ($post['name'] ?? '')));
     if ($name === '') {
-        $errors['name'] = 'Give it a name - ' . $info['name'] . ', or what you call it.';
+        $errors['name'] = __('Give it a name - %s, or what you call it.', $info['name']);
     } elseif (mb_strlen($name) > 200) {
-        $errors['name'] = 'That name is longer than 200 characters.';
+        $errors['name'] = __('That name is longer than 200 characters.');
     } else {
         global $mysqli;
         $taken = mysqli_fetch_row(mysqli_query($mysqli, "SELECT ai_provider_id FROM ai_providers WHERE ai_provider_name = '" . mysqli_real_escape_string($mysqli, $name) . "'
             AND ai_provider_id <> " . intval($before['ai_provider_id'] ?? 0) . " LIMIT 1"));
         if ($taken) {
-            $errors['name'] = 'There is a provider called that already - give this one a name of its own.';
+            $errors['name'] = __('There is a provider called that already - give this one a name of its own.');
         }
     }
 
     $url = aiProviderUrl($kind, $post['url'] ?? '');
     if ($url === '') {
-        $errors['url'] = 'Its address is needed - where ITFlow sends requests.';
+        $errors['url'] = __('Its address is needed - where ITFlow sends requests.');
     } elseif (mb_strlen($url) > 500) {
-        $errors['url'] = 'That address is longer than 500 characters.';
+        $errors['url'] = __('That address is longer than 500 characters.');
     } elseif (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $url)) {
-        $errors['url'] = "That isn't a web address - it starts https:// (or http:// for one on your own network).";
+        $errors['url'] = __("That isn't a web address - it starts https:// (or http:// for one on your own network).");
     } elseif (stripos($url, 'YOUR-RESOURCE') !== false) {
-        $errors['url'] = 'Put your Azure resource name in place of YOUR-RESOURCE - it is in the Azure portal, under Keys and Endpoint.';
+        $errors['url'] = __('Put your Azure resource name in place of YOUR-RESOURCE - it is in the Azure portal, under Keys and Endpoint.');
     }
 
     $key = (string) ($post['api_key'] ?? '');
@@ -684,11 +684,11 @@ function aiProviderCheck(array $post, $before = null) {
         $key_after = $key !== '' ? $key : $saved_key;
     }
     if (mb_strlen($key_after) > 500) {
-        $errors['api_key'] = 'That key is longer than 500 characters.';
+        $errors['api_key'] = __('That key is longer than 500 characters.');
     } elseif ($key !== '' && preg_match('/\s/', $key)) {
-        $errors['api_key'] = "A key has no spaces in it - check it was copied whole.";
+        $errors['api_key'] = __('A key has no spaces in it - check it was copied whole.');
     } elseif ($info['key'] && $key_after === '') {
-        $errors['api_key'] = $info['name'] . ' needs an API key' . ($info['keys_url'] !== '' ? ' - make one in its console.' : '.');
+        $errors['api_key'] = $info['keys_url'] !== '' ? __('%s needs an API key - make one in its console.', $info['name']) : __('%s needs an API key.', $info['name']);
     }
 
     $after = [
@@ -753,27 +753,27 @@ function aiModelCheck(array $post) {
     $errors = [];
     $provider = aiProviderRow($post['provider'] ?? 0);
     if (!$provider) {
-        $errors['provider'] = 'Pick the provider it is on.';
+        $errors['provider'] = __('Pick the provider it is on.');
     }
     $name = trim((string) ($post['model'] ?? ''));
     if ($name === '') {
-        $errors['model'] = "Its name is needed, as the provider knows it" . ($provider ? ' - like ' . aiProviderKind($provider['ai_provider_kind'])['example'] : '') . '.';
+        $errors['model'] = $provider ? __('Its name is needed, as the provider knows it - like %s.', aiProviderKind($provider['ai_provider_kind'])['example']) : __('Its name is needed, as the provider knows it.');
     } elseif (mb_strlen($name) > 200) {
-        $errors['model'] = 'That name is longer than 200 characters.';
+        $errors['model'] = __('That name is longer than 200 characters.');
     } elseif (preg_match('/\s/', $name) && !in_array($provider['ai_provider_kind'] ?? '', ['azure', 'custom'], true)) {
-        $errors['model'] = "A model's name has no spaces - " . aiProviderKind($provider['ai_provider_kind'] ?? 'custom')['example'] . ', say.';
+        $errors['model'] = __("A model's name has no spaces - %s, say.", aiProviderKind($provider['ai_provider_kind'] ?? 'custom')['example']);
     }
     $use_case = (string) ($post['use_case'] ?? '');
     if (!isset(aiUseCases()[$use_case])) {
-        $errors['use_case'] = 'Pick what it is for.';
+        $errors['use_case'] = __('Pick what it is for.');
     }
     $temperature = trim((string) ($post['temperature'] ?? ''));
     if ($temperature !== '' && (!is_numeric($temperature) || floatval($temperature) < 0 || floatval($temperature) > 2)) {
-        $errors['temperature'] = 'A temperature is from 0 to 2 - or leave it empty for the model\'s own.';
+        $errors['temperature'] = __('A temperature is from 0 to 2 - or leave it empty for the model\'s own.');
     }
     $prompt = trim(str_replace("\r\n", "\n", (string) ($post['prompt'] ?? '')));
     if (mb_strlen($prompt) > 4000) {
-        $errors['prompt'] = 'Keep the instructions under 4,000 characters - they go with every request.';
+        $errors['prompt'] = __('Keep the instructions under 4,000 characters - they go with every request.');
     }
     $after = [
         'ai_model_ai_provider_id' => intval($provider['ai_provider_id'] ?? 0),
@@ -804,7 +804,7 @@ function aiModelWrite(array $after, $model_id = 0) {
 
 /* A temperature as it reads - "the model's own" when there is none. */
 function aiTemperatureText($temperature) {
-    return $temperature === null || $temperature === '' ? "the model's own" : rtrim(rtrim(number_format(floatval($temperature), 2, '.', ''), '0'), '.');
+    return $temperature === null || $temperature === '' ? __("the model's own") : rtrim(rtrim(number_format(floatval($temperature), 2, '.', ''), '0'), '.');
 }
 
 /* What changed on a model, a line each, from what to what - the instructions only as changed. Plain text. */
@@ -892,18 +892,18 @@ function aiUseCaseStripHtml() {
     foreach (aiUseCaseMap()['map'] as $use_case => $lands) {
         $model = $lands['model'];
         if (!$model) {
-            $says = '<span class="text-warning-emphasis">nothing set up</span>';
+            $says = '<span class="text-warning-emphasis">' . __('nothing set up') . '</span>';
             $tone = 'border-warning-subtle bg-warning-subtle';
         } elseif ($lands['own']) {
-            $says = '<span class="fw-semibold">' . escapeHtml($model['ai_model_name']) . '</span> <span class="text-body-secondary">on ' . escapeHtml($model['ai_provider_name']) . '</span>';
+            $says = '<span class="fw-semibold">' . escapeHtml($model['ai_model_name']) . '</span> <span class="text-body-secondary">' . __('on %s', escapeHtml($model['ai_provider_name'])) . '</span>';
             $tone = 'bg-body';
         } else {
-            $says = '<span class="text-body-secondary">General\'s - ' . escapeHtml($model['ai_model_name']) . '</span>';
+            $says = '<span class="text-body-secondary">' . __('%1$s\'s - %2$s', aiUseCaseLabel('General'), escapeHtml($model['ai_model_name'])) . '</span>';
             $tone = 'bg-body';
         }
         $html .= '<div class="border rounded-pill px-3 py-1 small text-nowrap ' . $tone . '" data-ai-use-case="' . escapeHtml($use_case) . '" title="' . escapeHtml(aiUseCases()[$use_case]) . '">'
             . '<i class="fas fa-fw ' . (['General' => 'fa-magic', 'Tickets' => 'fa-life-ring', 'Documentation' => 'fa-file-alt', 'Billing' => 'fa-file-invoice-dollar'][$use_case] ?? 'fa-robot') . ' text-secondary me-1"></i>'
-            . escapeHtml($use_case) . ' <i class="fas fa-long-arrow-alt-right text-secondary mx-1"></i>' . $says . '</div>';
+            . escapeHtml(aiUseCaseLabel($use_case)) . ' <i class="fas fa-long-arrow-alt-right text-secondary mx-1"></i>' . $says . '</div>';
     }
     return $html . '</div>';
 }
@@ -927,7 +927,7 @@ function aiProblems() {
     if (!$last || intval($last['ai_usage_ok']) === 1) {
         return [];
     }
-    return [['warning', 'fa-robot', $failed . ' AI request' . ($failed === 1 ? '' : 's') . ' failed today',
-        'The last, to ' . $last['ai_usage_provider_name'] . ', too' . ($last['ai_usage_error'] ? ' - ' . $last['ai_usage_error'] : '') . '. Reword and summaries fail for agents until it is put right.',
+    return [['warning', 'fa-robot', _n('%d AI request failed today', '%d AI requests failed today', $failed),
+        __('The last, to %1$s, too%2$s. Reword and summaries fail for agents until it is put right.', $last['ai_usage_provider_name'], $last['ai_usage_error'] ? ' - ' . $last['ai_usage_error'] : ''),
         'ai_usage.php?view=failed', 'See why']];
 }

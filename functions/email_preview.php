@@ -165,96 +165,96 @@ function emailPreviewCatalog() {
     };
     return [
         // ---- Tickets, to clients
-        'ticket_created' => ['group' => 'Tickets - to clients', 'label' => 'Ticket opened for them', 'to' => 'The contact and the watchers', 'when' => 'An agent opens a ticket for a contact',
+        'ticket_created' => ['group' => __('Tickets - to clients'), 'label' => __('Ticket opened for them'), 'to' => __('The contact and the watchers'), 'when' => __('An agent opens a ticket for a contact'),
             'run' => function ($s) {
                 ticketMailCreated($s['ticket'], __('Ticket Created -'));
             }],
-        'ticket_created_email' => ['group' => 'Tickets - to clients', 'label' => 'Their email became a ticket', 'to' => 'Whoever emailed', 'when' => 'The email parser makes a ticket from an email',
+        'ticket_created_email' => ['group' => __('Tickets - to clients'), 'label' => __('Their email became a ticket'), 'to' => __('Whoever emailed'), 'when' => __('The email parser makes a ticket from an email'),
             'run' => function ($s) {
                 ticketMailCreated($s['ticket'], __('Ticket created -'), [], false, 'email', [['email' => $s['alex_email'], 'name' => $s['alex_name']]]);
             }],
-        'ticket_created_scheduled' => ['group' => 'Tickets - to clients', 'label' => 'Scheduled ticket raised', 'to' => 'The contact and the watchers', 'when' => 'A recurring ticket raises its ticket',
+        'ticket_created_scheduled' => ['group' => __('Tickets - to clients'), 'label' => __('Scheduled ticket raised'), 'to' => __('The contact and the watchers'), 'when' => __('A recurring ticket raises its ticket'),
             'pick' => 'contact', 'run' => function ($s) {
                 recurringTicketRaise($s['recurring'], 'Preview');
             }],
-        'ticket_reply' => ['group' => 'Tickets - to clients', 'label' => 'Reply', 'to' => 'The contact and the watchers', 'when' => 'An agent replies publicly',
+        'ticket_reply' => ['group' => __('Tickets - to clients'), 'label' => __('Reply'), 'to' => __('The contact and the watchers'), 'when' => __('An agent replies publicly'),
             'run' => function ($s) {
                 ticketMailReply($s['ticket'], $s['reply'], $s['by']);
             }],
-        'ticket_resolved' => ['group' => 'Tickets - to clients', 'label' => 'Resolved', 'to' => 'The contact and the watchers', 'when' => 'An agent resolves a ticket',
+        'ticket_resolved' => ['group' => __('Tickets - to clients'), 'label' => __('Resolved'), 'to' => __('The contact and the watchers'), 'when' => __('An agent resolves a ticket'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE tickets SET ticket_status = 4, ticket_resolved_at = NOW() WHERE ticket_id = " . intval($s['ticket']));
                 ticketMailReply($s['ticket'], $s['reply'], $s['by'], true);
             }],
-        'ticket_closed' => ['group' => 'Tickets - to clients', 'label' => 'Closed', 'to' => 'The contact and the watchers', 'when' => 'A ticket is closed, by an agent or after it was resolved',
+        'ticket_closed' => ['group' => __('Tickets - to clients'), 'label' => __('Closed'), 'to' => __('The contact and the watchers'), 'when' => __('A ticket is closed, by an agent or after it was resolved'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE tickets SET ticket_status = 5, ticket_resolved_at = NOW(), ticket_closed_at = NOW() WHERE ticket_id = " . intval($s['ticket']));
                 ticketMailClosed($s['ticket']);
             }],
-        'ticket_watcher' => ['group' => 'Tickets - to clients', 'label' => 'Made a watcher', 'to' => 'The new watcher', 'when' => 'An agent adds a watcher and asks to tell them',
+        'ticket_watcher' => ['group' => __('Tickets - to clients'), 'label' => __('Made a watcher'), 'to' => __('The new watcher'), 'when' => __('An agent adds a watcher and asks to tell them'),
             'run' => function ($s) {
                 ticketMailWatchersAdded($s['ticket'], [$s['jamie_email']], $s['by']);
             }],
-        'ticket_colleague_new' => ['group' => 'Tickets - to clients', 'label' => 'New ticket at their company', 'to' => 'Primary and technical contacts who asked', 'when' => 'Anyone raises a ticket for their company',
+        'ticket_colleague_new' => ['group' => __('Tickets - to clients'), 'label' => __('New ticket at their company'), 'to' => __('Primary and technical contacts who asked'), 'when' => __('Anyone raises a ticket for their company'),
             'run' => function ($s) {
                 ticketMailColleaguesNew($s['ticket']);
             }],
-        'ticket_approval' => ['group' => 'Tickets - to clients', 'label' => 'Approval needed', 'to' => 'The contact, or the technical or billing contacts', 'when' => 'An agent asks for a task to be approved',
+        'ticket_approval' => ['group' => __('Tickets - to clients'), 'label' => __('Approval needed'), 'to' => __('The contact, or the technical or billing contacts'), 'when' => __('An agent asks for a task to be approved'),
             'run' => function ($s) {
                 ticketMailTaskApproval($s['approval'], $s['by']);
             }],
-        'ticket_scheduled' => ['group' => 'Tickets - to clients', 'label' => 'Work booked', 'to' => 'The contact and the watchers, with a calendar file', 'when' => 'An agent schedules the work',
+        'ticket_scheduled' => ['group' => __('Tickets - to clients'), 'label' => __('Work booked'), 'to' => __('The contact and the watchers, with a calendar file'), 'when' => __('An agent schedules the work'),
             'pick' => 'contact', 'run' => $ticket_schedule],
-        'ticket_schedule_cancelled' => ['group' => 'Tickets - to clients', 'label' => 'Booked work cancelled', 'to' => 'The contact and the watchers, with a calendar file', 'when' => 'An agent cancels the scheduled work',
+        'ticket_schedule_cancelled' => ['group' => __('Tickets - to clients'), 'label' => __('Booked work cancelled'), 'to' => __('The contact and the watchers, with a calendar file'), 'when' => __('An agent cancels the scheduled work'),
             'pick' => 'contact', 'run' => function ($s) use ($ticket_schedule) {
                 $ticket_schedule($s);
                 emailCaptureStart(); // only the cancellation
                 ticketCancelSchedule(ticketRow($s['ticket']));
             }],
-        'ticket_closed_reply' => ['group' => 'Tickets - to clients', 'label' => 'Replied to a closed ticket', 'to' => 'Whoever replied', 'when' => 'The email parser gets a reply to a closed ticket',
+        'ticket_closed_reply' => ['group' => __('Tickets - to clients'), 'label' => __('Replied to a closed ticket'), 'to' => __('Whoever replied'), 'when' => __('The email parser gets a reply to a closed ticket'),
             'run' => function ($s) {
                 ticketMailClosedReply($s['ticket'], $s['alex_email']);
             }],
 
         // ---- Tickets, to the team
-        'agent_assigned' => ['group' => 'Tickets - to your team', 'label' => 'Assigned to you', 'to' => 'The agent', 'when' => 'Someone else assigns them a ticket',
+        'agent_assigned' => ['group' => __('Tickets - to your team'), 'label' => __('Assigned to you'), 'to' => __('The agent'), 'when' => __('Someone else assigns them a ticket'),
             'run' => function ($s) {
                 ticketMailAssigned($s['agent'], [$s['ticket']], $s['by']);
             }],
-        'agent_assigned_many' => ['group' => 'Tickets - to your team', 'label' => 'Several assigned to you', 'to' => 'The agent', 'when' => 'Someone assigns them several at once, with Bulk Action',
+        'agent_assigned_many' => ['group' => __('Tickets - to your team'), 'label' => __('Several assigned to you'), 'to' => __('The agent'), 'when' => __('Someone assigns them several at once, with Bulk Action'),
             'run' => function ($s) {
                 ticketMailAssigned($s['agent'], [$s['ticket'], $s['ticket2']], $s['by']);
             }],
-        'agent_mentioned' => ['group' => 'Tickets - to your team', 'label' => 'Mentioned in a note', 'to' => 'The agent mentioned', 'when' => 'Someone @mentions them in an internal note',
+        'agent_mentioned' => ['group' => __('Tickets - to your team'), 'label' => __('Mentioned in a note'), 'to' => __('The agent mentioned'), 'when' => __('Someone @mentions them in an internal note'),
             'run' => function ($s) {
                 $name = (string) getFieldById('users', $s['agent'], 'user_name');
                 ticketMailMentioned($s['ticket'], 0, '<p>' . ticketMentionSpan($s['agent'], $name) . ' can you look at the firewall logs from last night before we call them back? The VPN dropped at 2:14 AM for everyone at the main office.</p>', $s['agent'], $s['by']);
             }],
-        'agent_recurring_assigned' => ['group' => 'Tickets - to your team', 'label' => 'Recurring ticket assigned', 'to' => 'The agent', 'when' => 'Someone else assigns them a recurring ticket',
+        'agent_recurring_assigned' => ['group' => __('Tickets - to your team'), 'label' => __('Recurring ticket assigned'), 'to' => __('The agent'), 'when' => __('Someone else assigns them a recurring ticket'),
             'run' => function ($s) {
                 recurringTicketMailAssigned($s['agent'], ['Monthly backup check'], $s['by']);
             }],
-        'agent_new_ticket' => ['group' => 'Tickets - to your team', 'label' => 'New ticket', 'to' => 'The new-ticket address (Admin > Ticket)', 'when' => 'A ticket is raised in the portal, by email or on a schedule',
+        'agent_new_ticket' => ['group' => __('Tickets - to your team'), 'label' => __('New ticket'), 'to' => __('The new-ticket address (Admin > Ticket)'), 'when' => __('A ticket is raised in the portal, by email or on a schedule'),
             'run' => function ($s) {
                 ticketMailNewTicketAddress($s['ticket'], 'portal');
             }],
-        'agent_client_replied' => ['group' => 'Tickets - to your team', 'label' => 'Client replied', 'to' => 'The agent it is assigned to', 'when' => 'The client replies in the portal or by email',
+        'agent_client_replied' => ['group' => __('Tickets - to your team'), 'label' => __('Client replied'), 'to' => __('The agent it is assigned to'), 'when' => __('The client replies in the portal or by email'),
             'run' => function ($s) {
                 ticketMailAssigneeReplied($s['ticket'], 'portal', $s['client_reply'], $s['alex_name']);
             }],
-        'agent_sla_risk' => ['group' => 'Tickets - to your team', 'label' => 'SLA at risk', 'to' => 'The SLA alert address and the assigned agent', 'when' => 'A ticket nears its response or resolution target',
+        'agent_sla_risk' => ['group' => __('Tickets - to your team'), 'label' => __('SLA at risk'), 'to' => __('The SLA alert address and the assigned agent'), 'when' => __('A ticket nears its response or resolution target'),
             'pick' => 'agent', 'run' => function ($s) {
                 ticketSlaAlert($s['ticket'], 'response', false, date('Y-m-d H:i:s', time() + 1800), $s['sla_email']);
             }],
-        'agent_sla_missed' => ['group' => 'Tickets - to your team', 'label' => 'SLA missed', 'to' => 'The SLA alert address and the assigned agent', 'when' => 'A ticket misses its response or resolution target',
+        'agent_sla_missed' => ['group' => __('Tickets - to your team'), 'label' => __('SLA missed'), 'to' => __('The SLA alert address and the assigned agent'), 'when' => __('A ticket misses its response or resolution target'),
             'pick' => 'agent', 'run' => function ($s) {
                 ticketSlaAlert($s['ticket'], 'resolution', true, date('Y-m-d H:i:s', time() - 3600), $s['sla_email']);
             }],
-        'agent_scheduled' => ['group' => 'Tickets - to your team', 'label' => 'Work booked', 'to' => 'The agent it is assigned to, with a calendar file', 'when' => 'Someone schedules the work',
+        'agent_scheduled' => ['group' => __('Tickets - to your team'), 'label' => __('Work booked'), 'to' => __('The agent it is assigned to, with a calendar file'), 'when' => __('Someone schedules the work'),
             'pick' => 'agent', 'run' => $ticket_schedule],
-        'agent_approval' => ['group' => 'Tickets - to your team', 'label' => 'Approval needed', 'to' => 'The agent asked', 'when' => 'Someone asks an agent to approve a task',
+        'agent_approval' => ['group' => __('Tickets - to your team'), 'label' => __('Approval needed'), 'to' => __('The agent asked'), 'when' => __('Someone asks an agent to approve a task'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE task_approvals SET approval_scope = 'internal', approval_type = 'specific', approval_required_user_id = " . intval($s['agent']) . " WHERE approval_id = " . intval($s['approval']));
@@ -262,159 +262,159 @@ function emailPreviewCatalog() {
             }],
 
         // ---- Billing
-        'invoice' => ['group' => 'Billing', 'label' => 'Invoice', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'An invoice is sent, by hand or as it recurs',
+        'invoice' => ['group' => __('Billing'), 'label' => __('Invoice'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('An invoice is sent, by hand or as it recurs'),
             'run' => function ($s) {
                 emailPreviewInvoice($s['invoice']);
             }],
-        'invoice_reminder' => ['group' => 'Billing', 'label' => 'Reminder - due soon', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'Send Reminder, or the nightly reminders (Admin > Invoice)',
+        'invoice_reminder' => ['group' => __('Billing'), 'label' => __('Reminder - due soon'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('Send Reminder, or the nightly reminders (Admin > Invoice)'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE invoices SET invoice_due = CURDATE() + INTERVAL 3 DAY WHERE invoice_id = " . intval($s['invoice']));
                 emailPreviewInvoice($s['invoice'], ['kind' => 'reminder']);
             }],
-        'invoice_due_today' => ['group' => 'Billing', 'label' => 'Reminder - due today', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'Send Reminder, or the nightly reminders',
+        'invoice_due_today' => ['group' => __('Billing'), 'label' => __('Reminder - due today'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('Send Reminder, or the nightly reminders'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE invoices SET invoice_due = CURDATE() WHERE invoice_id = " . intval($s['invoice']));
                 emailPreviewInvoice($s['invoice'], ['kind' => 'reminder']);
             }],
-        'invoice_overdue' => ['group' => 'Billing', 'label' => 'Reminder - overdue', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'Send Reminder, or the nightly reminders',
+        'invoice_overdue' => ['group' => __('Billing'), 'label' => __('Reminder - overdue'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('Send Reminder, or the nightly reminders'),
             'run' => function ($s) {
                 global $mysqli;
                 mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Overdue', invoice_due = CURDATE() - INTERVAL 11 DAY WHERE invoice_id = " . intval($s['invoice']));
                 emailPreviewInvoice($s['invoice'], ['kind' => 'reminder']);
             }],
-        'invoice_paid' => ['group' => 'Billing', 'label' => 'Paid invoice', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'A paid invoice is sent',
+        'invoice_paid' => ['group' => __('Billing'), 'label' => __('Paid invoice'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('A paid invoice is sent'),
             'run' => function ($s) {
                 emailPreviewInvoice($s['paid']);
             }],
-        'payment_receipt' => ['group' => 'Billing', 'label' => 'Payment receipt', 'to' => 'The primary and billing contacts', 'when' => 'A payment is taken, with Email Receipt ticked',
+        'payment_receipt' => ['group' => __('Billing'), 'label' => __('Payment receipt'), 'to' => __('The primary and billing contacts'), 'when' => __('A payment is taken, with Email Receipt ticked'),
             'run' => function ($s) {
                 $invoice = billingRow('invoice', $s['paid'], false);
                 [$subject, $email] = billingPaymentEmail([['invoice' => $invoice, 'amount' => 290]], ['date' => date('Y-m-d'), 'method' => 'Credit Card', 'reference' => 'ch_3PxR1v2Sample', 'currency' => $invoice['invoice_currency_code']]);
                 billingEmailQueue(billingEmailRecipients($invoice['invoice_client_id']), $subject, $email);
             }],
-        'quote' => ['group' => 'Billing', 'label' => 'Quote', 'to' => 'The primary contact, with the PDF', 'when' => 'A quote is sent',
+        'quote' => ['group' => __('Billing'), 'label' => __('Quote'), 'to' => __('The primary contact, with the PDF'), 'when' => __('A quote is sent'),
             'run' => function ($s) {
                 $quote = billingRow('quote', $s['quote'], false);
                 [$subject, $email] = billingQuoteEmail($quote);
                 billingEmailQueue(billingEmailRecipients($quote['quote_client_id'], null, 'quote'), $subject, $email, ['from' => 'quote']);
             }],
-        'statement' => ['group' => 'Billing', 'label' => 'Statement', 'to' => 'The primary and billing contacts, with the PDF', 'when' => 'Send Statement on a client',
+        'statement' => ['group' => __('Billing'), 'label' => __('Statement'), 'to' => __('The primary and billing contacts, with the PDF'), 'when' => __('Send Statement on a client'),
             'run' => function ($s) {
                 $statement = billingStatement($s['client_id']);
                 [$subject, $email] = billingStatementEmail($statement);
                 billingEmailQueue(billingEmailRecipients($s['client_id']), $subject, $email);
             }],
-        'card_saved' => ['group' => 'Billing', 'label' => 'Card saved', 'to' => 'The contact who saved it', 'when' => 'A contact saves a card in the client portal',
+        'card_saved' => ['group' => __('Billing'), 'label' => __('Card saved'), 'to' => __('The contact who saved it'), 'when' => __('A contact saves a card in the client portal'),
             'run' => function ($s) {
                 billingMailCardSaved($s['alex_email'], $s['alex_name'], $s['client'], 'visa', '4242', 8, intval(date('Y')) + 3);
             }],
-        'quote_accepted' => ['group' => 'Billing', 'label' => 'Quote accepted', 'to' => 'The quote notification address (Admin > Quote)', 'when' => 'A client accepts a quote online',
+        'quote_accepted' => ['group' => __('Billing'), 'label' => __('Quote accepted'), 'to' => __('The quote notification address (Admin > Quote)'), 'when' => __('A client accepts a quote online'),
             'run' => function ($s) {
                 billingQuoteAnsweredNotify($s['quote'], true, $s['alex_name'], 'Looks good - please go ahead.');
             }],
-        'quote_declined' => ['group' => 'Billing', 'label' => 'Quote declined', 'to' => 'The quote notification address (Admin > Quote)', 'when' => 'A client declines a quote online',
+        'quote_declined' => ['group' => __('Billing'), 'label' => __('Quote declined'), 'to' => __('The quote notification address (Admin > Quote)'), 'when' => __('A client declines a quote online'),
             'run' => function ($s) {
                 billingQuoteAnsweredNotify($s['quote'], false, $s['alex_name'], 'We are going to hold off until next year.');
             }],
-        'payment_notify' => ['group' => 'Billing', 'label' => 'Invoice paid online', 'to' => 'The paid notification address (Admin > Invoice)', 'when' => 'A client pays online, or autopay charges a card',
+        'payment_notify' => ['group' => __('Billing'), 'label' => __('Invoice paid online'), 'to' => __('The paid notification address (Admin > Invoice)'), 'when' => __('A client pays online, or autopay charges a card'),
             'run' => function ($s) {
                 billingPaymentNotify(billingRow('invoice', $s['paid'], false), 290, 'Online card');
             }],
     ] + emailPreviewContractCatalog() + [
 
         // ---- Client portal
-        'portal_invite' => ['group' => 'Client portal', 'label' => 'Invite', 'to' => 'The contact', 'when' => 'An agent gives a contact portal access and ticks Email them an invite',
+        'portal_invite' => ['group' => __('Client portal'), 'label' => __('Invite'), 'to' => __('The contact'), 'when' => __('An agent gives a contact portal access and ticks Email them an invite'),
             'run' => function ($s) {
                 portalMailInvite($s['alex_user']);
             }],
-        'portal_invite_colleague' => ['group' => 'Client portal', 'label' => 'Invite from a colleague', 'to' => 'The contact', 'when' => 'A primary contact gives someone access in the portal',
+        'portal_invite_colleague' => ['group' => __('Client portal'), 'label' => __('Invite from a colleague'), 'to' => __('The contact'), 'when' => __('A primary contact gives someone access in the portal'),
             'run' => function ($s) {
                 portalMailInvite($s['jamie_user'], $s['alex_name']);
             }],
     ] + emailPreviewInviteCatalog() + [
-        'portal_reset' => ['group' => 'Client portal', 'label' => 'Forgot password', 'to' => 'The contact', 'when' => 'They ask for a link on the sign-in page',
+        'portal_reset' => ['group' => __('Client portal'), 'label' => __('Forgot password'), 'to' => __('The contact'), 'when' => __('They ask for a link on the sign-in page'),
             'run' => function ($s) {
                 portalMailPasswordReset($s['alex_user']);
             }],
-        'portal_password' => ['group' => 'Client portal', 'label' => 'Password changed', 'to' => 'The contact', 'when' => 'They change their password, or set it from a link',
+        'portal_password' => ['group' => __('Client portal'), 'label' => __('Password changed'), 'to' => __('The contact'), 'when' => __('They change their password, or set it from a link'),
             'run' => function ($s) {
                 portalMailAccountChange($s['alex_email'], $s['alex_name'], 'password');
             }],
-        'portal_mfa_on' => ['group' => 'Client portal', 'label' => 'Two-step sign-in on', 'to' => 'The contact', 'when' => 'They turn on two-step sign-in',
+        'portal_mfa_on' => ['group' => __('Client portal'), 'label' => __('Two-step sign-in on'), 'to' => __('The contact'), 'when' => __('They turn on two-step sign-in'),
             'run' => function ($s) {
                 portalMailAccountChange($s['alex_email'], $s['alex_name'], 'mfa_on');
             }],
-        'portal_mfa_off' => ['group' => 'Client portal', 'label' => 'Two-step sign-in off', 'to' => 'The contact', 'when' => 'They turn it off, or an agent does',
+        'portal_mfa_off' => ['group' => __('Client portal'), 'label' => __('Two-step sign-in off'), 'to' => __('The contact'), 'when' => __('They turn it off, or an agent does'),
             'run' => function ($s) {
                 portalMailAccountChange($s['alex_email'], $s['alex_name'], 'mfa_off_by_us');
             }],
 
         // ---- Shared links
-        'share_link' => ['group' => 'Shared links', 'label' => 'Secure link', 'to' => 'Whoever it is for', 'when' => 'An agent shares something and asks to email the link',
+        'share_link' => ['group' => __('Shared links'), 'label' => __('Secure link'), 'to' => __('Whoever it is for'), 'when' => __('An agent shares something and asks to email the link'),
             'run' => function ($s) {
                 global $config_base_url;
                 shareEmailLink(shareRow($s['share']), "https://$config_base_url/guest/share.php?id=" . intval($s['share']) . '#sample-key', 'passphrase');
             }],
-        'share_request' => ['group' => 'Shared links', 'label' => 'Login asked for', 'to' => 'Whoever it is asked of', 'when' => 'An agent asks a client for a login with a link',
+        'share_request' => ['group' => __('Shared links'), 'label' => __('Login asked for'), 'to' => __('Whoever it is asked of'), 'when' => __('An agent asks a client for a login with a link'),
             'run' => function ($s) {
                 global $config_base_url;
                 shareEmailLink(shareRow($s['request']), "https://$config_base_url/guest/share.php?id=" . intval($s['request']) . '#sample-key', 'none');
             }],
-        'share_code' => ['group' => 'Shared links', 'label' => 'Code to open a link', 'to' => 'Whoever it is for', 'when' => 'They open a link that is protected by an emailed code',
+        'share_code' => ['group' => __('Shared links'), 'label' => __('Code to open a link'), 'to' => __('Whoever it is for'), 'when' => __('They open a link that is protected by an emailed code'),
             'run' => function ($s) {
                 shareEmailCode(shareRow($s['share']), '482913');
             }],
-        'share_sent_back' => ['group' => 'Shared links', 'label' => 'Login sent back', 'to' => 'The agent who asked for it', 'when' => 'A client sends a login back through a link',
+        'share_sent_back' => ['group' => __('Shared links'), 'label' => __('Login sent back'), 'to' => __('The agent who asked for it'), 'when' => __('A client sends a login back through a link'),
             'run' => function ($s) {
                 $row = shareRow($s['request']);
-                shareNotifyCreator($row, 'Login sent back', 'A login was sent back for ' . shareName($row) . ' - ' . $row['client_name'], true);
+                shareNotifyCreator($row, __('Login sent back'), __('A login was sent back for %s', shareName($row)) . ' - ' . $row['client_name'], true);
             }],
 
         // ---- Calendar
-        'event_invite' => ['group' => 'Calendar', 'label' => 'Invitation', 'to' => 'The people invited, with a calendar file', 'when' => 'An event is saved with Send invitations ticked',
+        'event_invite' => ['group' => __('Calendar'), 'label' => __('Invitation'), 'to' => __('The people invited, with a calendar file'), 'when' => __('An event is saved with Send invitations ticked'),
             'run' => function ($s) {
                 calendarSendInvites(calendarEventRow($s['event']), 'invite');
             }],
-        'event_update' => ['group' => 'Calendar', 'label' => 'Event changed', 'to' => 'The people invited, with a calendar file', 'when' => 'An event they were invited to changes',
+        'event_update' => ['group' => __('Calendar'), 'label' => __('Event changed'), 'to' => __('The people invited, with a calendar file'), 'when' => __('An event they were invited to changes'),
             'run' => function ($s) {
                 calendarSendInvites(calendarEventRow($s['event']), 'update');
             }],
-        'event_cancel' => ['group' => 'Calendar', 'label' => 'Event cancelled', 'to' => 'The people invited, with a calendar file', 'when' => 'An event is deleted, or someone is taken off it',
+        'event_cancel' => ['group' => __('Calendar'), 'label' => __('Event cancelled'), 'to' => __('The people invited, with a calendar file'), 'when' => __('An event is deleted, or someone is taken off it'),
             'run' => function ($s) {
                 calendarSendInvites(calendarEventRow($s['event']), 'cancel');
             }],
     ] + emailPreviewUserInviteCatalog() + [
 
         // ---- Your team's accounts
-        'user_changed' => ['group' => 'Your team\'s accounts', 'label' => 'Account changed', 'to' => 'The agent', 'when' => 'Their password, email or MFA changes',
+        'user_changed' => ['group' => __('Your team\'s accounts'), 'label' => __('Account changed'), 'to' => __('The agent'), 'when' => __('Their password, email or MFA changes'),
             'run' => function ($s) {
-                userNotifyChange($s['agent_name'], $s['agent_email'], 'your password was changed');
+                userNotifyChange($s['agent_name'], $s['agent_email'], __('your password was changed'));
             }],
-        'user_new_device' => ['group' => 'Your team\'s accounts', 'label' => 'Sign in from a new device', 'to' => 'The agent', 'when' => 'They sign in from a new address and browser',
+        'user_new_device' => ['group' => __('Your team\'s accounts'), 'label' => __('Sign in from a new device'), 'to' => __('The agent'), 'when' => __('They sign in from a new address and browser'),
             'run' => function ($s) {
                 userMailSignInAlert($s['agent_name'], $s['agent_email'], 'new', '203.0.113.24', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36');
             }],
-        'user_mfa_failed' => ['group' => 'Your team\'s accounts', 'label' => 'Wrong MFA code', 'to' => 'The agent', 'when' => 'Someone uses their password with a wrong MFA code',
+        'user_mfa_failed' => ['group' => __('Your team\'s accounts'), 'label' => __('Wrong MFA code'), 'to' => __('The agent'), 'when' => __('Someone uses their password with a wrong MFA code'),
             'run' => function ($s) {
                 userMailSignInAlert($s['agent_name'], $s['agent_email'], 'mfa', '198.51.100.7', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) Gecko/20100101 Firefox/129.0');
             }],
-        'admin_sign_in_alert' => ['group' => 'Your team\'s accounts', 'label' => 'Failed sign-ins', 'to' => 'Every admin', 'when' => 'A run of failed sign-ins from one IP address or against one account (Admin > Settings > Security)',
+        'admin_sign_in_alert' => ['group' => __('Your team\'s accounts'), 'label' => __('Failed sign-ins'), 'to' => __('Every admin'), 'when' => __('A run of failed sign-ins from one IP address or against one account (Admin > Settings > Security)'),
             'run' => function ($s) {
-                signInMailAlert($s['agent_name'], $s['agent_email'], '10 failed sign-ins from 198.51.100.7',
+                signInMailAlert($s['agent_name'], $s['agent_email'], __('10 failed sign-ins from 198.51.100.7'),
                     '10 failed sign-ins in 10 minutes from 198.51.100.7, trying ' . $s['agent_name'] . ' and 3 emails with no account.',
                     ['IP address' => '198.51.100.7', 'Accounts tried' => 'Trying ' . $s['agent_name'] . ' and 3 emails with no account'], '/admin/sign_ins.php?view=ips&q=198.51.100.7');
             }],
 
         // ---- Other
-        'bulk' => ['group' => 'Other', 'label' => 'Email to many contacts', 'to' => 'The contacts picked', 'when' => 'Email on the contacts or clients list',
+        'bulk' => ['group' => __('Other'), 'label' => __('Email to many contacts'), 'to' => __('The contacts picked'), 'when' => __('Email on the contacts or clients list'),
             'run' => function ($s) {
                 emailBulkSend([['email' => $s['alex_email'], 'name' => $s['alex_name'], 'footnote' => 'You received this as a contact for ' . $s['client'] . ' with ' . (billingCompany()['company_name'] ?? '') . '.']],
                     array_key_first(emailMailboxes()) ?? 'system', '', 'Our office is closed on Friday',
                     '<p>Our office is closed this Friday for staff training. Support is still there for anything urgent - call us as usual.</p><p>Have a good weekend!</p>', true);
             }],
-        'test' => ['group' => 'Other', 'label' => 'Test email', 'to' => 'Whoever it is sent to', 'when' => 'Send a test in Admin > Mail',
+        'test' => ['group' => __('Other'), 'label' => __('Test email'), 'to' => __('Whoever it is sent to'), 'when' => __('Send a test in Admin > Mail'),
             'run' => function ($s) {
                 emailTestSend('you@example.com', 'system');
             }],
@@ -445,7 +445,7 @@ function emailPreviewContractCatalog() {
     }
     $catalog = [
         // ---- Contracts
-        'contract_reminder' => ['group' => 'Contracts', 'label' => 'Coming up to its notice date', 'to' => 'Whoever looks after the contract', 'when' => 'The nightly run, a month before a contract\'s notice date',
+        'contract_reminder' => ['group' => __('Contracts'), 'label' => __('Coming up to its notice date'), 'to' => __('Whoever looks after the contract'), 'when' => __('The nightly run, a month before a contract\'s notice date'),
             'run' => function ($s) {
                 contractRemind(emailPreviewContract($s, true));
             }],
@@ -454,19 +454,19 @@ function emailPreviewContractCatalog() {
         return $catalog;
     }
     return $catalog + [
-        'contract_sign_request' => ['group' => 'Contracts', 'label' => 'Please sign', 'to' => 'Who it is sent to', 'when' => 'An agent sends a contract to sign',
+        'contract_sign_request' => ['group' => __('Contracts'), 'label' => __('Please sign'), 'to' => __('Who it is sent to'), 'when' => __('An agent sends a contract to sign'),
             'run' => function ($s) {
                 contractSignatureSend(emailPreviewContract($s), $s['alex_name'], $s['alex_email'], $s['alex'], 'Here is the agreement we went over on Tuesday - let me know if anything needs changing.', $s['agent']);
             }],
-        'contract_client_signed' => ['group' => 'Contracts', 'label' => 'Signed by the client', 'to' => 'Whoever looks after the contract', 'when' => 'The client signs it, from the email or in the portal',
+        'contract_client_signed' => ['group' => __('Contracts'), 'label' => __('Signed by the client'), 'to' => __('Whoever looks after the contract'), 'when' => __('The client signs it, from the email or in the portal'),
             'run' => function ($s) {
                 $row = emailPreviewContract($s);
                 [$round_id] = contractSignatureSend($row, $s['alex_name'], $s['alex_email'], $s['alex'], '', $s['agent']);
                 emailCaptureStop();
                 emailCaptureStart();
-                contractSignatureClientSign(contractSignatureRow($round_id), ['name' => $s['alex_name'], 'title' => 'Practice Manager', 'image' => null], 'portal', $s['alex']);
+                contractSignatureClientSign(contractSignatureRow($round_id), ['name' => $s['alex_name'], 'title' => __('Practice Manager'), 'image' => null], 'portal', $s['alex']);
             }],
-        'contract_signed_copy' => ['group' => 'Contracts', 'label' => 'The signed copy', 'to' => 'Who signed it, and who it was sent to', 'when' => 'An agent countersigns - the PDF signed by both goes with it',
+        'contract_signed_copy' => ['group' => __('Contracts'), 'label' => __('The signed copy'), 'to' => __('Who signed it, and who it was sent to'), 'when' => __('An agent countersigns - the PDF signed by both goes with it'),
             'run' => function ($s) {
                 global $mysqli;
                 $row = emailPreviewContract($s);
@@ -479,7 +479,7 @@ function emailPreviewContractCatalog() {
                 contractSignatureSignedEmail(contractSignatureRow($round_id), false);
             }],
     ] + (contractHoursReady() ? [
-        'contract_hours_low' => ['group' => 'Contracts', 'label' => 'Prepaid hours running low', 'to' => 'Whoever looks after the contract', 'when' => 'Tickets drawn from a contract\'s prepaid hours take them under the hours set to be told at',
+        'contract_hours_low' => ['group' => __('Contracts'), 'label' => __('Prepaid hours running low'), 'to' => __('Whoever looks after the contract'), 'when' => __('Tickets drawn from a contract\'s prepaid hours take them under the hours set to be told at'),
             'run' => function ($s) {
                 $row = emailPreviewContract($s, true);
                 $row['contract_name'] = 'Support Block - 20 hours';
@@ -506,17 +506,17 @@ function emailPreviewInviteCatalog() {
         return [];
     }
     return [
-        'portal_join_invite' => ['group' => 'Client portal', 'label' => 'Invite to join', 'to' => 'Who is invited', 'when' => 'An agent invites someone from the client\'s Contacts > Invites',
+        'portal_join_invite' => ['group' => __('Client portal'), 'label' => __('Invite to join'), 'to' => __('Who is invited'), 'when' => __('An agent invites someone from the client\'s Contacts > Invites'),
             'run' => function ($s) {
                 $invite_id = emailPreviewInvite($s);
                 portalInviteMail($invite_id, portalInviteNewToken($invite_id));
             }],
-        'portal_join_invite_colleague' => ['group' => 'Client portal', 'label' => 'Invite to join from a colleague', 'to' => 'Who is invited', 'when' => 'A primary contact invites someone from Contacts in the portal',
+        'portal_join_invite_colleague' => ['group' => __('Client portal'), 'label' => __('Invite to join from a colleague'), 'to' => __('Who is invited'), 'when' => __('A primary contact invites someone from Contacts in the portal'),
             'run' => function ($s) {
                 $invite_id = emailPreviewInvite($s, 'invite', true);
                 portalInviteMail($invite_id, portalInviteNewToken($invite_id));
             }],
-        'portal_join_accepted' => ['group' => 'Client portal', 'label' => 'Invite accepted', 'to' => 'The primary contact who sent it', 'when' => 'Someone they invited joins',
+        'portal_join_accepted' => ['group' => __('Client portal'), 'label' => __('Invite accepted'), 'to' => __('The primary contact who sent it'), 'when' => __('Someone they invited joins'),
             'run' => function ($s) {
                 global $mysqli;
                 $invite_id = emailPreviewInvite($s, 'invite', true);
@@ -525,16 +525,16 @@ function emailPreviewInviteCatalog() {
                 mysqli_query($mysqli, "UPDATE portal_invites SET invite_accepted_at = NOW(), invite_contact_id = " . intval(mysqli_insert_id($mysqli)) . " WHERE invite_id = $invite_id");
                 portalMailInviteAccepted($invite_id);
             }],
-        'portal_signup' => ['group' => 'Client portal', 'label' => 'Finish signing up', 'to' => 'Who is signing up', 'when' => 'Someone asks to sign up from the sign-in page, with an address at a client that lets people sign up',
+        'portal_signup' => ['group' => __('Client portal'), 'label' => __('Finish signing up'), 'to' => __('Who is signing up'), 'when' => __('Someone asks to sign up from the sign-in page, with an address at a client that lets people sign up'),
             'run' => function ($s) {
                 $invite_id = emailPreviewInvite($s, 'signup');
                 portalInviteMail($invite_id, portalInviteNewToken($invite_id));
             }],
-        'portal_signup_exists' => ['group' => 'Client portal', 'label' => 'Signing up with an account already', 'to' => 'Who tried to sign up', 'when' => 'Someone asks to sign up with an address that signs in already',
+        'portal_signup_exists' => ['group' => __('Client portal'), 'label' => __('Signing up with an account already'), 'to' => __('Who tried to sign up'), 'when' => __('Someone asks to sign up with an address that signs in already'),
             'run' => function ($s) {
                 portalMailSignupExists($s['jamie_user']);
             }],
-        'portal_signup_joined' => ['group' => 'Client portal', 'label' => 'Someone signed up', 'to' => 'The client\'s primary contact', 'when' => 'Someone finishes signing up',
+        'portal_signup_joined' => ['group' => __('Client portal'), 'label' => __('Someone signed up'), 'to' => __('The client\'s primary contact'), 'when' => __('Someone finishes signing up'),
             'run' => function ($s) {
                 global $mysqli;
                 [$name, $email] = EMAIL_PREVIEW_PEOPLE['newcomer'];
@@ -550,7 +550,7 @@ function emailPreviewUserInviteCatalog() {
         return [];
     }
     return [
-        'user_invite' => ['group' => 'Your team\'s accounts', 'label' => 'Invite to join', 'to' => 'Who is invited', 'when' => 'An admin invites someone from New User or Get started',
+        'user_invite' => ['group' => __('Your team\'s accounts'), 'label' => __('Invite to join'), 'to' => __('Who is invited'), 'when' => __('An admin invites someone from New User or Get started'),
             'run' => function ($s) {
                 global $mysqli, $session_user_id;
                 [$name, $email] = EMAIL_PREVIEW_PEOPLE['newcomer'];

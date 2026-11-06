@@ -137,44 +137,47 @@ function gettingStartedSteps() {
                 $running = $heard && time() - strtotime($heard) < 300;
                 $on = intval($settings['config_enable_cron'] ?? 0) === 1;
                 $done = $running && $on;
-                $status = !$heard ? 'Not heard from yet' : ($running ? 'Ran ' . timeAgo($heard) : 'Last ran ' . timeAgo($heard)) . ($on ? '' : ' - switched off');
+                $status = !$heard ? __('Not heard from yet') : ($running ? __('Ran %s', timeAgo($heard)) : __('Last ran %s', timeAgo($heard))) . ($on ? '' : __(' - switched off'));
                 break;
             case 'mail':
                 $provider = (string) ($settings['config_smtp_provider'] ?? '');
                 $done = $provider !== '' && trim((string) ($settings['config_mail_from_email'] ?? '')) !== '';
-                $status = $done ? 'Sends as ' . $settings['config_mail_from_email'] : ($provider !== '' ? 'No address to send from' : 'Nothing is emailed yet');
+                $status = $done ? __('Sends as %s', $settings['config_mail_from_email']) : ($provider !== '' ? __('No address to send from') : __('Nothing is emailed yet'));
                 break;
             case 'backups':
                 $job = gettingStartedBackupJob();
                 $done = $job['enabled'];
-                $status = $done ? 'Every night at ' . date('g:i A', strtotime($job['daily_at'])) : 'Not scheduled';
+                $status = $done ? __('Every night at %s', formatDate($job['daily_at'], 'time')) : __('Not scheduled');
                 break;
             case 'billing':
                 $rate = floatval($settings['config_default_hourly_rate'] ?? 0);
                 $done = $rate > 0;
-                $status = $done ? billingMoney($rate, (string) ($settings['company_currency'] ?? '')) . ' an hour, ' . (intval($settings['config_default_net_terms'] ?? 0) ? 'due in ' . intval($settings['config_default_net_terms']) . ' days' : 'due on receipt') : 'No hourly rate yet';
+                $status = $done ? __('%1$s an hour, %2$s', billingMoney($rate, (string) ($settings['company_currency'] ?? '')), intval($settings['config_default_net_terms'] ?? 0) ? _n('due in %d day', 'due in %d days', intval($settings['config_default_net_terms'])) : __('due on receipt')) : __('No hourly rate yet');
                 break;
             case 'support':
                 $slas = $count("SELECT COUNT(*) FROM sla_assignments JOIN slas ON sla_id = sla_assignment_sla_id WHERE sla_assignment_client_id = 0 AND sla_archived_at IS NULL");
                 $done = $slas > 0;
-                $status = $done ? 'Response times for ' . $slas . ' ' . ($slas === 1 ? 'priority' : 'priorities') : 'No response times yet';
+                $status = $done ? _n('Response times for %d priority', 'Response times for %d priorities', $slas) : __('No response times yet');
                 break;
             case 'team':
                 $agents = $count("SELECT COUNT(*) FROM users WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL");
                 $invited = userInvitesHoldingSeats();
                 $done = $agents > 1 || $invited > 0;
-                $status = ($agents === 1 ? 'Just you' : "$agents people") . ($invited ? ", $invited invited" : '');
+                $status = ($agents === 1 ? __('Just you') : __('%d people', $agents)) . ($invited ? __(', %d invited', $invited) : '');
                 break;
             case 'content':
                 $templates = $count("SELECT (SELECT COUNT(*) FROM ticket_templates) + (SELECT COUNT(*) FROM canned_responses) + (SELECT COUNT(*) FROM document_templates)");
                 $done = $templates > 0;
-                $status = $done ? 'Templates to start from' : 'Nothing added yet';
+                $status = $done ? __('Templates to start from') : __('Nothing added yet');
                 break;
             case 'client':
                 $clients = $count("SELECT COUNT(*) FROM clients WHERE client_archived_at IS NULL");
                 $done = $clients > 0;
-                $status = $clients ? $clients . ' ' . ($clients === 1 ? 'client' : 'clients') : 'No clients yet';
+                $status = $clients ? _n('%d client', '%d clients', $clients) : __('No clients yet');
                 break;
+        }
+        foreach (['label', 'title', 'about'] as $field) {
+            $step[$field] = __($step[$field]); // i18n-dynamic - GETTING_STARTED_STEPS, entries in lang/pt_BR/maintenance.php
         }
         $steps[$key] = $step + ['key' => $key, 'done' => $done, 'skipped' => !$done && in_array($key, $state['skipped'], true), 'status' => $status];
     }

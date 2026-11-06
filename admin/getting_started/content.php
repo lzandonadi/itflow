@@ -33,22 +33,22 @@ $gs_packs = starterContentPacks();
                     <span class="itflow-gs-pack-icon" aria-hidden="true"><i class="fas fa-fw <?= escapeHtml($gs_pack['icon']) ?>"></i></span>
                     <div class="min-w-0 flex-grow-1">
                         <label class="d-flex flex-wrap align-items-baseline gap-2 mb-0" for="gsPack_<?= $gs_key ?>">
-                            <span class="fw-semibold"><?= escapeHtml($gs_pack['label']) ?></span>
+                            <span class="fw-semibold"><?= escapeHtml(__($gs_pack['label'])) // i18n-dynamic - starterContentPacks() ?></span>
                             <?php if ($gs_all_here) { ?>
-                                <span class="small text-body-secondary"><i class="fas fa-check text-success me-1"></i>All <?= $gs_total ?> here</span>
+                                <span class="small text-body-secondary"><i class="fas fa-check text-success me-1"></i><?= __('All %d here', $gs_total) ?></span>
                             <?php } else { ?>
-                                <span class="small text-body-secondary" data-starter-count data-starter-more="<?= $gs_missing < $gs_total ? 1 : 0 ?>"><?= $gs_missing < $gs_total ? "$gs_missing more to add" : "$gs_missing to add" ?></span>
+                                <span class="small text-body-secondary" data-starter-count data-starter-more="<?= $gs_missing < $gs_total ? 1 : 0 ?>"><?= $gs_missing < $gs_total ? __('%d more to add', $gs_missing) : __('%d to add', $gs_missing) ?></span>
                             <?php } ?>
                         </label>
-                        <div class="small text-body-secondary itflow-gs-pack-about" title="<?= escapeHtml($gs_pack['description']) ?>"><?= escapeHtml($gs_pack['description']) ?></div>
+                        <div class="small text-body-secondary itflow-gs-pack-about" title="<?= escapeHtml(__($gs_pack['description'])) // i18n-dynamic ?>"><?= escapeHtml(__($gs_pack['description'])) // i18n-dynamic ?></div>
                         <?= starterPickHtml($gs_key, $gs_items) ?>
                     </div>
                 </div>
             </div>
         <?php } ?>
     </div>
-    <p class="small text-body-secondary">Nothing you already have is changed. Each pack can be added later, or brought up to date, in Maintenance &gt; Starter Content.</p>
+    <p class="small text-body-secondary"><?= __('Nothing you already have is changed. Each pack can be added later, or brought up to date, in Maintenance &gt; Starter Content.') ?></p>
 
-    <button type="submit" name="getting_started_content" value="1" class="btn btn-primary" data-gs-save>Add the ones ticked<i class="fas fa-arrow-right ms-2"></i></button>
+    <button type="submit" name="getting_started_content" value="1" class="btn btn-primary" data-gs-save><?= __('Add the ones ticked') ?><i class="fas fa-arrow-right ms-2"></i></button>
 </form>
 <?= starterPreviewModalHtml() ?>

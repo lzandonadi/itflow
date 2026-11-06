@@ -449,4 +449,31 @@ return [
     'Connected to %s - saving' => 'Conectado a %s - salvando',
     '<i class="fas fa-spinner fa-spin me-2"></i>Saving' => '<i class="fas fa-spinner fa-spin me-2"></i>Salvando',
 
+    // Admin > AI Providers and AI Models windows
+    'Everything without a model of its own uses it.' => 'Tudo o que não tem modelo próprio o usa.',
+    'Nothing else is for %s - this one will be used for it, instead of General.' => 'Nenhum outro é para %s - este será usado para isso, em vez do Geral.',
+    'This one is used for %1$s - %2$s is for it too, but was added after.' => 'Este é usado para %1$s - %2$s também é, mas foi adicionado depois.',
+    'As the provider names it' => 'Como o provedor o chama',
+    'As the provider names it.' => 'Como o provedor o chama.',
+    'Asking the provider what it has...' => 'Perguntando ao provedor o que ele tem...',
+    'As the provider names it - %s to pick from as you type.' => 'Como o provedor o chama - %s para escolher enquanto digita.',
+    '<i class="fas fa-spinner fa-spin me-1"></i>Asking' => '<i class="fas fa-spinner fa-spin me-1"></i>Perguntando',
+    'It answered in %ss:' => 'Respondeu em %ss:',
+    '<span class="text-danger-emphasis" data-ai-try-failed><i class="fas fa-fw fa-times-circle me-1"></i>Not yet - see above.</span>' => '<span class="text-danger-emphasis" data-ai-try-failed><i class="fas fa-fw fa-times-circle me-1"></i>Ainda não - veja acima.</span>',
+    '%s runs on your own network and needs no key unless you set one. ITFlow has to be able to reach it - localhost is the ITFlow server itself.' => '%s roda na sua própria rede e não precisa de chave, a menos que você defina uma. O ITFlow precisa conseguir alcançá-lo - localhost é o próprio servidor do ITFlow.',
+    'Made in <a href="' => 'Criada em <a href="',
+    'If it needs one - sent as a bearer token.' => 'Se precisar de uma - enviada como bearer token.',
+    'It answered - %s model there.' => 'Respondeu - %s modelo lá.',
+    'It answered - %s models there.' => 'Respondeu - %s modelos lá.',
+    'Pick the one to use above.' => 'Escolha acima o que usar.',
+    '<i class="fas fa-spinner fa-spin me-1"></i>Testing' => '<i class="fas fa-spinner fa-spin me-1"></i>Testando',
+    '<span class="text-danger-emphasis" data-ai-test-failed><i class="fas fa-fw fa-times-circle me-1"></i>Not yet - see above.</span>' => '<span class="text-danger-emphasis" data-ai-test-failed><i class="fas fa-fw fa-times-circle me-1"></i>Ainda não - veja acima.</span>',
+    '<i class="fa fa-check me-2"></i>Save anyway' => '<i class="fa fa-check me-2"></i>Salvar mesmo assim',
+
+    // Admin > AI windows, texts with an apostrophe
+    '%1$s on %2$s is for %3$s already, and is the one used - this one won\'t be, while it is.' => '%1$s em %2$s já é para %3$s, e é o usado - este não será, enquanto for.',
+    'As the provider names it - it couldn\'t be asked what it has: %s' => 'Como o provedor o chama - não foi possível perguntar o que ele tem: %s',
+    'Your deployment\'s name, as it is in Azure.' => 'O nome da sua implantação, como está no Azure.',
+    '<span class="text-danger-emphasis">Couldn\'t try it - try again.</span>' => '<span class="text-danger-emphasis">Não foi possível testar - tente de novo.</span>',
+    '<span class="text-danger-emphasis">Couldn\'t test it - try again.</span>' => '<span class="text-danger-emphasis">Não foi possível testar - tente de novo.</span>',
 ];

@@ -17,7 +17,7 @@ $order = "DESC";
 
 require_once "includes/inc_all_admin.php";
 
-$page_title = 'AI Usage';
+$page_title = __('AI Usage');
 
 // Only these sort - an unknown column would take the page down
 $sortable_columns = [
@@ -35,10 +35,10 @@ if (!isset($sortable_columns[$sort])) {
 
 $features = aiFeatures();
 $views = [
-    '' => ['label' => 'All', 'icon' => 'fa-list', 'where' => "ai_usage_feature <> 'test'", 'title' => 'Every request but tests'],
-    'failed' => ['label' => 'Failed', 'icon' => 'fa-times-circle', 'where' => "ai_usage_feature <> 'test' AND ai_usage_ok = 0", 'title' => 'The provider turned them away, or couldn\'t be reached'],
-    'redacted' => ['label' => 'Secrets kept out', 'icon' => 'fa-user-secret', 'where' => "ai_usage_redacted > 0", 'title' => 'Passwords or keys were taken out before they were sent'],
-    'test' => ['label' => 'Tests', 'icon' => 'fa-vial', 'where' => "ai_usage_feature = 'test'", 'title' => 'Try it, from a model\'s window'],
+    '' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => "ai_usage_feature <> 'test'", 'title' => __('Every request but tests')],
+    'failed' => ['label' => __('Failed'), 'icon' => 'fa-times-circle', 'where' => "ai_usage_feature <> 'test' AND ai_usage_ok = 0", 'title' => __('The provider turned them away, or couldn\'t be reached')],
+    'redacted' => ['label' => __('Secrets kept out'), 'icon' => 'fa-user-secret', 'where' => "ai_usage_redacted > 0", 'title' => __('Passwords or keys were taken out before they were sent')],
+    'test' => ['label' => __('Tests'), 'icon' => 'fa-vial', 'where' => "ai_usage_feature = 'test'", 'title' => __('Try it, from a model\'s window')],
 ];
 $view = is_string($_GET['view'] ?? null) && isset($views[$_GET['view']]) ? $_GET['view'] : '';
 $provider_filter = intval($_GET['provider'] ?? 0);
@@ -118,17 +118,17 @@ $ms_text = function ($ms) {
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-    <li class="breadcrumb-item"><a href="ai_providers.php">AI Providers</a></li>
-    <li class="breadcrumb-item active">AI Usage</li>
+    <li class="breadcrumb-item"><a href="/admin"><?= __('Admin') ?></a></li>
+    <li class="breadcrumb-item"><a href="ai_providers.php"><?= __('AI Providers') ?></a></li>
+    <li class="breadcrumb-item active"><?= __('AI Usage') ?></li>
 </ol>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-chart-bar me-2"></i>AI Usage</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-chart-bar me-2"></i><?= __('AI Usage') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light me-1" href="ai_models.php"><i class="fas fa-fw fa-brain"></i><span class="d-none d-lg-inline ms-2">Models</span></a>
-            <a class="btn btn-outline-light" href="settings_logs.php" title="Kept as long as the audit log - <?= escapeHtml(appLogRetentionText($retention['audit'])) ?>"><i class="fas fa-fw fa-cog"></i><span class="d-none d-lg-inline ms-2">Keeping</span></a>
+            <a class="btn btn-outline-light me-1" href="ai_models.php"><i class="fas fa-fw fa-brain"></i><span class="d-none d-lg-inline ms-2"><?= __('Models') ?></span></a>
+            <a class="btn btn-outline-light" href="settings_logs.php" title="<?= escapeHtml(__('Kept as long as the audit log - %s', appLogRetentionText($retention['audit']))) ?>"><i class="fas fa-fw fa-cog"></i><span class="d-none d-lg-inline ms-2"><?= __('Keeping') ?></span></a>
         </div>
     </div>
     <div class="card-header py-3">
@@ -139,35 +139,35 @@ $ms_text = function ($ms) {
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-12">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search AI usage" title="Model, provider, feature, who, client or what went wrong">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search AI usage')) ?>" title="<?= escapeHtml(__('Model, provider, feature, who, client or what went wrong')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="When" aria-label="When">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('When')) ?>" aria-label="<?= escapeHtml(__('When')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml(is_string($_GET['canned_date'] ?? null) ? $_GET['canned_date'] : '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select class="form-select select2" name="provider" onchange="this.form.submit()" aria-label="Provider">
-                        <option value="">- Any provider -</option>
+                    <select class="form-select select2" name="provider" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Provider')) ?>">
+                        <option value=""><?= __('- Any provider -') ?></option>
                         <?php while ($provider = mysqli_fetch_assoc($providers)) { ?>
                             <option value="<?= intval($provider['ai_provider_id']) ?>" <?= intval($provider['ai_provider_id']) === $provider_filter ? 'selected' : '' ?><?= selectOptionData(['icon' => aiProviderIcon($provider['ai_provider_kind'])]) ?>><?= escapeHtml($provider['ai_provider_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select class="form-select select2" name="feature" onchange="this.form.submit()" aria-label="Feature">
-                        <option value="">- Any feature -</option>
+                    <select class="form-select select2" name="feature" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Feature')) ?>">
+                        <option value=""><?= __('- Any feature -') ?></option>
                         <?php foreach ($features as $key => $label) { ?>
                             <option value="<?= $key ?>" <?= $key === $feature_filter ? 'selected' : '' ?>><?= escapeHtml($label) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select class="form-select select2" name="user" onchange="this.form.submit()" aria-label="Who">
-                        <option value="">- Anyone -</option>
+                    <select class="form-select select2" name="user" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Who')) ?>">
+                        <option value=""><?= __('- Anyone -') ?></option>
                         <?php while ($person = mysqli_fetch_assoc($people)) { ?>
                             <option value="<?= intval($person['user_id']) ?>" <?= intval($person['user_id']) === $user_filter ? 'selected' : '' ?>><?= escapeHtml($person['user_name']) ?></option>
                         <?php } ?>
@@ -177,8 +177,8 @@ $ms_text = function ($ms) {
         </form>
         <?php if ($model_filter) { ?>
             <div class="mt-2 small" data-usage-model-filter>
-                Just <strong class="font-monospace"><?= escapeHtml($model_row['ai_model_name'] ?? "model #$model_filter") ?></strong>
-                <a class="ms-1" href="<?= escapeHtml($without_url('model')) ?>" title="Every model"><i class="fas fa-times-circle"></i></a>
+                <?= __('Just') ?> <strong class="font-monospace"><?= escapeHtml($model_row['ai_model_name'] ?? "model #$model_filter") ?></strong>
+                <a class="ms-1" href="<?= escapeHtml($without_url('model')) ?>" title="<?= escapeHtml(__('Every model')) ?>"><i class="fas fa-times-circle"></i></a>
             </div>
         <?php } ?>
         <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-3">
@@ -191,12 +191,12 @@ $ms_text = function ($ms) {
         </nav>
         <?php if (intval($totals['requests'])) { ?>
             <div class="row row-cols-2 row-cols-md-3 row-cols-xl-6 g-2 mt-1 small" data-usage-totals>
-                <div class="col"><div class="border rounded px-3 py-2 h-100"><div class="text-body-secondary">Requests</div><div class="fs-5 fw-semibold" data-usage-total="requests"><?= number_format($totals['requests']) ?></div></div></div>
-                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= number_format($totals['tokens_in']) ?> tokens sent"><div class="text-body-secondary">Tokens in</div><div class="fs-5 fw-semibold" data-usage-total="tokens_in"><?= aiTokensText($totals['tokens_in']) ?></div></div></div>
-                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= number_format($totals['tokens_out']) ?> tokens received"><div class="text-body-secondary">Tokens out</div><div class="fs-5 fw-semibold" data-usage-total="tokens_out"><?= aiTokensText($totals['tokens_out']) ?></div></div></div>
-                <div class="col"><div class="border rounded px-3 py-2 h-100"><div class="text-body-secondary">Failed</div><div class="fs-5 fw-semibold <?= intval($totals['failed']) ? 'text-danger-emphasis' : '' ?>" data-usage-total="failed"><?= number_format($totals['failed']) ?></div></div></div>
-                <div class="col"><div class="border rounded px-3 py-2 h-100" title="Passwords and keys taken out before they were sent"><div class="text-body-secondary">Secrets kept out</div><div class="fs-5 fw-semibold" data-usage-total="redacted"><?= number_format($totals['redacted']) ?></div></div></div>
-                <div class="col"><div class="border rounded px-3 py-2 h-100" title="How long an answer took, on average"><div class="text-body-secondary">Answer time</div><div class="fs-5 fw-semibold"><?= $ms_text($totals['ms']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100"><div class="text-body-secondary"><?= __('Requests') ?></div><div class="fs-5 fw-semibold" data-usage-total="requests"><?= number_format($totals['requests']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= number_format($totals['tokens_in']) ?> tokens sent"><div class="text-body-secondary"><?= __('Tokens in') ?></div><div class="fs-5 fw-semibold" data-usage-total="tokens_in"><?= aiTokensText($totals['tokens_in']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= number_format($totals['tokens_out']) ?> tokens received"><div class="text-body-secondary"><?= __('Tokens out') ?></div><div class="fs-5 fw-semibold" data-usage-total="tokens_out"><?= aiTokensText($totals['tokens_out']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100"><div class="text-body-secondary"><?= __('Failed') ?></div><div class="fs-5 fw-semibold <?= intval($totals['failed']) ? 'text-danger-emphasis' : '' ?>" data-usage-total="failed"><?= number_format($totals['failed']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= escapeHtml(__('Passwords and keys taken out before they were sent')) ?>"><div class="text-body-secondary"><?= __('Secrets kept out') ?></div><div class="fs-5 fw-semibold" data-usage-total="redacted"><?= number_format($totals['redacted']) ?></div></div></div>
+                <div class="col"><div class="border rounded px-3 py-2 h-100" title="<?= escapeHtml(__('How long an answer took, on average')) ?>"><div class="text-body-secondary"><?= __('Answer time') ?></div><div class="fs-5 fw-semibold"><?= $ms_text($totals['ms']) ?></div></div></div>
             </div>
         <?php } ?>
     </div>
@@ -204,13 +204,13 @@ $ms_text = function ($ms) {
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('ai_usage_id', 'When') ?></th>
-                <th><?= $sort_link('ai_usage_feature', 'Feature') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('user_name', 'Who') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('client_name', 'Client') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('ai_usage_model', 'Model') ?></th>
-                <th class="d-none d-sm-table-cell text-end"><?= $sort_link('tokens', 'Tokens') ?></th>
-                <th class="d-none d-lg-table-cell text-end"><?= $sort_link('ai_usage_ms', 'Time') ?></th>
+                <th class="ps-3"><?= $sort_link('ai_usage_id', __('When')) ?></th>
+                <th><?= $sort_link('ai_usage_feature', __('Feature')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('user_name', __('Who')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('client_name', __('Client')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('ai_usage_model', __('Model')) ?></th>
+                <th class="d-none d-sm-table-cell text-end"><?= $sort_link('tokens', __('Tokens')) ?></th>
+                <th class="d-none d-lg-table-cell text-end"><?= $sort_link('ai_usage_ms', __('Time')) ?></th>
             </tr>
             </thead>
             <tbody>
@@ -230,7 +230,7 @@ $ms_text = function ($ms) {
                             <div class="text-danger-emphasis text-break" data-usage-failed><i class="fas fa-fw fa-times-circle me-1"></i><?= escapeHtml($row['ai_usage_error'] ?: 'Failed') ?></div>
                         <?php } ?>
                         <?php if ($redacted) { ?>
-                            <div class="text-body-secondary" data-usage-redacted="<?= $redacted ?>" title="Taken out before it was sent, and put back in the answer"><i class="fas fa-fw fa-user-secret me-1"></i><?= $redacted ?> secret<?= $redacted === 1 ? '' : 's' ?> kept out</div>
+                            <div class="text-body-secondary" data-usage-redacted="<?= $redacted ?>" title="<?= escapeHtml(__('Taken out before it was sent, and put back in the answer')) ?>"><i class="fas fa-fw fa-user-secret me-1"></i><?= $redacted ?> secret<?= $redacted === 1 ? '' : 's' ?> kept out</div>
                         <?php } ?>
                         <div class="d-md-none text-body-secondary"><?= escapeHtml(trim(($row['user_name'] ?? '') . ' · ' . $row['ai_usage_model'], ' ·')) ?></div>
                     </td>
@@ -262,11 +262,11 @@ $ms_text = function ($ms) {
     </div>
     <?php
     $empty_state = [
-        'thing' => 'AI requests',
+        'thing' => __('AI requests'),
         'icon' => 'fa-chart-bar',
         'views' => ['view'],
-        'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => 'None ' . ($view === 'test' ? 'tried yet' : 'yet'), 'text' => escapeHtml($views[$view]['title']) . ' - they show here.'] : null,
-        'text' => 'Each time an agent rewords a reply, summarizes a ticket or drafts a document, it shows here - who, for what, the model and the tokens it took. ' . ($retention['audit'] ? 'Kept for ' . escapeHtml(appLogRetentionText($retention['audit'])) . ', as the audit log is.' : 'Kept as long as the audit log is.'),
+        'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => $view === 'test' ? __('None tried yet') : __('None yet'), 'text' => __('%s - they show here.', escapeHtml($views[$view]['title']))] : null,
+        'text' => __('Each time an agent rewords a reply, summarizes a ticket or drafts a document, it shows here - who, for what, the model and the tokens it took.') . ' ' . ($retention['audit'] ? __('Kept for %s, as the audit log is.', escapeHtml(appLogRetentionText($retention['audit']))) : __('Kept as long as the audit log is.')),
     ];
     ?>
     <?php require_once "../includes/filter_footer.php"; ?>

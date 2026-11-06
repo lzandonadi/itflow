@@ -22,7 +22,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/check_login.php';
 enforceAdminPermission();
 
 if (!gettingStartedReady()) {
-    flashAlert('Get started needs the database update - run it from Maintenance &gt; Update first', 'error');
+    flashAlert(__('Get started needs the database update - run it from Maintenance &gt; Update first'), 'error');
     redirect('/admin/update.php');
 }
 
@@ -65,7 +65,7 @@ if (!empty($_SESSION['alert_message'])) {
 }
 
 $gs_company = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT company_name, company_logo FROM companies WHERE company_id = 1")) ?: [];
-$gs_title = $gs_step === 'done' ? 'Where it stands' : $gs_info['title'];
+$gs_title = $gs_step === 'done' ? __('Where it stands') : $gs_info['title'];
 define('FROM_GETTING_STARTED', true);
 
 ?>
@@ -77,7 +77,7 @@ define('FROM_GETTING_STARTED', true);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="<?= $user_config_theme_dark ? 'dark' : 'light' ?>">
     <meta name="robots" content="noindex">
-    <title><?= escapeHtml($gs_title) ?> - Get started - <?= escapeHtml($gs_company['company_name'] ?? 'ITFlow') ?></title>
+    <title><?= escapeHtml($gs_title) ?> - <?= __('Get started') ?> - <?= escapeHtml($gs_company['company_name'] ?? 'ITFlow') ?></title>
     <?php if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico')) { ?>
         <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
     <?php } ?>
@@ -99,31 +99,31 @@ define('FROM_GETTING_STARTED', true);
             <?php } else { ?>
                 <span><span class="text-primary fw-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow</span>
             <?php } ?>
-            <span class="itflow-setup-brand-sub">Get started</span>
+            <span class="itflow-setup-brand-sub"><?= __('Get started') ?></span>
         </a>
         <?php if ($gs_progress['finished']) { ?>
-            <a href="/agent/dashboard.php" class="btn btn-sm btn-outline-secondary" data-gs-leave>Go to ITFlow<i class="fas fa-arrow-right ms-2"></i></a>
+            <a href="/agent/dashboard.php" class="btn btn-sm btn-outline-secondary" data-gs-leave><?= __('Go to ITFlow') ?><i class="fas fa-arrow-right ms-2"></i></a>
         <?php } else {
             // Do it later leaves the steps as they are, for the dashboard's Finish setting up to carry on from; Skip all puts every one off ?>
             <div class="itflow-gs-top-actions">
                 <form action="post.php" method="post" class="m-0">
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <button type="submit" name="getting_started_skip_all" value="1" class="btn btn-sm btn-link text-body-secondary text-decoration-none confirm-link" data-gs-skip-all
-                        data-confirm-title="Skip all of Get started?" data-confirm-text="Every step still to do is skipped, and the dashboard stops showing Finish setting up. Each one is in Admin > Get started whenever you want it." data-confirm-button="Skip all">Skip all</button>
+                        data-confirm-title="<?= escapeHtml(__('Skip all of Get started?')) ?>" data-confirm-text="<?= escapeHtml(__('Every step still to do is skipped, and the dashboard stops showing Finish setting up. Each one is in Admin > Get started whenever you want it.')) ?>" data-confirm-button="<?= escapeHtml(__('Skip all')) ?>"><?= __('Skip all') ?></button>
                 </form>
-                <a href="/agent/dashboard.php" class="btn btn-sm btn-outline-secondary" data-gs-later title="The dashboard shows what is left, to carry on from">Do it later<i class="fas fa-arrow-right ms-2"></i></a>
+                <a href="/agent/dashboard.php" class="btn btn-sm btn-outline-secondary" data-gs-later title="<?= escapeHtml(__('The dashboard shows what is left, to carry on from')) ?>"><?= __('Do it later') ?><i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         <?php } ?>
     </header>
 
     <!-- The steps, and where each stands -->
-    <nav class="itflow-setup-steps" aria-label="Get started steps">
+    <nav class="itflow-setup-steps" aria-label="<?= escapeHtml(__('Get started steps')) ?>">
         <ol class="list-unstyled d-none d-md-flex">
             <?php foreach ($gs_steps as $key => $step) {
                 $state = $key === $gs_step ? 'current' : ($step['done'] ? 'done' : ($step['skipped'] ? 'skipped' : 'todo'));
                 $marker = $step['done'] ? '<i class="fas fa-check"></i>' : ($step['skipped'] ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-fw ' . $step['icon'] . '"></i>'); ?>
                 <li class="itflow-setup-step is-<?= $state ?><?= $step['done'] ? ' has-done' : '' ?>" data-gs-step="<?= $key ?>" data-gs-state="<?= $step['done'] ? 'done' : ($step['skipped'] ? 'skipped' : 'todo') ?>"<?= $state === 'current' ? ' aria-current="step"' : '' ?>>
-                    <a href="<?= gettingStartedUrl($key) ?>" title="<?= escapeHtml($step['title'] . ' - ' . ($step['done'] ? 'done' : ($step['skipped'] ? 'skipped for now' : 'to do'))) ?>">
+                    <a href="<?= gettingStartedUrl($key) ?>" title="<?= escapeHtml($step['title'] . ' - ' . ($step['done'] ? 'done' : ($step['skipped'] ? __('skipped for now') : 'to do'))) ?>">
                         <span class="itflow-setup-step-marker"><?= $marker ?></span><span class="itflow-setup-step-label"><?= escapeHtml($step['label']) ?></span>
                     </a>
                 </li>
@@ -132,9 +132,9 @@ define('FROM_GETTING_STARTED', true);
         <div class="d-md-none">
             <div class="d-flex justify-content-between small mb-1">
                 <span class="fw-semibold"><?= escapeHtml($gs_title) ?></span>
-                <span class="text-body-secondary"><?= $gs_progress['done'] ?> of <?= $gs_progress['total'] ?> done</span>
+                <span class="text-body-secondary"><?= __('%1$d of %2$d done', $gs_progress['done'], $gs_progress['total']) ?></span>
             </div>
-            <div class="progress itflow-gs-progress" role="progressbar" aria-label="How far Get started has got" aria-valuenow="<?= $gs_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $gs_progress['total'] ?>">
+            <div class="progress itflow-gs-progress" role="progressbar" aria-label="<?= escapeHtml(__('How far Get started has got')) ?>" aria-valuenow="<?= $gs_progress['done'] ?>" aria-valuemin="0" aria-valuemax="<?= $gs_progress['total'] ?>">
                 <div class="progress-bar" style="width: <?= $gs_progress['total'] ? round($gs_progress['done'] * 100 / $gs_progress['total']) : 0 ?>%"></div>
             </div>
         </div>
@@ -154,9 +154,9 @@ define('FROM_GETTING_STARTED', true);
                     <div class="d-flex flex-wrap align-items-start gap-2 mb-1">
                         <h1 class="h4 fw-semibold mb-0 me-auto"><i class="fas fa-fw <?= $gs_info['icon'] ?> text-body-secondary me-2"></i><?= escapeHtml($gs_info['title']) ?></h1>
                         <?php if ($gs_info['done']) { ?>
-                            <span class="badge rounded-pill text-bg-success" data-gs-done><i class="fas fa-check me-1"></i>Done</span>
+                            <span class="badge rounded-pill text-bg-success" data-gs-done><i class="fas fa-check me-1"></i><?= __('Done') ?></span>
                         <?php } elseif ($gs_info['skipped']) { ?>
-                            <span class="badge rounded-pill text-bg-secondary" data-gs-skipped>Skipped for now</span>
+                            <span class="badge rounded-pill text-bg-secondary" data-gs-skipped><?= __('Skipped for now') ?></span>
                         <?php } ?>
                     </div>
                     <p class="text-body-secondary mb-4"><?= escapeHtml($gs_info['about']) ?></p>
@@ -164,15 +164,15 @@ define('FROM_GETTING_STARTED', true);
                 </div>
                 <div class="card-footer d-flex flex-wrap align-items-center gap-2 py-3 px-4">
                     <?php if ($gs_prev !== '') { ?>
-                        <a href="<?= gettingStartedUrl($gs_prev) ?>" class="btn btn-link text-decoration-none ps-0"><i class="fas fa-arrow-left me-2"></i>Back</a>
+                        <a href="<?= gettingStartedUrl($gs_prev) ?>" class="btn btn-link text-decoration-none ps-0"><i class="fas fa-arrow-left me-2"></i><?= __('Back') ?></a>
                     <?php } ?>
-                    <span class="me-auto small text-body-secondary"><?= $gs_progress['done'] ?> of <?= $gs_progress['total'] ?> done</span>
+                    <span class="me-auto small text-body-secondary"><?= __('%1$d of %2$d done', $gs_progress['done'], $gs_progress['total']) ?></span>
                     <?php if ($gs_info['done'] || $gs_info['skipped']) { ?>
                         <a href="<?= gettingStartedUrl($gs_next) ?>" class="btn btn-outline-primary" data-gs-continue><?= $gs_next === 'done' ? 'Finish' : 'Next: ' . escapeHtml($gs_steps[$gs_next]['title']) ?><i class="fas fa-arrow-right ms-2"></i></a>
                     <?php } else { ?>
                         <form action="post.php" method="post" class="m-0">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <button type="submit" name="getting_started_skip" value="<?= escapeHtml($gs_step) ?>" class="btn btn-outline-secondary" data-gs-skip><?= $gs_step === 'team' ? "It's just me" : 'Skip for now' ?></button>
+                            <button type="submit" name="getting_started_skip" value="<?= escapeHtml($gs_step) ?>" class="btn btn-outline-secondary" data-gs-skip><?= $gs_step === 'team' ? __("It's just me") : __('Skip for now') ?></button>
                         </form>
                     <?php } ?>
                 </div>
@@ -185,7 +185,7 @@ define('FROM_GETTING_STARTED', true);
     </main>
 
     <footer class="itflow-setup-footer">
-        Get started is in Admin whenever you want it.
+        <?= __('Get started is in Admin whenever you want it.') ?>
     </footer>
 
 </div>

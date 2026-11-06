@@ -22,7 +22,7 @@ if (isset($_POST['getting_started_cron_on'])) {
         mysqli_query($mysqli, "UPDATE settings SET config_enable_cron = 1 WHERE company_id = 1");
         logAudit("Settings", "Edit", "$session_name turned cron on in Get started");
     }
-    flashAlert('Cron is on - each job runs on its schedule, in Maintenance &gt; Cron');
+    flashAlert(__('Cron is on - each job runs on its schedule, in Maintenance &gt; Cron'));
 
     redirect(gettingStartedUrl(gettingStartedSteps()['cron']['done'] ? gettingStartedAfter('cron') : 'cron'));
 
@@ -52,14 +52,14 @@ if (isset($_POST['getting_started_mail'])) {
     $from_email = trim((string) ($_POST['config_mail_from_email'] ?? ''));
     $from_name = trim(preg_replace('/\s+/u', ' ', preg_replace('/[\x00-\x1F\x7F]/u', ' ', (string) ($_POST['config_mail_from_name'] ?? ''))));
     if ($from_email === '') {
-        $errors['config_mail_from_email'] = 'The address ITFlow sends as - help@ your domain, or the like.';
+        $errors['config_mail_from_email'] = __('The address ITFlow sends as - help@ your domain, or the like.');
     } elseif (($problem = settingsEmailProblem($from_email)) !== '') {
         $errors['config_mail_from_email'] = $problem;
     } elseif (mb_strlen($from_email) > 200) {
-        $errors['config_mail_from_email'] = 'Up to 200 characters.';
+        $errors['config_mail_from_email'] = __('Up to 200 characters.');
     }
     if (mb_strlen($from_name) > 200) {
-        $errors['config_mail_from_name'] = 'Up to 200 characters.';
+        $errors['config_mail_from_name'] = __('Up to 200 characters.');
     }
     $after['config_mail_from_email'] = $from_email;
     $after['config_mail_from_name'] = $from_name;
@@ -76,7 +76,7 @@ if (isset($_POST['getting_started_mail'])) {
             [$after, $found] = settingsMailServerCheck('imap', $after, $_POST);
             $errors += $found;
             if (!isset($errors['config_imap_username']) && !filter_var($after['config_imap_username'], FILTER_VALIDATE_EMAIL)) {
-                $errors['config_imap_username'] = "The mailbox's address - support@ your domain, or the like.";
+                $errors['config_imap_username'] = __("The mailbox's address - support@ your domain, or the like.");
             }
         }
     }
@@ -101,16 +101,16 @@ if (isset($_POST['getting_started_mail'])) {
     }
 
     if (($_POST['getting_started_mail'] ?? '') === 'test') {
-        $cron_note = gettingStartedSteps()['cron']['done'] ? 'it goes within a minute' : 'it goes once cron is running';
+        $cron_note = gettingStartedSteps()['cron']['done'] ? __('it goes within a minute') : __('it goes once cron is running');
         if (emailTestSend($session_email, 'system')) {
-            flashAlert(($lines ? 'Saved, and a' : 'A') . ' test email is queued to <strong>' . escapeHtml($session_email) . "</strong> - $cron_note. Maintenance &gt; Mail Queue shows how it went");
+            flashAlert(($lines ? __('Saved, and a test email is queued to <strong>%1$s</strong> - %2$s. Maintenance &gt; Mail Queue shows how it went', escapeHtml($session_email), $cron_note) : __('A test email is queued to <strong>%1$s</strong> - %2$s. Maintenance &gt; Mail Queue shows how it went', escapeHtml($session_email), $cron_note)));
         } else {
-            flashAlert(($lines ? 'Saved - but the' : 'The') . ' test could not be queued: <strong>' . escapeHtml($session_email) . '</strong>, your own address, isn\'t an email address. Change it in Your account', 'warning');
+            flashAlert(($lines ? __('Saved - but the test could not be queued: <strong>%s</strong>, your own address, isn\'t an email address. Change it in Your account', escapeHtml($session_email)) : __('The test could not be queued: <strong>%s</strong>, your own address, isn\'t an email address. Change it in Your account', escapeHtml($session_email))), 'warning');
         }
         redirect(gettingStartedUrl('mail'));
     }
 
-    flashAlert($lines ? 'Email saved - ITFlow sends as <strong>' . escapeHtml($from_email) . '</strong>' : 'Nothing about email changed', $lines ? 'success' : 'info');
+    flashAlert($lines ? __('Email saved - ITFlow sends as <strong>%s</strong>', escapeHtml($from_email)) : __('Nothing about email changed'), $lines ? 'success' : 'info');
     redirect(gettingStartedUrl(gettingStartedAfter('mail')));
 
 }
@@ -128,22 +128,22 @@ if (isset($_POST['getting_started_backups'])) {
 
     $errors = [];
     if ($enabled && backupEncryptionKey() === '') {
-        $errors['backup_enabled'] = "There is no backup key - ITFlow couldn't write one to config.php.";
+        $errors['backup_enabled'] = __("There is no backup key - ITFlow couldn't write one to config.php.");
     }
     if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $daily_at)) {
-        $errors['backup_daily_at'] = 'A time of day, as 02:00.';
+        $errors['backup_daily_at'] = __('A time of day, as 02:00.');
     }
     if (!in_array($type, backupUnattendedTypes(), true)) {
-        $errors['config_backup_cron_type'] = 'Pick one of these.';
+        $errors['config_backup_cron_type'] = __('Pick one of these.');
     }
     if (!ctype_digit($keep_count) || intval($keep_count) < 1 || intval($keep_count) > 1000) {
-        $errors['config_backup_retention_count'] = 'A whole number, 1 or more.';
+        $errors['config_backup_retention_count'] = __('A whole number, 1 or more.');
     }
     if (!ctype_digit($keep_days) || intval($keep_days) > 3650) {
-        $errors['config_backup_retention_days'] = 'A whole number of days - 0 for no limit.';
+        $errors['config_backup_retention_days'] = __('A whole number of days - 0 for no limit.');
     }
     if ($enabled && !$job['enabled'] && empty($_POST['backup_key_saved'])) {
-        $errors['backup_key_saved'] = 'Keep a copy of the backup key first - without it, no backup can be restored.';
+        $errors['backup_key_saved'] = __('Keep a copy of the backup key first - without it, no backup can be restored.');
     }
     if ($errors) {
         settingsRefuse('getting_started_backups', $errors, gettingStartedUrl('backups'));
@@ -154,9 +154,9 @@ if (isset($_POST['getting_started_backups'])) {
         logAudit("Settings", "Edit", "$session_name set up backups in Get started: " . escapeSql(implode('; ', $lines)));
     }
     if ($enabled) {
-        flashAlert('A backup is taken every night at <strong>' . escapeHtml(date('g:i A', strtotime($daily_at))) . '</strong>' . (gettingStartedSteps()['cron']['done'] ? '' : ', once cron is running'));
+        flashAlert((gettingStartedSteps()['cron']['done'] ? __('A backup is taken every night at <strong>%s</strong>', escapeHtml(date('g:i A', strtotime($daily_at)))) : __('A backup is taken every night at <strong>%s</strong>, once cron is running', escapeHtml(date('g:i A', strtotime($daily_at))))));
     } else {
-        flashAlert('Nightly backups are off - take one any time in Maintenance &gt; Backup', 'info');
+        flashAlert(__('Nightly backups are off - take one any time in Maintenance &gt; Backup'), 'info');
     }
     redirect(gettingStartedUrl(gettingStartedAfter('backups')));
 
@@ -171,11 +171,11 @@ if (isset($_POST['getting_started_billing'])) {
 
     $rate_text = str_replace([',', ' '], '', trim((string) ($_POST['config_default_hourly_rate'] ?? '')));
     if (!preg_match('/^\d{1,13}(\.\d{1,2})?$/', $rate_text) || floatval($rate_text) <= 0) {
-        $errors['config_default_hourly_rate'] = 'What you charge an hour, as 125 or 125.50.';
+        $errors['config_default_hourly_rate'] = __('What you charge an hour, as 125 or 125.50.');
     }
     $net_terms = (string) ($_POST['config_default_net_terms'] ?? '');
     if (!ctype_digit($net_terms) || !array_key_exists(intval($net_terms), settingsNetTerms())) {
-        $errors['config_default_net_terms'] = 'Pick one of these.';
+        $errors['config_default_net_terms'] = __('Pick one of these.');
     }
     [$invoice_prefix, $invoice_number, $found] = settingsNumberingCheck('invoice', $_POST, $before);
     $errors += $found;
@@ -242,7 +242,7 @@ if (isset($_POST['getting_started_billing'])) {
     if ($changed) {
         logAudit("Settings", "Edit", "$session_name set up billing in Get started: " . escapeSql(implode('; ', settingsChangeLines($before, $changed))));
     }
-    flashAlert($lines ? '<strong>Billing</strong> saved - ' . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes') : 'Nothing about billing changed', $lines ? 'success' : 'info');
+    flashAlert($lines ? _n('<strong>Billing</strong> saved - %d change', '<strong>Billing</strong> saved - %d changes', count($lines)) : __('Nothing about billing changed'), $lines ? 'success' : 'info');
     redirect(gettingStartedUrl(gettingStartedAfter('billing')));
 
 }
@@ -263,18 +263,18 @@ if (isset($_POST['getting_started_support'])) {
     }
     sort($days);
     if (!$days) {
-        $errors['business_days'] = 'At least one day - response times only count on these.';
+        $errors['business_days'] = __('At least one day - response times only count on these.');
     }
     $start = trim((string) ($_POST['business_hours_start'] ?? ''));
     $end = trim((string) ($_POST['business_hours_end'] ?? ''));
     $time = '/^([01]\d|2[0-3]):[0-5]\d$/';
     if (!preg_match($time, $start)) {
-        $errors['business_hours_start'] = 'A time of day, as 09:00.';
+        $errors['business_hours_start'] = __('A time of day, as 09:00.');
     }
     if (!preg_match($time, $end)) {
-        $errors['business_hours_end'] = 'A time of day, as 17:00.';
+        $errors['business_hours_end'] = __('A time of day, as 17:00.');
     } elseif (!isset($errors['business_hours_start']) && $end <= $start) {
-        $errors['business_hours_end'] = 'After the day starts.';
+        $errors['business_hours_end'] = __('After the day starts.');
     }
     [$ticket_prefix, $ticket_number, $found] = settingsNumberingCheck('ticket', $_POST, $before);
     $errors += $found;
@@ -312,7 +312,7 @@ if (isset($_POST['getting_started_support'])) {
     if ($lines) {
         logAudit("Settings", "Edit", "$session_name set up support in Get started: " . escapeSql(implode('; ', $lines) . ($restamped ? "; $restamped open tickets restamped" : '')));
     }
-    flashAlert($lines ? '<strong>Support</strong> saved - ' . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes') : 'Nothing about support changed', $lines ? 'success' : 'info');
+    flashAlert($lines ? _n('<strong>Support</strong> saved - %d change', '<strong>Support</strong> saved - %d changes', count($lines)) : __('Nothing about support changed'), $lines ? 'success' : 'info');
     redirect(gettingStartedUrl(gettingStartedAfter('support')));
 
 }
@@ -333,12 +333,12 @@ if (isset($_POST['getting_started_team'])) {
 
     $errors = [];
     if ($name === '') {
-        $errors['team_name'] = 'Their name, as it shows on tickets.';
+        $errors['team_name'] = __('Their name, as it shows on tickets.');
     } elseif (mb_strlen($name) > 200) {
-        $errors['team_name'] = 'Up to 200 characters.';
+        $errors['team_name'] = __('Up to 200 characters.');
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 200) {
-        $errors['team_email'] = 'The address they sign in with.';
+        $errors['team_email'] = __('The address they sign in with.');
     }
     $identity = null;
     if (!$errors) {
@@ -371,7 +371,7 @@ if (isset($_POST['getting_started_team'])) {
         }
         logAudit("User", "Invite", "$session_name invited " . escapeSql("$name ($email) as {$role['role_name']}") . " in Get started" . ($saved['again'] ? ', again' : ''));
         flashAlert('<strong>' . escapeHtml($name) . '</strong> is invited - an email with a link to join is on the way to <strong>' . escapeHtml($email) . '</strong>'
-            . (gettingStartedSteps()['cron']['done'] ? '' : ', once cron is running') . '. They choose their own password');
+            . (gettingStartedSteps()['cron']['done'] ? '' : __(', once cron is running')) . '. They choose their own password');
         redirect(gettingStartedUrl('team'));
     }
 
@@ -387,7 +387,7 @@ if (isset($_POST['getting_started_team'])) {
 
     logAudit("User", "Create", "$session_name created user " . escapeSql("$name ({$role['role_name']})") . " in Get started", 0, $user_id);
 
-    flashAlert('<strong>' . escapeHtml($name) . '</strong> is added. Their password is <code>' . escapeHtml($password) . '</code> - give it to them to sign in with and change. It isn\'t shown again', 'warning');
+    flashAlert(__('<strong>%1$s</strong> is added. Their password is <code>%2$s</code> - give it to them to sign in with and change. It isn\'t shown again', escapeHtml($name), escapeHtml($password)), 'warning');
     redirect(gettingStartedUrl('team'));
 
 }
@@ -402,12 +402,13 @@ if (isset($_POST['getting_started_content'])) {
     // Registry order is load order - categories before products, ticket templates before project templates
     $picked = array_values(array_intersect(array_keys($packs), array_map('strval', (array) ($_POST['packs'] ?? []))));
     if (!$picked) {
-        flashAlert('Tick what to add - or Skip for now', 'info');
+        flashAlert(__('Tick what to add - or Skip for now'), 'info');
         redirect(gettingStartedUrl('content'));
     }
 
     $added = 0;
     $summary = [];
+    $summary_shown = [];
     $none_ticked = 0;
     foreach ($picked as $pack) {
         // The items ticked under Pick which - the whole pack when its list wasn't sent
@@ -420,18 +421,19 @@ if (isset($_POST['getting_started_content'])) {
         if ($pack_added) {
             $added += $pack_added;
             $summary[] = "$pack_added " . $packs[$pack]['label'];
+            $summary_shown[] = "$pack_added " . __($packs[$pack]['label']); // i18n-dynamic - starterContentPacks()
         }
     }
 
     if (!$added && $none_ticked === count($picked)) {
-        flashAlert('Nothing is ticked under Pick which - tick what to add, or Skip for now', 'info');
+        flashAlert(__('Nothing is ticked under Pick which - tick what to add, or Skip for now'), 'info');
         redirect(gettingStartedUrl('content'));
     }
     if ($added) {
         logAudit("Starter Content", "Create", "$session_name loaded starter content in Get started - " . escapeSql(implode(', ', $summary)));
-        flashAlert('Added <strong>' . $added . '</strong> things to start from: ' . escapeHtml(implode(', ', $summary)));
+        flashAlert(__('Added <strong>%1$s</strong> things to start from: %2$s', $added, escapeHtml(implode(', ', $summary_shown))));
     } else {
-        flashAlert('Nothing to add - everything ticked is here already', 'info');
+        flashAlert(__('Nothing to add - everything ticked is here already'), 'info');
     }
     redirect(gettingStartedUrl(gettingStartedAfter('content')));
 
@@ -455,9 +457,9 @@ if (isset($_POST['getting_started_skip_all'])) {
 
     validateCSRFToken();
 
-    $left = gettingStartedSkipAll();
+    $left = i18nEnglish(fn () => gettingStartedSkipAll()); // the step titles go into the audit log
     logAudit("Settings", "Edit", "$session_name skipped all of Get started" . ($left ? ' - ' . escapeSql(implode(', ', $left)) . ' left to do' : ''));
-    flashAlert('Get started is skipped - each step is in Admin &gt; Get started whenever you want it', 'info');
+    flashAlert(__('Get started is skipped - each step is in Admin &gt; Get started whenever you want it'), 'info');
 
     redirect('/agent/dashboard.php');
 
@@ -469,7 +471,7 @@ if (isset($_POST['getting_started_dismiss'])) {
 
     gettingStartedDismiss();
     logAudit("Settings", "Edit", "$session_name stopped Get started showing on the dashboard");
-    flashAlert('Get started is off the dashboard - it is in Admin whenever you want it', 'info');
+    flashAlert(__('Get started is off the dashboard - it is in Admin whenever you want it'), 'info');
 
     redirect('/agent/dashboard.php');
 

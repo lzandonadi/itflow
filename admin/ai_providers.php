@@ -70,11 +70,11 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-robot me-2"></i>AI Providers</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-robot me-2"></i><?= __('AI Providers') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light me-1" href="ai_models.php" title="The models on them, and what each is for"><i class="fas fa-fw fa-brain"></i><span class="d-none d-lg-inline ms-2">Models</span></a>
-            <a class="btn btn-outline-light me-1" href="ai_usage.php" title="Each request - who, for what, and the tokens it took"><i class="fas fa-fw fa-chart-bar"></i><span class="d-none d-lg-inline ms-2">Usage</span></a>
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">Add Provider</span></button>
+            <a class="btn btn-outline-light me-1" href="ai_models.php" title="<?= escapeHtml(__('The models on them, and what each is for')) ?>"><i class="fas fa-fw fa-brain"></i><span class="d-none d-lg-inline ms-2"><?= __('Models') ?></span></a>
+            <a class="btn btn-outline-light me-1" href="ai_usage.php" title="<?= escapeHtml(__('Each request - who, for what, and the tokens it took')) ?>"><i class="fas fa-fw fa-chart-bar"></i><span class="d-none d-lg-inline ms-2"><?= __('Usage') ?></span></a>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('Add Provider') ?></span></button>
         </div>
     </div>
     <div class="card-header py-3">
@@ -82,8 +82,8 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search AI providers..." title="Name, kind, address or a model on it">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search AI providers...')) ?>" title="<?= escapeHtml(__('Name, kind, address or a model on it')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -96,11 +96,11 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('ai_provider_name', 'Provider') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('ai_provider_kind', 'Kind') ?></th>
-                <th class="d-none d-md-table-cell">Key</th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('model_count', 'Models') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('requests', 'Last 30 days') ?></th>
+                <th class="ps-3"><?= $sort_link('ai_provider_name', __('Provider')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('ai_provider_kind', __('Kind')) ?></th>
+                <th class="d-none d-md-table-cell"><?= __('Key') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('model_count', __('Models')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('requests', __('Last 30 days')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -117,8 +117,8 @@ $csrf = $_SESSION['csrf_token'];
                 $failed = intval($row['failed']);
                 $stopping = aiUseCasesStopping(['provider' => $provider_id]);
                 $model_names = array_column($models, 'ai_model_name');
-                $delete_text = ($models ? (count($models) === 1 ? "Its model, {$model_names[0]}, goes with it." : 'Its ' . count($models) . ' models go with it - ' . implode(', ', $model_names) . '.') : 'It has no models.')
-                    . ($stopping ? ' AI stops for ' . implode(' and ', $stopping) . ' until another model is set up.' : '');
+                $delete_text = ($models ? (count($models) === 1 ? __('Its model, %s, goes with it.', $model_names[0]) : __('Its %1$d models go with it - %2$s.', count($models), implode(', ', $model_names))) : __('It has no models.'))
+                    . ($stopping ? ' ' . __('AI stops for %s until another model is set up.', implode(__(' and '), array_map('aiUseCaseLabel', $stopping))) : '');
                 ?>
                 <tr data-ai-provider-id="<?= $provider_id ?>">
                     <td class="ps-3">
@@ -127,10 +127,10 @@ $csrf = $_SESSION['csrf_token'];
                             <div class="min-w-0">
                                 <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="<?= $edit_url ?>"><?= escapeHtml($name) ?></a>
                                 <?php if ($kind['local']) { ?>
-                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle ms-1" title="It runs on your own network - what is sent to it doesn't leave it">Your network</span>
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle ms-1" title="<?= escapeHtml(__('It runs on your own network - what is sent to it doesn\'t leave it')) ?>"><?= __('Your network') ?></span>
                                 <?php } ?>
                                 <?php if (!intval($row['ai_provider_redact'])) { ?>
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" data-provider-redact="off" title="Passwords and keys in what is sent go to it as they are">Secrets sent</span>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" data-provider-redact="off" title="<?= escapeHtml(__('Passwords and keys in what is sent go to it as they are')) ?>"><?= __('Secrets sent') ?></span>
                                 <?php } ?>
                                 <div class="small text-body-secondary text-truncate" style="max-width: 22rem;" title="<?= escapeHtml($row['ai_provider_api_url']) ?>"><?= escapeHtml($host . ($port ? ":$port" : '')) ?></div>
                                 <!-- On smaller screens its kind and models come along under the name -->
@@ -141,11 +141,11 @@ $csrf = $_SESSION['csrf_token'];
                     <td class="d-none d-lg-table-cell small"><?= escapeHtml($kind['name']) ?></td>
                     <td class="d-none d-md-table-cell small text-nowrap" data-provider-key="<?= intval($row['has_key']) ? 'saved' : 'none' ?>">
                         <?php if (intval($row['has_key'])) { ?>
-                            <i class="fas fa-fw fa-lock text-secondary me-1"></i>Saved
+                            <i class="fas fa-fw fa-lock text-secondary me-1"></i><?= __('Saved') ?>
                         <?php } elseif ($kind['key']) { ?>
-                            <span class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i>Needs one - add it in Edit</span>
+                            <span class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Needs one - add it in Edit') ?></span>
                         <?php } else { ?>
-                            <span class="text-body-secondary">None</span>
+                            <span class="text-body-secondary"><?= __('None') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small">
@@ -156,48 +156,48 @@ $csrf = $_SESSION['csrf_token'];
                                 <a class="text-reset ajax-modal" href="#" data-modal-url="modals/ai/ai_model_edit.php?id=<?= $model_id ?>"><?= escapeHtml($model['ai_model_name']) ?></a>
                                 <span class="text-body-secondary">· <?= escapeHtml($model['ai_model_use_case']) ?></span>
                                 <?php if (array_key_exists($model_id, $unused)) { ?>
-                                    <span class="badge text-bg-light border fw-normal ms-1" title="<?= escapeHtml($unused[$model_id] ? $unused[$model_id]['ai_model_name'] . ' is for ' . $model['ai_model_use_case'] . ' already, and is the one used' : 'Not one of the use cases') ?>">Not used</span>
+                                    <span class="badge text-bg-light border fw-normal ms-1" title="<?= escapeHtml($unused[$model_id] ? __('%1$s is for %2$s already, and is the one used', $unused[$model_id]['ai_model_name'], aiUseCaseLabel($model['ai_model_use_case'])) : __('Not one of the use cases')) ?>"><?= __('Not used') ?></span>
                                 <?php } ?>
                             </div>
                         <?php } ?>
                         <?php if (!$models) { ?>
-                            <a class="ajax-modal" href="#" data-modal-url="modals/ai/ai_model_edit.php?provider=<?= $provider_id ?>"><i class="fas fa-fw fa-plus me-1"></i>Add a model</a>
+                            <a class="ajax-modal" href="#" data-modal-url="modals/ai/ai_model_edit.php?provider=<?= $provider_id ?>"><i class="fas fa-fw fa-plus me-1"></i><?= __('Add a model') ?></a>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap" data-provider-requests="<?= $requests ?>">
                         <?php if ($requests) { ?>
                             <div><a class="text-reset" href="ai_usage.php?provider=<?= $provider_id ?>"><?= number_format($requests) ?> request<?= $requests === 1 ? '' : 's' ?></a></div>
-                            <div class="text-body-secondary" title="Tokens sent and received"><?= aiTokensText($row['tokens_in']) ?> in · <?= aiTokensText($row['tokens_out']) ?> out</div>
+                            <div class="text-body-secondary" title="<?= escapeHtml(__('Tokens sent and received')) ?>"><?= aiTokensText($row['tokens_in']) ?> in · <?= aiTokensText($row['tokens_out']) ?> out</div>
                             <?php if ($failed) { ?>
                                 <div><a class="text-danger-emphasis" href="ai_usage.php?provider=<?= $provider_id ?>&amp;view=failed"><?= $failed ?> failed</a></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="text-body-secondary"><?= $row['last_used'] ? 'None' : 'Not used yet' ?></div>
+                            <div class="text-body-secondary"><?= $row['last_used'] ? 'None' : __('Not used yet') ?></div>
                         <?php } ?>
                         <?php if ($row['last_used']) { ?>
-                            <div class="text-body-secondary" title="<?= escapeHtml($row['last_used']) ?>">Last <?= escapeHtml(timeAgo($row['last_used'])) ?></div>
+                            <div class="text-body-secondary" title="<?= escapeHtml($row['last_used']) ?>"><?= escapeHtml(__('Last %s', timeAgo($row['last_used']))) ?></div>
                         <?php } ?>
                     </td>
                     <td class="text-end pe-3">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?test_ai_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="Whether it answers, with its key, and has the models set up on it">
-                                    <i class="fas fa-fw fa-plug text-secondary me-2"></i>Test
+                                <a class="dropdown-item" href="post.php?test_ai_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Whether it answers, with its key, and has the models set up on it')) ?>">
+                                    <i class="fas fa-fw fa-plug text-secondary me-2"></i><?= __('Test') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ai/ai_model_edit.php?provider=<?= $provider_id ?>">
-                                    <i class="fas fa-fw fa-plus text-secondary me-2"></i>Add a model
+                                    <i class="fas fa-fw fa-plus text-secondary me-2"></i><?= __('Add a model') ?>
                                 </a>
                                 <a class="dropdown-item" href="ai_usage.php?provider=<?= $provider_id ?>">
-                                    <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>Usage
+                                    <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Usage') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_ai_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="Delete" data-confirm-text="<?= escapeHtml($delete_text) ?>">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="<?= escapeHtml(__('Delete')) ?>" data-confirm-text="<?= escapeHtml($delete_text) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -209,10 +209,10 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'AI providers',
+        'thing' => __('AI providers'),
         'icon' => 'fa-robot',
-        'text' => 'Connect OpenAI, Claude, Gemini, Azure OpenAI, or a model on your own network like Ollama - then agents can reword replies, summarize tickets and draft documents, with passwords and keys taken out of what is sent.',
-        'actions' => [['label' => 'Add Provider', 'modal' => $add_url]],
+        'text' => __('Connect OpenAI, Claude, Gemini, Azure OpenAI, or a model on your own network like Ollama - then agents can reword replies, summarize tickets and draft documents, with passwords and keys taken out of what is sent.'),
+        'actions' => [['label' => __('Add Provider'), 'modal' => $add_url]],
     ];
     ?>
     <?php require_once "../includes/filter_footer.php"; ?>
