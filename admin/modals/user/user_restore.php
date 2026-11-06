@@ -18,7 +18,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-redo-alt me-2"></i>Restore <?= escapeHtml($name) ?></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-redo-alt me-2"></i><?= escapeHtml(__('Restore %s', $name)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -38,29 +38,29 @@ ob_start();
             <div class="alert alert-danger small"><?= agentUserLimitMessage() ?></div>
         <?php } ?>
         <?php if ($email_taken) { ?>
-            <div class="alert alert-warning small"><i class="fas fa-exclamation-triangle me-2"></i><strong><?= escapeHtml($user['user_email']) ?></strong> signs in to another account now - change that one's email first.</div>
+            <div class="alert alert-warning small"><i class="fas fa-exclamation-triangle me-2"></i><strong><?= escapeHtml($user['user_email']) ?></strong> <?= __('signs in to another account now - change that one\'s email first.') ?></div>
         <?php } ?>
 
         <div class="mb-3">
-            <label class="form-label">New password <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('New password') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-lock"></i></span>
                 <input type="password" class="form-control font-monospace" data-toggle="password" name="new_password" id="userRestorePassword<?= $user_id ?>"
                     placeholder="At least <?= USER_PASSWORD_MIN ?> characters" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required>
                 <span class="input-group-text"><i class="fa fa-fw fa-eye"></i></span>
-                <button class="btn btn-outline-secondary clipboardjs" type="button" title="Copy password" data-clipboard-target="#userRestorePassword<?= $user_id ?>"><i class="far fa-fw fa-copy"></i></button>
-                <button class="btn btn-outline-secondary" type="button" title="Make one up - words that are easy to read out" data-user-restore-generate><i class="fas fa-fw fa-magic"></i></button>
+                <button class="btn btn-outline-secondary clipboardjs" type="button" title="<?= escapeHtml(__('Copy password')) ?>" data-clipboard-target="#userRestorePassword<?= $user_id ?>"><i class="far fa-fw fa-copy"></i></button>
+                <button class="btn btn-outline-secondary" type="button" title="<?= escapeHtml(__('Make one up - words that are easy to read out')) ?>" data-user-restore-generate><i class="fas fa-fw fa-magic"></i></button>
             </div>
-            <div class="form-text">Their old password was wiped when they were archived - give them this one, and have them change it.</div>
+            <div class="form-text"><?= __('Their old password was wiped when they were archived - give them this one, and have them change it.') ?></div>
         </div>
 
         <div>
-            <label class="form-label">Role <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Role') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-user-shield"></i></span>
                 <select class="form-select select2" name="role" required>
                     <?php if (!isset($roles[$role_id])) { ?>
-                        <option value="">- Pick a role -</option>
+                        <option value=""><?= __('- Pick a role -') ?></option>
                     <?php } ?>
                     <?php foreach ($roles as $id => $role) { ?>
                         <option value="<?= $id ?>" <?= $id === $role_id ? 'selected' : '' ?><?= selectOptionRole($role) ?>><?= escapeHtml($role['role_name']) ?><?= $role['role_archived_at'] ? ' (archived)' : '' ?></option>
@@ -70,8 +70,8 @@ ob_start();
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="restore_user" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Restore</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="restore_user" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Restore') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

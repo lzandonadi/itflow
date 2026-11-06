@@ -24,7 +24,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Audit Logs</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Audit Logs') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -39,19 +39,19 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <?php if ($entity_filter) { ?>
-            <div class="alert alert-info small py-2"><i class="fas fa-fw fa-filter me-1"></i>Just one record: <?= escapeHtml($type_filter !== '' ? $type_filter : 'record') ?> #<?= $entity_filter ?></div>
+            <div class="alert alert-info small py-2"><i class="fas fa-fw fa-filter me-1"></i><?= escapeHtml(__('Just one record: %1$s #%2$d', $type_filter !== '' ? auditLogTypeLabel($type_filter) : __('record'), $entity_filter)) ?></div>
         <?php } ?>
 
         <div class="mb-3">
-            <label class="form-label">Search</label>
+            <label class="form-label"><?= __('Search') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= escapeHtml($q_filter) ?>" placeholder="What was done, who, the client, the IP address or the browser">
+                <input type="text" class="form-control" name="q" value="<?= escapeHtml($q_filter) ?>" placeholder="<?= escapeHtml(__('What was done, who, the client, the IP address or the browser')) ?>">
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Showing</label>
+            <label class="form-label"><?= __('Showing') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                 <select class="form-select select2" name="view">
@@ -64,12 +64,12 @@ ob_start();
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">Who</label>
+                <label class="form-label"><?= __('Who') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="user">
-                        <option value="">- Anyone -</option>
-                        <option value="system" <?= $user_filter === 'system' ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cog']) ?>>ITFlow itself</option>
+                        <option value=""><?= __('- Anyone -') ?></option>
+                        <option value="system" <?= $user_filter === 'system' ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cog']) ?>><?= __('ITFlow itself') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar, user_type FROM users WHERE EXISTS (SELECT 1 FROM logs WHERE log_user_id = user_id) ORDER BY user_type ASC, user_name ASC");
                         while ($row = mysqli_fetch_assoc($sql)) {
@@ -80,11 +80,11 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Client</label>
+                <label class="form-label"><?= __('Client') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                     <select class="form-select select2" name="client">
-                        <option value="">- Any client -</option>
+                        <option value=""><?= __('- Any client -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE EXISTS (SELECT 1 FROM logs WHERE log_client_id = client_id) ORDER BY client_name ASC");
                         while ($row = mysqli_fetch_assoc($sql)) {
@@ -95,42 +95,42 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Type</label>
+                <label class="form-label"><?= __('Type') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-shapes"></i></span>
                     <select class="form-select select2" name="type">
-                        <option value="">- Any type -</option>
+                        <option value=""><?= __('- Any type -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT DISTINCT log_type FROM logs ORDER BY log_type ASC");
                         while ($row = mysqli_fetch_row($sql)) { ?>
-                            <option value="<?= escapeHtml($row[0]) ?>" <?= $type_filter === $row[0] ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . auditLogTypeIcon($row[0])]) ?>><?= escapeHtml($row[0]) ?></option>
+                            <option value="<?= escapeHtml($row[0]) ?>" <?= $type_filter === $row[0] ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . auditLogTypeIcon($row[0])]) ?>><?= escapeHtml(auditLogTypeLabel($row[0])) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Action</label>
+                <label class="form-label"><?= __('Action') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-bolt"></i></span>
                     <select class="form-select select2" name="action">
-                        <option value="">- Any action -</option>
+                        <option value=""><?= __('- Any action -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT DISTINCT log_action FROM logs ORDER BY log_action ASC");
                         while ($row = mysqli_fetch_row($sql)) { ?>
-                            <option value="<?= escapeHtml($row[0]) ?>" <?= $action_filter === $row[0] ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . auditLogActionStyle($row[0])['icon']]) ?>><?= escapeHtml($row[0]) ?></option>
+                            <option value="<?= escapeHtml($row[0]) ?>" <?= $action_filter === $row[0] ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . auditLogActionStyle($row[0])['icon']]) ?>><?= escapeHtml(auditLogActionLabel($row[0])) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">From</label>
+                <label class="form-label"><?= __('From') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">To</label>
+                <label class="form-label"><?= __('To') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

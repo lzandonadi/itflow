@@ -219,38 +219,38 @@ function auditLogFiltersSql(array $src, &$summary = []) {
         $like = escapeSql($q);
         $sql .= " AND (log_description LIKE '%$like%' OR log_type LIKE '%$like%' OR log_action LIKE '%$like%' OR log_ip LIKE '%$like%' OR log_user_agent LIKE '%$like%'
             OR user_name LIKE '%$like%' OR client_name LIKE '%$like%')";
-        $summary['Search'] = $q;
+        $summary[__('Search')] = $q;
     }
     $client = intval($src['client'] ?? 0);
     if ($client) {
         $sql .= " AND log_client_id = $client";
-        $summary['Client'] = (string) getFieldById('clients', $client, 'client_name');
+        $summary[__('Client')] = (string) getFieldById('clients', $client, 'client_name');
     }
     $user = $src['user'] ?? '';
     if ($user === 'system') {
         $sql .= " AND log_user_id = 0";
-        $summary['Who'] = 'ITFlow itself';
+        $summary[__('Who')] = __('ITFlow itself');
     } elseif (intval($user)) {
         $sql .= " AND log_user_id = " . intval($user);
-        $summary['Who'] = (string) getFieldById('users', intval($user), 'user_name');
+        $summary[__('Who')] = (string) getFieldById('users', intval($user), 'user_name');
     }
     foreach (['type' => ['log_type', 'Type'], 'action' => ['log_action', 'Action']] as $key => [$column, $label]) {
         $value = $src[$key] ?? '';
         if ($value !== '') {
             $sql .= " AND $column = '" . escapeSql($value) . "'";
-            $summary[$label] = $value;
+            $summary[__($label)] = $key === 'type' ? auditLogTypeLabel($value) : auditLogActionLabel($value); // i18n-dynamic
         }
     }
     $entity = intval($src['entity'] ?? 0);
     if ($entity) {
         $sql .= " AND log_entity_id = $entity";
-        $summary['Record'] = "#$entity";
+        $summary[__('Record')] = "#$entity";
     }
     $views = auditLogViews();
     $view = $src['view'] ?? '';
     if (isset($views[$view]) && $views[$view]['where'] !== '') {
         $sql .= " AND {$views[$view]['where']}";
-        $summary['Showing'] = $views[$view]['label'];
+        $summary[__('Showing')] = $views[$view]['label'];
     }
     // A half-open range on the column itself, so KEY log_created_at serves it
     $dtf = $src['dtf'] ?? '';
@@ -261,7 +261,7 @@ function auditLogFiltersSql(array $src, &$summary = []) {
         $sql .= " AND log_created_at >= '$dtf 00:00:00' AND log_created_at < '$dtt' + INTERVAL 1 DAY";
         $range = formatExportDateRange($dtf, $dtt);
         if ($range) {
-            $summary['Dated'] = $range;
+            $summary[__('Dated')] = $range;
         }
     }
     return $sql;

@@ -12,13 +12,13 @@ $row = apiKeyRow($_GET['id'] ?? 0);
 ob_start();
 
 if (!$row) { ?>
-    <div class="modal-body text-center text-secondary py-5">That key is gone - it may have been deleted.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That key is gone - it may have been deleted.') ?></div>
 <?php } else {
     $api_key_id = intval($row['api_key_id']);
     $role = roleRow($row['user_role_id'] ?? 0); ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-key me-2"></i>API Key: <strong><?= escapeHtml($row['api_key_name']) ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-key me-2"></i><?= __('API Key:') ?> <strong><?= escapeHtml($row['api_key_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -32,28 +32,28 @@ if (!$row) { ?>
         </div>
 
         <div class="mb-3">
-            <label>Name <strong class="text-danger">*</strong></label>
+            <label><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-sticky-note"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="What uses it" maxlength="255" value="<?= escapeHtml($row['api_key_name']) ?>" required autofocus>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('What uses it')) ?>" maxlength="255" value="<?= escapeHtml($row['api_key_name']) ?>" required autofocus>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Expires <strong class="text-danger">*</strong></label>
+            <label><?= __('Expires') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="expire" max="2999-12-31" value="<?= escapeHtml($row['api_key_expire']) ?>" required>
             </div>
-            <div class="form-text">It works until the start of that day. A later day brings an expired key back.</div>
+            <div class="form-text"><?= __('It works until the start of that day. A later day brings an expired key back.') ?></div>
         </div>
 
         <?= apiKeyAgentFieldHtml(isset(apiKeyAgents()[intval($row['api_key_user_id'])]) ? $row['api_key_user_id'] : 0) ?>
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_api_key" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save changes</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_api_key" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save changes') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

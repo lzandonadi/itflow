@@ -436,4 +436,9 @@ return [
     'Connect fetches it - or paste in one made elsewhere.' => 'Conectar o obtém - ou cole um gerado em outro lugar.',
     'From signing in to the mailbox with this app - Google\'s OAuth 2.0 Playground can make one with its ID and secret.' => 'Obtido ao entrar na caixa com este aplicativo - o OAuth 2.0 Playground do Google pode gerar um com o ID e o segredo.',
 
+    // Admin > Users (admin/modals/user/user_form.php)
+    'Sees all but 1 client' => 'Vê todos menos 1 cliente',
+    'Sees all but %s clients' => 'Vê todos menos %s clientes',
+    'Sees every client' => 'Vê todos os clientes',
+
 ];

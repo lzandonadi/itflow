@@ -13,7 +13,7 @@ require_once '../../includes/modal_header.php';
 $app_log_id = intval($_GET['id'] ?? 0);
 $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT * FROM app_logs WHERE app_log_id = $app_log_id"));
 if (!$row) {
-    echo json_encode(['error' => 'That app log entry no longer exists - it may have been cleared.']);
+    echo json_encode(['error' => __('That app log entry no longer exists - it may have been cleared.')]);
     exit;
 }
 
@@ -25,7 +25,7 @@ $at = escapeSql($row['app_log_created_at']);
 $window = "BETWEEN '$at' - INTERVAL 5 MINUTE AND '$at' + INTERVAL 5 MINUTE";
 
 // The other app log entries in the five minutes either side
-$around_where = "app_log_created_at $window AND app_log_id <> $app_log_id";
+$around_where = "app_log_created_at $window AND app_log_id <> $app_log_id"; // i18n-ignore - SQL or the audit log
 $around_count = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM app_logs WHERE $around_where"))[0]);
 $around = [];
 $sql = mysqli_query($mysqli, "SELECT app_log_id, app_log_category, app_log_type, app_log_details, app_log_created_at FROM app_logs WHERE $around_where ORDER BY app_log_created_at ASC, app_log_id ASC LIMIT 8");
@@ -54,41 +54,41 @@ ob_start();
     <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
         <span class="itflow-asset-icon itflow-asset-icon-lg bg-<?= $style['tone'] ?>-subtle text-<?= $style['tone'] ?>-emphasis" aria-hidden="true"><i class="<?= appLogCategoryIcon($category) ?>"></i></span>
         <div class="min-w-0 flex-grow-1">
-            <h5 class="modal-title fw-semibold text-break"><?= escapeHtml($category !== '' ? $category : 'No category') ?> &middot; <?= $style['one'] ?></h5>
+            <h5 class="modal-title fw-semibold text-break"><?= escapeHtml($category !== '' ? $category : __('No category')) ?> &middot; <?= $style['one'] ?></h5>
             <div class="small text-body-secondary mt-1"><?= escapeHtml(date('D, M j, Y \a\t g:i:s A', $created)) ?> &middot; <?= escapeHtml(timeAgo($row['app_log_created_at'])) ?></div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
 
     <div class="p-3 rounded border bg-body-tertiary mb-3 position-relative">
-        <button type="button" class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 clipboardjs" title="Copy" aria-label="Copy" data-clipboard-text="<?= escapeHtml($row['app_log_details']) ?>"><i class="far fa-fw fa-copy"></i></button>
+        <button type="button" class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" aria-label="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($row['app_log_details']) ?>"><i class="far fa-fw fa-copy"></i></button>
         <div class="text-break font-monospace small pe-5" style="white-space: pre-wrap;" data-app-log-full-details><?= escapeHtml((string) $row['app_log_details']) ?></div>
     </div>
 
     <div class="row g-2 itflow-asset-glance">
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Level">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Level')) ?>">
                 <i class="fas fa-fw fa-signal"></i>
                 <span><?= appLogLevelPill($level) ?> <span class="small text-body-secondary ms-1"><?= escapeHtml($style['title']) ?></span></span>
             </div>
-            <div class="itflow-glance-item" title="Category">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Category')) ?>">
                 <i class="fas fa-fw fa-folder"></i>
                 <?php if ($category !== '') { ?>
-                    <span><?= escapeHtml($category) ?> <a class="small ms-1" href="/admin/app_logs.php?category=<?= urlencode($category) ?>">All <?= number_format($category_count) ?> from it</a></span>
+                    <span><?= escapeHtml($category) ?> <a class="small ms-1" href="/admin/app_logs.php?category=<?= urlencode($category) ?>"><?= __('All %s from it', number_format($category_count)) ?></a></span>
                 <?php } else { ?>
-                    <span class="text-body-secondary">None</span>
+                    <span class="text-body-secondary"><?= __('None') ?></span>
                 <?php } ?>
             </div>
         </div>
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Entry">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Entry')) ?>">
                 <i class="fas fa-fw fa-hashtag"></i>
-                <span class="text-body-secondary">Entry <?= $app_log_id ?></span>
+                <span class="text-body-secondary"><?= __('Entry %d', $app_log_id) ?></span>
             </div>
-            <div class="itflow-glance-item" title="When">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('When')) ?>">
                 <i class="fas fa-fw fa-clock"></i>
                 <span class="font-monospace small"><?= escapeHtml($row['app_log_created_at']) ?></span>
             </div>
@@ -97,9 +97,9 @@ ob_start();
 
     <div class="mt-4" data-app-log-around>
         <div class="d-flex align-items-center mb-2">
-            <div class="small fw-semibold text-uppercase text-body-secondary">The app logs around then</div>
+            <div class="small fw-semibold text-uppercase text-body-secondary"><?= __('The app logs around then') ?></div>
             <?php if ($around_count > 0) { ?>
-                <a class="small ms-auto" href="/admin/app_logs.php?<?= $day_query ?>">All of that day</a>
+                <a class="small ms-auto" href="/admin/app_logs.php?<?= $day_query ?>"><?= __('All of that day') ?></a>
             <?php } ?>
         </div>
         <?php if ($around) { ?>
@@ -113,18 +113,18 @@ ob_start();
                 <?php } ?>
             </div>
             <?php if ($around_count > count($around)) { ?>
-                <div class="small text-body-secondary mt-1">and <?= $around_count - count($around) ?> more</div>
+                <div class="small text-body-secondary mt-1"><?= escapeHtml(__('and %d more', $around_count - count($around))) ?></div>
             <?php } ?>
         <?php } else { ?>
-            <div class="small text-body-secondary">Nothing else in the five minutes either side.</div>
+            <div class="small text-body-secondary"><?= __('Nothing else in the five minutes either side.') ?></div>
         <?php } ?>
     </div>
 
     <div class="mt-4" data-app-log-audit>
         <div class="d-flex align-items-center mb-2">
-            <div class="small fw-semibold text-uppercase text-body-secondary">The audit log then</div>
+            <div class="small fw-semibold text-uppercase text-body-secondary"><?= __('The audit log then') ?></div>
             <?php if ($audit_count > 0) { ?>
-                <a class="small ms-auto" href="/admin/audit_logs.php?<?= $day_query ?>">All of that day</a>
+                <a class="small ms-auto" href="/admin/audit_logs.php?<?= $day_query ?>"><?= __('All of that day') ?></a>
             <?php } ?>
         </div>
         <?php if ($audit) { ?>
@@ -138,17 +138,17 @@ ob_start();
                 <?php } ?>
             </div>
             <?php if ($audit_count > count($audit)) { ?>
-                <div class="small text-body-secondary mt-1">and <?= $audit_count - count($audit) ?> more</div>
+                <div class="small text-body-secondary mt-1"><?= escapeHtml(__('and %d more', $audit_count - count($audit))) ?></div>
             <?php } ?>
         <?php } else { ?>
-            <div class="small text-body-secondary">Nothing was done in the five minutes either side.</div>
+            <div class="small text-body-secondary"><?= __('Nothing was done in the five minutes either side.') ?></div>
         <?php } ?>
     </div>
 
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <?php

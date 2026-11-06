@@ -26,13 +26,13 @@ if (isExportRequest('export_app_logs')) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('app_logs', $format, "$session_company_name-App-Logs", 'App Logs', summarizeExportFilters($filter_summary));
+        $export = beginExport('app_logs', $format, "$session_company_name-App-Logs", __('App Logs'), summarizeExportFilters(appLogFiltersShown($filter_summary)));
 
         $sql = mysqli_query($mysqli, "SELECT app_log_id, app_log_category, app_log_type, app_log_details, app_log_created_at FROM app_logs
             WHERE $where
             ORDER BY app_log_created_at DESC, app_log_id DESC");
         while ($row = mysqli_fetch_assoc($sql)) {
-            $row['app_log_type'] = appLogLevels()[appLogLevel($row['app_log_type'])]['one'];
+            $row['app_log_type'] = i18nEnglish(fn () => appLogLevels()[appLogLevel($row['app_log_type'])]['one']);
             addExportRow($export, $row);
         }
 
@@ -43,7 +43,7 @@ if (isExportRequest('export_app_logs')) {
         exit;
     }
 
-    flashAlert('No app log entries match - nothing to export.', 'error');
+    flashAlert(__('No app log entries match - nothing to export.'), 'error');
 
     redirect();
 
@@ -58,7 +58,9 @@ if (isset($_POST['clear_app_logs'])) {
     // The ones shown, with the list's filters - or every one
     $all = ($_POST['scope'] ?? '') !== 'shown';
     $summary = [];
-    $where = $all ? '1 = 1' : appLogFiltersSql($_POST, $summary);
+    $where = $all ? '1 = 1' : i18nEnglish(function () use (&$summary) {
+        return appLogFiltersSql($_POST, $summary);
+    });
     if (!$all && !$summary) {
         $all = true;
     }
@@ -67,11 +69,11 @@ if (isset($_POST['clear_app_logs'])) {
     $cleared = mysqli_affected_rows($mysqli);
 
     if ($cleared > 0) {
-        $what = lcfirst(appLogFiltersText($summary));
-        logAudit("App Log", "Delete", "$session_name cleared $cleared app log " . ($cleared === 1 ? 'entry' : 'entries') . ($all ? ' - all of them' : ' - ' . escapeSql($what)));
-        flashAlert("Cleared $cleared app log " . ($cleared === 1 ? 'entry' : 'entries'));
+        $what = i18nEnglish(fn () => lcfirst(appLogFiltersText($summary)));
+        logAudit("App Log", "Delete", "$session_name cleared $cleared app log " . ($cleared === 1 ? 'entry' : 'entries') . ($all ? ' - all of them' : ' - ' . escapeSql($what))); // i18n-ignore - SQL or the audit log
+        flashAlert(_n('Cleared %d app log entry', 'Cleared %d app log entries', $cleared));
     } else {
-        flashAlert('There was nothing to clear.', 'error');
+        flashAlert(__('There was nothing to clear.'), 'error');
     }
 
     redirect('app_logs.php');

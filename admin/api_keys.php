@@ -67,9 +67,9 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-key me-2"></i>API Keys</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-key me-2"></i><?= __('API Keys') ?></h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/api/api_key_add.php"><i class="fas fa-plus me-2"></i>New API Key</button>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/api/api_key_add.php"><i class="fas fa-plus me-2"></i><?= __('New API Key') ?></button>
         </div>
     </div>
     <div class="card-header py-3">
@@ -78,20 +78,20 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search API keys..." title="Key name or the agent it acts as">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search API keys...')) ?>" title="<?= escapeHtml(__('Key name or the agent it acts as')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-md-7">
                     <div class="d-flex justify-content-end gap-2">
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action') ?> (<span id="selectedCount">0</span>)
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_api_keys"
-                                    data-confirm-title="Delete these keys?" data-confirm-text="Anything using them stops working." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= escapeHtml(__('Delete these keys?')) ?>" data-confirm-text="<?= escapeHtml(__('Anything using them stops working.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </button>
                             </div>
                         </div>
@@ -100,8 +100,8 @@ $csrf = $_SESSION['csrf_token'];
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs mt-2">
-            <a class="nav-link <?= $show_expired ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-key me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show_expired ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'expired']))) ?>" title="Expired or revoked - nothing can use them"><i class="fas fa-fw fa-ban me-1"></i>Expired <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show_expired ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-key me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show_expired ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'expired']))) ?>" title="<?= escapeHtml(__('Expired or revoked - nothing can use them')) ?>"><i class="fas fa-fw fa-ban me-1"></i><?= __('Expired') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
 
@@ -113,14 +113,14 @@ $csrf = $_SESSION['csrf_token'];
                 <tr>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
-                    <th><?= $sort_link('api_key_name', 'Key') ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('api_key_expire', 'by expiry') ?></span></th>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('user_name', 'Acts as') ?></th>
-                    <th class="d-none d-lg-table-cell">Can open</th>
-                    <th class="d-none d-sm-table-cell"><?= $sort_link('api_key_last_used_at', 'Last used') ?></th>
-                    <th class="d-none d-xl-table-cell text-end">Calls <span class="fw-normal text-body-secondary small">(30 days)</span></th>
+                    <th><?= $sort_link('api_key_name', __('Key')) ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('api_key_expire', __('by expiry')) ?></span></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('user_name', __('Acts as')) ?></th>
+                    <th class="d-none d-lg-table-cell"><?= __('Can open') ?></th>
+                    <th class="d-none d-sm-table-cell"><?= $sort_link('api_key_last_used_at', __('Last used')) ?></th>
+                    <th class="d-none d-xl-table-cell text-end"><?= __('Calls') ?> <span class="fw-normal text-body-secondary small">(<?= __('30 days') ?>)</span></th>
                     <th></th>
                 </tr>
                 </thead>
@@ -130,10 +130,10 @@ $csrf = $_SESSION['csrf_token'];
                     $role = $roles[intval($row['user_role_id'])] ?? null;
                     $expired = apiKeyExpired($row);
                     $agent_name = trim(str_replace(' (archived)', '', (string) $row['user_name']));
-                    $last_used = $row['api_key_last_used_at'] ? '<span title="' . escapeHtml($row['api_key_last_used_at']) . '">' . escapeHtml(timeAgo($row['api_key_last_used_at'])) . '</span>' : '<span class="text-body-secondary">Never</span>';
+                    $last_used = $row['api_key_last_used_at'] ? '<span title="' . escapeHtml($row['api_key_last_used_at']) . '">' . escapeHtml(timeAgo($row['api_key_last_used_at'])) . '</span>' : __('<span class="text-body-secondary">Never</span>');
                     $use = $usage[$api_key_id] ?? null;
                     if ($use && $use['last_ip'] !== '') {
-                        $last_used .= '<div class="text-body-secondary font-monospace" title="Where the last call came from">' . escapeHtml($use['last_ip']) . '</div>';
+                        $last_used .= '<div class="text-body-secondary font-monospace" title="' . escapeHtml(__('Where the last call came from')) . '">' . escapeHtml($use['last_ip']) . '</div>';
                     }
                     $usage_url = "modals/api/api_key_usage.php?id=$api_key_id";
                     ob_start(); ?>
@@ -142,14 +142,14 @@ $csrf = $_SESSION['csrf_token'];
                             <?= userAvatar($row['api_key_user_id'], $agent_name, $row['user_avatar'], 'sm') ?>
                             <div class="min-w-0">
                                 <div class="text-truncate"><?= escapeHtml($agent_name) ?></div>
-                                <div class="small text-body-secondary text-truncate"><i class="fas fa-fw <?= $role && intval($role['role_is_admin']) ? 'fa-user-shield' : 'fa-user-tag' ?> me-1"></i><?= $role ? escapeHtml($role['role_name']) : 'No role' ?></div>
+                                <div class="small text-body-secondary text-truncate"><i class="fas fa-fw <?= $role && intval($role['role_is_admin']) ? 'fa-user-shield' : 'fa-user-tag' ?> me-1"></i><?= $role ? escapeHtml($role['role_name']) : __('No role') ?></div>
                             </div>
                         </div>
                     <?php } else { ?>
-                        <span class="small text-danger-emphasis"><i class="fas fa-exclamation-triangle me-1"></i>Nobody</span>
+                        <span class="small text-danger-emphasis"><i class="fas fa-exclamation-triangle me-1"></i><?= __('Nobody') ?></span>
                     <?php }
                     $agent_html = ob_get_clean();
-                    $can_html = $role ? roleAccessHtml($role) . '<div class="small text-body-secondary mt-1"><i class="fas fa-fw fa-building me-1"></i>' . escapeHtml(userClientAccessText($access[intval($row['api_key_user_id'])] ?? ['allow' => [], 'deny' => []], intval($role['role_is_admin']))) . '</div>' : '<span class="small text-body-secondary">Nothing</span>';
+                    $can_html = $role ? roleAccessHtml($role) . '<div class="small text-body-secondary mt-1"><i class="fas fa-fw fa-building me-1"></i>' . escapeHtml(userClientAccessText($access[intval($row['api_key_user_id'])] ?? ['allow' => [], 'deny' => []], intval($role['role_is_admin']))) . '</div>' : __('<span class="small text-body-secondary">Nothing</span>');
                     ?>
                     <tr data-api-key-id="<?= $api_key_id ?>" class="<?= $expired ? 'text-body-secondary' : '' ?>">
                         <td class="checkbox-column bg-light border-end">
@@ -167,7 +167,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <!-- On a phone, who it acts as and when it was used come along -->
                                     <div class="d-md-none mt-2"><?= $agent_html ?></div>
                                     <div class="d-lg-none mt-2"><?= $can_html ?></div>
-                                    <div class="d-sm-none small mt-1">Last used <?= $last_used ?></div>
+                                    <div class="d-sm-none small mt-1"><?= __('Last used') ?> <?= $last_used ?></div>
                                 </div>
                             </div>
                         </td>
@@ -176,32 +176,32 @@ $csrf = $_SESSION['csrf_token'];
                         <td class="d-none d-sm-table-cell small text-nowrap"><?= $last_used ?></td>
                         <td class="d-none d-xl-table-cell text-end small text-nowrap" data-api-calls="<?= intval($use['calls'] ?? 0) ?>">
                             <?php if ($use) { ?>
-                                <a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $usage_url ?>" title="What it was used for"><?= number_format($use['calls']) ?></a>
+                                <a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $usage_url ?>" title="<?= escapeHtml(__('What it was used for')) ?>"><?= number_format($use['calls']) ?></a>
                                 <div class="text-body-secondary"><?= $use['endpoints'] ?> endpoint<?= $use['endpoints'] === 1 ? '' : 's' ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">None</span>
+                                <span class="text-body-secondary"><?= __('None') ?></span>
                             <?php } ?>
                         </td>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/api/api_key_edit.php?id=<?= $api_key_id ?>">
-                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $usage_url ?>">
-                                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>Usage
+                                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Usage') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <?php if (!$expired) { // revoked first, then deleted ?>
                                         <a class="dropdown-item text-danger confirm-link" href="post.php?revoke_api_key=<?= $api_key_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Revoke <?= $name ?>?" data-confirm-text="It stops working now. Anything using it is turned away." data-confirm-button="Revoke">
-                                            <i class="fas fa-fw fa-ban me-2"></i>Revoke
+                                            data-confirm-title="Revoke <?= $name ?>?" data-confirm-text="<?= escapeHtml(__('It stops working now. Anything using it is turned away.')) ?>" data-confirm-button="<?= escapeHtml(__('Revoke')) ?>">
+                                            <i class="fas fa-fw fa-ban me-2"></i><?= __('Revoke') ?>
                                         </a>
                                     <?php } else { ?>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_api_key=<?= $api_key_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Delete <?= $name ?>?" data-confirm-text="It has expired, so nothing can be using it." data-confirm-button="Delete">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-title="Delete <?= $name ?>?" data-confirm-text="<?= escapeHtml(__('It has expired, so nothing can be using it.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </a>
                                     <?php } ?>
                                 </div>
@@ -215,14 +215,14 @@ $csrf = $_SESSION['csrf_token'];
     </form>
     <?php
     $empty_state = [
-        'thing' => 'API keys',
+        'thing' => __('API keys'),
         'icon' => 'fa-key',
         'filtered' => $q !== '',
         'archived' => $show_expired,
-        'archived_title' => 'No expired API keys',
+        'archived_title' => __('No expired API keys'),
         'views' => ['show'],
-        'text' => 'A key lets another system read and write ITFlow through its API, as one of your agents - it can do what their role allows, for the clients they see, until it expires.',
-        'actions' => [['label' => 'New API Key', 'modal' => 'modals/api/api_key_add.php']],
+        'text' => __('A key lets another system read and write ITFlow through its API, as one of your agents - it can do what their role allows, for the clients they see, until it expires.'),
+        'actions' => [['label' => __('New API Key'), 'modal' => 'modals/api/api_key_add.php']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

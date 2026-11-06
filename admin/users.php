@@ -27,18 +27,18 @@ if (($_GET['canned_date'] ?? '') === 'custom' && empty($_GET['dtf'])) {
 $roles = userRoles();
 $role_filter = isset($roles[intval($_GET['role'] ?? 0)]) ? intval($_GET['role']) : 0;
 
-$filters = "user_type = 1 AND (user_name LIKE '%$q%' OR user_email LIKE '%$q%' OR role_name LIKE '%$q%')" . ($role_filter ? " AND user_role_id = $role_filter" : '');
+$filters = "user_type = 1 AND (user_name LIKE '%$q%' OR user_email LIKE '%$q%' OR role_name LIKE '%$q%')" . ($role_filter ? " AND user_role_id = $role_filter" : ''); // i18n-ignore - SQL or the audit log
 $joins = "LEFT JOIN user_roles ON user_role_id = role_id
     LEFT JOIN user_settings ON user_settings.user_id = users.user_id";
 
 // The views
 $shows = [
-    '' => ['label' => 'Users', 'icon' => 'fa-users', 'where' => 'user_archived_at IS NULL', 'title' => 'Everyone not archived'],
-    'admins' => ['label' => 'Admins', 'icon' => 'fa-user-shield', 'where' => 'user_archived_at IS NULL AND role_is_admin = 1', 'title' => 'Every client and every setting'],
-    'nomfa' => ['label' => 'No MFA', 'icon' => 'fa-unlock', 'where' => "user_archived_at IS NULL AND user_status = 1 AND (user_token IS NULL OR user_token = '')", 'title' => 'Active, and signing in with a password alone'],
-    'disabled' => ['label' => 'Disabled', 'icon' => 'fa-ban', 'where' => 'user_archived_at IS NULL AND user_status <> 1', 'title' => 'Cannot sign in'],
-    'invited' => ['label' => 'Invited', 'icon' => 'fa-paper-plane', 'where' => null, 'title' => 'Asked to join and not in yet - their invite waiting, or run out'],
-    'archived' => ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'user_archived_at IS NOT NULL', 'title' => 'Gone - restore one with a new password'],
+    '' => ['label' => __('Users'), 'icon' => 'fa-users', 'where' => 'user_archived_at IS NULL', 'title' => __('Everyone not archived')],
+    'admins' => ['label' => __('Admins'), 'icon' => 'fa-user-shield', 'where' => 'user_archived_at IS NULL AND role_is_admin = 1', 'title' => __('Every client and every setting')],
+    'nomfa' => ['label' => __('No MFA'), 'icon' => 'fa-unlock', 'where' => "user_archived_at IS NULL AND user_status = 1 AND (user_token IS NULL OR user_token = '')", 'title' => __('Active, and signing in with a password alone')],
+    'disabled' => ['label' => __('Disabled'), 'icon' => 'fa-ban', 'where' => 'user_archived_at IS NULL AND user_status <> 1', 'title' => __('Cannot sign in')],
+    'invited' => ['label' => __('Invited'), 'icon' => 'fa-paper-plane', 'where' => null, 'title' => __('Asked to join and not in yet - their invite waiting, or run out')],
+    'archived' => ['label' => __('Archived'), 'icon' => 'fa-archive', 'where' => 'user_archived_at IS NOT NULL', 'title' => __('Gone - restore one with a new password')],
 ];
 if (!userInvitesReady()) {
     unset($shows['invited']);
@@ -47,7 +47,7 @@ $show = isset($shows[$_GET['show'] ?? '']) ? ($_GET['show'] ?? '') : '';
 
 // The invites - not users yet, so a list of their own
 $invite_filters = "invite_accepted_at IS NULL AND invite_cancelled_at IS NULL AND (invite_name LIKE '%$q%' OR invite_email LIKE '%$q%' OR role_name LIKE '%$q%')"
-    . ($role_filter ? " AND invite_role_id = $role_filter" : '');
+    . ($role_filter ? " AND invite_role_id = $role_filter" : ''); // i18n-ignore - SQL or the audit log
 $invite_joins = "LEFT JOIN user_roles ON role_id = invite_role_id
     LEFT JOIN users inviter ON inviter.user_id = invite_created_by AND invite_created_by > 0";
 
@@ -58,7 +58,7 @@ $sortable_columns = [
     'user_email' => "user_email $order",
     'role_name' => "role_is_admin DESC, role_name $order, user_name ASC",
     'user_status' => "user_status $order, user_name ASC",
-    'last_login' => "$last_login_sql IS NULL, $last_login_sql $order, user_name ASC",
+    'last_login' => "$last_login_sql IS NULL, $last_login_sql $order, user_name ASC", // i18n-ignore - SQL or the audit log
     'user_created_at' => "user_created_at $order, user_name ASC",
 ];
 // ...and the same headers sort the invites: when it runs out for Sign in, when it was sent for Added
@@ -143,7 +143,7 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-users me-2"></i>Users
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-users me-2"></i><?= __('Users') ?>
             <?php if ($agent_user_limit > 0) { ?>
                 <span class="badge rounded-pill text-bg-<?= $agent_user_limit_reached ? 'danger' : 'secondary' ?> fw-normal ms-2"
                     title="<?= $agent_user_count ?> active agent<?= $agent_user_count === 1 ? '' : 's' ?><?= $agent_invites_holding ? " and $agent_invites_holding invite" . ($agent_invites_holding === 1 ? '' : 's') . ' waiting' : '' ?>, of the agent user limit set for this installation">
@@ -154,28 +154,28 @@ $csrf = $_SESSION['csrf_token'];
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($agent_user_limit_reached) { ?>
-                    <button type="button" class="btn btn-primary" disabled title="Every seat is taken - disable or archive a user<?= $agent_invites_holding ? ', or cancel an invite,' : '' ?> first">
-                        <i class="fas fa-user-plus"></i><span class="d-none d-lg-inline ms-2">New User</span>
+                    <button type="button" class="btn btn-primary" disabled title="Every seat is taken - disable or archive a user<?= $agent_invites_holding ? __(', or cancel an invite,') : '' ?> first">
+                        <i class="fas fa-user-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New User') ?></span>
                     </button>
                 <?php } else { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/user/user_add.php?role=<?= $role_filter ?>">
-                        <i class="fas fa-user-plus"></i><span class="d-none d-lg-inline ms-2">New User</span>
+                        <i class="fas fa-user-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New User') ?></span>
                     </button>
                 <?php } ?>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= buildExportModalUrl('modals/user/user_export.php', ['q', 'role'], ['archived' => $show === 'archived' ? 1 : null]) ?>">
-                        <i class="fa fa-fw fa-download text-secondary me-2"></i>Export
+                        <i class="fa fa-fw fa-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <a class="dropdown-item" href="roles.php">
-                        <i class="fa fa-fw fa-user-tag text-secondary me-2"></i>Roles
+                        <i class="fa fa-fw fa-user-tag text-secondary me-2"></i><?= __('Roles') ?>
                     </a>
                     <a class="dropdown-item" href="settings_security.php">
-                        <i class="fa fa-fw fa-shield-alt text-secondary me-2"></i>Security settings
+                        <i class="fa fa-fw fa-shield-alt text-secondary me-2"></i><?= __('Security settings') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/user/user_all_reset_password.php">
-                        <i class="fas fa-fw fa-skull-crossbones me-2"></i>Incident response
+                        <i class="fas fa-fw fa-skull-crossbones me-2"></i><?= __('Incident response') ?>
                     </a>
                 </div>
             </div>
@@ -188,13 +188,13 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?= escapeHtml($_GET['q'] ?? '') ?>" placeholder="Search users..." title="Name, email or role">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?= escapeHtml($_GET['q'] ?? '') ?>" placeholder="<?= escapeHtml(__('Search users...')) ?>" title="<?= escapeHtml(__('Name, email or role')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <select class="form-select select2" name="role" onchange="this.form.submit()">
-                        <option value="">- Any role -</option>
+                        <option value=""><?= __('- Any role -') ?></option>
                         <?php foreach ($roles as $role_id => $role) { ?>
                             <option value="<?= $role_id ?>" <?= $role_filter === $role_id ? 'selected' : '' ?><?= selectOptionRole($role) ?>><?= escapeHtml($role['role_name']) ?></option>
                         <?php } ?>
@@ -204,30 +204,30 @@ $csrf = $_SESSION['csrf_token'];
                     <div class="d-flex justify-content-end gap-2">
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action') ?> (<span id="selectedCount">0</span>)
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/user/user_bulk_role.php" data-bulk="true">
-                                    <i class="fas fa-fw fa-user-tag text-secondary me-2"></i>Role
+                                    <i class="fas fa-fw fa-user-tag text-secondary me-2"></i><?= __('Role') ?>
                                 </a>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_require_mfa_users">
-                                    <i class="fas fa-fw fa-lock text-secondary me-2"></i>Require MFA
+                                    <i class="fas fa-fw fa-lock text-secondary me-2"></i><?= __('Require MFA') ?>
                                 </button>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_unrequire_mfa_users">
-                                    <i class="fas fa-fw fa-lock-open text-secondary me-2"></i>Stop requiring MFA
+                                    <i class="fas fa-fw fa-lock-open text-secondary me-2"></i><?= __('Stop requiring MFA') ?>
                                 </button>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_revoke_remember_users">
-                                    <i class="fas fa-fw fa-laptop text-secondary me-2"></i>Forget remembered browsers
+                                    <i class="fas fa-fw fa-laptop text-secondary me-2"></i><?= __('Forget remembered browsers') ?>
                                 </button>
                                 <?php if ($show !== 'archived') { ?>
                                     <div class="dropdown-divider"></div>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_activate_users">
-                                        <i class="fas fa-fw fa-user-check text-secondary me-2"></i>Activate
+                                        <i class="fas fa-fw fa-user-check text-secondary me-2"></i><?= __('Activate') ?>
                                     </button>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_disable_users"
-                                        data-confirm-text="They are signed out and cannot sign in, and their open tickets and recurring tickets are unassigned. Activating them again does not give those back."
-                                        data-confirm-button="Disable">
-                                        <i class="fas fa-fw fa-user-slash me-2"></i>Disable
+                                        data-confirm-text="<?= escapeHtml(__('They are signed out and cannot sign in, and their open tickets and recurring tickets are unassigned. Activating them again does not give those back.')) ?>"
+                                        data-confirm-button="<?= escapeHtml(__('Disable')) ?>">
+                                        <i class="fas fa-fw fa-user-slash me-2"></i><?= __('Disable') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -250,13 +250,13 @@ $csrf = $_SESSION['csrf_token'];
     <?php if ($invite_link) {
         $invite_link_name = escapeHtml($invite_link['row']['invite_name']); ?>
         <div class="alert alert-info border-0 rounded-0 mb-0 px-3 py-3" data-user-invite-link="<?= intval($invite_link['row']['invite_id']) ?>">
-            <div class="fw-semibold mb-1"><i class="fas fa-link me-2"></i>The invite link for <?= $invite_link_name ?></div>
-            <div class="small mb-2">Send it to <?= $invite_link_name ?> yourself - by chat, text or your own email. With it they choose their own password and join as <?= escapeHtml((string) $invite_link['row']['role_name']) ?>.
-                It works for <?= USER_INVITE_LINK_DAYS ?> days and is only shown now - Get the link again makes a new one.</div>
+            <div class="fw-semibold mb-1"><i class="fas fa-link me-2"></i><?= __('The invite link for %s', $invite_link_name) ?></div>
+            <div class="small mb-2"><?= __('Send it to %1$s yourself - by chat, text or your own email. With it they choose their own password and join as %2$s.', $invite_link_name, escapeHtml((string) $invite_link['row']['role_name'])) ?>
+                <?= __('It works for %d days and is only shown now - Get the link again makes a new one.', USER_INVITE_LINK_DAYS) ?></div>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-link"></i></span>
-                <input type="text" class="form-control font-monospace" id="userInviteLink" value="<?= escapeHtml($invite_link['url']) ?>" readonly aria-label="The invite link" onfocus="this.select()">
-                <button class="btn btn-primary clipboardjs" type="button" data-clipboard-target="#userInviteLink"><i class="far fa-copy me-2"></i>Copy</button>
+                <input type="text" class="form-control font-monospace" id="userInviteLink" value="<?= escapeHtml($invite_link['url']) ?>" readonly aria-label="<?= escapeHtml(__('The invite link')) ?>" onfocus="this.select()">
+                <button class="btn btn-primary clipboardjs" type="button" data-clipboard-target="#userInviteLink"><i class="far fa-copy me-2"></i><?= __('Copy') ?></button>
             </div>
         </div>
     <?php } ?>
@@ -267,11 +267,11 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0 itflow-asset-table itflow-ticket-list itflow-user-list" data-user-invites>
             <thead class="<?php if (!$invites) { echo "d-none"; } ?> text-nowrap table-light">
             <tr>
-                <th><?= $sort_link('user_name', 'Invited') ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('user_email', 'by email') ?></span></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('role_name', 'Role') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('user_status', 'Invite') ?></th>
-                <th class="d-none d-xl-table-cell">Clients</th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('user_created_at', 'Invited by') ?></th>
+                <th><?= $sort_link('user_name', __('Invited')) ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('user_email', __('by email')) ?></span></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('role_name', __('Role')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('user_status', __('Invite')) ?></th>
+                <th class="d-none d-xl-table-cell"><?= __('Clients') ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('user_created_at', __('Invited by')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -282,14 +282,14 @@ $csrf = $_SESSION['csrf_token'];
                 $invite_expired = userInviteState($invite) === 'expired';
                 $invite_admin = intval($invite['role_is_admin']) === 1;
                 $invite_access = userInviteClientAccess($invite);
-                $invite_access_title = $invite_admin ? 'Admins see every client' : trim(
+                $invite_access_title = $invite_admin ? __('Admins see every client') : trim(
                     ($invite_access['allow'] ? 'Only: ' . implode(', ', $invite_access['allow']) . '. ' : '')
-                    . ($invite_access['deny'] ? 'Kept out of: ' . implode(', ', $invite_access['deny']) . '.' : '')
+                    . ($invite_access['deny'] ? __('Kept out of: %s.', implode(', ', $invite_access['deny'])) : '')
                 );
                 $invite_name = escapeHtml($invite['invite_name']);
                 $invite_sent = intval($invite['invite_sent_count']);
                 $invite_role = $invite['role_name'] === null
-                    ? '<span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i>Role removed</span>'
+                    ? __('<span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i>Role removed</span>')
                     : '<i class="fas fa-fw ' . ($invite_admin ? 'fa-user-shield text-primary' : 'fa-user-tag text-body-secondary') . ' me-1"></i>' . escapeHtml($invite['role_name']);
                 $invite_pill = '<span class="badge rounded-pill bg-' . $invite_label['tone'] . '-subtle text-' . $invite_label['tone'] . '-emphasis fw-normal" title="' . escapeHtml($invite_label['title']) . '"><i class="fas '
                     . ($invite_expired ? 'fa-hourglass-end' : 'fa-paper-plane') . ' me-1"></i>' . $invite_label['label'] . '</span>';
@@ -303,7 +303,7 @@ $csrf = $_SESSION['csrf_token'];
                             <div class="min-w-0">
                                 <span class="fw-semibold"><?= $invite_name ?></span>
                                 <div class="small text-body-secondary text-truncate">
-                                    <?= escapeHtml($invite['invite_email']) ?><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= escapeHtml($invite['invite_email']) ?>"><i class="far fa-copy"></i></button>
+                                    <?= escapeHtml($invite['invite_email']) ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= escapeHtml($invite['invite_email']) ?>"><i class="far fa-copy"></i></button>
                                 </div>
                                 <!-- On a phone the role and invite columns are off to the side - they come along -->
                                 <div class="d-md-none small text-body-secondary"><?= $invite_role ?></div>
@@ -319,10 +319,10 @@ $csrf = $_SESSION['csrf_token'];
                         <div class="d-flex flex-wrap gap-1">
                             <?= $invite_pill ?>
                             <?php if (intval($invite['invite_force_mfa'])) { ?>
-                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="Required - they set it up as they first sign in"><i class="fas fa-lock me-1"></i>MFA required</span>
+                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="<?= escapeHtml(__('Required - they set it up as they first sign in')) ?>"><i class="fas fa-lock me-1"></i><?= __('MFA required') ?></span>
                             <?php } ?>
                         </div>
-                        <div class="small text-body-secondary mt-1 text-nowrap"><?= escapeHtml($invite_expired ? 'Ran out ' . date('M j', strtotime($invite['invite_expires_at'])) : $invite_label['title']) ?></div>
+                        <div class="small text-body-secondary mt-1 text-nowrap"><?= escapeHtml($invite_expired ? __('Ran out %s', formatDate($invite['invite_expires_at'], 'date_short')) : $invite_label['title']) ?></div>
                     </td>
 
                     <td class="d-none d-xl-table-cell small <?= $invite_admin ? 'text-body-secondary' : '' ?>" title="<?= escapeHtml($invite_access_title) ?>">
@@ -331,40 +331,40 @@ $csrf = $_SESSION['csrf_token'];
 
                     <!-- Who sent it, and how -->
                     <td class="d-none d-lg-table-cell small">
-                        <div><?= escapeHtml(userInviteBy($invite) !== '' ? userInviteBy($invite) : 'Someone no longer here') ?> <span class="text-body-secondary" title="<?= escapeHtml($invite['invite_created_at']) ?>">· <?= escapeHtml(timeAgo($invite['invite_created_at'])) ?></span></div>
+                        <div><?= escapeHtml(userInviteBy($invite) !== '' ? userInviteBy($invite) : __('Someone no longer here')) ?> <span class="text-body-secondary" title="<?= escapeHtml($invite['invite_created_at']) ?>">· <?= escapeHtml(timeAgo($invite['invite_created_at'])) ?></span></div>
                         <div class="text-body-secondary">
                             <?php if ($invite_sent) { ?>
-                                <i class="fas fa-fw fa-envelope me-1"></i><span title="<?= escapeHtml((string) $invite['invite_sent_at']) ?>">Emailed <?= escapeHtml(timeAgo($invite['invite_sent_at'])) ?></span><?= $invite_sent > 1 ? " · $invite_sent times" : '' ?>
+                                <i class="fas fa-fw fa-envelope me-1"></i><span title="<?= escapeHtml((string) $invite['invite_sent_at']) ?>"><?= escapeHtml(__('Emailed %s', timeAgo($invite['invite_sent_at']))) ?></span><?= $invite_sent > 1 ? ' · ' . __('%d times', $invite_sent) : '' ?>
                             <?php } else { ?>
-                                <i class="fas fa-fw fa-link me-1"></i>A link to pass on
+                                <i class="fas fa-fw fa-link me-1"></i><?= __('A link to pass on') ?>
                             <?php } ?>
                         </div>
                     </td>
 
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <?php if ($invite_mail_ready) { ?>
                                     <a class="dropdown-item" href="post.php?resend_user_invite=<?= $invite_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i>Send again
+                                        <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i><?= __('Send again') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item confirm-link" href="post.php?link_user_invite=<?= $invite_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Get a new invite link?" data-confirm-icon="info"
+                                    data-confirm-title="<?= escapeHtml(__('Get a new invite link?')) ?>" data-confirm-icon="info"
                                     data-confirm-text="A new link is made for you to send <?= $invite_name ?> yourself, shown once. Any link sent before stops working, and it works for <?= USER_INVITE_LINK_DAYS ?> days."
-                                    data-confirm-button="Get the link">
-                                    <i class="fas fa-fw fa-link text-secondary me-2"></i>Get the link
+                                    data-confirm-button="<?= escapeHtml(__('Get the link')) ?>">
+                                    <i class="fas fa-fw fa-link text-secondary me-2"></i><?= __('Get the link') ?>
                                 </a>
                                 <a class="dropdown-item" href="audit_logs.php?q=<?= rawurlencode($invite['invite_email']) ?>">
-                                    <i class="fas fa-fw fa-history text-secondary me-2"></i>Audit log
+                                    <i class="fas fa-fw fa-history text-secondary me-2"></i><?= __('Audit log') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?cancel_user_invite=<?= $invite_id ?>&csrf_token=<?= $csrf ?>"
                                     data-confirm-title="Cancel <?= $invite_name ?>'s invite?"
-                                    data-confirm-text="The link <?= $invite_name ?> has stops working<?= $agent_user_limit > 0 && !$invite_expired ? ', and the seat it holds is free again' : '' ?>. Invite them again any time."
-                                    data-confirm-button="Cancel invite">
-                                    <i class="fas fa-fw fa-ban me-2"></i>Cancel invite
+                                    data-confirm-text="The link <?= $invite_name ?> has stops working<?= $agent_user_limit > 0 && !$invite_expired ? __(', and the seat it holds is free again') : '' ?>. Invite them again any time."
+                                    data-confirm-button="<?= escapeHtml(__('Cancel invite')) ?>">
+                                    <i class="fas fa-fw fa-ban me-2"></i><?= __('Cancel invite') ?>
                                 </a>
                             </div>
                         </div>
@@ -386,14 +386,14 @@ $csrf = $_SESSION['csrf_token'];
                 <tr>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
-                    <th><?= $sort_link('user_name', 'User') ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('user_email', 'by email') ?></span></th>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('role_name', 'Role') ?></th>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('user_status', 'Sign in') ?></th>
-                    <th class="d-none d-xl-table-cell">Clients</th>
-                    <th class="d-none d-lg-table-cell"><?= $sort_link('last_login', 'Last signed in') ?></th>
+                    <th><?= $sort_link('user_name', __('User')) ?> <span class="fw-normal text-body-secondary small ms-2"><?= $sort_link('user_email', __('by email')) ?></span></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('role_name', __('Role')) ?></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('user_status', __('Sign in')) ?></th>
+                    <th class="d-none d-xl-table-cell"><?= __('Clients') ?></th>
+                    <th class="d-none d-lg-table-cell"><?= $sort_link('last_login', __('Last signed in')) ?></th>
                     <th></th>
                 </tr>
                 </thead>
@@ -408,9 +408,9 @@ $csrf = $_SESSION['csrf_token'];
                     $name = escapeHtml($display_name);
                     $quick_url = "modals/user/user.php?id=$user_id";
                     $user_access = $access[$user_id];
-                    $access_title = $is_admin ? 'Admins see every client' : trim(
+                    $access_title = $is_admin ? __('Admins see every client') : trim(
                         ($user_access['allow'] ? 'Only: ' . implode(', ', $user_access['allow']) . '. ' : '')
-                        . ($user_access['deny'] ? 'Kept out of: ' . implode(', ', $user_access['deny']) . '.' : '')
+                        . ($user_access['deny'] ? __('Kept out of: %s.', implode(', ', $user_access['deny'])) : '')
                     );
                     $remember_count = $remembered[$user_id] ?? 0;
                     ?>
@@ -418,9 +418,9 @@ $csrf = $_SESSION['csrf_token'];
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
                                 <?php if ($is_self) { ?>
-                                    <input class="form-check-input" type="checkbox" disabled title="That's you - change your own account from Account">
+                                    <input class="form-check-input" type="checkbox" disabled title="<?= escapeHtml(__('That\'s you - change your own account from Account')) ?>">
                                 <?php } else { ?>
-                                    <input class="form-check-input bulk-select" type="checkbox" name="user_ids[]" value="<?= $user_id ?>" aria-label="Select <?= $name ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="user_ids[]" value="<?= $user_id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                 <?php } ?>
                             </div>
                         </td>
@@ -431,12 +431,12 @@ $csrf = $_SESSION['csrf_token'];
                                 <a class="ajax-modal text-decoration-none <?= $is_active ? '' : 'opacity-50' ?>" href="#" data-modal-url="<?= $quick_url ?>" tabindex="-1" aria-hidden="true"><?= userAvatar($user_id, $display_name, $row['user_avatar']) ?></a>
                                 <div class="min-w-0">
                                     <a class="ajax-modal <?= $is_active ? 'fw-semibold text-body' : 'text-body-secondary' ?>" href="#" data-modal-url="<?= $quick_url ?>"><?= $name ?></a>
-                                    <?php if ($is_self) { ?><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal ms-1">You</span><?php } ?>
+                                    <?php if ($is_self) { ?><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal ms-1"><?= __('You') ?></span><?php } ?>
                                     <div class="small text-body-secondary text-truncate">
-                                        <?= escapeHtml($row['user_email']) ?><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= escapeHtml($row['user_email']) ?>"><i class="far fa-copy"></i></button>
+                                        <?= escapeHtml($row['user_email']) ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= escapeHtml($row['user_email']) ?>"><i class="far fa-copy"></i></button>
                                     </div>
                                     <!-- On a phone the role and sign in columns are off to the side - they come along -->
-                                    <div class="d-md-none small text-body-secondary"><i class="fas fa-fw <?= $is_admin ? 'fa-user-shield' : 'fa-user-tag' ?> me-1"></i><?= escapeHtml($row['role_name'] ?? 'No role') ?></div>
+                                    <div class="d-md-none small text-body-secondary"><i class="fas fa-fw <?= $is_admin ? 'fa-user-shield' : 'fa-user-tag' ?> me-1"></i><?= escapeHtml($row['role_name'] ?? __('No role')) ?></div>
                                     <div class="d-md-none d-flex flex-wrap gap-1 mt-1">
                                         <?= userStatusPill($row['user_status'], $is_archived) ?>
                                         <?php if (!$is_archived) { ?><?= userMfaPill($row['user_token'], $row['user_config_force_mfa']) ?><?php } ?>
@@ -447,7 +447,7 @@ $csrf = $_SESSION['csrf_token'];
 
                         <td class="d-none d-md-table-cell text-nowrap">
                             <?php if ($row['role_name'] === null) { ?>
-                                <span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i>No role</span>
+                                <span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i><?= __('No role') ?></span>
                             <?php } else { ?>
                                 <i class="fas fa-fw <?= $is_admin ? 'fa-user-shield text-primary' : 'fa-user-tag text-body-secondary' ?> me-1"></i><?= escapeHtml($row['role_name']) ?>
                             <?php } ?>
@@ -460,7 +460,7 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php if (!$is_archived) { ?><?= userMfaPill($row['user_token'], $row['user_config_force_mfa']) ?><?php } ?>
                             </div>
                             <?php if ($remember_count && !$is_archived) { ?>
-                                <div class="small text-body-secondary mt-1 text-nowrap" title="Browsers that skip the MFA code - remember me, at sign in"><i class="fas fa-fw fa-laptop me-1"></i><?= $remember_count ?> remembered browser<?= $remember_count === 1 ? '' : 's' ?></div>
+                                <div class="small text-body-secondary mt-1 text-nowrap" title="<?= escapeHtml(__('Browsers that skip the MFA code - remember me, at sign in')) ?>"><i class="fas fa-fw fa-laptop me-1"></i><?= $remember_count ?> remembered browser<?= $remember_count === 1 ? '' : 's' ?></div>
                             <?php } ?>
                             <?php if ($is_archived) { ?>
                                 <div class="small text-body-secondary mt-1" title="<?= escapeHtml($row['user_archived_at']) ?>"><?= escapeHtml(timeAgo($row['user_archived_at'])) ?></div>
@@ -475,53 +475,53 @@ $csrf = $_SESSION['csrf_token'];
 
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $quick_url ?>">
-                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                     </a>
                                     <a class="dropdown-item" href="audit_logs.php?user=<?= $user_id ?>">
-                                        <i class="fas fa-fw fa-history text-secondary me-2"></i>Audit log
+                                        <i class="fas fa-fw fa-history text-secondary me-2"></i><?= __('Audit log') ?>
                                     </a>
                                     <?php if ($is_self) { ?>
                                         <a class="dropdown-item" href="/agent/user/user_details.php">
-                                            <i class="fas fa-fw fa-user-cog text-secondary me-2"></i>Your account
+                                            <i class="fas fa-fw fa-user-cog text-secondary me-2"></i><?= __('Your account') ?>
                                         </a>
                                     <?php } elseif ($is_archived) { ?>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/user/user_restore.php?id=<?= $user_id ?>">
-                                            <i class="fas fa-fw fa-redo-alt text-secondary me-2"></i>Restore
+                                            <i class="fas fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Restore') ?>
                                         </a>
                                     <?php } else { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/user/user_edit.php?id=<?= $user_id ?>">
-                                            <i class="fas fa-fw fa-user-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-user-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <?php if ($has_mfa) { ?>
                                             <a class="dropdown-item confirm-link" href="post.php?reset_user_mfa=<?= $user_id ?>&csrf_token=<?= $csrf ?>"
-                                                data-confirm-text="<?= $name ?> signs in with their password alone<?= intval($row['user_config_force_mfa']) ? ' until they set MFA up again, which they are asked to at their next sign in' : ' until they turn MFA on again' ?>. For a lost or replaced phone."
-                                                data-confirm-button="Reset MFA">
-                                                <i class="fas fa-fw fa-mobile-alt text-secondary me-2"></i>Reset MFA
+                                                data-confirm-text="<?= escapeHtml(intval($row['user_config_force_mfa']) ? __('%s signs in with their password alone until they set MFA up again, which they are asked to at their next sign in. For a lost or replaced phone.', $row['user_name']) : __('%s signs in with their password alone until they turn MFA on again. For a lost or replaced phone.', $row['user_name'])) ?>"
+                                                data-confirm-button="<?= escapeHtml(__('Reset MFA')) ?>">
+                                                <i class="fas fa-fw fa-mobile-alt text-secondary me-2"></i><?= __('Reset MFA') ?>
                                             </a>
                                         <?php } ?>
                                         <?php if ($remember_count) { ?>
                                             <a class="dropdown-item" href="post.php?revoke_remember_me=<?= $user_id ?>&csrf_token=<?= $csrf ?>">
-                                                <i class="fas fa-fw fa-laptop text-secondary me-2"></i>Forget <?= $remember_count ?> remembered browser<?= $remember_count === 1 ? '' : 's' ?>
+                                                <i class="fas fa-fw fa-laptop text-secondary me-2"></i><?= _n('Forget %d remembered browser', 'Forget %d remembered browsers', $remember_count) ?>
                                             </a>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($is_active) { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?disable_user=<?= $user_id ?>&csrf_token=<?= $csrf ?>"
-                                                data-confirm-text="<?= $name ?> is signed out and cannot sign in, and their open tickets and recurring tickets are unassigned. Activating them again does not give those back."
-                                                data-confirm-button="Disable">
-                                                <i class="fas fa-fw fa-user-slash me-2"></i>Disable
+                                                data-confirm-text="<?= __('%s is signed out and cannot sign in, and their open tickets and recurring tickets are unassigned. Activating them again does not give those back.', $name) ?>"
+                                                data-confirm-button="<?= escapeHtml(__('Disable')) ?>">
+                                                <i class="fas fa-fw fa-user-slash me-2"></i><?= __('Disable') ?>
                                             </a>
                                         <?php } else { ?>
                                             <a class="dropdown-item" href="post.php?activate_user=<?= $user_id ?>&csrf_token=<?= $csrf ?>">
-                                                <i class="fas fa-fw fa-user-check text-secondary me-2"></i>Activate
+                                                <i class="fas fa-fw fa-user-check text-secondary me-2"></i><?= __('Activate') ?>
                                             </a>
                                         <?php } ?>
                                         <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/user/user_archive.php?id=<?= $user_id ?>">
-                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                         </a>
                                     <?php } ?>
                                 </div>
@@ -542,8 +542,8 @@ $csrf = $_SESSION['csrf_token'];
         'filtered' => $q !== '' || $role_filter,
         'archived' => $show === 'archived',
         'views' => ['show'],
-        'view' => $show === 'nomfa' ? ['title' => 'Everyone active signs in with MFA', 'icon' => 'fa-check']
-            : ($show === 'invited' ? ['title' => 'No invites waiting', 'text' => 'Everyone invited has joined. Invite someone with New User.', 'icon' => 'fa-paper-plane'] : emptyStatePill($shows, $show)),
+        'view' => $show === 'nomfa' ? ['title' => __('Everyone active signs in with MFA'), 'icon' => 'fa-check']
+            : ($show === 'invited' ? ['title' => __('No invites waiting'), 'text' => __('Everyone invited has joined. Invite someone with New User.'), 'icon' => 'fa-paper-plane'] : emptyStatePill($shows, $show)),
     ];
     require_once "../includes/filter_footer.php";
     ?>

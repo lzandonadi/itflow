@@ -35,7 +35,7 @@ function userAvatar($user_id, $name, $avatar, $size = '') {
 /** A user's status as a pill. */
 function userStatusPill($status, $archived = false) {
     if ($archived) {
-        return '<span class="badge rounded-pill text-bg-secondary fw-normal"><i class="fas fa-archive me-1"></i>Archived</span>';
+        return __('<span class="badge rounded-pill text-bg-secondary fw-normal"><i class="fas fa-archive me-1"></i>Archived</span>');
     }
     [$label, $tone] = USER_STATUSES[intval($status)] ?? USER_STATUSES[0];
     $icon = ['success' => 'fa-check-circle', 'secondary' => 'fa-ban', 'info' => 'fa-paper-plane'][$tone];
@@ -83,11 +83,11 @@ function userForRequest($user_id, $not_self = true) {
     global $session_user_id;
     $row = userRow($user_id);
     if (!$row) {
-        flashAlert('That user no longer exists.', 'error');
+        flashAlert(__('That user no longer exists.'), 'error');
         redirect();
     }
     if ($not_self && intval($row['user_id']) === intval($session_user_id)) {
-        flashAlert('Change your own account from <strong>Account</strong> in the top right.', 'error');
+        flashAlert(__('Change your own account from <strong>Account</strong> in the top right.'), 'error');
         redirect();
     }
     return $row;
@@ -97,7 +97,7 @@ function userForRequest($user_id, $not_self = true) {
 function userForModal($user_id) {
     $row = userRow($user_id);
     if (!$row) {
-        echo json_encode(['error' => 'That user no longer exists.']);
+        echo json_encode(['error' => __('That user no longer exists.')]);
         exit;
     }
     return $row;
@@ -133,7 +133,7 @@ function userRoles($include_role_id = 0) {
 function selectOptionRole($role) {
     return selectOptionData([
         'icon' => 'fas ' . (intval($role['role_is_admin']) ? 'fa-user-shield' : 'fa-user-tag'),
-        'description' => implode(' · ', array_filter([intval($role['role_is_admin']) ? 'Administrator - every client, every setting' : '', $role['role_description']])),
+        'description' => implode(' · ', array_filter([intval($role['role_is_admin']) ? __('Administrator - every client, every setting') : '', $role['role_description']])),
     ]);
 }
 
@@ -160,7 +160,7 @@ function userCheckIdentity($post, $user_id, &$error = '') {
     $name = trim((string) ($post['name'] ?? ''));
     $email = trim((string) ($post['email'] ?? ''));
     if ($name === '') {
-        $error = 'A user needs a name.';
+        $error = __('A user needs a name.');
         return null;
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -170,7 +170,7 @@ function userCheckIdentity($post, $user_id, &$error = '') {
     $email_sql = escapeSql($email);
     $taken = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_id, user_type FROM users WHERE user_email = '$email_sql' AND user_archived_at IS NULL AND user_id <> " . intval($user_id) . " LIMIT 1"));
     if ($taken) {
-        $error = '<strong>' . $email . '</strong> already signs in to ' . (intval($taken['user_type']) === 1 ? 'another agent account' : 'a client portal account') . ' - each account needs its own email.';
+        $error = intval($taken['user_type']) === 1 ? __('<strong>%s</strong> already signs in to another agent account - each account needs its own email.', $email) : __('<strong>%s</strong> already signs in to a client portal account - each account needs its own email.', $email);
         return null;
     }
     return [mb_substr($name, 0, 200), mb_substr($email, 0, 200)];
@@ -181,7 +181,7 @@ function userCheckRole($role_id, $current_role_id, &$error = '') {
     $roles = userRoles($current_role_id);
     $role_id = intval($role_id);
     if (!isset($roles[$role_id]) || ($roles[$role_id]['role_archived_at'] && $role_id !== intval($current_role_id))) {
-        $error = 'Pick a role for them.';
+        $error = __('Pick a role for them.');
         return null;
     }
     return $roles[$role_id];
@@ -280,7 +280,7 @@ function userAvatarStore($file, $dir, &$error = '') {
         mkdir($dir, 0755, true);
     }
     if (!move_uploaded_file($file['tmp_name'], "$dir/$new_name")) {
-        $error = 'The avatar could not be saved.';
+        $error = __('The avatar could not be saved.');
         return '';
     }
     return $new_name;
@@ -340,14 +340,14 @@ function userClientAccess(array $user_ids) {
 /** What an agent can see, in words: "All clients", "3 clients", "All but 1". An admin sees everything. */
 function userClientAccessText($access, $is_admin) {
     if ($is_admin) {
-        return 'All clients (admin)';
+        return __('All clients (admin)');
     }
     $allow = count($access['allow']);
     $deny = count($access['deny']);
     if ($allow) {
-        return $allow . ' client' . ($allow === 1 ? '' : 's') . ($deny ? ", $deny kept out" : '');
+        return _n('%d client', '%d clients', $allow) . ($deny ? ', ' . __('%d kept out', $deny) : '');
     }
-    return $deny ? "All but $deny client" . ($deny === 1 ? '' : 's') : 'All clients';
+    return $deny ? _n('All but %d client', 'All but %d clients', $deny) : __('All clients');
 }
 
 /**

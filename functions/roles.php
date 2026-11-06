@@ -29,32 +29,32 @@ const ROLE_LEVEL_TONES = [0 => 'secondary', 1 => 'primary', 2 => 'warning', 3 =>
 function roleModuleInfo() {
     return [
         'module_client' => [
-            'label' => 'Clients', 'icon' => 'fa-users', 'about' => 'Clients, contacts, locations and vendors',
-            'levels' => [1 => 'See them', 2 => 'Add, edit, import and archive them', 3 => 'Delete them, and anonymize a contact'],
+            'label' => __('Clients'), 'icon' => 'fa-users', 'about' => __('Clients, contacts, locations and vendors'),
+            'levels' => [1 => __('See them'), 2 => __('Add, edit, import and archive them'), 3 => __('Delete them, and anonymize a contact')],
         ],
         'module_support' => [
-            'label' => 'Support', 'icon' => 'fa-life-ring', 'about' => 'Tickets, projects, assets and documentation',
-            'levels' => [1 => 'See them', 2 => 'Work tickets and projects, and add, edit and archive assets and documentation', 3 => 'Delete them'],
+            'label' => __('Support'), 'icon' => 'fa-life-ring', 'about' => __('Tickets, projects, assets and documentation'),
+            'levels' => [1 => __('See them'), 2 => __('Work tickets and projects, and add, edit and archive assets and documentation'), 3 => __('Delete them')],
         ],
         'module_credential' => [
-            'label' => 'Credentials', 'icon' => 'fa-key', 'about' => 'Client usernames, passwords and 2FA codes',
-            'levels' => [1 => 'See and copy them', 2 => 'Add, edit and share them', 3 => 'Delete them'],
+            'label' => __('Credentials'), 'icon' => 'fa-key', 'about' => __('Client usernames, passwords and 2FA codes'),
+            'levels' => [1 => __('See and copy them'), 2 => __('Add, edit and share them'), 3 => __('Delete them')],
         ],
         'module_sales' => [
-            'label' => 'Sales', 'icon' => 'fa-file-invoice', 'about' => 'Quotes, invoices, recurring invoices and products',
-            'levels' => [1 => 'See them', 2 => 'Create, edit and send them - and record payments, with Financial at Modify too', 3 => 'Delete them, and edit or refund a payment'],
+            'label' => __('Sales'), 'icon' => 'fa-file-invoice', 'about' => __('Quotes, invoices, recurring invoices and products'),
+            'levels' => [1 => __('See them'), 2 => __('Create, edit and send them - and record payments, with Financial at Modify too'), 3 => __('Delete them, and edit or refund a payment')],
         ],
         'module_financial' => [
-            'label' => 'Financial', 'icon' => 'fa-piggy-bank', 'about' => 'Payments, income, expenses, accounts, budgets and trips',
-            'levels' => [1 => 'See them', 2 => 'Add, edit and archive them, and reconcile accounts', 3 => 'Delete them, and undo a reconciliation'],
+            'label' => __('Financial'), 'icon' => 'fa-piggy-bank', 'about' => __('Payments, income, expenses, accounts, budgets and trips'),
+            'levels' => [1 => __('See them'), 2 => __('Add, edit and archive them, and reconcile accounts'), 3 => __('Delete them, and undo a reconciliation')],
         ],
         'module_reporting' => [
-            'label' => 'Reports', 'icon' => 'fa-chart-line', 'about' => 'The reports - each needs read access to what it reports on too',
-            'levels' => [1 => 'Open the reports'], 'max' => 1,
+            'label' => __('Reports'), 'icon' => 'fa-chart-line', 'about' => __('The reports - each needs read access to what it reports on too'),
+            'levels' => [1 => __('Open the reports')], 'max' => 1,
         ],
         'module_ai' => [
-            'label' => 'AI', 'icon' => 'fa-robot', 'about' => 'Rewording, summaries and drafts, by the AI providers in Admin - each needs access to what it works on too',
-            'levels' => [1 => 'Use AI'], 'max' => 1,
+            'label' => 'AI', 'icon' => 'fa-robot', 'about' => __('Rewording, summaries and drafts, by the AI providers in Admin - each needs access to what it works on too'),
+            'levels' => [1 => __('Use AI')], 'max' => 1,
         ],
     ];
 }
@@ -66,9 +66,11 @@ function roleModuleInfo() {
  */
 function roleModules() {
     global $mysqli;
-    static $modules = null;
-    if ($modules !== null) {
-        return $modules;
+    // Kept per language - the audit log reads the English ones (i18nEnglish())
+    static $cache = [];
+    $locale = i18nLocale();
+    if (isset($cache[$locale])) {
+        return $cache[$locale];
     }
     $info = roleModuleInfo();
     $modules = [];
@@ -77,10 +79,10 @@ function roleModules() {
         $name = $row['module_name'];
         $modules[intval($row['module_id'])] = ($info[$name] ?? [
             'label' => ucfirst(str_replace('module_', '', $name)), 'icon' => 'fa-cube', 'about' => (string) $row['module_description'],
-            'levels' => [1 => 'See it', 2 => 'Add, edit and archive', 3 => 'Delete'],
+            'levels' => [1 => __('See it'), 2 => __('Add, edit and archive'), 3 => __('Delete')],
         ]) + ['module_name' => $name, 'max' => 3];
     }
-    return $modules;
+    return $cache[$locale] = $modules;
 }
 
 /** Each role's levels - role_id => [module_id => level]. All roles when $role_ids is empty. */
@@ -157,7 +159,7 @@ function roleAgents(array $role_ids, $limit = 5) {
  */
 function roleAccessHtml(array $row) {
     if (intval($row['role_is_admin'])) {
-        return '<span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="Every part of ITFlow, every client, and Administration"><i class="fas fa-user-shield me-1"></i>Admin - everything</span>';
+        return '<span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal" title="' . escapeHtml(__('Every part of ITFlow, every client, and Administration')) . '"><i class="fas fa-user-shield me-1"></i>' . __('Admin - everything') . '</span>';
     }
     $pills = [];
     foreach (roleModules() as $module_id => $module) {
@@ -168,9 +170,9 @@ function roleAccessHtml(array $row) {
         $tone = ROLE_LEVEL_TONES[$level];
         $title = $module['label'] . ' - ' . implode('; ', array_slice($module['levels'], 0, $level));
         $pills[] = '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis fw-normal" title="' . escapeHtml($title) . '"><i class="fas fa-fw ' . $module['icon'] . ' me-1"></i>'
-            . escapeHtml($module['label']) . ($module['max'] > 1 ? ' · ' . ROLE_LEVELS[$level] : '') . '</span>';
+            . escapeHtml($module['label']) . ($module['max'] > 1 ? ' · ' . escapeHtml(_x(ROLE_LEVELS[$level], 'role level')) : '') . '</span>'; // i18n-dynamic - ROLE_LEVELS
     }
-    return $pills ? '<span class="d-inline-flex flex-wrap gap-1">' . implode('', $pills) . '</span>' : '<span class="small text-secondary">Nothing yet - it opens no part of ITFlow</span>';
+    return $pills ? '<span class="d-inline-flex flex-wrap gap-1">' . implode('', $pills) . '</span>' : __('<span class="small text-secondary">Nothing yet - it opens no part of ITFlow</span>');
 }
 
 /*
@@ -184,12 +186,12 @@ function roleFromInput(array $in, $role_id = 0) {
     $name = trim(mb_substr(preg_replace('/\s+/u', ' ', strip_tags((string) ($in['name'] ?? ''))), 0, 200));
     $description = trim(mb_substr(strip_tags((string) ($in['description'] ?? '')), 0, 200));
     if ($name === '') {
-        return [null, 'A role needs a name.'];
+        return [null, __('A role needs a name.')];
     }
     $taken = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT role_name, role_archived_at FROM user_roles
         WHERE LOWER(role_name) = LOWER('" . escapeSql($name) . "') AND role_id <> " . intval($role_id) . " LIMIT 1"));
     if ($taken) {
-        return [null, 'There is already a role called ' . $taken['role_name'] . ($taken['role_archived_at'] ? ' - it is archived, so restore it instead' : '') . '.'];
+        return [null, $taken['role_archived_at'] ? __('There is already a role called %s - it is archived, so restore it instead.', $taken['role_name']) : __('There is already a role called %s.', $taken['role_name'])];
     }
     $levels = [];
     foreach (roleModules() as $module_id => $module) {
@@ -210,12 +212,12 @@ function roleAdminBlocker(array $row) {
         return '';
     }
     if (intval($row['role_id']) === intval($session_user_role)) {
-        return 'It is your own role - another admin can change it.';
+        return __('It is your own role - another admin can change it.');
     }
     $others = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM users JOIN user_roles ON role_id = user_role_id
         WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL AND role_is_admin = 1 AND role_id <> " . intval($row['role_id'])))[0]);
     if ($others === 0 && intval($row['agents'])) {
-        return 'Its agents are the only admins - nobody would be left to run Admin.';
+        return __('Its agents are the only admins - nobody would be left to run Admin.');
     }
     return '';
 }
@@ -224,14 +226,14 @@ function roleAdminBlocker(array $row) {
 function roleArchiveBlocker(array $row) {
     global $session_user_role;
     if (intval($row['role_id']) === intval($session_user_role)) {
-        return 'It is your own role.';
+        return __('It is your own role.');
     }
     if (intval($row['agents'])) {
         $n = intval($row['agents']);
-        return $n . ' agent' . ($n === 1 ? ' has' : 's have') . ' it - give them another role first.';
+        return _n('%d agent has it - give them another role first.', '%d agents have it - give them another role first.', $n);
     }
     if (($n = userInvitesWithRole($row['role_id'])) > 0) {
-        return $n . ' invite' . ($n === 1 ? ' is' : 's are') . ' waiting with it - cancel ' . ($n === 1 ? 'it' : 'them') . ' in Users, Invited, and invite again with another role.';
+        return _n('%d invite is waiting with it - cancel it in Users, Invited, and invite again with another role.', '%d invites are waiting with it - cancel them in Users, Invited, and invite again with another role.', $n);
     }
     return '';
 }
@@ -247,7 +249,7 @@ function roleDeleteBlocker(array $row) {
     }
     if (intval($row['agents_archived'])) {
         $n = intval($row['agents_archived']);
-        return $n . ' archived agent' . ($n === 1 ? ' has' : 's have') . ' it - archive the role instead.';
+        return _n('%d archived agent has it - archive the role instead.', '%d archived agents have it - archive the role instead.', $n);
     }
     return '';
 }
@@ -265,7 +267,7 @@ function roleChangeText(array $before, array $fields) {
         $changes[] = 'description changed';
     }
     if (intval($before['role_is_admin'] ?? 0) !== $fields['admin']) {
-        $changes[] = $fields['admin'] ? 'made an admin role' : 'admin taken off';
+        $changes[] = $fields['admin'] ? __('made an admin role') : __('admin taken off');
     }
     foreach (roleModules() as $module_id => $module) {
         $was = intval($before['levels'][$module_id] ?? 0);
