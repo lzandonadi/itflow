@@ -39,47 +39,47 @@ ob_start();
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
 
     <?php if (!empty($network['network_archived_at'])) { ?>
-        <div class="alert alert-secondary py-2 small"><i class="fas fa-archive me-2"></i>Archived <?= escapeHtml(timeAgo($network['network_archived_at'])) ?></div>
+        <div class="alert alert-secondary py-2 small"><i class="fas fa-archive me-2"></i><?= escapeHtml(__('Archived %s', timeAgo($network['network_archived_at']))) ?></div>
     <?php } ?>
 
     <div class="mb-3">
         <?= networkUsageBar($usage) ?>
         <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
-            <span><i class="fas fa-fw fa-desktop me-1"></i><?= $usage['devices'] ?> device<?= $usage['devices'] === 1 ? '' : 's' ?></span>
+            <span><i class="fas fa-fw fa-desktop me-1"></i><?= _n('%d device', '%d devices', $usage['devices']) ?></span>
             <span><i class="fas fa-fw fa-list-ol me-1"></i><?= $usage['documented'] ?> documented</span>
             <?php if ($plan['next_free']) { ?>
-                <span>Next free <span class="font-monospace text-body"><?= escapeHtml($plan['next_free']) ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($plan['next_free']) ?>"><i class="far fa-copy"></i></button></span>
+                <span><?= __('Next free') ?> <span class="font-monospace text-body"><?= escapeHtml($plan['next_free']) ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($plan['next_free']) ?>"><i class="far fa-copy"></i></button></span>
             <?php } ?>
         </div>
     </div>
 
     <dl class="itflow-asset-dl mb-0">
         <?php if ($info) { ?>
-            <dt>Addresses</dt>
+            <dt><?= __('Addresses') ?></dt>
             <dd><span class="font-monospace small"><?= escapeHtml($info['first_host']) ?> - <?= escapeHtml($info['last_host']) ?></span> <span class="small text-body-secondary"><?= escapeHtml(networkSizeText($info)) ?></span></dd>
         <?php } ?>
-        <dt>Gateway</dt>
+        <dt><?= __('Gateway') ?></dt>
         <dd><?= $network['network_gateway'] ? '<span class="font-monospace">' . escapeHtml($network['network_gateway']) . '</span>' : '<span class="text-body-secondary">-</span>' ?></dd>
         <?php if ($dns) { ?>
-            <dt>DNS</dt>
+            <dt><?= __('DNS') ?></dt>
             <dd class="font-monospace"><?= escapeHtml(implode(', ', $dns)) ?></dd>
         <?php } ?>
         <?php if ($network['network_dhcp_range']) { ?>
-            <dt>DHCP</dt>
+            <dt><?= __('DHCP') ?></dt>
             <dd><?= $plan['pool'] ? '<span class="font-monospace">' . escapeHtml(networkRangeText(intToIpv4($plan['pool'][0]), intToIpv4($plan['pool'][1]))) . '</span>' : escapeHtml($network['network_dhcp_range']) ?></dd>
         <?php } ?>
         <?php if ($network['location_name']) { ?>
-            <dt>Site</dt>
+            <dt><?= __('Site') ?></dt>
             <dd><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=<?= intval($network['network_location_id']) ?>"><i class="fas fa-fw fa-map-marker-alt text-secondary me-1"></i><?= escapeHtml($network['location_name']) ?></a></dd>
         <?php } ?>
         <?php if ($network['vendor_name']) { ?>
-            <dt><?= $type === 'WAN' ? 'Provider' : 'Vendor' ?></dt>
+            <dt><?= $type === 'WAN' ? __('Provider') : __('Vendor') ?></dt>
             <dd class="min-w-0">
                 <?= vendorLink($network['network_vendor_id'], $network['vendor_name']) ?>
                 <?php $phone = contactPhoneLink($network['vendor_phone'], $network['vendor_phone_country_code'], $network['vendor_extension']);
@@ -92,17 +92,17 @@ ob_start();
             </dd>
         <?php } ?>
         <?php if ($network['network_description']) { ?>
-            <dt>About</dt>
+            <dt><?= __('About') ?></dt>
             <dd><?= escapeHtml($network['network_description']) ?></dd>
         <?php } ?>
         <?php if ($network_tags_display) { ?>
-            <dt>Tags</dt>
+            <dt><?= __('Tags') ?></dt>
             <dd><?= $network_tags_display ?></dd>
         <?php } ?>
     </dl>
 
     <?php if ($flagged || $plan['outside']) { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">To check</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('To check') ?></div>
         <ul class="list-unstyled small mb-0">
             <?php foreach (array_slice($flagged, 0, 5) as $row) { ?>
                 <li class="text-<?= $row['flags'][0][0] ?>-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><span class="font-monospace"><?= escapeHtml($row['ip']) ?></span> - <?= escapeHtml($row['flags'][0][1]) ?></li>
@@ -114,17 +114,17 @@ ob_start();
     <?php } ?>
 
     <?php if (trim((string) $network['network_notes']) !== '') { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">Notes</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('Notes') ?></div>
         <div class="itflow-service-text"><?= escapeHtml($network['network_notes']) ?></div>
     <?php } ?>
 
 </div>
 
 <div class="modal-footer">
-    <a class="btn btn-outline-secondary me-auto" href="<?= escapeHtml(networkUrl($network_id, $client_id)) ?>"><i class="fas fa-external-link-alt me-2"></i>Open</a>
+    <a class="btn btn-outline-secondary me-auto" href="<?= escapeHtml(networkUrl($network_id, $client_id)) ?>"><i class="fas fa-external-link-alt me-2"></i><?= __('Open') ?></a>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/network/network_ip_add.php?network_id=<?= $network_id ?>&next=1"><i class="fas fa-plus me-2"></i>Document an address</button>
-        <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/network/network_edit.php?id=<?= $network_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/network/network_ip_add.php?network_id=<?= $network_id ?>&next=1"><i class="fas fa-plus me-2"></i><?= __('Document an address') ?></button>
+        <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/network/network_edit.php?id=<?= $network_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
 </div>
 

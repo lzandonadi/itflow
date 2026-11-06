@@ -520,24 +520,24 @@ function softwareTemplateBilling(array $licenses, $product_id = 0) {
  */
 function softwareTemplateLicenseViews($has_product) {
     $views = [
-        '' => ['label' => 'All', 'icon' => 'fa-list', 'title' => 'Every current license made from it', 'test' => function () {
+        '' => ['label' => __('All'), 'icon' => 'fa-list', 'title' => __('Every current license made from it'), 'test' => function () {
             return true;
         }],
-        'over' => ['label' => 'Over seats', 'icon' => 'fa-exclamation-triangle', 'title' => 'More devices and users than seats bought - a true-up to bill', 'test' => function ($row) {
+        'over' => ['label' => __('Over seats'), 'icon' => 'fa-exclamation-triangle', 'title' => __('More devices and users than seats bought - a true-up to bill'), 'test' => function ($row) {
             return $row['seats']['state'] === 'over';
         }],
-        'spare' => ['label' => 'Spare seats', 'icon' => 'fa-chair', 'title' => 'Seats bought that nobody is on - seats to free', 'test' => function ($row) {
+        'spare' => ['label' => __('Spare seats'), 'icon' => 'fa-chair', 'title' => __('Seats bought that nobody is on - seats to free'), 'test' => function ($row) {
             return $row['seats']['total'] > 0 && $row['seats']['used'] < $row['seats']['total'];
         }],
-        'renewing' => ['label' => 'Renewing soon', 'icon' => 'fa-hourglass-half', 'title' => 'Renewing in the next 30 days', 'test' => function ($row) {
+        'renewing' => ['label' => __('Renewing soon'), 'icon' => 'fa-hourglass-half', 'title' => __('Renewing in the next 30 days'), 'test' => function ($row) {
             return $row['renewal'] && $row['renewal']['state'] === 'soon';
         }],
-        'expired' => ['label' => 'Expired', 'icon' => 'fa-calendar-times', 'title' => 'Past their renewal date', 'test' => function ($row) {
+        'expired' => ['label' => __('Expired'), 'icon' => 'fa-calendar-times', 'title' => __('Past their renewal date'), 'test' => function ($row) {
             return $row['renewal'] && $row['renewal']['state'] === 'expired';
         }],
     ];
     if ($has_product) {
-        $views['unbilled'] = ['label' => 'Not billed', 'icon' => 'fa-file-invoice-dollar', 'title' => "Not on the client's recurring invoice", 'test' => function ($row) {
+        $views['unbilled'] = ['label' => __('Not billed'), 'icon' => 'fa-file-invoice-dollar', 'title' => __('Not on the client\'s recurring invoice'), 'test' => function ($row) {
             return empty($row['billing']);
         }];
     }
@@ -576,7 +576,7 @@ function softwareTemplateTrueUp($software_template_id, array $seats_by_id) {
 
 /* Seats in words - "12 seats", "no seat limit". */
 function softwareTemplateSeatsText($seats) {
-    return $seats === null ? 'no seat limit' : intval($seats) . ' seat' . (intval($seats) === 1 ? '' : 's');
+    return $seats === null ? __('no seat limit') : _n('%d seat', '%d seats', intval($seats));
 }
 
 /*
@@ -615,11 +615,11 @@ function softwareTemplateBill($software_template_id, $software_id, $recurring_in
     $template = softwareTemplateRow($software_template_id);
     $product = $template && intval($template['software_template_product_id']) ? productRow($template['software_template_product_id']) : null;
     if (!$product) {
-        $error = 'It is not sold as a product - pick the product on the template first.';
+        $error = __('It is not sold as a product - pick the product on the template first.');
         return null;
     }
     if ($product['product_archived_at']) {
-        $error = 'The product it is sold as is archived - restore it, or pick another on the template.';
+        $error = __('The product it is sold as is archived - restore it, or pick another on the template.');
         return null;
     }
     $software_id = intval($software_id);
@@ -631,12 +631,12 @@ function softwareTemplateBill($software_template_id, $software_id, $recurring_in
         $count = 'used';
     }
     if (!$client_id) {
-        $error = 'That license is gone, or not made from this template.';
+        $error = __('That license is gone, or not made from this template.');
         return null;
     }
     if (!mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM recurring_invoices WHERE recurring_invoice_id = $recurring_invoice_id
         AND recurring_invoice_client_id = $client_id AND recurring_invoice_archived_at IS NULL"))) {
-        $error = "That isn't one of the client's recurring invoices.";
+        $error = __('That isn\'t one of the client\'s recurring invoices.');
         return null;
     }
     return billingItemSave('recurring', $recurring_invoice_id, [

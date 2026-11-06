@@ -280,8 +280,8 @@ if (isset($_GET['quick_pick_options'])) {
             $options[] = ['value' => $importance, 'label' => $importance, 'color' => $colors[$importance], 'description' => $descriptions[$importance]];
         }
     } elseif ($field === 'network_type') {
-        foreach (NETWORK_TYPES as $type => [$icon, $tone, $hint]) {
-            $options[] = ['value' => $type, 'label' => $type, 'icon' => "fas $icon", 'color' => networkToneColor($tone), 'description' => $hint];
+        foreach (networkTypes() as $type => [$icon, $tone, $hint]) {
+            $options[] = ['value' => $type, 'label' => networkTypeName($type), 'icon' => "fas $icon", 'color' => networkToneColor($tone), 'description' => $hint];
         }
     } elseif (in_array($field, ASSET_QUICK_FIELDS, true) || $field === 'contact_location') {
         // Locations and contacts are the client's own - functions/asset.php

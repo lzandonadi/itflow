@@ -536,20 +536,20 @@ function portalAssetScopeSql() {
 function portalAssetGroups() {
     // By the type's group (ASSET_TYPES, functions/asset_type.php)
     $kinds = [
-        'computers' => ['Computers', 'fa-desktop', assetTypesInGroup('workstation')],
-        'servers' => ['Servers', 'fa-server', assetTypesInGroup('server', 'virtual')],
-        'network' => ['Network', 'fa-network-wired', assetTypesInGroup('network')],
-        'power' => ['Power', 'fa-car-battery', assetTypesInGroup('power')],
-        'phones' => ['Phones & tablets', 'fa-mobile-alt', assetTypesInGroup('mobile')],
+        'computers' => [__('Computers'), 'fa-desktop', assetTypesInGroup('workstation')],
+        'servers' => [__('Servers'), 'fa-server', assetTypesInGroup('server', 'virtual')],
+        'network' => [__('Network'), 'fa-network-wired', assetTypesInGroup('network')],
+        'power' => [__('Power'), 'fa-car-battery', assetTypesInGroup('power')],
+        'phones' => [__('Phones & tablets'), 'fa-mobile-alt', assetTypesInGroup('mobile')],
     ];
-    $groups = ['all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1']];
+    $groups = ['all' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => '1 = 1']];
     $taken = [];
     foreach ($kinds as $key => [$label, $icon, $types]) {
         $in = "'" . implode("', '", array_map('escapeSql', $types)) . "'";
         $groups[$key] = ['label' => $label, 'icon' => $icon, 'where' => "asset_type IN ($in)"];
         $taken[] = $in;
     }
-    $groups['other'] = ['label' => 'Other', 'icon' => 'fa-print', 'where' => "asset_type NOT IN (" . implode(', ', $taken) . ")"];
+    $groups['other'] = ['label' => __('Other'), 'icon' => 'fa-print', 'where' => "asset_type NOT IN (" . implode(', ', $taken) . ")"];
     return $groups;
 }
 

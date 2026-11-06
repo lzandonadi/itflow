@@ -16,7 +16,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i>Assign Contact to <strong><?= $count ?></strong> asset<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-user-check me-2"></i><?= _n('Assign Contact to %s asset', 'Assign Contact to %s assets', $count, '<strong>' . $count . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -26,11 +26,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Contact</label>
+            <label><?= __('Contact') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                 <select class="form-select select2" name="bulk_contact_id">
-                    <option value="">- Contact -</option>
+                    <option value=""><?= __('- Contact -') ?></option>
                     <?php
 
                     $sql = mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_client_id, contact_photo, contact_title FROM contacts WHERE contact_archived_at IS NULL AND contact_client_id = $client_id ORDER BY contact_name ASC");
@@ -49,8 +49,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_assign_asset_contact" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Assign Contact</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_assign_asset_contact" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Assign Contact') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

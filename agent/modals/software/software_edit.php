@@ -12,7 +12,7 @@ enforceUserPermission('module_support', 2);
 $software_id = intval($_GET['id'] ?? 0);
 $row = softwareRow($software_id);
 if (!$row) {
-    echo json_encode(['error' => 'That license no longer exists.']);
+    echo json_encode(['error' => __('That license no longer exists.')]);
     exit;
 }
 
@@ -42,7 +42,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-cube me-2"></i>Editing license: <strong><?= $software_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-cube me-2"></i><?= __('Editing license:') ?> <strong><?= $software_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -53,8 +53,8 @@ ob_start();
         <?php require 'software_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_software" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_software" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

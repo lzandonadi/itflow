@@ -54,7 +54,7 @@ function interfaceForRequest($interface_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = interfaceRow($interface_id);
     if (!$row) {
-        flashAlert('That interface no longer exists.', 'error');
+        flashAlert(__('That interface no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['asset_client_id']);
@@ -66,17 +66,17 @@ function interfaceForRequest($interface_id, $level) {
 function interfaceForModal($interface_id, $level = 2) {
     global $client_id;
     if (!networkCan($level)) {
-        echo json_encode(['error' => 'Your role cannot change interfaces.']);
+        echo json_encode(['error' => __('Your role cannot change interfaces.')]);
         exit;
     }
     $row = interfaceRow($interface_id);
     if (!$row) {
-        echo json_encode(['error' => 'That interface no longer exists.']);
+        echo json_encode(['error' => __('That interface no longer exists.')]);
         exit;
     }
     $client_id = intval($row['asset_client_id']);
     if (!hasClientAccess($client_id)) {
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     return $row;
@@ -88,7 +88,7 @@ function interfaceAssetForRequest($asset_id, $level = 2) {
     enforceUserPermission('module_support', $level);
     $asset = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type, asset_client_id FROM assets WHERE asset_id = " . intval($asset_id) . " LIMIT 1"));
     if (!$asset) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($asset['asset_client_id']);
@@ -100,17 +100,17 @@ function interfaceAssetForRequest($asset_id, $level = 2) {
 function interfaceAssetForModal($asset_id) {
     global $mysqli, $client_id;
     if (!networkCan(2)) {
-        echo json_encode(['error' => 'Your role cannot change interfaces.']);
+        echo json_encode(['error' => __('Your role cannot change interfaces.')]);
         exit;
     }
     $asset = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type, asset_client_id FROM assets WHERE asset_id = " . intval($asset_id) . " LIMIT 1"));
     if (!$asset) {
-        echo json_encode(['error' => 'That asset no longer exists.']);
+        echo json_encode(['error' => __('That asset no longer exists.')]);
         exit;
     }
     $client_id = intval($asset['asset_client_id']);
     if (!hasClientAccess($client_id)) {
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     return $asset;
@@ -252,7 +252,7 @@ function interfaceFormSet($post, $asset, $interface_id, &$error = '', &$warnings
 
     $name = trim((string) ($post['name'] ?? ''));
     if ($name === '') {
-        $error = 'An interface needs a name or port number.';
+        $error = __('An interface needs a name or port number.');
         return '';
     }
     $name_sql = escapeSql(mb_substr($name, 0, 200));
@@ -273,12 +273,12 @@ function interfaceFormSet($post, $asset, $interface_id, &$error = '', &$warnings
     } else {
         $ip_normal = normalizeIpAddress($ip);
         if ($ip_normal === false) {
-            $error = '<strong>' . $ip . '</strong> is not an IP address.';
+            $error = __('%s is not an IP address.', '<strong>' . $ip . '</strong>');
             return '';
         }
         $ip = $ip_normal;
         if ($network && networkSubnetInfo($network['network']) && !isIpInSubnet($ip, $network['network'])) {
-            $error = '<strong>' . $ip . '</strong> is outside ' . $network['network_name'] . ' (' . $network['network'] . ').';
+            $error = __('%1$s is outside %2$s (%3$s).', '<strong>' . $ip . '</strong>', $network['network_name'], $network['network']);
             return '';
         }
         if ($network_id) {
@@ -291,17 +291,17 @@ function interfaceFormSet($post, $asset, $interface_id, &$error = '', &$warnings
 
     $mac = normalizeMacAddress($post['mac'] ?? '');
     if ($mac === false) {
-        $error = '<strong>' . trim($post['mac']) . '</strong> is not a MAC address - it is six pairs, like 00:1A:2B:3C:4D:5E.';
+        $error = __('%s is not a MAC address - it is six pairs, like 00:1A:2B:3C:4D:5E.', '<strong>' . trim($post['mac']) . '</strong>');
         return '';
     }
 
     $other = [];
-    foreach (['nat_ip' => 'The NAT address', 'ipv6' => 'The IPv6 address'] as $field => $label) {
+    foreach (['nat_ip' => __('The NAT address'), 'ipv6' => __('The IPv6 address')] as $field => $label) {
         $value = trim((string) ($post[$field] ?? ''));
         if ($value !== '') {
             $normal = normalizeIpAddress($value);
             if ($normal === false || ($field === 'ipv6' && strpos($normal, ':') === false)) {
-                $error = $label . ' <strong>' . $value . '</strong> is not ' . ($field === 'ipv6' ? 'an IPv6 address.' : 'an IP address.');
+                $error = $field === 'ipv6' ? __('%1$s %2$s is not an IPv6 address.', $label, '<strong>' . $value . '</strong>') : __('%1$s %2$s is not an IP address.', $label, '<strong>' . $value . '</strong>');
                 return '';
             }
             $value = $normal;
@@ -418,7 +418,7 @@ function interfaceIpHtml($ip) {
         return '<span class="text-body-secondary">-</span>';
     }
     if (strtoupper($ip) === 'DHCP') {
-        return '<span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal">DHCP</span>';
+        return '<span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal">' . __('DHCP') . '</span>';
     }
     return '<span class="font-monospace">' . escapeHtml($ip) . '</span>';
 }

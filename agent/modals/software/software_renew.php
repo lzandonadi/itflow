@@ -26,7 +26,7 @@ foreach (array_unique($ids) as $software_id) {
     $licenses[] = $row;
 }
 if (!$licenses) {
-    echo json_encode(['error' => 'Tick the licenses to renew first.']);
+    echo json_encode(['error' => __('Tick the licenses to renew first.')]);
     exit;
 }
 
@@ -44,7 +44,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-redo-alt me-2"></i>Renew <?= $single ? '<strong>' . escapeHtml($licenses[0]['software_name']) . '</strong>' : '<strong>' . count($licenses) . '</strong> licenses' ?></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-redo-alt me-2"></i><?= $single ? __('Renew %s', '<strong>' . escapeHtml($licenses[0]['software_name']) . '</strong>') : _n('Renew <strong>%d</strong> license', 'Renew <strong>%d</strong> licenses', count($licenses)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="/agent/post.php" method="post" autocomplete="off" data-renew-form>
@@ -54,14 +54,14 @@ ob_start();
 
     <div class="modal-body">
 
-        <label class="form-label">Renew for</label>
-        <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Term">
+        <label class="form-label"><?= __('Renew for') ?></label>
+        <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="<?= escapeHtml(__('Term')) ?>">
             <?php foreach (SOFTWARE_RENEWAL_TERMS as $term => $term_label) { ?>
                 <input type="radio" class="btn-check" name="renew_term" id="renewTerm<?= $term ?>" value="<?= $term ?>" <?= $term === $default_term ? 'checked' : '' ?>>
-                <label class="btn btn-outline-primary btn-sm" for="renewTerm<?= $term ?>"><?= $term_label ?></label>
+                <label class="btn btn-outline-primary btn-sm" for="renewTerm<?= $term ?>"><?= escapeHtml(softwareRenewalTermLabel($term)) ?></label>
             <?php } ?>
             <input type="radio" class="btn-check" name="renew_term" id="renewTermDate" value="date">
-            <label class="btn btn-outline-secondary btn-sm" for="renewTermDate"><i class="fas fa-calendar-alt me-1"></i>A date</label>
+            <label class="btn btn-outline-secondary btn-sm" for="renewTermDate"><i class="fas fa-calendar-alt me-1"></i><?= __('A date') ?></label>
         </div>
         <div class="mb-3" data-renew-date-box hidden>
             <div class="input-group">
@@ -69,11 +69,11 @@ ob_start();
                 <input type="date" class="form-control" name="renew_date" max="2999-12-31" data-renew-date>
             </div>
         </div>
-        <div class="form-text mb-3">Each date moves on from its current renewal date, or from today if it has already passed.</div>
+        <div class="form-text mb-3"><?= __('Each date moves on from its current renewal date, or from today if it has already passed.') ?></div>
 
         <div class="table-responsive border rounded mb-3">
             <table class="table table-sm align-middle mb-0">
-                <thead class="table-light text-nowrap"><tr><th class="ps-2">License</th><th>Renews now</th><th class="pe-2">New date</th></tr></thead>
+                <thead class="table-light text-nowrap"><tr><th class="ps-2"><?= __('License') ?></th><th><?= __('Renews now') ?></th><th class="pe-2"><?= __('New date') ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($licenses as $row) {
                     $renewal = softwareRenewal($row['software_expire']);
@@ -96,7 +96,7 @@ ob_start();
                                 <?= escapeHtml($renewal['date']) ?>
                                 <div class="small text-<?= $renewal['tone'] === 'success' ? 'body-secondary' : $renewal['tone'] . '-emphasis' ?>"><?= escapeHtml($renewal['text']) ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">No date</span>
+                                <span class="text-body-secondary"><?= __('No date') ?></span>
                             <?php } ?>
                         </td>
                         <td class="text-nowrap fw-semibold text-success-emphasis pe-2" data-renew-next='<?= escapeHtml(json_encode($next)) ?>'><?= $next[$default_term] ?></td>
@@ -106,16 +106,16 @@ ob_start();
             </table>
         </div>
 
-        <label class="form-label">New order / invoice reference</label>
+        <label class="form-label"><?= __('New order / invoice reference') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-receipt"></i></span>
-            <input type="text" class="form-control" name="purchase_reference" maxlength="200" placeholder="Leave blank to keep <?= $single && $licenses[0]['software_purchase_reference'] ? escapeHtml($licenses[0]['software_purchase_reference']) : 'what each has' ?>">
+            <input type="text" class="form-control" name="purchase_reference" maxlength="200" placeholder="<?= escapeHtml(__('Leave blank to keep %s', $single && $licenses[0]['software_purchase_reference'] ? $licenses[0]['software_purchase_reference'] : __('what each has'))) ?>">
         </div>
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="renew_software" class="btn btn-primary text-bold"><i class="fas fa-redo-alt me-2"></i>Renew</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="renew_software" class="btn btn-primary text-bold"><i class="fas fa-redo-alt me-2"></i><?= __('Renew') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

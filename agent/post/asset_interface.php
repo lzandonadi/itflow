@@ -14,10 +14,12 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 
 /** What saving an interface says - its name, and anything worth knowing (the address is on another device too). */
 function interfaceSavedMessage($verb, $name, $warnings) {
+    $created = $verb === 'created';
     if ($warnings) {
-        flashAlert("Interface <strong>$name</strong> $verb - " . implode('; ', $warnings) . '.', 'warning');
+        $warning_text = implode('; ', $warnings);
+        flashAlert($created ? __('Interface <strong>%1$s</strong> created - %2$s.', $name, $warning_text) : __('Interface <strong>%1$s</strong> saved - %2$s.', $name, $warning_text), 'warning');
     } else {
-        flashAlert("Interface <strong>$name</strong> $verb");
+        flashAlert($created ? __('Interface <strong>%s</strong> created', $name) : __('Interface <strong>%s</strong> saved', $name));
     }
 }
 
@@ -115,7 +117,7 @@ if (isset($_GET['disconnect_asset_interface'])) {
         logAudit("Asset Interface", "Edit", "$session_name disconnected interface " . escapeSql($row['interface_name']) . " on asset " . escapeSql($row['asset_name']) . " from " . escapeSql($row['link']['asset_name'] . ' ' . $row['link']['interface_name']), $client_id, intval($row['asset_id']));
     }
 
-    flashAlert("<strong>" . $row['asset_name'] . ' ' . $row['interface_name'] . "</strong> disconnected");
+    flashAlert(__('<strong>%1$s %2$s</strong> disconnected', $row['asset_name'], $row['interface_name']));
 
     redirect();
 
@@ -131,7 +133,7 @@ if (isset($_GET['primary_asset_interface'])) {
 
     logAudit("Asset Interface", "Edit", "$session_name made interface " . escapeSql($row['interface_name']) . " the primary of asset " . escapeSql($row['asset_name']), $client_id, intval($row['asset_id']));
 
-    flashAlert("<strong>" . $row['interface_name'] . "</strong> is the primary interface of " . $row['asset_name']);
+    flashAlert(__('<strong>%1$s</strong> is the primary interface of %2$s', $row['interface_name'], $row['asset_name']));
 
     redirect();
 
@@ -148,7 +150,7 @@ if (isset($_GET['delete_asset_interface'])) {
 
     logAudit("Asset Interface", "Delete", "$session_name deleted interface " . escapeSql($row['interface_name']) . " from asset " . escapeSql($row['asset_name']), $client_id, intval($row['asset_id']));
 
-    flashAlert("Interface <strong>" . $row['interface_name'] . "</strong> deleted", 'error');
+    flashAlert(__('Interface <strong>%s</strong> deleted', $row['interface_name']), 'error');
 
     redirect();
 
@@ -164,7 +166,7 @@ if (isset($_POST['add_asset_multiple_interfaces'])) {
 
     $count = intval($_POST['interfaces'] ?? 0);
     if ($count < 1 || $count > 128) {
-        flashAlert('Add from 1 to 128 interfaces at a time.', 'error');
+        flashAlert(__('Add from 1 to 128 interfaces at a time.'), 'error');
         redirect();
     }
     $names = interfaceSeriesNames(trim((string) ($_POST['name_prefix'] ?? '')), $_POST['interface_start'] ?? 1, $count, $_POST['pad'] ?? 0);
@@ -194,7 +196,7 @@ if (isset($_POST['add_asset_multiple_interfaces'])) {
 
     logAudit("Asset Interface", "Bulk Create", "$session_name created $added interface(s) " . escapeSql($names[0] . ' - ' . end($names)) . " on asset " . escapeSql($asset['asset_name']), $client_id, $asset_id);
 
-    flashAlert("Added <strong>$added</strong> interface" . ($added === 1 ? '' : 's') . " to <strong>" . $asset['asset_name'] . "</strong>" . ($skipped ? " - $skipped already there" : ''));
+    flashAlert(_n('Added <strong>%1$d</strong> interface to %2$s', 'Added <strong>%1$d</strong> interfaces to %2$s', $added, $added, '<strong>' . $asset['asset_name'] . '</strong>') . ($skipped ? ' - ' . __('%d already there', $skipped) : ''));
 
     redirect();
 
@@ -213,7 +215,7 @@ if (isset($_POST['bulk_edit_asset_interface_type'])) {
         $count++;
     }
 
-    flashAlert("Type set to <strong>" . ($type ?: 'none') . "</strong> on <strong>$count</strong> interface" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Type set to %1$s on <strong>%2$d</strong> interface', 'Type set to %1$s on <strong>%2$d</strong> interfaces', $count, '<strong>' . ($type ?: __('none')) . '</strong>', $count));
 
     redirect();
 
@@ -226,7 +228,7 @@ if (isset($_POST['bulk_edit_asset_interface_network'])) {
     $network_id = intval($_POST['bulk_network'] ?? 0);
     $network = $network_id ? networkRow($network_id) : null;
     if ($network_id && !$network) {
-        flashAlert('That network no longer exists.', 'error');
+        flashAlert(__('That network no longer exists.'), 'error');
         redirect();
     }
 
@@ -247,9 +249,9 @@ if (isset($_POST['bulk_edit_asset_interface_network'])) {
     }
 
     // The network is named once an interface took it - one that fits none of them may be a client this agent can't see
-    $network_label = !$network ? 'none' : ($count ? escapeHtml($network['network_name']) : 'that network');
-    flashAlert("Network set to <strong>$network_label</strong> on <strong>$count</strong> interface" . ($count === 1 ? '' : 's')
-        . ($outside ? " - $outside ha" . ($outside === 1 ? 's an address' : 've addresses') . " outside " . escapeHtml($network['network']) : ''), $outside ? 'warning' : 'success');
+    $network_label = !$network ? __('none') : ($count ? escapeHtml($network['network_name']) : __('that network'));
+    flashAlert(_n('Network set to %1$s on <strong>%2$d</strong> interface', 'Network set to %1$s on <strong>%2$d</strong> interfaces', $count, '<strong>' . $network_label . '</strong>', $count)
+        . ($outside ? ' - ' . _n('%1$d has an address outside %2$s', '%1$d have addresses outside %2$s', $outside, $outside, escapeHtml($network['network'])) : ''), $outside ? 'warning' : 'success');
 
     redirect();
 
@@ -266,7 +268,7 @@ if (isset($_POST['bulk_edit_asset_interface_ip_dhcp'])) {
         $count++;
     }
 
-    flashAlert("Set <strong>$count</strong> interface" . ($count === 1 ? '' : 's') . " to <strong>DHCP</strong>");
+    flashAlert(_n('Set <strong>%d</strong> interface to <strong>DHCP</strong>', 'Set <strong>%d</strong> interfaces to <strong>DHCP</strong>', $count));
 
     redirect();
 
@@ -285,7 +287,7 @@ if (isset($_POST['bulk_edit_asset_interface_vlans'])) {
         $count++;
     }
 
-    flashAlert("VLANs set to <strong>" . ($vlans ?: 'none') . "</strong> on <strong>$count</strong> interface" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('VLANs set to %1$s on <strong>%2$d</strong> interface', 'VLANs set to %1$s on <strong>%2$d</strong> interfaces', $count, '<strong>' . ($vlans ?: __('none')) . '</strong>', $count));
 
     redirect();
 
@@ -304,7 +306,7 @@ if (isset($_POST['bulk_disconnect_asset_interfaces'])) {
         }
     }
 
-    flashAlert("Disconnected <strong>$count</strong> interface" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Disconnected <strong>%d</strong> interface', 'Disconnected <strong>%d</strong> interfaces', $count));
 
     redirect();
 
@@ -321,7 +323,7 @@ if (isset($_POST['bulk_delete_asset_interfaces'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> interface" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> interface', 'Deleted <strong>%d</strong> interfaces', $count), 'error');
 
     redirect();
 
@@ -338,15 +340,15 @@ if (isset($_POST['import_client_asset_interfaces_csv'])) {
     $asset_id = intval($asset['asset_id']);
 
     if (empty($_FILES['file']['tmp_name'])) {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
     if (strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        flashAlert("Bad file extension - only .csv files are accepted.", 'error');
+        flashAlert(__('Bad file extension - only .csv files are accepted.'), 'error');
         redirect();
     }
     if ($_FILES['file']['size'] < 1) {
-        flashAlert("Bad file size (empty file?).", 'error');
+        flashAlert(__('Bad file size (empty file?).'), 'error');
         redirect();
     }
 
@@ -354,7 +356,7 @@ if (isset($_POST['import_client_asset_interfaces_csv'])) {
     $header = fgetcsv($file, 1000, ',');
     if (!is_array($header) || !in_array(count($header), [8, 9], true)) {
         fclose($file);
-        flashAlert("Bad column count - use the template: " . implode(', ', INTERFACE_CSV_COLUMNS) . " (VLANs may be left off).", 'error');
+        flashAlert(__('Bad column count - use the template: %s (VLANs may be left off).', implode(', ', INTERFACE_CSV_COLUMNS)), 'error');
         redirect();
     }
 
@@ -399,7 +401,7 @@ if (isset($_POST['import_client_asset_interfaces_csv'])) {
 
     logAudit("Asset Interface", "Import", "$session_name imported $row_count interface(s) to asset " . escapeSql($asset['asset_name']) . " via CSV file", $client_id, $asset_id);
 
-    $message = "<strong>$row_count</strong> interface" . ($row_count === 1 ? '' : 's') . " added to <strong>" . $asset['asset_name'] . "</strong>";
+    $message = _n('%1$s interface added to %2$s', '%1$s interfaces added to %2$s', $row_count, "<strong>$row_count</strong>", '<strong>' . $asset['asset_name'] . '</strong>');
     if ($duplicate_count) {
         $message .= ", <strong>$duplicate_count</strong> already there";
     }

@@ -20,7 +20,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-upload me-2"></i>Import IP Addresses</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-upload me-2"></i><?= __('Import IP Addresses') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -28,18 +28,18 @@ ob_start();
     <input type="hidden" name="network_id" value="<?= $network_id ?>">
 
     <div class="modal-body">
-        <p><strong>Format csv file with headings &amp; data:</strong><br>IP Address, Hostname, Description, Type, MAC <span class="text-secondary">(Type and MAC may be left off - an address is Static, Reservation, Reserved or Virtual)</span></p>
-        <p class="text-secondary mb-0">Importing into <strong><?= $network_name ?></strong> (<span class="font-monospace"><?= $network ?></span>). Rows that aren't a valid address, fall outside the subnet, or are already documented here are skipped.</p>
+        <p><strong><?= __('Format csv file with headings &amp; data:') ?></strong><br>IP Address, Hostname, Description, Type, MAC <span class="text-secondary">(<?= __('Type and MAC may be left off - an address is Static, Reservation, Reserved or Virtual') ?>)</span></p>
+        <p class="text-secondary mb-0"><?= __('Importing into') ?> <strong><?= $network_name ?></strong> (<span class="font-monospace"><?= $network ?></span>). <?= __('Rows that aren\'t a valid address, fall outside the subnet, or are already documented here are skipped.') ?></p>
         <hr>
         <div class="mb-3 my-4">
             <input type="file" class="form-control" name="file" accept=".csv" required>
         </div>
         <hr>
-        <div>Download: <a class="text-bold" href="post.php?download_network_ips_csv_template=<?= $network_id ?>">sample csv template</a></div>
+        <div><?= __('Download:') ?> <a class="text-bold" href="post.php?download_network_ips_csv_template=<?= $network_id ?>"><?= __('sample csv template') ?></a></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="import_network_ips_csv" class="btn btn-primary text-bold"><i class="fa fa-upload me-2"></i>Import</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="import_network_ips_csv" class="btn btn-primary text-bold"><i class="fa fa-upload me-2"></i><?= __('Import') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

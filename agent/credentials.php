@@ -69,12 +69,12 @@ if (isset($_GET['tags']) && is_array($_GET['tags']) && !empty($_GET['tags'])) {
 // Which ones - the pills along the top
 $rotate_days = CREDENTIAL_ROTATE_DAYS;
 $shows = [
-    '' => ['label' => 'All', 'where' => ''],
-    'starred' => ['label' => 'Starred', 'icon' => 'fa-star', 'where' => 'c.credential_favorite = 1'],
-    'otp' => ['label' => 'With 2FA', 'icon' => 'fa-clock', 'where' => "c.credential_otp_secret <> ''"],
-    'nootp' => ['label' => 'No 2FA', 'icon' => 'fa-unlock', 'where' => "(c.credential_otp_secret IS NULL OR c.credential_otp_secret = '')"],
-    'due' => ['label' => "Not changed in $rotate_days days", 'icon' => 'fa-history', 'where' => "(c.credential_password_changed_at IS NULL OR c.credential_password_changed_at < NOW() - INTERVAL $rotate_days DAY)"],
-    'shared' => ['label' => 'Shared', 'icon' => 'fa-share-alt', 'where' => "c.credential_id IN (SELECT item_related_id FROM shared_items WHERE item_type = 'Credential' AND " . shareOpenSql() . ")"],
+    '' => ['label' => __('All'), 'where' => ''],
+    'starred' => ['label' => __('Starred'), 'icon' => 'fa-star', 'where' => 'c.credential_favorite = 1'],
+    'otp' => ['label' => __('With 2FA'), 'icon' => 'fa-clock', 'where' => "c.credential_otp_secret <> ''"],
+    'nootp' => ['label' => __('No 2FA'), 'icon' => 'fa-unlock', 'where' => "(c.credential_otp_secret IS NULL OR c.credential_otp_secret = '')"],
+    'due' => ['label' => __('Not changed in %d days', $rotate_days), 'icon' => 'fa-history', 'where' => "(c.credential_password_changed_at IS NULL OR c.credential_password_changed_at < NOW() - INTERVAL $rotate_days DAY)"],
+    'shared' => ['label' => __('Shared'), 'icon' => 'fa-share-alt', 'where' => "c.credential_id IN (SELECT item_related_id FROM shared_items WHERE item_type = 'Credential' AND " . shareOpenSql() . ")"],
 ];
 $show = isset($shows[$_GET['show'] ?? '']) ? ($_GET['show'] ?? '') : '';
 $show_query = $shows[$show]['where'] ? 'AND ' . $shows[$show]['where'] : '';
@@ -149,36 +149,36 @@ $filter_url = function ($changes) use ($client_url) {
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-key me-2"></i>Credentials</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-key me-2"></i><?= __('Credentials') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit || $num_rows[0]) { ?>
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/credential/credential_add.php?<?= $client_url ?>">
-                        <i class="fas fa-plus me-2"></i>New Credential
+                        <i class="fas fa-plus me-2"></i><?= __('New Credential') ?>
                     </button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <?php if ($can_request) { ?>
                         <a class="dropdown-item text-dark ajax-modal" href="#" data-modal-url="modals/share/share_add.php?type=Request&amp;client_id=<?= intval($client_id) ?>">
-                            <i class="fa fa-fw fa-inbox me-2"></i>Ask the client for a login
+                            <i class="fa fa-fw fa-inbox me-2"></i><?= __('Ask the client for a login') ?>
                         </a>
                     <?php } ?>
                     <?php if ($client_url && $can_edit) { ?>
                         <a class="dropdown-item text-dark ajax-modal" href="#" data-modal-url="modals/credential/credential_import.php?<?= $client_url ?>">
-                            <i class="fa fa-fw fa-upload me-2"></i>Import
+                            <i class="fa fa-fw fa-upload me-2"></i><?= __('Import') ?>
                         </a>
                     <?php } ?>
                     <?php if ($num_rows[0] > 0) { ?>
                         <a class="dropdown-item text-dark ajax-modal" href="#"
                             data-modal-url="<?= buildExportModalUrl('modals/credential/credential_export.php', ['client_id', 'client', 'tags', 'archived', 'q']) ?>">
-                            <i class="fa fa-fw fa-download me-2"></i>Export
+                            <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                         </a>
                     <?php } ?>
                     <?php if (reportCanOpen('credential_rotation')) { ?>
                     <a class="dropdown-item text-dark" href="reports/credential_rotation.php<?= $client_url ? '?client_id=' . intval($client_id) : '' ?>">
-                        <i class="fa fa-fw fa-history me-2"></i>Rotation report
+                        <i class="fa fa-fw fa-history me-2"></i><?= __('Rotation report') ?>
                     </a>
                     <?php } ?>
                 </div>
@@ -196,12 +196,12 @@ $filter_url = function ($changes) use ($client_url) {
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search name, link, notes, asset...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search name, link, notes, asset...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Tags -')) ?>" multiple>
                         <?php
                         // Tags in use on credentials in this scope, plus any already picked
                         $sql_tags_filter = mysqli_query($mysqli, "
@@ -223,7 +223,7 @@ $filter_url = function ($changes) use ($client_url) {
                 <div class="col-lg-3 col-md-6">
                     <?php if ($client_url) { ?>
                         <select class="form-select select2" name="location" onchange="this.form.submit()">
-                            <option value="">- All Asset Locations -</option>
+                            <option value=""><?= __('- All Asset Locations -') ?></option>
                             <?php
                             $sql_locations_filter = mysqli_query($mysqli, "SELECT location_id, location_name FROM locations WHERE location_client_id = $client_id AND location_archived_at IS NULL ORDER BY location_name ASC");
                             while ($row = mysqli_fetch_assoc($sql_locations_filter)) {
@@ -233,7 +233,7 @@ $filter_url = function ($changes) use ($client_url) {
                         </select>
                     <?php } else { ?>
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="" <?php if ($client == "") { echo "selected"; } ?>>- All Clients -</option>
+                            <option value="" <?php if ($client == "") { echo "selected"; } ?>><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "
                                 SELECT DISTINCT client_id, client_name, client_abbreviation
@@ -253,38 +253,38 @@ $filter_url = function ($changes) use ($client_url) {
                 <div class="col-lg-2 col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="<?= escapeHtml($filter_url(['archived' => $archived ? '' : 1])) ?>"
-                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active credentials' : 'Show archived credentials' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2">Archived</span>
+                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Back to active credentials') : __('Show archived credentials') ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="credential" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                 </a>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_favorite_credentials">
-                                    <i class="fas fa-fw fa-star text-warning me-2"></i>Star
+                                    <i class="fas fa-fw fa-star text-warning me-2"></i><?= __('Star') ?>
                                 </button>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_unfavorite_credentials">
-                                    <i class="far fa-fw fa-star me-2"></i>Unstar
+                                    <i class="far fa-fw fa-star me-2"></i><?= __('Unstar') ?>
                                 </button>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
                                     <button class="dropdown-item text-info" type="submit" form="bulkActions" name="bulk_restore_credentials">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                         <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_credentials"
-                                            data-confirm-text="The credentials go for good, with any share links still open.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The credentials go for good, with any share links still open.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_credentials">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -314,26 +314,26 @@ $filter_url = function ($changes) use ($client_url) {
                     <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=credential_name&order=<?= $disp ?>">
-                            Credential <?php if ($sort == 'credential_name') { echo $order_icon; } ?>
+                            <?= __('Credential') ?> <?php if ($sort == 'credential_name') { echo $order_icon; } ?>
                         </a>
                     </th>
-                    <th>Login</th>
-                    <th>For</th>
+                    <th><?= __('Login') ?></th>
+                    <th><?= __('For') ?></th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=credential_password_changed_at&order=<?= $disp ?>">
-                            Changed <?php if ($sort == 'credential_password_changed_at') { echo $order_icon; } ?>
+                            <?= __('Changed') ?> <?php if ($sort == 'credential_password_changed_at') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php if (!$client_url) { ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                            Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                            <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php } ?>
@@ -361,7 +361,7 @@ $filter_url = function ($changes) use ($client_url) {
                         <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="credential_ids[]" value="<?= $credential_id ?>" aria-label="Select <?= $credential_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="credential_ids[]" value="<?= $credential_id ?>" aria-label="<?= __('Select %s', $credential_name) ?>">
                             </div>
                         </td>
                         <?php } ?>
@@ -370,9 +370,9 @@ $filter_url = function ($changes) use ($client_url) {
                                 <?= credentialTile($row) ?>
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="<?= $quick_url ?>"><?= $credential_name ?></a>
-                                    <?php if ($credential_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="Starred"></i><?php } ?>
-                                    <?php if ($credential_shares) { ?><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal ms-1" title="Shared with <?= escapeHtml(implode(', ', array_filter(array_column($credential_shares, 'item_recipient'))) ?: 'a link') ?>"><i class="fas fa-share-alt me-1"></i>Shared</span><?php } ?>
-                                    <?php if ($credential_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($credential_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                                    <?php if ($credential_shares) { ?><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal ms-1" title="Shared with <?= escapeHtml(implode(', ', array_filter(array_column($credential_shares, 'item_recipient'))) ?: 'a link') ?>"><i class="fas fa-share-alt me-1"></i><?= __('Shared') ?></span><?php } ?>
+                                    <?php if ($credential_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($credential_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $credential_description ?>"><?= $credential_description ?></div>
                                     <?php } ?>
@@ -410,51 +410,51 @@ $filter_url = function ($changes) use ($client_url) {
                         </td>
                         <td class="text-nowrap">
                             <?= credentialAgePill($age, true) ?: '<span class="text-body-secondary">-</span>' ?>
-                            <?php if ($row['credential_accessed_at']) { ?><div class="small text-body-secondary mt-1" title="Password last shown or copied <?= escapeHtml($row['credential_accessed_at']) ?>">Used <?= timeAgo($row['credential_accessed_at']) ?></div><?php } ?>
+                            <?php if ($row['credential_accessed_at']) { ?><div class="small text-body-secondary mt-1" title="<?= escapeHtml(__('Password last shown or copied %s', $row['credential_accessed_at'])) ?>"><?= __('Used %s', timeAgo($row['credential_accessed_at'])) ?></div><?php } ?>
                         </td>
                         <?php if (!$client_url) { ?>
                         <td><a href="credentials.php?client_id=<?= $row_client_id ?>"><?= escapeHtml($row['client_name']) ?></a></td>
                         <?php } ?>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $quick_url ?>">
-                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                     </a>
                                     <?php if ($can_edit && !$credential_archived_at) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/credential/credential_edit.php?id=<?= $credential_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/credential/credential_rotate.php?id=<?= $credential_id ?>">
-                                            <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Change password
+                                            <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i><?= __('Change password') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_share && !$credential_archived_at) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/share/share_add.php?type=Credential&amp;id=<?= $credential_id ?>">
-                                            <i class="fas fa-fw fa-share-alt text-secondary me-2"></i>Share
+                                            <i class="fas fa-fw fa-share-alt text-secondary me-2"></i><?= __('Share') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_edit) { ?>
                                         <?php if (!$credential_archived_at) { ?>
                                             <a class="dropdown-item" href="post.php?<?= $credential_favorite ? 'unfavorite_credential' : 'favorite_credential' ?>=<?= $credential_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="<?= $credential_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $credential_favorite ? 'Unstar' : 'Star' ?>
+                                                <i class="<?= $credential_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $credential_favorite ? __('Unstar') : __('Star') ?>
                                             </a>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($credential_archived_at) { ?>
                                             <a class="dropdown-item" href="post.php?restore_credential=<?= $credential_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                             </a>
                                             <?php if ($can_delete) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_credential=<?= $credential_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                                     data-confirm-text="<?= $credential_name ?> goes for good, with any share links still open.">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_credential=<?= $credential_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     <?php } ?>
@@ -476,10 +476,10 @@ $filter_url = function ($changes) use ($client_url) {
         'filtered' => $q || $tag_query,
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['nootp', 'due']),
-        'text' => 'The logins for their systems, encrypted in the vault.',
+        'text' => __('The logins for their systems, encrypted in the vault.'),
         'actions' => $can_edit ? array_merge(
-            [['label' => 'New Credential', 'modal' => "modals/credential/credential_add.php?$client_url", 'size' => 'lg']],
-            $client_url ? [['label' => 'Import', 'modal' => "modals/credential/credential_import.php?$client_url", 'icon' => 'fa-upload']] : []
+            [['label' => __('New Credential'), 'modal' => "modals/credential/credential_add.php?$client_url", 'size' => 'lg']],
+            $client_url ? [['label' => __('Import'), 'modal' => "modals/credential/credential_import.php?$client_url", 'icon' => 'fa-upload']] : []
         ) : [],
     ];
     require_once "../includes/filter_footer.php";

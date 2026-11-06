@@ -15,7 +15,7 @@ $asset_id = intval($_GET['id'] ?? 0);
 
 $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_client_id, asset_name FROM assets WHERE asset_id = $asset_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That asset no longer exists.']);
+    echo json_encode(['error' => __('That asset no longer exists.')]);
     exit;
 }
 $asset_name = escapeHtml($row['asset_name']);
@@ -34,7 +34,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-key me-2"></i>Link a credential to <strong><?= $asset_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-key me-2"></i><?= __('Link a credential to') ?> <strong><?= $asset_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -44,7 +44,7 @@ ob_start();
         <?php if ($choices) { ?>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-key"></i></span>
-                <select class="form-select select2" name="credential_id" required data-placeholder="Pick a credential">
+                <select class="form-select select2" name="credential_id" required data-placeholder="<?= escapeHtml(__('Pick a credential')) ?>">
                     <option value=""></option>
                     <?php foreach ($choices as $credential_id => $choice) {
                         $where_now = !empty($choice['asset_id']) ? 'On ' . $choice['asset_name'] . ' - moves here' : ($choice['credential_description'] ?: $choice['credential_uri']); ?>
@@ -52,16 +52,16 @@ ob_start();
                     <?php } ?>
                 </select>
             </div>
-            <div class="form-text">A credential belongs to one asset - one already on another asset moves here.</div>
+            <div class="form-text"><?= __('A credential belongs to one asset - one already on another asset moves here.') ?></div>
         <?php } else { ?>
-            <p class="text-body-secondary mb-0">This client has no other credentials to link - make a new one instead.</p>
+            <p class="text-body-secondary mb-0"><?= __('This client has no other credentials to link - make a new one instead.') ?></p>
         <?php } ?>
     </div>
     <div class="modal-footer">
         <?php if ($choices) { ?>
-            <button type="submit" name="link_asset_to_credential" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Link</button>
+            <button type="submit" name="link_asset_to_credential" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Link') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

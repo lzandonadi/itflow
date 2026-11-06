@@ -49,20 +49,20 @@ $item_types = rackItemTypes();
 ?>
 
 <div class="mb-3">
-    <div class="btn-group w-100" role="group" aria-label="What is going in the rack">
+    <div class="btn-group w-100" role="group" aria-label="<?= escapeHtml(__('What is going in the rack')) ?>">
         <input type="radio" class="btn-check" name="item_kind" id="rackItemKindAsset" value="asset" <?= $unit_is_asset ? 'checked' : '' ?>>
-        <label class="btn btn-outline-secondary" for="rackItemKindAsset"><i class="fas fa-fw fa-desktop me-2"></i>An asset</label>
+        <label class="btn btn-outline-secondary" for="rackItemKindAsset"><i class="fas fa-fw fa-desktop me-2"></i><?= __('An asset') ?></label>
         <input type="radio" class="btn-check" name="item_kind" id="rackItemKindOther" value="other" <?= $unit_is_asset ? '' : 'checked' ?>>
-        <label class="btn btn-outline-secondary" for="rackItemKindOther"><i class="fas fa-fw fa-ethernet me-2"></i>Something else</label>
+        <label class="btn btn-outline-secondary" for="rackItemKindOther"><i class="fas fa-fw fa-ethernet me-2"></i><?= __('Something else') ?></label>
     </div>
 </div>
 
 <div class="mb-3" data-rack-kind="asset">
-    <label class="form-label">Asset <strong class="text-danger">*</strong></label>
+    <label class="form-label"><?= __('Asset') ?> <strong class="text-danger">*</strong></label>
     <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-desktop"></i></span>
         <select class="form-select select2" name="asset" id="rackItemAsset">
-            <option value="">- Select an asset -</option>
+            <option value=""><?= __('- Select an asset -') ?></option>
             <?php foreach ($asset_options as $asset_option) {
                 $asset_option_id = intval($asset_option['asset_id']);
                 ?>
@@ -71,17 +71,17 @@ $item_types = rackItemTypes();
         </select>
     </div>
     <?php if (empty($asset_options)) { ?>
-        <div class="form-text">Every asset this client has is already racked.</div>
+        <div class="form-text"><?= __('Every asset this client has is already racked.') ?></div>
     <?php } ?>
 </div>
 
 <div class="mb-3" data-rack-kind="other">
-    <label class="form-label">What is it</label>
+    <label class="form-label"><?= __('What is it') ?></label>
     <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-shapes"></i></span>
         <select class="form-select select2" name="type" id="rackItemType">
             <?php foreach ($item_types as $item_type => $item_type_style) { ?>
-                <option value="<?= escapeHtml($item_type) ?>" <?php if ($unit_type === $item_type) { echo "selected"; } ?><?= selectOptionData(['icon' => 'fas ' . $item_type_style['icon']]) ?>><?= escapeHtml($item_type) ?></option>
+                <option value="<?= escapeHtml($item_type) ?>" <?php if ($unit_type === $item_type) { echo "selected"; } ?><?= selectOptionData(['icon' => 'fas ' . $item_type_style['icon']]) ?>><?= escapeHtml(rackItemTypeLabel($item_type)) ?></option>
             <?php } ?>
         </select>
     </div>
@@ -89,25 +89,25 @@ $item_types = rackItemTypes();
 
 <div class="mb-3">
     <label class="form-label" for="rackItemName">
-        <span data-rack-kind="asset">Label <span class="text-secondary fw-normal">(optional, shown under the asset name)</span></span>
-        <span data-rack-kind="other">Name <strong class="text-danger">*</strong></span>
+        <span data-rack-kind="asset"><?= __('Label') ?> <span class="text-secondary fw-normal"><?= __('(optional, shown under the asset name)') ?></span></span>
+        <span data-rack-kind="other"><?= __('Name') ?> <strong class="text-danger">*</strong></span>
     </label>
     <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-tag"></i></span>
-        <input type="text" class="form-control" name="name" id="rackItemName" maxlength="200" value="<?= $unit_device ?>" placeholder="24-port Cat6 patch panel">
+        <input type="text" class="form-control" name="name" id="rackItemName" maxlength="200" value="<?= $unit_device ?>" placeholder="<?= escapeHtml(__('24-port Cat6 patch panel')) ?>">
     </div>
 </div>
 
 <div class="row g-3 mb-1">
     <div class="col-sm-4">
-        <label class="form-label" for="rackItemStart">Lowest U <strong class="text-danger">*</strong></label>
+        <label class="form-label" for="rackItemStart"><?= __('Lowest U') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text">U</span>
             <input type="number" class="form-control" name="unit_start" id="rackItemStart" min="1" max="<?= $rack_units ?>" value="<?= $unit_start ?: '' ?>" required>
         </div>
     </div>
     <div class="col-sm-4">
-        <label class="form-label" for="rackItemHeight">Height <strong class="text-danger">*</strong></label>
+        <label class="form-label" for="rackItemHeight"><?= __('Height') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-arrows-alt-v"></i></span>
             <input type="number" class="form-control" name="unit_height" id="rackItemHeight" min="1" max="<?= $rack_units ?>" value="<?= $unit_height ?>" required>
@@ -115,26 +115,26 @@ $item_types = rackItemTypes();
         </div>
     </div>
     <div class="col-sm-4">
-        <label class="form-label">Mounted on</label>
+        <label class="form-label"><?= __('Mounted on') ?></label>
         <div class="btn-group w-100" role="group">
             <input type="radio" class="btn-check" name="face" id="rackItemFaceFront" value="front" <?= $unit_face === 'rear' ? '' : 'checked' ?>>
-            <label class="btn btn-outline-secondary" for="rackItemFaceFront">Front</label>
+            <label class="btn btn-outline-secondary" for="rackItemFaceFront"><?= __('Front') ?></label>
             <input type="radio" class="btn-check" name="face" id="rackItemFaceRear" value="rear" <?= $unit_face === 'rear' ? 'checked' : '' ?>>
-            <label class="btn btn-outline-secondary" for="rackItemFaceRear">Rear</label>
+            <label class="btn btn-outline-secondary" for="rackItemFaceRear"><?= __('Rear') ?></label>
         </div>
     </div>
 </div>
 
 <div class="form-check form-switch mt-2">
     <input class="form-check-input" type="checkbox" name="full_depth" value="1" id="rackItemFullDepth" <?= $unit_full_depth ? 'checked' : '' ?>>
-    <label class="form-check-label" for="rackItemFullDepth">Full depth <span class="text-secondary">- fills the front and the rear</span></label>
+    <label class="form-check-label" for="rackItemFullDepth"><?= __('Full depth') ?> <span class="text-secondary"><?= __('- fills the front and the rear') ?></span></label>
 </div>
 
 <div class="itflow-rack-fit small mt-2 mb-3" id="rackItemFit" aria-live="polite"></div>
 
 <div class="row g-3">
     <div class="col-sm-5">
-        <label class="form-label">Power draw</label>
+        <label class="form-label"><?= __('Power draw') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-bolt"></i></span>
             <input type="number" class="form-control" name="power_watts" min="0" max="100000" placeholder="350" value="<?= $unit_power_watts ?: '' ?>">
@@ -142,10 +142,10 @@ $item_types = rackItemTypes();
         </div>
     </div>
     <div class="col-sm-7">
-        <label class="form-label">Notes</label>
+        <label class="form-label"><?= __('Notes') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-sticky-note"></i></span>
-            <input type="text" class="form-control" name="notes" maxlength="255" placeholder="Rails in the box, PSU A on PDU-A port 3" value="<?= $unit_notes ?>">
+            <input type="text" class="form-control" name="notes" maxlength="255" placeholder="<?= escapeHtml(__('Rails in the box, PSU A on PDU-A port 3')) ?>" value="<?= $unit_notes ?>">
         </div>
     </div>
 </div>
@@ -180,6 +180,13 @@ $item_types = rackItemTypes();
         return s === e ? 'U' + s : 'U' + s + '–U' + e;
     }
 
+    var faces = <?= json_encode(['front' => __('front'), 'rear' => __('rear')], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    var t = <?= json_encode(['nofit' => __('%1$s doesn\'t fit - this rack runs from U1 to U%2$s'), 'clash' => __('%1$s clashes with %2$s (%3$s, %4$s)'), 'full' => __('full depth'), 'free' => __('%1$s is free on the %2$s'), 'both' => __('front and rear'), 'optional' => __('Optional'), 'panel' => __('24-port Cat6 patch panel')], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    function fill(text) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return text.replace(/%(\d)\$s/g, function (m, n) { return args[n - 1]; });
+    }
+
     function setText(el, icon, cls, text) {
         el.className = 'itflow-rack-fit small mt-2 mb-3 ' + cls;
         el.textContent = '';
@@ -199,7 +206,7 @@ $item_types = rackItemTypes();
         }
         var e = s + h - 1;
         if (s < 1 || e > rackUnits) {
-            setText(fit, 'fa-times-circle', 'text-danger', position(s, e) + " doesn't fit - this rack runs from U1 to U" + rackUnits);
+            setText(fit, 'fa-times-circle', 'text-danger', fill(t.nofit, position(s, e), rackUnits));
             return;
         }
         var f = face();
@@ -208,9 +215,9 @@ $item_types = rackItemTypes();
             return o.start <= e && o.end >= s && (o.full || full || o.face === f);
         });
         if (clash) {
-            setText(fit, 'fa-times-circle', 'text-danger', position(s, e) + ' clashes with ' + clash.name + ' (' + position(clash.start, clash.end) + ', ' + (clash.full ? 'full depth' : clash.face) + ')');
+            setText(fit, 'fa-times-circle', 'text-danger', fill(t.clash, position(s, e), clash.name, position(clash.start, clash.end), clash.full ? t.full : (faces[clash.face] || clash.face)));
         } else {
-            setText(fit, 'fa-check-circle', 'text-success', position(s, e) + ' is free on the ' + (full ? 'front and rear' : f));
+            setText(fit, 'fa-check-circle', 'text-success', fill(t.free, position(s, e), full ? t.both : (faces[f] || f)));
         }
     }
 
@@ -221,7 +228,7 @@ $item_types = rackItemTypes();
         });
         assetSelect.required = k === 'asset';
         nameInput.required = k === 'other';
-        nameInput.placeholder = k === 'asset' ? 'Optional' : '24-port Cat6 patch panel';
+        nameInput.placeholder = k === 'asset' ? t.optional : t.panel;
     }
 
     form.querySelectorAll('input[name="item_kind"]').forEach(function (r) {

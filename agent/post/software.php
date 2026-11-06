@@ -22,7 +22,7 @@ function softwareForRequest($software_id) {
     global $client_id;
     $row = softwareRow($software_id);
     if (!$row) {
-        flashAlert('That license no longer exists.', 'error');
+        flashAlert(__('That license no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['software_client_id']);
@@ -57,7 +57,7 @@ if (isset($_POST['add_software'])) {
     enforceClientAccess();
 
     if (trim((string) ($_POST['name'] ?? '')) === '') {
-        flashAlert('A license needs a name.', 'error');
+        flashAlert(__('A license needs a name.'), 'error');
         redirect();
     }
 
@@ -84,7 +84,7 @@ if (isset($_POST['add_software'])) {
     logAudit("Software", "Create", "$session_name created license " . escapeSql($name . softwareSeatChangeText($changes)), $client_id, $software_id);
 
     $warning = softwareSeatWarning($software_id);
-    flashAlert("License <strong>$name</strong> created" . ($keys_added ? " with $keys_added key" . ($keys_added === 1 ? '' : 's') : '') . ($vendor_made ? ", and vendor <strong>" . escapeHtml($vendor_name) . "</strong> added for the client" : '') . $warning, $warning ? 'warning' : 'success');
+    flashAlert(__('License %s created', "<strong>$name</strong>") . ($keys_added ? ' ' . _n('with %d key', 'with %d keys', $keys_added) : '') . ($vendor_made ? __(', and vendor %s added for the client', '<strong>' . escapeHtml($vendor_name) . '</strong>') : '') . $warning, $warning ? 'warning' : 'success');
 
     redirect();
 
@@ -102,13 +102,13 @@ if (isset($_POST['add_software_from_template'])) {
     enforceClientAccess();
 
     if (!mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM clients WHERE client_id = $client_id AND client_archived_at IS NULL"))) {
-        flashAlert('Pick the client it is for.', 'error');
+        flashAlert(__('Pick the client it is for.'), 'error');
         redirect();
     }
     $template = softwareTemplateRow($_POST['software_template_id'] ?? 0);
     $software_id = softwareTemplateMakeLicense($_POST['software_template_id'] ?? 0, $client_id, $_POST, intval(lookupUserPermission('module_client')) >= 2, $vendor_made);
     if (!$software_id) {
-        flashAlert('That license template is gone or archived.', 'error');
+        flashAlert(__('That license template is gone or archived.'), 'error');
         redirect();
     }
 
@@ -119,7 +119,7 @@ if (isset($_POST['add_software_from_template'])) {
     }
     logAudit("Software", "Create", "$session_name created license " . escapeSql($template['software_template_name']) . " from template " . escapeSql($template['software_template_name']), $client_id, $software_id);
 
-    flashAlert("License <strong>" . escapeHtml($template['software_template_name']) . "</strong> created from template <strong>" . escapeHtml($template['software_template_name']) . "</strong>" . ($vendor_made ? ", with vendor <strong>" . escapeHtml($vendor_name) . "</strong> added for the client" : '') . " - put its devices and users on it");
+    flashAlert(__('License %1$s created from template %2$s', '<strong>' . escapeHtml($template['software_template_name']) . '</strong>', '<strong>' . escapeHtml($template['software_template_name']) . '</strong>') . ($vendor_made ? __(', with vendor %s added for the client', '<strong>' . escapeHtml($vendor_name) . '</strong>') : '') . ' - ' . __('put its devices and users on it'));
 
     redirect("/agent/software.php?client_id=$client_id");
 
@@ -136,7 +136,7 @@ if (isset($_POST['edit_software'])) {
 
     $set = softwareFormSet($_POST, $client_id);
     if ($set === null) {
-        flashAlert('A license needs a name.', 'error');
+        flashAlert(__('A license needs a name.'), 'error');
         redirect();
     }
 
@@ -156,7 +156,7 @@ if (isset($_POST['edit_software'])) {
     logAudit("Software", "Edit", "$session_name edited license " . escapeSql($name . softwareSeatChangeText($changes)), $client_id, $software_id);
 
     $warning = softwareSeatWarning($software_id);
-    flashAlert("License <strong>$name</strong> updated$warning", $warning ? 'warning' : 'success');
+    flashAlert(__('License <strong>%1$s</strong> updated%2$s', $name, $warning), $warning ? 'warning' : 'success');
 
     redirect();
 
@@ -180,12 +180,12 @@ if (isset($_POST['set_software_seats'])) {
     $warning = softwareSeatWarning($software_id);
     $summary = [];
     if ($changes['added']) {
-        $summary[] = count($changes['added']) . ' added';
+        $summary[] = __('%d added', count($changes['added']));
     }
     if ($changes['removed']) {
-        $summary[] = count($changes['removed']) . ' removed';
+        $summary[] = __('%d removed', count($changes['removed']));
     }
-    flashAlert("Seats on <strong>{$row['software_name']}</strong> " . ($summary ? 'updated - ' . implode(', ', $summary) : 'unchanged') . $warning, $warning ? 'warning' : 'success');
+    flashAlert(($summary ? __('Seats on %1$s updated - %2$s', "<strong>{$row['software_name']}</strong>", implode(', ', $summary)) : __('Seats on %s unchanged', "<strong>{$row['software_name']}</strong>")) . $warning, $warning ? 'warning' : 'success');
 
     redirect();
 
@@ -204,7 +204,7 @@ if (isset($_POST['renew_software'])) {
     $reference = trim((string) ($_POST['purchase_reference'] ?? ''));
 
     if (!$rows || ($mode === 'extend' && !isset(SOFTWARE_RENEWAL_TERMS[$term])) || ($mode === 'date' && !$new_date)) {
-        flashAlert('Pick a term or a new renewal date.', 'error');
+        flashAlert(__('Pick a term or a new renewal date.'), 'error');
         redirect();
     }
 
@@ -222,9 +222,9 @@ if (isset($_POST['renew_software'])) {
     }
 
     if (count($renewed) === 1) {
-        flashAlert("License <strong>{$renewed[0][0]}</strong> renewed until <strong>{$renewed[0][1]}</strong>");
+        flashAlert(__('License <strong>%1$s</strong> renewed until <strong>%2$s</strong>', $renewed[0][0], $renewed[0][1]));
     } else {
-        flashAlert("Renewed <strong>" . count($renewed) . "</strong> licenses");
+        flashAlert(__('Renewed <strong>%s</strong> licenses', count($renewed)));
     }
 
     redirect();
@@ -244,9 +244,9 @@ if (isset($_POST['add_software_keys'])) {
 
     if ($added) {
         logAudit("Software", "Keys", "$session_name added $added key" . ($added === 1 ? '' : 's') . " to license " . escapeSql($row['software_name']), $client_id, $software_id);
-        flashAlert("Added <strong>$added</strong> key" . ($added === 1 ? '' : 's') . " to <strong>{$row['software_name']}</strong>");
+        flashAlert(_n('Added <strong>%1$d</strong> key to %2$s', 'Added <strong>%1$d</strong> keys to %2$s', $added, $added, "<strong>{$row['software_name']}</strong>"));
     } else {
-        flashAlert("No new keys to add - blank, or <strong>{$row['software_name']}</strong> already has them.", 'warning');
+        flashAlert(__('No new keys to add - blank, or <strong>%s</strong> already has them.', $row['software_name']), 'warning');
     }
 
     redirect();
@@ -262,7 +262,7 @@ if (isset($_POST['edit_software_key'])) {
     $software_key_id = intval($_POST['software_key_id'] ?? 0);
     $key_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT software_key, software_key_software_id FROM software_keys WHERE software_key_id = $software_key_id"));
     if (!$key_row) {
-        flashAlert('That key no longer exists.', 'error');
+        flashAlert(__('That key no longer exists.'), 'error');
         redirect();
     }
     $row = softwareForRequest($key_row['software_key_software_id']);
@@ -270,7 +270,7 @@ if (isset($_POST['edit_software_key'])) {
 
     $key = mb_substr(trim((string) ($_POST['key'] ?? '')), 0, 400);
     if ($key === '') {
-        flashAlert('A key cannot be blank - delete it instead.', 'error');
+        flashAlert(__('A key cannot be blank - delete it instead.'), 'error');
         redirect();
     }
     mysqli_query($mysqli, "UPDATE software_keys SET software_key = '" . escapeSql($key) . "' WHERE software_key_id = $software_key_id");
@@ -295,7 +295,7 @@ if (isset($_POST['edit_software_key'])) {
     logAudit("Software", "Keys", "$session_name updated a key on license " . escapeSql($row['software_name']) . ($holders ? ', handed to ' . escapeSql(implode(', ', $holders)) : ', not handed to anyone'), $client_id, $software_id);
 
     $warning = softwareSeatWarning($software_id);
-    flashAlert("Key on <strong>{$row['software_name']}</strong> saved" . ($holders ? ' - handed to <strong>' . implode(', ', $holders) . '</strong>' : '') . $warning, $warning ? 'warning' : 'success');
+    flashAlert(__('Key on %s saved', "<strong>{$row['software_name']}</strong>") . ($holders ? ' - ' . __('handed to %s', '<strong>' . implode(', ', $holders) . '</strong>') : '') . $warning, $warning ? 'warning' : 'success');
 
     redirect();
 
@@ -310,7 +310,7 @@ if (isset($_GET['delete_software_key'])) {
     $software_key_id = intval($_GET['delete_software_key']);
     $key_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT software_key_software_id FROM software_keys WHERE software_key_id = $software_key_id"));
     if (!$key_row) {
-        flashAlert('That key no longer exists.', 'error');
+        flashAlert(__('That key no longer exists.'), 'error');
         redirect();
     }
     $row = softwareForRequest($key_row['software_key_software_id']);
@@ -319,7 +319,7 @@ if (isset($_GET['delete_software_key'])) {
 
     logAudit("Software", "Keys", "$session_name deleted a key from license " . escapeSql($row['software_name']), $client_id, intval($row['software_id']));
 
-    flashAlert("Key deleted from <strong>{$row['software_name']}</strong>", 'error');
+    flashAlert(__('Key deleted from <strong>%s</strong>', $row['software_name']), 'error');
 
     redirect();
 
@@ -340,7 +340,7 @@ if (isset($_GET['archive_software'])) {
 
     logAudit("Software", "Archive", "$session_name archived license " . escapeSql($row['software_name']), $client_id, $software_id);
 
-    flashAlert("License <strong>{$row['software_name']}</strong> archived", 'error');
+    flashAlert(__('License <strong>%s</strong> archived', $row['software_name']), 'error');
 
     redirect();
 
@@ -359,7 +359,7 @@ if (isset($_GET['restore_software'])) {
 
     logAudit("Software", "Restore", "$session_name restored license " . escapeSql($row['software_name']), $client_id, $software_id);
 
-    flashAlert("License <strong>{$row['software_name']}</strong> restored");
+    flashAlert(__('License <strong>%s</strong> restored', $row['software_name']));
 
     redirect();
 
@@ -379,7 +379,7 @@ if (isset($_GET['delete_software'])) {
 
     logAudit("Software", "Delete", "$session_name deleted license " . escapeSql($row['software_name']) . " with its seats and keys", $client_id);
 
-    flashAlert("License <strong>{$row['software_name']}</strong> deleted", 'error');
+    flashAlert(__('License <strong>%s</strong> deleted', $row['software_name']), 'error');
 
     // From its own page, back to the client's licenses - that page is gone
     if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/license.php') !== false) {
@@ -402,7 +402,7 @@ if (isset($_POST['bulk_archive_software'])) {
         logAudit("Software", "Archive", "$session_name archived license " . escapeSql($row['software_name']), $client_id, $software_id);
     }
 
-    flashAlert("Archived <strong>" . count($rows) . "</strong> license" . (count($rows) === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived <strong>%d</strong> license', 'Archived <strong>%d</strong> licenses', count($rows)), 'error');
 
     redirect();
 
@@ -421,7 +421,7 @@ if (isset($_POST['bulk_restore_software'])) {
         logAudit("Software", "Restore", "$session_name restored license " . escapeSql($row['software_name']), $client_id, $software_id);
     }
 
-    flashAlert("Restored <strong>" . count($rows) . "</strong> license" . (count($rows) === 1 ? '' : 's'));
+    flashAlert(_n('Restored <strong>%d</strong> license', 'Restored <strong>%d</strong> licenses', count($rows)));
 
     redirect();
 
@@ -440,7 +440,7 @@ if (isset($_POST['bulk_delete_software'])) {
         logAudit("Software", "Delete", "$session_name deleted license " . escapeSql($row['software_name']) . " with its seats and keys", $client_id);
     }
 
-    flashAlert("Deleted <strong>" . count($rows) . "</strong> license" . (count($rows) === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> license', 'Deleted <strong>%d</strong> licenses', count($rows)), 'error');
 
     redirect();
 

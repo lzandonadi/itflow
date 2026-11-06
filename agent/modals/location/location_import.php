@@ -23,7 +23,7 @@ ob_start();
 			<input type="file" class="form-control" name="file" accept=".csv" required>
 		</div>
 		<hr>
-		<div><?= __('Download:') ?> <a class="text-bold" href="post.php?download_locations_csv_template=<?= $client_id ?>">sample csv template</a></div>
+		<div><?= __('Download:') ?> <a class="text-bold" href="post.php?download_locations_csv_template=<?= $client_id ?>"><?= __('sample csv template') ?></a></div>
 	</div>
 	<div class="modal-footer">
 		<button type="submit" name="import_locations_csv" class="btn btn-primary text-bold"><i class="fa fa-upload me-2"></i><?= __('Import') ?></button>

@@ -105,11 +105,11 @@ foreach ($racks as $rack_id => $row) {
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-server me-2"></i>Racks</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-server me-2"></i><?= __('Racks') ?></h3>
         <?php if ($client_url && $can_edit) { ?>
             <div class="card-tools">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/rack/rack_add.php?client_id=<?= $client_id ?>">
-                    <i class="fas fa-plus me-2"></i>New Rack
+                    <i class="fas fa-plus me-2"></i><?= __('New Rack') ?>
                 </button>
             </div>
         <?php } ?>
@@ -124,15 +124,15 @@ foreach ($racks as $rack_id => $row) {
 
                 <div class="col-lg-3 col-md-4">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search racks and what's in them">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search racks and what\'s in them')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
 
                 <?php if ($client_url) { ?>
                     <div class="col-lg-2 col-md-4">
                         <select class="form-select select2" name="location" onchange="this.form.submit()">
-                            <option value="">- All Locations -</option>
+                            <option value=""><?= __('- All Locations -') ?></option>
                             <?php
                             $sql_locations_filter = mysqli_query($mysqli, "SELECT location_id, location_name FROM locations
                                 WHERE location_client_id = $client_id
@@ -148,7 +148,7 @@ foreach ($racks as $rack_id => $row) {
                 <?php } else { ?>
                     <div class="col-lg-2 col-md-4">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "SELECT DISTINCT client_id, client_name, client_abbreviation FROM clients
                                 JOIN racks ON rack_client_id = client_id
@@ -166,7 +166,7 @@ foreach ($racks as $rack_id => $row) {
 
                 <div class="col-lg-2 col-md-4">
                     <select class="form-select select2" name="type" onchange="this.form.submit()">
-                        <option value="">- All Types -</option>
+                        <option value=""><?= __('- All Types -') ?></option>
                         <?= categoryFilterOptionsHtml('rack_type', $type_filter, "SELECT DISTINCT rack_type FROM racks
                             LEFT JOIN clients ON client_id = rack_client_id
                             WHERE rack_type IS NOT NULL AND rack_type <> '' AND $archive_query
@@ -177,11 +177,11 @@ foreach ($racks as $rack_id => $row) {
                 <div class="col-lg-5 col-md-12 d-flex align-items-center justify-content-md-end gap-3">
                     <?php if ($racks) { ?>
                         <span class="small text-body-secondary d-none d-xl-inline">
-                            <?= number_format($total_used) ?> of <?= number_format($total_units) ?>U in use &middot; <?= number_format($total_items) ?> items<?= intval($num_rows[0]) > count($racks) ? ' on this page' : '' ?>
+                            <?= __('%1$s of %2$sU in use', number_format($total_used), number_format($total_units)) ?> &middot; <?= intval($num_rows[0]) > count($racks) ? __('%s items on this page', number_format($total_items)) : __('%s items', number_format($total_items)) ?>
                         </span>
                     <?php } ?>
                     <a href="?<?= $client_url ?>archived=<?= $archived ? 0 : 1 ?>" class="btn btn-<?= $archived ? 'primary' : 'default' ?> text-nowrap">
-                        <i class="fa fa-fw fa-archive me-2"></i>Archived
+                        <i class="fa fa-fw fa-archive me-2"></i><?= __('Archived') ?>
                     </a>
                 </div>
 
@@ -198,8 +198,8 @@ foreach ($racks as $rack_id => $row) {
                 'icon' => 'fa-server',
                 'filtered' => $q || $location_filter || $client_filter || $type_filter !== '',
                 'archived' => $archived,
-                'text' => "Document the comms closet: what's racked where, front and rear, and how much room and power is left.",
-                'actions' => $client_url && $can_edit ? [['label' => 'New Rack', 'modal' => "modals/rack/rack_add.php?client_id=$client_id", 'size' => 'lg']] : [],
+                'text' => __('Document the comms closet: what\'s racked where, front and rear, and how much room and power is left.'),
+                'actions' => $client_url && $can_edit ? [['label' => __('New Rack'), 'modal' => "modals/rack/rack_add.php?client_id=$client_id", 'size' => 'lg']] : [],
             ]) ?>
 
         <?php } else { ?>
@@ -251,35 +251,35 @@ foreach ($racks as $rack_id => $row) {
                                             </div>
                                         </div>
                                         <?php if ($rack_archived_at) { ?>
-                                            <span class="badge rounded-pill text-bg-secondary fw-normal">Archived</span>
+                                            <span class="badge rounded-pill text-bg-secondary fw-normal"><?= __('Archived') ?></span>
                                         <?php } ?>
                                         <?php if ($can_edit) { ?>
                                             <div class="dropdown dropstart itflow-rack-card-menu">
-                                                <button class="btn btn-sm btn-link text-body-secondary px-1" title="More actions" type="button" data-bs-toggle="dropdown">
+                                                <button class="btn btn-sm btn-link text-body-secondary px-1" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                                     <i class="fas fa-fw fa-ellipsis-v"></i>
                                                 </button>
                                                 <div class="dropdown-menu">
                                                     <?php if (!$rack_archived_at) { ?>
                                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/rack/rack_device_add.php?id=<?= $rack_id ?>">
-                                                            <i class="fas fa-fw fa-plus text-secondary me-2"></i>Add Item
+                                                            <i class="fas fa-fw fa-plus text-secondary me-2"></i><?= __('Add Item') ?>
                                                         </a>
                                                     <?php } ?>
                                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/rack/rack_edit.php?id=<?= $rack_id ?>">
-                                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                                     </a>
                                                     <div class="dropdown-divider"></div>
                                                     <?php if ($rack_archived_at) { ?>
                                                         <a class="dropdown-item confirm-link" href="post.php?restore_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                            <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                            <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                                         </a>
                                                     <?php } else { ?>
                                                         <a class="dropdown-item text-danger confirm-link" href="post.php?archive_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                                         </a>
                                                     <?php } ?>
                                                     <?php if ($can_delete) { ?>
                                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                         </a>
                                                     <?php } ?>
                                                 </div>
@@ -295,16 +295,16 @@ foreach ($racks as $rack_id => $row) {
 
                                     <div class="mt-auto pt-3">
                                         <div class="d-flex justify-content-between small mb-1">
-                                            <span><span class="fw-semibold"><?= $occupancy['any'] ?></span><span class="text-body-secondary"> / <?= $rack_units ?>U used</span></span>
+                                            <span><span class="fw-semibold"><?= $occupancy['any'] ?></span><span class="text-body-secondary"> / <?= __('%dU used', $rack_units) ?></span></span>
                                             <span class="text-<?= $usage_tone ?>-emphasis fw-semibold"><?= $used_percent ?>%</span>
                                         </div>
-                                        <div class="progress" style="height: .375rem" role="progressbar" aria-label="Units used" aria-valuenow="<?= $used_percent ?>" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress" style="height: .375rem" role="progressbar" aria-label="<?= escapeHtml(__('Units used')) ?>" aria-valuenow="<?= $used_percent ?>" aria-valuemin="0" aria-valuemax="100">
                                             <div class="progress-bar bg-<?= $usage_tone ?>" style="width: <?= $used_percent ?>%"></div>
                                         </div>
                                         <div class="d-flex flex-wrap column-gap-3 small text-body-secondary mt-2">
-                                            <span><i class="fas fa-fw fa-cubes me-1"></i><?= count($rack_items) ?> item<?= count($rack_items) === 1 ? '' : 's' ?></span>
+                                            <span><i class="fas fa-fw fa-cubes me-1"></i><?= _n('%d item', '%d items', count($rack_items)) ?></span>
                                             <?php if ($occupancy['largest_gap']['size']) { ?>
-                                                <span title="The tallest full-depth item that still fits"><i class="fas fa-fw fa-arrows-alt-v me-1"></i><?= $occupancy['largest_gap']['size'] ?>U gap</span>
+                                                <span title="<?= escapeHtml(__('The tallest full-depth item that still fits')) ?>"><i class="fas fa-fw fa-arrows-alt-v me-1"></i><?= __('%dU gap', $occupancy['largest_gap']['size']) ?></span>
                                             <?php } ?>
                                             <?php if ($power_used || $rack_power_capacity) { ?>
                                                 <span class="<?= $rack_power_capacity && $power_used > $rack_power_capacity ? 'text-danger' : '' ?>">

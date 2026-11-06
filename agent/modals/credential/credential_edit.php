@@ -7,7 +7,7 @@ enforceUserPermission('module_credential', 2);
 $credential_id = intval($_GET['id'] ?? 0);
 $credential = credentialRow($credential_id);
 if (!$credential) {
-    echo json_encode(['error' => 'That credential no longer exists.']);
+    echo json_encode(['error' => __('That credential no longer exists.')]);
     exit;
 }
 $client_id = intval($credential['credential_client_id']);
@@ -40,7 +40,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-key me-2"></i>Editing credential: <strong><?= $credential_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-key me-2"></i><?= __('Editing credential:') ?> <strong><?= $credential_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -49,13 +49,13 @@ ob_start();
     <input type="hidden" name="credential_id" value="<?= $credential_id ?>">
     <div class="modal-body">
         <?php if (!$vault_open) { ?>
-            <div class="alert alert-warning small"><i class="fas fa-lock me-2"></i>Your vault session has expired, so this login cannot be read or saved. Sign out and back in first.</div>
+            <div class="alert alert-warning small"><i class="fas fa-lock me-2"></i><?= __('Your vault session has expired, so this login cannot be read or saved. Sign out and back in first.') ?></div>
         <?php } ?>
         <?php require 'credential_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_credential" class="btn btn-primary text-bold" <?= $vault_open ? '' : 'disabled' ?>><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_credential" class="btn btn-primary text-bold" <?= $vault_open ? '' : 'disabled' ?>><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

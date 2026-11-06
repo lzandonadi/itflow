@@ -154,6 +154,134 @@ const ASSET_TYPE_GROUPS = [
     'other' => ['label' => 'Other', 'icon' => 'fa-tag'],
 ];
 
+/** An asset type as people read it - the stored English name in the interface language. */
+function assetTypeLabel($asset_type) {
+    $asset_type = (string) $asset_type;
+    return [
+        'Laptop' => _x('Laptop', 'asset type'),
+        'Desktop' => _x('Desktop', 'asset type'),
+        'Server' => _x('Server', 'asset type'),
+        'NAS' => _x('NAS', 'asset type'),
+        'Virtual Machine' => _x('Virtual Machine', 'asset type'),
+        'Firewall/Router' => _x('Firewall/Router', 'asset type'),
+        'Switch' => _x('Switch', 'asset type'),
+        'Access Point' => _x('Access Point', 'asset type'),
+        'Modem/ONT' => _x('Modem/ONT', 'asset type'),
+        'UPS' => _x('UPS', 'asset type'),
+        'PDU' => _x('PDU', 'asset type'),
+        'Printer' => _x('Printer', 'asset type'),
+        'Phone' => _x('Phone', 'asset type'),
+        'Mobile Phone' => _x('Mobile Phone', 'asset type'),
+        'Tablet' => _x('Tablet', 'asset type'),
+        'Display' => _x('Display', 'asset type'),
+        'Camera' => _x('Camera', 'asset type'),
+        'NVR/DVR' => _x('NVR/DVR', 'asset type'),
+        'Other' => _x('Other', 'asset type'),
+    ][$asset_type] ?? $asset_type;
+}
+
+/** A detail's label (ASSET_SPECS) in the interface language. */
+function assetSpecLabel($key) {
+    return [
+        'cpu' => _x('CPU', 'asset detail'),
+        'ram_gb' => _x('RAM', 'asset detail'),
+        'storage' => _x('Storage', 'asset detail'),
+        'vm_host' => _x('Host', 'asset detail'),
+        'vcpus' => _x('vCPUs', 'asset detail'),
+        'ports' => _x('Ports', 'asset detail'),
+        'sfp_ports' => _x('SFP ports', 'asset detail'),
+        'poe_watts' => _x('PoE budget', 'asset detail'),
+        'managed' => _x('Management', 'asset detail'),
+        'wifi' => _x('Wi-Fi', 'asset detail'),
+        'drive_bays' => _x('Drive bays', 'asset detail'),
+        'drives' => _x('Drives', 'asset detail'),
+        'raw_tb' => _x('Raw capacity', 'asset detail'),
+        'usable_tb' => _x('Usable capacity', 'asset detail'),
+        'raid' => _x('RAID', 'asset detail'),
+        'va' => _x('Capacity', 'asset detail'),
+        'watts' => _x('Output', 'asset detail'),
+        'runtime_min' => _x('Runtime', 'asset detail'),
+        'outlets' => _x('Outlets', 'asset detail'),
+        'battery_installed' => _x('Battery installed', 'asset detail'),
+        'battery_replace' => _x('Replace battery by', 'asset detail'),
+        'pdu_type' => _x('Kind', 'asset detail'),
+        'power_input' => _x('Input', 'asset detail'),
+        'circuit_id' => _x('Circuit ID', 'asset detail'),
+        'isp_account' => _x('ISP account', 'asset detail'),
+        'channels' => _x('Channels', 'asset detail'),
+        'color' => _x('Prints in', 'asset detail'),
+        'supplies' => _x('Supplies', 'asset detail'),
+        'extension' => _x('Extension', 'asset detail'),
+        'phone_number' => _x('Phone number', 'asset detail'),
+        'carrier' => _x('Carrier', 'asset detail'),
+        'imei' => _x('IMEI', 'asset detail'),
+        'size_in' => _x('Size', 'asset detail'),
+        'resolution' => _x('Resolution', 'asset detail'),
+    ][$key] ?? (ASSET_SPECS[$key]['label'] ?? (string) $key);
+}
+
+/** One of a select detail's options (stored in English) as people read it. */
+function assetSpecOptionLabel($value) {
+    $value = (string) $value;
+    return [
+        'Managed' => _x('Managed', 'asset detail option'),
+        'Smart' => _x('Smart', 'asset detail option'),
+        'Unmanaged' => _x('Unmanaged', 'asset detail option'),
+        'Basic' => _x('Basic', 'asset detail option'),
+        'Metered' => _x('Metered', 'asset detail option'),
+        'Monitored' => _x('Monitored', 'asset detail option'),
+        'Switched' => _x('Switched', 'asset detail option'),
+        'Color' => _x('Color', 'asset detail option'),
+        'Black and white' => _x('Black and white', 'asset detail option'),
+    ][$value] ?? $value;
+}
+
+/** A type group's label (ASSET_TYPE_GROUPS) in the interface language. */
+function assetTypeGroupLabel($group) {
+    return [
+        'workstation' => __('Workstations'),
+        'server' => __('Servers & storage'),
+        'virtual' => __('Virtual'),
+        'network' => __('Network'),
+        'power' => __('Power'),
+        'printer' => __('Printers'),
+        'mobile' => __('Phones & tablets'),
+        'peripheral' => __('Displays & cameras'),
+        'other' => __('Other'),
+    ][$group] ?? (ASSET_TYPE_GROUPS[$group]['label'] ?? (string) $group);
+}
+
+/** A type's example for the form's placeholders, its description in the interface language. */
+function assetTypeExample($asset_type) {
+    $example = assetTypeInfo($asset_type)['example'];
+    $example['description'] = [
+        'Laptop' => __('Front desk laptop'),
+        'Desktop' => __('Reception PC'),
+        'Server' => __('Domain controller for HQ'),
+        'NAS' => __('File shares and backups'),
+        'Virtual Machine' => __('Line of business app'),
+        'Firewall/Router' => __('Edge firewall'),
+        'Switch' => __('Core switch, comms closet'),
+        'Access Point' => __('Lobby ceiling'),
+        'Modem/ONT' => __('Fiber handoff'),
+        'UPS' => __('Rack UPS, comms closet'),
+        'PDU' => __('Rack PDU, A side'),
+        'Printer' => __('Front desk printer'),
+        'Phone' => __('Front desk phone'),
+        'Mobile Phone' => __('Owner\'s phone'),
+        'Tablet' => __('Patient check-in tablet'),
+        'Display' => __('Reception monitor'),
+        'Camera' => __('Lobby entrance'),
+        'NVR/DVR' => __('Camera recorder'),
+        'Other' => __('What it is for'),
+    ][assetTypeInfo($asset_type)['name']] ?? $example['description'];
+    if (assetTypeInfo($asset_type)['name'] === 'Other') {
+        $example['make'] = __('Make');
+        $example['model'] = __('Model');
+    }
+    return $example;
+}
+
 /** A type's entry - Other's for a type that isn't one ITFlow knows, with its name. */
 function assetTypeInfo($asset_type) {
     $asset_type = (string) $asset_type;
@@ -212,12 +340,12 @@ function assetTypeGroupSql($group, $column = 'asset_type') {
  */
 function assetTypeTabs($column = 'asset_type') {
     $tabs = [
-        'workstation' => ['label' => 'Workstations', 'new' => 'Workstation', 'groups' => ['workstation']],
-        'server' => ['label' => 'Servers & NAS', 'new' => 'Server', 'groups' => ['server']],
-        'virtual' => ['label' => 'Virtual', 'new' => 'Virtual Machine', 'groups' => ['virtual']],
-        'network' => ['label' => 'Network', 'new' => 'Network Device', 'groups' => ['network']],
-        'power' => ['label' => 'Power', 'new' => 'UPS', 'groups' => ['power']],
-        'printer' => ['label' => 'Printers', 'new' => 'Printer', 'groups' => ['printer']],
+        'workstation' => ['label' => __('Workstations'), 'new' => __('New Workstation'), 'groups' => ['workstation']],
+        'server' => ['label' => __('Servers & NAS'), 'new' => __('New Server'), 'groups' => ['server']],
+        'virtual' => ['label' => __('Virtual'), 'new' => __('New Virtual Machine'), 'groups' => ['virtual']],
+        'network' => ['label' => __('Network'), 'new' => __('New Network Device'), 'groups' => ['network']],
+        'power' => ['label' => __('Power'), 'new' => __('New UPS'), 'groups' => ['power']],
+        'printer' => ['label' => __('Printers'), 'new' => __('New Printer'), 'groups' => ['printer']],
     ];
     $taken = [];
     foreach ($tabs as $key => $tab) {
@@ -226,7 +354,7 @@ function assetTypeTabs($column = 'asset_type') {
         $tabs[$key]['icon'] = ASSET_TYPE_GROUPS[$tab['groups'][0]]['icon'];
         $tabs[$key]['query'] = "$column IN ('" . implode("', '", array_map('escapeSql', $types)) . "')";
     }
-    $tabs['other'] = ['label' => 'Other', 'new' => 'Asset', 'groups' => ['mobile', 'peripheral', 'other'], 'icon' => 'fa-tag',
+    $tabs['other'] = ['label' => __('Other'), 'new' => __('New Asset'), 'groups' => ['mobile', 'peripheral', 'other'], 'icon' => 'fa-tag',
         'query' => "$column NOT IN ('" . implode("', '", array_map('escapeSql', $taken)) . "')"];
     return $tabs;
 }
@@ -238,14 +366,14 @@ function assetTypeHasField($asset_type, $field) {
 
 /** What the OS field is called on this type - "Operating system" or "Firmware". */
 function assetTypeOsLabel($asset_type) {
-    return assetTypeInfo($asset_type)['os'] === 'firmware' ? 'Firmware' : 'Operating system';
+    return assetTypeInfo($asset_type)['os'] === 'firmware' ? __('Firmware') : __('Operating system');
 }
 
 /** A type's details - key => ASSET_SPECS entry, in its order. */
 function assetTypeSpecs($asset_type) {
     $specs = [];
     foreach (assetTypeInfo($asset_type)['specs'] as $key) {
-        $specs[$key] = ASSET_SPECS[$key];
+        $specs[$key] = ['label' => assetSpecLabel($key)] + ASSET_SPECS[$key];
     }
     return $specs;
 }
@@ -315,7 +443,7 @@ function assetSpecsFromInput($asset_type, $input, $client_id, $asset_id = 0, &$p
                 $number = str_replace(',', '', $value);
                 if (!is_numeric($number) || (float) $number < ($spec['min'] ?? 0) || (float) $number > ($spec['max'] ?? PHP_INT_MAX)
                     || (($spec['step'] ?? 'any') === 1 && floor((float) $number) != (float) $number)) {
-                    $problems[] = $spec['label'] . ': ' . (($spec['step'] ?? 'any') === 1 ? 'a whole number' : 'a number') . ' from ' . ($spec['min'] ?? 0) . ' to ' . ($spec['max'] ?? '') . (isset($spec['unit']) ? ' ' . $spec['unit'] : '');
+                    $problems[] = (($spec['step'] ?? 'any') === 1 ? __('%1$s: a whole number from %2$s to %3$s', $spec['label'], $spec['min'] ?? 0, $spec['max'] ?? '') : __('%1$s: a number from %2$s to %3$s', $spec['label'], $spec['min'] ?? 0, $spec['max'] ?? '')) . (isset($spec['unit']) ? ' ' . $spec['unit'] : '');
                     continue 2;
                 }
                 $value = assetSpecNumber($number);
@@ -323,7 +451,7 @@ function assetSpecsFromInput($asset_type, $input, $client_id, $asset_id = 0, &$p
             case 'date':
                 $date = DateTime::createFromFormat('!Y-m-d', $value);
                 if (!$date || $date->format('Y-m-d') !== $value) {
-                    $problems[] = $spec['label'] . ': a date';
+                    $problems[] = __('%s: a date', $spec['label']);
                     continue 2;
                 }
                 break;
@@ -335,7 +463,7 @@ function assetSpecsFromInput($asset_type, $input, $client_id, $asset_id = 0, &$p
                     }
                 }
                 if ($match === '') {
-                    $problems[] = $spec['label'] . ': one of ' . implode(', ', $spec['options']);
+                    $problems[] = __('%1$s: one of %2$s', $spec['label'], implode(', ', array_map('assetSpecOptionLabel', $spec['options'])));
                     continue 2;
                 }
                 $value = $match;
@@ -349,9 +477,7 @@ function assetSpecsFromInput($asset_type, $input, $client_id, $asset_id = 0, &$p
                     $pick = intval($named['asset_id'] ?? 0);
                 }
                 if (!$pick || $pick === intval($asset_id) || !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_id = $pick AND asset_client_id = " . intval($client_id) . " AND asset_type IN ($types) LIMIT 1"))) {
-                    $problems[] = $spec['label'] . ': one of the client\'s ' . implode(' or ', array_map(function ($type) {
-                        return strtoupper($type) === $type ? $type : strtolower($type) . 's';
-                    }, $spec['asset_types']));
+                    $problems[] = __('%1$s: one of the client\'s assets of type %2$s', $spec['label'], implode(', ', array_map('assetTypeLabel', $spec['asset_types'])));
                     continue 2;
                 }
                 $value = (string) $pick;
@@ -413,12 +539,12 @@ function assetPortsFromSpecs($asset_id, $asset_type, array $specs) {
 function assetPortsMadeText(array $made) {
     $parts = [];
     if ($made['copper']) {
-        $parts[] = $made['copper'] . ' port' . ($made['copper'] === 1 ? '' : 's');
+        $parts[] = _n('%d port', '%d ports', $made['copper']);
     }
     if ($made['sfp']) {
-        $parts[] = $made['sfp'] . ' SFP port' . ($made['sfp'] === 1 ? '' : 's');
+        $parts[] = _n('%d SFP port', '%d SFP ports', $made['sfp']);
     }
-    return implode(' and ', $parts);
+    return implode(' ' . __('and') . ' ', $parts);
 }
 
 /**
@@ -437,7 +563,7 @@ function assetSpecsFromPost($asset_id, $asset_type, $input, $client_id) {
     if (($before['ports'] ?? '') !== ($specs['ports'] ?? '') || ($before['sfp_ports'] ?? '') !== ($specs['sfp_ports'] ?? '')) {
         $made = assetPortsMadeText(assetPortsFromSpecs($asset_id, $asset_type, $specs));
     }
-    return [$made !== '' ? ", with $made added" : '', $problems];
+    return [$made !== '' ? __(', with %s added', $made) : '', $problems];
 }
 
 /**
@@ -457,7 +583,9 @@ function assetSpecText($key, $value, array $opts = []) {
         case 'asset':
             $hosts = $opts['hosts'] ?? null;
             $name = $hosts !== null ? ($hosts[intval($value)] ?? '') : (string) getFieldById('assets', intval($value), 'asset_name');
-            return $name !== '' ? $name : 'An asset that is gone';
+            return $name !== '' ? $name : __('An asset that is gone');
+        case 'select':
+            return assetSpecOptionLabel($value);
         default:
             return $value;
     }
@@ -494,8 +622,8 @@ function assetSpecRows($asset_type, array $specs, $client_id = 0) {
         } elseif (!empty($spec['flag'])) {
             $flag = assetWarranty($value);
             if ($flag) {
-                $flag['short'] = $flag['tone'] === 'success' ? 'Good' : ($flag['tone'] === 'danger' ? 'Overdue' : $flag['short']);
-                $flag['text'] = $flag['tone'] === 'danger' ? 'Due ' . timeAgo($flag['date']) : ($flag['tone'] === 'warning' ? ($flag['days'] === 0 ? 'Due today' : 'Due in ' . $flag['days'] . ' day' . ($flag['days'] === 1 ? '' : 's')) : 'By ' . $flag['date']);
+                $flag['short'] = $flag['tone'] === 'success' ? __('Good') : ($flag['tone'] === 'danger' ? __('Overdue') : $flag['short']);
+                $flag['text'] = $flag['tone'] === 'danger' ? __('Due %s', timeAgo($flag['date'])) : ($flag['tone'] === 'warning' ? ($flag['days'] === 0 ? __('Due today') : _n('Due in %d day', 'Due in %d days', $flag['days'])) : __('By %s', formatDate($flag['date'], 'date')));
             }
         } elseif (!empty($spec['mono'])) {
             $html = '<span class="font-monospace">' . $html . '</span>';
@@ -504,8 +632,8 @@ function assetSpecRows($asset_type, array $specs, $client_id = 0) {
         $label = $spec['label'];
         $alone = !empty($spec['alone']) || stripos($text, $label) === 0;
         $brief = ($alone ? '' : '<span class="text-body-secondary">' . escapeHtml($label) . '</span> ') . $html;
-        if ($spec['input'] === 'date' && !$flag && !in_array($age = assetAge($value), ['', 'new'], true)) {
-            $html .= '<div class="small text-body-secondary">' . escapeHtml($age) . ' ago</div>';
+        if ($spec['input'] === 'date' && !$flag && !in_array($age = assetAge($value), ['', __('new')], true)) {
+            $html .= '<div class="small text-body-secondary">' . escapeHtml(__('%s ago', $age)) . '</div>';
         }
         $rows[$key] = ['label' => $label, 'icon' => $spec['icon'], 'text' => $text, 'html' => $html, 'flag' => $flag, 'alone' => $alone, 'brief' => $brief];
     }

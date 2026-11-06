@@ -32,7 +32,7 @@ if (isset($_POST['add_asset'])) {
         'username' => $_POST['username'] ?? null,
         'password' => $_POST['password'] ?? null,
     ])) {
-        flashAlert("Credential <strong>$credential_field_too_long</strong> is too long to store", 'error');
+        flashAlert(__('Credential <strong>%s</strong> is too long to store', $credential_field_too_long), 'error');
         redirect();
         exit;
     }
@@ -78,7 +78,7 @@ if (isset($_POST['add_asset'])) {
 
         // A vault session that didn't open encrypts to nothing - better no login than one that can never be read
         if ($username === false || $password === false) {
-            $alert_extended = ", but not its login - your vault session has expired, so sign in again and add it from the asset";
+            $alert_extended = __(', but not its login - your vault session has expired, so sign in again and add it from the asset');
         } else {
             $username = escapeSql($username);
             $password = escapeSql($password);
@@ -89,7 +89,7 @@ if (isset($_POST['add_asset'])) {
 
             logAudit("Credential", "Create", "$session_name created login credential for asset $name", $client_id, $credential_id);
 
-            $alert_extended = " along with login credentials";
+            $alert_extended = ' ' . __('along with login credentials');
         }
 
     }
@@ -99,7 +99,7 @@ if (isset($_POST['add_asset'])) {
 
     logAudit("Asset", "Create", "$session_name created asset $name", $client_id, $asset_id);
 
-    flashAlert("Asset <strong>" . stripslashes($name) . "</strong> created$alert_extended" . ($spec_problems ? ' - not kept: ' . escapeHtml(implode('; ', $spec_problems)) : ''), $spec_problems ? 'warning' : 'success');
+    flashAlert(__('Asset %s created', '<strong>' . stripslashes($name) . '</strong>') . $alert_extended . ($spec_problems ? ' - ' . __('not kept: %s', escapeHtml(implode('; ', $spec_problems))) : ''), $spec_problems ? 'warning' : 'success');
 
     redirect();
 
@@ -119,7 +119,7 @@ if (isset($_POST['edit_asset'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_photo, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $existing_file_name = $row['asset_photo'] ?? '';
@@ -177,7 +177,7 @@ if (isset($_POST['edit_asset'])) {
 
     logAudit("Asset", "Edit", "$session_name edited asset $name", $client_id, $asset_id);
 
-    flashAlert("Asset <strong>" . stripslashes($name) . "</strong> saved$spec_note" . ($spec_problems ? ' - not kept: ' . escapeHtml(implode('; ', $spec_problems)) : ''), $spec_problems ? 'warning' : 'success');
+    flashAlert(__('Asset %s saved', '<strong>' . stripslashes($name) . '</strong>') . $spec_note . ($spec_problems ? ' - ' . __('not kept: %s', escapeHtml(implode('; ', $spec_problems))) : ''), $spec_problems ? 'warning' : 'success');
 
     redirect();
 
@@ -195,7 +195,7 @@ if (isset($_GET['archive_asset'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -210,7 +210,7 @@ if (isset($_GET['archive_asset'])) {
 
     logAudit("Asset", "Archive", "$session_name archived asset $asset_name", $client_id, $asset_id);
 
-    flashAlert("Asset <strong>" . stripslashes($asset_name) . "</strong> archived", 'error');
+    flashAlert(__('Asset <strong>%s</strong> archived', stripslashes($asset_name)), 'error');
 
     redirect();
 
@@ -228,7 +228,7 @@ if (isset($_GET['restore_asset'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -243,7 +243,7 @@ if (isset($_GET['restore_asset'])) {
 
     logAudit("Asset", "Restore", "$session_name restored asset $asset_name", $client_id, $asset_id);
 
-    flashAlert("Asset <strong>" . stripslashes($asset_name) . "</strong> restored");
+    flashAlert(__('Asset <strong>%s</strong> restored', stripslashes($asset_name)));
 
     redirect();
 
@@ -261,7 +261,7 @@ if (isset($_GET['delete_asset'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -279,7 +279,7 @@ if (isset($_GET['delete_asset'])) {
 
     logAudit("Asset", "Delete", "$session_name deleted asset $asset_name", $client_id);
 
-    flashAlert("Asset <strong>" . stripslashes($asset_name) . "</strong> deleted", 'error');
+    flashAlert(__('Asset <strong>%s</strong> deleted', stripslashes($asset_name)), 'error');
 
     redirect();
 
@@ -299,7 +299,7 @@ if (isset($_POST['add_asset_note'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_name, asset_client_id FROM assets WHERE asset_id = $asset_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That asset no longer exists.', 'error');
+        flashAlert(__('That asset no longer exists.'), 'error');
         redirect();
     }
     $asset_name = escapeSql($row['asset_name']);
@@ -314,7 +314,7 @@ if (isset($_POST['add_asset_note'])) {
     //Logging
     logAudit("Asset", "Edit", "$session_name created a $type note for asset $asset_name", $client_id, $asset_id);
 
-    $_SESSION['alert_message'] = "Note <strong>$type</strong> created for <strong>$asset_name</strong>";
+    $_SESSION['alert_message'] = __('Note <strong>%1$s</strong> created for <strong>%2$s</strong>', $type, $asset_name);
 
     redirect();
 
@@ -332,7 +332,7 @@ if (isset($_GET['archive_asset_note'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_note_type, asset_id, asset_name, asset_client_id FROM asset_notes LEFT JOIN assets ON asset_id = asset_note_asset_id WHERE asset_note_id = $asset_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $asset_note_type = escapeSql($row['asset_note_type']);
@@ -346,7 +346,7 @@ if (isset($_GET['archive_asset_note'])) {
 
     logAudit("Asset", "Edit", "$session_name archived note $asset_note_type for $asset_name", $client_id, $asset_id);
 
-    flashAlert("Note <strong>$asset_note_type</strong> archived", 'error');
+    flashAlert(__('Note <strong>%s</strong> archived', $asset_note_type), 'error');
 
     redirect();
 
@@ -364,7 +364,7 @@ if (isset($_GET['restore_asset_note'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_note_type, asset_id, asset_name, asset_client_id FROM asset_notes LEFT JOIN assets ON asset_id = asset_note_asset_id WHERE asset_note_id = $asset_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $asset_note_type = escapeSql($row['asset_note_type']);
@@ -378,7 +378,7 @@ if (isset($_GET['restore_asset_note'])) {
 
     logAudit("Asset", "Edit", "$session_name restored note $asset_note_type for $asset_name", $client_id, $asset_id);
 
-    flashAlert("Note <strong>$asset_note_type</strong> restored");
+    flashAlert(__('Note <strong>%s</strong> restored', $asset_note_type));
 
     redirect();
 
@@ -396,7 +396,7 @@ if (isset($_GET['delete_asset_note'])) {
     $sql = mysqli_query($mysqli,"SELECT asset_note_type, asset_id, asset_name, asset_client_id FROM asset_notes LEFT JOIN assets ON asset_id = asset_note_asset_id WHERE asset_note_id = $asset_note_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('That note no longer exists.', 'error');
+        flashAlert(__('That note no longer exists.'), 'error');
         redirect();
     }
     $asset_note_type = escapeSql($row['asset_note_type']);
@@ -410,7 +410,7 @@ if (isset($_GET['delete_asset_note'])) {
 
     logAudit("Asset", "Edit", "$session_name deleted $asset_note_type note for $asset_name", $client_id, $asset_id);
 
-    flashAlert("Note <strong>$asset_note_type</strong> deleted", 'error');
+    flashAlert(__('Note <strong>%s</strong> deleted', $asset_note_type), 'error');
 
     redirect();
 
@@ -428,7 +428,7 @@ if (isset($_POST['bulk_assign_asset_location'])) {
     $sql = mysqli_query($mysqli,"SELECT location_name, location_client_id FROM locations WHERE location_id = $location_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('Pick a location to move them to.', 'error');
+        flashAlert(__('Pick a location to move them to.'), 'error');
         redirect();
     }
     $location_name = escapeSql($row['location_name']);
@@ -468,7 +468,7 @@ if (isset($_POST['bulk_assign_asset_location'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name assigned $asset_count assets to location $location_name", $location_client_id);
 
-        flashAlert("<strong>$asset_count</strong> asset" . ($asset_count === 1 ? '' : 's') . " assigned to location <strong>" . stripslashes($location_name) . "</strong>");
+        flashAlert(_n('%1$s asset assigned to location %2$s', '%1$s assets assigned to location %2$s', $asset_count, "<strong>$asset_count</strong>", '<strong>' . stripslashes($location_name) . '</strong>'));
     }
 
     redirect();
@@ -508,7 +508,7 @@ if (isset($_POST['bulk_assign_asset_physical_location'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name set $asset_count assets to physical location $physical_location", $client_id);
 
-        flashAlert("Physical location of <strong>$asset_count</strong> asset" . ($asset_count === 1 ? '' : 's') . " set to <strong>" . stripslashes($physical_location) . "</strong>");
+        flashAlert(_n('Physical location of <strong>%1$d</strong> asset set to %2$s', 'Physical location of <strong>%1$d</strong> assets set to %2$s', $asset_count, $asset_count, '<strong>' . stripslashes($physical_location) . '</strong>'));
     }
 
     redirect();
@@ -607,7 +607,7 @@ if (isset($_POST['bulk_transfer_client_asset'])) {
 
         logAudit("Asset", "Bulk Transfer", "$session_name transferred $asset_count assets to $new_client_name", $new_client_id);
 
-        flashAlert("Transferred <strong>$asset_count</strong> asset" . ($asset_count === 1 ? '' : 's') . " to <strong>" . stripslashes($new_client_name) . "</strong>");
+        flashAlert(_n('Transferred <strong>%1$d</strong> asset to %2$s', 'Transferred <strong>%1$d</strong> assets to %2$s', $asset_count, $asset_count, '<strong>' . stripslashes($new_client_name) . '</strong>'));
     }
 
     redirect();
@@ -626,7 +626,7 @@ if (isset($_POST['bulk_assign_asset_contact'])) {
     $sql = mysqli_query($mysqli,"SELECT contact_name, contact_client_id FROM contacts WHERE contact_id = $contact_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert('Pick a contact to assign them to.', 'error');
+        flashAlert(__('Pick a contact to assign them to.'), 'error');
         redirect();
     }
     $contact_name = escapeSql($row['contact_name']);
@@ -662,7 +662,7 @@ if (isset($_POST['bulk_assign_asset_contact'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name assigned $asset_count assets to contact $contact_name", $client_id);
 
-        flashAlert("<strong>$asset_count</strong> asset" . ($asset_count === 1 ? '' : 's') . " assigned to <strong>" . stripslashes($contact_name) . "</strong>");
+        flashAlert(_n('%1$s asset assigned to %2$s', '%1$s assets assigned to %2$s', $asset_count, "<strong>$asset_count</strong>", '<strong>' . stripslashes($contact_name) . '</strong>'));
     }
 
     redirect();
@@ -703,7 +703,7 @@ if (isset($_POST['bulk_edit_asset_status'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name set status to $status on $asset_count assets", $client_id);
 
-        flashAlert("Status set to <strong>" . stripslashes($status) . "</strong> on <strong>$asset_count</strong> asset" . ($asset_count === 1 ? '' : 's'));
+        flashAlert(_n('Status set to %1$s on <strong>%2$d</strong> asset', 'Status set to %1$s on <strong>%2$d</strong> assets', $asset_count, '<strong>' . stripslashes($status) . '</strong>', $asset_count));
     }
 
     redirect();
@@ -740,7 +740,7 @@ if (isset($_POST['bulk_favorite_assets'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name favorited $count assets", $client_id);
 
-        flashAlert("Favorited <strong>$count</strong> asset(s)");
+        flashAlert(__('Favorited <strong>%s</strong> asset(s)', $count));
 
     }
 
@@ -778,7 +778,7 @@ if (isset($_POST['bulk_unfavorite_assets'])) {
 
         logAudit("Asset", "Bulk Edit", "$session_name unfavorited $count assets", $client_id);
 
-        flashAlert("Unfavorited <strong>$count</strong> asset(s)");
+        flashAlert(__('Unfavorited <strong>%s</strong> asset(s)', $count));
 
     }
 
@@ -819,7 +819,7 @@ if (isset($_POST['bulk_archive_assets'])) {
 
         logAudit("Asset", "Bulk Archive", "$session_name archived $count assets", $client_id);
 
-        flashAlert("Archived <strong>$count</strong> asset(s)", 'error');
+        flashAlert(__('Archived <strong>%s</strong> asset(s)', $count), 'error');
 
     }
 
@@ -861,7 +861,7 @@ if (isset($_POST['bulk_restore_assets'])) {
 
         logAudit("Asset", "Bulk Restore", "$session_name restored $count assets");
 
-        flashAlert("Restored <strong>$count</strong> asset(s)");
+        flashAlert(__('Restored <strong>%s</strong> asset(s)', $count));
 
     }
 
@@ -900,7 +900,7 @@ if (isset($_POST['bulk_delete_assets'])) {
 
         logAudit("Asset", "Bulk Delete", "$session_name deleted $count assets");
 
-        flashAlert("Deleted <strong>$count</strong> asset(s)", 'error');
+        flashAlert(__('Deleted <strong>%s</strong> asset(s)', $count), 'error');
     }
 
     redirect();
@@ -927,7 +927,7 @@ if (isset($_POST['link_asset_to_credential'])) {
     $sql_credential = mysqli_query($mysqli,"SELECT credential_name, credential_client_id FROM credentials WHERE credential_id = $credential_id");
     $row = mysqli_fetch_assoc($sql_credential);
     if (!$row) {
-        flashAlert("That credential no longer exists", 'error');
+        flashAlert(__('That credential no longer exists'), 'error');
         redirect();
     }
     $credential_name = escapeSql($row['credential_name']);
@@ -937,7 +937,7 @@ if (isset($_POST['link_asset_to_credential'])) {
 
     // Only to one of the same client's assets
     if (!assetClientOwnedId('asset', $asset_id, $client_id)) {
-        flashAlert("That asset isn't one of this client's", 'error');
+        flashAlert(__('That asset isn\'t one of this client\'s'), 'error');
         redirect();
     }
 
@@ -948,7 +948,7 @@ if (isset($_POST['link_asset_to_credential'])) {
 
     logAudit("Credential", "Link", "$session_name linked credential $credential_name to asset $asset_name", $client_id, $credential_id);
 
-    flashAlert("Asset <strong>" . stripslashes($asset_name) . "</strong> linked with credential <strong>" . stripslashes($credential_name) . "</strong>");
+    flashAlert(__('Asset <strong>%1$s</strong> linked with credential <strong>%2$s</strong>', stripslashes($asset_name), stripslashes($credential_name)));
 
     redirect();
 
@@ -968,7 +968,7 @@ if (isset($_GET['unlink_credential_from_asset'])) {
     $sql_credential = mysqli_query($mysqli,"SELECT credential_name, credential_client_id FROM credentials WHERE credential_id = $credential_id");
     $row = mysqli_fetch_assoc($sql_credential);
     if (!$row) {
-        flashAlert('That credential no longer exists.', 'error');
+        flashAlert(__('That credential no longer exists.'), 'error');
         redirect();
     }
     $credential_name = escapeSql($row['credential_name']);
@@ -984,7 +984,7 @@ if (isset($_GET['unlink_credential_from_asset'])) {
 
     logAudit("Credential", "Unlink", "$session_name unlinked asset $asset_name from credential $credential_name", $client_id, $credential_id);
 
-    flashAlert("Credential <strong>" . stripslashes($credential_name) . "</strong> unlinked from asset <strong>" . stripslashes($asset_name) . "</strong>", 'error');
+    flashAlert(__('Credential <strong>%1$s</strong> unlinked from asset <strong>%2$s</strong>', stripslashes($credential_name), stripslashes($asset_name)), 'error');
 
     redirect();
 
@@ -1009,7 +1009,7 @@ if (isset($_POST["import_assets_csv"])) {
     if (!empty($_FILES["file"]["tmp_name"])) {
         $file_name = $_FILES["file"]["tmp_name"];
     } else {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
 
@@ -1018,13 +1018,13 @@ if (isset($_POST["import_assets_csv"])) {
     $allowed_file_extensions = array('csv');
     if (in_array($file_extension,$allowed_file_extensions) === false) {
         $error = true;
-        flashAlert("Bad file extension", 'error');
+        flashAlert(__('Bad file extension'), 'error');
     }
 
     //Check file isn't empty
     elseif ($_FILES["file"]["size"] < 1) {
         $error = true;
-        flashAlert("Bad file size (empty?)", 'error');
+        flashAlert(__('Bad file size (empty?)'), 'error');
     }
 
     //(Else)Check column count (name, desc, type, make, model, serial, os, purchase date, assigned to, location, physical location, notes),
@@ -1033,7 +1033,7 @@ if (isset($_POST["import_assets_csv"])) {
     $f_columns = fgetcsv($f, 1000, ",");
     if (!$error & (!is_array($f_columns) || count($f_columns) < 12)) {
         $error = true;
-        flashAlert("Invalid column count.", 'error');
+        flashAlert(__('Invalid column count.'), 'error');
     }
     $spec_columns = [];
     if (!$error) {
@@ -1180,9 +1180,9 @@ if (isset($_POST["import_assets_csv"])) {
         logAudit("Asset", "Import", "$session_name imported $row_count asset(s) via CSV file", $client_id);
 
         if ($spec_problems) {
-            flashAlert("$row_count Asset(s) added, $duplicate_count duplicate(s) detected - details not kept: " . escapeHtml(implode(', ', array_slice($spec_problems, 0, 5)) . (count($spec_problems) > 5 ? ' and ' . (count($spec_problems) - 5) . ' more' : '')), 'warning');
+            flashAlert(__('%1$s Asset(s) added, %2$s duplicate(s) detected - details not kept: %3$s', $row_count, $duplicate_count, escapeHtml(implode(', ', array_slice($spec_problems, 0, 5)) . (count($spec_problems) > 5 ? ' ' . __('and %d more', count($spec_problems) - 5) : ''))), 'warning');
         } else {
-            flashAlert("$row_count Asset(s) added, $duplicate_count duplicate(s) detected");
+            flashAlert(__('%1$s Asset(s) added, %2$s duplicate(s) detected', $row_count, $duplicate_count));
         }
 
         redirect();

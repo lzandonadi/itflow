@@ -15,15 +15,16 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 /** What Add / Edit say after saving - the stored subnet when it differs from what was typed, and any overlap. */
 function networkSavedMessage($verb, $network_id, $note) {
     $row = networkRow($network_id);
-    $message = "Network <strong>" . $row['network_name'] . "</strong> $verb";
+    $message = $verb === 'created' ? __('Network %s created', '<strong>' . $row['network_name'] . '</strong>') : __('Network %s saved', '<strong>' . $row['network_name'] . '</strong>');
     if ($note !== '') {
         $message .= ' - ' . $note;
     }
     $overlaps = networkOverlaps($row);
     if ($overlaps) {
-        $message .= ' It overlaps <strong>' . implode(', ', array_map(function ($overlap) {
+        $overlap_names = '<strong>' . implode(', ', array_map(function ($overlap) {
             return $overlap['network_name'] . ' (' . $overlap['network'] . ')';
-        }, array_slice($overlaps, 0, 3))) . '</strong>' . (count($overlaps) > 3 ? ' and ' . (count($overlaps) - 3) . ' more' : '') . '.';
+        }, array_slice($overlaps, 0, 3))) . '</strong>';
+        $message .= ' ' . (count($overlaps) > 3 ? __('It overlaps %1$s and %2$d more.', $overlap_names, count($overlaps) - 3) : __('It overlaps %s.', $overlap_names));
     }
     flashAlert($message, $overlaps ? 'warning' : 'success');
 }
@@ -37,7 +38,7 @@ if (isset($_POST['add_network'])) {
     $client_id = intval($_POST['client_id'] ?? 0);
     enforceClientAccess();
     if (!$client_id || !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM clients WHERE client_id = $client_id AND client_archived_at IS NULL"))) {
-        flashAlert('Pick the client the network is at.', 'error');
+        flashAlert(__('Pick the client the network is at.'), 'error');
         redirect();
     }
 
@@ -111,7 +112,7 @@ if (isset($_POST['network_set_notes'])) {
         exit;
     }
 
-    flashAlert("Notes saved");
+    flashAlert(__('Notes saved'));
 
     redirect();
 
@@ -128,7 +129,7 @@ if (isset($_GET['favorite_network']) || isset($_GET['unfavorite_network'])) {
 
     logAudit("Network", "Edit", "$session_name " . ($favorite ? 'starred' : 'unstarred') . " network " . escapeSql($row['network_name']), $client_id, intval($row['network_id']));
 
-    flashAlert("Network <strong>" . $row['network_name'] . "</strong> " . ($favorite ? 'starred' : 'unstarred'));
+    flashAlert($favorite ? __('Network %s starred', '<strong>' . $row['network_name'] . '</strong>') : __('Network %s unstarred', '<strong>' . $row['network_name'] . '</strong>'));
 
     redirect();
 
@@ -142,7 +143,7 @@ if (isset($_GET['archive_network'])) {
 
     networkArchive($row);
 
-    flashAlert("Network <strong>" . $row['network_name'] . "</strong> archived", 'error');
+    flashAlert(__('Network <strong>%s</strong> archived', $row['network_name']), 'error');
 
     redirect();
 
@@ -156,7 +157,7 @@ if (isset($_GET['restore_network'])) {
 
     networkRestore($row);
 
-    flashAlert("Network <strong>" . $row['network_name'] . "</strong> restored");
+    flashAlert(__('Network <strong>%s</strong> restored', $row['network_name']));
 
     redirect();
 
@@ -170,7 +171,7 @@ if (isset($_GET['delete_network'])) {
 
     networkDelete($row);
 
-    flashAlert("Network <strong>" . $row['network_name'] . "</strong> deleted", 'error');
+    flashAlert(__('Network <strong>%s</strong> deleted', $row['network_name']), 'error');
 
     // Not back to the page of a network that is gone
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
@@ -191,7 +192,7 @@ if (isset($_POST['bulk_edit_networks'])) {
     $set_location = $location !== '';
 
     if (!$set_type && !$set_location) {
-        flashAlert('Nothing picked to change.', 'warning');
+        flashAlert(__('Nothing picked to change.'), 'warning');
         redirect();
     }
 
@@ -222,7 +223,7 @@ if (isset($_POST['bulk_edit_networks'])) {
         $count++;
     }
 
-    flashAlert("Updated <strong>$count</strong> network" . ($count === 1 ? '' : 's') . ($skipped ? " - the site is not at the client of $skipped of them, so they kept theirs" : ''), $skipped ? 'warning' : 'success');
+    flashAlert(_n('Updated <strong>%d</strong> network', 'Updated <strong>%d</strong> networks', $count) . ($skipped ? ' - ' . __('the site is not at the client of %d of them, so they kept theirs', $skipped) : ''), $skipped ? 'warning' : 'success');
 
     redirect();
 
@@ -239,7 +240,7 @@ if (isset($_POST['bulk_favorite_networks']) || isset($_POST['bulk_unfavorite_net
         $count++;
     }
 
-    flashAlert(($favorite ? 'Starred' : 'Unstarred') . " <strong>$count</strong> network" . ($count === 1 ? '' : 's'));
+    flashAlert($favorite ? _n('Starred %s network', 'Starred %s networks', $count, "<strong>$count</strong>") : _n('Unstarred %s network', 'Unstarred %s networks', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -257,7 +258,7 @@ if (isset($_POST['bulk_archive_networks'])) {
         }
     }
 
-    flashAlert("Archived <strong>$count</strong> network" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived <strong>%d</strong> network', 'Archived <strong>%d</strong> networks', $count), 'error');
 
     redirect();
 
@@ -275,7 +276,7 @@ if (isset($_POST['bulk_restore_networks'])) {
         }
     }
 
-    flashAlert("Restored <strong>$count</strong> network" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored <strong>%d</strong> network', 'Restored <strong>%d</strong> networks', $count));
 
     redirect();
 
@@ -291,7 +292,7 @@ if (isset($_POST['bulk_delete_networks'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> network" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> network', 'Deleted <strong>%d</strong> networks', $count), 'error');
 
     redirect();
 
@@ -428,15 +429,15 @@ if (isset($_POST['import_networks_csv'])) {
     enforceClientAccess();
 
     if (empty($_FILES['file']['tmp_name'])) {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
     if (strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        flashAlert("Bad file extension - only .csv files are accepted.", 'error');
+        flashAlert(__('Bad file extension - only .csv files are accepted.'), 'error');
         redirect();
     }
     if ($_FILES['file']['size'] < 1) {
-        flashAlert("Bad file size (empty file?).", 'error');
+        flashAlert(__('Bad file size (empty file?).'), 'error');
         redirect();
     }
 
@@ -444,7 +445,7 @@ if (isset($_POST['import_networks_csv'])) {
     $header = fgetcsv($file, 1000, ',');
     if (!is_array($header) || !in_array(count($header), [8, 9], true)) {
         fclose($file);
-        flashAlert("Bad column count - use the template: " . implode(', ', NETWORK_CSV_COLUMNS) . " (Type may be left off).", 'error');
+        flashAlert(__('Bad column count - use the template: %s (Type may be left off).', implode(', ', NETWORK_CSV_COLUMNS)), 'error');
         redirect();
     }
 
@@ -493,7 +494,7 @@ if (isset($_POST['import_networks_csv'])) {
 
     logAudit("Network", "Import", "$session_name imported $row_count network(s). $duplicate_count duplicate(s) and " . count($problems) . " row(s) with problems not imported", $client_id);
 
-    $message = "<strong>$row_count</strong> network" . ($row_count === 1 ? '' : 's') . " imported";
+    $message = _n('%s network imported', '%s networks imported', $row_count, "<strong>$row_count</strong>");
     if ($duplicate_count) {
         $message .= ", <strong>$duplicate_count</strong> already there";
     }

@@ -38,7 +38,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-key me-2"></i>New Credential<?php if ($for_name) { ?> <small class="opacity-75 ms-1">for <?= escapeHtml($for_name) ?></small><?php } ?></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-key me-2"></i><?= __('New Credential') ?><?php if ($for_name) { ?> <small class="opacity-75 ms-1">for <?= escapeHtml($for_name) ?></small><?php } ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -50,13 +50,13 @@ ob_start();
 
     <div class="modal-body">
         <?php if (!$vault_open) { ?>
-            <div class="alert alert-warning small"><i class="fas fa-lock me-2"></i>Your vault session has expired, so a new login cannot be encrypted. Sign out and back in first.</div>
+            <div class="alert alert-warning small"><i class="fas fa-lock me-2"></i><?= __('Your vault session has expired, so a new login cannot be encrypted. Sign out and back in first.') ?></div>
         <?php } ?>
         <?php require 'credential_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_credential" class="btn btn-primary text-bold" <?= $vault_open ? '' : 'disabled' ?>><i class="fa fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_credential" class="btn btn-primary text-bold" <?= $vault_open ? '' : 'disabled' ?>><i class="fa fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
