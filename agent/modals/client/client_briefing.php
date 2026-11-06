@@ -47,7 +47,7 @@ ob_start();
         <div class="btn-group btn-group-sm mb-3" role="group" aria-label="<?= escapeHtml(__('Looking back over')) ?>">
             <?php foreach (aiBriefingPeriods() as $days => $label) { ?>
                 <input type="radio" class="btn-check" name="days" id="aiBriefing<?= $days ?>" value="<?= $days ?>" autocomplete="off" <?= $days === 90 ? 'checked' : '' ?> data-ai-briefing-days>
-                <label class="btn btn-outline-secondary" for="aiBriefing<?= $days ?>" title="<?= escapeHtml(ucfirst($label)) ?>"><?= $days === 30 ? __('Last 30 days') : ($days === 90 ? __('Last quarter') : __('Last year')) ?></label>
+                <label class="btn btn-outline-secondary" for="aiBriefing<?= $days ?>" title="<?= escapeHtml(aiBriefingPeriodTitle($days)) ?>"><?= $days === 30 ? __('Last 30 days') : ($days === 90 ? __('Last quarter') : __('Last year')) ?></label>
             <?php } ?>
         </div>
         <div class="itflow-ai-summary" data-ai-briefing aria-live="polite">

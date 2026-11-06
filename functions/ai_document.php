@@ -100,7 +100,7 @@ function aiDocumentDraft($client_id, $prompt, $use_client = true) {
     }
     $prompt = trim((string) $prompt);
     if ($prompt === '') {
-        return ['ok' => false, 'error' => 'Say what the document is for first.'];
+        return ['ok' => false, 'error' => __('Say what the document is for first.')];
     }
     $profile = $use_client ? aiClientProfile($client_id) : '';
     $result = callAiApi($model, [
@@ -115,7 +115,7 @@ function aiDocumentDraft($client_id, $prompt, $use_client = true) {
     }
     [$title, $description, $html] = aiDocumentSplit(aiCleanHtml($result['content']));
     if (trim(strip_tags($html)) === '') {
-        return ['ok' => false, 'error' => 'The AI provider answered with nothing to keep - try again.'];
+        return ['ok' => false, 'error' => __('The AI provider answered with nothing to keep - try again.')];
     }
     return ['ok' => true, 'title' => $title, 'description' => $description, 'html' => $html];
 }
@@ -136,11 +136,11 @@ function aiDocumentReview($document_id) {
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT document_name, document_description, document_content, document_client_id, document_updated_at, client_name
         FROM documents LEFT JOIN clients ON client_id = document_client_id WHERE document_id = " . intval($document_id)));
     if (!$row) {
-        return ['ok' => false, 'error' => 'That document no longer exists.'];
+        return ['ok' => false, 'error' => __('That document no longer exists.')];
     }
     $text = aiHtmlToText($row['document_content'], 30000);
     if ($text === '') {
-        return ['ok' => false, 'error' => 'There is nothing in it to review yet.'];
+        return ['ok' => false, 'error' => __('There is nothing in it to review yet.')];
     }
     [, $secrets] = aiRedact($text);
 
@@ -157,7 +157,7 @@ function aiDocumentReview($document_id) {
     }
     $answer = aiJsonFromText($result['content']);
     if (!$answer) {
-        return ['ok' => false, 'error' => "The AI provider's answer couldn't be read - try again."];
+        return ['ok' => false, 'error' => __("The AI provider's answer couldn't be read - try again.")];
     }
     $order = ['high' => 0, 'medium' => 1, 'low' => 2];
     $findings = [];

@@ -148,20 +148,20 @@ function aiClientConfig() {
     }
     // Draft is on the ticket reply editor only - its textarea says which ticket
     return ['reword' => $general, 'rewordTicket' => $tickets, 'draft' => $tickets, 'endpoint' => '/agent/ajax.php',
-        'tones' => aiRewordTones(), 'languages' => aiLanguages()];
+        'tones' => aiRewordTones(), 'languages' => aiLanguages(), 'language_labels' => aiLanguageLabels()];
 }
 
 /* What Reword can do to text - tone => what the editor's menu calls it. Reword is the button itself; Translate asks which language. */
 function aiRewordTones() {
     return [
-        'reword' => 'Reword - clearer and more professional',
-        'shorter' => 'Make it shorter',
-        'formal' => 'More formal',
-        'friendly' => 'Friendlier',
-        'plain' => 'Plain English, for someone non-technical',
-        'structure' => 'Organize it - headings and lists',
-        'proofread' => 'Just fix spelling and grammar',
-        'translate' => 'Translate...',
+        'reword' => __('Reword - clearer and more professional'),
+        'shorter' => __('Make it shorter'),
+        'formal' => __('More formal'),
+        'friendly' => __('Friendlier'),
+        'plain' => __('Plain English, for someone non-technical'),
+        'structure' => __('Organize it - headings and lists'),
+        'proofread' => __('Just fix spelling and grammar'),
+        'translate' => __('Translate...'),
     ];
 }
 
@@ -170,6 +170,20 @@ function aiLanguages() {
     return ['English', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Polish', 'Swedish', 'Danish', 'Norwegian', 'Finnish', 'Czech', 'Romanian',
         'Hungarian', 'Greek', 'Turkish', 'Russian', 'Ukrainian', 'Arabic', 'Hebrew', 'Hindi', 'Vietnamese', 'Thai', 'Indonesian', 'Filipino', 'Chinese (Simplified)',
         'Chinese (Traditional)', 'Japanese', 'Korean'];
+}
+
+/* The languages Translate offers as the menu shows them - the English name (what the model is asked for) => its name in the interface language. */
+function aiLanguageLabels() {
+    $labels = [];
+    foreach (aiLanguages() as $language) {
+        $labels[$language] = _x($language, 'language'); // i18n-dynamic - aiLanguages(), entries in lang/pt_BR/ai.php
+    }
+    return $labels;
+}
+
+/* A use case's name as shown - aiUseCases() keys stay English (they are stored). */
+function aiUseCaseLabel($use_case) {
+    return _x((string) $use_case, 'ai use case'); // i18n-dynamic - aiUseCases() keys, entries in lang/pt_BR/ai.php
 }
 
 /*
@@ -206,7 +220,7 @@ function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
  */
 function aiModelMissingError($use_case) {
     logApp('AI', 'warning', "No AI model configured for use case '$use_case' and no General model to fall back on");
-    return "No AI model is set up for $use_case. Add one in Admin > AI Providers.";
+    return __('No AI model is set up for %s. Add one in Admin > AI Providers.', aiUseCaseLabel($use_case));
 }
 
 /* ------------------------------------------------------------- Keeping secrets out */
@@ -383,7 +397,7 @@ function callAiApi($model, $messages, array $context = []) {
     if ($response === false) {
         logApp('AI', 'error', "$label - could not reach the provider: $transport_error");
         aiUsageRecord($usage + ['ok' => false, 'error' => 'Could not reach the provider']);
-        return ['ok' => false, 'error' => 'Could not reach the AI provider.'];
+        return ['ok' => false, 'error' => __('Could not reach the AI provider.')];
     }
 
     $decoded = json_decode($response, true);
@@ -402,14 +416,14 @@ function callAiApi($model, $messages, array $context = []) {
         }
         logApp('AI', 'error', $detail);
         aiUsageRecord($usage + ['ok' => false, 'error' => "HTTP $status" . (!empty($provider_error['message']) && is_scalar($provider_error['message']) ? ' - ' . $provider_error['message'] : '')]);
-        return ['ok' => false, 'error' => "The AI provider turned the request away (HTTP $status) - see Admin > App Logs."];
+        return ['ok' => false, 'error' => __('The AI provider turned the request away (HTTP %d) - see Admin > App Logs.', $status)];
     }
 
     $content = $decoded['choices'][0]['message']['content'] ?? null;
     if (!is_string($content)) {
         logApp('AI', 'error', "$label - HTTP $status but the response carried no choices[0].message.content");
         aiUsageRecord($usage + ['ok' => false, 'error' => 'No answer in the response']);
-        return ['ok' => false, 'error' => 'The AI provider returned an unexpected response - see Admin > App Logs.'];
+        return ['ok' => false, 'error' => __('The AI provider returned an unexpected response - see Admin > App Logs.')];
     }
 
     aiUsageRecord($usage + ['ok' => true, 'tokens_in' => intval($decoded['usage']['prompt_tokens'] ?? 0), 'tokens_out' => intval($decoded['usage']['completion_tokens'] ?? 0)]);

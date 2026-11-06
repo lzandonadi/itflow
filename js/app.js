@@ -269,6 +269,7 @@ function itflowAiReword(editor, ticket) {
 
     function translate() {
         var languages = ai.languages || ['English'];
+        var labels = ai.language_labels || {};
         var last = '';
         try {
             last = localStorage.getItem('itflowAiLanguage') || '';
@@ -279,7 +280,7 @@ function itflowAiReword(editor, ticket) {
             title: __('Translate with AI'),
             body: {
                 type: 'panel',
-                items: [{ type: 'selectbox', name: 'language', label: __('Into'), items: languages.map(function (language) { return { text: language, value: language }; }) }]
+                items: [{ type: 'selectbox', name: 'language', label: __('Into'), items: languages.map(function (language) { return { text: labels[language] || language, value: language }; }) }]
             },
             initialData: { language: languages.indexOf(last) >= 0 ? last : languages[0] },
             buttons: [{ type: 'cancel', text: __('Cancel') }, { type: 'submit', text: __('Translate'), primary: true }],
