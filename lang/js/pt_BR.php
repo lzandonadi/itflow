@@ -292,4 +292,21 @@ return [
     'Invoiced' => 'Faturado',
     'Paid' => 'Pago',
 
+    // Shared links (agent/js/share_add.js, js/guest_share.js)
+    'Copy it by hand' => 'Copie manualmente',
+    'An emailed code goes to the recipient - pick a contact or type their email address.' => 'Um código por e-mail vai para o destinatário - escolha um contato ou digite o e-mail dele.',
+    'The link could not be made - try again.' => 'Não foi possível criar o link - tente de novo.',
+    'Done' => 'Concluir',
+    'The link could not be made - check your connection and try again.' => 'Não foi possível criar o link - verifique sua conexão e tente de novo.',
+    'Something went wrong - try again in a moment.' => 'Algo deu errado - tente de novo em instantes.',
+    'Could not reach the server - check your connection and try again.' => 'Não foi possível falar com o servidor - verifique sua conexão e tente de novo.',
+    'It may have expired, been used up or been turned off.' => 'Ele pode ter expirado, atingido o limite de aberturas ou sido desativado.',
+    'Download' => 'Baixar',
+    'Open the document' => 'Abrir o documento',
+    'Reveal' => 'Revelar',
+    'The file could not be downloaded.' => 'Não foi possível baixar o arquivo.',
+    'Ended' => 'Encerrado',
+    'Fill in the username, the password, or both.' => 'Preencha o usuário, a senha ou os dois.',
+    'The link is not complete - copy the whole of it from the email, including everything after the #.' => 'O link está incompleto - copie-o inteiro do e-mail, incluindo tudo depois do #.',
+
 ];

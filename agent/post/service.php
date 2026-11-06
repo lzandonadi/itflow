@@ -19,7 +19,7 @@ if (isset($_POST['add_service'])) {
     $client_id = intval($_POST['client_id'] ?? 0);
     enforceClientAccess();
     if (!$client_id || !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM clients WHERE client_id = $client_id AND client_archived_at IS NULL"))) {
-        flashAlert('Pick the client the service is for.', 'error');
+        flashAlert(__('Pick the client the service is for.'), 'error');
         redirect();
     }
 
@@ -47,7 +47,8 @@ if (isset($_POST['add_service'])) {
         }
     }
 
-    flashAlert("Service <strong>" . escapeHtml(trim($_POST['name'])) . "</strong> created" . ($linked ? " with <strong>$linked</strong> linked" : ' - link what it runs on and depends on below'));
+    $name_html = escapeHtml(trim($_POST['name']));
+    flashAlert($linked ? __('Service <strong>%1$s</strong> created with %2$s linked', $name_html, "<strong>$linked</strong>") : __('Service <strong>%s</strong> created - link what it runs on and depends on below', $name_html));
 
     redirect(serviceUrl($service_id, $client_id));
 
@@ -77,7 +78,7 @@ if (isset($_POST['edit_service'])) {
     $service_name = escapeSql(trim($_POST['name']));
     logAudit("Service", "Edit", "$session_name edited service $service_name", $client_id, $service_id);
 
-    flashAlert("Service <strong>" . escapeHtml(trim($_POST['name'])) . "</strong> saved");
+    flashAlert(__('Service <strong>%s</strong> saved', escapeHtml(trim($_POST['name']))));
 
     redirect();
 
@@ -100,7 +101,7 @@ if (isset($_POST['service_set_notes'])) {
         exit;
     }
 
-    flashAlert("Notes saved");
+    flashAlert(__('Notes saved'));
 
     redirect();
 
@@ -120,7 +121,7 @@ if (isset($_POST['review_service'])) {
 
     $next = serviceMarkReviewed($row, trim((string) ($_POST['review_due'] ?? '')), (string) ($_POST['note'] ?? ''));
 
-    flashAlert("Service <strong>" . escapeHtml($row['service_name']) . "</strong> marked reviewed" . ($next ? " - next review " . date('M j, Y', strtotime($next)) : ''));
+    flashAlert($next ? __('Service <strong>%1$s</strong> marked reviewed - next review %2$s', escapeHtml($row['service_name']), formatDate($next, 'date')) : __('Service <strong>%s</strong> marked reviewed', escapeHtml($row['service_name'])));
 
     redirect();
 
@@ -137,7 +138,7 @@ if (isset($_GET['favorite_service']) || isset($_GET['unfavorite_service'])) {
 
     logAudit("Service", "Edit", "$session_name " . ($favorite ? 'starred' : 'unstarred') . " service " . escapeSql($row['service_name']), $client_id, intval($row['service_id']));
 
-    flashAlert("Service <strong>" . escapeHtml($row['service_name']) . "</strong> " . ($favorite ? 'starred' : 'unstarred'));
+    flashAlert($favorite ? __('Service <strong>%s</strong> starred', escapeHtml($row['service_name'])) : __('Service <strong>%s</strong> unstarred', escapeHtml($row['service_name'])));
 
     redirect();
 
@@ -151,7 +152,7 @@ if (isset($_GET['archive_service'])) {
 
     serviceArchive($row);
 
-    flashAlert("Service <strong>" . escapeHtml($row['service_name']) . "</strong> archived", 'error');
+    flashAlert(__('Service <strong>%s</strong> archived', escapeHtml($row['service_name'])), 'error');
 
     redirect();
 
@@ -165,7 +166,7 @@ if (isset($_GET['restore_service'])) {
 
     serviceRestore($row);
 
-    flashAlert("Service <strong>" . escapeHtml($row['service_name']) . "</strong> restored");
+    flashAlert(__('Service <strong>%s</strong> restored', escapeHtml($row['service_name'])));
 
     redirect();
 
@@ -179,7 +180,7 @@ if (isset($_GET['delete_service'])) {
 
     serviceDelete($row);
 
-    flashAlert("Service <strong>" . escapeHtml($row['service_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Service <strong>%s</strong> deleted', escapeHtml($row['service_name'])), 'error');
 
     // Not back to the page of a service that is gone
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
@@ -197,9 +198,9 @@ if (isset($_POST['link_service_tickets'])) {
     $added = serviceLinkTickets($row['service_id'], $client_id, (array) ($_POST['ticket_ids'] ?? []));
     if ($added) {
         logAudit("Service", "Link", "$session_name linked $added ticket(s) to service " . escapeSql($row['service_name']), $client_id, intval($row['service_id']));
-        flashAlert("Linked <strong>$added</strong> ticket" . ($added === 1 ? '' : 's') . " to <strong>" . escapeHtml($row['service_name']) . "</strong>");
+        flashAlert(_n('Linked %1$s ticket to %2$s', 'Linked %1$s tickets to %2$s', $added, "<strong>$added</strong>", '<strong>' . escapeHtml($row['service_name']) . '</strong>'));
     } else {
-        flashAlert("Nothing new to link to <strong>" . escapeHtml($row['service_name']) . "</strong>.", 'warning');
+        flashAlert(__('Nothing new to link to <strong>%s</strong>.', escapeHtml($row['service_name'])), 'warning');
     }
 
     redirect();
@@ -215,7 +216,7 @@ if (isset($_POST['link_ticket_services'])) {
     $ticket_id = intval($_POST['ticket_id'] ?? 0);
     $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_id, ticket_prefix, ticket_number, ticket_client_id FROM tickets WHERE ticket_id = $ticket_id"));
     if (!$ticket || !intval($ticket['ticket_client_id'])) {
-        flashAlert('That ticket no longer exists.', 'error');
+        flashAlert(__('That ticket no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($ticket['ticket_client_id']);
@@ -234,9 +235,9 @@ if (isset($_POST['link_ticket_services'])) {
     }
 
     if ($names) {
-        flashAlert("Ticket linked to <strong>" . escapeHtml(implode(', ', $names)) . "</strong>");
+        flashAlert(__('Ticket linked to <strong>%s</strong>', escapeHtml(implode(', ', $names))));
     } else {
-        flashAlert('Nothing new to link.', 'warning');
+        flashAlert(__('Nothing new to link.'), 'warning');
     }
 
     redirect();
@@ -255,7 +256,7 @@ if (isset($_GET['unlink_service_ticket'])) {
         $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_prefix, ticket_number FROM tickets WHERE ticket_id = $ticket_id"));
         $reference = $ticket ? $ticket['ticket_prefix'] . $ticket['ticket_number'] : "#$ticket_id";
         logAudit("Service", "Unlink", "$session_name unlinked ticket " . escapeSql($reference) . " from service " . escapeSql($row['service_name']), $client_id, intval($row['service_id']));
-        flashAlert("Ticket <strong>" . escapeHtml($reference) . "</strong> unlinked from <strong>" . escapeHtml($row['service_name']) . "</strong>", 'error');
+        flashAlert(__('Ticket <strong>%1$s</strong> unlinked from <strong>%2$s</strong>', escapeHtml($reference), escapeHtml($row['service_name'])), 'error');
     }
 
     redirect();
@@ -289,7 +290,7 @@ if (isset($_POST['bulk_edit_services'])) {
     $set_interval = $interval !== '' && isset(SERVICE_REVIEW_INTERVALS[intval($interval)]);
 
     if (!$sets && !$set_interval) {
-        flashAlert('Nothing picked to change.', 'warning');
+        flashAlert(__('Nothing picked to change.'), 'warning');
         redirect();
     }
 
@@ -316,7 +317,7 @@ if (isset($_POST['bulk_edit_services'])) {
         $count++;
     }
 
-    flashAlert("Updated <strong>$count</strong> service" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Updated %s service', 'Updated %s services', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -335,7 +336,7 @@ if (isset($_POST['bulk_review_services'])) {
         $count++;
     }
 
-    flashAlert("Marked <strong>$count</strong> service" . ($count === 1 ? '' : 's') . " reviewed");
+    flashAlert(_n('Marked %s service reviewed', 'Marked %s services reviewed', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -352,7 +353,7 @@ if (isset($_POST['bulk_favorite_services']) || isset($_POST['bulk_unfavorite_ser
         $count++;
     }
 
-    flashAlert(($favorite ? 'Starred' : 'Unstarred') . " <strong>$count</strong> service" . ($count === 1 ? '' : 's'));
+    flashAlert($favorite ? _n('Starred %s service', 'Starred %s services', $count, "<strong>$count</strong>") : _n('Unstarred %s service', 'Unstarred %s services', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -370,7 +371,7 @@ if (isset($_POST['bulk_archive_services'])) {
         }
     }
 
-    flashAlert("Archived <strong>$count</strong> service" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived %s service', 'Archived %s services', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 
@@ -388,7 +389,7 @@ if (isset($_POST['bulk_restore_services'])) {
         }
     }
 
-    flashAlert("Restored <strong>$count</strong> service" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored %s service', 'Restored %s services', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -404,7 +405,7 @@ if (isset($_POST['bulk_delete_services'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> service" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted %s service', 'Deleted %s services', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 
@@ -522,7 +523,7 @@ if (isExportRequest('export_services')) {
         exit;
     }
 
-    flashAlert('No services match - nothing to export.', 'error');
+    flashAlert(__('No services match - nothing to export.'), 'error');
 
     redirect();
 

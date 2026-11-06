@@ -485,6 +485,28 @@ const DOMAIN_HISTORY_LABELS = [
     'domain_dmarc' => 'DMARC', 'domain_dkim' => 'DKIM', 'domain_raw_whois' => 'WHOIS', 'domain_notes' => 'Notes',
 ];
 
+/** A DOMAIN_ROLES role's label in the interface language. */
+function domainRoleLabel($role) {
+    switch ($role) {
+        case 'registrar': return _x('Registrar', 'domain role');
+        case 'dnshost': return _x('DNS', 'domain role');
+        case 'webhost': return _x('Website', 'domain role');
+        case 'mailhost': return _x('Email', 'domain role');
+    }
+    return DOMAIN_ROLES[$role]['label'] ?? (string) $role;
+}
+
+/** Who holds a DOMAIN_ROLES role, as a field label: "Registrar", "DNS host"... in the interface language. */
+function domainRoleHolderLabel($role) {
+    switch ($role) {
+        case 'registrar': return __('Registrar');
+        case 'dnshost': return __('DNS host');
+        case 'webhost': return __('Website host');
+        case 'mailhost': return __('Email host');
+    }
+    return domainRoleLabel($role);
+}
+
 /** May this agent do this with domains? 1 is to see them, 2 to change them, 3 to delete them. */
 function domainCan($level) {
     return lookupUserPermission('module_support') >= $level;
@@ -579,19 +601,19 @@ function domainFormSet($post, $client_id, $domain_id = 0, &$error = '') {
     $domain_id = intval($domain_id);
     $name = domainNormalizeName($post['name'] ?? '');
     if ($name === '') {
-        $error = "That isn't a domain name - something like example.com.";
+        $error = __('That isn\'t a domain name - something like example.com.');
         return null;
     }
     $name_sql = escapeSql($name);
     if (mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM domains WHERE domain_name = '$name_sql' AND domain_client_id = $client_id AND domain_id <> $domain_id LIMIT 1"))) {
-        $error = "$name is already on this client.";
+        $error = __('%s is already on this client.', $name);
         return null;
     }
     $expire = trim((string) ($post['expire'] ?? ''));
     if ($expire !== '') {
         $date = DateTime::createFromFormat('!Y-m-d', $expire);
         if (!$date || $date->format('Y-m-d') !== $expire) {
-            $error = 'The expiry date is not a date.';
+            $error = __('The expiry date is not a date.');
             return null;
         }
     }
@@ -739,8 +761,8 @@ function domainExpiry($expire, $auto_renew = 0) {
 /** The expiry as a soft pill - red expired, amber soon, blue soon but auto-renewing, otherwise green. */
 function domainExpiryPill($expiry, $use_text = false) {
     if (!$expiry) {
-        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fw-normal" title="No expiry date - look it up or set it">'
-            . '<i class="fas fa-question me-1"></i>Unknown</span>';
+        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fw-normal" title="' . escapeHtml(__('No expiry date - look it up or set it')) . '">'
+            . '<i class="fas fa-question me-1"></i>' . __('Unknown') . '</span>';
     }
     $tone = $expiry['tone'];
     $icon = $expiry['state'] === 'expired' ? 'fa-calendar-times' : ($expiry['auto'] ? 'fa-sync-alt' : ($expiry['state'] === 'soon' ? 'fa-hourglass-half' : 'fa-calendar-check'));
@@ -784,7 +806,7 @@ function domainVendors($row) {
         if (!isset($vendors[$vendor_id])) {
             $vendors[$vendor_id] = ['name' => $row["{$role}_name"], 'client_id' => intval($row["{$role}_client_id"]), 'archived' => !empty($row["{$role}_archived_at"]), 'roles' => []];
         }
-        $vendors[$vendor_id]['roles'][] = $info['label'];
+        $vendors[$vendor_id]['roles'][] = domainRoleLabel($role);
     }
     return $vendors;
 }
@@ -814,41 +836,41 @@ function domainMailChecks($row) {
     $checks = [];
 
     $checks['mx'] = $has_mail
-        ? ['label' => 'MX', 'state' => 'ok', 'text' => 'Takes mail at ' . implode(', ', array_map(function ($mx) { return preg_replace('/^\d+\s+/', '', $mx); }, array_slice(domainLines($row['domain_mail_servers']), 0, 2)))]
-        : ['label' => 'MX', 'state' => 'off', 'text' => 'No mail servers - it takes no email'];
+        ? ['label' => 'MX', 'state' => 'ok', 'text' => __('Takes mail at %s', implode(', ', array_map(function ($mx) { return preg_replace('/^\d+\s+/', '', $mx); }, array_slice(domainLines($row['domain_mail_servers']), 0, 2))))]
+        : ['label' => 'MX', 'state' => 'off', 'text' => __('No mail servers - it takes no email')];
 
     if (count($spf) > 1) {
-        $checks['spf'] = ['label' => 'SPF', 'state' => 'bad', 'text' => count($spf) . ' SPF records - receivers treat that as no SPF at all. Merge them into one.'];
+        $checks['spf'] = ['label' => 'SPF', 'state' => 'bad', 'text' => __('%d SPF records - receivers treat that as no SPF at all. Merge them into one.', count($spf))];
     } elseif (!$spf) {
-        $checks['spf'] = ['label' => 'SPF', 'state' => $has_mail ? 'bad' : 'warn', 'text' => $has_mail ? 'No SPF record - anyone can send as this domain' : 'No SPF record - add "v=spf1 -all" so nobody can send as it'];
+        $checks['spf'] = ['label' => 'SPF', 'state' => $has_mail ? 'bad' : 'warn', 'text' => $has_mail ? __('No SPF record - anyone can send as this domain') : __('No SPF record - add "v=spf1 -all" so nobody can send as it')];
     } else {
         $record = trim($spf[0], '"');
         if (preg_match('/[\-~]all\b/i', $record) || stripos($record, 'redirect=') !== false) {
-            $checks['spf'] = ['label' => 'SPF', 'state' => 'ok', 'text' => (stripos($record, '-all') !== false ? 'SPF, hard fail (-all)' : (stripos($record, '~all') !== false ? 'SPF, soft fail (~all)' : 'SPF, redirected')) . ': ' . $record];
+            $checks['spf'] = ['label' => 'SPF', 'state' => 'ok', 'text' => (stripos($record, '-all') !== false ? __('SPF, hard fail (-all)') : (stripos($record, '~all') !== false ? __('SPF, soft fail (~all)') : __('SPF, redirected'))) . ': ' . $record];
         } else {
-            $checks['spf'] = ['label' => 'SPF', 'state' => 'warn', 'text' => 'SPF that lets anyone through (no -all or ~all): ' . $record];
+            $checks['spf'] = ['label' => 'SPF', 'state' => 'warn', 'text' => __('SPF that lets anyone through (no -all or ~all): %s', $record)];
         }
     }
 
     $dmarc = trim((string) ($row['domain_dmarc'] ?? ''));
     if (!$looked_up && $dmarc === '') {
-        $checks['dmarc'] = ['label' => 'DMARC', 'state' => 'unknown', 'text' => 'Not checked yet - look the domain up'];
+        $checks['dmarc'] = ['label' => 'DMARC', 'state' => 'unknown', 'text' => __('Not checked yet - look the domain up')];
     } elseif ($dmarc === '') {
-        $checks['dmarc'] = ['label' => 'DMARC', 'state' => $has_mail ? 'bad' : 'warn', 'text' => 'No DMARC record'];
+        $checks['dmarc'] = ['label' => 'DMARC', 'state' => $has_mail ? 'bad' : 'warn', 'text' => __('No DMARC record')];
     } else {
         $policy = preg_match('/\bp\s*=\s*(none|quarantine|reject)/i', $dmarc, $match) ? strtolower($match[1]) : 'none';
         $checks['dmarc'] = $policy === 'none'
-            ? ['label' => 'DMARC', 'state' => 'warn', 'text' => 'DMARC p=none - reports only, spoofed mail still delivered: ' . $dmarc]
+            ? ['label' => 'DMARC', 'state' => 'warn', 'text' => __('DMARC p=none - reports only, spoofed mail still delivered: %s', $dmarc)]
             : ['label' => 'DMARC', 'state' => 'ok', 'text' => "DMARC p=$policy: $dmarc"];
     }
 
     $dkim = domainLines($row['domain_dkim'] ?? '');
     if (!$looked_up && !$dkim) {
-        $checks['dkim'] = ['label' => 'DKIM', 'state' => 'unknown', 'text' => 'Not checked yet - look the domain up'];
+        $checks['dkim'] = ['label' => 'DKIM', 'state' => 'unknown', 'text' => __('Not checked yet - look the domain up')];
     } elseif ($dkim) {
-        $checks['dkim'] = ['label' => 'DKIM', 'state' => 'ok', 'text' => 'DKIM at ' . implode(', ', $dkim)];
+        $checks['dkim'] = ['label' => 'DKIM', 'state' => 'ok', 'text' => __('DKIM at %s', implode(', ', $dkim))];
     } else {
-        $checks['dkim'] = ['label' => 'DKIM', 'state' => $has_mail ? 'warn' : 'off', 'text' => 'No DKIM at the usual selectors (' . implode(', ', DOMAIN_DKIM_SELECTORS) . ') - it may use another'];
+        $checks['dkim'] = ['label' => 'DKIM', 'state' => $has_mail ? 'warn' : 'off', 'text' => __('No DKIM at the usual selectors (%s) - it may use another', implode(', ', DOMAIN_DKIM_SELECTORS))];
     }
     return $checks;
 }

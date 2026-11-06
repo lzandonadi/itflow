@@ -18,7 +18,7 @@ function domainForRequest($domain_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = domainRow($domain_id);
     if (!$row) {
-        flashAlert('That domain no longer exists.', 'error');
+        flashAlert(__('That domain no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['domain_client_id']);
@@ -67,7 +67,7 @@ if (isset($_POST['add_domain'])) {
     enforceClientAccess();
 
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('Pick the client this domain is for.', 'error');
+        flashAlert(__('Pick the client this domain is for.'), 'error');
         redirect();
     }
 
@@ -115,15 +115,18 @@ if (isset($_POST['add_domain'])) {
         }
 
         $count = count($added);
-        $message = "<strong>$count</strong> domain" . ($count === 1 ? '' : 's') . " added";
-        if ($count) {
-            $message .= $looked_up === $count ? ' and looked up' : ", <strong>$looked_up</strong> looked up now - the rest are checked on the refresher's next run";
+        if (!$count) {
+            $message = __('No domains added');
+        } elseif ($looked_up === $count) {
+            $message = _n('%s domain added and looked up', '%s domains added and looked up', $count, "<strong>$count</strong>");
+        } else {
+            $message = _n('%1$s domain added, %2$s looked up now - the rest are checked on the refresher\'s next run', '%1$s domains added, %2$s looked up now - the rest are checked on the refresher\'s next run', $count, "<strong>$count</strong>", "<strong>$looked_up</strong>");
         }
         if ($skipped_existing) {
-            $message .= ", <strong>$skipped_existing</strong> already on this client";
+            $message = __('%1$s, %2$s already on this client', $message, "<strong>$skipped_existing</strong>");
         }
         if ($skipped_invalid) {
-            $message .= ", <strong>$skipped_invalid</strong> not domain names";
+            $message = _n('%1$s, %2$s not a domain name', '%1$s, %2$s not domain names', $skipped_invalid, $message, "<strong>$skipped_invalid</strong>");
         }
         logAudit("Domain", "Bulk Create", "$session_name added $count domain(s)", $client_id);
         flashAlert($message, $count ? 'success' : 'error');
@@ -148,7 +151,7 @@ if (isset($_POST['add_domain'])) {
     $name = $form['name'];
     logAudit("Domain", "Create", "$session_name created domain " . escapeSql($name) . ($with_certificate ? ', with its SSL certificate' : ''), $client_id, $domain_id);
 
-    flashAlert("Domain <strong>$name</strong> created" . ($found ? ($with_certificate ? ', with its SSL certificate' : '') : ' - nothing answered for it in DNS, so check the name'), $found ? 'success' : 'warning');
+    flashAlert($found ? ($with_certificate ? __('Domain <strong>%s</strong> created, with its SSL certificate', $name) : __('Domain <strong>%s</strong> created', $name)) : __('Domain <strong>%s</strong> created - nothing answered for it in DNS, so check the name', $name), $found ? 'success' : 'warning');
 
     redirect();
 
@@ -186,7 +189,7 @@ if (isset($_POST['edit_domain'])) {
     $name = $form['name'];
     logAudit("Domain", "Edit", "$session_name edited domain " . escapeSql($name), $client_id, $domain_id);
 
-    flashAlert("Domain <strong>$name</strong> updated");
+    flashAlert(__('Domain <strong>%s</strong> updated', $name));
 
     redirect();
 
@@ -201,13 +204,13 @@ if (isset($_GET['refresh_domain'])) {
     $name = $row['domain_name'];
 
     if (!domainRefresh($row)) {
-        flashAlert("Nothing answered for <strong>$name</strong> in DNS - nothing was changed. Check the name, or whether it has lapsed.", 'error');
+        flashAlert(__('Nothing answered for <strong>%s</strong> in DNS - nothing was changed. Check the name, or whether it has lapsed.', $name), 'error');
         redirect();
     }
 
     logAudit("Domain", "Refresh", "$session_name looked up domain " . escapeSql($name), $client_id, $domain_id);
 
-    flashAlert("Looked up <strong>$name</strong>");
+    flashAlert(__('Looked up <strong>%s</strong>', $name));
 
     redirect();
 
@@ -240,7 +243,7 @@ if (isset($_GET['archive_domain'])) {
 
     logAudit("Domain", "Archive", "$session_name archived domain " . escapeSql($row['domain_name']), $client_id, $domain_id);
 
-    flashAlert("Domain <strong>{$row['domain_name']}</strong> archived", 'error');
+    flashAlert(__('Domain <strong>%s</strong> archived', $row['domain_name']), 'error');
 
     redirect();
 
@@ -257,7 +260,7 @@ if (isset($_GET['restore_domain'])) {
 
     logAudit("Domain", "Restore", "$session_name restored domain " . escapeSql($row['domain_name']), $client_id, $domain_id);
 
-    flashAlert("Domain <strong>{$row['domain_name']}</strong> restored");
+    flashAlert(__('Domain <strong>%s</strong> restored', $row['domain_name']));
 
     redirect();
 
@@ -273,7 +276,7 @@ if (isset($_GET['delete_domain'])) {
 
     logAudit("Domain", "Delete", "$session_name deleted domain " . escapeSql($row['domain_name']), $client_id);
 
-    flashAlert("Domain <strong>{$row['domain_name']}</strong> deleted", 'error');
+    flashAlert(__('Domain <strong>%s</strong> deleted', $row['domain_name']), 'error');
 
     redirect();
 
@@ -291,7 +294,7 @@ if (isset($_POST['bulk_favorite_domains']) || isset($_POST['bulk_unfavorite_doma
         $count++;
     }
 
-    flashAlert(($favorite ? 'Starred' : 'Unstarred') . " <strong>$count</strong> domain" . ($count === 1 ? '' : 's'));
+    flashAlert($favorite ? _n('Starred %s domain', 'Starred %s domains', $count, "<strong>$count</strong>") : _n('Unstarred %s domain', 'Unstarred %s domains', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -304,7 +307,7 @@ if (isset($_POST['bulk_set_domain_vendor'])) {
 
     $role = $_POST['role'] ?? '';
     if (!isset(DOMAIN_ROLES[$role])) {
-        flashAlert('Pick what the vendor does for them.', 'error');
+        flashAlert(__('Pick what the vendor does for them.'), 'error');
         redirect();
     }
     $column = DOMAIN_ROLES[$role]['column'];
@@ -325,7 +328,11 @@ if (isset($_POST['bulk_set_domain_vendor'])) {
         $count++;
     }
 
-    flashAlert("Set the " . strtolower(DOMAIN_ROLES[$role]['label']) . ($role === 'registrar' ? '' : ' host') . " on <strong>$count</strong> domain" . ($count === 1 ? '' : 's') . ($skipped ? ", <strong>$skipped</strong> skipped - that vendor is another client's" : ''));
+    $message = _n('Set the %1$s on %2$s domain', 'Set the %1$s on %2$s domains', $count, mb_strtolower(domainRoleHolderLabel($role)), "<strong>$count</strong>");
+    if ($skipped) {
+        $message = __('%1$s, %2$s skipped - that vendor is another client\'s', $message, "<strong>$skipped</strong>");
+    }
+    flashAlert($message);
 
     redirect();
 
@@ -350,7 +357,11 @@ if (isset($_POST['bulk_refresh_domains'])) {
     }
 
     $missed = $count - $found;
-    flashAlert("Looked up <strong>$found</strong> domain" . ($found === 1 ? '' : 's') . ($missed ? ", nothing answered for <strong>$missed</strong> - left as they were" : ''), $missed ? 'warning' : 'success');
+    $message = _n('Looked up %s domain', 'Looked up %s domains', $found, "<strong>$found</strong>");
+    if ($missed) {
+        $message = __('%1$s, nothing answered for %2$s - left as they were', $message, "<strong>$missed</strong>");
+    }
+    flashAlert($message, $missed ? 'warning' : 'success');
 
     redirect();
 
@@ -367,7 +378,7 @@ if (isset($_POST['bulk_archive_domains'])) {
         $count++;
     }
 
-    flashAlert("Archived <strong>$count</strong> domain" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived %s domain', 'Archived %s domains', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 
@@ -384,7 +395,7 @@ if (isset($_POST['bulk_restore_domains'])) {
         $count++;
     }
 
-    flashAlert("Restored <strong>$count</strong> domain" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored %s domain', 'Restored %s domains', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -401,7 +412,7 @@ if (isset($_POST['bulk_delete_domains'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> domain" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted %s domain', 'Deleted %s domains', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 

@@ -16,7 +16,7 @@ enforceUserPermission('module_support');
 $domain_id = intval($_GET['id'] ?? 0);
 $domain = domainRow($domain_id);
 if (!$domain) {
-    echo json_encode(['error' => 'That domain no longer exists.']);
+    echo json_encode(['error' => __('That domain no longer exists.')]);
     exit;
 }
 $client_id = intval($domain['domain_client_id']);
@@ -42,11 +42,11 @@ $txt_records = array_values(array_filter(array_map('trim', preg_split('/\r?\n/',
 $record = function ($value) {
     $value = trim((string) $value);
     return '<div class="d-flex align-items-center min-w-0"><span class="font-monospace small text-truncate" title="' . escapeHtml($value) . '">' . escapeHtml($value) . '</span>'
-        . '<button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="' . escapeHtml($value) . '"><i class="far fa-copy"></i></button></div>';
+        . '<button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy')) . '" data-clipboard-text="' . escapeHtml($value) . '"><i class="far fa-copy"></i></button></div>';
 };
 $records = function ($text) use ($record) {
     $lines = domainLines($text);
-    return $lines ? implode('', array_map($record, $lines)) : '<span class="text-body-secondary">None</span>';
+    return $lines ? implode('', array_map($record, $lines)) : '<span class="text-body-secondary">' . __('None') . '</span>';
 };
 
 ob_start();
@@ -59,8 +59,8 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $domain_name ?></span>
-                <?php if (intval($domain['domain_favorite'])) { ?><i class="fas fa-star text-warning small" title="Starred"></i><?php } ?>
-                <?php if ($domain_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if (intval($domain['domain_favorite'])) { ?><i class="fas fa-star text-warning small" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                <?php if ($domain_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
                 <span><?= escapeHtml($domain['client_name']) ?></span>
@@ -68,7 +68,7 @@ ob_start();
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -76,55 +76,55 @@ ob_start();
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small text-body-secondary">
         <?= domainExpiryPill($expiry, true) ?>
         <?php if (intval($domain['domain_auto_renew'])) { ?>
-            <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle fw-normal"><i class="fas fa-sync-alt me-1"></i>Auto-renews</span>
+            <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle fw-normal"><i class="fas fa-sync-alt me-1"></i><?= __('Auto-renews') ?></span>
         <?php } ?>
-        <a href="https://<?= $domain_name ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-1"></i>Open the website</a>
-        <span title="<?= escapeHtml($domain['domain_refreshed_at'] ?? '') ?>"><i class="fas fa-search me-1"></i><?= $domain['domain_refreshed_at'] ? 'Looked up ' . timeAgo($domain['domain_refreshed_at']) : 'Not looked up yet' ?></span>
+        <a href="https://<?= $domain_name ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-1"></i><?= __('Open the website') ?></a>
+        <span title="<?= escapeHtml($domain['domain_refreshed_at'] ?? '') ?>"><i class="fas fa-search me-1"></i><?= $domain['domain_refreshed_at'] ? __('Looked up %s', timeAgo($domain['domain_refreshed_at'])) : __('Not looked up yet') ?></span>
         <?php if ($tags) { ?><span><?= tagPills('domain', $domain_id, $tags, "domains.php?client_id=$client_id&", false) ?></span><?php } ?>
     </div>
 
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Registration</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Registration') ?></div>
             <dl class="itflow-asset-dl itflow-domain-dl mb-3">
-                <dt>Expires</dt>
-                <dd><?= $expiry ? escapeHtml($expiry['date']) : '<span class="text-body-secondary">Unknown</span>' ?></dd>
-                <dt>Auto-renew</dt>
-                <dd><?= intval($domain['domain_auto_renew']) ? 'Yes' : 'No' ?></dd>
+                <dt><?= __('Expires') ?></dt>
+                <dd><?= $expiry ? escapeHtml(formatDate($expiry['date'], 'date')) : '<span class="text-body-secondary">' . __('Unknown') . '</span>' ?></dd>
+                <dt><?= __('Auto-renew') ?></dt>
+                <dd><?= intval($domain['domain_auto_renew']) ? __('Yes') : __('No') ?></dd>
                 <?php if (!empty($facts['registered'])) { ?>
-                    <dt>Registered</dt>
+                    <dt><?= __('Registered') ?></dt>
                     <dd><?= escapeHtml($facts['registered']) ?> <span class="small text-body-secondary">(<?= timeAgo($facts['registered']) ?>)</span></dd>
                 <?php } ?>
                 <?php if (!empty($facts['registrar'])) { ?>
-                    <dt>Registry says</dt>
+                    <dt><?= __('Registry says') ?></dt>
                     <dd class="text-break"><?= escapeHtml($facts['registrar']) ?></dd>
                 <?php } ?>
                 <?php if (!empty($facts['status'])) { ?>
-                    <dt>Status</dt>
+                    <dt><?= __('Status') ?></dt>
                     <dd class="small text-break"><?= escapeHtml($facts['status']) ?></dd>
                 <?php } ?>
             </dl>
 
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Who</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Who') ?></div>
             <?php if (domainVendors($domain)) { ?>
                 <div class="d-flex flex-column gap-2 mb-3"><?= domainVendorsHtml($domain) ?></div>
             <?php } else { ?>
-                <p class="small text-body-secondary mb-3">No registrar or hosts set<?= $can_edit ? ' - Edit to add them' : '' ?>.</p>
+                <p class="small text-body-secondary mb-3"><?= $can_edit ? __('No registrar or hosts set - Edit to add them.') : __('No registrar or hosts set.') ?></p>
             <?php } ?>
         </div>
 
         <div class="col-md-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">DNS</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('DNS') ?></div>
             <dl class="itflow-asset-dl itflow-domain-dl mb-3">
                 <dt>A</dt>
                 <dd class="min-w-0"><?= $records($domain['domain_ip']) ?></dd>
-                <dt>Name servers</dt>
+                <dt><?= __('Name servers') ?></dt>
                 <dd class="min-w-0"><?= $records($domain['domain_name_servers']) ?></dd>
-                <dt>MX</dt>
+                <dt><?= __('MX') ?></dt>
                 <dd class="min-w-0"><?= $records($domain['domain_mail_servers']) ?></dd>
             </dl>
 
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Email</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Email') ?></div>
             <div class="mb-2"><?= domainMailPillsHtml($mail_checks) ?></div>
             <ul class="list-unstyled small mb-0 itflow-domain-checks">
                 <?php foreach ($mail_checks as $check) { ?>
@@ -136,9 +136,9 @@ ob_start();
 
     <?php if ($certificates || $can_edit) { ?>
         <div class="d-flex align-items-center mt-3 mb-1">
-            <div class="small text-body-secondary fw-semibold text-uppercase me-auto">Certificates</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase me-auto"><?= __('Certificates') ?></div>
             <?php if ($can_edit) { ?>
-                <a class="small ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/certificate/certificate_add.php?domain_id=<?= $domain_id ?>"><i class="fas fa-plus me-1"></i>New certificate</a>
+                <a class="small ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/certificate/certificate_add.php?domain_id=<?= $domain_id ?>"><i class="fas fa-plus me-1"></i><?= __('New certificate') ?></a>
             <?php } ?>
         </div>
         <?php if ($certificates) { ?>
@@ -147,7 +147,7 @@ ob_start();
                     <li class="itflow-link-row">
                         <div class="min-w-0 flex-grow-1">
                             <div class="d-flex min-w-0"><?= certificateLink($certificate['certificate_id'], $certificate['certificate_name']) ?></div>
-                            <div class="small text-body-secondary text-truncate"><?= escapeHtml(implode(' · ', array_filter([$certificate['certificate_domain'] !== $certificate['certificate_name'] ? $certificate['certificate_domain'] : '', $certificate['certificate_issued_by'] ?: 'Issuer unknown']))) ?></div>
+                            <div class="small text-body-secondary text-truncate"><?= escapeHtml(implode(' · ', array_filter([$certificate['certificate_domain'] !== $certificate['certificate_name'] ? $certificate['certificate_domain'] : '', $certificate['certificate_issued_by'] ?: __('Issuer unknown')]))) ?></div>
                         </div>
                         <div class="d-flex flex-wrap justify-content-end gap-1">
                             <?php if (!in_array($certificate['certificate_check_status'], [null, '', 'ok'], true)) { ?><?= certificateStatusPill($certificate) ?><?php } ?>
@@ -157,15 +157,15 @@ ob_start();
                 <?php } ?>
             </ul>
         <?php } else { ?>
-            <p class="small text-body-secondary mb-0">None on this domain yet.</p>
+            <p class="small text-body-secondary mb-0"><?= __('None on this domain yet.') ?></p>
         <?php } ?>
     <?php } ?>
 
     <?php if ($services || $can_edit) { ?>
         <div class="d-flex align-items-center mt-3 mb-1">
-            <span class="small text-body-secondary fw-semibold text-uppercase me-auto">Services that use it</span>
+            <span class="small text-body-secondary fw-semibold text-uppercase me-auto"><?= __('Services that use it') ?></span>
             <?php if ($can_edit) { ?>
-                <a class="small ajax-modal" href="#" data-modal-url="modals/link/link.php?from=domain&id=<?= $domain_id ?>&to=service"><i class="fas fa-link me-1"></i>Link a service</a>
+                <a class="small ajax-modal" href="#" data-modal-url="modals/link/link.php?from=domain&id=<?= $domain_id ?>&to=service"><i class="fas fa-link me-1"></i><?= __('Link a service') ?></a>
             <?php } ?>
         </div>
         <?php if ($services) { ?>
@@ -173,23 +173,23 @@ ob_start();
                 return "post.php?unlink_item&from=domain&id=$domain_id&to=service&other=" . intval($row['service_id']) . "&csrf_token=" . $_SESSION['csrf_token'];
             } : null) ?>
         <?php } else { ?>
-            <p class="small text-body-secondary mb-0">No service is linked to it.</p>
+            <p class="small text-body-secondary mb-0"><?= __('No service is linked to it.') ?></p>
         <?php } ?>
     <?php } ?>
 
     <?php if ($logins) { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">Logins for the registrar and hosts</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('Logins for the registrar and hosts') ?></div>
         <?= credentialListHtml($logins) ?>
     <?php } ?>
 
     <?php if (trim((string) $domain['domain_notes']) !== '') { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">Notes</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('Notes') ?></div>
         <div class="itflow-credential-note small"><?= nl2br(escapeHtml($domain['domain_notes'])) ?></div>
     <?php } ?>
 
     <?php if ($txt_records) { ?>
         <details class="mt-3">
-            <summary class="small text-body-secondary fw-semibold text-uppercase">TXT records (<?= count($txt_records) ?>)</summary>
+            <summary class="small text-body-secondary fw-semibold text-uppercase"><?= __('TXT records (%d)', count($txt_records)) ?></summary>
             <div class="mt-2"><?= implode('', array_map($record, $txt_records)) ?></div>
             <?php if (trim((string) $domain['domain_dmarc']) !== '') { ?>
                 <div class="small text-body-secondary mt-2">_dmarc</div>
@@ -200,14 +200,14 @@ ob_start();
 
     <?php if (trim((string) $domain['domain_raw_whois']) !== '') { ?>
         <details class="mt-3">
-            <summary class="small text-body-secondary fw-semibold text-uppercase">WHOIS</summary>
+            <summary class="small text-body-secondary fw-semibold text-uppercase"><?= __('WHOIS') ?></summary>
             <pre class="itflow-credential-note small mt-2 mb-0"><?= escapeHtml($domain['domain_raw_whois']) ?></pre>
         </details>
     <?php } ?>
 
     <?php if ($history) { ?>
         <details class="mt-3">
-            <summary class="small text-body-secondary fw-semibold text-uppercase">History</summary>
+            <summary class="small text-body-secondary fw-semibold text-uppercase"><?= __('History') ?></summary>
             <ul class="list-unstyled small mt-2 mb-0">
                 <?php foreach ($history as $entry) {
                     $old = trim((string) $entry['domain_history_old_value']);
@@ -232,10 +232,10 @@ ob_start();
 
 <div class="modal-footer">
     <?php if ($can_edit) { ?>
-        <a class="btn btn-outline-secondary me-auto" href="post.php?refresh_domain=<?= $domain_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-sync-alt me-2"></i>Look up now</a>
-        <button type="button" class="btn btn-primary text-bold ajax-modal" data-modal-size="lg" data-modal-url="modals/domain/domain_edit.php?id=<?= $domain_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <a class="btn btn-outline-secondary me-auto" href="post.php?refresh_domain=<?= $domain_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-sync-alt me-2"></i><?= __('Look up now') ?></a>
+        <button type="button" class="btn btn-primary text-bold ajax-modal" data-modal-size="lg" data-modal-url="modals/domain/domain_edit.php?id=<?= $domain_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <?php

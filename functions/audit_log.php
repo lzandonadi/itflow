@@ -429,7 +429,7 @@ function auditLogHistoryUrl(array $history, $client_id = 0) {
 function auditLogHistoryHtml(array $history, array $opts = []) {
     global $session_is_admin;
     if (!$history['rows']) {
-        return '<div class="itflow-asset-empty" data-audit-history-empty>' . escapeHtml($opts['empty'] ?? 'Nothing logged yet.') . '</div>';
+        return '<div class="itflow-asset-empty" data-audit-history-empty>' . escapeHtml($opts['empty'] ?? __('Nothing logged yet.')) . '</div>';
     }
     $flush = $opts['flush'] ?? true;
     $html = '<ul class="list-group ' . ($flush ? 'list-group-flush' : '') . ' itflow-audit-history" data-audit-history="' . escapeHtml($history['type']) . '">';
@@ -452,8 +452,8 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
     $url = auditLogHistoryUrl($history, $opts['client_id'] ?? 0);
     if ($more > 0 || $url !== '') {
         $html .= '<div class="d-flex flex-wrap align-items-center gap-2 small px-3 py-2 ' . ($flush ? 'border-top' : '') . '" data-audit-history-more>'
-            . ($more > 0 ? '<span class="text-body-secondary">and ' . number_format($more) . ' more</span>' : '')
-            . ($url !== '' ? '<a class="ms-auto" href="' . escapeHtml($url) . '"><i class="fas fa-fw fa-history me-1"></i>' . ($history['count'] > 1 ? 'All ' . number_format($history['count']) . ' in the audit log' : 'In the audit log') . '</a>' : '')
+            . ($more > 0 ? '<span class="text-body-secondary">' . __('and %s more', number_format($more)) . '</span>' : '')
+            . ($url !== '' ? '<a class="ms-auto" href="' . escapeHtml($url) . '"><i class="fas fa-fw fa-history me-1"></i>' . ($history['count'] > 1 ? __('All %s in the audit log', number_format($history['count'])) : __('In the audit log')) . '</a>' : '')
             . '</div>';
     }
     return $html;

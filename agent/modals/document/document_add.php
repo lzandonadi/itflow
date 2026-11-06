@@ -34,7 +34,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-file-alt me-2"></i>New document<?php if ($link_name) { ?> <small class="opacity-75 ms-1">for <?= escapeHtml($link_name) ?></small><?php } ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-file-alt me-2"></i><?= __('New document') ?><?php if ($link_name) { ?> <small class="opacity-75 ms-1">for <?= escapeHtml($link_name) ?></small><?php } ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -49,15 +49,15 @@ ob_start();
     <div class="modal-body">
         <?php if ($ai_draft) { ?>
             <div class="mb-3 p-3 border rounded bg-body-tertiary" data-ai-document-draft data-client-id="<?= $client_id ?>">
-                <label class="form-label" for="aiDocumentPrompt">Draft it with AI</label>
+                <label class="form-label" for="aiDocumentPrompt"><?= __('Draft it with AI') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-magic"></i></span>
-                    <input type="text" class="form-control" id="aiDocumentPrompt" maxlength="500" placeholder="What it is for - a disaster recovery plan for the main office" data-ai-document-prompt>
-                    <button class="btn btn-info" type="button" data-ai-document-go><i class="fa fa-fw fa-magic me-1"></i>Draft</button>
+                    <input type="text" class="form-control" id="aiDocumentPrompt" maxlength="500" placeholder="<?= escapeHtml(__('What it is for - a disaster recovery plan for the main office')) ?>" data-ai-document-prompt>
+                    <button class="btn btn-info" type="button" data-ai-document-go><i class="fa fa-fw fa-magic me-1"></i><?= __('Draft') ?></button>
                 </div>
                 <div class="form-check mt-2 mb-0">
                     <input class="form-check-input" type="checkbox" id="aiDocumentUseClient" checked data-ai-document-use-client>
-                    <label class="form-check-label small" for="aiDocumentUseClient">Use what ITFlow knows about <?= escapeHtml(getFieldById('clients', $client_id, 'client_name') ?? 'them') ?> - their sites, people, servers, networks and software, never a password or key</label>
+                    <label class="form-check-label small" for="aiDocumentUseClient"><?= __('Use what ITFlow knows about %s - their sites, people, servers, networks and software, never a password or key', escapeHtml(getFieldById('clients', $client_id, 'client_name') ?? __('them'))) ?></label>
                 </div>
                 <div class="small mt-2 d-none" data-ai-document-said></div>
             </div>
@@ -65,8 +65,8 @@ ob_start();
         <?php require 'document_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_document" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_document" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -97,8 +97,8 @@ ob_start();
         }
         var label = go.innerHTML;
         go.disabled = true;
-        go.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Drafting';
-        say('body', 'AI is writing it - this can take a minute.');
+        go.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>' + <?= json_encode(__('Drafting'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        say('body', <?= json_encode(__('AI is writing it - this can take a minute.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>);
         fetch('/agent/ajax.php?ai_document_draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -131,11 +131,11 @@ ob_start();
                 } else {
                     textarea.value = answer.html;
                 }
-                say('success', 'Drafted by AI - check it and fill in what is in [square brackets]. Undo in the editor puts back what was there.');
+                say('success', <?= json_encode(__('Drafted by AI - check it and fill in what is in [square brackets]. Undo in the editor puts back what was there.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>);
                 said.setAttribute('data-ai-document-drafted', '');
             })
             .catch(function (error) {
-                say('danger', error && error.message ? error.message : 'It couldn\'t be drafted - try again.');
+                say('danger', error && error.message ? error.message : <?= json_encode(__('It couldn\'t be drafted - try again.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>);
             })
             .finally(function () {
                 go.disabled = false;

@@ -75,7 +75,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     if ($row['certificate_check_status'] === 'ok' && in_array($status, ['mismatch', 'untrusted', 'expired'], true)) {
         $certificate_id = intval($row['certificate_id']);
         $client_id = intval($row['certificate_client_id']);
-        appNotify("Certificate Problem", escapeSql("Certificate {$row['certificate_name']} for {$row['client_name']}: " . CERTIFICATE_CHECK_STATES[$status]['text']), "/agent/certificates.php?client_id=$client_id&open=$certificate_id", $client_id);
+        appNotify("Certificate Problem", escapeSql(__('Certificate %1$s for %2$s: %3$s', $row['certificate_name'], $row['client_name'], certificateCheckStateText($status))), "/agent/certificates.php?client_id=$client_id&open=$certificate_id", $client_id);
     }
 }
 

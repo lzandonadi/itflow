@@ -18,7 +18,7 @@ function documentForHandler($document_id) {
             document_created_at, document_created_by, document_updated_at, document_updated_by
         FROM documents WHERE document_id = $document_id"));
     if (!$row) {
-        flashAlert('That document no longer exists.', 'error');
+        flashAlert(__('That document no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['document_client_id']);
@@ -66,7 +66,7 @@ if (isset($_POST['add_document'])) {
     $client_visible = intval($_POST['client_visible'] ?? 0) ? 1 : 0;
 
     if ($name === '') {
-        flashAlert('A document needs a name.', 'error');
+        flashAlert(__('A document needs a name.'), 'error');
         redirect();
     }
 
@@ -116,7 +116,7 @@ if (isset($_POST['add_document'])) {
         $from_ticket = null;
     }
 
-    flashAlert("Document <strong>" . trim($_POST['name']) . "</strong> created");
+    flashAlert(__('Document <strong>%s</strong> created', trim($_POST['name'])));
 
     // From an asset, a contact, a license, a location, a vendor or a service, back to it; otherwise to the new document
     redirect(!$from_ticket && ($contact_id || $asset_id || $software_id || $location_id || $vendor_id || $service_id) ? null : "document.php?client_id=$client_id&document_id=$document_id");
@@ -134,7 +134,7 @@ if (isset($_POST['add_document_from_template'])) {
 
     enforceClientAccess();
     if (!mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM clients WHERE client_id = $client_id"))) {
-        flashAlert('Pick the client it is for.', 'error');
+        flashAlert(__('Pick the client it is for.'), 'error');
         redirect();
     }
 
@@ -142,7 +142,7 @@ if (isset($_POST['add_document_from_template'])) {
 
     $template = documentTemplateRow($document_template_id);
     if (!$template || $template['document_template_archived_at']) {
-        flashAlert('That template is gone or archived.', 'error');
+        flashAlert(__('That template is gone or archived.'), 'error');
         redirect();
     }
 
@@ -160,7 +160,7 @@ if (isset($_POST['add_document_from_template'])) {
 
     logAudit("Document", "Create", "$session_name created document " . escapeSql($document_name) . " from template " . escapeSql($template['document_template_name']), $client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($document_name) . "</strong> created from template <strong>" . escapeHtml($template['document_template_name']) . "</strong>");
+    flashAlert(__('Document <strong>%1$s</strong> created from template <strong>%2$s</strong>', escapeHtml($document_name), escapeHtml($template['document_template_name'])));
 
     redirect("/agent/document.php?client_id=$client_id&document_id=$document_id");
 }
@@ -177,7 +177,7 @@ if (isset($_POST['edit_document'])) {
     $document_id = intval($row['document_id']);
 
     if ($name === '') {
-        flashAlert('A document needs a name.', 'error');
+        flashAlert(__('A document needs a name.'), 'error');
         redirect();
     }
 
@@ -212,7 +212,7 @@ if (isset($_POST['edit_document'])) {
 
     logAudit("Document", "Edit", "$session_name edited document $name, previous version kept", $client_id, $document_id);
 
-    flashAlert("Document <strong>" . trim($_POST['name']) . "</strong> saved - the previous version is kept");
+    flashAlert(__('Document <strong>%s</strong> saved - the previous version is kept', trim($_POST['name'])));
 
     redirect("document.php?client_id=$client_id&document_id=$document_id");
 
@@ -235,7 +235,7 @@ if (isset($_POST['move_document'])) {
 
     logAudit("Document", "Move", "$session_name moved document " . escapeSql($row['document_name']) . " to folder " . escapeSql($folder_name), $client_id, $document_id);
 
-    flashAlert("Document <strong>{$row['document_name']}</strong> moved to <strong>$folder_name</strong>");
+    flashAlert(__('Document <strong>%1$s</strong> moved to <strong>%2$s</strong>', $row['document_name'], $folder_id ? $folder_name : __('Top level')));
 
     redirect();
 
@@ -251,7 +251,7 @@ if (isset($_GET['mark_document_reviewed'])) {
     $row = documentForHandler($_GET['mark_document_reviewed']);
     $document_id = intval($row['document_id']);
     if ($row['document_archived_at']) {
-        flashAlert('That document is archived.', 'error');
+        flashAlert(__('That document is archived.'), 'error');
         redirect();
     }
 
@@ -262,7 +262,7 @@ if (isset($_GET['mark_document_reviewed'])) {
     $review = documentReviewState(mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT document_created_at, document_updated_at, document_reviewed_at, document_template_review_months, document_template_archived_at
         FROM documents LEFT JOIN document_templates USING (document_template_id) WHERE document_id = $document_id")));
 
-    flashAlert("Document <strong>" . escapeHtml($row['document_name']) . "</strong> marked as reviewed" . ($review ? " - next due " . date('M j, Y', strtotime($review['next'])) : ''));
+    flashAlert($review ? __('Document <strong>%1$s</strong> marked as reviewed - next due %2$s', escapeHtml($row['document_name']), formatDate($review['next'], 'date')) : __('Document <strong>%s</strong> marked as reviewed', escapeHtml($row['document_name'])));
 
     redirect();
 
@@ -283,7 +283,7 @@ if (isset($_POST['set_document_template'])) {
     $template_id = intval($_POST['document_template_id'] ?? 0);
     $template = $template_id ? documentTemplateRow($template_id) : null;
     if ($template_id && (!$template || ($template['document_template_archived_at'] && $template_id !== $current_id))) {
-        flashAlert('That template is gone or archived.', 'error');
+        flashAlert(__('That template is gone or archived.'), 'error');
         redirect();
     }
 
@@ -291,7 +291,7 @@ if (isset($_POST['set_document_template'])) {
 
     logAudit("Document", "Edit", "$session_name " . ($template ? "set document " . escapeSql($row['document_name']) . " as made from template " . escapeSql($template['document_template_name']) : "set document " . escapeSql($row['document_name']) . " as not from a template"), $client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($row['document_name']) . "</strong> " . ($template ? "counts as made from <strong>" . escapeHtml($template['document_template_name']) . "</strong>" : "no longer counts as made from a template"));
+    flashAlert($template ? __('Document <strong>%1$s</strong> counts as made from <strong>%2$s</strong>', escapeHtml($row['document_name']), escapeHtml($template['document_template_name'])) : __('Document <strong>%s</strong> no longer counts as made from a template', escapeHtml($row['document_name'])));
 
     redirect();
 
@@ -309,7 +309,7 @@ if (isset($_POST['rename_document'])) {
     $description_sql = isset($_POST['description']) ? ", document_description = '" . escapeSql($_POST['description']) . "'" : '';
 
     if ($name === '') {
-        flashAlert('A document needs a name.', 'error');
+        flashAlert(__('A document needs a name.'), 'error');
         redirect();
     }
 
@@ -317,7 +317,7 @@ if (isset($_POST['rename_document'])) {
 
     logAudit("Document", "Edit", "$session_name renamed document " . escapeSql($row['document_name']) . " to $name", $client_id, $document_id);
 
-    flashAlert("Document <strong>" . trim($_POST['name']) . "</strong> saved");
+    flashAlert(__('Document <strong>%s</strong> saved', trim($_POST['name'])));
 
     redirect();
 
@@ -338,7 +338,7 @@ if (isset($_POST['toggle_document_visibility'])) {
 
     logAudit("Document", "Edit", "$session_name made document " . escapeSql($row['document_name']) . " $wording in the client portal", $client_id, $document_id);
 
-    flashAlert("Document <strong>{$row['document_name']}</strong> is now <strong>$wording</strong> in the client portal");
+    flashAlert($document_visible ? __('Document <strong>%s</strong> is now <strong>visible</strong> in the client portal', $row['document_name']) : __('Document <strong>%s</strong> is now <strong>hidden</strong> in the client portal', $row['document_name']));
 
     redirect();
 
@@ -388,7 +388,7 @@ if (isset($_GET['archive_document'])) {
 
     logAudit("Document", "Archive", "$session_name archived document " . escapeSql($row['document_name']), $client_id, $document_id);
 
-    flashAlert("Document <strong>{$row['document_name']}</strong> archived", 'error');
+    flashAlert(__('Document <strong>%s</strong> archived', $row['document_name']), 'error');
 
     redirect();
 
@@ -407,7 +407,7 @@ if (isset($_GET['restore_document'])) {
 
     logAudit("Document", "Restore", "$session_name restored document " . escapeSql($row['document_name']), $client_id, $document_id);
 
-    flashAlert("Document <strong>{$row['document_name']}</strong> restored");
+    flashAlert(__('Document <strong>%s</strong> restored', $row['document_name']));
 
     redirect();
 
@@ -428,7 +428,7 @@ if (isset($_POST['restore_document_version'])) {
             document_version_content, document_version_created_at
         FROM document_versions WHERE document_version_id = $document_version_id"));
     if (!$version) {
-        flashAlert('That version no longer exists.', 'error');
+        flashAlert(__('That version no longer exists.'), 'error');
         redirect();
     }
 
@@ -451,7 +451,7 @@ if (isset($_POST['restore_document_version'])) {
     $version_date = date('M j, Y g:ia', strtotime($version['document_version_created_at']));
     logAudit("Document", "Edit", "$session_name restored document $name to its version of " . escapeSql($version_date) . ", the current one kept", $client_id, $document_id);
 
-    flashAlert("Document <strong>{$version['document_version_name']}</strong> restored to the version of $version_date - what it said before is kept as a version");
+    flashAlert(__('Document <strong>%1$s</strong> restored to the version of %2$s - what it said before is kept as a version', $version['document_version_name'], formatDate($version['document_version_created_at'], 'datetime')));
 
     redirect("document.php?client_id=$client_id&document_id=$document_id");
 
@@ -468,7 +468,7 @@ if (isset($_GET['delete_document_version'])) {
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT document_version_name, document_client_id FROM documents, document_versions
         WHERE document_version_document_id = document_id AND document_version_id = $document_version_id"));
     if (!$row) {
-        flashAlert('That version no longer exists.', 'error');
+        flashAlert(__('That version no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['document_client_id']);
@@ -479,7 +479,7 @@ if (isset($_GET['delete_document_version'])) {
 
     logAudit("Document Version", "Delete", "$session_name deleted document version " . escapeSql($row['document_version_name']), $client_id);
 
-    flashAlert("A version of <strong>{$row['document_version_name']}</strong> deleted", 'error');
+    flashAlert(__('A version of <strong>%s</strong> deleted', $row['document_version_name']), 'error');
 
     redirect();
 
@@ -494,11 +494,11 @@ if (isset($_GET['delete_document'])) {
     $document_name = documentDeleteForGood(intval($_GET['delete_document']));
 
     if ($document_name === null) {
-        flashAlert('That document no longer exists.', 'error');
+        flashAlert(__('That document no longer exists.'), 'error');
         redirect();
     }
 
-    flashAlert("Document <strong>$document_name</strong> and all its versions deleted", 'error');
+    flashAlert(__('Document <strong>%s</strong> and all its versions deleted', $document_name), 'error');
 
     // From the document's own page there is nothing to go back to
     if (($_GET['from'] ?? '') === 'document_details') {

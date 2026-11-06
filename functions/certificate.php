@@ -22,7 +22,7 @@ const CERTIFICATE_SHORT_LIVED_DAYS = 100;
 /** What a check of the host can find. */
 const CERTIFICATE_CHECK_STATES = [
     'ok' => ['label' => 'OK', 'tone' => 'success', 'icon' => 'fa-check', 'text' => 'The host serves it, valid and trusted'],
-    'mismatch' => ['label' => 'Name mismatch', 'tone' => 'warning', 'icon' => 'fa-not-equal', 'text' => "What the host serves doesn't cover the host name - browsers will warn"],
+    'mismatch' => ['label' => 'Name mismatch', 'tone' => 'warning', 'icon' => 'fa-not-equal', 'text' => 'What the host serves doesn\'t cover the host name - browsers will warn'],
     'untrusted' => ['label' => 'Untrusted', 'tone' => 'warning', 'icon' => 'fa-exclamation-triangle', 'text' => 'Self-signed, or its chain is incomplete - browsers will warn'],
     'expired' => ['label' => 'Expired', 'tone' => 'danger', 'icon' => 'fa-calendar-times', 'text' => 'The host serves an expired certificate'],
     'unreachable' => ['label' => 'Unreachable', 'tone' => 'secondary', 'icon' => 'fa-plug', 'text' => 'Nothing answered on that host and port'],
@@ -34,6 +34,38 @@ const CERTIFICATE_HISTORY_LABELS = [
     'certificate_issued_by' => 'Issuer', 'certificate_issued_at' => 'Issued', 'certificate_expire' => 'Expiry', 'certificate_names' => 'Names covered',
     'certificate_fingerprint' => 'Fingerprint', 'certificate_notes' => 'Notes',
 ];
+
+/** A CERTIFICATE_CHECK_STATES state's label in the interface language. */
+function certificateCheckStateLabel($status) {
+    switch ($status) {
+        case 'ok': return _x('OK', 'certificate check');
+        case 'mismatch': return _x('Name mismatch', 'certificate check');
+        case 'untrusted': return _x('Untrusted', 'certificate check');
+        case 'expired': return _x('Expired', 'certificate check');
+        case 'unreachable': return _x('Unreachable', 'certificate check');
+    }
+    return CERTIFICATE_CHECK_STATES[$status]['label'] ?? (string) $status;
+}
+
+/** A CERTIFICATE_CHECK_STATES state's explanation in the interface language. */
+function certificateCheckStateText($status) {
+    switch ($status) {
+        case 'ok': return __('The host serves it, valid and trusted');
+        case 'mismatch': return __('What the host serves doesn\'t cover the host name - browsers will warn');
+        case 'untrusted': return __('Self-signed, or its chain is incomplete - browsers will warn');
+        case 'expired': return __('The host serves an expired certificate');
+        case 'unreachable': return __('Nothing answered on that host and port');
+    }
+    return CERTIFICATE_CHECK_STATES[$status]['text'] ?? '';
+}
+
+/** A CERTIFICATE_CHECK_STATES state with label and text in the interface language. */
+function certificateCheckState($status) {
+    if (!isset(CERTIFICATE_CHECK_STATES[$status])) {
+        return null;
+    }
+    return ['label' => certificateCheckStateLabel($status), 'text' => certificateCheckStateText($status)] + CERTIFICATE_CHECK_STATES[$status];
+}
 
 /** May this agent do this with certificates? 1 is to see them, 2 to change them, 3 to delete them. */
 function certificateCan($level) {
@@ -335,23 +367,23 @@ function certificateFormSet($post, $client_id, &$error = '') {
     $host_input = trim((string) ($post['domain'] ?? ''));
     $host = $host_input === '' ? null : certificateHost($host_input);
     if ($host_input !== '' && !$host) {
-        $error = "That isn't a host - something like www.example.com, or portal.example.com:8443.";
+        $error = __('That isn\'t a host - something like www.example.com, or portal.example.com:8443.');
         return null;
     }
     $pem_input = trim((string) ($post['public_key'] ?? ''));
     $parsed = $pem_input === '' ? null : certificateParse($pem_input);
     if ($pem_input !== '' && !$parsed) {
-        $error = "That isn't a certificate - paste the PEM, from -----BEGIN CERTIFICATE----- to -----END CERTIFICATE-----.";
+        $error = __('That isn\'t a certificate - paste the PEM, from -----BEGIN CERTIFICATE----- to -----END CERTIFICATE-----.');
         return null;
     }
     $name = trim((string) ($post['name'] ?? '')) ?: ($host ? $host['display'] : ($parsed['subject'] ?? ''));
     if ($name === '') {
-        $error = 'A certificate needs a name, or the host it is served on.';
+        $error = __('A certificate needs a name, or the host it is served on.');
         return null;
     }
     $expire = trim((string) ($post['expire'] ?? ''));
     if ($expire !== '' && (!($date = DateTime::createFromFormat('!Y-m-d', $expire)) || $date->format('Y-m-d') !== $expire)) {
-        $error = 'The expiry date is not a date.';
+        $error = __('The expiry date is not a date.');
         return null;
     }
     $domain_id = certificateDomainId($post['domain_id'] ?? 0, $client_id) ?: ($host ? certificateDomainFor($host['host'], $client_id) : 0);
@@ -415,13 +447,18 @@ function certificateExpiry($row) {
     }
     $days = $renewal['days'];
     if ($renewal['state'] === 'expired') {
-        $renewal['short'] = 'Expired';
+        $renewal['short'] = __('Expired');
     } elseif ($renewal['state'] === 'soon') {
-        $when = $days === 0 ? 'today' : ($days === 1 ? 'tomorrow' : "in $days days");
-        $renewal['text'] = 'Expires ' . $when . ($short_lived ? ' - it should have renewed by now' : '');
-        $renewal['short'] = $days === 0 ? 'Today' : ($days === 1 ? 'Tomorrow' : "$days days");
+        if ($days === 0) {
+            $renewal['text'] = $short_lived ? __('Expires today - it should have renewed by now') : __('Expires today');
+        } elseif ($days === 1) {
+            $renewal['text'] = $short_lived ? __('Expires tomorrow - it should have renewed by now') : __('Expires tomorrow');
+        } else {
+            $renewal['text'] = $short_lived ? _n('Expires in %d day - it should have renewed by now', 'Expires in %d days - it should have renewed by now', $days) : _n('Expires in %d day', 'Expires in %d days', $days);
+        }
+        $renewal['short'] = $days === 0 ? __('Today') : ($days === 1 ? __('Tomorrow') : _n('%d day', '%d days', $days));
     } else {
-        $renewal['text'] = ($short_lived ? 'Renews itself, expires ' : 'Expires ') . timeAgo($renewal['date']);
+        $renewal['text'] = $short_lived ? __('Renews itself, expires %s', timeAgo($renewal['date'])) : __('Expires %s', timeAgo($renewal['date']));
         $renewal['short'] = timeAgo($renewal['date']);
     }
     $renewal['short_lived'] = $short_lived;
@@ -431,12 +468,12 @@ function certificateExpiry($row) {
 /** The expiry as a soft pill - red expired, amber soon, green otherwise (with a renew icon when it renews itself). */
 function certificateExpiryPill($expiry, $use_text = false) {
     if (!$expiry) {
-        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fw-normal" title="No expiry date - check the host or paste the certificate">'
-            . '<i class="fas fa-question me-1"></i>Unknown</span>';
+        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fw-normal" title="' . escapeHtml(__('No expiry date - check the host or paste the certificate')) . '">'
+            . '<i class="fas fa-question me-1"></i>' . __('Unknown') . '</span>';
     }
     $tone = $expiry['tone'];
     $icon = $expiry['state'] === 'expired' ? 'fa-calendar-times' : ($expiry['state'] === 'soon' ? 'fa-hourglass-half' : ($expiry['short_lived'] ? 'fa-sync-alt' : 'fa-calendar-check'));
-    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . escapeHtml($expiry['date'] . ($expiry['short_lived'] ? ' - short-lived, renews itself' : '')) . '">'
+    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . escapeHtml($expiry['short_lived'] ? __('%s - short-lived, renews itself', formatDate($expiry['date'], 'date')) : formatDate($expiry['date'], 'date')) . '">'
         . '<i class="fas ' . $icon . ' me-1"></i>' . escapeHtml($use_text ? $expiry['text'] : $expiry['short']) . '</span>';
 }
 
@@ -444,10 +481,10 @@ function certificateExpiryPill($expiry, $use_text = false) {
 function certificateStatusPill($row, $use_text = false) {
     $status = (string) ($row['certificate_check_status'] ?? '');
     if (!isset(CERTIFICATE_CHECK_STATES[$status])) {
-        $label = trim((string) ($row['certificate_domain'] ?? '')) === '' ? 'No host to check' : 'Not checked';
+        $label = trim((string) ($row['certificate_domain'] ?? '')) === '' ? __('No host to check') : __('Not checked');
         return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle fw-normal"><i class="fas fa-minus me-1"></i>' . $label . '</span>';
     }
-    $state = CERTIFICATE_CHECK_STATES[$status];
+    $state = certificateCheckState($status);
     $when = !empty($row['certificate_checked_at']) ? ' - checked ' . timeAgo($row['certificate_checked_at']) : '';
     return '<span class="badge rounded-pill bg-' . $state['tone'] . '-subtle text-' . $state['tone'] . '-emphasis border border-' . $state['tone'] . '-subtle fw-normal" title="' . escapeHtml($state['text'] . $when) . '">'
         . '<i class="fas ' . $state['icon'] . ' me-1"></i>' . escapeHtml($use_text ? $state['text'] : $state['label']) . '</span>';

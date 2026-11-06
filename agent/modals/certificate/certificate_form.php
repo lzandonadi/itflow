@@ -39,13 +39,13 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
 
 <ul class="nav nav-pills nav-fill flex-nowrap overflow-auto mb-3 itflow-asset-form-tabs" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Certificate"><i class="fas fa-fw fa-lock me-2 d-none d-lg-inline"></i>Certificate</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Certificate"><i class="fas fa-fw fa-lock me-2 d-none d-lg-inline"></i><?= __('Certificate') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-file-code me-2 d-none d-lg-inline"></i>Paste or by hand</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-file-code me-2 d-none d-lg-inline"></i><?= __('Paste or by hand') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i>Notes</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i><?= __('Notes') ?></a>
     </li>
 </ul>
 
@@ -56,11 +56,11 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
     <div class="row g-3">
         <?php if (!$client_id) { ?>
             <div class="col-12">
-                <label class="form-label">Client <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="client_id" required data-certificate-client>
-                        <option value="">- Select Client -</option>
+                        <option value=""><?= __('- Select Client -') ?></option>
                         <?php foreach ($client_options as $client_option) { ?>
                             <option value="<?= intval($client_option['client_id']) ?>"<?= selectOptionClient($client_option['client_id'], $client_option['client_name'], $client_option['client_abbreviation'] ?? '') ?>><?= escapeHtml($client_option['client_name']) ?></option>
                         <?php } ?>
@@ -69,52 +69,52 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
             </div>
         <?php } ?>
         <div class="col-12">
-            <label class="form-label">Host</label>
+            <label class="form-label"><?= __('Host') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-server"></i></span>
-                <input type="text" class="form-control" name="domain" placeholder="www.example.com, portal.example.com:8443, fw01.example.local" maxlength="200" value="<?= $certificate_domain ?>"
+                <input type="text" class="form-control" name="domain" placeholder="<?= escapeHtml(__('www.example.com, portal.example.com:8443, fw01.example.local')) ?>" maxlength="200" value="<?= $certificate_domain ?>"
                     autocomplete="off" spellcheck="false" data-certificate-host <?= $certificate_form_mode === 'edit' ? '' : 'autofocus' ?>>
-                <button type="button" class="btn btn-outline-secondary" data-certificate-check-button><i class="fas fa-fw fa-search me-1"></i>Check</button>
+                <button type="button" class="btn btn-outline-secondary" data-certificate-check-button><i class="fas fa-fw fa-search me-1"></i><?= __('Check') ?></button>
             </div>
-            <div class="form-text" data-certificate-check>Where it is served - a web address is fine, and a port when it isn't 443. Check shows what it serves now; saving a new one checks it.</div>
+            <div class="form-text" data-certificate-check><?= __('Where it is served - a web address is fine, and a port when it isn\'t 443. Check shows what it serves now; saving a new one checks it.') ?></div>
             <div class="itflow-certificate-check-result mt-2 d-none" data-certificate-result></div>
         </div>
         <div class="col-md-8">
-            <label class="form-label">Name</label>
+            <label class="form-label"><?= __('Name') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="<?= $certificate_domain !== '' ? $certificate_domain : 'The host, if left empty' ?>" maxlength="200" value="<?= $certificate_name ?>" data-certificate-name>
+                <input type="text" class="form-control" name="name" placeholder="<?= $certificate_domain !== '' ? $certificate_domain : __('The host, if left empty') ?>" maxlength="200" value="<?= $certificate_name ?>" data-certificate-name>
             </div>
         </div>
         <div class="col-md-4 d-flex align-items-end">
             <div class="form-check form-switch mb-2">
                 <input type="checkbox" class="form-check-input" name="favorite" value="1" id="<?= $form_id ?>Favorite" <?= $certificate_favorite ? 'checked' : '' ?>>
-                <label class="form-check-label" for="<?= $form_id ?>Favorite"><i class="fas fa-star text-warning me-1"></i>Starred</label>
+                <label class="form-check-label" for="<?= $form_id ?>Favorite"><i class="fas fa-star text-warning me-1"></i><?= __('Starred') ?></label>
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Description</label>
+            <label class="form-label"><?= __('Description') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-                <input type="text" class="form-control" name="description" placeholder="Client portal, VPN, firewall admin, Exchange" maxlength="500" value="<?= $certificate_description ?>">
+                <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('Client portal, VPN, firewall admin, Exchange')) ?>" maxlength="500" value="<?= $certificate_description ?>">
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Domain</label>
+            <label class="form-label"><?= __('Domain') ?></label>
             <?php if ($client_id) { ?>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-globe"></i></span>
                     <select class="form-select select2" name="domain_id" data-certificate-domain>
-                        <option value="0">- Matched from the host -</option>
+                        <option value="0"><?= __('- Matched from the host -') ?></option>
                         <?php foreach ($domain_options as $domain_option) {
                             $domain_option_id = intval($domain_option['domain_id']); ?>
                             <option value="<?= $domain_option_id ?>" <?= intval($certificate_domain_id) === $domain_option_id ? 'selected' : '' ?> data-icon="fas fa-globe"><?= escapeHtml($domain_option['domain_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">The client's domain it is for. Left blank, it is the domain the host is under.</div>
+                <div class="form-text"><?= __('The client\'s domain it is for. Left blank, it is the domain the host is under.') ?></div>
             <?php } else { ?>
-                <div class="form-text mt-0">Matched to the client's domain the host is under when it's saved.</div>
+                <div class="form-text mt-0"><?= __('Matched to the client\'s domain the host is under when it\'s saved.') ?></div>
             <?php } ?>
         </div>
     </div>
@@ -122,39 +122,39 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
 
 <!-- The certificate itself, or the issuer and expiry by hand -->
 <div class="tab-pane fade" id="<?= $form_id ?>Details">
-    <label class="form-label">Certificate (PEM)</label>
+    <label class="form-label"><?= __('Certificate (PEM)') ?></label>
     <textarea class="form-control font-monospace small" rows="9" name="public_key" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----" data-certificate-pem><?= $certificate_public_key ?></textarea>
-    <div class="form-text mb-3">For a host ITFlow can't reach. The issuer, dates, names it covers and fingerprint are read from it - a whole chain is fine, only the first certificate is kept. Never paste the private key.</div>
+    <div class="form-text mb-3"><?= __('For a host ITFlow can\'t reach. The issuer, dates, names it covers and fingerprint are read from it - a whole chain is fine, only the first certificate is kept. Never paste the private key.') ?></div>
 
     <fieldset data-certificate-by-hand>
-        <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Nothing to paste? By hand</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Nothing to paste? By hand') ?></div>
         <div class="row g-3">
             <div class="col-md-7">
-                <label class="form-label">Issuer</label>
+                <label class="form-label"><?= __('Issuer') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
-                    <input type="text" class="form-control" name="issued_by" maxlength="200" placeholder="Let's Encrypt, DigiCert, Sectigo" value="<?= $certificate_issued_by ?>">
+                    <input type="text" class="form-control" name="issued_by" maxlength="200" placeholder="<?= escapeHtml(__('Let\'s Encrypt, DigiCert, Sectigo')) ?>" value="<?= $certificate_issued_by ?>">
                 </div>
             </div>
             <div class="col-md-5">
-                <label class="form-label">Expires</label>
+                <label class="form-label"><?= __('Expires') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar-times"></i></span>
                     <input type="date" class="form-control" name="expire" max="2999-12-31" value="<?= $certificate_expire ?>">
                 </div>
             </div>
         </div>
-        <div class="form-text" data-certificate-by-hand-note<?= $has_pem ? '' : ' hidden' ?>>Read from the certificate above - clear it to type these.</div>
+        <div class="form-text" data-certificate-by-hand-note<?= $has_pem ? '' : ' hidden' ?>><?= __('Read from the certificate above - clear it to type these.') ?></div>
     </fieldset>
     <?php if ($certificate_form_mode === 'edit') { ?>
-        <p class="text-body-secondary small text-end mt-3 mb-0">Certificate ID <span class="font-monospace"><?= intval($certificate_id) ?></span></p>
+        <p class="text-body-secondary small text-end mt-3 mb-0"><?= __('Certificate ID') ?> <span class="font-monospace"><?= intval($certificate_id) ?></span></p>
     <?php } ?>
 </div>
 
 <!-- Notes -->
 <div class="tab-pane fade" id="<?= $form_id ?>Notes">
-    <label class="form-label">Notes</label>
-    <textarea class="form-control" rows="10" name="notes" placeholder="Where it is installed, who renews it and how, the CSR and where the private key lives, anything to know before replacing it"><?= $certificate_notes ?></textarea>
+    <label class="form-label"><?= __('Notes') ?></label>
+    <textarea class="form-control" rows="10" name="notes" placeholder="<?= escapeHtml(__('Where it is installed, who renews it and how, the CSR and where the private key lives, anything to know before replacing it')) ?>"><?= $certificate_notes ?></textarea>
 </div>
 
 </div>
@@ -209,7 +209,7 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
         var last = '';
 
         host.addEventListener('input', function () {
-            name.placeholder = host.value.trim().replace(/^[a-z][a-z0-9+.\-]*:\/\//i, '').split(/[\/?#\s]/)[0].toLowerCase() || 'The host, if left empty';
+            name.placeholder = host.value.trim().replace(/^[a-z][a-z0-9+.\-]*:\/\//i, '').split(/[\/?#\s]/)[0].toLowerCase() || <?= json_encode(__('The host, if left empty'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
         });
 
         function runCheck(force) {
@@ -228,8 +228,8 @@ $has_pem = trim(html_entity_decode($certificate_public_key, ENT_QUOTES, 'UTF-8')
                 return;
             }
             button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Checking';
-            message.textContent = 'Connecting to ' + value + '...';
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>' + <?= json_encode(__('Checking'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+            message.textContent = <?= json_encode(__('Connecting to %s...'), JSON_HEX_TAG | JSON_HEX_AMP) ?>.replace('%s', value);
             itflowGet('ajax.php', { certificate_check: 'true', host: value, client_id: client, certificate_id: <?= intval($certificate_id) ?> }, function (data) {
                 button.disabled = false;
                 button.innerHTML = buttonDefault;

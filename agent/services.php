@@ -131,18 +131,18 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-stream me-2"></i>Services</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-stream me-2"></i><?= __('Services') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/service/service_add.php?<?= $client_url ?>">
-                        <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Service</span>
+                        <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Service') ?></span>
                     </button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item text-dark ajax-modal" href="#" data-modal-url="<?= buildExportModalUrl('modals/service/service_export.php', ['client_id', 'client', 'show', 'importance', 'category', 'tags', 'q']) ?>">
-                        <i class="fa fa-fw fa-download me-2"></i>Export
+                        <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                     </a>
                 </div>
             </div>
@@ -158,13 +158,13 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-4' : 'col-lg-3' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search services..." title="Name, description, category, notes, client, tags">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search services...')) ?>" title="<?= escapeHtml(__('Name, description, category, notes, client, tags')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select class="form-select select2" name="category" onchange="this.form.submit()">
-                        <option value="">- Any category -</option>
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?php foreach ($categories as $category) { ?>
                             <option value="<?= escapeHtml($category) ?>" <?= $category_filter === $category ? 'selected' : '' ?> data-icon="fas <?= serviceStyle($category)['icon'] ?>"><?= escapeHtml($category) ?></option>
                         <?php } ?>
@@ -172,21 +172,21 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <select class="form-select select2" name="importance" onchange="this.form.submit()">
-                        <option value="">- Any importance -</option>
+                        <option value=""><?= __('- Any importance -') ?></option>
                         <?php foreach (SERVICE_IMPORTANCE as $importance) { ?>
-                            <option value="<?= $importance ?>" <?= $importance_filter === $importance ? 'selected' : '' ?>><?= $importance ?></option>
+                            <option value="<?= $importance ?>" <?= $importance_filter === $importance ? 'selected' : '' ?>><?= serviceImportanceLabel($importance) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Tags -')) ?>" multiple>
                         <?= tagFilterOptionsHtml('service', $tag_filter_ids, '1 ' . clientScopeSql('service_client_id') . ($client_url ? " AND service_client_id = $client_id" : '')) ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                     <div class="col-lg-2 col-md-6">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                                 WHERE client_archived_at IS NULL AND (EXISTS (SELECT 1 FROM services WHERE service_client_id = client_id) OR client_id = $client_filter)
@@ -203,42 +203,42 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                         <?php if ($can_edit) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                    <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/service/service_bulk_edit.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-edit me-2"></i>Importance, category, review
+                                        <i class="fas fa-fw fa-edit me-2"></i><?= __('Importance, category, review') ?>
                                     </a>
                                     <button class="dropdown-item confirm-link" type="submit" form="bulkActions" name="bulk_review_services"
-                                        data-confirm-text="Each one is marked reviewed today, and its next review set from its schedule.">
-                                        <i class="fas fa-fw fa-clipboard-check me-2"></i>Mark reviewed
+                                        data-confirm-text="<?= escapeHtml(__('Each one is marked reviewed today, and its next review set from its schedule.')) ?>">
+                                        <i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Mark reviewed') ?>
                                     </button>
                                     <?php if ($show !== 'archived') { ?>
                                         <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="service" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                            <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                         </a>
                                     <?php } ?>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_favorite_services">
-                                        <i class="fas fa-fw fa-star text-warning me-2"></i>Star
+                                        <i class="fas fa-fw fa-star text-warning me-2"></i><?= __('Star') ?>
                                     </button>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_unfavorite_services">
-                                        <i class="far fa-fw fa-star me-2"></i>Unstar
+                                        <i class="far fa-fw fa-star me-2"></i><?= __('Unstar') ?>
                                     </button>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($show === 'archived') { ?>
                                         <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_restore_services">
-                                            <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                            <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                         </button>
                                         <?php if ($can_delete) { ?>
                                             <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_services"
-                                                data-confirm-text="The services go for good. What they linked to - assets, logins, documents - stays.">
-                                                <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                data-confirm-text="<?= escapeHtml(__('The services go for good. What they linked to - assets, logins, documents - stays.')) ?>">
+                                                <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                             </button>
                                         <?php } ?>
                                     <?php } else { ?>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_services"
-                                            data-confirm-text="They move to Archived, off the lists and counts, until restored.">
-                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                            data-confirm-text="<?= escapeHtml(__('They move to Archived, off the lists and counts, until restored.')) ?>">
+                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                         </button>
                                     <?php } ?>
                                 </div>
@@ -272,15 +272,15 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                     <?php if ($can_edit) { ?>
                         <th class="checkbox-column border-end">
                             <div class="form-check">
-                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                             </div>
                         </th>
                     <?php } ?>
-                    <th><?= $sort_link('service_name', 'Service') ?></th>
+                    <th><?= $sort_link('service_name', __('Service')) ?></th>
                     <?php if (!$client_url) { ?><th><?= $sort_link('client_name', 'Client') ?></th><?php } ?>
                     <th><?= $sort_link('service_importance', 'Importance') ?></th>
-                    <th class="d-none d-xxl-table-cell">Depends on</th>
-                    <th>Attention</th>
+                    <th class="d-none d-xxl-table-cell"><?= __('Depends on') ?></th>
+                    <th><?= __('Attention') ?></th>
                     <th><?= $sort_link('service_review_due', 'Review') ?></th>
                     <th></th>
                 </tr>
@@ -311,7 +311,7 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                         <?php if ($can_edit) { ?>
                             <td class="checkbox-column bg-light border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input bulk-select" type="checkbox" name="service_ids[]" value="<?= $service_id ?>" aria-label="Select <?= $name ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="service_ids[]" value="<?= $service_id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                 </div>
                             </td>
                         <?php } ?>
@@ -322,8 +322,8 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                                 <?= serviceTile($row['service_category']) ?>
                                 <div class="min-w-0">
                                     <a class="<?= $is_archived ? 'text-body-secondary' : 'fw-semibold text-body' ?>" href="<?= $url ?>"><?= $name ?></a>
-                                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="Starred"></i><?php } ?>
-                                    <?php if ($is_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                                    <?php if ($is_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($detail !== '') { ?>
                                         <div class="small text-body-secondary text-truncate itflow-service-desc" title="<?= escapeHtml($detail) ?>"><?= escapeHtml($detail) ?></div>
                                     <?php } ?>
@@ -335,7 +335,7 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                                     <!-- On a phone the other columns are off to the side - the essentials come along -->
                                     <div class="d-md-none d-flex flex-wrap align-items-center gap-2 mt-1 small">
                                         <?= serviceImportancePill($row['service_importance']) ?>
-                                        <?php if ($row_issues) { ?><span class="text-<?= $has_danger ? 'danger' : 'warning' ?>-emphasis"><i class="fas fa-exclamation-triangle me-1"></i><?= count($row_issues) ?> to look at</span><?php } ?>
+                                        <?php if ($row_issues) { ?><span class="text-<?= $has_danger ? 'danger' : 'warning' ?>-emphasis"><i class="fas fa-exclamation-triangle me-1"></i><?= __('%d to look at', count($row_issues)) ?></span><?php } ?>
                                         <?php if (!$client_url) { ?><span class="text-body-secondary text-truncate"><?= escapeHtml($row['client_name']) ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -354,7 +354,7 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                             <?php if ($chips) { ?>
                                 <a class="d-flex flex-wrap gap-1 text-decoration-none itflow-service-chips" href="<?= $url ?>"><?= $chips ?></a>
                             <?php } else { ?>
-                                <span class="small text-body-secondary" title="Link the assets, logins and vendors it depends on from its page">Nothing linked</span>
+                                <span class="small text-body-secondary" title="<?= escapeHtml(__('Link the assets, logins and vendors it depends on from its page')) ?>"><?= __('Nothing linked') ?></span>
                             <?php } ?>
                         </td>
 
@@ -364,10 +364,10 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
                                 <div class="text-<?= $first['tone'] ?>-emphasis text-truncate" title="<?= escapeHtml(implode("\n", array_column($row_issues, 'text'))) ?>">
                                     <i class="fas fa-fw fa-exclamation-<?= $first['tone'] === 'danger' ? 'circle' : 'triangle' ?> me-1"></i><?= escapeHtml($first['text']) ?>
                                 </div>
-                                <?php if (count($row_issues) > 1) { ?><div class="text-body-secondary">and <?= count($row_issues) - 1 ?> more</div><?php } ?>
+                                <?php if (count($row_issues) > 1) { ?><div class="text-body-secondary"><?= __('and %d more', count($row_issues) - 1) ?></div><?php } ?>
                             <?php } ?>
                             <?php if ($c['open_tickets']) { ?>
-                                <a class="text-reset text-nowrap" href="<?= $url ?>#tickets"><i class="fas fa-fw fa-life-ring text-body-secondary me-1"></i><?= $c['open_tickets'] ?> open ticket<?= $c['open_tickets'] === 1 ? '' : 's' ?></a>
+                                <a class="text-reset text-nowrap" href="<?= $url ?>#tickets"><i class="fas fa-fw fa-life-ring text-body-secondary me-1"></i><?= _n('%d open ticket', '%d open tickets', $c['open_tickets']) ?></a>
                             <?php } ?>
                             <?php if (!$row_issues && !$c['open_tickets']) { ?>
                                 <span class="text-body-secondary">-</span>
@@ -378,44 +378,44 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
 
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $quick_url ?>">
-                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                     </a>
                                     <a class="dropdown-item" href="<?= $url ?>" target="_blank">
-                                        <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i>Open in a new tab
+                                        <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i><?= __('Open in a new tab') ?>
                                     </a>
                                     <?php if ($can_edit && !$is_archived) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= escapeHtml('modals/ticket/ticket_add.php?' . http_build_query(['client_id' => $row_client_id, 'service_id' => $service_id])) ?>">
-                                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i>Report a problem
+                                            <i class="fas fa-fw fa-life-ring text-secondary me-2"></i><?= __('Report a problem') ?>
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/service/service_edit.php?id=<?= $service_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/service/service_review.php?id=<?= $service_id ?>">
-                                            <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Mark reviewed
+                                            <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Mark reviewed') ?>
                                         </a>
                                         <a class="dropdown-item" href="post.php?<?= $is_favorite ? 'unfavorite_service' : 'favorite_service' ?>=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? 'Unstar' : 'Star' ?>
+                                            <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? __('Unstar') : __('Star') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_edit) { ?>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($is_archived) { ?>
                                             <a class="dropdown-item" href="post.php?restore_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                             </a>
                                             <?php if ($can_delete) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                                     data-confirm-text="<?= $name ?> goes for good. What it linked to - assets, logins, documents - stays.">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                data-confirm-text="<?= $name ?> moves to Archived, off the lists and counts, until restored.">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                data-confirm-text="<?= escapeHtml(__('%s moves to Archived, off the lists and counts, until restored.', $name)) ?>">
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     <?php } ?>
@@ -436,8 +436,8 @@ $link_icons = ['asset' => ['fa-desktop', 'asset', 'assets'], 'credential' => ['f
         'archived' => $show === 'archived',
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['unreviewed']),
-        'text' => 'Start with what the client cannot work without: email, backup, their line of business app.',
-        'actions' => $can_edit ? [['label' => 'New Service', 'modal' => "modals/service/service_add.php?$client_url", 'size' => 'lg']] : [],
+        'text' => __('Start with what the client cannot work without: email, backup, their line of business app.'),
+        'actions' => $can_edit ? [['label' => __('New Service'), 'modal' => "modals/service/service_add.php?$client_url", 'size' => 'lg']] : [],
     ];
     require_once "../includes/filter_footer.php";
     ?>

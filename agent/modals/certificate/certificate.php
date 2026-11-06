@@ -16,7 +16,7 @@ enforceUserPermission('module_support');
 $certificate_id = intval($_GET['id'] ?? 0);
 $certificate = certificateRow($certificate_id);
 if (!$certificate) {
-    echo json_encode(['error' => 'That certificate no longer exists.']);
+    echo json_encode(['error' => __('That certificate no longer exists.')]);
     exit;
 }
 $client_id = intval($certificate['certificate_client_id']);
@@ -41,13 +41,13 @@ $fingerprint = trim((string) $certificate['certificate_fingerprint']);
 $status_problem = null;
 $status = (string) $certificate['certificate_check_status'];
 if ($status !== 'ok' && isset(CERTIFICATE_CHECK_STATES[$status])) {
-    $status_problem = CERTIFICATE_CHECK_STATES[$status];
+    $status_problem = certificateCheckState($status);
     $status_problem['hint'] = [
-        'mismatch' => 'install the certificate for this name, or check the host is right',
-        'untrusted' => !$parsed ? 'replace a self-signed certificate with one from a CA (or your own CA, for internal hosts), or install the intermediate certificates with it'
-            : ($parsed['self_signed'] ? 'replace the self-signed certificate with one from a CA (or your own CA, for internal hosts)' : 'install the intermediate certificates with it'),
-        'expired' => 'renew it, and install the new one',
-        'unreachable' => 'check the host and port, or that ITFlow can reach it',
+        'mismatch' => __('install the certificate for this name, or check the host is right'),
+        'untrusted' => !$parsed ? __('replace a self-signed certificate with one from a CA (or your own CA, for internal hosts), or install the intermediate certificates with it')
+            : ($parsed['self_signed'] ? __('replace the self-signed certificate with one from a CA (or your own CA, for internal hosts)') : __('install the intermediate certificates with it')),
+        'expired' => __('renew it, and install the new one'),
+        'unreachable' => __('check the host and port, or that ITFlow can reach it'),
     ][$status] ?? '';
 }
 
@@ -68,8 +68,8 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $certificate_name ?></span>
-                <?php if (intval($certificate['certificate_favorite'])) { ?><i class="fas fa-star text-warning small" title="Starred"></i><?php } ?>
-                <?php if ($certificate_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if (intval($certificate['certificate_favorite'])) { ?><i class="fas fa-star text-warning small" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                <?php if ($certificate_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
                 <span><?= escapeHtml($certificate['client_name']) ?></span>
@@ -77,7 +77,7 @@ ob_start();
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -86,10 +86,10 @@ ob_start();
         <?= certificateStatusPill($certificate) ?>
         <?= certificateExpiryPill($expiry, true) ?>
         <?php if ($host) { ?>
-            <a href="https://<?= escapeHtml($host['display']) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-1"></i>Open the site</a>
+            <a href="https://<?= escapeHtml($host['display']) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-1"></i><?= __('Open the site') ?></a>
         <?php } ?>
         <?php if ($host) { ?>
-            <span title="<?= escapeHtml($certificate['certificate_checked_at'] ?? '') ?>"><i class="fas fa-search me-1"></i><?= $certificate['certificate_checked_at'] ? 'Checked ' . timeAgo($certificate['certificate_checked_at']) : 'Not checked yet' ?></span>
+            <span title="<?= escapeHtml($certificate['certificate_checked_at'] ?? '') ?>"><i class="fas fa-search me-1"></i><?= $certificate['certificate_checked_at'] ? 'Checked ' . timeAgo($certificate['certificate_checked_at']) : __('Not checked yet') ?></span>
         <?php } ?>
     </div>
 
@@ -102,26 +102,26 @@ ob_start();
 
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Certificate</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Certificate') ?></div>
             <dl class="itflow-asset-dl itflow-domain-dl mb-3">
-                <dt>Issuer</dt>
-                <dd class="text-break"><?= $certificate['certificate_issued_by'] !== '' ? escapeHtml($certificate['certificate_issued_by']) : '<span class="text-body-secondary">Unknown</span>' ?><?= $parsed && $parsed['self_signed'] ? ' <span class="small text-body-secondary">(self-signed)</span>' : '' ?></dd>
+                <dt><?= __('Issuer') ?></dt>
+                <dd class="text-break"><?= $certificate['certificate_issued_by'] !== '' ? escapeHtml($certificate['certificate_issued_by']) : '<span class="text-body-secondary">' . __('Unknown') . '</span>' ?><?= $parsed && $parsed['self_signed'] ? ' <span class="small text-body-secondary">' . __('(self-signed)') . '</span>' : '' ?></dd>
                 <?php if (!empty($certificate['certificate_issued_at'])) { ?>
-                    <dt>Issued</dt>
+                    <dt><?= __('Issued') ?></dt>
                     <dd><?= escapeHtml($certificate['certificate_issued_at']) ?> <span class="small text-body-secondary">(<?= timeAgo($certificate['certificate_issued_at']) ?>)</span></dd>
                 <?php } ?>
-                <dt>Expires</dt>
-                <dd><?= $expiry ? escapeHtml($expiry['date']) . ' <span class="small text-body-secondary">(' . timeAgo($expiry['date']) . ')</span>' : '<span class="text-body-secondary">Unknown</span>' ?></dd>
+                <dt><?= __('Expires') ?></dt>
+                <dd><?= $expiry ? escapeHtml(formatDate($expiry['date'], 'date')) . ' <span class="small text-body-secondary">(' . timeAgo($expiry['date']) . ')</span>' : '<span class="text-body-secondary">' . __('Unknown') . '</span>' ?></dd>
                 <?php if ($parsed) { ?>
-                    <dt>Valid for</dt>
-                    <dd><?= $parsed['days'] ?> days<?= certificateShortLived($certificate) ? ' <span class="small text-body-secondary">- short-lived, renews itself</span>' : '' ?></dd>
+                    <dt><?= __('Valid for') ?></dt>
+                    <dd><?= _n('%d day', '%d days', $parsed['days']) ?><?= certificateShortLived($certificate) ? ' <span class="small text-body-secondary">' . __('- short-lived, renews itself') . '</span>' : '' ?></dd>
                 <?php } ?>
                 <?php if ($fingerprint !== '') { ?>
-                    <dt>SHA-256</dt>
+                    <dt><?= __('SHA-256') ?></dt>
                     <dd class="min-w-0">
                         <div class="d-flex align-items-center min-w-0">
                             <span class="font-monospace small itflow-certificate-fingerprint"><?= str_replace(':', ':<wbr>', escapeHtml($fingerprint)) ?></span>
-                            <button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($fingerprint) ?>"><i class="far fa-copy"></i></button>
+                            <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($fingerprint) ?>"><i class="far fa-copy"></i></button>
                         </div>
                     </dd>
                 <?php } ?>
@@ -129,34 +129,34 @@ ob_start();
         </div>
 
         <div class="col-md-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">Where</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('Where') ?></div>
             <dl class="itflow-asset-dl itflow-domain-dl mb-3">
-                <dt>Host</dt>
+                <dt><?= __('Host') ?></dt>
                 <dd class="min-w-0">
                     <?php if ($host) { ?>
                         <div class="d-flex align-items-center min-w-0">
                             <span class="font-monospace small text-truncate"><?= escapeHtml($host['display']) ?></span>
-                            <button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($host['display']) ?>"><i class="far fa-copy"></i></button>
+                            <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($host['display']) ?>"><i class="far fa-copy"></i></button>
                         </div>
                     <?php } else { ?>
-                        <span class="text-body-secondary">None<?= $can_edit ? ' - Edit to add the host, so it can be checked' : '' ?></span>
+                        <span class="text-body-secondary"><?= $can_edit ? __('None - Edit to add the host, so it can be checked') : __('None') ?></span>
                     <?php } ?>
                 </dd>
-                <dt>Domain</dt>
+                <dt><?= __('Domain') ?></dt>
                 <dd class="min-w-0"><?= intval($certificate['certificate_domain_id']) && $certificate['domain_name'] !== null
                     ? domainLink($certificate['certificate_domain_id'], $certificate['domain_name'], ['archived' => !empty($certificate['domain_archived_at'])])
-                    : '<span class="text-body-secondary">None</span>' ?></dd>
-                <dt>Covers</dt>
+                    : '<span class="text-body-secondary">' . __('None') . '</span>' ?></dd>
+                <dt><?= __('Covers') ?></dt>
                 <dd class="min-w-0">
                     <?php if ($names) { ?>
                         <ul class="list-unstyled mb-0 small">
                             <?php foreach (array_slice($names, 0, 8) as $covered) { ?>
-                                <li class="font-monospace text-break"><?= escapeHtml($covered) ?><?= $host && certificateCovers($host['host'], [$covered]) ? ' <i class="fas fa-check text-success ms-1" title="Covers the host"></i>' : '' ?></li>
+                                <li class="font-monospace text-break"><?= escapeHtml($covered) ?><?= $host && certificateCovers($host['host'], [$covered]) ? ' <i class="fas fa-check text-success ms-1" title="' . escapeHtml(__('Covers the host')) . '"></i>' : '' ?></li>
                             <?php } ?>
                         </ul>
                         <?php if (count($names) > 8) { ?>
                             <details class="small">
-                                <summary class="text-body-secondary"><?= count($names) - 8 ?> more</summary>
+                                <summary class="text-body-secondary"><?= __('%d more', count($names) - 8) ?></summary>
                                 <ul class="list-unstyled mb-0">
                                     <?php foreach (array_slice($names, 8) as $covered) { ?>
                                         <li class="font-monospace text-break"><?= escapeHtml($covered) ?></li>
@@ -165,7 +165,7 @@ ob_start();
                             </details>
                         <?php } ?>
                     <?php } else { ?>
-                        <span class="text-body-secondary">Unknown</span>
+                        <span class="text-body-secondary"><?= __('Unknown') ?></span>
                     <?php } ?>
                 </dd>
             </dl>
@@ -174,9 +174,9 @@ ob_start();
 
     <?php if ($services || $can_edit) { ?>
         <div class="d-flex align-items-center mt-1 mb-1">
-            <span class="small text-body-secondary fw-semibold text-uppercase me-auto">Services that use it</span>
+            <span class="small text-body-secondary fw-semibold text-uppercase me-auto"><?= __('Services that use it') ?></span>
             <?php if ($can_edit) { ?>
-                <a class="small ajax-modal" href="#" data-modal-url="modals/link/link.php?from=certificate&id=<?= $certificate_id ?>&to=service"><i class="fas fa-link me-1"></i>Link a service</a>
+                <a class="small ajax-modal" href="#" data-modal-url="modals/link/link.php?from=certificate&id=<?= $certificate_id ?>&to=service"><i class="fas fa-link me-1"></i><?= __('Link a service') ?></a>
             <?php } ?>
         </div>
         <?php if ($services) { ?>
@@ -184,22 +184,22 @@ ob_start();
                 return "post.php?unlink_item&from=certificate&id=$certificate_id&to=service&other=" . intval($row['service_id']) . "&csrf_token=" . $_SESSION['csrf_token'];
             } : null) ?>
         <?php } else { ?>
-            <p class="small text-body-secondary mb-0">No service is linked to it.</p>
+            <p class="small text-body-secondary mb-0"><?= __('No service is linked to it.') ?></p>
         <?php } ?>
     <?php } ?>
 
     <?php if (trim((string) $certificate['certificate_notes']) !== '') { ?>
-        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1">Notes</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mt-3 mb-1"><?= __('Notes') ?></div>
         <div class="itflow-credential-note small"><?= nl2br(escapeHtml($certificate['certificate_notes'])) ?></div>
     <?php } ?>
 
     <?php if ($pem !== '') {
         $file_name = preg_replace('/[^a-z0-9.\-]+/i', '-', $host ? $host['host'] : $certificate['certificate_name']) . '.crt'; ?>
         <details class="mt-3">
-            <summary class="small text-body-secondary fw-semibold text-uppercase">Certificate (PEM)</summary>
+            <summary class="small text-body-secondary fw-semibold text-uppercase"><?= __('Certificate (PEM)') ?></summary>
             <div class="d-flex flex-wrap gap-2 mt-2 mb-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary clipboardjs" data-clipboard-text="<?= escapeHtml($pem) ?>"><i class="far fa-copy me-1"></i>Copy</button>
-                <a class="btn btn-sm btn-outline-secondary" href="<?= certificateDownloadHref($pem) ?>" download="<?= escapeHtml($file_name) ?>"><i class="fas fa-download me-1"></i>Download .crt</a>
+                <button type="button" class="btn btn-sm btn-outline-secondary clipboardjs" data-clipboard-text="<?= escapeHtml($pem) ?>"><i class="far fa-copy me-1"></i><?= __('Copy') ?></button>
+                <a class="btn btn-sm btn-outline-secondary" href="<?= certificateDownloadHref($pem) ?>" download="<?= escapeHtml($file_name) ?>"><i class="fas fa-download me-1"></i><?= __('Download .crt') ?></a>
             </div>
             <pre class="itflow-credential-note small mb-0"><?= escapeHtml($pem) ?></pre>
         </details>
@@ -207,7 +207,7 @@ ob_start();
 
     <?php if ($history) { ?>
         <details class="mt-3">
-            <summary class="small text-body-secondary fw-semibold text-uppercase">History</summary>
+            <summary class="small text-body-secondary fw-semibold text-uppercase"><?= __('History') ?></summary>
             <ul class="list-unstyled small mt-2 mb-0">
                 <?php foreach ($history as $entry) {
                     $old = trim((string) $entry['certificate_history_old_value']);
@@ -233,11 +233,11 @@ ob_start();
 <div class="modal-footer">
     <?php if ($can_edit) { ?>
         <?php if ($host) { ?>
-            <a class="btn btn-outline-secondary me-auto" href="post.php?check_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-sync-alt me-2"></i>Check now</a>
+            <a class="btn btn-outline-secondary me-auto" href="post.php?check_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-sync-alt me-2"></i><?= __('Check now') ?></a>
         <?php } ?>
-        <button type="button" class="btn btn-primary text-bold ajax-modal" data-modal-size="lg" data-modal-url="modals/certificate/certificate_edit.php?id=<?= $certificate_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-primary text-bold ajax-modal" data-modal-size="lg" data-modal-url="modals/certificate/certificate_edit.php?id=<?= $certificate_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <?php

@@ -18,7 +18,7 @@ function certificateForRequest($certificate_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = certificateRow($certificate_id);
     if (!$row) {
-        flashAlert('That certificate no longer exists.', 'error');
+        flashAlert(__('That certificate no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['certificate_client_id']);
@@ -47,17 +47,19 @@ function certificatesForBulk($level) {
 function certificateCheckMessage($check, $name, $host_display) {
     $name = escapeHtml($name);
     if ($check === null) {
-        return ["<strong>$name</strong> has no host to check - Edit it to add the host it is served on, or paste the certificate.", 'error'];
+        return [__('<strong>%s</strong> has no host to check - Edit it to add the host it is served on, or paste the certificate.', $name), 'error', ''];
     }
     if (empty($check['reachable'])) {
-        return ["Nothing answered on <strong>" . escapeHtml($host_display) . "</strong> - the certificate on file was left as it was. Check the host and port, or paste the certificate if ITFlow can't reach it.", 'error'];
+        return [__('Nothing answered on <strong>%s</strong> - the certificate on file was left as it was. Check the host and port, or paste the certificate if ITFlow can\'t reach it.', escapeHtml($host_display)), 'error', ''];
     }
-    $state = CERTIFICATE_CHECK_STATES[$check['status']];
+    $state = certificateCheckState($check['status']);
     if ($check['status'] === 'ok') {
         $expiry = certificateExpiry(['certificate_expire' => $check['expire'], 'certificate_issued_at' => $check['issued_at']]);
-        return ["Checked <strong>$name</strong> - OK" . ($expiry ? ', ' . lcfirst($expiry['text']) : ''), $expiry && $expiry['state'] === 'soon' ? 'warning' : 'success'];
+        $result = $expiry ? __('OK, %s', lcfirst($expiry['text'])) : _x('OK', 'certificate check');
+        return [__('Checked <strong>%1$s</strong> - %2$s', $name, $result), $expiry && $expiry['state'] === 'soon' ? 'warning' : 'success', $result];
     }
-    return ["Checked <strong>$name</strong> - " . escapeHtml($state['label']) . ': ' . escapeHtml(lcfirst($state['text'])), $check['status'] === 'expired' ? 'error' : 'warning'];
+    $result = escapeHtml($state['label']) . ': ' . escapeHtml(lcfirst($state['text']));
+    return [__('Checked <strong>%1$s</strong> - %2$s', $name, $result), $check['status'] === 'expired' ? 'error' : 'warning', $result];
 }
 
 if (isset($_POST['add_certificate'])) {
@@ -71,7 +73,7 @@ if (isset($_POST['add_certificate'])) {
     enforceClientAccess();
 
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('Pick the client this certificate is for.', 'error');
+        flashAlert(__('Pick the client this certificate is for.'), 'error');
         redirect();
     }
 
@@ -92,12 +94,13 @@ if (isset($_POST['add_certificate'])) {
     logAudit("Certificate", "Create", "$session_name created certificate " . escapeSql($name), $client_id, $certificate_id);
 
     if ($check !== null && empty($check['reachable'])) {
-        flashAlert("Certificate <strong>$name_html</strong> created - nothing answered on <strong>" . escapeHtml($form['host']['display']) . "</strong>, so " . ($form['parsed'] ? 'what you pasted is what is on file' : 'paste the certificate, or set the expiry by hand'), 'warning');
+        $host_html = escapeHtml($form['host']['display']);
+        flashAlert($form['parsed'] ? __('Certificate <strong>%1$s</strong> created - nothing answered on <strong>%2$s</strong>, so what you pasted is what is on file', $name_html, $host_html) : __('Certificate <strong>%1$s</strong> created - nothing answered on <strong>%2$s</strong>, so paste the certificate, or set the expiry by hand', $name_html, $host_html), 'warning');
     } elseif ($check !== null) {
-        [$message, $type] = certificateCheckMessage($check, $name, $form['host']['display']);
-        flashAlert("Certificate <strong>$name_html</strong> created and " . lcfirst(str_replace("<strong>$name_html</strong> ", '', $message)), $type);
+        [$message, $type, $result] = certificateCheckMessage($check, $name, $form['host']['display']);
+        flashAlert(__('Certificate <strong>%1$s</strong> created and checked - %2$s', $name_html, $result), $type);
     } else {
-        flashAlert("Certificate <strong>$name_html</strong> created");
+        flashAlert(__('Certificate <strong>%s</strong> created', $name_html));
     }
 
     redirect();
@@ -137,7 +140,7 @@ if (isset($_POST['edit_certificate'])) {
     $name = $form['name'];
     logAudit("Certificate", "Edit", "$session_name edited certificate " . escapeSql($name), $client_id, $certificate_id);
 
-    flashAlert("Certificate <strong>" . escapeHtml($name) . "</strong> updated");
+    flashAlert(__('Certificate <strong>%s</strong> updated', escapeHtml($name)));
 
     redirect();
 
@@ -191,7 +194,7 @@ if (isset($_GET['archive_certificate'])) {
 
     logAudit("Certificate", "Archive", "$session_name archived certificate " . escapeSql($row['certificate_name']), $client_id, $certificate_id);
 
-    flashAlert("Certificate <strong>" . escapeHtml($row['certificate_name']) . "</strong> archived", 'error');
+    flashAlert(__('Certificate <strong>%s</strong> archived', escapeHtml($row['certificate_name'])), 'error');
 
     redirect();
 
@@ -208,7 +211,7 @@ if (isset($_GET['restore_certificate'])) {
 
     logAudit("Certificate", "Restore", "$session_name restored certificate " . escapeSql($row['certificate_name']), $client_id, $certificate_id);
 
-    flashAlert("Certificate <strong>" . escapeHtml($row['certificate_name']) . "</strong> restored");
+    flashAlert(__('Certificate <strong>%s</strong> restored', escapeHtml($row['certificate_name'])));
 
     redirect();
 
@@ -226,7 +229,7 @@ if (isset($_GET['delete_certificate'])) {
 
     logAudit("Certificate", "Delete", "$session_name deleted certificate " . escapeSql($row['certificate_name']), $client_id);
 
-    flashAlert("Certificate <strong>" . escapeHtml($row['certificate_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Certificate <strong>%s</strong> deleted', escapeHtml($row['certificate_name'])), 'error');
 
     redirect();
 
@@ -244,7 +247,7 @@ if (isset($_POST['bulk_favorite_certificates']) || isset($_POST['bulk_unfavorite
         $count++;
     }
 
-    flashAlert(($favorite ? 'Starred' : 'Unstarred') . " <strong>$count</strong> certificate" . ($count === 1 ? '' : 's'));
+    flashAlert($favorite ? _n('Starred %s certificate', 'Starred %s certificates', $count, "<strong>$count</strong>") : _n('Unstarred %s certificate', 'Unstarred %s certificates', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -274,11 +277,15 @@ if (isset($_POST['bulk_check_certificates']) || isset($_POST['bulk_refresh_certi
     $parts = [];
     foreach ($tally as $status => $count) {
         if ($count) {
-            $parts[] = "<strong>$count</strong> " . (in_array($status, ['ok', 'mismatch'], true) ? CERTIFICATE_CHECK_STATES[$status]['label'] : strtolower(CERTIFICATE_CHECK_STATES[$status]['label']));
+            $parts[] = __('%1$s %2$s', "<strong>$count</strong>", in_array($status, ['ok', 'mismatch'], true) ? certificateCheckStateLabel($status) : mb_strtolower(certificateCheckStateLabel($status)));
         }
     }
     $problems = $checked - $tally['ok'];
-    flashAlert("Checked <strong>$checked</strong> certificate" . ($checked === 1 ? '' : 's') . ($parts ? ' - ' . implode(', ', $parts) : '') . ($no_host ? "; <strong>$no_host</strong> with no host to check" : ''), $problems || $no_host ? 'warning' : 'success');
+    $message = _n('Checked %s certificate', 'Checked %s certificates', $checked, "<strong>$checked</strong>") . ($parts ? ' - ' . implode(', ', $parts) : '');
+    if ($no_host) {
+        $message = __('%1$s; %2$s with no host to check', $message, "<strong>$no_host</strong>");
+    }
+    flashAlert($message, $problems || $no_host ? 'warning' : 'success');
 
     redirect();
 
@@ -295,7 +302,7 @@ if (isset($_POST['bulk_archive_certificates'])) {
         $count++;
     }
 
-    flashAlert("Archived <strong>$count</strong> certificate" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived %s certificate', 'Archived %s certificates', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 
@@ -312,7 +319,7 @@ if (isset($_POST['bulk_restore_certificates'])) {
         $count++;
     }
 
-    flashAlert("Restored <strong>$count</strong> certificate" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored %s certificate', 'Restored %s certificates', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -329,7 +336,7 @@ if (isset($_POST['bulk_delete_certificates'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> certificate" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted %s certificate', 'Deleted %s certificates', $count, "<strong>$count</strong>"), 'error');
 
     redirect();
 

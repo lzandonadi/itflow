@@ -49,11 +49,11 @@ const SHARE_PASSPHRASE_MIN = 6;
 /** What can be shared: what it is called, its icon, and whether it holds a secret. */
 function shareTypes() {
     return [
-        'Credential' => ['label' => 'Login', 'icon' => 'fa-key', 'secret' => true],
-        'Note' => ['label' => 'Secure note', 'icon' => 'fa-user-secret', 'secret' => true],
-        'Document' => ['label' => 'Document', 'icon' => 'fa-file-alt', 'secret' => false],
-        'File' => ['label' => 'File', 'icon' => 'fa-paperclip', 'secret' => false],
-        'Request' => ['label' => 'Login request', 'icon' => 'fa-inbox', 'secret' => false],
+        'Credential' => ['label' => __('Login'), 'icon' => 'fa-key', 'secret' => true],
+        'Note' => ['label' => __('Secure note'), 'icon' => 'fa-user-secret', 'secret' => true],
+        'Document' => ['label' => __('Document'), 'icon' => 'fa-file-alt', 'secret' => false],
+        'File' => ['label' => __('File'), 'icon' => 'fa-paperclip', 'secret' => false],
+        'Request' => ['label' => __('Login request'), 'icon' => 'fa-inbox', 'secret' => false],
     ];
 }
 
@@ -61,7 +61,7 @@ function shareTypes() {
 function shareExpiryOptions() {
     global $config_share_max_hours;
     $max = intval($config_share_max_hours ?? 720) ?: 720;
-    $options = [1 => '1 hour', 4 => '4 hours', 24 => '1 day', 72 => '3 days', 168 => '1 week', 336 => '2 weeks', 720 => '30 days', 2160 => '90 days'];
+    $options = [1 => __('1 hour'), 4 => __('4 hours'), 24 => __('1 day'), 72 => __('3 days'), 168 => __('1 week'), 336 => __('2 weeks'), 720 => __('30 days'), 2160 => __('90 days')];
     return array_filter($options, function ($hours) use ($max) {
         return $hours <= $max;
     }, ARRAY_FILTER_USE_KEY);
@@ -69,12 +69,12 @@ function shareExpiryOptions() {
 
 /** What the admin may set as the longest a link can last, in hours => label. */
 function shareMaxOptions() {
-    return [24 => '1 day', 72 => '3 days', 168 => '1 week', 336 => '2 weeks', 720 => '30 days', 2160 => '90 days'];
+    return [24 => __('1 day'), 72 => __('3 days'), 168 => __('1 week'), 336 => __('2 weeks'), 720 => __('30 days'), 2160 => __('90 days')];
 }
 
 /** How many times a link may be opened => label; 0 is until it expires. */
 function shareViewOptions() {
-    return [1 => 'Once', 2 => 'Twice', 3 => '3 times', 5 => '5 times', 10 => '10 times', 0 => 'Until it expires'];
+    return [1 => __('Once'), 2 => __('Twice'), 3 => __('3 times'), 5 => __('5 times'), 10 => __('10 times'), 0 => __('Until it expires')];
 }
 
 /** The window's starting choices for a type - a short, single-use link for anything secret. */
@@ -192,7 +192,7 @@ function shareQrSvg($url) {
     $generator = new barcode_generator();
     $svg = (string) $generator->render_svg('qr', $url, ['w' => 180, 'h' => 180, 'p' => 0]);
     $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', $svg);
-    return preg_replace('/<svg /', '<svg class="itflow-share-qr" role="img" aria-label="QR code of the link" ', $svg, 1);
+    return preg_replace('/<svg /', '<svg class="itflow-share-qr" role="img" aria-label="' . escapeHtml(__('QR code of the link')) . '" ', $svg, 1);
 }
 
 /** One link by id, with who made it and the client - raw, or null. */
@@ -260,16 +260,16 @@ function shareState($row) {
 /** Each state's label and badge. */
 function shareStates() {
     return [
-        'active' => ['Active', 'text-bg-success'],
-        'waiting' => ['Waiting', 'text-bg-info'],
-        'received' => ['Received', 'text-bg-warning'],
-        'used' => ['Used', 'text-bg-secondary'],
-        'expired' => ['Expired', 'text-bg-secondary'],
-        'revoked' => ['Turned off', 'text-bg-secondary'],
-        'locked' => ['Locked', 'text-bg-danger'],
-        'destroyed' => ['Destroyed', 'text-bg-secondary'],
-        'saved' => ['Saved', 'text-bg-success'],
-        'discarded' => ['Discarded', 'text-bg-secondary'],
+        'active' => [_x('Active', 'shared link'), 'text-bg-success'],
+        'waiting' => [_x('Waiting', 'shared link'), 'text-bg-info'],
+        'received' => [_x('Received', 'shared link'), 'text-bg-warning'],
+        'used' => [_x('Used', 'shared link'), 'text-bg-secondary'],
+        'expired' => [_x('Expired', 'shared link'), 'text-bg-secondary'],
+        'revoked' => [_x('Turned off', 'shared link'), 'text-bg-secondary'],
+        'locked' => [_x('Locked', 'shared link'), 'text-bg-danger'],
+        'destroyed' => [_x('Destroyed', 'shared link'), 'text-bg-secondary'],
+        'saved' => [_x('Saved', 'shared link'), 'text-bg-success'],
+        'discarded' => [_x('Discarded', 'shared link'), 'text-bg-secondary'],
     ];
 }
 
@@ -295,12 +295,12 @@ function shareViewsText($row) {
     $views = intval($row['item_views']);
     $limit = intval($row['item_view_limit']);
     if ($row['item_type'] === 'Request') {
-        return !empty($row['item_received_at']) ? 'Answered' : 'Not answered';
+        return !empty($row['item_received_at']) ? __('Answered') : __('Not answered');
     }
     if ($limit > 0) {
-        return "$views of $limit " . ($limit === 1 ? 'view' : 'views');
+        return _n('%1$d of %2$d view', '%1$d of %2$d views', $limit, $views, $limit);
     }
-    return $views ? "Opened $views " . ($views === 1 ? 'time' : 'times') : 'Not opened';
+    return $views ? _n('Opened %d time', 'Opened %d times', $views) : __('Not opened');
 }
 
 /** What the link asks for before it opens: '', 'passphrase' or 'code'. */
@@ -314,7 +314,7 @@ function shareProtection($row) {
 /** The name to show for a link - its own, or its type's. */
 function shareName($row) {
     $name = trim((string) ($row['item_name'] ?? ''));
-    return $name !== '' ? $name : (shareTypes()[$row['item_type']]['label'] ?? 'Shared item');
+    return $name !== '' ? $name : (shareTypes()[$row['item_type']]['label'] ?? __('Shared item'));
 }
 
 /** The name of the record a link shares, as it is now - null when it is gone. */
@@ -354,38 +354,38 @@ function shareCreate(array $in, &$error = '') {
     $related_id = intval($in['related_id'] ?? 0);
 
     if (!isset(shareTypes()[$type])) {
-        $error = 'That cannot be shared.';
+        $error = __('That cannot be shared.');
         return null;
     }
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        $error = 'That client no longer exists.';
+        $error = __('That client no longer exists.');
         return null;
     }
 
     $expires = intval($in['expires'] ?? 0);
     if (!isset(shareExpiryOptions()[$expires])) {
-        $error = 'Pick how long the link lasts.';
+        $error = __('Pick how long the link lasts.');
         return null;
     }
     $views = $type === 'Request' ? 1 : intval($in['views'] ?? 1);
     if (!isset(shareViewOptions()[$views])) {
-        $error = 'Pick how many times the link can be opened.';
+        $error = __('Pick how many times the link can be opened.');
         return null;
     }
 
     $recipient = trim((string) ($in['recipient'] ?? ''));
     if (mb_strlen($recipient) > 250) {
-        $error = 'That recipient is too long.';
+        $error = __('That recipient is too long.');
         return null;
     }
     $recipient_email = filter_var($recipient, FILTER_VALIDATE_EMAIL) ? $recipient : '';
     $send = !empty($in['send']);
     if ($send && !$recipient_email) {
-        $error = 'To email the link, pick a contact or type an email address.';
+        $error = __('To email the link, pick a contact or type an email address.');
         return null;
     }
     if ($send && !shareMailReady()) {
-        $error = 'Mail is not set up, so the link cannot be emailed - copy it instead.';
+        $error = __('Mail is not set up, so the link cannot be emailed - copy it instead.');
         return null;
     }
 
@@ -394,30 +394,30 @@ function shareCreate(array $in, &$error = '') {
         $protect = '';
     }
     if ($protect === '' && shareNeedsProtection($type)) {
-        $error = 'Your sharing policy needs a passphrase or an emailed code on passwords and secure notes.';
+        $error = __('Your sharing policy needs a passphrase or an emailed code on passwords and secure notes.');
         return null;
     }
     $passphrase = trim((string) ($in['passphrase'] ?? ''));
     if ($protect === 'passphrase' && mb_strlen($passphrase) < SHARE_PASSPHRASE_MIN) {
-        $error = 'The passphrase needs at least ' . SHARE_PASSPHRASE_MIN . ' characters.';
+        $error = __('The passphrase needs at least %d characters.', SHARE_PASSPHRASE_MIN);
         return null;
     }
     if ($protect === 'passphrase' && mb_strlen($passphrase) > 200) {
-        $error = 'That passphrase is too long.';
+        $error = __('That passphrase is too long.');
         return null;
     }
     if ($protect === 'code' && !$recipient_email) {
-        $error = 'An emailed code needs the recipient\'s email address.';
+        $error = __('An emailed code needs the recipient\'s email address.');
         return null;
     }
     if ($protect === 'code' && !shareMailReady()) {
-        $error = 'Mail is not set up, so a code cannot be emailed - use a passphrase instead.';
+        $error = __('Mail is not set up, so a code cannot be emailed - use a passphrase instead.');
         return null;
     }
 
     $note = trim((string) ($in['note'] ?? ''));
     if (mb_strlen($note) > 1000) {
-        $error = 'The note for them is too long - keep it under 1000 characters.';
+        $error = __('The note for them is too long - keep it under 1000 characters.');
         return null;
     }
 
@@ -431,13 +431,13 @@ function shareCreate(array $in, &$error = '') {
         $credential = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT credential_name, credential_uri, credential_username, credential_password, credential_otp_secret
             FROM credentials WHERE credential_id = $related_id AND credential_client_id = $client_id LIMIT 1"));
         if (!$credential) {
-            $error = 'That credential no longer exists.';
+            $error = __('That credential no longer exists.');
             return null;
         }
         $username = decryptCredentialEntry($credential['credential_username']);
         $password = decryptCredentialEntry($credential['credential_password']);
         if ($password === false || $username === false || encryptCredentialEntry('probe') === false) {
-            $error = 'Your vault session has expired, so the login could not be read - sign out and back in, then try again.';
+            $error = __('Your vault session has expired, so the login could not be read - sign out and back in, then try again.');
             return null;
         }
         $name = (string) $credential['credential_name'];
@@ -452,40 +452,40 @@ function shareCreate(array $in, &$error = '') {
     } elseif ($type === 'Document') {
         $name = mysqli_fetch_row(mysqli_query($mysqli, "SELECT document_name FROM documents WHERE document_id = $related_id AND document_client_id = $client_id LIMIT 1"))[0] ?? null;
         if ($name === null) {
-            $error = 'That document no longer exists.';
+            $error = __('That document no longer exists.');
             return null;
         }
     } elseif ($type === 'File') {
         $name = mysqli_fetch_row(mysqli_query($mysqli, "SELECT file_name FROM files WHERE file_id = $related_id AND file_client_id = $client_id LIMIT 1"))[0] ?? null;
         if ($name === null) {
-            $error = 'That file no longer exists.';
+            $error = __('That file no longer exists.');
             return null;
         }
     } elseif ($type === 'Note') {
         $related_id = 0;
         $text = rtrim((string) ($in['text'] ?? ''));
         if (trim($text) === '') {
-            $error = 'Type what you want to send.';
+            $error = __('Type what you want to send.');
             return null;
         }
         if (mb_strlen($text) > SHARE_NOTE_MAX) {
-            $error = 'That is too long for a secure note - keep it under ' . number_format(SHARE_NOTE_MAX) . ' characters, or share a document.';
+            $error = __('That is too long for a secure note - keep it under %s characters, or share a document.', number_format(SHARE_NOTE_MAX));
             return null;
         }
-        $name = trim((string) ($in['name'] ?? '')) ?: 'Secure note';
+        $name = trim((string) ($in['name'] ?? '')) ?: __('Secure note');
         $payload = shareSeal(['text' => $text], $key);
     } elseif ($type === 'Request') {
         $related_id = 0;
         $name = trim((string) ($in['name'] ?? ''));
         if ($name === '') {
-            $error = 'Say what login you are asking for - it is shown to them, and becomes the credential\'s name.';
+            $error = __('Say what login you are asking for - it is shown to them, and becomes the credential\'s name.');
             return null;
         }
         // What they send is encrypted with the link's key; the vault keeps a
         // copy of that key, so only an agent who can open the vault reads it
         $vault_key = encryptCredentialEntry(base64_encode($key));
         if ($vault_key === false) {
-            $error = 'Your vault session has expired - sign out and back in, then try again.';
+            $error = __('Your vault session has expired - sign out and back in, then try again.');
             return null;
         }
     }
@@ -524,9 +524,9 @@ function shareCreate(array $in, &$error = '') {
     }
 
     // Logging - on the link, and on the credential, so its history says who it went to
-    $what = shareTypes()[$type]['label'];
+    $what = i18nEnglish(fn () => shareTypes()[$type]['label']);
     $to = $recipient !== '' ? ' for ' . escapeSql($recipient) : '';
-    $how = ', ' . strtolower(shareViewOptions()[$views]) . ', for ' . shareExpiryOptions()[$expires]
+    $how = i18nEnglish(fn () => ', ' . strtolower(shareViewOptions()[$views]) . ', for ' . shareExpiryOptions()[$expires])
         . ($protect === 'passphrase' ? ', with a passphrase' : '') . ($protect === 'code' ? ', with an emailed code' : '')
         . ($emailed ? ', emailed' : '');
     if ($type === 'Request') {
@@ -571,9 +571,9 @@ function shareCompany() {
 function shareExpiryText($expire_at) {
     $at = strtotime((string) $expire_at);
     if ($at - time() <= 86400) {
-        return date('g:i A', $at) . (date('Y-m-d', $at) === date('Y-m-d') ? ' today' : ' tomorrow');
+        return date('Y-m-d', $at) === date('Y-m-d') ? __('%s today', formatDate($expire_at, 'time')) : __('%s tomorrow', formatDate($expire_at, 'time'));
     }
-    return date('M j', $at) . ' at ' . date('g:i A', $at);
+    return __('%1$s at %2$s', formatDate($expire_at, 'date_short'), formatDate($expire_at, 'time'));
 }
 
 /** Who the shared links' emails come from - the system mailbox, under the company's name when it has none. */
@@ -590,38 +590,55 @@ function shareEmailLink($row, $url, $protect) {
     global $session_name;
     $company = shareCompany();
     $agent = stripslashes((string) $session_name);
-    $from = "$agent at " . $company['name'];
+    $from = __('%1$s at %2$s', $agent, $company['name']);
     $name = shareName($row);
     $expiry = shareExpiryText($row['item_expire_at']);
     $limit = intval($row['item_view_limit']);
     $intro = [];
 
     if ($row['item_type'] === 'Request') {
-        $subject = $company['name'] . ' is asking for a login - ' . $row['item_name'];
-        $email = ['kind' => 'Login request', 'title' => 'Please send us a login', 'preview' => "$from is asking you for $name"];
-        $intro[] = "$from is asking you for $name. Use the secure link below rather than email - what you type is encrypted and goes straight to us.";
-        $summary = ['For' => $name, 'Link works' => "Once, until $expiry"];
-        $button = 'Send it securely';
+        $subject = __('%1$s is asking for a login - %2$s', $company['name'], $row['item_name']);
+        $email = ['kind' => __('Login request'), 'title' => __('Please send us a login'), 'preview' => __('%1$s is asking you for %2$s', $from, $name)];
+        $intro[] = __('%1$s is asking you for %2$s. Use the secure link below rather than email - what you type is encrypted and goes straight to us.', $from, $name);
+        $summary = [__('For') => $name, __('Link works') => __('Once, until %s', $expiry)];
+        $button = __('Send it securely');
     } else {
-        $what = ['Credential' => 'login details', 'Note' => 'a secure note', 'Document' => 'a document', 'File' => 'a file'][$row['item_type']] ?? 'something';
-        $subject = $company['name'] . ' sent you ' . $what . ' - secure link';
-        $email = ['kind' => 'Secure link', 'title' => $row['item_type'] === 'Credential' ? 'Login details for you' : 'Something to open securely', 'preview' => "$from sent you $what"];
-        $named = in_array($row['item_type'], ['Credential', 'Document', 'File'], true);
-        $intro[] = "$from sent you $what" . ($named ? ": $name" : '') . '.';
-        $summary = ($named ? ['What' => $name] : []) + ['Link works' => "Until $expiry" . ($limit === 1 ? ', once' : ($limit > 1 ? ", $limit times" : ''))];
-        if ($limit === 1) {
-            $intro[] = 'It opens only once - copy what you need when you open it.';
+        $type = $row['item_type'];
+        $named = in_array($type, ['Credential', 'Document', 'File'], true);
+        if ($type === 'Credential') {
+            $subject = __('%s sent you login details - secure link', $company['name']);
+            $sent = __('%s sent you login details', $from);
+            $sent_line = __('%1$s sent you login details: %2$s.', $from, $name);
+        } elseif ($type === 'Note') {
+            $subject = __('%s sent you a secure note - secure link', $company['name']);
+            $sent = __('%s sent you a secure note', $from);
+            $sent_line = __('%s sent you a secure note.', $from);
+        } elseif ($type === 'Document') {
+            $subject = __('%s sent you a document - secure link', $company['name']);
+            $sent = __('%s sent you a document', $from);
+            $sent_line = __('%1$s sent you a document: %2$s.', $from, $name);
+        } else {
+            $subject = __('%s sent you a file - secure link', $company['name']);
+            $sent = __('%s sent you a file', $from);
+            $sent_line = __('%1$s sent you a file: %2$s.', $from, $name);
         }
-        $button = 'Open it securely';
+        $email = ['kind' => __('Secure link'), 'title' => $type === 'Credential' ? __('Login details for you') : __('Something to open securely'), 'preview' => $sent];
+        $intro[] = $sent_line;
+        $works = $limit === 1 ? __('Until %s, once', $expiry) : ($limit > 1 ? __('Until %1$s, %2$d times', $expiry, $limit) : __('Until %s', $expiry));
+        $summary = ($named ? [__('What') => $name] : []) + [__('Link works') => $works];
+        if ($limit === 1) {
+            $intro[] = __('It opens only once - copy what you need when you open it.');
+        }
+        $button = __('Open it securely');
     }
     $callout = '';
     if ($protect === 'passphrase') {
-        $callout = "You will need a passphrase to open it - $agent will give it to you another way, such as by phone or text.";
+        $callout = __('You will need a passphrase to open it - %s will give it to you another way, such as by phone or text.', $agent);
     } elseif ($protect === 'code') {
-        $intro[] = 'To open it, we will email a code to this address.';
+        $intro[] = __('To open it, we will email a code to this address.');
     }
     return (bool) emailQueue([['email' => (string) $row['item_recipient'], 'greet' => '',
-        'footnote' => 'This email is for the person it was sent to. If it reached you by mistake, delete it and let us know.']], $subject, $email + [
+        'footnote' => __('This email is for the person it was sent to. If it reached you by mistake, delete it and let us know.')]], $subject, $email + [
         'tone' => 'primary',
         'intro' => $intro,
         'note' => trim((string) $row['item_note']),
@@ -635,11 +652,11 @@ function shareEmailLink($row, $url, $protect) {
 function shareEmailCode($row, $code) {
     $company = shareCompany();
     return (bool) emailQueue([['email' => (string) $row['item_recipient'], 'greet' => '',
-        'footnote' => 'This email is for the person it was sent to. If it reached you by mistake, delete it and let us know.']], "Your code: $code - " . $company['name'], [
-        'kind' => 'Secure link', 'tone' => 'primary', 'preview' => "Your code is $code",
-        'title' => "Your code is $code",
-        'intro' => ['Enter it on the page that asked for it, to open the secure link ' . $company['name'] . ' sent you. It works for ' . SHARE_CODE_MINUTES . ' minutes.'],
-        'callout' => 'If you did not ask for it, someone else has the link - ignore this email and let us know.',
+        'footnote' => __('This email is for the person it was sent to. If it reached you by mistake, delete it and let us know.')]], __('Your code: %1$s - %2$s', $code, $company['name']), [
+        'kind' => __('Secure link'), 'tone' => 'primary', 'preview' => __('Your code is %s', $code),
+        'title' => __('Your code is %s', $code),
+        'intro' => [__('Enter it on the page that asked for it, to open the secure link %1$s sent you. It works for %2$d minutes.', $company['name'], SHARE_CODE_MINUTES)],
+        'callout' => __('If you did not ask for it, someone else has the link - ignore this email and let us know.'),
     ], ['from' => shareMailFrom()]);
 }
 
@@ -667,12 +684,12 @@ function shareNotifyCreator($row, $title, $details, $email = false, $always = fa
         notification_action = '" . escapeSql($action) . "', notification_client_id = $client_id, notification_entity_id = " . intval($row['item_id']) . ", notification_user_id = $user_id");
     if ($email && shareMailReady()) {
         global $config_base_url;
-        emailQueue([['email' => $user['user_email'], 'name' => $user['user_name'], 'footnote' => 'You get this because you asked for this login with a shared link.']],
+        emailQueue([['email' => $user['user_email'], 'name' => $user['user_name'], 'footnote' => __('You get this because you asked for this login with a shared link.')]],
             "$title - " . $row['client_name'], [
-                'kind' => 'Shared links', 'tone' => 'primary', 'preview' => $details,
-                'title' => $title, 'intro' => [$details, "Open it in Shared Links to save it to the client's credentials, or discard it."],
-                'summary' => ['Client' => (string) $row['client_name'], 'Asked for' => (string) shareName($row)],
-                'button' => ['label' => 'Review it', 'url' => "https://$config_base_url$action"],
+                'kind' => __('Shared links'), 'tone' => 'primary', 'preview' => $details,
+                'title' => $title, 'intro' => [$details, __('Open it in Shared Links to save it to the client\'s credentials, or discard it.')],
+                'summary' => [__('Client') => (string) $row['client_name'], __('Asked for') => (string) shareName($row)],
+                'button' => ['label' => __('Review it'), 'url' => "https://$config_base_url$action"],
             ]);
     }
 }
@@ -800,17 +817,18 @@ function shareRequestSave($row, &$error = '') {
     $error = '';
     $data = shareRequestOpen($row);
     if ($data === false) {
-        $error = 'Your vault session has expired, so it could not be read - sign out and back in, then try again.';
+        $error = __('Your vault session has expired, so it could not be read - sign out and back in, then try again.');
         return null;
     }
     if (!$data) {
-        $error = 'There is nothing to save - it may have been saved or discarded already.';
+        $error = __('There is nothing to save - it may have been saved or discarded already.');
         return null;
     }
     $client_id = intval($row['item_client_id']);
     $from = trim((string) $row['item_recipient']);
     $note = trim((string) ($data['note'] ?? ''));
-    $note .= ($note !== '' ? "\n\n" : '') . 'Sent by ' . ($from !== '' ? $from : 'the client') . ' through a request link, ' . date('M j, Y', strtotime((string) $row['item_received_at'])) . '.';
+    $received_on = formatDate($row['item_received_at'], 'date');
+    $note .= ($note !== '' ? "\n\n" : '') . ($from !== '' ? __('Sent by %1$s through a request link, %2$s.', $from, $received_on) : __('Sent by the client through a request link, %s.', $received_on));
     $post = [
         'name' => shareName($row),
         'uri' => (string) ($data['uri'] ?? ''),
@@ -821,7 +839,7 @@ function shareRequestSave($row, &$error = '') {
     ];
     if (credentialOtpSeed($post['otp_secret']) === false) {
         // Saved without it rather than not at all - it stays in the note to fix
-        $post['note'] .= "\n2FA secret as sent (not a valid seed): " . $post['otp_secret'];
+        $post['note'] .= "\n" . __('2FA secret as sent (not a valid seed): %s', $post['otp_secret']);
         $post['otp_secret'] = '';
     }
     $set = credentialFormSet($post, $client_id, $error);
@@ -890,16 +908,16 @@ function shareItemMenuLink($row) {
             return '';
         }
         $live = shareItemLive(['item_type' => 'Credential', 'item_related_id' => $id, 'item_client_id' => $row['item_client_id']]);
-        return $live === null ? '' : '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/credential/credential.php?id=' . $id . '"><i class="fas fa-fw fa-key text-secondary me-2"></i>' . ($type === 'Request' ? 'Open the saved credential' : 'Open the credential') . '</a>';
+        return $live === null ? '' : '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/credential/credential.php?id=' . $id . '"><i class="fas fa-fw fa-key text-secondary me-2"></i>' . ($type === 'Request' ? __('Open the saved credential') : __('Open the credential')) . '</a>';
     }
     if (shareItemLive($row) === null) {
         return '';
     }
     if ($type === 'Document') {
-        return '<a class="dropdown-item" href="document.php?client_id=' . intval($row['item_client_id']) . '&amp;document_id=' . $id . '"><i class="fas fa-fw fa-file-alt text-secondary me-2"></i>Open the document</a>';
+        return '<a class="dropdown-item" href="document.php?client_id=' . intval($row['item_client_id']) . '&amp;document_id=' . $id . '"><i class="fas fa-fw fa-file-alt text-secondary me-2"></i>' . __('Open the document') . '</a>';
     }
     if ($type === 'File') {
-        return '<a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/file/file.php?id=' . $id . '"><i class="fas fa-fw fa-paperclip text-secondary me-2"></i>Open the file</a>';
+        return '<a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/file/file.php?id=' . $id . '"><i class="fas fa-fw fa-paperclip text-secondary me-2"></i>' . __('Open the file') . '</a>';
     }
     return '';
 }

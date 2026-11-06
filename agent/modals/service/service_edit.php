@@ -16,7 +16,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-stream me-2"></i>Edit <strong><?= escapeHtml($form['service_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-stream me-2"></i><?= __('Edit') ?> <strong><?= escapeHtml($form['service_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -27,9 +27,9 @@ ob_start();
         <?php require 'service_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <a class="me-auto small" href="<?= escapeHtml(serviceUrl($service_id, $form_client_id)) ?>"><i class="fas fa-link me-1"></i>Link what it depends on from its page</a>
-        <button type="submit" name="edit_service" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <a class="me-auto small" href="<?= escapeHtml(serviceUrl($service_id, $form_client_id)) ?>"><i class="fas fa-link me-1"></i><?= __('Link what it depends on from its page') ?></a>
+        <button type="submit" name="edit_service" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

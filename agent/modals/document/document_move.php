@@ -12,7 +12,7 @@ $document_id = intval($_GET['id'] ?? 0);
 
 $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT document_client_id, document_folder_id, document_name FROM documents WHERE document_id = $document_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That document no longer exists.']);
+    echo json_encode(['error' => __('That document no longer exists.')]);
     exit;
 }
 $client_id = intval($row['document_client_id']);
@@ -23,7 +23,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-folder-open me-2"></i>Move <strong><?= escapeHtml($row['document_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-folder-open me-2"></i><?= __('Move') ?> <strong><?= escapeHtml($row['document_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -31,7 +31,7 @@ ob_start();
     <input type="hidden" name="document_id" value="<?= $document_id ?>">
     <div class="modal-body">
 
-        <label class="form-label">To folder</label>
+        <label class="form-label"><?= __('To folder') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
             <select class="form-select select2" name="folder">
@@ -41,8 +41,8 @@ ob_start();
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="move_document" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Move</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="move_document" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Move') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

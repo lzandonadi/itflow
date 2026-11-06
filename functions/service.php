@@ -24,6 +24,39 @@
 /** How bad an outage is, most first. */
 const SERVICE_IMPORTANCE = ['High', 'Medium', 'Low'];
 
+/** A SERVICE_IMPORTANCE value in the interface language. */
+function serviceImportanceLabel($importance) {
+    switch ($importance) {
+        case 'High': return _x('High', 'service importance');
+        case 'Medium': return _x('Medium', 'service importance');
+        case 'Low': return _x('Low', 'service importance');
+    }
+    return (string) $importance;
+}
+
+/** "High importance" and the like, in the interface language. */
+function serviceImportanceText($importance) {
+    switch ($importance) {
+        case 'High': return __('High importance');
+        case 'Medium': return __('Medium importance');
+        case 'Low': return __('Low importance');
+    }
+    return (string) $importance;
+}
+
+/** A SERVICE_REVIEW_INTERVALS entry in the interface language. */
+function serviceReviewIntervalLabel($months) {
+    switch (intval($months)) {
+        case 0: return __('Not on a schedule');
+        case 1: return __('Every month');
+        case 3: return __('Every 3 months');
+        case 6: return __('Every 6 months');
+        case 12: return __('Every year');
+        case 24: return __('Every 2 years');
+    }
+    return SERVICE_REVIEW_INTERVALS[intval($months)] ?? '';
+}
+
 /** "Review due" - within this many days. */
 const SERVICE_REVIEW_SOON_DAYS = 30;
 
@@ -81,7 +114,7 @@ function serviceForRequest($service_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = serviceRow($service_id);
     if (!$row) {
-        flashAlert('That service no longer exists.', 'error');
+        flashAlert(__('That service no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['service_client_id']);
@@ -99,13 +132,13 @@ function serviceForModal($service_id, $level = 1, $active_only = false) {
     enforceUserPermission('module_support', $level);
     $row = serviceRow($service_id);
     if (!$row) {
-        echo json_encode(['error' => 'That service no longer exists.']);
+        echo json_encode(['error' => __('That service no longer exists.')]);
         exit;
     }
     $client_id = intval($row['service_client_id']);
     enforceClientAccess();
     if ($active_only && !empty($row['service_archived_at'])) {
-        echo json_encode(['error' => escapeHtml($row['service_name']) . ' is archived - restore it first.']);
+        echo json_encode(['error' => __('%s is archived - restore it first.', escapeHtml($row['service_name']))]);
         exit;
     }
     return $row;
@@ -177,7 +210,7 @@ function serviceLink($service_id, $name, $client_id, $options = []) {
     $label = escapeHtml(html_entity_decode((string) $name, ENT_QUOTES, 'UTF-8'));
     $archived = !empty($options['archived']);
     $class = trim('text-truncate ' . ($options['class'] ?? '') . ($archived ? ' text-decoration-line-through text-body-secondary' : ''));
-    $title = $archived ? ' title="Archived service"' : '';
+    $title = $archived ? ' title="' . escapeHtml(__('Archived service')) . '"' : '';
     if (!empty($options['quick'])) {
         $link = "<a class=\"ajax-modal $class\" href=\"#\" data-modal-size=\"lg\" data-modal-url=\"modals/service/service.php?id=$service_id\"$title>$label</a>";
     } else {
@@ -197,13 +230,13 @@ function selectOptionService($row) {
 function serviceImportancePill($importance, $use_text = false) {
     $importance = in_array($importance, SERVICE_IMPORTANCE, true) ? $importance : 'Medium';
     $styles = [
-        'High' => ['danger', 'fa-thermometer-full', 'Down means the client cannot work'],
-        'Medium' => ['warning', 'fa-thermometer-half', 'Down hurts, but there is a way round it'],
-        'Low' => ['secondary', 'fa-thermometer-quarter', 'Down is an inconvenience'],
+        'High' => ['danger', 'fa-thermometer-full', __('Down means the client cannot work')],
+        'Medium' => ['warning', 'fa-thermometer-half', __('Down hurts, but there is a way round it')],
+        'Low' => ['secondary', 'fa-thermometer-quarter', __('Down is an inconvenience')],
     ];
     [$tone, $icon, $title] = $styles[$importance];
-    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . $title . '">'
-        . '<i class="fas ' . $icon . ' me-1"></i>' . $importance . ($use_text ? ' importance' : '') . '</span>';
+    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . escapeHtml($title) . '">'
+        . '<i class="fas ' . $icon . ' me-1"></i>' . escapeHtml($use_text ? serviceImportanceText($importance) : serviceImportanceLabel($importance)) . '</span>';
 }
 
 /** Whole days from today to a date: negative is past. */
@@ -235,28 +268,28 @@ function serviceReview($row) {
     $due = $row['service_review_due'] ?? null;
     $reviewed = $row['service_reviewed_at'] ?? null;
     if (!$due || strpos((string) $due, '0000-00-00') === 0) {
-        return ['state' => 'none', 'tone' => 'secondary', 'short' => 'Not scheduled', 'date' => '', 'days' => null, 'reviewed' => $reviewed,
-            'text' => $reviewed ? 'Last reviewed ' . timeAgo($reviewed) . ' - no next review set' : 'No review scheduled'];
+        return ['state' => 'none', 'tone' => 'secondary', 'short' => __('Not scheduled'), 'date' => '', 'days' => null, 'reviewed' => $reviewed,
+            'text' => $reviewed ? __('Last reviewed %s - no next review set', timeAgo($reviewed)) : __('No review scheduled')];
     }
     $days = serviceDaysFromToday($due);
-    $date = date('M j, Y', strtotime($due));
+    $date = formatDate($due, 'date');
     if ($days < 0) {
-        return ['state' => 'overdue', 'tone' => 'danger', 'short' => 'Overdue', 'date' => $due, 'days' => $days, 'reviewed' => $reviewed,
-            'text' => 'Review was due ' . $date . ' (' . abs($days) . ' day' . (abs($days) === 1 ? '' : 's') . ' ago)'];
+        return ['state' => 'overdue', 'tone' => 'danger', 'short' => __('Overdue'), 'date' => $due, 'days' => $days, 'reviewed' => $reviewed,
+            'text' => _n('Review was due %1$s (%2$d day ago)', 'Review was due %1$s (%2$d days ago)', abs($days), $date, abs($days))];
     }
     if ($days <= SERVICE_REVIEW_SOON_DAYS) {
-        $when = $days === 0 ? 'today' : ($days === 1 ? 'tomorrow' : "in $days days");
-        return ['state' => 'soon', 'tone' => 'warning', 'short' => $days === 0 ? 'Today' : ($days === 1 ? 'Tomorrow' : "$days days"), 'date' => $due, 'days' => $days, 'reviewed' => $reviewed,
-            'text' => "Review due $when ($date)"];
+        $text = $days === 0 ? __('Review due today (%s)', $date) : ($days === 1 ? __('Review due tomorrow (%s)', $date) : _n('Review due in %1$d day (%2$s)', 'Review due in %1$d days (%2$s)', $days, $days, $date));
+        return ['state' => 'soon', 'tone' => 'warning', 'short' => $days === 0 ? __('Today') : ($days === 1 ? __('Tomorrow') : _n('%d day', '%d days', $days)), 'date' => $due, 'days' => $days, 'reviewed' => $reviewed,
+            'text' => $text];
     }
-    return ['state' => 'scheduled', 'tone' => 'success', 'short' => date('M j, Y', strtotime($due)), 'date' => $due, 'days' => $days, 'reviewed' => $reviewed, 'text' => "Next review $date"];
+    return ['state' => 'scheduled', 'tone' => 'success', 'short' => $date, 'date' => $due, 'days' => $days, 'reviewed' => $reviewed, 'text' => __('Next review %s', $date)];
 }
 
 /** The review as a soft pill. */
 function serviceReviewPill($review, $use_text = false) {
     $icons = ['overdue' => 'far fa-calendar-times', 'soon' => 'fas fa-hourglass-half', 'scheduled' => 'far fa-calendar-check', 'none' => 'far fa-calendar'];
     $tone = $review['tone'];
-    $title = $review['text'] . (!empty($review['reviewed']) && $review['state'] !== 'none' ? ' - last reviewed ' . date('M j, Y', strtotime($review['reviewed'])) : '');
+    $title = !empty($review['reviewed']) && $review['state'] !== 'none' ? __('%1$s - last reviewed %2$s', $review['text'], formatDate($review['reviewed'], 'date')) : $review['text'];
     return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . escapeHtml($title) . '">'
         . '<i class="' . $icons[$review['state']] . ' me-1"></i>' . escapeHtml($use_text ? $review['text'] : $review['short']) . '</span>';
 }
@@ -265,16 +298,16 @@ function serviceReviewPill($review, $use_text = false) {
 function serviceViews() {
     $active = 'services.service_archived_at IS NULL';
     return [
-        '' => ['label' => 'Active', 'icon' => 'fa-stream', 'where' => $active, 'title' => 'Not archived'],
-        'attention' => ['label' => 'Needs attention', 'icon' => 'fa-exclamation-triangle', 'where' => "$active AND " . serviceAttentionSql(),
-            'title' => 'Something it depends on is expiring, out of warranty, out of action or archived', 'alarm' => 'danger'],
-        'review' => ['label' => 'Review due', 'icon' => 'fa-clipboard-check', 'where' => "$active AND " . serviceReviewDueSql(),
-            'title' => 'Due for review in the next ' . SERVICE_REVIEW_SOON_DAYS . ' days, or overdue', 'alarm' => 'warning'],
-        'high' => ['label' => 'High importance', 'icon' => 'fa-thermometer-full', 'where' => "$active AND services.service_importance = 'High'", 'title' => 'Down means the client cannot work'],
-        'unreviewed' => ['label' => 'No review set', 'icon' => 'fa-calendar', 'where' => "$active AND services.service_review_due IS NULL", 'title' => 'No next review date'],
-        'starred' => ['label' => 'Starred', 'icon' => 'fa-star', 'where' => "$active AND services.service_favorite = 1"],
-        'archived' => ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'services.service_archived_at IS NOT NULL'],
-        'all' => ['label' => 'All', 'where' => ''],
+        '' => ['label' => __('Active'), 'icon' => 'fa-stream', 'where' => $active, 'title' => __('Not archived')],
+        'attention' => ['label' => __('Needs attention'), 'icon' => 'fa-exclamation-triangle', 'where' => "$active AND " . serviceAttentionSql(),
+            'title' => __('Something it depends on is expiring, out of warranty, out of action or archived'), 'alarm' => 'danger'],
+        'review' => ['label' => __('Review due'), 'icon' => 'fa-clipboard-check', 'where' => "$active AND " . serviceReviewDueSql(),
+            'title' => __('Due for review in the next %d days, or overdue', SERVICE_REVIEW_SOON_DAYS), 'alarm' => 'warning'],
+        'high' => ['label' => __('High importance'), 'icon' => 'fa-thermometer-full', 'where' => "$active AND services.service_importance = 'High'", 'title' => __('Down means the client cannot work')],
+        'unreviewed' => ['label' => __('No review set'), 'icon' => 'fa-calendar', 'where' => "$active AND services.service_review_due IS NULL", 'title' => __('No next review date')],
+        'starred' => ['label' => __('Starred'), 'icon' => 'fa-star', 'where' => "$active AND services.service_favorite = 1"],
+        'archived' => ['label' => __('Archived'), 'icon' => 'fa-archive', 'where' => 'services.service_archived_at IS NOT NULL'],
+        'all' => ['label' => __('All'), 'where' => ''],
     ];
 }
 
@@ -398,12 +431,12 @@ function serviceIssues(array $service_ids) {
         ORDER BY c.certificate_expire");
     while ($row = mysqli_fetch_assoc($sql)) {
         $expiry = certificateExpiry($row);
-        $status = CERTIFICATE_CHECK_STATES[(string) $row['certificate_check_status']] ?? null;
+        $status = certificateCheckState((string) $row['certificate_check_status']);
         if ($expiry && $expiry['state'] !== 'active') {
             $text = lcfirst($expiry['text']);
             $tone = $expiry['state'] === 'expired' ? 'danger' : 'warning';
         } else {
-            $text = $status ? lcfirst($status['label']) . ' - ' . lcfirst($status['text']) : 'the last check found a problem';
+            $text = $status ? lcfirst($status['label']) . ' - ' . lcfirst($status['text']) : __('the last check found a problem');
             $tone = $status && $status['tone'] === 'danger' ? 'danger' : 'warning';
         }
         $issues[intval($row['service_id'])][] = ['tone' => $tone, 'icon' => 'fa-lock', 'text' => $row['certificate_name'] . ': ' . $text,
@@ -421,7 +454,7 @@ function serviceIssues(array $service_ids) {
         $service_id = intval($row['service_id']);
         $base = ['type' => 'asset', 'id' => intval($row['asset_id']), 'name' => $row['asset_name'], 'icon' => 'fa-desktop'];
         if ($row['asset_archived_at']) {
-            $issues[$service_id][] = $base + ['tone' => 'warning', 'text' => $row['asset_name'] . ': archived, but still listed - unlink it or link what replaced it', 'archived' => true];
+            $issues[$service_id][] = $base + ['tone' => 'warning', 'text' => __('%s: archived, but still listed - unlink it or link what replaced it', $row['asset_name']), 'archived' => true];
         } elseif (in_array($row['asset_status'], SERVICE_ASSET_DOWN_STATUSES, true)) {
             $issues[$service_id][] = $base + ['tone' => $row['asset_status'] === 'Out for Repair' ? 'warning' : 'danger', 'text' => $row['asset_name'] . ': ' . strtolower($row['asset_status'])];
         } else {
@@ -438,7 +471,7 @@ function serviceIssues(array $service_ids) {
             JOIN {$entity['table']} t ON t.{$entity['id']} = l.{$entity['id']}
             WHERE l.service_id IN ($in) AND t.{$entity['archived']} IS NOT NULL ORDER BY t.{$entity['name']}");
         while ($row = mysqli_fetch_row($sql)) {
-            $issues[intval($row[0])][] = ['tone' => 'warning', 'icon' => $entity['icon'], 'text' => $row[2] . ': ' . $entity['label'] . ' archived, but still listed - unlink it or link what replaced it',
+            $issues[intval($row[0])][] = ['tone' => 'warning', 'icon' => $entity['icon'], 'text' => __('%1$s: %2$s archived, but still listed - unlink it or link what replaced it', $row[2], $entity['label']),
                 'type' => $type, 'id' => intval($row[1]), 'name' => $row[2], 'archived' => true];
         }
     }
@@ -464,7 +497,7 @@ function serviceIssuesHtml(array $issues, $limit = 0) {
             . '<i class="fas fa-fw ' . $issue['icon'] . ' text-body-secondary me-1"></i>' . escapeHtml($issue['text']) . '</li>';
     }
     if ($limit && count($issues) > $limit) {
-        $html .= '<li class="text-body-secondary small">and ' . (count($issues) - $limit) . ' more</li>';
+        $html .= '<li class="text-body-secondary small">' . __('and %d more', count($issues) - $limit) . '</li>';
     }
     return $html . '</ul>';
 }
@@ -537,10 +570,10 @@ function serviceRowsHtml(array $rows, $unlink = null) {
         $remove = $unlink ? $unlink($row) : '';
         $html .= '<li class="itflow-link-row">' . serviceTile($row['service_category'], 'sm')
             . '<div class="min-w-0 flex-grow-1"><div class="d-flex align-items-center gap-2 min-w-0"><a class="text-truncate fw-semibold" href="' . escapeHtml(serviceUrl($service_id, $row['service_client_id'])) . '">' . escapeHtml($row['service_name']) . '</a>'
-            . '<a class="ajax-modal text-body-secondary small" href="#" data-modal-size="lg" data-modal-url="modals/service/service.php?id=' . $service_id . '" title="Quick look"><i class="fas fa-eye"></i></a></div>'
+            . '<a class="ajax-modal text-body-secondary small" href="#" data-modal-size="lg" data-modal-url="modals/service/service.php?id=' . $service_id . '" title="' . escapeHtml(__('Quick look')) . '"><i class="fas fa-eye"></i></a></div>'
             . ($detail !== '' ? '<div class="small text-body-secondary text-truncate">' . escapeHtml($detail) . '</div>' : '') . '</div>'
             . '<span class="ms-2 text-nowrap">' . serviceImportancePill($row['service_importance']) . '</span>'
-            . ($remove ? '<a class="itflow-link-remove confirm-link" href="' . escapeHtml($remove) . '" title="Unlink service" data-confirm-text="' . escapeHtml($row['service_name']) . ' stops listing it."><i class="fas fa-unlink"></i></a>' : '')
+            . ($remove ? '<a class="itflow-link-remove confirm-link" href="' . escapeHtml($remove) . '" title="' . escapeHtml(__('Unlink service')) . '" data-confirm-text="' . escapeHtml(__('%s stops listing it.', $row['service_name'])) . '"><i class="fas fa-unlink"></i></a>' : '')
             . '</li>';
     }
     return $html . '</ul>';
@@ -593,7 +626,7 @@ function serviceUrls($service_id, $with_credentials) {
 function serviceFormSet($post, &$error = '', $current = null) {
     $name = trim((string) ($post['name'] ?? ''));
     if ($name === '') {
-        $error = 'A service needs a name.';
+        $error = __('A service needs a name.');
         return '';
     }
     $importance = in_array($post['importance'] ?? '', SERVICE_IMPORTANCE, true) ? $post['importance'] : 'Medium';
@@ -702,17 +735,17 @@ function ticketServices($ticket_id) {
  * runs on, who to call, how it comes back - plain text, one fact a line.
  */
 function serviceTicketDetails($row, $assets, $vendors) {
-    $lines = ['Service: ' . $row['service_name'] . ' (' . $row['service_importance'] . ' importance)'];
+    $lines = [__('Service: %1$s (%2$s)', $row['service_name'], mb_strtolower(serviceImportanceText($row['service_importance'])))];
     if ($assets) {
-        $lines[] = 'Runs on: ' . implode(', ', array_column(array_filter($assets, function ($a) { return !$a['archived_at']; }), 'name'));
+        $lines[] = __('Runs on:') . ' ' . implode(', ', array_column(array_filter($assets, function ($a) { return !$a['archived_at']; }), 'name'));
     }
     if ($vendors) {
-        $lines[] = 'Vendors: ' . implode(', ', array_column(array_filter($vendors, function ($v) { return !$v['archived_at']; }), 'name'));
+        $lines[] = __('Vendors:') . ' ' . implode(', ', array_column(array_filter($vendors, function ($v) { return !$v['archived_at']; }), 'name'));
     }
     if (trim((string) $row['service_backup']) !== '') {
-        $lines[] = 'Backup and recovery: ' . $row['service_backup'];
+        $lines[] = __('Backup and recovery: %s', $row['service_backup']);
     }
     $lines[] = '';
-    $lines[] = 'What is happening:';
+    $lines[] = __('What is happening:');
     return implode("\n", $lines);
 }

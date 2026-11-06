@@ -27,7 +27,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Services</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Services') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -42,7 +42,7 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label class="form-label">Which</label>
+            <label class="form-label"><?= __('Which') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-eye"></i></span>
                 <select class="form-select select2" name="show">
@@ -55,22 +55,22 @@ ob_start();
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">Importance</label>
+                <label class="form-label"><?= __('Importance') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-thermometer-half"></i></span>
                     <select class="form-select select2" name="importance">
-                        <option value="">- Any importance -</option>
+                        <option value=""><?= __('- Any importance -') ?></option>
                         <?php foreach (SERVICE_IMPORTANCE as $importance) { ?>
-                            <option value="<?= $importance ?>" <?= $importance_filter === $importance ? 'selected' : '' ?>><?= $importance ?></option>
+                            <option value="<?= $importance ?>" <?= $importance_filter === $importance ? 'selected' : '' ?>><?= serviceImportanceLabel($importance) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Category</label>
+                <label class="form-label"><?= __('Category') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
-                    <input type="text" class="form-control" name="category" value="<?= escapeHtml($category_filter) ?>" placeholder="Any category">
+                    <input type="text" class="form-control" name="category" value="<?= escapeHtml($category_filter) ?>" placeholder="<?= escapeHtml(__('Any category')) ?>">
                 </div>
             </div>
         </div>
@@ -78,20 +78,20 @@ ob_start();
         <?= tagExportFieldHtml('service', $tag_filter) ?>
 
         <div class="mb-3">
-            <label class="form-label">Search</label>
+            <label class="form-label"><?= __('Search') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Name, description, category, client">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Name, description, category, client')) ?>">
             </div>
         </div>
 
         <?php if (!$client_id) { ?>
             <div class="mb-3">
-                <label class="form-label">Client</label>
+                <label class="form-label"><?= __('Client') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="client">
-                        <option value="">- All Clients -</option>
+                        <option value=""><?= __('- All Clients -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                             WHERE client_archived_at IS NULL AND EXISTS (SELECT 1 FROM services WHERE service_client_id = client_id) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");

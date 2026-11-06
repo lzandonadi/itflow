@@ -31,7 +31,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Certificates</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Certificates') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -46,20 +46,20 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label>Search</label>
+            <label><?= __('Search') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Name, host, names covered, issuer, fingerprint">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Name, host, names covered, issuer, fingerprint')) ?>">
             </div>
         </div>
 
         <?php if (!$client_id) { ?>
         <div class="mb-3">
-            <label>Client</label>
+            <label><?= __('Client') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                 <select class="form-select select2" name="client">
-                    <option value="">- All Clients -</option>
+                    <option value=""><?= __('- All Clients -') ?></option>
                     <?php
                     $sql_clients_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE EXISTS (SELECT 1 FROM certificates WHERE certificate_client_id = client_id)" . clientScopeSql('client_id') . " ORDER BY client_name ASC");
                     while ($row = mysqli_fetch_assoc($sql_clients_filter)) {
@@ -76,37 +76,37 @@ ob_start();
         <?php } ?>
 
         <div class="mb-3">
-            <label>Expiring In</label>
+            <label><?= __('Expiring In') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-hourglass-half"></i></span>
                 <select class="form-select select2" name="expire_days">
-                    <option value="">- Any -</option>
-                    <option <?php if ($expire_filter === 'expired') { echo "selected"; } ?> value="expired">Expired</option>
+                    <option value=""><?= __('- Any -') ?></option>
+                    <option <?php if ($expire_filter === 'expired') { echo "selected"; } ?> value="expired"><?= __('Expired') ?></option>
                     <?php foreach ([7, 30, 45, 60, 90] as $expire_option) { ?>
-                        <option <?php if ($expire_filter !== '' && $expire_filter == $expire_option) { echo "selected"; } ?> value="<?= $expire_option ?>"><?= $expire_option ?> Days</option>
+                        <option <?php if ($expire_filter !== '' && $expire_filter == $expire_option) { echo "selected"; } ?> value="<?= $expire_option ?>"><?= _n('%d day', '%d days', $expire_option) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Last Check</label>
+            <label><?= __('Last Check') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-shield-alt"></i></span>
                 <select class="form-select select2" name="problems">
-                    <option <?php if (!$problems_filter) { echo "selected"; } ?> value="0">- Any -</option>
-                    <option <?php if ($problems_filter) { echo "selected"; } ?> value="1">Problems found - mismatch, untrusted, expired or unreachable</option>
+                    <option <?php if (!$problems_filter) { echo "selected"; } ?> value="0"><?= __('- Any -') ?></option>
+                    <option <?php if ($problems_filter) { echo "selected"; } ?> value="1"><?= __('Problems found - mismatch, untrusted, expired or unreachable') ?></option>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Archived</label>
+            <label><?= __('Archived') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-archive"></i></span>
                 <select class="form-select select2" name="archived">
-                    <option <?php if (!$archived_filter) { echo "selected"; } ?> value="0">Active only</option>
-                    <option <?php if ($archived_filter) { echo "selected"; } ?> value="1">Archived only</option>
+                    <option <?php if (!$archived_filter) { echo "selected"; } ?> value="0"><?= __('Active only') ?></option>
+                    <option <?php if ($archived_filter) { echo "selected"; } ?> value="1"><?= __('Archived only') ?></option>
                 </select>
             </div>
         </div>

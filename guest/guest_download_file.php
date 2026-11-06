@@ -29,7 +29,7 @@ function shareDownloadStop($message, $gone = false) {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    shareDownloadStop('Open the link you were sent, and download from there.');
+    shareDownloadStop(__('Open the link you were sent, and download from there.'));
 }
 
 $input = json_decode((string) file_get_contents('php://input'), true);
@@ -40,16 +40,16 @@ if (!is_array($input)) {
 shareSweep();
 $row = shareFind(intval($input['id'] ?? 0), (string) ($input['key'] ?? ''));
 if (!$row || $row['item_type'] !== 'File') {
-    shareDownloadStop('The link is not right - check you have all of it.', true);
+    shareDownloadStop(__('The link is not right - check you have all of it.'), true);
 }
 
 $state = shareState($row);
 $again = shareOpenedHere($row);
 if (!($state === 'active' || ($state === 'used' && $again))) {
-    shareDownloadStop($state === 'expired' ? 'It has expired.' : ($state === 'used' ? 'It has been downloaded as many times as it allowed.' : 'It was turned off.'), true);
+    shareDownloadStop($state === 'expired' ? __('It has expired.') : ($state === 'used' ? __('It has been downloaded as many times as it allowed.') : __('It was turned off.')), true);
 }
 if (!shareVerified($row)) {
-    shareDownloadStop('Enter the passphrase or code first.');
+    shareDownloadStop(__('Enter the passphrase or code first.'));
 }
 
 $file = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_name, file_reference_name, file_client_id FROM files
@@ -59,26 +59,27 @@ $path = $file ? realpath(dirname(__DIR__) . '/uploads/clients/' . intval($row['i
 
 // Don't use a view on a file that is missing from disk
 if (!$file || !$client_dir || !$path || strpos($path, $client_dir . DIRECTORY_SEPARATOR) !== 0 || !is_readable($path)) {
-    shareDownloadStop('The file it shared has been removed.', true);
+    shareDownloadStop(__('The file it shared has been removed.'), true);
 }
 
 if (!$again) {
     // The claim, before a byte is sent - racing requests cannot both win the last view
     if (!shareClaim($row['item_id'])) {
-        shareDownloadStop('It has been downloaded as many times as it allowed.', true);
+        shareDownloadStop(__('It has been downloaded as many times as it allowed.'), true);
     }
     shareSessionMark($row['item_id'], 'opened');
     $who = shareProtection($row) === 'code' ? ' by ' . $row['item_recipient'] . ' (emailed code)' : (shareProtection($row) === 'passphrase' ? ' with the passphrase' : '');
     logAudit('Share', 'Download', escapeSql("Downloaded$who"), intval($row['item_client_id']), intval($row['item_id']));
-    shareNotifyCreator($row, 'Shared link opened', 'File ' . $file['file_name'] . " was downloaded$who - " . $row['client_name']);
+    $who_text = shareProtection($row) === 'code' ? ' ' . __('by %s (emailed code)', $row['item_recipient']) : (shareProtection($row) === 'passphrase' ? ' ' . __('with the passphrase') : '');
+    shareNotifyCreator($row, __('Shared link opened'), __('File %s was downloaded', $file['file_name']) . $who_text . ' - ' . $row['client_name']);
 }
 
 // What the page says after - whether it downloads again
 $after_row = shareRow($row['item_id']);
 $left = intval($after_row['item_view_limit']) - intval($after_row['item_views']);
 $after = intval($after_row['item_view_limit']) && $left <= 0
-    ? 'That was the last download this link allows.'
-    : (intval($after_row['item_view_limit']) ? "It can be downloaded $left more " . ($left === 1 ? 'time' : 'times') . '.' : 'The link keeps working until ' . date('M j \a\t g:i A', strtotime($after_row['item_expire_at'])) . '.');
+    ? __('That was the last download this link allows.')
+    : (intval($after_row['item_view_limit']) ? _n('It can be downloaded %d more time.', 'It can be downloaded %d more times.', $left) : __('The link keeps working until %s.', __('%1$s at %2$s', formatDate($after_row['item_expire_at'], 'date_short'), formatDate($after_row['item_expire_at'], 'time'))));
 
 $name = str_replace(["\r", "\n", '"'], ['', '', "'"], (string) $file['file_name']);
 $ascii = preg_replace('/[^\x20-\x7E]/', '_', $name);

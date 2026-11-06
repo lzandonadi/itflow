@@ -31,7 +31,7 @@ $service = serviceRow($service_id);
 
 if (!$service || ($client_url && intval($service['service_client_id']) !== intval($client_id))) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
 
 } else {
 
@@ -122,12 +122,12 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
     $history = auditLogHistory('Service', $service_id);
 
     $service_tabs = [
-        'assets' => ['label' => 'Runs on', 'icon' => 'fa-desktop', 'count' => count($assets)],
-        'logins' => ['label' => 'Logins', 'icon' => 'fa-key', 'count' => count($credentials) + count($asset_credentials) + count($archived_credentials)],
-        'web' => ['label' => 'Domains &amp; SSL', 'icon' => 'fa-globe', 'count' => count($domains) + count($certificates)],
-        'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'count' => count($documents)],
-        'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'count' => count($tickets), 'alarm' => $open_tickets],
-        'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+        'assets' => ['label' => __('Runs on'), 'icon' => 'fa-desktop', 'count' => count($assets)],
+        'logins' => ['label' => __('Logins'), 'icon' => 'fa-key', 'count' => count($credentials) + count($asset_credentials) + count($archived_credentials)],
+        'web' => ['label' => __('Domains &amp; SSL'), 'icon' => 'fa-globe', 'count' => count($domains) + count($certificates)],
+        'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'count' => count($documents)],
+        'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'count' => count($tickets), 'alarm' => $open_tickets],
+        'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
     ];
     if (!$can_credentials) {
         unset($service_tabs['logins']);
@@ -145,8 +145,8 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
         $entity = LINK_ENTITIES[$to];
         return '<li class="itflow-link-row"><span class="itflow-link-icon" aria-hidden="true"><i class="fas fa-fw ' . $entity['icon'] . '"></i></span>'
             . '<div class="min-w-0 flex-grow-1"><div class="text-truncate text-decoration-line-through text-body-secondary">' . escapeHtml($row['name']) . '</div>'
-            . '<div class="small text-warning-emphasis">Archived - unlink it, or link what replaced it</div></div>'
-            . ($can_edit ? '<a class="btn btn-sm btn-light" href="' . escapeHtml($unlink_url($to, $row['id'])) . '" title="Unlink"><i class="fas fa-fw fa-unlink"></i></a>' : '')
+            . '<div class="small text-warning-emphasis">' . __('Archived - unlink it, or link what replaced it') . '</div></div>'
+            . ($can_edit ? '<a class="btn btn-sm btn-light" href="' . escapeHtml($unlink_url($to, $row['id'])) . '" title="' . escapeHtml(__('Unlink')) . '"><i class="fas fa-fw fa-unlink"></i></a>' : '')
             . '</li>';
     };
 
@@ -157,7 +157,7 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
             <a href="client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($service['client_name']) ?></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="services.php?client_id=<?= $client_id ?>">Services</a>
+            <a href="services.php?client_id=<?= $client_id ?>"><?= __('Services') ?></a>
         </li>
         <li class="breadcrumb-item active"><?= $service_name ?></li>
     </ol>
@@ -170,8 +170,8 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
             <div class="flex-grow-1 min-w-0">
                 <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                     <span><?= $service_name ?></span>
-                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning fs-6" title="Starred"></i><?php } ?>
-                    <?php if ($service_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning fs-6" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                    <?php if ($service_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                     <span class="fs-6"><?= serviceImportancePill($service['service_importance'], true) ?></span>
                     <span class="fs-6"><?= serviceReviewPill($review, true) ?></span>
                 </h1>
@@ -187,57 +187,57 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
             <div class="d-flex flex-wrap gap-2 d-print-none">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-outline-danger ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($report_url) ?>">
-                        <i class="fas fa-life-ring me-2"></i>Report a problem
+                        <i class="fas fa-life-ring me-2"></i><?= __('Report a problem') ?>
                     </button>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i>Link</button>
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>asset"><i class="fa fa-fw fa-desktop text-secondary me-2"></i>Asset it runs on</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>asset"><i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Asset it runs on') ?></a>
                             <?php if ($can_link_credentials) { ?>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>credential"><i class="fa fa-fw fa-key text-secondary me-2"></i>Login</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>credential"><i class="fa fa-fw fa-key text-secondary me-2"></i><?= __('Login') ?></a>
                             <?php } ?>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>domain"><i class="fa fa-fw fa-globe text-secondary me-2"></i>Domain</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>certificate"><i class="fa fa-fw fa-lock text-secondary me-2"></i>Certificate</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i>Person</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>vendor"><i class="fa fa-fw fa-building text-secondary me-2"></i>Vendor</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/service/service_link_ticket.php?id=<?= $service_id ?>"><i class="fa fa-fw fa-life-ring text-secondary me-2"></i>Ticket</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>domain"><i class="fa fa-fw fa-globe text-secondary me-2"></i><?= __('Domain') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>certificate"><i class="fa fa-fw fa-lock text-secondary me-2"></i><?= __('Certificate') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i><?= __('Person') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>vendor"><i class="fa fa-fw fa-building text-secondary me-2"></i><?= __('Vendor') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/service/service_link_ticket.php?id=<?= $service_id ?>"><i class="fa fa-fw fa-life-ring text-secondary me-2"></i><?= __('Ticket') ?></a>
                         </div>
                     </div>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/service/service_review.php?id=<?= $service_id ?>">
-                        <i class="fas fa-clipboard-check me-2"></i>Mark reviewed
+                        <i class="fas fa-clipboard-check me-2"></i><?= __('Mark reviewed') ?>
                     </button>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/service/service_edit.php?id=<?= $service_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                 <?php } ?>
                 <?php if ($can_restore) { ?>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($service_archived) { ?>
                                 <a class="dropdown-item" href="post.php?restore_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                 </a>
                                 <?php if ($can_delete) { ?>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                         data-confirm-text="<?= $service_name ?> goes for good. What it linked to - assets, logins, documents - stays.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             <?php } else { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&service_id=<?= $service_id ?>">
-                                    <i class="fas fa-fw fa-file-alt text-secondary me-2"></i>New runbook document
+                                    <i class="fas fa-fw fa-file-alt text-secondary me-2"></i><?= __('New runbook document') ?>
                                 </a>
                                 <a class="dropdown-item" href="post.php?<?= $is_favorite ? 'unfavorite_service' : 'favorite_service' ?>=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? 'Unstar' : 'Star' ?>
+                                    <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? __('Unstar') : __('Star') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_service=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                    data-confirm-text="<?= $service_name ?> moves to Archived, off the lists and counts, until restored.">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    data-confirm-text="<?= escapeHtml(__('%s moves to Archived, off the lists and counts, until restored.', $service_name)) ?>">
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -252,7 +252,7 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
         <div class="alert alert-<?= $has_danger ? 'danger' : 'warning' ?> d-flex gap-3 mb-3 itflow-service-alert">
             <i class="fas fa-exclamation-triangle mt-1"></i>
             <div class="min-w-0">
-                <div class="fw-semibold mb-1"><?= count($issues) ?> thing<?= count($issues) === 1 ? '' : 's' ?> it depends on need<?= count($issues) === 1 ? 's' : '' ?> attention</div>
+                <div class="fw-semibold mb-1"><?= _n('%d thing it depends on needs attention', '%d things it depends on need attention', count($issues)) ?></div>
                 <?= serviceIssuesHtml($issues) ?>
             </div>
         </div>
@@ -265,26 +265,26 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-stream text-secondary me-2"></i>Service</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-stream text-secondary me-2"></i><?= __('Service') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-asset-dl mb-0">
-                        <dt>Importance</dt>
+                        <dt><?= __('Importance') ?></dt>
                         <dd><?= $can_edit ? quickPick('service_importance', $service_id, $service['service_importance'], serviceImportancePill($service['service_importance'])) : serviceImportancePill($service['service_importance']) ?></dd>
-                        <dt>Review</dt>
+                        <dt><?= __('Review') ?></dt>
                         <dd>
                             <?php if ($review['date']) { ?>
                                 <?= escapeHtml(date('M j, Y', strtotime($review['date']))) ?>
                                 <div class="small text-<?= $review['tone'] === 'success' ? 'body-secondary' : $review['tone'] . '-emphasis' ?>"><?= escapeHtml($review['state'] === 'scheduled' ? ucfirst(timeAgo($review['date'])) : $review['text']) ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">Not scheduled</span>
+                                <span class="text-body-secondary"><?= __('Not scheduled') ?></span>
                             <?php } ?>
                             <div class="small text-body-secondary">
-                                <?= escapeHtml(SERVICE_REVIEW_INTERVALS[intval($service['service_review_interval'])] ?? '') ?><?= $service['service_reviewed_at'] ? ' · last ' . escapeHtml(date('M j, Y', strtotime($service['service_reviewed_at']))) : ' · never reviewed' ?>
+                                <?= escapeHtml(serviceReviewIntervalLabel($service['service_review_interval'])) ?> · <?= $service['service_reviewed_at'] ? escapeHtml(__('last %s', formatDate($service['service_reviewed_at'], 'date'))) : __('never reviewed') ?>
                             </div>
                         </dd>
                         <?php if ($urls) { ?>
-                            <dt>Opens at</dt>
+                            <dt><?= __('Opens at') ?></dt>
                             <dd class="min-w-0">
                                 <?php foreach ($urls as $url) { ?>
                                     <div class="text-truncate"><a href="<?= escapeHtml($url['url']) ?>" target="_blank" rel="noopener noreferrer" title="<?= escapeHtml($url['url']) ?>"><i class="fas fa-fw <?= $url['icon'] ?> text-secondary me-1"></i><?= escapeHtml($url['label']) ?></a></div>
@@ -292,15 +292,15 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             </dd>
                         <?php } ?>
                         <?php if ($networks || $sites) { ?>
-                            <dt>Where</dt>
+                            <dt><?= __('Where') ?></dt>
                             <dd>
                                 <?php if ($sites) { ?><div><i class="fas fa-fw fa-map-marker-alt text-secondary me-1"></i><?= escapeHtml(implode(', ', $sites)) ?></div><?php } ?>
                                 <?php if ($networks) { ?><div class="d-flex flex-wrap column-gap-3"><?= implode('', $networks) ?></div><?php } ?>
                             </dd>
                         <?php } ?>
-                        <dt>Added</dt><dd title="<?= escapeHtml($service['service_created_at']) ?>"><?= timeAgo($service['service_created_at']) ?></dd>
+                        <dt><?= __('Added') ?></dt><dd title="<?= escapeHtml($service['service_created_at']) ?>"><?= timeAgo($service['service_created_at']) ?></dd>
                         <?php if ($service['service_updated_at']) { ?>
-                            <dt>Updated</dt><dd title="<?= escapeHtml($service['service_updated_at']) ?>"><?= timeAgo($service['service_updated_at']) ?></dd>
+                            <dt><?= __('Updated') ?></dt><dd title="<?= escapeHtml($service['service_updated_at']) ?>"><?= timeAgo($service['service_updated_at']) ?></dd>
                         <?php } ?>
                     </dl>
                 </div>
@@ -308,15 +308,15 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-history text-secondary me-2"></i>Backup and recovery</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-history text-secondary me-2"></i><?= __('Backup and recovery') ?></h3>
                 </div>
                 <div class="card-body">
                     <?php if (trim((string) $service['service_backup']) !== '') { ?>
                         <div class="itflow-service-text"><?= escapeHtml($service['service_backup']) ?></div>
                     <?php } else { ?>
                         <div class="small text-body-secondary">
-                            How it is backed up and how it comes back is not written down.
-                            <?php if ($can_edit) { ?><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/service/service_edit.php?id=<?= $service_id ?>">Add it</a><?php } ?>
+                            <?= __('How it is backed up and how it comes back is not written down.') ?>
+                            <?php if ($can_edit) { ?><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/service/service_edit.php?id=<?= $service_id ?>"><?= __('Add it') ?></a><?php } ?>
                         </div>
                     <?php } ?>
                 </div>
@@ -325,13 +325,13 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
             <!-- Who to call - the vendors and the people at the client -->
             <div class="card mb-3">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-phone text-secondary me-2"></i>Who to call</h3>
+                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-phone text-secondary me-2"></i><?= __('Who to call') ?></h3>
                     <?php if ($can_edit) { ?>
                         <div class="dropdown">
-                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-1"></i>Link</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-1"></i><?= __('Link') ?></button>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>vendor"><i class="fa fa-fw fa-building text-secondary me-2"></i>Vendor</a>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i>Person at the client</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>vendor"><i class="fa fa-fw fa-building text-secondary me-2"></i><?= __('Vendor') ?></a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i><?= __('Person at the client') ?></a>
                             </div>
                         </div>
                     <?php } ?>
@@ -352,16 +352,16 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             <li class="list-group-item itflow-service-callee">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     <?= vendorLink($vendor_id, $vendor['name'], ['page' => true, 'client_id' => $client_id, 'class' => 'fw-semibold']) ?>
-                                    <span class="small text-body-secondary ms-1">Vendor</span>
+                                    <span class="small text-body-secondary ms-1"><?= __('Vendor') ?></span>
                                     <?php if ($can_edit) { ?>
-                                        <a class="itflow-link-remove ms-auto confirm-link" href="<?= escapeHtml($unlink_url('vendor', $vendor_id)) ?>" title="Unlink vendor" data-confirm-text="<?= escapeHtml($vendor['name']) ?> is no longer listed on this service."><i class="fas fa-unlink"></i></a>
+                                        <a class="itflow-link-remove ms-auto confirm-link" href="<?= escapeHtml($unlink_url('vendor', $vendor_id)) ?>" title="<?= escapeHtml(__('Unlink vendor')) ?>" data-confirm-text="<?= escapeHtml($vendor['name']) ?> is no longer listed on this service."><i class="fas fa-unlink"></i></a>
                                     <?php } ?>
                                 </div>
                                 <?php if ($vendor['vendor_description']) { ?><div class="small text-body-secondary text-truncate"><?= escapeHtml($vendor['vendor_description']) ?></div><?php } ?>
                                 <div class="small d-flex flex-wrap column-gap-3 row-gap-1 mt-1">
                                     <?php if ($phone) { ?><span><i class="fas fa-fw fa-phone text-secondary me-1"></i><?= $phone ?></span><?php } ?>
                                     <?php if (!empty($details['vendor_email'])) { ?><span class="text-truncate"><i class="fas fa-fw fa-envelope text-secondary me-1"></i><a href="mailto:<?= escapeHtml($details['vendor_email']) ?>"><?= escapeHtml($details['vendor_email']) ?></a></span><?php } ?>
-                                    <?php if ($account) { ?><span title="Account number"><i class="fas fa-fw fa-fingerprint text-secondary me-1"></i><span class="font-monospace"><?= $account ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy account number" data-clipboard-text="<?= $account ?>"><i class="far fa-copy"></i></button></span><?php } ?>
+                                    <?php if ($account) { ?><span title="<?= escapeHtml(__('Account number')) ?>"><i class="fas fa-fw fa-fingerprint text-secondary me-1"></i><span class="font-monospace"><?= $account ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy account number')) ?>" data-clipboard-text="<?= $account ?>"><i class="far fa-copy"></i></button></span><?php } ?>
                                     <?php if ($pin) { ?><span><span class="text-body-secondary">PIN</span> <?= $pin ?></span><?php } ?>
                                     <?php if ($when) { ?><span class="text-body-secondary"><i class="fas fa-fw fa-clock me-1"></i><?= $when ?></span><?php } ?>
                                 </div>
@@ -379,9 +379,9 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             <li class="list-group-item itflow-service-callee">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     <?= contactLink($client_id, $contact_id, $contact['name'], $contact['contact_photo'], ['class' => 'fw-semibold']) ?>
-                                    <span class="small text-body-secondary ms-1 text-truncate"><?= escapeHtml($contact['contact_title'] ?: 'At the client') ?></span>
+                                    <span class="small text-body-secondary ms-1 text-truncate"><?= escapeHtml($contact['contact_title'] ?: __('At the client')) ?></span>
                                     <?php if ($can_edit) { ?>
-                                        <a class="itflow-link-remove ms-auto confirm-link" href="<?= escapeHtml($unlink_url('contact', $contact_id)) ?>" title="Unlink person" data-confirm-text="<?= escapeHtml($contact['name']) ?> is no longer listed on this service."><i class="fas fa-unlink"></i></a>
+                                        <a class="itflow-link-remove ms-auto confirm-link" href="<?= escapeHtml($unlink_url('contact', $contact_id)) ?>" title="<?= escapeHtml(__('Unlink person')) ?>" data-confirm-text="<?= escapeHtml($contact['name']) ?> is no longer listed on this service."><i class="fas fa-unlink"></i></a>
                                     <?php } ?>
                                 </div>
                                 <div class="small d-flex flex-wrap column-gap-3 row-gap-1 mt-1">
@@ -393,15 +393,15 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                         <?php } ?>
                     </ul>
                 <?php } else { ?>
-                    <div class="card-body small text-body-secondary">No vendor or person linked - who gets the call when it breaks?</div>
+                    <div class="card-body small text-body-secondary"><?= __('No vendor or person linked - who gets the call when it breaks?') ?></div>
                 <?php } ?>
             </div>
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i>Notes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i><?= __('Notes') ?></h3>
                 </div>
-                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-service-notes" rows="7" placeholder="How it fits together, the quirks, what to check first when it breaks - saves when you click away"
+                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-service-notes" rows="7" placeholder="<?= escapeHtml(__('How it fits together, the quirks, what to check first when it breaks - saves when you click away')) ?>"
                     data-service-id="<?= $service_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token']) ?>" <?= $can_edit ? '' : 'readonly' ?>><?= escapeHtml($service['service_notes']) ?></textarea>
             </div>
 
@@ -427,10 +427,10 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                     <!-- What it runs on -->
                     <div class="tab-pane fade" id="service-pane-assets" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">The servers, firewalls, NAS and other kit it runs on - when one is down, so is the service.</span>
+                            <span class="text-body-secondary small"><?= __('The servers, firewalls, NAS and other kit it runs on - when one is down, so is the service.') ?></span>
                             <?php if ($can_edit) { ?>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url ?>asset">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                             <?php } ?>
                         </div>
@@ -438,7 +438,7 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="text-nowrap table-light">
-                                    <tr><th>Asset</th><th>Address</th><th>Site</th><th>Status</th><th></th></tr>
+                                    <tr><th><?= __('Asset') ?></th><th><?= __('Address') ?></th><th><?= __('Site') ?></th><th><?= __('Status') ?></th><th></th></tr>
                                     </thead>
                                     <tbody>
                                     <?php foreach ($assets as $asset) {
@@ -457,7 +457,7 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                                             </td>
                                             <td class="small text-nowrap">
                                                 <?php if ($asset['interface_ip']) { ?>
-                                                    <span class="font-monospace"><?= escapeHtml($asset['interface_ip']) ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy address" data-clipboard-text="<?= escapeHtml($asset['interface_ip']) ?>"><i class="far fa-copy"></i></button>
+                                                    <span class="font-monospace"><?= escapeHtml($asset['interface_ip']) ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy address')) ?>" data-clipboard-text="<?= escapeHtml($asset['interface_ip']) ?>"><i class="far fa-copy"></i></button>
                                                 <?php } ?>
                                                 <?php if ($asset['network_name']) { ?><div class="text-body-secondary"><?= networkLink($asset['interface_network_id'], $asset['network_name'], $client_id, ['type' => networkType($asset), 'class' => 'text-reset']) ?><?= $asset['network_vlan'] ? ' · VLAN ' . escapeHtml($asset['network_vlan']) : '' ?></div><?php } ?>
                                                 <?php if (!$asset['interface_ip'] && !$asset['network_name']) { ?><span class="text-body-secondary">-</span><?php } ?>
@@ -465,17 +465,17 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                                             <td class="small"><?= $asset['location_name'] ? escapeHtml($asset['location_name']) : '<span class="text-body-secondary">-</span>' ?></td>
                                             <td class="small">
                                                 <?php if ($asset_archived) { ?>
-                                                    <span class="badge rounded-pill text-bg-secondary fw-normal">Archived</span>
+                                                    <span class="badge rounded-pill text-bg-secondary fw-normal"><?= __('Archived') ?></span>
                                                 <?php } else { ?>
                                                     <?= assetStatusPill($asset['asset_status']) ?>
                                                     <?php if ($warranty && $warranty['tone'] !== 'success') { ?>
-                                                        <div class="text-<?= $warranty['tone'] ?>-emphasis mt-1 text-nowrap" title="Warranty"><i class="fas fa-shield-alt me-1"></i><?= escapeHtml($warranty['short']) ?></div>
+                                                        <div class="text-<?= $warranty['tone'] ?>-emphasis mt-1 text-nowrap" title="<?= escapeHtml(__('Warranty')) ?>"><i class="fas fa-shield-alt me-1"></i><?= escapeHtml($warranty['short']) ?></div>
                                                     <?php } ?>
                                                 <?php } ?>
                                             </td>
                                             <td class="text-end text-nowrap">
                                                 <?php if ($can_edit) { ?>
-                                                    <a href="<?= escapeHtml($unlink_url('asset', $asset_id)) ?>" class="btn btn-sm btn-light confirm-link" title="Unlink" data-confirm-text="<?= escapeHtml($asset['asset_name']) ?> is no longer listed as something it runs on."><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= escapeHtml($unlink_url('asset', $asset_id)) ?>" class="btn btn-sm btn-light confirm-link" title="<?= escapeHtml(__('Unlink')) ?>" data-confirm-text="<?= escapeHtml($asset['asset_name']) ?> is no longer listed as something it runs on."><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -485,9 +485,9 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             </div>
                         <?php } else { ?>
                             <div class="itflow-asset-empty">
-                                <div>Nothing linked as what it runs on.</div>
+                                <div><?= __('Nothing linked as what it runs on.') ?></div>
                                 <?php if ($can_edit) { ?>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mt-3 ajax-modal" data-modal-url="<?= $link_url ?>asset"><i class="fas fa-link me-2"></i>Link assets</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-3 ajax-modal" data-modal-url="<?= $link_url ?>asset"><i class="fas fa-link me-2"></i><?= __('Link assets') ?></button>
                                 <?php } ?>
                             </div>
                         <?php } ?>
@@ -497,10 +497,10 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                     <!-- Logins: its own, then the ones on its assets -->
                     <div class="tab-pane fade" id="service-pane-logins" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Admin consoles, portals and service accounts. Passwords are fetched only when you ask.</span>
+                            <span class="text-body-secondary small"><?= __('Admin consoles, portals and service accounts. Passwords are fetched only when you ask.') ?></span>
                             <?php if ($can_link_credentials) { ?>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url ?>credential">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                             <?php } ?>
                         </div>
@@ -518,11 +518,11 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             </ul>
                         <?php } ?>
                         <?php if ($asset_credentials) { ?>
-                            <div class="itflow-license-section"><i class="fas fa-fw fa-desktop me-1"></i>On the assets it runs on <span class="badge rounded-pill ms-1"><?= count($asset_credentials) ?></span></div>
+                            <div class="itflow-license-section"><i class="fas fa-fw fa-desktop me-1"></i><?= __('On the assets it runs on') ?> <span class="badge rounded-pill ms-1"><?= count($asset_credentials) ?></span></div>
                             <?= credentialTableHtml($asset_credentials, ['for' => true]) ?>
                         <?php } ?>
                         <?php if (!$credentials && !$asset_credentials && !$archived_credentials) { ?>
-                            <div class="itflow-asset-empty">No logins linked, and none on the assets it runs on.</div>
+                            <div class="itflow-asset-empty"><?= __('No logins linked, and none on the assets it runs on.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
@@ -530,13 +530,13 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                     <!-- Domains and certificates -->
                     <div class="tab-pane fade" id="service-pane-web" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">The domains its mail or web run on and the certificates that keep it on https - expiring ones show at the top of the page.</span>
+                            <span class="text-body-secondary small"><?= __('The domains its mail or web run on and the certificates that keep it on https - expiring ones show at the top of the page.') ?></span>
                             <?php if ($can_edit) { ?>
                                 <div class="dropdown">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i>Link</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>domain"><i class="fa fa-fw fa-globe text-secondary me-2"></i>Domain</a>
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>certificate"><i class="fa fa-fw fa-lock text-secondary me-2"></i>Certificate</a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>domain"><i class="fa fa-fw fa-globe text-secondary me-2"></i><?= __('Domain') ?></a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>certificate"><i class="fa fa-fw fa-lock text-secondary me-2"></i><?= __('Certificate') ?></a>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -555,28 +555,28 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                                     <li class="itflow-link-row">
                                         <?= linkRowHtml($to, $linked_row, $client_id) ?>
                                         <?php if ($can_edit) { ?>
-                                            <a class="itflow-link-remove" href="<?= escapeHtml($unlink_url($to, $linked_row['id'])) ?>" title="Unlink <?= $to ?>"><i class="fas fa-unlink"></i></a>
+                                            <a class="itflow-link-remove" href="<?= escapeHtml($unlink_url($to, $linked_row['id'])) ?>" title="<?= escapeHtml(__('Unlink')) ?>"><i class="fas fa-unlink"></i></a>
                                         <?php } ?>
                                     </li>
                                 <?php } ?>
                             </ul>
                         <?php } ?>
                         <?php if (!$domains && !$certificates) { ?>
-                            <div class="itflow-asset-empty">No domains or certificates linked.</div>
+                            <div class="itflow-asset-empty"><?= __('No domains or certificates linked.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Documents -->
                     <div class="tab-pane fade" id="service-pane-documents" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Runbooks, diagrams, the restore procedure, the vendor contract.</span>
+                            <span class="text-body-secondary small"><?= __('Runbooks, diagrams, the restore procedure, the vendor contract.') ?></span>
                             <?php if ($can_edit) { ?>
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url ?>document">
-                                        <i class="fas fa-link me-2"></i>Link
+                                        <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&service_id=<?= $service_id ?>">
-                                        <i class="fas fa-plus me-2"></i>New Document
+                                        <i class="fas fa-plus me-2"></i><?= __('New Document') ?>
                                     </button>
                                 </div>
                             <?php } ?>
@@ -591,27 +591,27 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                                     <li class="itflow-link-row">
                                         <?= linkRowHtml('document', $linked_row, $client_id) ?>
                                         <?php if ($can_edit) { ?>
-                                            <a class="itflow-link-remove" href="<?= escapeHtml($unlink_url('document', $linked_row['id'])) ?>" title="Unlink document"><i class="fas fa-unlink"></i></a>
+                                            <a class="itflow-link-remove" href="<?= escapeHtml($unlink_url('document', $linked_row['id'])) ?>" title="<?= escapeHtml(__('Unlink document')) ?>"><i class="fas fa-unlink"></i></a>
                                         <?php } ?>
                                     </li>
                                 <?php } ?>
                             </ul>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No documents linked.</div>
+                            <div class="itflow-asset-empty"><?= __('No documents linked.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- Tickets about it, or about what it runs on -->
                     <div class="tab-pane fade" id="service-pane-tickets" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Raised about it, or about what it runs on - open ones first.</span>
+                            <span class="text-body-secondary small"><?= __('Raised about it, or about what it runs on - open ones first.') ?></span>
                             <?php if ($can_edit) { ?>
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="modals/service/service_link_ticket.php?id=<?= $service_id ?>">
-                                        <i class="fas fa-link me-2"></i>Link
+                                        <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($report_url) ?>">
-                                        <i class="fas fa-plus me-2"></i>Report a problem
+                                        <i class="fas fa-plus me-2"></i><?= __('Report a problem') ?>
                                     </button>
                                 </div>
                             <?php } ?>
@@ -622,23 +622,23 @@ if (!$service || ($client_url && intval($service['service_client_id']) !== intva
                             $linked_tickets = array_values(array_filter($tickets, function ($row) use ($linked_ticket_ids) { return isset($linked_ticket_ids[intval($row['ticket_id'])]); }));
                             if ($linked_tickets && $can_edit) { ?>
                                 <div class="small text-body-secondary px-3 py-2 border-top d-flex flex-wrap align-items-center gap-2">
-                                    <span>Raised about the service:</span>
+                                    <span><?= __('Raised about the service:') ?></span>
                                     <?php foreach ($linked_tickets as $row) { ?>
                                         <span class="itflow-contact-chip"><?= escapeHtml(ticketReference($row)) ?>
-                                            <a class="text-body-secondary ms-1" href="post.php?unlink_service_ticket=<?= intval($row['ticket_id']) ?>&service_id=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="Not about this service"><i class="fas fa-times"></i></a>
+                                            <a class="text-body-secondary ms-1" href="post.php?unlink_service_ticket=<?= intval($row['ticket_id']) ?>&service_id=<?= $service_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" title="<?= escapeHtml(__('Not about this service')) ?>"><i class="fas fa-times"></i></a>
                                         </span>
                                     <?php } ?>
                                 </div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No tickets about it or what it runs on.</div>
+                            <div class="itflow-asset-empty"><?= __('No tickets about it or what it runs on.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- History, from the audit log -->
                     <div class="tab-pane fade" id="service-pane-history" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Reviews, links, edits - newest first.</span>
+                            <span class="text-body-secondary small"><?= __('Reviews, links, edits - newest first.') ?></span>
                         </div>
                         <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                     </div>

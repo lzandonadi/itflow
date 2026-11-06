@@ -13,21 +13,22 @@ $folder_id = intval($_GET['id'] ?? 0);
 
 $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT folder_client_id, folder_name, parent_folder FROM folders WHERE folder_id = $folder_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That folder no longer exists.']);
+    echo json_encode(['error' => __('That folder no longer exists.')]);
     exit;
 }
 $client_id = intval($row['folder_client_id']);
 enforceClientAccess();
 
 $parent_folder = folderOwnedId($row['parent_folder'], $client_id);
-$parent_name = escapeHtml(folderDisplayName($parent_folder));
+$parent_name = $parent_folder ? escapeHtml(folderDisplayName($parent_folder)) : __('Top level');
+$inside_files = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM files WHERE file_folder_id = $folder_id AND file_client_id = $client_id"))[0]);
+$inside_documents = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM documents WHERE document_folder_id = $folder_id AND document_client_id = $client_id"))[0]);
+$inside_folders = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM folders WHERE parent_folder = $folder_id AND folder_client_id = $client_id"))[0]);
 $inside = array_filter([
-    intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM files WHERE file_folder_id = $folder_id AND file_client_id = $client_id"))[0]) . ' file(s)',
-    intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM documents WHERE document_folder_id = $folder_id AND document_client_id = $client_id"))[0]) . ' document(s)',
-    intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM folders WHERE parent_folder = $folder_id AND folder_client_id = $client_id"))[0]) . ' folder(s)',
-], function ($part) {
-    return intval($part) > 0;
-});
+    $inside_files ? _n('%d file', '%d files', $inside_files) : '',
+    $inside_documents ? _n('%d document', '%d documents', $inside_documents) : '',
+    $inside_folders ? _n('%d folder', '%d folders', $inside_folders) : '',
+]);
 
 ob_start();
 
@@ -35,19 +36,19 @@ ob_start();
 
 <div class="modal-body text-center py-4">
     <i class="fas fa-folder fa-3x text-body-secondary mb-3"></i>
-    <h5 class="mb-1">Delete <strong><?= escapeHtml($row['folder_name']) ?></strong>?</h5>
+    <h5 class="mb-1"><?= __('Delete %s?', '<strong>' . escapeHtml($row['folder_name']) . '</strong>') ?></h5>
     <div class="small text-body-secondary mb-4">
         <?php if ($inside) { ?>
-            The <?= implode(', ', $inside) ?> inside move up to <strong><?= $parent_name ?></strong> - nothing is deleted with it.
+            <?= __('What is inside (%1$s) moves up to %2$s - nothing is deleted with it.', implode(', ', $inside), '<strong>' . $parent_name . '</strong>') ?>
         <?php } else { ?>
-            It is empty.
+            <?= __('It is empty.') ?>
         <?php } ?>
     </div>
     <form action="post.php" method="post">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <input type="hidden" name="folder_id" value="<?= $folder_id ?>">
-        <button type="button" class="btn btn-light px-4 me-2" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" name="delete_folder" class="btn btn-danger px-4"><i class="fas fa-trash me-2"></i>Delete folder</button>
+        <button type="button" class="btn btn-light px-4 me-2" data-bs-dismiss="modal"><?= __('Cancel') ?></button>
+        <button type="submit" name="delete_folder" class="btn btn-danger px-4"><i class="fas fa-trash me-2"></i><?= __('Delete folder') ?></button>
     </form>
 </div>
 

@@ -21,7 +21,7 @@ if (isset($_POST['create_folder'])) {
     $parent_folder = folderOwnedId($_POST['parent_folder'] ?? 0, $client_id);
 
     if ($folder_name === '') {
-        flashAlert('A folder needs a name.', 'error');
+        flashAlert(__('A folder needs a name.'), 'error');
         redirect();
     }
 
@@ -30,7 +30,7 @@ if (isset($_POST['create_folder'])) {
 
     logAudit("Folder", "Create", "$session_name created folder $folder_name", $client_id, $folder_id);
 
-    flashAlert("Folder <strong>" . trim($_POST['folder_name']) . "</strong> created");
+    flashAlert(__('Folder <strong>%s</strong> created', trim($_POST['folder_name'])));
 
     redirect("files.php?client_id=$client_id&folder_id=$folder_id");
 
@@ -47,7 +47,7 @@ if (isset($_POST['rename_folder'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT folder_name, folder_client_id, parent_folder FROM folders WHERE folder_id = $folder_id"));
     if (!$row) {
-        flashAlert('That folder no longer exists.', 'error');
+        flashAlert(__('That folder no longer exists.'), 'error');
         redirect();
     }
     $old_folder_name = escapeSql($row['folder_name']);
@@ -56,7 +56,7 @@ if (isset($_POST['rename_folder'])) {
     enforceClientAccess();
 
     if ($folder_name === '') {
-        flashAlert('A folder needs a name.', 'error');
+        flashAlert(__('A folder needs a name.'), 'error');
         redirect();
     }
 
@@ -78,7 +78,7 @@ if (isset($_POST['rename_folder'])) {
         logAudit("Folder", "Move", "$session_name moved folder $folder_name into " . escapeSql(folderDisplayName($parent_folder)), $client_id, $folder_id);
     }
 
-    flashAlert("Folder <strong>" . trim($_POST['folder_name']) . "</strong> saved");
+    flashAlert(__('Folder <strong>%s</strong> saved', trim($_POST['folder_name'])));
 
     redirect();
 
@@ -100,7 +100,7 @@ if (isset($_POST['delete_folder']) || isset($_GET['delete_folder'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT folder_name, folder_client_id, parent_folder FROM folders WHERE folder_id = $folder_id"));
     if (!$row) {
-        flashAlert('That folder no longer exists.', 'error');
+        flashAlert(__('That folder no longer exists.'), 'error');
         redirect();
     }
     $folder_name = escapeSql($row['folder_name']);
@@ -117,7 +117,7 @@ if (isset($_POST['delete_folder']) || isset($_GET['delete_folder'])) {
 
     logAudit("Folder", "Delete", "$session_name deleted folder $folder_name, its contents moved to " . escapeSql(folderDisplayName($parent_folder)), $client_id);
 
-    flashAlert("Folder <strong>{$row['folder_name']}</strong> deleted", 'error');
+    flashAlert(__('Folder <strong>%s</strong> deleted', $row['folder_name']), 'error');
 
     redirect("files.php?client_id=$client_id&folder_id=$parent_folder");
 

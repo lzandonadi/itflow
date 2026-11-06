@@ -32,14 +32,14 @@ if (isset($_GET['certificate_check'])) {
     }
     $host = certificateHost($input);
     if (!$host) {
-        echo json_encode(['state' => 'bad', 'message' => "That isn't a host - something like www.example.com, or portal.example.com:8443.", 'html' => '']);
+        echo json_encode(['state' => 'bad', 'message' => __('That isn\'t a host - something like www.example.com, or portal.example.com:8443.'), 'html' => '']);
         exit;
     }
 
     $response = ['host' => $host['display'], 'domain_id' => 0, 'html' => ''];
     $notes = [];
     if (strcasecmp($input, $host['display']) !== 0) {
-        $notes[] = "Saved as {$host['display']}.";
+        $notes[] = __('Saved as %s.', $host['display']);
     }
 
     // Already on this client? Which of its domains is it under?
@@ -49,7 +49,7 @@ if (isset($_GET['certificate_check'])) {
         $host_sql = escapeSql($host['display']);
         $existing = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT certificate_name FROM certificates WHERE certificate_domain = '$host_sql' AND certificate_client_id = $check_client_id AND certificate_id <> $check_certificate_id AND certificate_archived_at IS NULL LIMIT 1"));
         if ($existing) {
-            $notes[] = 'This client already has it, as ' . $existing['certificate_name'] . '.';
+            $notes[] = __('This client already has it, as %s.', $existing['certificate_name']);
         }
         $response['domain_id'] = certificateDomainFor($host['host'], $check_client_id);
     }
@@ -57,12 +57,12 @@ if (isset($_GET['certificate_check'])) {
     $check = certificateCheck($host);
     if (empty($check['reachable'])) {
         $response['state'] = 'bad';
-        $response['message'] = trim(implode(' ', $notes) . " Nothing answered on {$host['display']} - check the host and port. If ITFlow can't reach it, paste the certificate instead.");
+        $response['message'] = trim(implode(' ', $notes) . ' ' . __('Nothing answered on %s - check the host and port. If ITFlow can\'t reach it, paste the certificate instead.', $host['display']));
         echo json_encode($response);
         exit;
     }
 
-    $state = CERTIFICATE_CHECK_STATES[$check['status']];
+    $state = certificateCheckState($check['status']);
     $response['state'] = $check['status'] === 'ok' ? 'ok' : 'warn';
     $response['message'] = trim(implode(' ', $notes) . ' ' . $state['text'] . '.');
 
@@ -72,9 +72,9 @@ if (isset($_GET['certificate_check'])) {
         . certificateStatusPill(['certificate_check_status' => $check['status'], 'certificate_domain' => $host['display']])
         . certificateExpiryPill($expiry, true) . '</div>'
         . '<dl class="itflow-asset-dl mb-0">'
-        . '<dt>Issuer</dt><dd class="text-break">' . escapeHtml($check['issuer'] ?: 'Unknown') . ($check['self_signed'] ? ' <span class="text-body-secondary">(self-signed)</span>' : '') . '</dd>'
-        . '<dt>Valid</dt><dd>' . escapeHtml($check['issued_at']) . ' to ' . escapeHtml($check['expire']) . ' <span class="text-body-secondary">(' . $check['days'] . ' days)</span></dd>'
-        . '<dt>Covers</dt><dd class="text-break">' . escapeHtml(implode(', ', array_slice($names, 0, 6))) . (count($names) > 6 ? ' <span class="text-body-secondary">and ' . (count($names) - 6) . ' more</span>' : '') . '</dd>'
+        . '<dt>' . __('Issuer') . '</dt><dd class="text-break">' . escapeHtml($check['issuer'] ?: __('Unknown')) . ($check['self_signed'] ? ' <span class="text-body-secondary">' . __('(self-signed)') . '</span>' : '') . '</dd>'
+        . '<dt>' . __('Valid') . '</dt><dd>' . escapeHtml(__('%1$s to %2$s', formatDate($check['issued_at'], 'date'), formatDate($check['expire'], 'date'))) . ' <span class="text-body-secondary">(' . _n('%d day', '%d days', intval($check['days'])) . ')</span></dd>'
+        . '<dt>' . __('Covers') . '</dt><dd class="text-break">' . escapeHtml(implode(', ', array_slice($names, 0, 6))) . (count($names) > 6 ? ' <span class="text-body-secondary">' . __('and %d more', count($names) - 6) . '</span>' : '') . '</dd>'
         . '</dl>';
 
     echo json_encode($response);
@@ -861,11 +861,11 @@ if (isset($_POST['share_create'])) {
 
     $type = (string) ($_POST['type'] ?? '');
     if (!shareCanMake($type)) {
-        exit(json_encode(['error' => "You don't have access to share that."]));
+        exit(json_encode(['error' => __('You don\'t have access to share that.')]));
     }
     $client_id = intval($_POST['client_id'] ?? 0);
     if (!$client_id || !hasClientAccess($client_id)) {
-        exit(json_encode(['error' => "You don't have access to that client."]));
+        exit(json_encode(['error' => __('You don\'t have access to that client.')]));
     }
 
     $result = shareCreate([
@@ -890,17 +890,17 @@ if (isset($_POST['share_create'])) {
     }
 
     // "Works until Oct 17 at 9:00 AM, opens once, needs a passphrase, emailed to bob@example.com"
-    $summary = ['Works until ' . date('M j \a\t g:i A', strtotime($result['expire_at']))];
+    $summary = [__('Works until %s', formatDate($result['expire_at'], 'datetime_short'))];
     if ($type !== 'Request') {
-        $summary[] = $result['views'] ? 'opens ' . strtolower(shareViewOptions()[$result['views']]) : 'opens any number of times';
+        $summary[] = $result['views'] ? _n('opens once', 'opens %d times', $result['views']) : __('opens any number of times');
     }
     if ($result['protect'] === 'passphrase') {
-        $summary[] = 'needs the passphrase';
+        $summary[] = __('needs the passphrase');
     } elseif ($result['protect'] === 'code') {
-        $summary[] = 'needs a code emailed to ' . $result['recipient'];
+        $summary[] = __('needs a code emailed to %s', $result['recipient']);
     }
     if ($result['emailed']) {
-        $summary[] = 'emailed to ' . $result['recipient'];
+        $summary[] = __('emailed to %s', $result['recipient']);
     }
 
     echo json_encode([

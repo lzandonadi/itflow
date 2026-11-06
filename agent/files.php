@@ -40,7 +40,7 @@ if (!isset($folder_tree[$folder_id])) {
     $folder_id = 0;
 }
 $folder_path = folderPath($folder_tree, $folder_id);
-$folder_name = $folder_id ? escapeHtml($folder_tree[$folder_id]['folder_name']) : 'Top level';
+$folder_name = $folder_id ? escapeHtml($folder_tree[$folder_id]['folder_name']) : __('Top level');
 
 // '' everything, 'file' uploads only, 'document' created documents only, 'due' documents due a review
 $type_filter = $_GET['type'] ?? '';
@@ -218,7 +218,7 @@ function filesLinkChips($kind, $id) {
     $html = '';
     foreach ($link_counts[$kind][$id] ?? [] as $to => $num) {
         $entity = LINK_ENTITIES[$to];
-        $html .= '<span class="itflow-contact-chip" title="' . $num . ' ' . ($num === 1 ? $entity['label'] : strtolower($entity['plural'])) . '"><i class="fas ' . $entity['icon'] . '"></i>' . $num . '</span>';
+        $html .= '<span class="itflow-contact-chip" title="' . escapeHtml(linkEntityPlural($to)) . ': ' . $num . '"><i class="fas ' . $entity['icon'] . '"></i>' . $num . '</span>';
     }
     return $html;
 }
@@ -231,44 +231,44 @@ function filesItemMenu($item) {
     $archived = !empty($item['archived']);
     $html = '';
     if ($item['kind'] === 'file') {
-        $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"lg\" data-modal-url=\"modals/file/file.php?id=$id\"><i class=\"fas fa-fw fa-info-circle me-2\"></i>Details</a>";
-        $html .= "<a class=\"dropdown-item\" href=\"file.php?file_id=$id\"><i class=\"fas fa-fw fa-download me-2\"></i>Download</a>";
+        $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"lg\" data-modal-url=\"modals/file/file.php?id=$id\"><i class=\"fas fa-fw fa-info-circle me-2\"></i>" . __('Details') . "</a>";
+        $html .= "<a class=\"dropdown-item\" href=\"file.php?file_id=$id\"><i class=\"fas fa-fw fa-download me-2\"></i>" . __('Download') . "</a>";
         if (!$archived && shareCanMake('File')) {
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/share/share_add.php?type=File&amp;id=$id\"><i class=\"fas fa-fw fa-share-alt me-2\"></i>Share</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/share/share_add.php?type=File&amp;id=$id\"><i class=\"fas fa-fw fa-share-alt me-2\"></i>" . __('Share') . "</a>";
         }
         if ($can_edit && !$archived) {
             $html .= '<div class="dropdown-divider"></div>';
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>Rename</a>";
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_move.php?id=$id\"><i class=\"fas fa-fw fa-folder-open me-2\"></i>Move</a>";
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/link/link.php?from=file&amp;id=$id\"><i class=\"fas fa-fw fa-link me-2\"></i>Link</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>" . __('Rename') . "</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_move.php?id=$id\"><i class=\"fas fa-fw fa-folder-open me-2\"></i>" . __('Move') . "</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/link/link.php?from=file&amp;id=$id\"><i class=\"fas fa-fw fa-link me-2\"></i>" . __('Link') . "</a>";
         }
         $archive_name = 'file';
     } else {
-        $html .= "<a class=\"dropdown-item\" href=\"document.php?client_id=$client_id&amp;document_id=$id\"><i class=\"fas fa-fw fa-arrow-right me-2\"></i>Open</a>";
-        $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"lg\" data-modal-url=\"modals/document/document_view.php?id=$id\"><i class=\"fas fa-fw fa-eye me-2\"></i>Quick view</a>";
+        $html .= "<a class=\"dropdown-item\" href=\"document.php?client_id=$client_id&amp;document_id=$id\"><i class=\"fas fa-fw fa-arrow-right me-2\"></i>" . __('Open') . "</a>";
+        $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"lg\" data-modal-url=\"modals/document/document_view.php?id=$id\"><i class=\"fas fa-fw fa-eye me-2\"></i>" . __('Quick view') . "</a>";
         if (!$archived && shareCanMake('Document')) {
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/share/share_add.php?type=Document&amp;id=$id\"><i class=\"fas fa-fw fa-share-alt me-2\"></i>Share</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/share/share_add.php?type=Document&amp;id=$id\"><i class=\"fas fa-fw fa-share-alt me-2\"></i>" . __('Share') . "</a>";
         }
         if ($can_edit && !$archived) {
             $html .= '<div class="dropdown-divider"></div>';
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"xl\" data-modal-url=\"modals/document/document_edit.php?id=$id\"><i class=\"fas fa-fw fa-edit me-2\"></i>Edit</a>";
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/document/document_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>Rename</a>";
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/document/document_move.php?id=$id\"><i class=\"fas fa-fw fa-folder-open me-2\"></i>Move</a>";
-            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/link/link.php?from=document&amp;id=$id\"><i class=\"fas fa-fw fa-link me-2\"></i>Link</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-size=\"xl\" data-modal-url=\"modals/document/document_edit.php?id=$id\"><i class=\"fas fa-fw fa-edit me-2\"></i>" . __('Edit') . "</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/document/document_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>" . __('Rename') . "</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/document/document_move.php?id=$id\"><i class=\"fas fa-fw fa-folder-open me-2\"></i>" . __('Move') . "</a>";
+            $html .= "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/link/link.php?from=document&amp;id=$id\"><i class=\"fas fa-fw fa-link me-2\"></i>" . __('Link') . "</a>";
         }
         $archive_name = 'document';
     }
     if ($can_edit) {
         $html .= '<div class="dropdown-divider"></div>';
         if ($archived) {
-            $html .= "<a class=\"dropdown-item\" href=\"post.php?restore_$archive_name=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-redo me-2\"></i>Restore</a>";
+            $html .= "<a class=\"dropdown-item\" href=\"post.php?restore_$archive_name=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-redo me-2\"></i>" . __('Restore') . "</a>";
             if ($can_delete) {
                 $html .= $item['kind'] === 'file'
-                    ? "<a class=\"dropdown-item text-danger ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_delete.php?id=$id\"><i class=\"fas fa-fw fa-trash me-2\"></i>Delete</a>"
-                    : "<a class=\"dropdown-item text-danger confirm-link\" href=\"post.php?delete_document=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-trash me-2\"></i>Delete</a>";
+                    ? "<a class=\"dropdown-item text-danger ajax-modal\" href=\"#\" data-modal-url=\"modals/file/file_delete.php?id=$id\"><i class=\"fas fa-fw fa-trash me-2\"></i>" . __('Delete') . "</a>"
+                    : "<a class=\"dropdown-item text-danger confirm-link\" href=\"post.php?delete_document=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-trash me-2\"></i>" . __('Delete') . "</a>";
             }
         } else {
-            $html .= "<a class=\"dropdown-item text-danger confirm-link\" href=\"post.php?archive_$archive_name=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-archive me-2\"></i>Archive</a>";
+            $html .= "<a class=\"dropdown-item text-danger confirm-link\" href=\"post.php?archive_$archive_name=$id&amp;csrf_token=$csrf\"><i class=\"fas fa-fw fa-archive me-2\"></i>" . __('Archive') . "</a>";
         }
     }
     return $html;
@@ -281,7 +281,7 @@ function filesFolderNote($item) {
         return '';
     }
     $path = array_column(folderPath($folder_tree, $item['folder_id']), 'folder_name');
-    return '<a class="itflow-above-stretch small text-body-secondary text-decoration-none" href="' . escapeHtml(filesUrl(['folder_id' => $item['folder_id'], 'q' => ''])) . '"><i class="fas fa-folder me-1"></i>' . escapeHtml($path ? implode(' / ', $path) : 'Top level') . '</a>';
+    return '<a class="itflow-above-stretch small text-body-secondary text-decoration-none" href="' . escapeHtml(filesUrl(['folder_id' => $item['folder_id'], 'q' => ''])) . '"><i class="fas fa-folder me-1"></i>' . escapeHtml($path ? implode(' / ', $path) : __('Top level')) . '</a>';
 }
 
 /** One folder and its subfolders in the tree. */
@@ -297,15 +297,15 @@ function filesFolderTree($parent_id, $depth = 0) {
         $name = escapeHtml($folder['folder_name']);
         $menu = '';
         if ($can_edit) {
-            $menu = '<div class="dropdown itflow-folder-menu"><button type="button" class="btn btn-sm" data-bs-toggle="dropdown" title="Folder actions"><i class="fas fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-end">'
-                . "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_add.php?client_id=$client_id&amp;current_folder_id=$id\"><i class=\"fas fa-fw fa-folder-plus me-2\"></i>New folder inside</a>"
-                . "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>Rename or move</a>"
-                . ($can_delete ? "<div class=\"dropdown-divider\"></div><a class=\"dropdown-item text-danger ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_delete.php?id=$id\"><i class=\"fas fa-fw fa-trash me-2\"></i>Delete</a>" : '')
+            $menu = '<div class="dropdown itflow-folder-menu"><button type="button" class="btn btn-sm" data-bs-toggle="dropdown" title="' . escapeHtml(__('Folder actions')) . '"><i class="fas fa-ellipsis-v"></i></button><div class="dropdown-menu dropdown-menu-end">'
+                . "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_add.php?client_id=$client_id&amp;current_folder_id=$id\"><i class=\"fas fa-fw fa-folder-plus me-2\"></i>" . __('New folder inside') . "</a>"
+                . "<a class=\"dropdown-item ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_rename.php?id=$id\"><i class=\"fas fa-fw fa-pen me-2\"></i>" . __('Rename or move') . "</a>"
+                . ($can_delete ? "<div class=\"dropdown-divider\"></div><a class=\"dropdown-item text-danger ajax-modal\" href=\"#\" data-modal-url=\"modals/folder/folder_delete.php?id=$id\"><i class=\"fas fa-fw fa-trash me-2\"></i>" . __('Delete') . "</a>" : '')
                 . '</div></div>';
         }
         $html .= '<li class="itflow-folder' . ($is_open ? ' is-open' : '') . '" data-folder-id="' . $id . '">'
             . '<div class="itflow-folder-row' . ($id === $folder_id ? ' active' : '') . '" style="--itflow-folder-depth: ' . $depth . '">'
-            . ($has_children ? '<button type="button" class="itflow-folder-toggle" data-folder-toggle aria-label="Show or hide subfolders"><i class="fas fa-chevron-right"></i></button>' : '<span class="itflow-folder-toggle"></span>')
+            . ($has_children ? '<button type="button" class="itflow-folder-toggle" data-folder-toggle aria-label="' . escapeHtml(__('Show or hide subfolders')) . '"><i class="fas fa-chevron-right"></i></button>' : '<span class="itflow-folder-toggle"></span>')
             . '<a class="itflow-folder-link" href="' . escapeHtml(filesUrl(['folder_id' => $id, 'q' => ''])) . '"><i class="fas fa-fw ' . ($id === $folder_id || $is_open ? 'fa-folder-open' : 'fa-folder') . ' me-2"></i><span class="text-truncate">' . $name . '</span>'
             . ($count ? '<span class="badge rounded-pill ms-auto">' . $count . '</span>' : '') . '</a>'
             . $menu . '</div>'
@@ -324,24 +324,24 @@ $preview = []; // the grid's previewer payload
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-folder me-2"></i>Files</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-folder me-2"></i><?= __('Files') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit) { ?>
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $upload_url ?>">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>Upload
+                        <i class="fas fa-cloud-upload-alt me-2"></i><?= __('Upload') ?>
                     </button>
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More ways to add"></button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More ways to add')) ?>"></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&folder_id=<?= $folder_id ?>">
-                            <i class="fas fa-fw fa-file-alt me-2"></i>New document
+                            <i class="fas fa-fw fa-file-alt me-2"></i><?= __('New document') ?>
                         </a>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/document/document_add_from_template.php?client_id=<?= $client_id ?>&folder_id=<?= $folder_id ?>">
-                            <i class="fas fa-fw fa-puzzle-piece me-2"></i>Document from template
+                            <i class="fas fa-fw fa-puzzle-piece me-2"></i><?= __('Document from template') ?>
                         </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/folder/folder_add.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>">
-                            <i class="fas fa-fw fa-folder-plus me-2"></i>New folder
+                            <i class="fas fa-fw fa-folder-plus me-2"></i><?= __('New folder') ?>
                         </a>
                     </div>
                 </div>
@@ -353,17 +353,17 @@ $preview = []; // the grid's previewer payload
     <div class="card-header py-2 itflow-asset-tabs">
         <nav class="nav nav-pills flex-nowrap overflow-auto">
             <a class="nav-link text-nowrap <?= $type_filter === '' ? 'active' : '' ?>" href="<?= escapeHtml(filesUrl(['type' => ''])) ?>">
-                All<?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['file'] + $type_counts['document'] ?></span><?php } ?>
+                <?= __('All') ?><?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['file'] + $type_counts['document'] ?></span><?php } ?>
             </a>
             <a class="nav-link text-nowrap <?= $type_filter === 'document' ? 'active' : '' ?>" href="<?= escapeHtml(filesUrl(['type' => 'document'])) ?>">
-                <i class="fas fa-fw fa-file-alt me-1"></i>Documents<?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['document'] ?></span><?php } ?>
+                <i class="fas fa-fw fa-file-alt me-1"></i><?= __('Documents') ?><?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['document'] ?></span><?php } ?>
             </a>
             <a class="nav-link text-nowrap <?= $type_filter === 'file' ? 'active' : '' ?>" href="<?= escapeHtml(filesUrl(['type' => 'file'])) ?>">
-                <i class="fas fa-fw fa-paperclip me-1"></i>Uploads<?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['file'] ?></span><?php } ?>
+                <i class="fas fa-fw fa-paperclip me-1"></i><?= __('Uploads') ?><?php if ($type_filter !== 'due') { ?> <span class="badge rounded-pill ms-1"><?= $type_counts['file'] ?></span><?php } ?>
             </a>
             <?php if ($due_documents || $type_filter === 'due') { ?>
-                <a class="nav-link text-nowrap <?= $type_filter === 'due' ? 'active' : '' ?>" href="<?= escapeHtml(filesUrl(['type' => 'due'])) ?>" title="Documents their template says are due a review - from every folder">
-                    <i class="fas fa-fw fa-calendar-check me-1"></i>Review due <span class="badge rounded-pill ms-1 <?= $due_documents ? 'text-bg-warning' : '' ?>"><?= count($due_documents) ?></span>
+                <a class="nav-link text-nowrap <?= $type_filter === 'due' ? 'active' : '' ?>" href="<?= escapeHtml(filesUrl(['type' => 'due'])) ?>" title="<?= escapeHtml(__('Documents their template says are due a review - from every folder')) ?>">
+                    <i class="fas fa-fw fa-calendar-check me-1"></i><?= __('Review due') ?> <span class="badge rounded-pill ms-1 <?= $due_documents ? 'text-bg-warning' : '' ?>"><?= count($due_documents) ?></span>
                 </a>
             <?php } ?>
         </nav>
@@ -372,10 +372,10 @@ $preview = []; // the grid's previewer payload
     <?php if ($missing_templates) { ?>
         <!-- The document templates this client should have a document from, and hasn't -->
         <div class="card-header py-2 bg-warning-subtle d-flex flex-wrap align-items-center gap-2 itflow-files-missing">
-            <span class="small text-warning-emphasis fw-semibold"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= count($missing_templates) === 1 ? 'A document it should have' : 'Documents it should have' ?>:</span>
+            <span class="small text-warning-emphasis fw-semibold"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= count($missing_templates) === 1 ? __('A document it should have') : __('Documents it should have') ?>:</span>
             <?php foreach ($missing_templates as $missing_id => $missing_name) { ?>
                 <?php if ($can_edit) { ?>
-                    <button type="button" class="btn btn-sm btn-light border py-0 ajax-modal" data-modal-size="lg" data-modal-url="modals/document/document_add_from_template.php?client_id=<?= $client_id ?>&document_template_id=<?= $missing_id ?>" title="Make it from the template" data-missing-template-id="<?= $missing_id ?>">
+                    <button type="button" class="btn btn-sm btn-light border py-0 ajax-modal" data-modal-size="lg" data-modal-url="modals/document/document_add_from_template.php?client_id=<?= $client_id ?>&document_template_id=<?= $missing_id ?>" title="<?= escapeHtml(__('Make it from the template')) ?>" data-missing-template-id="<?= $missing_id ?>">
                         <i class="fas fa-plus me-1 text-secondary"></i><?= escapeHtml($missing_name) ?>
                     </button>
                 <?php } else { ?>
@@ -395,49 +395,49 @@ $preview = []; // the grid's previewer payload
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="Search <?= $search_label === 'all folders' ? 'all folders' : 'in ' . $search_label ?> - names and document text">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?= escapeHtml($search) ?>" placeholder="<?= $search_label === 'all folders' ? escapeHtml(__('Search all folders - names and document text')) : __('Search in %s - names and document text', $search_label) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Document tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Document tags -')) ?>" multiple>
                         <?= tagFilterOptionsHtml('document', $tag_filter_ids, "document_client_id = $client_id AND document_$archive_query") ?>
                     </select>
                 </div>
                 <div class="col-md-auto ms-md-auto d-flex flex-wrap gap-2">
-                    <div class="btn-group" role="group" aria-label="View">
-                        <a href="<?= escapeHtml(filesUrl(['view' => 0])) ?>" class="btn <?= $view === 0 ? 'btn-dark' : 'btn-outline-dark' ?>" title="List"><i class="fas fa-list-ul"></i></a>
-                        <a href="<?= escapeHtml(filesUrl(['view' => 1])) ?>" class="btn <?= $view === 1 ? 'btn-dark' : 'btn-outline-dark' ?>" title="Grid with previews"><i class="fas fa-th-large"></i></a>
+                    <div class="btn-group" role="group" aria-label="<?= escapeHtml(__('View')) ?>">
+                        <a href="<?= escapeHtml(filesUrl(['view' => 0])) ?>" class="btn <?= $view === 0 ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= escapeHtml(__('List')) ?>"><i class="fas fa-list-ul"></i></a>
+                        <a href="<?= escapeHtml(filesUrl(['view' => 1])) ?>" class="btn <?= $view === 1 ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= escapeHtml(__('Grid with previews')) ?>"><i class="fas fa-th-large"></i></a>
                     </div>
-                    <a href="<?= escapeHtml(filesUrl(['archived' => $archived ? 0 : 1])) ?>" class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Showing archived - back to current' : 'Show archived' ?>">
-                        <i class="fa fa-fw fa-archive"></i><span class="d-none d-xl-inline ms-2">Archived</span>
+                    <a href="<?= escapeHtml(filesUrl(['archived' => $archived ? 0 : 1])) ?>" class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Showing archived - back to current') : __('Show archived') ?>">
+                        <i class="fa fa-fw fa-archive"></i><span class="d-none d-xl-inline ms-2"><?= __('Archived') ?></span>
                     </a>
                     <?php if ($can_edit) { ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <?php if (!$archived) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-bulk="true"
                                         data-modal-url="modals/file/file_bulk_move.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>">
-                                        <i class="fas fa-fw fa-folder-open me-2"></i>Move
+                                        <i class="fas fa-fw fa-folder-open me-2"></i><?= __('Move') ?>
                                     </a>
-                                    <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="document" data-tag-bulk="document_ids[]" data-csrf="<?= $_SESSION['csrf_token'] ?>" title="The documents ticked - uploads don't take tags">
-                                        <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="document" data-tag-bulk="document_ids[]" data-csrf="<?= $_SESSION['csrf_token'] ?>" title="<?= escapeHtml(__('The documents ticked - uploads don\'t take tags')) ?>">
+                                        <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_files">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } else { ?>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_restore_files">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_files">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete for good
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete for good') ?>
                                         </button>
                                     <?php } ?>
                                 <?php } ?>
@@ -455,16 +455,16 @@ $preview = []; // the grid's previewer payload
         <div class="col-lg-3 border-end itflow-files-tree">
             <div class="p-2 d-lg-none">
                 <button class="btn btn-outline-secondary btn-sm w-100 text-truncate" type="button" data-bs-toggle="collapse" data-bs-target="#filesFolderTree" aria-expanded="false">
-                    <i class="fas fa-folder-open me-2"></i>Folders<span class="text-body-secondary ms-1">&middot; <?= $folder_name ?></span>
+                    <i class="fas fa-folder-open me-2"></i><?= __('Folders') ?><span class="text-body-secondary ms-1">&middot; <?= $folder_name ?></span>
                 </button>
             </div>
             <div class="collapse d-lg-block" id="filesFolderTree">
                 <div class="d-flex align-items-center px-3 pt-3 pb-1">
-                    <span class="small fw-semibold text-uppercase text-body-secondary me-auto">Folders</span>
-                    <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 me-2" data-folder-expand-all title="Open every folder"><i class="fas fa-angle-double-down"></i></button>
-                    <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 me-2" data-folder-collapse-all title="Close every folder"><i class="fas fa-angle-double-up"></i></button>
+                    <span class="small fw-semibold text-uppercase text-body-secondary me-auto"><?= __('Folders') ?></span>
+                    <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 me-2" data-folder-expand-all title="<?= escapeHtml(__('Open every folder')) ?>"><i class="fas fa-angle-double-down"></i></button>
+                    <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 me-2" data-folder-collapse-all title="<?= escapeHtml(__('Close every folder')) ?>"><i class="fas fa-angle-double-up"></i></button>
                     <?php if ($can_edit) { ?>
-                        <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 ajax-modal" data-modal-url="modals/folder/folder_add.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>" title="New folder in <?= $folder_name ?>"><i class="fas fa-folder-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-link text-body-secondary p-0 ajax-modal" data-modal-url="modals/folder/folder_add.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>" title="<?= __('New folder in %s', $folder_name) ?>"><i class="fas fa-folder-plus"></i></button>
                     <?php } ?>
                 </div>
                 <ul class="list-unstyled mb-0 px-2 pb-3 itflow-folder-tree" data-client-id="<?= $client_id ?>">
@@ -472,7 +472,7 @@ $preview = []; // the grid's previewer payload
                         <div class="itflow-folder-row<?= $folder_id === 0 ? ' active' : '' ?>" style="--itflow-folder-depth: 0">
                             <span class="itflow-folder-toggle"></span>
                             <a class="itflow-folder-link" href="<?= escapeHtml(filesUrl(['folder_id' => 0, 'q' => ''])) ?>">
-                                <i class="fas fa-fw fa-home me-2"></i><span class="text-truncate">Top level</span>
+                                <i class="fas fa-fw fa-home me-2"></i><span class="text-truncate"><?= __('Top level') ?></span>
                                 <?php if (!empty($folder_counts[0])) { ?><span class="badge rounded-pill ms-auto"><?= $folder_counts[0] ?></span><?php } ?>
                             </a>
                         </div>
@@ -486,26 +486,26 @@ $preview = []; // the grid's previewer payload
 
             <!-- Where you are -->
             <div class="d-flex align-items-center gap-2 px-3 py-2 border-bottom itflow-files-path">
-                <nav aria-label="Folder" class="min-w-0 me-auto">
+                <nav aria-label="<?= escapeHtml(__('Folder')) ?>" class="min-w-0 me-auto">
                     <ol class="breadcrumb mb-0 flex-nowrap text-nowrap overflow-auto">
-                        <li class="breadcrumb-item"><a href="<?= escapeHtml(filesUrl(['folder_id' => 0, 'q' => ''])) ?>"><i class="fas fa-home me-1"></i>Top level</a></li>
+                        <li class="breadcrumb-item"><a href="<?= escapeHtml(filesUrl(['folder_id' => 0, 'q' => ''])) ?>"><i class="fas fa-home me-1"></i><?= __('Top level') ?></a></li>
                         <?php foreach ($folder_path as $crumb) { ?>
                             <li class="breadcrumb-item"><a href="<?= escapeHtml(filesUrl(['folder_id' => $crumb['folder_id'], 'q' => ''])) ?>"><?= escapeHtml($crumb['folder_name']) ?></a></li>
                         <?php } ?>
                         <?php if ($search !== '') { ?>
-                            <li class="breadcrumb-item active">Results for "<?= escapeHtml($search) ?>"</li>
+                            <li class="breadcrumb-item active"><?= __('Results for "%s"', escapeHtml($search)) ?></li>
                         <?php } ?>
                     </ol>
                 </nav>
                 <?php if ($folder_id && $can_edit) { ?>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="dropdown" title="This folder"><i class="fas fa-ellipsis-h"></i></button>
+                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="dropdown" title="<?= escapeHtml(__('This folder')) ?>"><i class="fas fa-ellipsis-h"></i></button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/folder/folder_add.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>"><i class="fas fa-fw fa-folder-plus me-2"></i>New folder inside</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/folder/folder_rename.php?id=<?= $folder_id ?>"><i class="fas fa-fw fa-pen me-2"></i>Rename or move</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/folder/folder_add.php?client_id=<?= $client_id ?>&current_folder_id=<?= $folder_id ?>"><i class="fas fa-fw fa-folder-plus me-2"></i><?= __('New folder inside') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/folder/folder_rename.php?id=<?= $folder_id ?>"><i class="fas fa-fw fa-pen me-2"></i><?= __('Rename or move') ?></a>
                             <?php if ($can_delete) { ?>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/folder/folder_delete.php?id=<?= $folder_id ?>"><i class="fas fa-fw fa-trash me-2"></i>Delete folder</a>
+                                <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/folder/folder_delete.php?id=<?= $folder_id ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete folder') ?></a>
                             <?php } ?>
                         </div>
                     </div>
@@ -516,25 +516,25 @@ $preview = []; // the grid's previewer payload
 
                 <!-- Nothing here -->
                 <?= emptyStateHtml([
-                    'thing' => 'files or documents',
+                    'thing' => __('files or documents'),
                     'icon' => 'fa-folder-open',
                     'filtered' => $search !== '' || $tag_filter_ids,
                     'clear_url' => filesUrl(['q' => '', 'tags' => null]),
-                    'match_title' => $search !== '' ? 'Nothing matches "' . escapeHtml($search) . '"' . ($look_everywhere ? '' : ' in ' . $folder_name) : ($tag_filter_ids ? 'No documents with ' . (count($tag_filter_ids) === 1 ? 'that tag' : 'those tags') . ($look_everywhere ? '' : ' in ' . $folder_name) : null),
+                    'match_title' => $search !== '' ? ($look_everywhere ? __('Nothing matches "%s"', escapeHtml($search)) : __('Nothing matches "%1$s" in %2$s', escapeHtml($search), $folder_name)) : ($tag_filter_ids ? ($look_everywhere ? _n('No documents with that tag', 'No documents with those tags', count($tag_filter_ids)) : _n('No documents with that tag in %s', 'No documents with those tags in %s', count($tag_filter_ids), $folder_name)) : null),
                     'archived' => $archived,
-                    'archived_title' => 'Nothing archived ' . ($folder_id ? 'in ' . $folder_name : 'here'),
-                    'title' => $folder_id ? $folder_name . ' is empty' : 'No files or documents yet',
-                    'text' => $can_edit ? 'Drop files here to upload them, or start a document.' : '',
+                    'archived_title' => $folder_id ? __('Nothing archived in %s', $folder_name) : __('Nothing archived here'),
+                    'title' => $folder_id ? __('%s is empty', $folder_name) : __('No files or documents yet'),
+                    'text' => $can_edit ? __('Drop files here to upload them, or start a document.') : '',
                     'view' => $type_filter === 'due' ? [
-                        'title' => 'Nothing due a review',
-                        'text' => 'Every document is within the review its template asks for.',
+                        'title' => __('Nothing due a review'),
+                        'text' => __('Every document is within the review its template asks for.'),
                     ] : ($type_filter && !$folder_id ? [
-                        'title' => $type_filter === 'document' ? 'No documents yet' : 'No uploads yet',
-                        'text' => $can_edit ? ($type_filter === 'document' ? 'Write one here - a procedure, a how-to, notes on the site.' : 'Drop files here to upload them.') : '',
+                        'title' => $type_filter === 'document' ? __('No documents yet') : __('No uploads yet'),
+                        'text' => $can_edit ? ($type_filter === 'document' ? __('Write one here - a procedure, a how-to, notes on the site.') : __('Drop files here to upload them.')) : '',
                     ] : null),
                     'actions' => $can_edit ? [
-                        ['label' => 'Upload files', 'modal' => $upload_url, 'icon' => 'fa-cloud-upload-alt'],
-                        ['label' => 'New document', 'modal' => "modals/document/document_add.php?client_id=$client_id&folder_id=$folder_id", 'size' => 'xl', 'icon' => 'fa-file-alt'],
+                        ['label' => __('Upload files'), 'modal' => $upload_url, 'icon' => 'fa-cloud-upload-alt'],
+                        ['label' => __('New document'), 'modal' => "modals/document/document_add.php?client_id=$client_id&folder_id=$folder_id", 'size' => 'xl', 'icon' => 'fa-file-alt'],
                     ] : [],
                 ]) ?>
 
@@ -557,7 +557,7 @@ $preview = []; // the grid's previewer payload
                                     $kind = 'document';
                                     $preview_url = "ajax.php?get_document_content=$id";
                                     $action_url = "document.php?client_id=$client_id&document_id=$id";
-                                    $meta = 'Document';
+                                    $meta = __('Document');
                                 } else {
                                     $mime = $row['file_mime_type'];
                                     $excerpt = '';
@@ -584,7 +584,7 @@ $preview = []; // the grid's previewer payload
                                     'meta' => $meta,
                                     'preview' => $preview_url,
                                     'download' => $action_url,
-                                    'action' => $item['kind'] === 'document' ? 'Open document' : 'Download',
+                                    'action' => $item['kind'] === 'document' ? __('Open document') : __('Download'),
                                     'details' => $item['kind'] === 'file' ? "modals/file/file.php?id=$id" : '',
                                 ];
                                 ?>
@@ -592,7 +592,7 @@ $preview = []; // the grid's previewer payload
                                     <div class="card h-100 mb-0 itflow-file-card <?= $item['kind'] === 'document' ? 'is-document' : '' ?>">
                                         <?php if ($can_edit) { ?>
                                             <div class="form-check itflow-file-card-check">
-                                                <input class="form-check-input bulk-select" type="checkbox" name="<?= $item['kind'] ?>_ids[]" value="<?= $id ?>" aria-label="Select <?= $name ?>">
+                                                <input class="form-check-input bulk-select" type="checkbox" name="<?= $item['kind'] ?>_ids[]" value="<?= $id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                             </div>
                                         <?php } ?>
                                         <a href="#" class="itflow-file-card-preview" data-files-preview="<?= $preview_index ?>" title="Preview <?= $name ?>">
@@ -615,14 +615,14 @@ $preview = []; // the grid's previewer payload
                                                 <?php } ?>
                                                 <div class="small text-body-secondary text-truncate"><?= escapeHtml($meta) ?> &middot; <?= timeAgo($item['updated']) ?></div>
                                                 <?php if ($item['kind'] === 'document' && isset($due_documents[$id])) { ?>
-                                                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal mt-1"><i class="fas fa-calendar-check me-1"></i>Review due</span>
+                                                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal mt-1"><i class="fas fa-calendar-check me-1"></i><?= __('Review due') ?></span>
                                                 <?php } ?>
                                                 <?php if ($item['kind'] === 'document' && !empty($documents_tags[$id])) { ?>
                                                     <div class="mt-1"><?= tagPills('document', $id, $documents_tags[$id], "files.php?client_id=$client_id&", false) ?></div>
                                                 <?php } ?>
                                             </div>
                                             <div class="dropdown">
-                                                <button type="button" class="btn btn-sm btn-link text-body-secondary px-1" data-bs-toggle="dropdown" title="More actions"><i class="fas fa-ellipsis-v"></i></button>
+                                                <button type="button" class="btn btn-sm btn-link text-body-secondary px-1" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More actions')) ?>"><i class="fas fa-ellipsis-v"></i></button>
                                                 <div class="dropdown-menu dropdown-menu-end"><?= filesItemMenu($item) ?></div>
                                             </div>
                                         </div>
@@ -641,19 +641,19 @@ $preview = []; // the grid's previewer payload
                                     <?php if ($can_edit) { ?>
                                         <td class="checkbox-column bg-light border-end">
                                             <div class="form-check">
-                                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" aria-label="Select all">
+                                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" aria-label="<?= escapeHtml(__('Select all')) ?>">
                                             </div>
                                         </td>
                                     <?php } ?>
-                                    <?php foreach (['name' => 'Name', 'type' => 'Type', 'size' => 'Size', 'updated' => 'Updated'] as $column => $label) { ?>
+                                    <?php foreach (['name' => __('Name'), 'type' => __('Type'), 'size' => __('Size'), 'updated' => __('Updated')] as $column => $label) { ?>
                                         <th class="<?= $column === 'size' ? 'd-none d-md-table-cell' : ($column === 'type' ? 'd-none d-sm-table-cell' : '') ?>">
                                             <a class="text-reset" href="<?= escapeHtml(filesUrl(['sort' => $column, 'order' => $sort === $column && $order === 'ASC' ? 'DESC' : 'ASC'])) ?>">
                                                 <?= $label ?><?php if ($sort === $column) { ?><i class="fas fa-sort-<?= $order === 'ASC' ? 'up' : 'down' ?> ms-1"></i><?php } ?>
                                             </a>
                                         </th>
                                     <?php } ?>
-                                    <th class="d-none d-lg-table-cell">Linked</th>
-                                    <th class="position-relative"><span class="visually-hidden">Actions</span></th>
+                                    <th class="d-none d-lg-table-cell"><?= __('Linked') ?></th>
+                                    <th class="position-relative"><span class="visually-hidden"><?= __('Actions') ?></span></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -667,7 +667,7 @@ $preview = []; // the grid's previewer payload
                                         <?php if ($can_edit) { ?>
                                             <td class="checkbox-column bg-light border-end">
                                                 <div class="form-check">
-                                                    <input class="form-check-input bulk-select" type="checkbox" name="<?= $item['kind'] ?>_ids[]" value="<?= $id ?>" aria-label="Select <?= $name ?>">
+                                                    <input class="form-check-input bulk-select" type="checkbox" name="<?= $item['kind'] ?>_ids[]" value="<?= $id ?>" aria-label="<?= __('Select %s', $name) ?>">
                                                 </div>
                                             </td>
                                         <?php } ?>
@@ -679,16 +679,16 @@ $preview = []; // the grid's previewer payload
                                                         <?php if ($item['kind'] === 'document') { ?>
                                                             <a class="fw-semibold text-body stretched-link text-break" href="document.php?client_id=<?= $client_id ?>&document_id=<?= $id ?>"><?= $name ?></a>
                                                             <?php if (!empty($row['document_client_visible'])) { ?>
-                                                                <span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal" title="Technical contacts can read this in the client portal">Portal</span>
+                                                                <span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal" title="<?= escapeHtml(__('Technical contacts can read this in the client portal')) ?>"><?= __('Portal') ?></span>
                                                             <?php } ?>
                                                             <?php if (isset($due_documents[$id])) { ?>
-                                                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="Last edited or reviewed <?= escapeHtml(date('M j, Y', strtotime($due_documents[$id]['reviewed_at']))) ?> - <?= escapeHtml($due_documents[$id]['document_template_name']) ?> is reviewed <?= lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($due_documents[$id]['document_template_review_months'])] ?? '') ?>"><i class="fas fa-calendar-check me-1"></i>Review due</span>
+                                                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="<?= escapeHtml(__('Last edited or reviewed %1$s - %2$s is reviewed %3$s', formatDate($due_documents[$id]['reviewed_at'], 'date'), $due_documents[$id]['document_template_name'], lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($due_documents[$id]['document_template_review_months'])] ?? ''))) ?>"><i class="fas fa-calendar-check me-1"></i><?= __('Review due') ?></span>
                                                             <?php } ?>
                                                         <?php } else { ?>
                                                             <a class="fw-semibold text-body stretched-link text-break ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/file/file.php?id=<?= $id ?>"><?= $name ?></a>
                                                         <?php } ?>
                                                         <?php if ($share) { ?>
-                                                            <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="Shared<?= $share['item_recipient'] ? ' with ' . escapeHtml($share['item_recipient']) : '' ?> - link expires <?= timeAgo($share['item_expire_at']) ?>"><i class="fas fa-link me-1"></i>Shared</span>
+                                                            <span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="<?= $share['item_recipient'] ? escapeHtml(__('Shared with %1$s - link expires %2$s', $share['item_recipient'], timeAgo($share['item_expire_at']))) : escapeHtml(__('Shared - link expires %s', timeAgo($share['item_expire_at']))) ?>"><i class="fas fa-link me-1"></i><?= __('Shared') ?></span>
                                                         <?php } ?>
                                                     </div>
                                                     <?php if ($item['description']) { ?>
@@ -701,7 +701,7 @@ $preview = []; // the grid's previewer payload
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="small text-nowrap d-none d-sm-table-cell"><?= escapeHtml($item['type']) ?></td>
+                                        <td class="small text-nowrap d-none d-sm-table-cell"><?= $item['kind'] === 'document' ? __('Document') : escapeHtml($item['type']) ?></td>
                                         <td class="small text-nowrap d-none d-md-table-cell"><?= $item['kind'] === 'file' ? formatBytes($item['size']) : '<span class="text-body-secondary">-</span>' ?></td>
                                         <td class="small text-nowrap">
                                             <span title="<?= escapeHtml($item['updated']) ?>"><?= timeAgo($item['updated']) ?></span>
@@ -710,7 +710,7 @@ $preview = []; // the grid's previewer payload
                                         <td class="d-none d-lg-table-cell itflow-files-linked"><div class="d-flex flex-wrap gap-1"><?= filesLinkChips($item['kind'], $id) ?></div></td>
                                         <td class="text-end">
                                             <div class="dropdown dropstart">
-                                                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="dropdown" title="More actions"><i class="fas fa-ellipsis-v"></i></button>
+                                                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More actions')) ?>"><i class="fas fa-ellipsis-v"></i></button>
                                                 <div class="dropdown-menu"><?= filesItemMenu($item) ?></div>
                                             </div>
                                         </td>
@@ -734,7 +734,7 @@ $preview = []; // the grid's previewer payload
     <?php if ($can_edit && !$archived) { ?>
         <!-- Shown while files are dragged over the list -->
         <div class="itflow-files-dropzone" hidden>
-            <div><i class="fas fa-cloud-upload-alt fa-3x mb-2"></i><div class="fw-semibold">Drop to upload to <?= $folder_name ?></div></div>
+            <div><i class="fas fa-cloud-upload-alt fa-3x mb-2"></i><div class="fw-semibold"><?= __('Drop to upload to %s', $folder_name) ?></div></div>
         </div>
     <?php } ?>
 </div>
