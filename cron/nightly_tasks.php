@@ -501,9 +501,10 @@ if ($reminder_rules['enabled']) {
         if ($config_invoice_late_fee_enable == 1 && $days > 0 && $days % 30 === 0 && !cronInvoiceHistoryToday($invoice_id, 'Cron applied a late fee')) {
             $late_fee = round($balance * $config_invoice_late_fee_percent / 100, 2);
             if ($late_fee > 0) {
-                billingItemSave('invoice', $invoice_id, ['name' => 'Late Fee', 'description' => floatval($config_invoice_late_fee_percent) . '% late fee applied on ' . date('Y-m-d'), 'qty' => 1, 'price' => $late_fee, 'tax_id' => 0]);
+                // The line is on the client's invoice, so it is in the interface language
+                billingItemSave('invoice', $invoice_id, ['name' => __('Late Fee'), 'description' => __('%1$s%% late fee applied on %2$s', floatval($config_invoice_late_fee_percent), formatDate(date('Y-m-d'), 'date')), 'qty' => 1, 'price' => $late_fee, 'tax_id' => 0]);
                 billingLog('invoice', $invoice_id, $invoice['invoice_status'], 'Cron applied a late fee of ' . billingMoney($late_fee, $invoice['invoice_currency_code']));
-                appNotify("Invoice Late Charge", escapeSql("Invoice $number for {$invoice['client_name']} with a balance of " . billingMoney($balance, $invoice['invoice_currency_code']) . " was charged a late fee of " . billingMoney($late_fee, $invoice['invoice_currency_code'])), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
+                appNotify("Invoice Late Charge", escapeSql(__('Invoice %1$s for %2$s with a balance of %3$s was charged a late fee of %4$s', $number, $invoice['client_name'], billingMoney($balance, $invoice['invoice_currency_code']), billingMoney($late_fee, $invoice['invoice_currency_code']))), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
                 $invoice = billingRow('invoice', $invoice_id, false);
                 $balance = invoiceState($invoice, invoicePaid($invoice_id))['balance'];
             }
@@ -514,7 +515,7 @@ if ($reminder_rules['enabled']) {
         }
 
         if ($days > 0) {
-            appNotify("Invoice Overdue", escapeSql("Invoice $number for {$invoice['client_name']} with a balance of " . billingMoney($balance, $invoice['invoice_currency_code']) . " is overdue by $days days"), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
+            appNotify("Invoice Overdue", escapeSql(_n('Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d day', 'Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d days', $days, $days, $number, $invoice['client_name'], billingMoney($balance, $invoice['invoice_currency_code']))), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
         }
 
         // Left out, charged by autopay on the day, already reminded today, or no mail
@@ -534,7 +535,7 @@ if ($reminder_rules['enabled']) {
             $attach[] = $file;
         }
         $sent = billingEmailQueue($recipients, $subject, $email, ['attach' => $attach]);
-        billingLog('invoice', $invoice_id, $invoice['invoice_status'], 'Reminder emailed to ' . implode(', ', $sent) . ' - ' . billingReminderWhen($days));
+        billingLog('invoice', $invoice_id, $invoice['invoice_status'], 'Reminder emailed to ' . implode(', ', $sent) . ' - ' . i18nEnglish(fn () => billingReminderWhen($days)));
     }
 
     // Statements each month, on the day in the invoice settings, to every client with a balance

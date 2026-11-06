@@ -92,21 +92,29 @@ function billingReminderScheduleText(?array $rules = null) {
         return $day > 0;
     }));
     $list = function ($days) {
-        return count($days) > 1 ? implode(', ', array_slice($days, 0, -1)) . ' and ' . end($days) : (string) reset($days);
+        return count($days) > 1 ? __('%1$s and %2$s', implode(', ', array_slice($days, 0, -1)), end($days)) : (string) reset($days);
+    };
+    // The plural follows the last number - "1 and 2 days", "1 day"
+    $count = function ($days) {
+        return count($days) === 1 ? intval(end($days)) : 2;
     };
     if ($before) {
-        $parts[] = $list($before) . ' day' . (end($before) === 1 && count($before) === 1 ? '' : 's') . ' before it is due';
+        $parts[] = _n('%s day before it is due', '%s days before it is due', $count($before), $list($before));
     }
     if (in_array(0, $rules['days'], true)) {
-        $parts[] = 'on the due date';
+        $parts[] = _x('on the due date', 'reminder schedule');
     }
     if ($after) {
-        $parts[] = $list($after) . ' day' . (end($after) === 1 && count($after) === 1 ? '' : 's') . ' late';
+        $parts[] = _n('%s day late', '%s days late', $count($after), $list($after));
     }
     if ($rules['repeat'] > 0) {
-        $parts[] = ($parts ? 'then ' : '') . 'every ' . $rules['repeat'] . ' day' . ($rules['repeat'] === 1 ? '' : 's') . ($after || in_array(0, $rules['days'], true) ? '' : ' after it is due') . ' until it is paid';
+        $after_due = !($after || in_array(0, $rules['days'], true));
+        $every = $after_due
+            ? _n('every %d day after it is due until it is paid', 'every %d days after it is due until it is paid', $rules['repeat'], $rules['repeat'])
+            : _n('every %d day until it is paid', 'every %d days until it is paid', $rules['repeat'], $rules['repeat']);
+        $parts[] = $parts ? _x('then %s', 'reminder schedule', $every) : $every;
     }
-    return $parts ? implode(', ', $parts) : 'never';
+    return $parts ? implode(', ', $parts) : _x('never', 'reminder schedule');
 }
 
 /**
@@ -147,17 +155,17 @@ function billingReminderAutopay(array $invoice) {
 function billingReminderWhen($days) {
     $days = intval($days);
     if ($days < 0) {
-        return 'due in ' . (-$days) . ' day' . ($days === -1 ? '' : 's');
+        return _n('due in %d day', 'due in %d days', -$days);
     }
-    return $days === 0 ? 'due today' : $days . ' day' . ($days === 1 ? '' : 's') . ' late';
+    return $days === 0 ? _x('due today', 'reminder') : _n('%d day late', '%d days late', $days);
 }
 
 /* ------------------------------------------------------------ The email */
 
-/** A date for an email - "Oct 20, 2026". */
+/** A date for an email - "Oct 20, 2026", in the interface language. */
 function billingEmailDate($date) {
     $time = strtotime((string) $date);
-    return $time ? date('M j, Y', $time) : (string) $date;
+    return $time ? formatDate($date, 'date') : (string) $date;
 }
 
 /**
@@ -290,7 +298,7 @@ function billingEmailPdfCleanup($days = 7) {
 /** The footnote for a client's billing contact. */
 function billingEmailFootnote($client_name) {
     $company = billingCompany();
-    return "You received this email as a billing contact for $client_name with " . ($company['company_name'] ?? 'us') . '.';
+    return __('You received this email as a billing contact for %1$s with %2$s.', $client_name, $company['company_name'] ?? __('us'));
 }
 
 /**
@@ -312,68 +320,76 @@ function billingInvoiceEmail(array $invoice, array $opts = []) {
     $owed = $state['balance'] > 0 && !in_array($invoice['invoice_status'], ['Paid', 'Cancelled', 'Non-Billable'], true);
     $pay = $owed && billingOnlinePayments();
     $kind = ($opts['kind'] ?? 'invoice') === 'reminder' && $owed ? 'reminder' : 'invoice';
-    $contact_line = 'Questions? Reply to this email' . (!empty($company['phone_display']) ? ' or call us on ' . $company['phone_display'] : '') . '.';
+    $contact_line = !empty($company['phone_display'])
+        ? __('Questions? Reply to this email or call us on %s.', $company['phone_display'])
+        : __('Questions? Reply to this email.');
+    $due = billingEmailDate($invoice['invoice_due']);
+    $balance_due = _x('Balance due', 'billing document');
 
-    $summary = ['Invoice' => $number];
+    $summary = [__('Invoice') => $number];
     if ($scope !== '') {
-        $summary['For'] = $scope;
+        $summary[__('For')] = $scope;
     }
-    $summary['Issued'] = billingEmailDate($invoice['invoice_date']);
+    $summary[_x('Issued', 'invoice')] = billingEmailDate($invoice['invoice_date']);
     if ($owed) {
-        $summary['Due'] = billingEmailDate($invoice['invoice_due']);
+        $summary[_x('Due', 'billing document')] = $due;
     }
-    $summary['Total'] = billingMoney($invoice['invoice_amount'], $currency);
+    $summary[_x('Total', 'billing document')] = billingMoney($invoice['invoice_amount'], $currency);
     if ($paid > 0) {
-        $summary['Paid'] = billingMoney($paid, $currency);
+        $summary[__('Paid')] = billingMoney($paid, $currency);
     }
     $email = [
         'note' => $opts['note'] ?? '',
-        'button' => ['label' => $pay ? 'View and pay invoice' : 'View invoice', 'url' => $url],
+        'button' => ['label' => $pay ? _x('View and pay invoice', 'billing email') : _x('View invoice', 'billing email'), 'url' => $url],
         'footnote' => billingEmailFootnote($invoice['client_name']),
     ];
 
     if (!$owed && $invoice['invoice_status'] === 'Paid') {
-        return ["Receipt for invoice $number from $company_name", $email + [
-            'kind' => 'Receipt', 'tone' => 'success', 'title' => "Invoice $number is paid",
-            'intro' => ['Thank you - invoice ' . $number . ($scope !== '' ? " for \"$scope\"" : '') . ' is paid in full.'],
-            'summary' => $summary, 'strong' => 'Paid',
-            'after' => ['Please keep this email for your records. You can download the invoice as a PDF from its page.'],
+        return [__('Receipt for invoice %1$s from %2$s', $number, $company_name), $email + [
+            'kind' => __('Receipt'), 'tone' => 'success', 'title' => __('Invoice %s is paid', $number),
+            'intro' => [$scope !== '' ? __('Thank you - invoice %1$s for "%2$s" is paid in full.', $number, $scope) : __('Thank you - invoice %s is paid in full.', $number)],
+            'summary' => $summary, 'strong' => __('Paid'),
+            'after' => [__('Please keep this email for your records. You can download the invoice as a PDF from its page.')],
         ]];
     }
 
     if ($kind === 'reminder') {
         $days = $state['days'] !== null ? -intval($state['days']) : 0;
         $balance = billingMoney($state['balance'], $currency);
-        $summary['Balance due'] = $balance;
+        $summary[$balance_due] = $balance;
         if ($days < 0) {
-            $subject = "Reminder: invoice $number is due " . billingEmailDate($invoice['invoice_due']);
-            $intro = ["A friendly reminder that invoice $number" . ($scope !== '' ? " for \"$scope\"" : '') . " is due on " . billingEmailDate($invoice['invoice_due']) . ", with $balance to pay."];
+            $subject = __('Reminder: invoice %1$s is due %2$s', $number, $due);
+            $intro = [$scope !== '' ? __('A friendly reminder that invoice %1$s for "%2$s" is due on %3$s, with %4$s to pay.', $number, $scope, $due, $balance)
+                : __('A friendly reminder that invoice %1$s is due on %2$s, with %3$s to pay.', $number, $due, $balance)];
             $tone = 'primary';
-            $title = 'Due ' . billingEmailDate($invoice['invoice_due']);
+            $title = _x('Due %s', 'reminder', $due);
         } elseif ($days === 0) {
-            $subject = "Reminder: invoice $number is due today";
-            $intro = ["A friendly reminder that invoice $number" . ($scope !== '' ? " for \"$scope\"" : '') . " is due today, with $balance to pay."];
+            $subject = __('Reminder: invoice %s is due today', $number);
+            $intro = [$scope !== '' ? __('A friendly reminder that invoice %1$s for "%2$s" is due today, with %3$s to pay.', $number, $scope, $balance)
+                : __('A friendly reminder that invoice %1$s is due today, with %2$s to pay.', $number, $balance)];
             $tone = 'warning';
-            $title = 'Due today';
+            $title = __('Due today');
         } else {
-            $subject = "Overdue: invoice $number is $days day" . ($days === 1 ? '' : 's') . ' past due';
-            $intro = ["Invoice $number" . ($scope !== '' ? " for \"$scope\"" : '') . ' was due on ' . billingEmailDate($invoice['invoice_due']) . " and $balance is still outstanding. Please arrange payment as soon as you can."];
+            $subject = _n('Overdue: invoice %2$s is %1$d day past due', 'Overdue: invoice %2$s is %1$d days past due', $days, $days, $number);
+            $intro = [$scope !== '' ? __('Invoice %1$s for "%2$s" was due on %3$s and %4$s is still outstanding. Please arrange payment as soon as you can.', $number, $scope, $due, $balance)
+                : __('Invoice %1$s was due on %2$s and %3$s is still outstanding. Please arrange payment as soon as you can.', $number, $due, $balance)];
             $tone = 'danger';
-            $title = "$days day" . ($days === 1 ? '' : 's') . ' past due';
+            $title = _n('%d day past due', '%d days past due', $days);
         }
         return [$subject, $email + [
-            'kind' => 'Payment reminder', 'tone' => $tone, 'title' => "Invoice $number - $title",
-            'intro' => $intro, 'summary' => $summary, 'strong' => 'Balance due',
-            'after' => ["If you have already paid, thank you, and please disregard this reminder. $contact_line"],
+            'kind' => _x('Payment reminder', 'billing email'), 'reminder' => true, 'tone' => $tone, 'title' => __('Invoice %1$s - %2$s', $number, $title),
+            'intro' => $intro, 'summary' => $summary, 'strong' => $balance_due,
+            'after' => [__('If you have already paid, thank you, and please disregard this reminder.') . ' ' . $contact_line],
         ]];
     }
 
-    $summary[$owed ? 'Balance due' : 'Balance'] = billingMoney($state['balance'], $currency);
-    return ["Invoice $number from $company_name", $email + [
-        'kind' => 'Invoice', 'tone' => 'primary', 'title' => "Invoice $number",
-        'intro' => ['Here is your invoice' . ($scope !== '' ? " for \"$scope\"" : '') . '.' . ($owed ? ' Payment is due by ' . billingEmailDate($invoice['invoice_due']) . '.' : '')],
-        'summary' => $summary, 'strong' => $owed ? 'Balance due' : 'Balance',
-        'after' => [($pay ? 'You can pay online by card from the invoice page, and download it as a PDF. ' : 'You can download it as a PDF from the invoice page. ') . $contact_line],
+    $balance_label = $owed ? $balance_due : __('Balance');
+    $summary[$balance_label] = billingMoney($state['balance'], $currency);
+    return [__('Invoice %1$s from %2$s', $number, $company_name), $email + [
+        'kind' => __('Invoice'), 'tone' => 'primary', 'title' => _x('Invoice %s', 'billing email', $number),
+        'intro' => [($scope !== '' ? __('Here is your invoice for "%s".', $scope) : __('Here is your invoice.')) . ($owed ? ' ' . __('Payment is due by %s.', $due) : '')],
+        'summary' => $summary, 'strong' => $balance_label,
+        'after' => [($pay ? __('You can pay online by card from the invoice page, and download it as a PDF.') : __('You can download it as a PDF from the invoice page.')) . ' ' . $contact_line],
     ]];
 }
 
@@ -384,17 +400,18 @@ function billingQuoteEmail(array $quote, array $opts = []) {
     $company = billingCompany();
     $scope = trim((string) $quote['quote_scope']);
     $groups = quoteGroups($quote);
-    $summary = ['Quote' => $number];
+    $summary = [__('Quote') => $number];
     if ($scope !== '') {
-        $summary['For'] = $scope;
+        $summary[__('For')] = $scope;
     }
-    $summary['Date'] = billingEmailDate($quote['quote_date']);
-    $summary['Valid until'] = billingEmailDate($quote['quote_expire']);
-    $strong = 'Total';
+    $summary[__('Date')] = billingEmailDate($quote['quote_date']);
+    $summary[_x('Valid until', 'billing document')] = billingEmailDate($quote['quote_expire']);
+    $strong = _x('Total', 'billing document');
+    $frequency_labels = ['month' => _x('Each month', 'billing frequency'), 'quarter' => _x('Each quarter', 'billing frequency'), 'year' => _x('Each year', 'billing frequency')];
     if (quoteHasRecurring($groups)) {
         foreach ($groups as $group) {
             if ($group['items'] || $group['frequency'] === '') {
-                $label = $group['frequency'] === '' ? 'Up front' : $group['label'];
+                $label = $group['frequency'] === '' ? _x('Up front', 'billing document') : ($frequency_labels[$group['frequency']] ?? $group['label']);
                 $summary[$label] = billingMoney($group['total'], $currency);
                 if ($group['frequency'] === '') {
                     $strong = $label;
@@ -402,15 +419,16 @@ function billingQuoteEmail(array $quote, array $opts = []) {
             }
         }
     } else {
-        $summary['Total'] = billingMoney($quote['quote_amount'], $currency);
+        $summary[_x('Total', 'billing document')] = billingMoney($quote['quote_amount'], $currency);
     }
-    return ["Quote $number from " . ($company['company_name'] ?? '') . ($scope !== '' ? " - $scope" : ''), [
-        'kind' => 'Quote', 'tone' => 'primary', 'title' => "Quote $number",
-        'intro' => ['Thank you for the opportunity. Here is our quote' . ($scope !== '' ? " for \"$scope\"" : '') . ', valid until ' . billingEmailDate($quote['quote_expire']) . '.'],
+    $expire = billingEmailDate($quote['quote_expire']);
+    return [__('Quote %1$s from %2$s', $number, $company['company_name'] ?? '') . ($scope !== '' ? " - $scope" : ''), [
+        'kind' => __('Quote'), 'tone' => 'primary', 'title' => __('Quote %s', $number),
+        'intro' => [$scope !== '' ? __('Thank you for the opportunity. Here is our quote for "%1$s", valid until %2$s.', $scope, $expire) : __('Thank you for the opportunity. Here is our quote, valid until %s.', $expire)],
         'note' => $opts['note'] ?? '',
         'summary' => $summary, 'strong' => $strong,
-        'button' => ['label' => 'View and accept quote', 'url' => billingGuestUrl('quote', $quote)],
-        'after' => ['You can accept or decline it online, and download it as a PDF. Questions? Reply to this email.'],
+        'button' => ['label' => _x('View and accept quote', 'billing email'), 'url' => billingGuestUrl('quote', $quote)],
+        'after' => [__('You can accept or decline it online, and download it as a PDF.') . ' ' . __('Questions? Reply to this email.')],
         'footnote' => billingEmailFootnote($quote['client_name']),
     ]];
 }
@@ -424,50 +442,51 @@ function billingPaymentEmail(array $applied, array $payment) {
     $currency = (string) ($payment['currency'] ?? ($applied[0]['invoice']['invoice_currency_code'] ?? ''));
     $total = array_sum(array_column($applied, 'amount'));
     $first = $applied[0]['invoice'];
-    $summary = ['Amount paid' => billingMoney($total, $currency), 'Date' => billingEmailDate($payment['date'] ?? date('Y-m-d'))];
+    $amount_paid = _x('Amount paid', 'billing email');
+    $summary = [$amount_paid => billingMoney($total, $currency), __('Date') => billingEmailDate($payment['date'] ?? date('Y-m-d'))];
     if (!empty($payment['method'])) {
-        $summary['Method'] = $payment['method'];
+        $summary[_x('Method', 'payment')] = $payment['method'];
     }
     if (!empty($payment['reference'])) {
-        $summary['Reference'] = $payment['reference'];
+        $summary[__('Reference')] = $payment['reference'];
     }
-    $email = ['kind' => 'Payment received', 'tone' => 'success', 'footnote' => billingEmailFootnote($first['client_name'])];
+    $email = ['kind' => _x('Payment received', 'billing email'), 'tone' => 'success', 'footnote' => billingEmailFootnote($first['client_name'])];
     if (count($applied) === 1) {
         $number = billingNumber('invoice', $first);
         $balance = invoiceState($first, invoicePaid($first['invoice_id']))['balance'];
-        $summary['Invoice'] = $number;
-        $summary[$balance > 0 ? 'Still to pay' : 'Invoice balance'] = $balance > 0 ? billingMoney($balance, $currency) : 'Paid in full';
-        return ["Payment received for invoice $number", $email + [
-            'title' => 'Thank you for your payment',
-            'intro' => ['We have received your payment of ' . billingMoney($total, $currency) . " for invoice $number."],
-            'summary' => $summary, 'strong' => 'Amount paid',
-            'button' => ['label' => 'View invoice', 'url' => billingGuestUrl('invoice', $first)],
-            'after' => ['Please keep this email as your receipt.'],
+        $summary[__('Invoice')] = $number;
+        $summary[$balance > 0 ? _x('Still to pay', 'billing email') : _x('Invoice balance', 'billing email')] = $balance > 0 ? billingMoney($balance, $currency) : _x('Paid in full', 'billing email');
+        return [__('Payment received for invoice %s', $number), $email + [
+            'title' => __('Thank you for your payment'),
+            'intro' => [__('We have received your payment of %1$s for invoice %2$s.', billingMoney($total, $currency), $number)],
+            'summary' => $summary, 'strong' => $amount_paid,
+            'button' => ['label' => _x('View invoice', 'billing email'), 'url' => billingGuestUrl('invoice', $first)],
+            'after' => [__('Please keep this email as your receipt.')],
         ]];
     }
     $rows = [];
     foreach ($applied as $entry) {
         $balance = invoiceState($entry['invoice'], invoicePaid($entry['invoice']['invoice_id']))['balance'];
         $rows[] = [['text' => billingNumber('invoice', $entry['invoice']), 'url' => billingGuestUrl('invoice', $entry['invoice'])],
-            billingMoney($entry['amount'], $currency), $balance > 0 ? billingMoney($balance, $currency) : 'Paid'];
+            billingMoney($entry['amount'], $currency), $balance > 0 ? billingMoney($balance, $currency) : __('Paid')];
     }
-    return ['Payment received - ' . count($applied) . ' invoices', $email + [
-        'title' => 'Thank you for your payment',
-        'intro' => ['We have received your payment of ' . billingMoney($total, $currency) . ' and applied it to these invoices.'],
-        'summary' => $summary, 'strong' => 'Amount paid',
-        'lines' => ['head' => ['Invoice', 'Applied', 'Balance'], 'align' => ['left', 'right', 'right'], 'rows' => $rows],
-        'after' => ['Please keep this email as your receipt.'],
+    return [_n('Payment received - %d invoice', 'Payment received - %d invoices', count($applied)), $email + [
+        'title' => __('Thank you for your payment'),
+        'intro' => [__('We have received your payment of %s and applied it to these invoices.', billingMoney($total, $currency))],
+        'summary' => $summary, 'strong' => $amount_paid,
+        'lines' => ['head' => [__('Invoice'), _x('Applied', 'payment'), __('Balance')], 'align' => ['left', 'right', 'right'], 'rows' => $rows],
+        'after' => [__('Please keep this email as your receipt.')],
     ]];
 }
 
 /** Confirm a card a contact saved in the client portal - its brand, last four digits and expiry. Who it went to. */
 function billingMailCardSaved($email, $name, $client_name, $brand, $last4, $exp_month, $exp_year) {
-    return billingEmailQueue([['email' => (string) $email, 'name' => (string) $name]], 'Payment method saved', [
-        'kind' => 'Payment method', 'tone' => 'success', 'preview' => 'Your card is saved for future invoices',
-        'title' => 'Your payment method is saved',
-        'intro' => ['Your payment details are stored securely with Stripe, our payment processor, and you authorized us to bill this card automatically for future invoices.'],
-        'summary' => ['Card' => ucfirst((string) $brand) . ' ending ' . $last4, 'Expires' => sprintf('%02d/%d', intval($exp_month), intval($exp_year))],
-        'after' => ['You can change or remove it at any time in the client portal.', 'Thank you for your business!'],
+    return billingEmailQueue([['email' => (string) $email, 'name' => (string) $name]], __('Payment method saved'), [
+        'kind' => _x('Payment method', 'billing email'), 'tone' => 'success', 'preview' => __('Your card is saved for future invoices'),
+        'title' => __('Your payment method is saved'),
+        'intro' => [__('Your payment details are stored securely with Stripe, our payment processor, and you authorized us to bill this card automatically for future invoices.')],
+        'summary' => [_x('Card', 'payment') => __('%1$s ending %2$s', ucfirst((string) $brand), $last4), __('Expires') => sprintf('%02d/%d', intval($exp_month), intval($exp_year))],
+        'after' => [__('You can change or remove it at any time in the client portal.'), __('Thank you for your business!')],
         'footnote' => billingEmailFootnote((string) $client_name),
     ]);
 }
@@ -494,19 +513,28 @@ function billingQuoteAnsweredNotify($quote_id, $accepted, $by = '', $note = '') 
         return [];
     }
     $number = billingNumber('quote', $quote);
-    $word = $accepted ? 'accepted' : 'declined';
     $by = trim((string) $by);
-    $summary = ['Client' => $quote['client_name'], 'Quote' => $number, 'Total' => billingMoney($quote['quote_amount'], $quote['quote_currency_code'])];
+    $client_name = $quote['client_name'];
+    $scope = trim((string) $quote['quote_scope']);
+    $summary = [__('Client') => $client_name, __('Quote') => $number, _x('Total', 'billing document') => billingMoney($quote['quote_amount'], $quote['quote_currency_code'])];
     if ($by !== '') {
-        $summary = ['Client' => $quote['client_name'], ucfirst($word) . ' by' => $by] + $summary;
+        $summary = [__('Client') => $client_name, ($accepted ? _x('Accepted by', 'quote') : _x('Declined by', 'quote')) => $by] + $summary;
     }
-    return billingNotifyEmail($to, 'Quote ' . ucfirst($word) . " - {$quote['client_name']} - Quote $number", [
-        'kind' => 'Quote ' . $word, 'tone' => $accepted ? 'success' : 'danger', 'title' => "{$quote['client_name']} $word $number",
-        'intro' => ["{$quote['client_name']} $word quote $number " . ($by !== '' ? 'in the client portal' : 'online') . (trim((string) $quote['quote_scope']) !== '' ? " - \"{$quote['quote_scope']}\"" : '') . '.'
-            . (trim((string) $note) !== '' ? ' They left a note:' : '')],
+    if ($accepted) {
+        $subject = __('Quote Accepted - %1$s - Quote %2$s', $client_name, $number);
+        $title = __('%1$s accepted %2$s', $client_name, $number);
+        $intro = $by !== '' ? __('%1$s accepted quote %2$s in the client portal', $client_name, $number) : __('%1$s accepted quote %2$s online', $client_name, $number);
+    } else {
+        $subject = __('Quote Declined - %1$s - Quote %2$s', $client_name, $number);
+        $title = __('%1$s declined %2$s', $client_name, $number);
+        $intro = $by !== '' ? __('%1$s declined quote %2$s in the client portal', $client_name, $number) : __('%1$s declined quote %2$s online', $client_name, $number);
+    }
+    return billingNotifyEmail($to, $subject, [
+        'kind' => $accepted ? _x('Quote accepted', 'billing email') : _x('Quote declined', 'billing email'), 'tone' => $accepted ? 'success' : 'danger', 'title' => $title,
+        'intro' => [$intro . ($scope !== '' ? " - \"$scope\"" : '') . '.' . (trim((string) $note) !== '' ? ' ' . __('They left a note:') : '')],
         'note' => trim((string) $note),
         'summary' => $summary,
-        'button' => ['label' => 'Open in ITFlow', 'url' => "https://$config_base_url/agent/quote.php?quote_id=" . intval($quote['quote_id'])],
+        'button' => ['label' => __('Open in ITFlow'), 'url' => "https://$config_base_url/agent/quote.php?quote_id=" . intval($quote['quote_id'])],
     ], 'quote');
 }
 
@@ -523,12 +551,13 @@ function billingPaymentNotify(array $invoice, $amount, $how) {
     $number = billingNumber('invoice', $invoice);
     $currency = (string) $invoice['invoice_currency_code'];
     $balance = invoiceState($invoice, invoicePaid($invoice['invoice_id']))['balance'];
-    billingNotifyEmail($to, "Payment received - {$invoice['client_name']} - invoice $number", [
-        'kind' => 'Payment received', 'tone' => 'success', 'title' => "{$invoice['client_name']} paid $number",
-        'intro' => ["$how payment of " . billingMoney($amount, $currency) . " on invoice $number for {$invoice['client_name']}."],
-        'summary' => ['Client' => $invoice['client_name'], 'Invoice' => $number, 'Amount paid' => billingMoney($amount, $currency), 'Balance' => $balance > 0 ? billingMoney($balance, $currency) : 'Paid in full'],
-        'strong' => 'Amount paid',
-        'button' => ['label' => 'Open in ITFlow', 'url' => "https://$config_base_url/agent/invoice.php?invoice_id=" . intval($invoice['invoice_id'])],
+    $amount_paid = _x('Amount paid', 'billing email');
+    billingNotifyEmail($to, __('Payment received - %1$s - invoice %2$s', $invoice['client_name'], $number), [
+        'kind' => _x('Payment received', 'billing email'), 'tone' => 'success', 'title' => __('%1$s paid %2$s', $invoice['client_name'], $number),
+        'intro' => [billingPaymentHowText($how, billingMoney($amount, $currency)) . ' ' . __('On invoice %1$s for %2$s.', $number, $invoice['client_name'])],
+        'summary' => [__('Client') => $invoice['client_name'], __('Invoice') => $number, $amount_paid => billingMoney($amount, $currency), __('Balance') => $balance > 0 ? billingMoney($balance, $currency) : _x('Paid in full', 'billing email')],
+        'strong' => $amount_paid,
+        'button' => ['label' => __('Open in ITFlow'), 'url' => "https://$config_base_url/agent/invoice.php?invoice_id=" . intval($invoice['invoice_id'])],
     ]);
 }
 
@@ -549,14 +578,16 @@ function billingPaymentNotifyMany(array $applied, $how) {
     foreach ($applied as $entry) {
         $balance = invoiceState($entry['invoice'], invoicePaid($entry['invoice']['invoice_id']))['balance'];
         $rows[] = [['text' => billingNumber('invoice', $entry['invoice']), 'url' => "https://$config_base_url/agent/invoice.php?invoice_id=" . intval($entry['invoice']['invoice_id'])],
-            billingMoney($entry['amount'], $currency), $balance > 0 ? billingMoney($balance, $currency) : 'Paid'];
+            billingMoney($entry['amount'], $currency), $balance > 0 ? billingMoney($balance, $currency) : __('Paid')];
     }
-    billingNotifyEmail($to, "Payment received - {$first['client_name']} - " . count($applied) . ' invoices', [
-        'kind' => 'Payment received', 'tone' => 'success', 'title' => "{$first['client_name']} paid " . count($applied) . ' invoices',
-        'intro' => ["$how payment of " . billingMoney($total, $currency) . " for {$first['client_name']}, over these invoices."],
-        'summary' => ['Client' => $first['client_name'], 'Invoices' => (string) count($applied), 'Amount paid' => billingMoney($total, $currency)],
-        'strong' => 'Amount paid',
-        'lines' => ['head' => ['Invoice', 'Applied', 'Balance'], 'align' => ['left', 'right', 'right'], 'rows' => $rows],
+    $amount_paid = _x('Amount paid', 'billing email');
+    $count = count($applied);
+    billingNotifyEmail($to, _n('Payment received - %2$s - %1$d invoice', 'Payment received - %2$s - %1$d invoices', $count, $count, $first['client_name']), [
+        'kind' => _x('Payment received', 'billing email'), 'tone' => 'success', 'title' => _n('%2$s paid %1$d invoice', '%2$s paid %1$d invoices', $count, $count, $first['client_name']),
+        'intro' => [billingPaymentHowText($how, billingMoney($total, $currency)) . ' ' . __('For %s, over these invoices.', $first['client_name'])],
+        'summary' => [__('Client') => $first['client_name'], __('Invoices') => (string) $count, $amount_paid => billingMoney($total, $currency)],
+        'strong' => $amount_paid,
+        'lines' => ['head' => [__('Invoice'), _x('Applied', 'payment'), __('Balance')], 'align' => ['left', 'right', 'right'], 'rows' => $rows],
     ]);
 }
 
@@ -575,7 +606,7 @@ function billingPaymentReceiptSend(array $applied, array $payment, $notify = fal
     $sent = billingEmailQueue(billingEmailRecipients($first['client_id']), $subject, $email);
     if ($sent) {
         foreach ($applied as $entry) {
-            billingLog('invoice', $entry['invoice']['invoice_id'], 'Sent', 'Payment receipt emailed to ' . implode(', ', $sent));
+            billingLog('invoice', $entry['invoice']['invoice_id'], 'Sent', 'Payment receipt emailed to ' . implode(', ', $sent)); // i18n-ignore - invoice history stays English
         }
     }
     if ($notify && count($applied) === 1) {
@@ -658,7 +689,36 @@ function billingStatement($client_id, $from = '', $to = '', $include_paid = fals
 
 /** A statement's period in words - "up to Oct 16, 2026", "Jul 1, 2026 to Oct 16, 2026". */
 function billingStatementPeriod(array $statement) {
-    return ($statement['from'] !== '' ? billingEmailDate($statement['from']) . ' to ' : 'up to ') . billingEmailDate($statement['to']);
+    return $statement['from'] !== ''
+        ? _x('%1$s to %2$s', 'billing period', billingEmailDate($statement['from']), billingEmailDate($statement['to']))
+        : _x('up to %s', 'billing period', billingEmailDate($statement['to']));
+}
+
+/** A statement's aging bucket as shown - the keys stay English. */
+function billingAgingLabel($bucket) {
+    $labels = ['Current' => _x('Current', 'aging'), '1-30 days' => _x('1-30 days', 'aging'), '31-60 days' => _x('31-60 days', 'aging'),
+        '61-90 days' => _x('61-90 days', 'aging'), 'Over 90 days' => _x('Over 90 days', 'aging')];
+    return $labels[$bucket] ?? (string) $bucket;
+}
+
+/**
+ * "Online payment of R$ 10.00." - $how is how it was paid, as the payment
+ * code passes it ('Online', 'Saved card', ...); one not known is shown as is.
+ */
+function billingPaymentHowText($how, $amount) {
+    switch ((string) $how) {
+        case 'Online':
+            return __('Online payment of %s.', $amount);
+        case 'Online card':
+            return __('Online card payment of %s.', $amount);
+        case 'Saved card':
+            return __('Saved card payment of %s.', $amount);
+        case 'Automatic card':
+            return __('Automatic card payment of %s.', $amount);
+        case 'Card':
+            return __('Card payment of %s.', $amount);
+    }
+    return __('%1$s payment of %2$s.', $how, $amount);
 }
 
 /** A statement as a PDF - ['name', 'data']. See functions/billing_pdf.php. */
@@ -678,24 +738,30 @@ function billingStatementEmail(array $statement, array $opts = []) {
         $rows[] = [
             ['text' => billingNumber('invoice', $invoice), 'url' => billingGuestUrl('invoice', $invoice)],
             billingEmailDate($invoice['invoice_date']),
-            ['text' => billingEmailDate($invoice['invoice_due']) . ($late ? ' (' . $invoice['days'] . 'd late)' : ''), 'tone' => $late ? 'danger' : ''],
-            ['text' => $invoice['balance'] > 0 ? billingMoney($invoice['balance'], $currency) : 'Paid', 'tone' => $invoice['balance'] > 0 ? '' : 'success'],
+            ['text' => billingEmailDate($invoice['invoice_due']) . ($late ? ' (' . _n('%dd late', '%dd late', intval($invoice['days'])) . ')' : ''), 'tone' => $late ? 'danger' : ''],
+            ['text' => $invoice['balance'] > 0 ? billingMoney($invoice['balance'], $currency) : __('Paid'), 'tone' => $invoice['balance'] > 0 ? '' : 'success'],
         ];
     }
-    $summary = ['Statement date' => billingEmailDate(date('Y-m-d')), 'Period' => ucfirst(billingStatementPeriod($statement)), 'Open invoices' => (string) count(array_filter($statement['invoices'], function ($invoice) {
+    $total_due = _x('Total due', 'billing document');
+    $summary = [_x('Statement date', 'billing document') => billingEmailDate(date('Y-m-d')), _x('Period', 'billing document') => ucfirst(billingStatementPeriod($statement)), _x('Open invoices', 'billing email') => (string) count(array_filter($statement['invoices'], function ($invoice) {
         return $invoice['balance'] > 0;
     }))];
     if ($statement['overdue'] > 0) {
-        $summary['Overdue'] = billingMoney($statement['overdue'], $currency);
+        $summary[_x('Overdue', 'billing email')] = billingMoney($statement['overdue'], $currency);
     }
-    $summary['Total due'] = billingMoney($statement['total'], $currency);
-    return ['Statement from ' . ($company['company_name'] ?? '') . ' - ' . billingEmailDate($statement['to']), [
-        'kind' => 'Statement', 'tone' => $statement['overdue'] > 0 ? 'warning' : 'primary', 'title' => 'Your account statement',
-        'intro' => ['Here is your statement for ' . $statement['client']['client_name'] . ', ' . billingStatementPeriod($statement) . '.' . ($statement['total'] > 0 ? ' Open an invoice to view' . (billingOnlinePayments() ? ' or pay' : '') . ' it.' : ' Nothing is owed - thank you.')],
+    $summary[$total_due] = billingMoney($statement['total'], $currency);
+    if ($statement['total'] > 0) {
+        $open = billingOnlinePayments() ? __('Open an invoice to view or pay it.') : __('Open an invoice to view it.');
+    } else {
+        $open = __('Nothing is owed - thank you.');
+    }
+    return [__('Statement from %1$s - %2$s', $company['company_name'] ?? '', billingEmailDate($statement['to'])), [
+        'kind' => __('Statement'), 'tone' => $statement['overdue'] > 0 ? 'warning' : 'primary', 'title' => __('Your account statement'),
+        'intro' => [__('Here is your statement for %1$s, %2$s.', $statement['client']['client_name'], billingStatementPeriod($statement)) . ' ' . $open],
         'note' => $opts['note'] ?? '',
-        'summary' => $summary, 'strong' => 'Total due',
-        'lines' => ['head' => ['Invoice', 'Date', 'Due', 'Balance'], 'align' => ['left', 'left', 'left', 'right'], 'rows' => $rows],
-        'after' => ['Questions about your account? Reply to this email' . (!empty($company['phone_display']) ? ' or call us on ' . $company['phone_display'] : '') . '.'],
+        'summary' => $summary, 'strong' => $total_due,
+        'lines' => ['head' => [__('Invoice'), __('Date'), _x('Due', 'billing document'), __('Balance')], 'align' => ['left', 'left', 'left', 'right'], 'rows' => $rows],
+        'after' => [!empty($company['phone_display']) ? __('Questions about your account? Reply to this email or call us on %s.', $company['phone_display']) : __('Questions about your account? Reply to this email.')],
         'footnote' => billingEmailFootnote($statement['client']['client_name']),
     ]];
 }
