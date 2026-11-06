@@ -357,7 +357,7 @@ if (isExportRequest('export_certificates')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -365,7 +365,7 @@ if (isExportRequest('export_certificates')) {
         $client_query = "AND certificate_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
 
@@ -379,7 +379,7 @@ if (isExportRequest('export_certificates')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (certificate_client_id = $filter_client_id)";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
 
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR certificate_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND certificate_archived_at IS NULL)";
@@ -390,11 +390,11 @@ if (isExportRequest('export_certificates')) {
     if (!empty($_POST['expire_days'])) {
         if ($_POST['expire_days'] == "expired") {
             $expire_query = "AND (certificate_expire IS NOT NULL AND certificate_expire < CURDATE())";
-            $filter_summary['Expiry'] = 'Expired';
+            $filter_summary[__('Expiry')] = _x('Expired', 'export expiry');
         } else {
             $expire_days = intval($_POST['expire_days']);
             $expire_query = "AND (certificate_expire IS NOT NULL AND certificate_expire BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL $expire_days DAY))";
-            $filter_summary['Expiry'] = "Expiring within $expire_days days";
+            $filter_summary[__('Expiry')] = _n('Expiring within %d day', 'Expiring within %d days', $expire_days);
         }
     }
 
@@ -402,13 +402,13 @@ if (isExportRequest('export_certificates')) {
     $problem_query = '';
     if (!empty($_POST['problems'])) {
         $problem_query = 'AND ' . certificateProblemSql();
-        $filter_summary['Check'] = 'Problems found';
+        $filter_summary[__('Check')] = __('Problems found');
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     [$certificate_columns, $certificate_joins] = certificateSelectSql();
@@ -434,13 +434,13 @@ if (isExportRequest('export_certificates')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'certificates');
+    guardExportHasRows($num_rows, __('certificates'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('certificates', $format, $file_name_prepend . 'Certificates', 'Certificates', summarizeExportFilters($filter_summary));
+        $export = beginExport('certificates', $format, $file_name_prepend . 'Certificates', __('Certificates'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);

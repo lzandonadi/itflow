@@ -286,9 +286,9 @@ function tagIdsForRecord($entity, $record_id) {
 
 /* An export window's Tags field - any of them, the tags offered as in a record form. */
 function tagExportFieldHtml($entity, array $selected) {
-    return '<div class="mb-3"><label>Tags</label><div class="input-group">'
+    return '<div class="mb-3"><label>' . __('Tags') . '</label><div class="input-group">'
         . '<span class="input-group-text"><i class="fa fa-fw fa-tags"></i></span>'
-        . '<select class="form-select select2" name="tags[]" data-placeholder="- Any -" multiple>' . tagOptionsHtml($entity, $selected) . '</select>'
+        . '<select class="form-select select2" name="tags[]" data-placeholder="' . escapeHtml(__('- Any -')) . '" multiple>' . tagOptionsHtml($entity, $selected) . '</select>'
         . '</div></div>';
 }
 

@@ -464,13 +464,13 @@ if (isExportRequest('export_asset_interfaces')) {
 
     $num_rows = count($rows);
 
-    guardExportHasRows($num_rows, 'interfaces');
+    guardExportHasRows($num_rows, __('interfaces'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('asset_interfaces', $format, toAlphanumeric($asset_name) . '-Interfaces', "$asset_name - Interfaces", '');
+        $export = beginExport('asset_interfaces', $format, toAlphanumeric($asset_name) . '-Interfaces', __('%s - Interfaces', $asset_name), '');
 
         foreach ($rows as $row) {
             $link = $links[intval($row['interface_id'])] ?? null;

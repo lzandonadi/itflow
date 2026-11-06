@@ -312,7 +312,7 @@ if (isExportRequest('export_networks')) {
 
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -321,7 +321,7 @@ if (isExportRequest('export_networks')) {
         $client_query = "AND network_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
         $archive_query = $archived ? "network_archived_at IS NOT NULL" : "network_archived_at IS NULL";
     } else {
         $client_query = '';
@@ -330,7 +330,7 @@ if (isExportRequest('export_networks')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND network_client_id = $filter_client_id";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR network_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND network_archived_at IS NULL)";
     }
@@ -339,20 +339,20 @@ if (isExportRequest('export_networks')) {
     if (!empty($_POST['location'])) {
         $filter_location_id = intval($_POST['location']);
         $location_query = "AND network_location_id = $filter_location_id";
-        $filter_summary['Site'] = exportRecordName('locations', $filter_location_id, 'location_name', 'location_client_id');
+        $filter_summary[__('Site')] = exportRecordName('locations', $filter_location_id, 'location_name', 'location_client_id');
     }
 
     $type_query = '';
     if (isset(NETWORK_TYPES[$_POST['type'] ?? ''])) {
         $type_query = "AND network_type = '" . $_POST['type'] . "'";
-        $filter_summary['Type'] = $_POST['type'];
+        $filter_summary[__('Type')] = networkTypeName($_POST['type']);
     }
 
     $tag_query = tagExportFilterSql('network', $_POST['tags'] ?? [], $filter_summary, 'networks.network_id');
 
     $q = escapeSql($_POST['q'] ?? '');
     if ($q !== '') {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query(
@@ -374,13 +374,13 @@ if (isExportRequest('export_networks')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'networks');
+    guardExportHasRows($num_rows, __('networks'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('networks', $format, $file_name_prepend . 'Networks', 'Networks', summarizeExportFilters($filter_summary));
+        $export = beginExport('networks', $format, $file_name_prepend . 'Networks', __('Networks'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['network_tags'] = (string) $row['network_tags'];

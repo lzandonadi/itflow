@@ -315,7 +315,7 @@ if (isExportRequest('export_products')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     $client_id = 0; // for Logging
@@ -324,16 +324,16 @@ if (isExportRequest('export_products')) {
     // Type Filter - the page's tabs
     $type_filter = (string) ($_POST['type'] ?? '');
     $type_queries = [
-        'service' => ["AND product_type = 'service'", 'Services'],
-        'product' => ["AND product_type = 'product'", 'Products'],
-        'recurring' => ["AND product_frequency IS NOT NULL", 'Billed each month, quarter or year'],
-        'stocked' => ["AND product_track_stock = 1", 'Stock tracked'],
-        'reorder' => ["AND " . productReorderSql(), 'To reorder'],
-        'hardware' => ["AND " . productHardwareSql(), 'Become client assets'],
+        'service' => ["AND product_type = 'service'", __('Services')],
+        'product' => ["AND product_type = 'product'", __('Products')],
+        'recurring' => ["AND product_frequency IS NOT NULL", __('Billed each month, quarter or year')],
+        'stocked' => ["AND product_track_stock = 1", __('Stock tracked')],
+        'reorder' => ["AND " . productReorderSql(), __('To reorder')],
+        'hardware' => ["AND " . productHardwareSql(), __('Become client assets')],
     ];
     $type_query = '';
     if (isset($type_queries[$type_filter])) {
-        [$type_query, $filter_summary['Showing']] = $type_queries[$type_filter];
+        [$type_query, $filter_summary[__('Showing')]] = $type_queries[$type_filter];
     }
 
     $archive_query = $archived ? "product_archived_at IS NOT NULL" : "product_archived_at IS NULL";
@@ -342,7 +342,7 @@ if (isExportRequest('export_products')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND (category_id = $filter_category_id)";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     } else {
         // Default - any
         $category_query = '';
@@ -353,13 +353,13 @@ if (isExportRequest('export_products')) {
     if (!empty($_POST['vendor'])) {
         $filter_vendor_id = intval($_POST['vendor']);
         $vendor_query = "AND product_vendor_id = $filter_vendor_id";
-        $filter_summary['Vendor'] = exportRecordName('vendors', $filter_vendor_id, 'vendor_name', 'vendor_client_id');
+        $filter_summary[__('Vendor')] = exportRecordName('vendors', $filter_vendor_id, 'vendor_name', 'vendor_client_id');
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query(
@@ -380,13 +380,13 @@ if (isExportRequest('export_products')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'products');
+    guardExportHasRows($num_rows, __('products'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('products', $format, $file_name_prepend . 'Products', 'Products', summarizeExportFilters($filter_summary));
+        $export = beginExport('products', $format, $file_name_prepend . 'Products', __('Products'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $margin = productMargin($row['product_price'], $row['product_cost']);

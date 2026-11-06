@@ -334,13 +334,13 @@ if (isExportRequest('export_network_ips')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'IP addresses');
+    guardExportHasRows($num_rows, __('IP addresses'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('network_ips', $format, toAlphanumeric($network_name) . '-IPs', "$network_name - IP Addresses", '');
+        $export = beginExport('network_ips', $format, toAlphanumeric($network_name) . '-IPs', __('%s - IP Addresses', $network_name), '');
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);

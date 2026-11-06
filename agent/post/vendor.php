@@ -420,7 +420,7 @@ if (isExportRequest('export_vendors')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
     $archive_query = $archived ? "vendor_archived_at IS NOT NULL" : "vendor_archived_at IS NULL";
 
@@ -432,18 +432,18 @@ if (isExportRequest('export_vendors')) {
         $client_query = "AND vendor_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
     } elseif (($_POST['view'] ?? '') === 'clients') {
         // Every client's vendors this agent may see
         enforceUserPermission('module_client');
         $client_id = 0; // for Logging
         $client_query = "AND vendor_client_id > 0";
         $file_name_prepend = "$session_company_name-Client-";
-        $filter_summary['Vendors'] = 'Client vendors';
+        $filter_summary[__('Vendors')] = __('Client vendors');
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND vendor_client_id = $filter_client_id";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR vendor_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND vendor_archived_at IS NULL)";
     } else {
@@ -464,13 +464,13 @@ if (isExportRequest('export_vendors')) {
         while ($tag_row = mysqli_fetch_assoc($sql_tags)) {
             $tag_names[] = $tag_row['tag_name'];
         }
-        $filter_summary['Tags'] = implode(', ', $tag_names);
+        $filter_summary[__('Tags')] = implode(', ', $tag_names);
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query(
@@ -491,13 +491,13 @@ if (isExportRequest('export_vendors')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'vendors');
+    guardExportHasRows($num_rows, __('vendors'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('vendors', $format, $file_name_prepend . 'Vendors', 'Vendors', summarizeExportFilters($filter_summary));
+        $export = beginExport('vendors', $format, $file_name_prepend . 'Vendors', __('Vendors'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);

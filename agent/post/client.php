@@ -373,7 +373,7 @@ if (isExportRequest('export_clients')) {
     // Leads Filter
     if (isset($_POST['leads']) && $_POST['leads'] == 1) {
         $leads_query = "AND client_lead = 1";
-        $filter_summary['Showing'] = 'Leads';
+        $filter_summary[__('Showing')] = __('Leads');
         $export_label = 'Leads';
     } else {
         $leads_query = "AND client_lead = 0";
@@ -390,7 +390,7 @@ if (isExportRequest('export_clients')) {
         while ($tag_row = mysqli_fetch_assoc($sql_tags)) {
             $tag_names[] = $tag_row['tag_name'];
         }
-        $filter_summary['Tags'] = implode(', ', $tag_names);
+        $filter_summary[__('Tags')] = implode(', ', $tag_names);
     } else {
         // Default - any
         $tag_query = '';
@@ -399,7 +399,7 @@ if (isExportRequest('export_clients')) {
     // Industry Filter
     if (!empty($_POST['industry'])) {
         $industry_query = "AND (clients.client_type = '" . escapeSql($_POST['industry']) . "')";
-        $filter_summary['Industry'] = $_POST['industry'];
+        $filter_summary[__('Industry')] = $_POST['industry'];
     } else {
         // Default - any
         $industry_query = '';
@@ -408,7 +408,7 @@ if (isExportRequest('export_clients')) {
     // Referral Filter
     if (!empty($_POST['referral'])) {
         $referral_query = "AND (clients.client_referral = '" . escapeSql($_POST['referral']) . "')";
-        $filter_summary['Referral'] = $_POST['referral'];
+        $filter_summary[__('Referral')] = $_POST['referral'];
     } else {
         // Default - any
         $referral_query = '';
@@ -417,7 +417,7 @@ if (isExportRequest('export_clients')) {
     // Archived Filter
     if (isset($_POST['archived']) && $_POST['archived'] == 1) {
         $archive_query = "client_archived_at IS NOT NULL";
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     } else {
         $archive_query = "client_archived_at IS NULL";
     }
@@ -428,14 +428,14 @@ if (isExportRequest('export_clients')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Created'] = $date_range;
+        $filter_summary[__('Created')] = $date_range;
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     $phone_query = preg_replace('/\D/', '', $q);
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Get records from database - same shape as the clients page list query
@@ -465,13 +465,13 @@ if (isExportRequest('export_clients')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'clients');
+    guardExportHasRows($num_rows, __('clients'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('clients', $format, "$session_company_name-$export_label", $export_label, summarizeExportFilters($filter_summary));
+        $export = beginExport('clients', $format, "$session_company_name-$export_label", $export_label === 'Leads' ? __('Leads') : __('Clients'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $tax_client = taxClient($row['client_id']);
@@ -1128,7 +1128,7 @@ if (isset($_POST['export_client_pdf']) || isset($_POST['export_client_archive'])
 
         logAudit("Client", "Export", "$session_name exported the documentation PDF for " . escapeSql($client_name) . " ($logged)", $client_id, $client_id);
 
-        clientExportSendHeaders(clientExportFileName($client_name, 'IT Documentation', 'pdf'), 'application/pdf', strlen($pdf));
+        clientExportSendHeaders(clientExportFileName($client_name, __('IT Documentation'), 'pdf'), 'application/pdf', strlen($pdf));
         echo $pdf;
         exit;
     }
@@ -1141,7 +1141,7 @@ if (isset($_POST['export_client_pdf']) || isset($_POST['export_client_archive'])
     logAudit("Client", "Export", "$session_name exported all data for " . escapeSql($client_name) . " ($logged" . ($options['archived'] ? ', archived records' : '')
         . ($options['internal'] ? ', internal notes' : '') . ")", $client_id, $client_id);
 
-    clientExportSendHeaders(clientExportFileName($client_name, 'Export', 'zip'), 'application/zip', filesize($zip_path));
+    clientExportSendHeaders(clientExportFileName($client_name, __('Export'), 'zip'), 'application/zip', filesize($zip_path));
     while (ob_get_level()) {
         ob_end_clean();
     }

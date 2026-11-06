@@ -514,7 +514,7 @@ if (isExportRequest('export_invoices')) {
         $client_query = "AND invoice_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -527,20 +527,20 @@ if (isExportRequest('export_invoices')) {
     $overdue_query = '';
     if (!empty($_POST['status']) && $_POST['status'] == 'Draft') {
         $status_query = "invoice_status = 'Draft'";
-        $filter_summary['Status'] = 'Draft';
+        $filter_summary[__('Status')] = _x('Draft', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Unpaid') {
         $status_query = "invoice_status = 'Sent' OR invoice_status = 'Viewed' OR invoice_status = 'Partial'";
-        $filter_summary['Status'] = 'Unpaid';
+        $filter_summary[__('Status')] = _x('Unpaid', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Overdue') {
         $status_query = "invoice_status = 'Sent' OR invoice_status = 'Viewed' OR invoice_status = 'Partial'";
         $overdue_query = "AND (invoice_due < CURDATE())";
-        $filter_summary['Status'] = 'Overdue';
+        $filter_summary[__('Status')] = _x('Overdue', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Paid') {
         $status_query = "invoice_status = 'Paid'";
-        $filter_summary['Status'] = 'Paid';
+        $filter_summary[__('Status')] = _x('Paid', 'invoices filter');
     } elseif (!empty($_POST['status']) && $_POST['status'] == 'Cancelled') {
         $status_query = "invoice_status IN ('Cancelled', 'Non-Billable')";
-        $filter_summary['Status'] = 'Cancelled or non-billable';
+        $filter_summary[__('Status')] = _x('Cancelled or non-billable', 'invoices filter');
     } else {
         // Default - any
         $status_query = "invoice_status LIKE '%'";
@@ -550,7 +550,7 @@ if (isExportRequest('export_invoices')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND (category_id = $filter_category_id)";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     } else {
         // Default - any
         $category_query = '';
@@ -561,7 +561,7 @@ if (isExportRequest('export_invoices')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Issued'] = $date_range;
+        $filter_summary[__('Issued')] = $date_range;
         $file_name_append = "-$dtf-to-$dtt";
     } else {
         $file_name_append = '';
@@ -570,7 +570,7 @@ if (isExportRequest('export_invoices')) {
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Get records from database - same shape as the invoices page list query
@@ -591,13 +591,13 @@ if (isExportRequest('export_invoices')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'invoices');
+    guardExportHasRows($num_rows, __('invoices'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('invoices', $format, $file_name_prepend . 'Invoices' . $file_name_append, 'Invoices', summarizeExportFilters($filter_summary));
+        $export = beginExport('invoices', $format, $file_name_prepend . 'Invoices' . $file_name_append, __('Invoices'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['invoice_number_display'] = $row['invoice_prefix'] . $row['invoice_number'];

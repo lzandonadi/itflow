@@ -398,5 +398,6 @@ return [
     'and %s more' => 'e mais %s',
     'All %s in the audit log' => 'Todos os %s no log de auditoria',
     'In the audit log' => 'No log de auditoria',
+    'services view::Active' => 'Ativos',
 
 ];

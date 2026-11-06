@@ -344,7 +344,7 @@ if (isExportRequest('export_recurring_invoices')) {
         $client_query = "AND recurring_invoice_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -356,10 +356,10 @@ if (isExportRequest('export_recurring_invoices')) {
     // Status Filter
     if (isset($_POST['status']) && $_POST['status'] === 'inactive') {
         $status_query = "AND recurring_invoice_status = 0";
-        $filter_summary['Status'] = 'Inactive';
+        $filter_summary[__('Status')] = _x('Inactive', 'recurring invoices filter');
     } elseif (isset($_POST['status']) && $_POST['status'] === 'active') {
         $status_query = "AND recurring_invoice_status = 1";
-        $filter_summary['Status'] = 'Active';
+        $filter_summary[__('Status')] = _x('Active', 'recurring invoices filter');
     } else {
         // Default - any
         $status_query = '';
@@ -370,13 +370,13 @@ if (isExportRequest('export_recurring_invoices')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Created'] = $date_range;
+        $filter_summary[__('Created')] = $date_range;
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Category Filter
@@ -384,7 +384,7 @@ if (isExportRequest('export_recurring_invoices')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND recurring_invoice_category_id = $filter_category_id";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     }
 
     $sql = mysqli_query(
@@ -405,13 +405,13 @@ if (isExportRequest('export_recurring_invoices')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'recurring invoices');
+    guardExportHasRows($num_rows, __('recurring invoices'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('recurring_invoices', $format, $file_name_prepend . 'RecurringInvoices', 'Recurring Invoices', summarizeExportFilters($filter_summary));
+        $export = beginExport('recurring_invoices', $format, $file_name_prepend . 'RecurringInvoices', __('Recurring Invoices'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['recurring_invoice_number_display'] = $row['recurring_invoice_prefix'] . $row['recurring_invoice_number'];

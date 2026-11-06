@@ -360,13 +360,13 @@ if (isExportRequest('export_expenses')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'expenses');
+    guardExportHasRows($num_rows, __('expenses'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('expenses', $format, "$session_company_name-Expenses", 'Expenses', summarizeExportFilters($filter_summary));
+        $export = beginExport('expenses', $format, "$session_company_name-Expenses", __('Expenses'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['expense_receipt_display'] = $row['expense_receipt'] ? 'Yes' : 'No';

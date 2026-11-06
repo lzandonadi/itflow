@@ -298,7 +298,7 @@ function serviceReviewPill($review, $use_text = false) {
 function serviceViews() {
     $active = 'services.service_archived_at IS NULL';
     return [
-        '' => ['label' => __('Active'), 'icon' => 'fa-stream', 'where' => $active, 'title' => __('Not archived')],
+        '' => ['label' => _x('Active', 'services view'), 'icon' => 'fa-stream', 'where' => $active, 'title' => __('Not archived')],
         'attention' => ['label' => __('Needs attention'), 'icon' => 'fa-exclamation-triangle', 'where' => "$active AND " . serviceAttentionSql(),
             'title' => __('Something it depends on is expiring, out of warranty, out of action or archived'), 'alarm' => 'danger'],
         'review' => ['label' => __('Review due'), 'icon' => 'fa-clipboard-check', 'where' => "$active AND " . serviceReviewDueSql(),

@@ -309,4 +309,7 @@ return [
     'Fill in the username, the password, or both.' => 'Preencha o usuário, a senha ou os dois.',
     'The link is not complete - copy the whole of it from the email, including everything after the #.' => 'O link está incompleto - copie-o inteiro do e-mail, incluindo tudo depois do #.',
 
+    // Client export (agent/js/client_export.js)
+    'The passwords do not match' => 'As senhas não conferem',
+
 ];

@@ -33,7 +33,7 @@ class ClientExportPdf extends TCPDF {
         $this->SetFont('dejavusans', '', 7.5);
         $this->SetTextColor(108, 117, 125);
         $this->Cell($width / 2, 4, $this->running_title, 0, 0, 'L');
-        $this->Cell($width / 2, 4, 'IT Documentation', 0, 1, 'R');
+        $this->Cell($width / 2, 4, __('IT Documentation'), 0, 1, 'R');
         $this->SetDrawColor(222, 226, 230);
         $this->SetLineWidth(0.2);
         $this->Line($margins['left'], 14, $this->getPageWidth() - $margins['right'], 14);
@@ -49,7 +49,7 @@ class ClientExportPdf extends TCPDF {
         $this->SetFont('dejavusans', '', 7.5);
         $this->SetTextColor(108, 117, 125);
         $this->Cell($width * 0.7, 4, $this->running_footer, 0, 0, 'L');
-        $this->Cell($width * 0.3, 4, 'Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 0, 'R');
+        $this->Cell($width * 0.3, 4, __('Page %1$s of %2$s', $this->getAliasNumPage(), $this->getAliasNbPages()), 0, 0, 'R');
     }
 
     public function Error($msg) {

@@ -1247,7 +1247,7 @@ if (isExportRequest('export_assets')) {
         $client_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT client_name FROM clients WHERE client_id = $client_id"));
         $client_name = $client_row['client_name'];
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -1260,14 +1260,14 @@ if (isExportRequest('export_assets')) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (asset_client_id = $filter_client_id)";
             $client_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT client_name FROM clients WHERE client_id = $filter_client_id"));
-            $filter_summary['Client'] = $client_row['client_name'] ?? '';
+            $filter_summary[__('Client')] = $client_row['client_name'] ?? '';
         }
     }
 
     // Archived Filter
     if (isset($_POST['archived']) && $_POST['archived'] == 1) {
         $archive_query = $client_id ? "asset_archived_at IS NOT NULL" : "(client_archived_at IS NOT NULL OR asset_archived_at IS NOT NULL)";
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     } else {
         $archive_query = $client_id ? "asset_archived_at IS NULL" : "(client_archived_at IS NULL AND asset_archived_at IS NULL)";
     }
@@ -1277,7 +1277,7 @@ if (isExportRequest('export_assets')) {
     $type = (string) ($_POST['type'] ?? '');
     if (isset($type_tabs[$type])) {
         $type_query = $type_tabs[$type]['query'];
-        $filter_summary['Type'] = $type_tabs[$type]['label'];
+        $filter_summary[__('Type')] = $type_tabs[$type]['label'];
     } else {
         // Default - any
         $type = '';
@@ -1288,7 +1288,7 @@ if (isExportRequest('export_assets')) {
     if (!empty($_POST['location'])) {
         $filter_location_id = intval($_POST['location']);
         $location_query = "AND (asset_location_id = $filter_location_id)";
-        $filter_summary['Location'] = exportRecordName('locations', $filter_location_id, 'location_name', 'location_client_id');
+        $filter_summary[__('Location')] = exportRecordName('locations', $filter_location_id, 'location_name', 'location_client_id');
     } else {
         // Default - any
         $location_query = '';
@@ -1298,7 +1298,7 @@ if (isExportRequest('export_assets')) {
     $status_filter = trim(strip_tags((string) ($_POST['status'] ?? '')));
     if ($status_filter !== '') {
         $status_query = "AND asset_status = '" . escapeSql($status_filter) . "'";
-        $filter_summary['Status'] = $status_filter;
+        $filter_summary[__('Status')] = $status_filter;
     } else {
         // Default - any
         $status_query = '';
@@ -1314,7 +1314,7 @@ if (isExportRequest('export_assets')) {
         while ($tag_row = mysqli_fetch_assoc($sql_tags)) {
             $tag_names[] = $tag_row['tag_name'];
         }
-        $filter_summary['Tags'] = implode(', ', $tag_names);
+        $filter_summary[__('Tags')] = implode(', ', $tag_names);
     } else {
         // Default - any
         $tag_query = '';
@@ -1324,11 +1324,11 @@ if (isExportRequest('export_assets')) {
     if (!empty($_POST['expire_days'])) {
         if ($_POST['expire_days'] == "expired") {
             $expire_query = "AND (asset_warranty_expire IS NOT NULL AND asset_warranty_expire != '0000-00-00' AND asset_warranty_expire < CURDATE())";
-            $filter_summary['Warranty'] = 'Expired';
+            $filter_summary[__('Warranty')] = _x('Expired', 'export expiry');
         } else {
             $expire_days = intval($_POST['expire_days']);
             $expire_query = "AND (asset_warranty_expire IS NOT NULL AND asset_warranty_expire != '0000-00-00' AND asset_warranty_expire BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL $expire_days DAY))";
-            $filter_summary['Warranty'] = "Expiring within $expire_days days";
+            $filter_summary[__('Warranty')] = _n('Expiring within %d day', 'Expiring within %d days', $expire_days);
         }
     } else {
         // Default - any
@@ -1338,7 +1338,7 @@ if (isExportRequest('export_assets')) {
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Get records from database - same shape as the assets page list query
@@ -1365,13 +1365,13 @@ if (isExportRequest('export_assets')) {
     );
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'assets');
+    guardExportHasRows($num_rows, __('assets'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('assets', $format, $file_name_prepend . 'Assets', 'Assets', summarizeExportFilters($filter_summary));
+        $export = beginExport('assets', $format, $file_name_prepend . 'Assets', __('Assets'), summarizeExportFilters($filter_summary));
 
         // Each with its details, should any of their columns be picked (functions/asset_type.php)
         $export_rows = [];

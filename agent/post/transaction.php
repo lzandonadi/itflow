@@ -26,7 +26,7 @@ if (isExportRequest('export_transactions')) {
     }
     $where = accountLedgerFiltersSql($_POST, $filter_summary, true, !$account);
     if ($account) {
-        $filter_summary = ['Account' => $account['account_name']] + $filter_summary;
+        $filter_summary = [__('Account') => $account['account_name']] + $filter_summary;
     }
     $kinds = accountLedgerKinds();
 
@@ -35,14 +35,14 @@ if (isExportRequest('export_transactions')) {
         ORDER BY ledger.txn_date ASC, ledger.txn_created_at ASC, ledger.txn_order ASC, ledger.txn_id ASC");
 
     $num_rows = mysqli_num_rows($sql);
-    guardExportHasRows($num_rows, 'transactions');
+    guardExportHasRows($num_rows, __('transactions'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
         $name = $account ? $account['account_name'] : 'All accounts';
-        $export = beginExport('transactions', $format, "$session_company_name-$name-Transactions", "$name - Transactions", summarizeExportFilters($filter_summary));
+        $export = beginExport('transactions', $format, "$session_company_name-$name-Transactions", __('%s - Transactions', $name), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row = accountLedgerVisible($row);

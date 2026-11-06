@@ -498,16 +498,16 @@ if (isExportRequest('export_projects')) {
         enforceClientAccess();
         $where[] = "AND project_client_id = $client_id";
         $file_name_prepend = getFieldById('clients', $client_id, 'client_name') . '-';
-        $filter_summary['Client'] = getFieldById('clients', $client_id, 'client_name');
+        $filter_summary[__('Client')] = getFieldById('clients', $client_id, 'client_name');
     } else {
         $file_name_prepend = "$session_company_name-";
         $client_filter = (string) ($_POST['client'] ?? '');
         if ($client_filter === 'internal') {
             $where[] = 'AND project_client_id = 0';
-            $filter_summary['Client'] = 'Internal';
+            $filter_summary[__('Client')] = __('Internal');
         } elseif (intval($client_filter)) {
             $where[] = 'AND project_client_id = ' . intval($client_filter);
-            $filter_summary['Client'] = exportClientName($client_filter);
+            $filter_summary[__('Client')] = exportClientName($client_filter);
         }
     }
 
@@ -519,20 +519,20 @@ if (isExportRequest('export_projects')) {
     if ($views[$show]['where'] !== '') {
         $where[] = 'AND ' . $views[$show]['where'];
     }
-    $filter_summary['Showing'] = $views[$show]['label'];
+    $filter_summary[__('Showing')] = $views[$show]['label'];
 
     $manager = (string) ($_POST['manager'] ?? '');
     if ($manager === 'none') {
         $where[] = 'AND project_manager = 0';
-        $filter_summary['Manager'] = 'None';
+        $filter_summary[__('Manager')] = __('None');
     } elseif (intval($manager)) {
         $where[] = 'AND project_manager = ' . intval($manager);
-        $filter_summary['Manager'] = getFieldById('users', intval($manager), 'user_name');
+        $filter_summary[__('Manager')] = getFieldById('users', intval($manager), 'user_name');
     }
 
     $q = escapeSql($_POST['q'] ?? '');
     if ($q !== '') {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query($mysqli, "SELECT projects.*, client_name, user_name, contact_name
@@ -556,7 +556,7 @@ if (isExportRequest('export_projects')) {
         guardExportPdfRowCount($format, $num_rows);
 
         $stats = projectStats(array_keys($rows));
-        $export = beginExport('projects', $format, $file_name_prepend . 'Projects', 'Projects', summarizeExportFilters($filter_summary));
+        $export = beginExport('projects', $format, $file_name_prepend . 'Projects', __('Projects'), summarizeExportFilters($filter_summary));
 
         foreach ($rows as $project_id => $row) {
             $s = $stats[$project_id];

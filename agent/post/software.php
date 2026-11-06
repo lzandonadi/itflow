@@ -461,7 +461,7 @@ if (isExportRequest('export_software')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -469,7 +469,7 @@ if (isExportRequest('export_software')) {
         $client_query = "AND software_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
 
@@ -483,7 +483,7 @@ if (isExportRequest('export_software')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (software_client_id = $filter_client_id)";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
 
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR software_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND software_archived_at IS NULL)";
@@ -493,11 +493,11 @@ if (isExportRequest('export_software')) {
     if (!empty($_POST['expire_days'])) {
         if ($_POST['expire_days'] == "expired") {
             $expire_query = "AND (software_expire IS NOT NULL AND software_expire != '0000-00-00' AND software_expire < CURDATE())";
-            $filter_summary['Expiry'] = 'Expired';
+            $filter_summary[__('Expiry')] = _x('Expired', 'export expiry');
         } else {
             $expire_days = intval($_POST['expire_days']);
             $expire_query = "AND (software_expire IS NOT NULL AND software_expire != '0000-00-00' AND software_expire BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL $expire_days DAY))";
-            $filter_summary['Expiry'] = "Expiring within $expire_days days";
+            $filter_summary[__('Expiry')] = _n('Expiring within %d day', 'Expiring within %d days', $expire_days);
         }
     } else {
         // Default - any
@@ -510,7 +510,7 @@ if (isExportRequest('export_software')) {
     $status_query = '';
     if (isset($status_filters[$status])) {
         $status_query = "AND ({$status_filters[$status]['sql']})";
-        $filter_summary['Showing'] = $status_filters[$status]['label'];
+        $filter_summary[__('Showing')] = $status_filters[$status]['label'];
     }
 
     // Software type
@@ -518,14 +518,14 @@ if (isExportRequest('export_software')) {
     $software_type_query = '';
     if ($software_type_filter !== '') {
         $software_type_query = "AND software_type = '" . escapeSql($software_type_filter) . "'";
-        $filter_summary['Software Type'] = $software_type_filter;
+        $filter_summary[__('Software Type')] = $software_type_filter;
     }
 
     // License type
     $license_type_query = '';
     if (!empty($_POST['license_type'])) {
         $license_type_query = "AND software_license_type = '" . escapeSql($_POST['license_type']) . "'";
-        $filter_summary['License Type'] = $_POST['license_type'];
+        $filter_summary[__('License Type')] = softwareLicenseTypeLabel($_POST['license_type']);
     }
 
     // Tags - a license with any of them
@@ -534,7 +534,7 @@ if (isExportRequest('export_software')) {
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Who is on each license, in the same query - not two more queries per row
@@ -570,13 +570,13 @@ if (isExportRequest('export_software')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'licenses');
+    guardExportHasRows($num_rows, __('licenses'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('software', $format, $file_name_prepend . 'Licenses', 'Licenses', summarizeExportFilters($filter_summary));
+        $export = beginExport('software', $format, $file_name_prepend . 'Licenses', __('Licenses'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['assigned_to_assets'] = (string) $row['assigned_to_assets'];

@@ -492,7 +492,7 @@ if (isExportRequest('export_quotes')) {
         $client_query = "AND quote_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -506,13 +506,13 @@ if (isExportRequest('export_quotes')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Dated'] = $date_range;
+        $filter_summary[__('Dated')] = $date_range;
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Category Filter
@@ -520,7 +520,7 @@ if (isExportRequest('export_quotes')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND quote_category_id = $filter_category_id";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     }
 
     $sql = mysqli_query(
@@ -539,13 +539,13 @@ if (isExportRequest('export_quotes')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'quotes');
+    guardExportHasRows($num_rows, __('quotes'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('quotes', $format, $file_name_prepend . 'Quotes', 'Quotes', summarizeExportFilters($filter_summary));
+        $export = beginExport('quotes', $format, $file_name_prepend . 'Quotes', __('Quotes'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['quote_number_display'] = $row['quote_prefix'] . $row['quote_number'];

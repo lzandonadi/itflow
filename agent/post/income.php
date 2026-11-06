@@ -195,13 +195,13 @@ if (isExportRequest('export_income')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'income entries');
+    guardExportHasRows($num_rows, __('income entries'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('income', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Income', 'Income', summarizeExportFilters($filter_summary));
+        $export = beginExport('income', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Income', __('Income'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $is_payment = $row['income_type'] === 'payment';

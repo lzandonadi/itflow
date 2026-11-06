@@ -426,13 +426,13 @@ if (isExportRequest('export_services')) {
         enforceClientAccess();
         $where[] = "AND service_client_id = $client_id";
         $file_name_prepend = getFieldById('clients', $client_id, 'client_name') . '-';
-        $filter_summary['Client'] = getFieldById('clients', $client_id, 'client_name');
+        $filter_summary[__('Client')] = getFieldById('clients', $client_id, 'client_name');
     } else {
         $file_name_prepend = "$session_company_name-";
         $where[] = 'AND clients.client_archived_at IS NULL';
         if (intval($_POST['client'] ?? 0)) {
             $where[] = 'AND service_client_id = ' . intval($_POST['client']);
-            $filter_summary['Client'] = exportClientName($_POST['client']);
+            $filter_summary[__('Client')] = exportClientName($_POST['client']);
         }
     }
 
@@ -444,23 +444,23 @@ if (isExportRequest('export_services')) {
     if ($views[$show]['where'] !== '') {
         $where[] = 'AND ' . $views[$show]['where'];
     }
-    $filter_summary['Showing'] = $views[$show]['label'];
+    $filter_summary[__('Showing')] = $views[$show]['label'];
 
     if (in_array($_POST['importance'] ?? '', SERVICE_IMPORTANCE, true)) {
         $where[] = "AND service_importance = '{$_POST['importance']}'";
-        $filter_summary['Importance'] = $_POST['importance'];
+        $filter_summary[__('Importance')] = serviceImportanceLabel($_POST['importance']);
     }
     $category = trim((string) ($_POST['category'] ?? ''));
     if ($category !== '') {
         $where[] = "AND service_category = '" . escapeSql($category) . "'";
-        $filter_summary['Category'] = $category;
+        $filter_summary[__('Category')] = $category;
     }
 
     $where[] = tagExportFilterSql('service', $_POST['tags'] ?? [], $filter_summary, 'services.service_id');
 
     $q = escapeSql($_POST['q'] ?? '');
     if ($q !== '') {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query($mysqli, "SELECT services.*, client_name, " . tagNamesSql('service', 'services.service_id') . " AS service_tags FROM services
@@ -498,7 +498,7 @@ if (isExportRequest('export_services')) {
             }
         }
 
-        $export = beginExport('services', $format, $file_name_prepend . 'Services', 'Services', summarizeExportFilters($filter_summary));
+        $export = beginExport('services', $format, $file_name_prepend . 'Services', __('Services'), summarizeExportFilters($filter_summary));
 
         foreach ($rows as $service_id => $row) {
             $review = serviceReview($row);

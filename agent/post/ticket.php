@@ -1629,7 +1629,7 @@ if (isExportRequest('export_tickets')) {
         $client_query = "AND ticket_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -1641,7 +1641,7 @@ if (isExportRequest('export_tickets')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND ticket_client_id = $filter_client_id";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
     }
 
@@ -1651,21 +1651,21 @@ if (isExportRequest('export_tickets')) {
         $ticket_status_snippet = "ticket_status IN ($status_ids)";
 
         $status_names = [];
-        $sql_statuses = mysqli_query($mysqli, "SELECT ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_name ASC");
+        $sql_statuses = mysqli_query($mysqli, "SELECT ticket_status_id, ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_name ASC");
         while ($status_row = mysqli_fetch_assoc($sql_statuses)) {
-            $status_names[] = $status_row['ticket_status_name'];
+            $status_names[] = ticketStatusLabel($status_row['ticket_status_id'], $status_row['ticket_status_name']);
         }
-        $filter_summary['Status'] = implode(', ', $status_names);
+        $filter_summary[__('Status')] = implode(', ', $status_names);
     } elseif (!empty($_POST['resolution']) && $_POST['resolution'] == 'Closed') {
         $ticket_status_snippet = "ticket_resolved_at IS NOT NULL";
-        $filter_summary['Status'] = 'Closed';
+        $filter_summary[__('Status')] = _x('Closed', 'tickets view');
     } elseif (!empty($_POST['resolution']) && $_POST['resolution'] == 'All') {
         $ticket_status_snippet = "1 = 1";
-        $filter_summary['Status'] = 'Open and closed';
+        $filter_summary[__('Status')] = __('Open and closed');
     } else {
         // Default - open tickets
         $ticket_status_snippet = "ticket_resolved_at IS NULL";
-        $filter_summary['Status'] = 'Open';
+        $filter_summary[__('Status')] = _x('Open', 'tickets view');
     }
 
     // Billing Filter - same values the tickets page offers
@@ -1673,13 +1673,13 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['billing'])) {
         if ($_POST['billing'] == 'unbilled') {
             $ticket_billable_snippet = "AND ticket_billable = 1 AND ticket_invoice_id = 0";
-            $filter_summary['Billing'] = 'Billable, not invoiced';
+            $filter_summary[__('Billing')] = __('Billable, not invoiced');
         } elseif ($_POST['billing'] == 'invoiced') {
             $ticket_billable_snippet = "AND ticket_invoice_id > 0";
-            $filter_summary['Billing'] = 'Invoiced';
+            $filter_summary[__('Billing')] = __('Invoiced');
         } elseif ($_POST['billing'] == 'nonbillable') {
             $ticket_billable_snippet = "AND ticket_billable = 0";
-            $filter_summary['Billing'] = 'Not billable';
+            $filter_summary[__('Billing')] = __('Not billable');
         }
     }
 
@@ -1687,7 +1687,7 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND (ticket_category = $filter_category_id)";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     } else {
         // Default - any
         $category_query = '';
@@ -1697,11 +1697,11 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['assigned'])) {
         if ($_POST['assigned'] == 'unassigned') {
             $ticket_assigned_query = 'AND ticket_assigned_to = 0';
-            $filter_summary['Assigned'] = 'Unassigned';
+            $filter_summary[__('Assigned')] = __('Unassigned');
         } else {
             $filter_user_id = intval($_POST['assigned']);
             $ticket_assigned_query = "AND ticket_assigned_to = $filter_user_id";
-            $filter_summary['Assigned'] = getFieldById('users', $filter_user_id, 'user_name');
+            $filter_summary[__('Assigned')] = getFieldById('users', $filter_user_id, 'user_name');
         }
     } else {
         // Default - any
@@ -1714,20 +1714,20 @@ if (isExportRequest('export_tickets')) {
         $sla_filter = $_POST['sla'];
         if ($sla_filter == 'breached') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND (ticket_response_sla_alert_stage = 2 OR ticket_resolution_sla_alert_stage = 2 OR ticket_response_sla_met = 0 OR ticket_resolution_sla_met = 0)';
-            $filter_summary['SLA'] = 'SLA breached';
+            $filter_summary[__('SLA')] = __('SLA breached');
         } elseif ($sla_filter == 'at_risk') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND COALESCE(ticket_status_pauses_sla, 0) = 0 AND (ticket_response_sla_alert_stage = 1 OR ticket_resolution_sla_alert_stage = 1)';
-            $filter_summary['SLA'] = 'SLA at risk';
+            $filter_summary[__('SLA')] = __('SLA at risk');
         } elseif ($sla_filter == 'paused') {
             // Mirrors agent/tickets.php - finished tickets have a verdict, not a pause
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND ticket_status_pauses_sla = 1 AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL';
-            $filter_summary['SLA'] = 'SLA paused';
+            $filter_summary[__('SLA')] = __('SLA paused');
         } elseif ($sla_filter == 'met') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND ticket_response_sla_met = 1 AND (ticket_resolution_sla_met = 1 OR ticket_resolution_due_at IS NULL)';
-            $filter_summary['SLA'] = 'SLA met';
+            $filter_summary[__('SLA')] = __('SLA met');
         } elseif ($sla_filter == 'none') {
             $ticket_sla_query = 'AND ticket_sla_id = 0';
-            $filter_summary['SLA'] = 'No SLA';
+            $filter_summary[__('SLA')] = __('No SLA');
         }
     }
 
@@ -1735,7 +1735,7 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['project']) && $_POST['project'] > '0') {
         $filter_project_id = intval($_POST['project']);
         $ticket_project_snippet = "AND ticket_project_id = $filter_project_id";
-        $filter_summary['Project'] = exportRecordName('projects', $filter_project_id, 'project_name', 'project_client_id');
+        $filter_summary[__('Project')] = exportRecordName('projects', $filter_project_id, 'project_name', 'project_client_id');
     } else {
         // Default - any, including tickets without a project
         $ticket_project_snippet = '';
@@ -1749,13 +1749,13 @@ if (isExportRequest('export_tickets')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Opened'] = $date_range;
+        $filter_summary[__('Opened')] = $date_range;
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Tags - a ticket with any of them
@@ -1792,13 +1792,13 @@ if (isExportRequest('export_tickets')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'tickets');
+    guardExportHasRows($num_rows, __('tickets'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('tickets', $format, $file_name_prepend . 'Tickets', 'Tickets', summarizeExportFilters($filter_summary));
+        $export = beginExport('tickets', $format, $file_name_prepend . 'Tickets', __('Tickets'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             // Per-ticket prefix where the row carries one, config default otherwise

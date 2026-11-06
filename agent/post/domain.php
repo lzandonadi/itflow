@@ -433,7 +433,7 @@ if (isExportRequest('export_domains')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -441,7 +441,7 @@ if (isExportRequest('export_domains')) {
         $client_query = "AND domain_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
 
@@ -455,7 +455,7 @@ if (isExportRequest('export_domains')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (domain_client_id = $filter_client_id)";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
 
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR domain_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND domain_archived_at IS NULL)";
@@ -466,11 +466,11 @@ if (isExportRequest('export_domains')) {
     if (!empty($_POST['expire_days'])) {
         if ($_POST['expire_days'] == "expired") {
             $expire_query = "AND (domain_expire IS NOT NULL AND domain_expire < CURDATE())";
-            $filter_summary['Expiry'] = 'Expired';
+            $filter_summary[__('Expiry')] = _x('Expired', 'export expiry');
         } else {
             $expire_days = intval($_POST['expire_days']);
             $expire_query = "AND (domain_expire IS NOT NULL AND domain_expire BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL $expire_days DAY))";
-            $filter_summary['Expiry'] = "Expiring within $expire_days days";
+            $filter_summary[__('Expiry')] = _n('Expiring within %d day', 'Expiring within %d days', $expire_days);
         }
     }
 
@@ -486,13 +486,13 @@ if (isExportRequest('export_domains')) {
     if (!empty($_POST['vendor'])) {
         $vendor_filter = intval($_POST['vendor']);
         $vendor_query = "AND $vendor_filter IN (domain_registrar, domain_dnshost, domain_webhost, domain_mailhost)";
-        $filter_summary['Vendor'] = exportRecordName('vendors', $vendor_filter, 'vendor_name', 'vendor_client_id');
+        $filter_summary[__('Vendor')] = exportRecordName('vendors', $vendor_filter, 'vendor_name', 'vendor_client_id');
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     [$domain_columns, $domain_joins] = domainSelectSql();
@@ -518,13 +518,13 @@ if (isExportRequest('export_domains')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'domains');
+    guardExportHasRows($num_rows, __('domains'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('domains', $format, $file_name_prepend . 'Domains', 'Domains', summarizeExportFilters($filter_summary));
+        $export = beginExport('domains', $format, $file_name_prepend . 'Domains', __('Domains'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);

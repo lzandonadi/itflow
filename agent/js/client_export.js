@@ -60,11 +60,11 @@
         // The two passwords have to match before anything is sent
         if (passwords.length === 2) {
             passwords[1].addEventListener('input', function () {
-                passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : 'The passwords do not match');
+                passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : __('The passwords do not match'));
             });
             passwords[0].addEventListener('input', function () {
                 if (passwords[1].value !== '') {
-                    passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : 'The passwords do not match');
+                    passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : __('The passwords do not match'));
                 }
             });
         }

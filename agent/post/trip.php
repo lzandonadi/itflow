@@ -306,13 +306,13 @@ if (isExportRequest('export_trips')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'trips');
+    guardExportHasRows($num_rows, __('trips'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('trips', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Trips', 'Trips', summarizeExportFilters($filter_summary));
+        $export = beginExport('trips', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Trips', __('Trips'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['user_name'] = $row['driver_name'];
