@@ -26,7 +26,7 @@ O sistema SHALL usar os status Draft, Active, Cancelled e Ended. Na tarefa notur
 - **THEN** o responsável pelo contrato é lembrado
 
 ### Requirement: Condições do contrato em vigor
-O sistema SHALL aplicar, enquanto o contrato está em vigor, o SLA dele para cada prioridade, o valor por hora dele (o valor fora de horário para chamados abertos fora do expediente) e o prazo de pagamento dele em faturas novas. Sem contrato em vigor, SHALL valer o padrão da instalação. Com dois em vigor, SHALL valer o que começou por último.
+O sistema SHALL aplicar, enquanto o contrato está em vigor, o SLA dele para cada prioridade, o valor por hora dele (o valor fora de horário para chamados abertos fora do expediente) e o prazo de pagamento dele em faturas novas. Cada condição SHALL ser decidida separadamente: vale o contrato em vigor que começou por último entre os que definem aquela condição e, se nenhum define, o padrão da instalação. Para o tempo de um chamado, conta o contrato em vigor na data em que o chamado foi concluído.
 
 #### Scenario: Chamado aberto fora do expediente
 - **WHEN** o tempo de um chamado aberto fora do horário comercial é faturado e o contrato em vigor define valor fora de horário
@@ -35,6 +35,10 @@ O sistema SHALL aplicar, enquanto o contrato está em vigor, o SLA dele para cad
 #### Scenario: Cliente sem contrato
 - **WHEN** o cliente não tem contrato em vigor
 - **THEN** valem o valor por hora e o prazo de pagamento padrão da instalação
+
+#### Scenario: Contrato mais novo sem valor por hora
+- **WHEN** o cliente tem dois contratos em vigor e o mais recente não define valor por hora
+- **THEN** o tempo é cobrado pelo valor do contrato mais antigo, e o prazo de pagamento vem do mais recente se ele o definir
 
 ### Requirement: Assinatura online
 O sistema SHALL enviar o contrato para assinatura como um documento fixado no envio, identificado por hash, com link próprio. O cliente assina pelo link ou pelo portal, informando o nome, desenhando ou digitando a assinatura e marcando que concorda. A equipe é avisada da assinatura do cliente. Um técnico então contra-assina, o PDF assinado vai para o cliente e o rascunho se torna ativo. Contratos encerrados ou cancelados e clientes arquivados não SHALL receber pedido de assinatura.
