@@ -18,9 +18,16 @@ DEFINE("BACKUP_TYPE_FULL", "full");
 DEFINE("BACKUP_TYPE_DATABASE", "database");
 DEFINE("BACKUP_TYPE_MASTER_KEY", "master_key");
 
+// Turning the PHP engine off is a mod_php directive: Apache running PHP through PHP-FPM
+// does not know php_flag and answers 500 for everything under a .htaccess that has it.
+// Wrapped, it stays a second barrier under mod_php and is skipped elsewhere, where the
+// deny rules around it do the work. The same text is in the .htaccess files in git
+// (uploads/, its private subfolders and scripts/), which must match what is written here.
+DEFINE("BACKUP_UPLOADS_PHP_OFF", "<IfModule mod_php.c>\n  php_flag engine off\n</IfModule>\n");
+
 // The deny-all guard written into upload directories that must never be served. Kept in one
 // place so the restore path and the storage-dir hardening agree on what "our guard" is.
-DEFINE("BACKUP_UPLOADS_DENY_GUARD", "Require all denied\nOptions -ExecCGI -Indexes\nphp_flag engine off\n");
+DEFINE("BACKUP_UPLOADS_DENY_GUARD", "Require all denied\nOptions -ExecCGI -Indexes\n" . BACKUP_UPLOADS_PHP_OFF);
 
 /**
  * The backup types that can be produced without a logged-in user.
@@ -226,7 +233,8 @@ function backupAssertUploadsGuards(): void
     }
 
     $htaccess = $uploads . "/.htaccess";
-    $wanted = "Options -ExecCGI -Indexes\nphp_flag engine off\nRemoveHandler .php .phtml .phar .phps\nRemoveType .php .phtml .phar .phps\n<FilesMatch \"\\.(php|phtml|phar|phps|cgi|pl|sh)\$\">\n  Require all denied\n</FilesMatch>\n";
+    // The same text as uploads/.htaccess in git - the engine-off line only applies under mod_php
+    $wanted = "Options -ExecCGI -Indexes\n" . BACKUP_UPLOADS_PHP_OFF . "RemoveHandler .php .phtml .phar .phps\nRemoveType .php .phtml .phar .phps\n<FilesMatch \"\\.(php|phtml|phar|phps|cgi|pl|sh)\$\">\n  Require all denied\n</FilesMatch>\n";
 
     // Overwrite unconditionally - an archive is allowed to carry a .htaccess, it is not
     // allowed to decide what ours says.
