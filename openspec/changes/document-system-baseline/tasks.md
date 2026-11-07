@@ -18,7 +18,7 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 
 - [x] 3.1 Verificar e completar `invoicing`: transições de status (quem muda para Viewed, Overdue e Cancelled), regras de numeração, recorrentes, multas, lembretes, extratos; verificar rodando `ddev exec php cron/nightly_tasks.php` com uma fatura vencida há 30 dias
 - [x] 3.2 Verificar e completar `online-payments`: pagamento múltiplo, autopay, recusa, taxas; verificar lendo `functions/billing_pay.php`, o bloco de autopay de `cron/nightly_tasks.php` e `cron/payment_provider_fees.php` (sem Stripe real no DDEV)
-- [ ] 3.3 Verificar e completar `contracts`: ciclo de vida, condições em vigor, assinatura, horas pré-pagas; reproduzir uma assinatura completa pelo link guest e um consumo parcial de horas
+- [x] 3.3 Verificar e completar `contracts`: ciclo de vida, condições em vigor, assinatura, horas pré-pagas; reproduzir uma assinatura completa pelo link guest e um consumo parcial de horas
 
 ## 4. Atendimento
 

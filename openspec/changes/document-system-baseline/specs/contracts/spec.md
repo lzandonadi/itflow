@@ -7,11 +7,19 @@ Define o contrato com cada cliente: ciclo de vida, renovação e aviso prévio, 
 ## ADDED Requirements
 
 ### Requirement: Ciclo de vida do contrato
-O sistema SHALL criar contratos como rascunho até serem ativados. Na tarefa noturna, SHALL renovar no fim do período o contrato com renovação automática, encerrar o que não renova e lembrar o responsável antes da data de aviso prévio. Contratos cancelados SHALL ser mantidos.
+O sistema SHALL usar os status Draft, Active, Cancelled e Ended. Na tarefa noturna, SHALL renovar no fim do período o contrato com renovação automática, encerrar o que não renova (avisando a equipe) e lembrar o responsável, uma única vez, antes da data de aviso prévio. Um contrato cancelado SHALL continuar em vigor até a data de término.
 
 #### Scenario: Fim do período com renovação automática
 - **WHEN** chega o fim do período de um contrato ativo com renovação automática
 - **THEN** a tarefa noturna renova o contrato
+
+#### Scenario: Renovação atrasada por vários períodos
+- **WHEN** a tarefa noturna encontra um contrato com renovação automática cujo fim passou há mais de um período
+- **THEN** o contrato é renovado até o primeiro período que ainda não terminou
+
+#### Scenario: Contrato termina sem renovação
+- **WHEN** chega o fim de um contrato ativo sem renovação automática
+- **THEN** o status passa a Ended, a equipe é avisada e as faturas recorrentes ligadas a ele são pausadas
 
 #### Scenario: Data de aviso prévio se aproximando
 - **WHEN** a data limite para avisar o encerramento está próxima
@@ -29,11 +37,15 @@ O sistema SHALL aplicar, enquanto o contrato está em vigor, o SLA dele para cad
 - **THEN** valem o valor por hora e o prazo de pagamento padrão da instalação
 
 ### Requirement: Assinatura online
-O sistema SHALL enviar o contrato para assinatura como um documento fixado no envio, identificado por hash, com link próprio. O cliente assina pelo link ou pelo portal, informando o nome e desenhando ou digitando a assinatura. Um técnico então contra-assina, o PDF assinado vai para o cliente e o rascunho se torna ativo.
+O sistema SHALL enviar o contrato para assinatura como um documento fixado no envio, identificado por hash, com link próprio. O cliente assina pelo link ou pelo portal, informando o nome, desenhando ou digitando a assinatura e marcando que concorda. A equipe é avisada da assinatura do cliente. Um técnico então contra-assina, o PDF assinado vai para o cliente e o rascunho se torna ativo. Contratos encerrados ou cancelados e clientes arquivados não SHALL receber pedido de assinatura.
 
 #### Scenario: Assinatura completa
 - **WHEN** o cliente assina e um técnico contra-assina
 - **THEN** o contrato fica ativo e o cliente recebe o PDF assinado
+
+#### Scenario: Documento muda enquanto o cliente lê
+- **WHEN** o cliente envia a assinatura de uma versão do documento diferente da que está no pedido
+- **THEN** a assinatura é recusada e o cliente é orientado a ler o contrato de novo
 
 ### Requirement: Pedido de assinatura retirado quando o documento muda
 O sistema SHALL retirar o pedido de assinatura em aberto quando o contrato for alterado e o documento resultante mudar, ou quando o contrato for cancelado, terminar ou o cliente for arquivado. Nada SHALL ser assinado em um pedido retirado, e os pedidos anteriores SHALL ser mantidos.
@@ -43,7 +55,7 @@ O sistema SHALL retirar o pedido de assinatura em aberto quando o contrato for a
 - **THEN** o link enviado deixa de permitir assinar e um novo envio é necessário
 
 ### Requirement: Horas pré-pagas consumidas pelos chamados
-O sistema SHALL consumir as horas pré-pagas do contrato com o tempo dos chamados do cliente que estejam faturáveis e resolvidos ou fechados, começando pelo bloco que vence primeiro e arredondando pelas regras de faturamento. O excedente SHALL continuar no tempo não faturado. O responsável SHALL ser avisado uma vez quando as horas ficarem baixas.
+O sistema SHALL consumir as horas pré-pagas dos contratos ativos do cliente com o tempo dos chamados faturáveis e resolvidos ou fechados, começando pelo bloco que vence primeiro, mesmo que seja de outro contrato, e arredondando pelas regras de faturamento. Um bloco só cobre chamados concluídos entre a data da compra e a do vencimento dele. O excedente SHALL continuar no tempo não faturado. O responsável SHALL ser avisado uma vez quando as horas ficarem baixas.
 
 #### Scenario: Chamado totalmente coberto
 - **WHEN** um chamado resolvido faturável usa 2 horas e o contrato tem 10 horas disponíveis
@@ -52,3 +64,7 @@ O sistema SHALL consumir as horas pré-pagas do contrato com o tempo dos chamado
 #### Scenario: Chamado parcialmente coberto
 - **WHEN** um chamado usa 3 horas e restam 2 horas no contrato
 - **THEN** 2 horas são consumidas e 1 hora fica no tempo não faturado
+
+#### Scenario: Chamado concluído antes da compra das horas
+- **WHEN** um chamado foi resolvido um dia antes da compra do único bloco de horas do cliente
+- **THEN** nada é consumido e o chamado fica no tempo não faturado
