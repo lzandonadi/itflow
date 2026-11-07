@@ -272,7 +272,7 @@ if ($config_enable_alert_domain_expire == 1) {
 
             // Auto-renew still fails on an expired card, so it is said rather than skipped
             $domain_renewal = intval($row['domain_auto_renew']) ? ' - set to auto-renew, check it goes through' : '';
-            appNotify("Domain Expiring", "Domain $domain_name for $client_name will expire in $day Days on $domain_expire$domain_renewal", "/agent/domains.php?client_id=$client_id&open=$domain_id", $client_id);
+            appNotifyOncePerDay("Domain Expiring", "Domain $domain_name for $client_name will expire in $day Days on $domain_expire$domain_renewal", "/agent/domains.php?client_id=$client_id&open=$domain_id", $client_id);
 
         }
 
@@ -315,7 +315,7 @@ foreach ($certificateAlertArray as $day) {
         }
 
         $renewal = $short_lived ? ' - it renews itself, so check why it has not' : '';
-        appNotify("Certificate Expiring", "Certificate $certificate_name for $client_name will expire in $day day(s) on $certificate_expire$renewal", "/agent/certificates.php?client_id=$client_id&open=$certificate_id", $client_id);
+        appNotifyOncePerDay("Certificate Expiring", "Certificate $certificate_name for $client_name will expire in $day day(s) on $certificate_expire$renewal", "/agent/certificates.php?client_id=$client_id&open=$certificate_id", $client_id);
 
     }
 
@@ -331,7 +331,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $api_key_id = intval($row['api_key_id']);
     $api_key_name = escapeSql($row['api_key_name']);
     $api_key_expire = escapeSql($row['api_key_expire']);
-    appNotify("API Key Expiring", "API key $api_key_name will expire in 7 days on $api_key_expire", "/admin/api_keys.php", 0, $api_key_id);
+    appNotifyOncePerDay("API Key Expiring", "API key $api_key_name will expire in 7 days on $api_key_expire", "/admin/api_keys.php", 0, $api_key_id);
 }
 
 // Asset Warranties Expiring
@@ -355,7 +355,7 @@ foreach ($warranty_alert_array as $day) {
         $client_id = intval($row['client_id']);
         $client_name = escapeSql($row['client_name']);
 
-        appNotify("Asset Warranty Expiring", "Asset $asset_name warranty for $client_name will expire in $day Days on $asset_warranty_expire", "/agent/assets.php?client_id=$client_id", $client_id);
+        appNotifyOncePerDay("Asset Warranty Expiring", "Asset $asset_name warranty for $client_name will expire in $day Days on $asset_warranty_expire", "/agent/assets.php?client_id=$client_id", $client_id);
 
     }
 
@@ -373,7 +373,7 @@ foreach (assetSpecsReady() ? $warranty_alert_array : [] as $day) {
     while ($row = mysqli_fetch_assoc($sql)) {
         $asset_id = intval($row['asset_id']);
         $client_id = intval($row['client_id']);
-        appNotify("UPS Battery Due", "The battery in " . escapeSql($row['asset_name']) . " for " . escapeSql($row['client_name']) . " is due for replacing in $day day" . ($day === 1 ? '' : 's') . ", on " . escapeSql($row['asset_spec_value']),
+        appNotifyOncePerDay("UPS Battery Due", "The battery in " . escapeSql($row['asset_name']) . " for " . escapeSql($row['client_name']) . " is due for replacing in $day day" . ($day === 1 ? '' : 's') . ", on " . escapeSql($row['asset_spec_value']),
             "/agent/asset.php?client_id=$client_id&asset_id=$asset_id", $client_id);
     }
 }
@@ -387,7 +387,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $service_name = escapeSql($row['service_name']);
     $client_id = intval($row['client_id']);
     $client_name = escapeSql($row['client_name']);
-    appNotify("Service Review", "Service $service_name for $client_name (" . escapeSql($row['service_importance']) . " importance) is due for review today", "/agent/" . serviceUrl($service_id, $client_id), $client_id);
+    appNotifyOncePerDay("Service Review", "Service $service_name for $client_name (" . escapeSql($row['service_importance']) . " importance) is due for review today", "/agent/" . serviceUrl($service_id, $client_id), $client_id);
 }
 
 // Notify of New Tickets
@@ -398,7 +398,7 @@ $tickets_pending_assignment = mysqli_num_rows($sql_tickets_pending_assignment);
 
 if ($tickets_pending_assignment > 0) {
 
-    appNotify("Pending Tickets", escapeSql(_n('There is %d new ticket pending assignment', 'There are %d new tickets pending assignment', $tickets_pending_assignment)), "/agent/tickets.php?status=New");
+    appNotifyOncePerDay("Pending Tickets", escapeSql(_n('There is %d new ticket pending assignment', 'There are %d new tickets pending assignment', $tickets_pending_assignment)), "/agent/tickets.php?status=New", 0, 0, false);
 
     // Logging
     logApp("Cron", "info", "Cron created notifications for new tickets that are pending assignment");
@@ -515,7 +515,7 @@ if ($reminder_rules['enabled']) {
         }
 
         if ($days > 0) {
-            appNotify("Invoice Overdue", escapeSql(_n('Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d day', 'Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d days', $days, $days, $number, $invoice['client_name'], billingMoney($balance, $invoice['invoice_currency_code']))), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
+            appNotifyOncePerDay("Invoice Overdue", escapeSql(_n('Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d day', 'Invoice %2$s for %3$s with a balance of %4$s is overdue by %1$d days', $days, $days, $number, $invoice['client_name'], billingMoney($balance, $invoice['invoice_currency_code']))), "/agent/invoice.php?invoice_id=$invoice_id", intval($invoice['client_id']));
         }
 
         // Left out, charged by autopay on the day, already reminded today, or no mail
@@ -588,7 +588,7 @@ $sql_invalid_recurring_invoices = mysqli_query($mysqli, "SELECT recurring_invoic
 while ($row = mysqli_fetch_assoc($sql_invalid_recurring_invoices)) {
     $invoice_prefix = $row['recurring_invoice_prefix'];
     $invoice_number = intval($row['recurring_invoice_number']);
-    appNotify("Invoice", escapeSql(__("Recurring invoice %s is behind - its next date has passed and it won't bill until it is invoiced or moved on", $invoice_prefix . $invoice_number)), "/agent/recurring_invoice.php?recurring_invoice_id=" . intval($row['recurring_invoice_id']), intval($row['recurring_invoice_client_id']));
+    appNotifyOncePerDay("Invoice", escapeSql(__("Recurring invoice %s is behind - its next date has passed and it won't bill until it is invoiced or moved on", $invoice_prefix . $invoice_number)), "/agent/recurring_invoice.php?recurring_invoice_id=" . intval($row['recurring_invoice_id']), intval($row['recurring_invoice_client_id']));
 }
 // End Flag any active recurring "next run" dates that are in the past
 
@@ -598,7 +598,7 @@ $invoices_pending_send = mysqli_num_rows($sql_invoices_pending_send);
 
 if ($invoices_pending_send > 0) {
 
-    appNotify("Draft Invoices", escapeSql(_n('There is %d draft invoice pending review', 'There are %d draft invoices pending review', intval($invoices_pending_send))), "/agent/invoices.php?&status=Draft");
+    appNotifyOncePerDay("Draft Invoices", escapeSql(_n('There is %d draft invoice pending review', 'There are %d draft invoices pending review', intval($invoices_pending_send))), "/agent/invoices.php?&status=Draft", 0, 0, false);
 }
 // End Notify draft invoices needing review
 
@@ -786,7 +786,7 @@ $sql_recurring_expenses = mysqli_query($mysqli, "SELECT recurring_expense_id FRO
     WHERE " . recurringExpenseRunningSql() . " AND recurring_expense_next_date = CURDATE() - INTERVAL " . (RECURRING_EXPENSE_GRACE_DAYS + 1) . " DAY");
 while ($row = mysqli_fetch_assoc($sql_recurring_expenses)) {
     $recurring = recurringExpenseRow(intval($row['recurring_expense_id']), false);
-    appNotify("Expense", escapeSql("The recurring expense " . recurringExpenseLabel($recurring) . " is " . (RECURRING_EXPENSE_GRACE_DAYS + 1) . " days behind and won't be recorded by itself - record the missed runs or move it on"),
+    appNotifyOncePerDay("Expense", escapeSql("The recurring expense " . recurringExpenseLabel($recurring) . " is " . (RECURRING_EXPENSE_GRACE_DAYS + 1) . " days behind and won't be recorded by itself - record the missed runs or move it on"),
         "/agent/recurring_expenses.php?status=late", intval($recurring['recurring_expense_client_id']));
 }
 
@@ -1055,7 +1055,7 @@ if (settingsColumnExists($mysqli, 'config_update_latest_commit')) {
 
     if ($latest_version !== '' && $current_version !== '' && $latest_version !== $current_version) {
         // Send Alert to inform Updates Available
-        appNotify("Update", "New Updates are Available [$latest_version]", "/admin/update.php");
+        appNotifyOncePerDay("Update", "New Updates are Available [$latest_version]", "/admin/update.php", 0, 0, false);
     }
 
 }

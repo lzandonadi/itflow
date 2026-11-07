@@ -19,15 +19,15 @@ function triggerCustomAction($trigger, $entity) {
     chdir($original_dir); // Restore original working directory
 }
 
-function appNotify($type, $details, $action = null, $client_id = 0, $entity_id = 0) {
-    global $mysqli;
-
+/*
+ * The notification's text fields made ready for the INSERT: cut to their column sizes,
+ * without an odd trailing backslash. Shared by appNotify() and appNotifyOncePerDay(), so
+ * the "same notice" check compares exactly what appNotify() stores.
+ */
+function appNotifyFields($type, $details, $action) {
     if (is_null($action)) {
-        $action = "NULL"; // Without quotes for SQL NULL
+        $action = "NULL"; // Stored as it always has been
     }
-
-    $client_id = intval($client_id);
-    $entity_id = intval($entity_id);
 
     $type = substr($type, 0, 200);
     $details = substr($details, 0, 1000);
@@ -46,12 +46,70 @@ function appNotify($type, $details, $action = null, $client_id = 0, $entity_id =
         $action = substr($action, 0, -1);
     }
 
+    return [$type, $details, $action];
+}
+
+/*
+ * Notify every active technician. Use it for something that happened (a payment, an
+ * update applied) - each call is a new notice. A notice a daily job picks by today's
+ * date goes through appNotifyOncePerDay() instead.
+ */
+function appNotify($type, $details, $action = null, $client_id = 0, $entity_id = 0) {
+    global $mysqli;
+
+    [$type, $details, $action] = appNotifyFields($type, $details, $action);
+    $client_id = intval($client_id);
+    $entity_id = intval($entity_id);
+
     $sql = mysqli_query($mysqli, "SELECT user_id FROM users
         WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL
     ");
 
     while ($row = mysqli_fetch_assoc($sql)) {
         $user_id = intval($row['user_id']);
+
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = '$type', notification = '$details', notification_action = '$action', notification_client_id = $client_id, notification_entity_id = $entity_id, notification_user_id = $user_id");
+    }
+}
+
+/*
+ * Notify every active technician who has not already had this notice today - for the
+ * notices a daily job picks by date (something expiring, an overdue invoice, a summary),
+ * so running the job again the same day does not repeat them. A dismissed notice still
+ * counts as had. "This notice" is the same type, link, client and entity, and the same
+ * text unless $match_details is false: a summary whose count can change during the day
+ * passes false, so it goes out once a day whatever the number. Same arguments as
+ * appNotify(), already SQL-safe.
+ */
+function appNotifyOncePerDay($type, $details, $action = null, $client_id = 0, $entity_id = 0, $match_details = true) {
+    global $mysqli;
+
+    [$type, $details, $action] = appNotifyFields($type, $details, $action);
+    $client_id = intval($client_id);
+    $entity_id = intval($entity_id);
+
+    $had = [];
+    $sql_had = mysqli_query($mysqli, "SELECT DISTINCT notification_user_id FROM notifications
+        WHERE notification_timestamp >= CURDATE()
+        AND notification_type = '$type'
+        AND notification_action = '$action'
+        AND notification_client_id = $client_id
+        AND notification_entity_id = $entity_id"
+        . ($match_details ? " AND notification = '$details'" : "")
+    );
+    while ($row = mysqli_fetch_row($sql_had)) {
+        $had[intval($row[0])] = true;
+    }
+
+    $sql = mysqli_query($mysqli, "SELECT user_id FROM users
+        WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL
+    ");
+
+    while ($row = mysqli_fetch_assoc($sql)) {
+        $user_id = intval($row['user_id']);
+        if (isset($had[$user_id])) {
+            continue;
+        }
 
         mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = '$type', notification = '$details', notification_action = '$action', notification_client_id = $client_id, notification_entity_id = $entity_id, notification_user_id = $user_id");
     }
