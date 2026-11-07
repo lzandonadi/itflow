@@ -144,11 +144,14 @@ function billingReminderNext(array $invoice, ?array $rules = null, $late_only = 
     return null;
 }
 
-/** Will a recurring autopay charge this invoice on its due date? Then it isn't reminded before. */
+/**
+ * Will a recurring autopay charge this invoice on its due date? Then it isn't reminded before.
+ * Only an autopay on a saved card with its provider on can (billingAutopayUsableSql()).
+ */
 function billingReminderAutopay(array $invoice) {
     global $mysqli;
     $recurring_id = intval($invoice['invoice_recurring_invoice_id'] ?? 0);
-    return $recurring_id > 0 && mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM recurring_payments WHERE recurring_payment_recurring_invoice_id = $recurring_id LIMIT 1")) > 0;
+    return $recurring_id > 0 && mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM DUAL WHERE " . billingAutopayUsableSql($recurring_id))) > 0;
 }
 
 /** How late an invoice is, in words - "due in 3 days", "due today", "7 days late". */

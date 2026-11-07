@@ -8,6 +8,8 @@ This file documents all notable changes made to ITFlow.
 
 This release has one database change (3.5.5 to 3.5.6), which adds the interface language setting. Until it has run, ITFlow stays in English.
 
+Autopay that has no saved card - set up before version 2.2.3, when autopay was a payment method and an account rather than a card - no longer marks invoices paid. If you used it on purpose, record those payments yourself from now on. To check what it recorded in the past, look for payments with the reference "Paid via AutoPay": ITFlow charged nothing for them, so confirm each was really paid. To remove such an autopay, open the recurring invoice: it now says its autopay cannot charge anything, with a Turn off button.
+
 ### New Features & Updates
 
 - ITFlow can now be used in Brazilian Portuguese. Pick the language in Admin > Settings > Localization ("Interface language"); it applies to everyone - agents, admins, the client portal, guest links - and to the PDFs and emails ITFlow sends, while the company locale still decides how numbers and money are written. English stays the default and reads as before. Statuses, CSV exports, the audit log, the app log, the API and anything stored stay in English in every language, so filters, imports and integrations are unaffected. The terms used are listed in lang/GLOSSARY.md.
@@ -43,6 +45,7 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 
 ### Bug Fixes
 
+- Autopay without a saved card no longer records the invoice as paid when nothing was charged - on the due date the invoice stays open, keeps its reminders and the team is told. Every autopay that does not charge now tells the team, once a day per invoice: a declined card, a card no longer on file or a payment provider turned off, or missing Stripe details (before, most of these were silent). Only an autopay on a saved card with its provider on counts as autopay for reminders and for the wallet icon in the recurring invoice list.
 - Editing a client's reply on a ticket no longer fills Time worked with the current time of day - a reply with no time worked shows 00:00:00.
 - Running the nightly task again the same day (Run Now) no longer repeats your team's notifications - overdue invoices, tickets waiting for assignment, draft invoices, an update being available, and domains, certificates, API keys, warranties, UPS batteries, service reviews and recurring invoices or expenses falling behind. Each comes once a day per technician, even if dismissed; a technician activated during the day still gets that day's. Emails to clients were already sent only once.
 - On Apache servers running PHP through PHP-FPM, nothing in the uploads folder was served - company logo, favicon, avatars, asset and location photos, ticket attachments - and every address under it, backups included, answered with a server error. The protection files there used a setting only Apache's own PHP module understands; they now apply it only when that module is in use. With Apache's PHP module or with nginx nothing changes.

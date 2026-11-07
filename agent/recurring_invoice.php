@@ -86,6 +86,11 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $saved_methods[intval($row['saved_payment_id'])] = $row;
 }
 $autopay_id = intval($recurring['recurring_payment_saved_payment_id'] ?? 0);
+// An autopay that can charge: a card the client still has on file, with its provider on
+// (billingAutopayUsableSql()). One without - set up before 2.2.3, or its provider turned off -
+// charges nothing, and the nightly job tells the team on each due date until it is turned off
+$autopay_usable = $autopay_id && isset($saved_methods[$autopay_id]) && intval($saved_methods[$autopay_id]['payment_provider_active']) === 1;
+$autopay_stale = intval($recurring['recurring_payment_id'] ?? 0) > 0 && !$autopay_usable;
 
 // Override Tab Title // No Sanitizing needed as this var will only be used in the tab title
 $tab_title = $recurring['client_name'];
@@ -130,7 +135,7 @@ $paper = [
                 <?php if (intval($recurring['recurring_invoice_quote_id'] ?? 0) && ($from_quote = billingRow('quote', intval($recurring['recurring_invoice_quote_id'])))) { ?>
                     <span><i class="fas fa-fw fa-comment-dollar me-1"></i><?= __('From %s', '<a class="text-reset" href="quote.php?quote_id=' . intval($from_quote['quote_id']) . '">' . escapeHtml(billingNumber('quote', $from_quote)) . '</a>') ?></span>
                 <?php } ?>
-                <?php if ($autopay_id && isset($saved_methods[$autopay_id])) { ?><span><i class="fas fa-fw fa-wallet me-1"></i><?= __('Autopay') ?></span><?php } ?>
+                <?php if ($autopay_usable) { ?><span><i class="fas fa-fw fa-wallet me-1"></i><?= __('Autopay') ?></span><?php } ?>
                 <?php if ($for_contract) { ?>
                     <span title="<?= __('It starts and stops with the contract') ?>" data-recurring-contract><i class="fas fa-fw fa-file-contract me-1"></i><?= __('For %s', '<a class="text-reset" href="contract.php?client_id=' . $client_id . '&contract_id=' . intval($for_contract['contract_id']) . '">' . escapeHtml($for_contract['contract_name']) . '</a>') ?></span>
                 <?php } ?>
@@ -354,6 +359,20 @@ $paper = [
                 <h3 class="card-title mb-0"><i class="fas fa-fw fa-wallet text-secondary me-2"></i><?= __('Autopay') ?></h3>
             </div>
             <div class="card-body">
+                <?php if ($autopay_stale) { ?>
+                    <div class="alert alert-warning small d-flex flex-wrap align-items-center gap-2 mb-3" role="alert">
+                        <span class="flex-grow-1"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Its autopay cannot charge anything - it has no usable card on file. The invoices it makes stay open until they are paid, and the team is told on each due date.') ?></span>
+                        <?php if ($can_edit) { ?>
+                            <form action="post.php" method="post" class="m-0">
+                                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                                <input type="hidden" name="set_recurring_payment" value="1">
+                                <input type="hidden" name="recurring_invoice_id" value="<?= $recurring_invoice_id ?>">
+                                <input type="hidden" name="saved_payment_id" value="0">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-fw fa-power-off me-1"></i><?= __('Turn off') ?></button>
+                            </form>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
                 <?php if ($saved_methods) { ?>
                     <form action="post.php" method="post">
                         <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
@@ -369,7 +388,7 @@ $paper = [
                             </select>
                         </div>
                     </form>
-                    <div class="form-text"><?= $autopay_id ? __('Charged on the due date of each invoice it makes.') : __('Charge a card on file on the due date of each invoice it makes.') ?></div>
+                    <div class="form-text"><?= $autopay_usable ? __('Charged on the due date of each invoice it makes.') : __('Charge a card on file on the due date of each invoice it makes.') ?></div>
                 <?php } else { ?>
                     <div class="small text-body-secondary"><?= __('No card on file for %s. Once they save one paying an invoice online, it can be charged here automatically.', escapeHtml($recurring['client_name'])) ?></div>
                 <?php } ?>

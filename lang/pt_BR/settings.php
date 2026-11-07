@@ -418,6 +418,7 @@ return [
     'Recurring invoice %s is behind - its next date has passed and it won\'t bill until it is invoiced or moved on' => 'A fatura recorrente %s está atrasada - a próxima data já passou e ela não vai faturar até ser faturada ou adiada',
     'There is %d draft invoice pending review' => ['Há %d fatura em rascunho aguardando revisão', 'Há %d faturas em rascunho aguardando revisão'],
     'Invoice %s automatically paid' => 'Fatura %s paga automaticamente',
+    'Autopay did not charge invoice %s - it is still open. Its history says why.' => 'A cobrança automática não cobrou a fatura %s, que continua em aberto. O histórico da fatura mostra o motivo.',
     'Email and notifications' => 'E-mail e notificações',
     'Sign-in and access' => 'Login e acesso',
     'Your company as it shows on invoices, quotes and emails - its name, address, contact details and logo.' => 'A sua empresa como aparece nas faturas, orçamentos e e-mails - nome, endereço, contato e logotipo.',

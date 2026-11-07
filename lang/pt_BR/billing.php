@@ -198,6 +198,7 @@ return [
     'Charged on the due date of each invoice it makes.' => 'Cobrado no vencimento de cada fatura gerada.',
     'Charge a card on file on the due date of each invoice it makes.' => 'Cobrar um cartão salvo no vencimento de cada fatura gerada.',
     'No card on file for %s. Once they save one paying an invoice online, it can be charged here automatically.' => 'Nenhum cartão salvo para %s. Quando salvarem um ao pagar uma fatura on-line, ele pode ser cobrado aqui automaticamente.',
+    'Its autopay cannot charge anything - it has no usable card on file. The invoices it makes stay open until they are paid, and the team is told on each due date.' => 'A cobrança automática desta fatura recorrente não consegue cobrar nada: não há cartão salvo utilizável. As faturas geradas ficam em aberto até serem pagas, e a equipe é avisada em cada vencimento.',
     'None yet - the first is made on %s.' => 'Nenhuma ainda - a primeira é gerada em %s.',
     'None yet.' => 'Nenhuma ainda.',
     'Next 7 days' => 'Próximos 7 dias',

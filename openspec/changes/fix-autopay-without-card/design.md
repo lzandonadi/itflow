@@ -44,6 +44,7 @@ O ramo `else` que grava "Paid via AutoPay" sai. As linhas sem cartão, os cartõ
 
 ### D2. A equipe é avisada de toda cobrança automática que falha, uma vez por dia
 Um helper novo em `functions/billing_pay.php`, por exemplo `billingAutopayFailed($invoice_id, $client_id, $number, $reason)`, grava o histórico, o audit log e a notificação "Invoice" com o motivo e o link da fatura. Ele fica em `functions/` porque um job do cron não pode declarar funções. Antes de chamá-lo, a tarefa verifica com `cronInvoiceHistoryToday()` se a fatura já tem "Autopay not charged" ou "Stripe autopay failed" no dia, e só segue se não tiver. A recusa de cartão passa a chamar o mesmo helper.
+- *Ajuste na implementação:* a notificação usa `appNotifyOncePerDay()` (`functions/logging.php`), criada pela change `fix-nightly-duplicate-notifications`, com o link da fatura e o `invoice_id` como entidade. A checagem de `cronInvoiceHistoryToday()` continua, porque é ela que impede uma nova tentativa de cobrança e um novo histórico no mesmo dia. O helper de notificação garante, além disso, um aviso só por técnico e por dia.
 - *Por quê:* sem aviso, uma fatura que deveria ter sido cobrada some em silêncio até o primeiro lembrete de atraso. Hoje nem a recusa avisa ninguém.
 - *Alternativa descartada:* avisar só nos casos novos. Deixaria a recusa, o caso mais comum numa instalação nova, sem aviso.
 

@@ -468,7 +468,8 @@ while ($row = mysqli_fetch_assoc($sql_resolved_tickets_to_close)) {
  * billingReminderRules()): each open invoice whose day it is - before, on or after its due
  * date - gets one, to the client's primary and billing contacts, unless the client is left
  * out of reminders. One a recurring autopay will charge on its due date isn't reminded
- * before then. Agents hear about each one late, on its reminder days, and the late fee
+ * before then - an autopay on a saved card with its provider on; one without a card charges
+ * nothing, so its invoices are reminded like any other. Agents hear about each one late, on its reminder days, and the late fee
  * still comes every 30 days late. At most one of each a day, however often this runs.
  */
 $reminder_rules = billingReminderRules(true);
@@ -476,7 +477,7 @@ if ($reminder_rules['enabled']) {
 
     $earliest = min(0, $reminder_rules['days'] ? min($reminder_rules['days']) : 0);
     $sql_reminders = mysqli_query($mysqli, "SELECT invoice_id, DATEDIFF(CURDATE(), invoice_due) AS days_late, client_reminders,
-            invoice_recurring_invoice_id > 0 AND EXISTS (SELECT 1 FROM recurring_payments WHERE recurring_payment_recurring_invoice_id = invoice_recurring_invoice_id) AS autopay
+            invoice_recurring_invoice_id > 0 AND " . billingAutopayUsableSql('invoice_recurring_invoice_id') . " AS autopay
         FROM invoices
         JOIN clients ON client_id = invoice_client_id
         WHERE invoice_status IN ('Sent', 'Viewed', 'Partial') AND invoice_due IS NOT NULL AND DATEDIFF(CURDATE(), invoice_due) >= $earliest
@@ -608,8 +609,7 @@ if ($invoices_pending_send > 0) {
 $sql_recurring_payments = mysqli_query($mysqli, "
     SELECT client_id, client_name, contact_email, contact_name, invoice_amount, invoice_currency_code,
         invoice_date, invoice_due, invoice_id, invoice_number, invoice_prefix, invoice_scope,
-        invoice_url_key, recurring_payment_account_id, recurring_payment_currency_code,
-        recurring_payment_method, recurring_payment_saved_payment_id FROM recurring_payments
+        invoice_url_key, recurring_payment_currency_code, recurring_payment_saved_payment_id FROM recurring_payments
     LEFT JOIN invoices ON invoice_recurring_invoice_id = recurring_payment_recurring_invoice_id
     LEFT JOIN clients ON client_id = invoice_client_id
     LEFT JOIN contacts ON client_id = contact_client_id AND contact_primary = 1
@@ -627,8 +627,6 @@ while ($row = mysqli_fetch_assoc($sql_recurring_payments)) {
     $invoice_amount = floatval($row['invoice_amount']);
     $invoice_url_key = escapeSql($row['invoice_url_key']);
     $invoice_currency_code = escapeSql($row['invoice_currency_code']);
-    $recurring_payment_account_id = intval($row['recurring_payment_account_id']);
-    $recurring_payment_method = escapeSql($row['recurring_payment_method']);
     $recurring_payment_currency_code = escapeSql($row['recurring_payment_currency_code']);
     $recurring_payment_saved_payment_id = intval($row['recurring_payment_saved_payment_id']);
     $client_id = intval($row['client_id']);
@@ -636,126 +634,127 @@ while ($row = mysqli_fetch_assoc($sql_recurring_payments)) {
     $contact_name = escapeSql($row['contact_name']);
     $contact_email = escapeSql($row['contact_email']);
 
-    // A card that already declined today is not retried - the day-matched selection above
-    // would otherwise re-attempt the same charge on every extra run of this script
-    if (cronInvoiceHistoryToday($invoice_id, 'Stripe autopay failed')) {
+    $invoice_reference = $row['invoice_prefix'] . $row['invoice_number'];
+
+    // A charge already tried today is not tried again - the day-matched selection above
+    // would otherwise re-attempt it, and re-record the failure, on every extra run of this script
+    if (cronInvoiceHistoryToday($invoice_id, 'Stripe autopay failed') || cronInvoiceHistoryToday($invoice_id, 'Autopay not charged')) {
         continue;
     }
 
-    // Only attempt autopay if a saved payment method is set
-    if ($recurring_payment_saved_payment_id) {
-        // Get the saved payment method and provider details
-        $saved_payment = mysqli_fetch_assoc(mysqli_query($mysqli, "
-            SELECT payment_provider_account, payment_provider_id, payment_provider_name,
-                payment_provider_private_key, saved_payment_description, saved_payment_provider_method FROM client_saved_payment_methods
-            LEFT JOIN payment_providers ON saved_payment_provider_id = payment_provider_id
-            WHERE saved_payment_id = $recurring_payment_saved_payment_id
-              AND saved_payment_client_id = $client_id
-              AND payment_provider_active = 1
-            LIMIT 1
-        "));
+    // Nothing is paid unless a card is charged. An autopay set up before 2.2.3 has no card -
+    // it used to record the invoice as paid with no money taken; now the team is told instead
+    if (!$recurring_payment_saved_payment_id) {
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, 'Autopay not charged: no card on file', 'the autopay has no saved card (set up before 2.2.3)');
+        continue;
+    }
 
-        if (!$saved_payment) {
-            logAudit("Invoice", "Payment", "Failed auto Payment for invoice $invoice_prefix$invoice_number: Saved payment method not found or provider inactive", $client_id, $invoice_id);
-            continue;
+    // Get the saved payment method and provider details
+    $saved_payment = mysqli_fetch_assoc(mysqli_query($mysqli, "
+        SELECT payment_provider_account, payment_provider_id, payment_provider_name,
+            payment_provider_private_key, saved_payment_description, saved_payment_provider_method FROM client_saved_payment_methods
+        LEFT JOIN payment_providers ON saved_payment_provider_id = payment_provider_id
+        WHERE saved_payment_id = $recurring_payment_saved_payment_id
+          AND saved_payment_client_id = $client_id
+          AND payment_provider_active = 1
+        LIMIT 1
+    "));
+
+    if (!$saved_payment) {
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, 'Autopay not charged: card not found or payment provider turned off', 'saved payment method not found or provider inactive');
+        continue;
+    }
+
+    $provider_id = intval($saved_payment['payment_provider_id']);
+    $provider_name = escapeSql($saved_payment['payment_provider_name']);
+    $provider_private_key = $saved_payment['payment_provider_private_key'];
+    $account_id = intval($saved_payment['payment_provider_account']);
+    $saved_payment_description = escapeSql($saved_payment['saved_payment_description']);
+    $stripe_payment_method_id = $saved_payment['saved_payment_provider_method'];
+
+    // Get the payment_provider_client (Stripe Customer ID) from client_payment_provider
+    $cpp_query = mysqli_query($mysqli, "
+        SELECT payment_provider_client FROM client_payment_provider
+        WHERE client_id = $client_id
+          AND payment_provider_id = $provider_id
+        LIMIT 1
+    ");
+    $cpp_row = mysqli_fetch_assoc($cpp_query);
+    $stripe_customer_id = $cpp_row ? escapeSql($cpp_row['payment_provider_client']) : '';
+
+    // Stripe is the only provider that can charge a saved card
+    if ($provider_name !== "Stripe") {
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, 'Autopay not charged: payment provider not supported', "provider " . $saved_payment['payment_provider_name'] . " cannot charge a saved card");
+        continue;
+    }
+
+    if (!$provider_private_key || !$stripe_customer_id || !$stripe_payment_method_id) {
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, 'Autopay not charged: Stripe details missing', 'the Stripe key, the client\'s Stripe customer or the card\'s payment method is missing');
+        continue;
+    }
+
+    require_once __DIR__ . '/../includes/stripe_init.php';
+    $stripe = new \Stripe\StripeClient($provider_private_key);
+
+    $balance_to_pay = round($invoice_amount, 2);
+    $pi_description = "ITFlow: $client_name payment of $recurring_payment_currency_code $balance_to_pay for $invoice_prefix$invoice_number";
+
+    try {
+        $payment_intent = $stripe->paymentIntents->create([
+            'amount' => intval(round($balance_to_pay * 100)),
+            'currency' => $recurring_payment_currency_code,
+            'customer' => $stripe_customer_id,
+            'payment_method' => $stripe_payment_method_id,
+            'off_session' => true,
+            'confirm' => true,
+            'description' => $pi_description,
+            'metadata' => [
+                'itflow_client_id' => $client_id,
+                'itflow_client_name' => $client_name,
+                'itflow_invoice_number' => $invoice_prefix . $invoice_number,
+                'itflow_invoice_id' => $invoice_id,
+            ]
+        ]);
+
+        $pi_id = escapeSql($payment_intent->id);
+        $pi_date = date('Y-m-d', $payment_intent->created);
+        $pi_amount_paid = floatval($payment_intent->amount_received / 100);
+        $pi_currency = strtoupper(escapeSql($payment_intent->currency));
+        $pi_livemode = $payment_intent->livemode;
+
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+        error_log("Stripe payment error - encountered exception during payment intent for invoice ID $invoice_id / $invoice_prefix$invoice_number: $error");
+        logApp("Stripe", "error", "Exception during PI for invoice ID $invoice_id: $error");
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, 'Stripe autopay failed due to payment error', "Stripe payment error: $error");
+        continue;
+    }
+
+    if ($payment_intent->status == "succeeded" && intval($balance_to_pay) == intval($pi_amount_paid)) {
+
+        // Update Invoice Status
+        mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Paid' WHERE invoice_id = $invoice_id");
+
+        // Add Payment to History
+        mysqli_query($mysqli, "INSERT INTO payments SET payment_date = '$pi_date', payment_amount = $pi_amount_paid, payment_currency_code = '$pi_currency', payment_account_id = $account_id, payment_method = 'Stripe', payment_reference = 'Stripe - $pi_id', payment_invoice_id = $invoice_id");
+        mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Paid', history_description = 'Online Payment added (autopay)', history_invoice_id = $invoice_id");
+
+        // The client's receipt, and the paid notification address - functions/billing_email.php
+        if (!empty($config_smtp_provider)) {
+            $receipt_to = billingPaymentSend($invoice_id, $pi_amount_paid, ['date' => $pi_date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => 'Automatic card'], true);
+            if ($receipt_to) {
+                logAudit("Invoice", "Payment", "Payment receipt for invoice $invoice_prefix$invoice_number queued to " . escapeSql(implode(', ', $receipt_to)), $client_id, $invoice_id);
+            }
         }
 
-        $provider_id = intval($saved_payment['payment_provider_id']);
-        $provider_name = escapeSql($saved_payment['payment_provider_name']);
-        $provider_private_key = $saved_payment['payment_provider_private_key'];
-        $account_id = intval($saved_payment['payment_provider_account']);
-        $saved_payment_description = escapeSql($saved_payment['saved_payment_description']);
-        $stripe_payment_method_id = $saved_payment['saved_payment_provider_method'];
+        // LOGGING
+        $extended_log_desc = !$pi_livemode ? '(DEV MODE)' : '';
+        appNotify("Invoice Paid", escapeSql(__('Invoice %s automatically paid', $invoice_prefix . $invoice_number)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
+        logAudit("Invoice", "Payment", "Auto Stripe payment amount of " . numfmt_format_currency($currency_format, $invoice_amount, $recurring_payment_currency_code) . " added to invoice $invoice_prefix$invoice_number - $pi_id $extended_log_desc", $client_id, $invoice_id);
+        triggerCustomAction('invoice_pay', $invoice_id);
 
-        // NEW: Get the payment_provider_client (Stripe Customer ID) from client_payment_provider
-        $cpp_query = mysqli_query($mysqli, "
-            SELECT payment_provider_client FROM client_payment_provider
-            WHERE client_id = $client_id
-              AND payment_provider_id = $provider_id
-            LIMIT 1
-        ");
-        $cpp_row = mysqli_fetch_assoc($cpp_query);
-        $stripe_customer_id = $cpp_row ? escapeSql($cpp_row['payment_provider_client']) : '';
-
-        // Stripe
-        if ($provider_name === "Stripe") {
-            if ($provider_private_key && $stripe_customer_id && $stripe_payment_method_id) {
-                require_once __DIR__ . '/../includes/stripe_init.php';
-                $stripe = new \Stripe\StripeClient($provider_private_key);
-
-                $balance_to_pay = round($invoice_amount, 2);
-                $pi_description = "ITFlow: $client_name payment of $recurring_payment_currency_code $balance_to_pay for $invoice_prefix$invoice_number";
-
-                try {
-                    $payment_intent = $stripe->paymentIntents->create([
-                        'amount' => intval(round($balance_to_pay * 100)),
-                        'currency' => $recurring_payment_currency_code,
-                        'customer' => $stripe_customer_id,
-                        'payment_method' => $stripe_payment_method_id,
-                        'off_session' => true,
-                        'confirm' => true,
-                        'description' => $pi_description,
-                        'metadata' => [
-                            'itflow_client_id' => $client_id,
-                            'itflow_client_name' => $client_name,
-                            'itflow_invoice_number' => $invoice_prefix . $invoice_number,
-                            'itflow_invoice_id' => $invoice_id,
-                        ]
-                    ]);
-
-                    $pi_id = escapeSql($payment_intent->id);
-                    $pi_date = date('Y-m-d', $payment_intent->created);
-                    $pi_amount_paid = floatval($payment_intent->amount_received / 100);
-                    $pi_currency = strtoupper(escapeSql($payment_intent->currency));
-                    $pi_livemode = $payment_intent->livemode;
-
-                } catch (Exception $e) {
-                    $error = $e->getMessage();
-                    error_log("Stripe payment error - encountered exception during payment intent for invoice ID $invoice_id / $invoice_prefix$invoice_number: $error");
-                    logApp("Stripe", "error", "Exception during PI for invoice ID $invoice_id: $error");
-                    mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Payment failed', history_description = 'Stripe autopay failed due to payment error', history_invoice_id = $invoice_id");
-                    logAudit("Invoice", "Payment", "Failed auto Payment amount of invoice $invoice_prefix$invoice_number due to Stripe payment error: $error", $client_id, $invoice_id);
-                    continue;
-                }
-
-                if ($payment_intent->status == "succeeded" && intval($balance_to_pay) == intval($pi_amount_paid)) {
-
-                    // Update Invoice Status
-                    mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Paid' WHERE invoice_id = $invoice_id");
-
-                    // Add Payment to History
-                    mysqli_query($mysqli, "INSERT INTO payments SET payment_date = '$pi_date', payment_amount = $pi_amount_paid, payment_currency_code = '$pi_currency', payment_account_id = $account_id, payment_method = 'Stripe', payment_reference = 'Stripe - $pi_id', payment_invoice_id = $invoice_id");
-                    mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Paid', history_description = 'Online Payment added (autopay)', history_invoice_id = $invoice_id");
-
-                    // The client's receipt, and the paid notification address - functions/billing_email.php
-                    if (!empty($config_smtp_provider)) {
-                        $receipt_to = billingPaymentSend($invoice_id, $pi_amount_paid, ['date' => $pi_date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => 'Automatic card'], true);
-                        if ($receipt_to) {
-                            logAudit("Invoice", "Payment", "Payment receipt for invoice $invoice_prefix$invoice_number queued to " . escapeSql(implode(', ', $receipt_to)), $client_id, $invoice_id);
-                        }
-                    }
-
-                    // LOGGING
-                    $extended_log_desc = !$pi_livemode ? '(DEV MODE)' : '';
-                    appNotify("Invoice Paid", escapeSql(__('Invoice %s automatically paid', $invoice_prefix . $invoice_number)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
-                    logAudit("Invoice", "Payment", "Auto Stripe payment amount of " . numfmt_format_currency($currency_format, $invoice_amount, $recurring_payment_currency_code) . " added to invoice $invoice_prefix$invoice_number - $pi_id $extended_log_desc", $client_id, $invoice_id);
-                    triggerCustomAction('invoice_pay', $invoice_id);
-
-                } else {
-                    mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Payment failed', history_description = 'Stripe autopay failed: Status {$payment_intent->status}', history_invoice_id = $invoice_id");
-                    logAudit("Invoice", "Payment", "Failed auto Payment for invoice $invoice_prefix$invoice_number. Stripe PI status: {$payment_intent->status}", $client_id, $invoice_id);
-                }
-            } // End if Stripe creds and IDs
-        } // End if Stripe provider
-        // Add other provider logic here as needed
     } else {
-        // Handle Non-payment-provider autopay
-        mysqli_query($mysqli, "INSERT INTO payments SET payment_date = CURDATE(), payment_amount = $invoice_amount, payment_currency_code = '$recurring_payment_currency_code', payment_account_id = $recurring_payment_account_id, payment_method = '$recurring_payment_method', payment_reference = 'Paid via AutoPay', payment_invoice_id = $invoice_id");
-        $payment_id = mysqli_insert_id($mysqli);
-
-        mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Paid' WHERE invoice_id = $invoice_id");
-        mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Paid', history_description = 'Payment added via Auto Pay', history_invoice_id = $invoice_id");
-        logAudit("Invoice", "Payment", "Auto Payment amount of $recurring_payment_currency_code $invoice_amount added to invoice $invoice_prefix$invoice_number", $client_id, $invoice_id);
+        billingAutopayFailed($invoice_id, $client_id, $invoice_reference, "Stripe autopay failed: Status {$payment_intent->status}", "Stripe PI status: {$payment_intent->status}");
     }
 }
 

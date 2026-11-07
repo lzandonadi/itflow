@@ -71,7 +71,7 @@ $joins = "LEFT JOIN clients ON recurring_invoice_client_id = client_id LEFT JOIN
 
 // The contract each bills, when one is linked (functions/contract_billing.php)
 $contract_sql = contractBillingReady() ? "(SELECT contract_name FROM contracts WHERE contract_recurring_invoice_id = recurring_invoice_id AND contract_archived_at IS NULL ORDER BY contract_id DESC LIMIT 1)" : 'NULL';
-$sql = mysqli_query($mysqli, "SELECT SQL_CALC_FOUND_ROWS recurring_invoices.*, client_name, category_name, recurring_payment_id, $monthly_sql AS monthly, $contract_sql AS contract_name
+$sql = mysqli_query($mysqli, "SELECT SQL_CALC_FOUND_ROWS recurring_invoices.*, client_name, category_name, recurring_payment_id, " . billingAutopayUsableSql('recurring_invoices.recurring_invoice_id') . " AS autopay_usable, $monthly_sql AS monthly, $contract_sql AS contract_name
     FROM recurring_invoices $joins
     LEFT JOIN recurring_payments ON recurring_payment_recurring_invoice_id = recurring_invoice_id
     WHERE 1 $filters $status_query
@@ -242,7 +242,7 @@ $stat_money = function ($amount) use ($session_company_currency) {
                 <tr class="<?= $row_active ? '' : 'text-body-secondary' ?>">
                     <td class="ps-3 itflow-billing-number">
                         <a class="fw-semibold" href="<?= $row_url ?>"><?= escapeHtml($row_number) ?></a>
-                        <?php if (intval($row['recurring_payment_id'])) { ?><i class="fas fa-wallet text-success small ms-1" title="<?= __('Autopay - charged to a card on file') ?>"></i><?php } ?>
+                        <?php if (intval($row['autopay_usable'])) { ?><i class="fas fa-wallet text-success small ms-1" title="<?= __('Autopay - charged to a card on file') ?>"></i><?php } ?>
                         <?php $row_seats = recurringSeatLines($recurring_invoice_id, $row_client_id);
                         if ($row_seats) {
                             $row_drift = count(array_filter($row_seats, function ($line) { return $line['seat_drift']; })); ?>

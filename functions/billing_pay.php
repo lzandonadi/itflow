@@ -529,3 +529,40 @@ function billingPaymentMethodText($method, $reference = '') {
     }
     return $method !== '' ? $method : __('Payment');
 }
+
+/* ------------------------------------------------------------ Autopay */
+
+/**
+ * SQL for "this recurring invoice has an autopay that can charge": a recurring_payments row
+ * on a card its client saved, with the card's provider turned on - what the nightly job needs
+ * before it charges anything. A row without a card (made before 2.2.3) never charges, so it
+ * doesn't count. $recurring_column is the outer query's recurring invoice id, qualified when
+ * the outer query reads recurring_invoices itself.
+ */
+function billingAutopayUsableSql($recurring_column) {
+    return "EXISTS (SELECT 1 FROM recurring_payments
+        JOIN recurring_invoices AS autopay_recurring ON autopay_recurring.recurring_invoice_id = recurring_payment_recurring_invoice_id
+        JOIN client_saved_payment_methods ON saved_payment_id = recurring_payment_saved_payment_id AND saved_payment_client_id = autopay_recurring.recurring_invoice_client_id
+        JOIN payment_providers ON payment_provider_id = saved_payment_provider_id AND payment_provider_active = 1
+        WHERE recurring_payment_recurring_invoice_id = $recurring_column)";
+}
+
+/**
+ * An autopay that did not charge: nothing is paid and the invoice stays open. It goes in the
+ * invoice's history and the audit log, and the team is told - once a day per invoice and
+ * technician. $history starts "Autopay not charged" or "Stripe autopay failed" (the nightly
+ * job skips an invoice that already has one today, so the charge is tried once a day);
+ * $reason is for the audit log. Both in English, like the job's other history rows. Raw
+ * values - escaped here.
+ */
+function billingAutopayFailed($invoice_id, $client_id, $reference, $history, $reason) {
+    global $mysqli;
+
+    $invoice_id = intval($invoice_id);
+    $client_id = intval($client_id);
+    $history_sql = escapeSql($history);
+
+    mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Payment failed', history_description = '$history_sql', history_invoice_id = $invoice_id");
+    logAudit("Invoice", "Payment", "Failed auto Payment for invoice " . escapeSql($reference) . ": " . escapeSql($reason), $client_id, $invoice_id);
+    appNotifyOncePerDay("Invoice", escapeSql(__('Autopay did not charge invoice %s - it is still open. Its history says why.', $reference)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id, $invoice_id);
+}
