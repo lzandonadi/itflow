@@ -48,6 +48,10 @@ O sistema SHALL tratar o "Run Now" da administração como um pedido atendido pe
 - **WHEN** um administrador pede para rodar a tarefa noturna agora
 - **THEN** a página responde imediatamente e a tarefa roda na próxima chamada do despachante
 
+#### Scenario: Run Now em tarefa desligada
+- **WHEN** um administrador pede Run Now de uma tarefa que está desligada
+- **THEN** a tarefa roda uma vez na próxima chamada e continua desligada depois
+
 ### Requirement: Interruptor geral do cron
 O sistema SHALL ter um interruptor geral, desligado por padrão, que faz toda tarefa parar logo no início quando está desligado. Religá-lo SHALL devolver exatamente a configuração por tarefa que existia antes.
 
@@ -56,8 +60,19 @@ O sistema SHALL ter um interruptor geral, desligado por padrão, que faz toda ta
 - **THEN** a tarefa termina sem enviar nada
 
 ### Requirement: Tarefas diárias não repetem efeitos no mesmo dia
-O sistema SHALL garantir que tarefas cujo trabalho é escolhido pela data de hoje não repitam o efeito quando rodam mais de uma vez no dia. Tarefas que não podem garantir isso SHALL ficar restritas à agenda diária.
+O sistema SHALL garantir que tarefas cujo trabalho é escolhido pela data de hoje não repitam o efeito quando rodam mais de uma vez no dia. Tarefas que não podem garantir isso (tarefa noturna, backup e aplicação de atualização) SHALL rodar no máximo uma vez por dia pela agenda, mesmo que a linha do banco peça um intervalo menor.
 
 #### Scenario: Tarefa noturna roda duas vezes
 - **WHEN** a tarefa noturna roda no horário e de novo por Run Now no mesmo dia
 - **THEN** multas por atraso e lembretes de vencimento não são aplicados nem enviados duas vezes
+
+### Requirement: Resultado de cada execução visível
+O sistema SHALL guardar, para cada tarefa, o início, o fim, a duração e o resultado da última execução. Um erro SHALL continuar visível depois de execuções bem-sucedidas, até um administrador limpá-lo, e um erro fatal no meio de uma tarefa SHALL ficar registrado como falha dessa tarefa.
+
+#### Scenario: Tarefa parada por configuração
+- **WHEN** a leitura da caixa de suporte roda sem a funcionalidade ligada
+- **THEN** o resultado da execução diz que ela parou e por quê
+
+#### Scenario: Despachante sem disparar
+- **WHEN** nenhuma tarefa estava vencida
+- **THEN** a tela de cron ainda mostra quando o despachante foi chamado pela última vez
