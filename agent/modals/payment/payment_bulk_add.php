@@ -57,8 +57,6 @@ ob_start();
 <form action="post.php" method="post" autocomplete="off">
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
-    <input type="hidden" name="balance" value="<?= number_format($owed, 2, '.', '') ?>">
-    <input type="hidden" name="currency_code" value="<?= escapeHtml($currency) ?>">
 
     <div class="modal-body">
         <p class="small text-body-secondary"><?= __("One payment spread over %s's unpaid invoices, oldest first - each is paid in full until the payment runs out, and the last one it reaches may be part paid.", escapeHtml($client['client_name'])) ?></p>

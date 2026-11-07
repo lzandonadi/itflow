@@ -17,11 +17,9 @@ if (isset($_POST['add_payment'])) {
     enforceBillingMoney('take');
 
     $invoice_id = intval($_POST['invoice_id']);
-    $balance = floatval($_POST['balance']);
     $date = escapeSql($_POST['date']);
     $amount = floatval($_POST['amount']);
     $account = intval($_POST['account']);
-    $currency_code = escapeSql($_POST['currency_code']);
     $payment_method = escapeSql($_POST['payment_method']);
     $reference = escapeSql($_POST['reference']);
     $email_receipt = intval($_POST['email_receipt']);
@@ -31,22 +29,26 @@ if (isset($_POST['add_payment'])) {
     enforceClientAccess();
 
     // Only an open invoice with something owed takes a payment - as the invoice page offers it
-    $pay_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT invoice_prefix, invoice_number, invoice_status, invoice_amount, invoice_due FROM invoices WHERE invoice_id = $invoice_id"));
+    $pay_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT invoice_prefix, invoice_number, invoice_status, invoice_amount, invoice_due, invoice_currency_code FROM invoices WHERE invoice_id = $invoice_id"));
     if (!$pay_row) {
         flashAlert(__('That invoice no longer exists.'), 'error');
         redirect();
     }
     $pay_paid = floatval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT SUM(payment_amount) FROM payments WHERE payment_invoice_id = $invoice_id"))[0]);
-    if (!invoiceCanPay($pay_row, invoiceState($pay_row, $pay_paid))) {
+    $pay_state = invoiceState($pay_row, $pay_paid);
+    if (!invoiceCanPay($pay_row, $pay_state)) {
         flashAlert(__('Invoice %s is no longer in a status that allows this.', '<strong>' . escapeHtml($pay_row['invoice_prefix'] . $pay_row['invoice_number']) . '</strong>'), 'error');
         redirect();
     }
 
-    //Check to see if amount entered is greater than the balance of the invoice
-    if ($amount > $balance) {
-        flashAlert(__('Payment can not be more than the balance'), 'error');
+    // More than zero and no more than the balance - the server's, not a figure from the form
+    $amount_error = paymentAmountCheck($amount, $pay_state['balance']);
+    if ($amount_error !== null) {
+        flashAlert($amount_error, 'error');
         redirect();
     } else {
+        // In the invoice's own currency
+        $currency_code = escapeSql($pay_row['invoice_currency_code']);
         mysqli_query($mysqli,"INSERT INTO payments SET payment_date = '$date', payment_amount = $amount, payment_currency_code = '$currency_code', payment_account_id = $account, payment_method = '$payment_method', payment_reference = '$reference', payment_invoice_id = $invoice_id");
 
         // Get Payment ID for reference
@@ -111,13 +113,23 @@ if (isset($_POST['edit_payment'])) {
     $reference = escapeSql($_POST['reference']);
 
     // payments has no client column - the client comes from the invoice the payment sits on
-    $client_id = intval(getFieldById('invoices', intval(getFieldById('payments', $payment_id, 'payment_invoice_id')), 'invoice_client_id'));
+    $edit_invoice_id = intval(getFieldById('payments', $payment_id, 'payment_invoice_id'));
+    $client_id = intval(getFieldById('invoices', $edit_invoice_id, 'invoice_client_id'));
 
     enforceClientAccess();
 
     // Cleared on a reconciled statement - its date, amount and account stay
     if (!reconcileCheckChange('payment', $payment_id, $date, $amount, $account, $error)) {
         flashAlert(escapeHtml($error), 'error');
+        redirect();
+    }
+
+    // More than zero, and no more than what the invoice still owes plus what this payment
+    // already covers - the invoice can't end up paid beyond its total
+    $edit_limit = floatval(getFieldById('invoices', $edit_invoice_id, 'invoice_amount')) - invoicePaid($edit_invoice_id) + floatval(getFieldById('payments', $payment_id, 'payment_amount'));
+    $amount_error = paymentAmountCheck($amount, $edit_limit);
+    if ($amount_error !== null) {
+        flashAlert($amount_error, 'error');
         redirect();
     }
     // Moved to another account - out of the deposit it was in
@@ -417,19 +429,23 @@ if (isset($_POST['add_bulk_payment'])) {
     $client_id = intval($_POST['client_id']);
     $date = escapeSql($_POST['date']);
     $bulk_payment_amount = floatval($_POST['amount']);
-    $bulk_payment_amount_static = floatval($_POST['amount']);
-    $total_account_balance = floatval($_POST['balance']);
     $account = intval($_POST['account']);
-    $currency_code = escapeSql($_POST['currency_code']);
     $payment_method = escapeSql($_POST['payment_method']);
     $reference = escapeSql($_POST['reference']);
     $email_receipt = intval($_POST['email_receipt']);
 
     enforceClientAccess();
 
-    // Check if bulk_payment_amount exceeds total_account_balance
-    if ($bulk_payment_amount > $total_account_balance) {
-        flashAlert(__('Payment exceeds Client Balance.'), 'error');
+    // What the client owes, worked out here - the same invoices and balances the bulk payment
+    // form lists - and the amount must be more than zero and no more than that. Above it the
+    // whole payment is refused, rather than the excess dropped without a word.
+    $owed_row = mysqli_fetch_row(mysqli_query($mysqli, "SELECT COALESCE(SUM(GREATEST(invoice_amount - COALESCE((SELECT SUM(payment_amount) FROM payments WHERE payment_invoice_id = invoice_id), 0), 0)), 0)
+        FROM invoices
+        WHERE invoice_status IN ('Sent', 'Viewed', 'Partial')
+        AND invoice_client_id = $client_id"));
+    $amount_error = paymentAmountCheck($bulk_payment_amount, floatval($owed_row[0]), __('Payment exceeds Client Balance.'));
+    if ($amount_error !== null) {
+        flashAlert($amount_error, 'error');
         redirect();
     }
 
@@ -441,8 +457,11 @@ if (isset($_POST['add_bulk_payment'])) {
         ORDER BY invoice_number ASC";
     $result_invoices = mysqli_query($mysqli, $sql_invoices);
 
-    // Loop Through Each Invoice
+    // Loop Through Each Invoice - in whole cents, so the last invoice reached is not left a fraction short
+    $bulk_cents = (int) round($bulk_payment_amount * 100);
     $applied_payments = [];
+    $applied_cents = 0;
+    $currency_code = '';
     while ($row = mysqli_fetch_assoc($result_invoices)) {
         $invoice_id = intval($row['invoice_id']);
         $invoice_prefix = escapeSql($row['invoice_prefix']);
@@ -453,33 +472,37 @@ if (isset($_POST['add_bulk_payment'])) {
         $result_amount_paid = mysqli_query($mysqli, $invoice_balance_query);
         $row_amount_paid = mysqli_fetch_assoc($result_amount_paid);
         $amount_paid = floatval($row_amount_paid['amount_paid']);
-        $invoice_balance = $invoice_amount - $amount_paid;
+        $invoice_balance_cents = (int) round(($invoice_amount - $amount_paid) * 100);
+        // Each payment in its invoice's own currency
+        $invoice_currency_code = escapeSql($row['invoice_currency_code']);
 
-        if ($bulk_payment_amount <= 0) {
+        if ($bulk_cents <= 0) {
             break; // Exit the loop if no payment amount is left
         }
 
         // Nothing owed on this one - a zero-value invoice, or one paid without its status catching up
-        if ($invoice_balance <= 0) {
+        if ($invoice_balance_cents <= 0) {
             continue;
         }
 
-        if ($bulk_payment_amount >= $invoice_balance) {
-            $payment_amount = $invoice_balance;
+        if ($bulk_cents >= $invoice_balance_cents) {
+            $payment_cents = $invoice_balance_cents;
             $invoice_status = "Paid";
         } else {
-            $payment_amount = $bulk_payment_amount;
+            $payment_cents = $bulk_cents;
             $invoice_status = "Partial";
         }
 
         // Subtract the payment amount from the bulk payment amount
-        $bulk_payment_amount -= $payment_amount;
-
-        // Get Invoice Remain Balance
-        $remaining_invoice_balance = $invoice_balance - $payment_amount;
+        $bulk_cents -= $payment_cents;
+        $applied_cents += $payment_cents;
+        $payment_amount = $payment_cents / 100;
+        if ($currency_code === '') {
+            $currency_code = $invoice_currency_code;
+        }
 
         // Add Payment
-        $payment_query = "INSERT INTO payments (payment_date, payment_amount, payment_currency_code, payment_account_id, payment_method, payment_reference, payment_invoice_id) VALUES ('{$date}', {$payment_amount}, '{$currency_code}', {$account}, '{$payment_method}', '{$reference}', {$invoice_id})";
+        $payment_query = "INSERT INTO payments (payment_date, payment_amount, payment_currency_code, payment_account_id, payment_method, payment_reference, payment_invoice_id) VALUES ('{$date}', {$payment_amount}, '{$invoice_currency_code}', {$account}, '{$payment_method}', '{$reference}', {$invoice_id})";
         mysqli_query($mysqli, $payment_query);
         $payment_id = mysqli_insert_id($mysqli);
 
@@ -517,7 +540,8 @@ if (isset($_POST['add_bulk_payment'])) {
         }
     }
 
-    logAudit("Invoice", "Payment", "Bulk Payment amount of " . numfmt_format_currency($currency_format, $bulk_payment_amount_static, $currency_code) . " applied to multiple invoices", $client_id);
+    // What actually went on the invoices
+    logAudit("Invoice", "Payment", "Bulk Payment amount of " . numfmt_format_currency($currency_format, $applied_cents / 100, $currency_code) . " applied to multiple invoices", $client_id);
 
     flashAlert(!empty($receipt_queued) ? __('Email receipt queued and Bulk Payment added') : __('Bulk Payment added'));
 

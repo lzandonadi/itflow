@@ -42,8 +42,6 @@ ob_start();
 <form action="post.php" method="post" autocomplete="off">
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
     <input type="hidden" name="invoice_id" value="<?= $invoice_id ?>">
-    <input type="hidden" name="balance" value="<?= number_format($state['balance'], 2, '.', '') ?>">
-    <input type="hidden" name="currency_code" value="<?= escapeHtml($invoice['invoice_currency_code']) ?>">
 
     <div class="modal-body">
         <div class="d-flex align-items-center gap-3 p-3 mb-3 rounded bg-body-tertiary">

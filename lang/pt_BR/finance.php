@@ -245,6 +245,7 @@ return [
     'The first line shows in the list.' => 'A primeira linha aparece na lista.',
     'The invoice this was paid on has since been deleted.' => 'A fatura em que isto foi pago foi excluída.',
     'The lines' => 'As linhas',
+    'The payment amount must be greater than zero.' => 'O valor do pagamento tem de ser maior que zero.',
     'The payment provider\'s fee was' => 'A taxa do provedor de pagamento foi',
     'The receipt could not be saved' => 'Não deu para salvar o recibo',
     'The receipt was not saved - it has to be a photo (JPG, PNG, GIF or WebP) or a PDF' => 'O recibo não foi salvo - tem de ser uma foto (JPG, PNG, GIF ou WebP) ou um PDF',
