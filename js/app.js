@@ -707,7 +707,7 @@ function itflowInit() {
                 onAction: function() {
                     var selectedText = editor.selection.getContent({ format: 'text' });
                     if (selectedText) {
-                        var newContent = '<span style="font-weight: bold; color: red;">[REDACTED]</span>';
+                        var newContent = '<span style="font-weight: bold; color: red;">' + __('[REDACTED]') + '</span>';
                         editor.selection.setContent(newContent);
                     } else {
                         alert(__('Please select a word to redact'));
@@ -759,12 +759,12 @@ function itflowInit() {
 
             editor.ui.registry.addButton('redactButton', {
                 icon: 'permanent-pen',
-                tooltip: 'Redact',
-                text: 'REDACT',
+                tooltip: __('Redact'),
+                text: __('REDACT'),
                 onAction: function() {
                     var selectedText = editor.selection.getContent({ format: 'text' });
                     if (selectedText) {
-                        var newContent = '<span style="font-weight: bold; color: red;">[REDACTED]</span>';
+                        var newContent = '<span style="font-weight: bold; color: red;">' + __('[REDACTED]') + '</span>';
                         editor.selection.setContent(newContent);
                     } else {
                         alert(__('Please select a word to redact'));

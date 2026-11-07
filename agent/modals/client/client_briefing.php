@@ -81,7 +81,7 @@ ob_start();
     var save = form.querySelector('[data-ai-briefing-save]');
     var copy = form.querySelector('[data-ai-briefing-copy]');
     var again = form.querySelector('[data-ai-briefing-again]');
-    var names = { '30': 'last 30 days', '90': 'last quarter', '365': 'last year' };
+    var names = { '30': __('last 30 days'), '90': __('last quarter'), '365': __('last year') };
 
     function ready(on) {
         [save, copy, again].forEach(function (button) {
@@ -119,7 +119,7 @@ ob_start();
                 // HTML as the server cleaned it
                 target.innerHTML = answer.html;
                 content.value = answer.html;
-                name.value = 'Briefing - ' + new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + ', ' + names[days()];
+                name.value = __('Briefing - %1$s, %2$s', new Date().toLocaleDateString(document.documentElement.lang || undefined, { year: 'numeric', month: 'short', day: 'numeric' }), names[days()]);
                 said.classList.remove('d-none');
                 ready(true);
             })

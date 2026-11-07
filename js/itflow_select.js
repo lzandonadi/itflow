@@ -421,7 +421,7 @@
                     remove.type = 'button';
                     remove.tabIndex = -1;
                     remove.setAttribute('data-remove', item.value);
-                    remove.setAttribute('aria-label', 'Remove ' + item.label);
+                    remove.setAttribute('aria-label', __('Remove %s', item.label));
                     remove.appendChild(make('i', 'fas fa-times'));
                     chip.appendChild(remove);
                 }
@@ -503,7 +503,7 @@
         input.autocomplete = 'off';
         input.spellcheck = false;
         input.placeholder = this.tags ? __('Search or add') : __('Search');
-        input.setAttribute('aria-label', 'Search ' + (this.label || 'options'));
+        input.setAttribute('aria-label', this.label ? __('Search %s', this.label) : __('Search options'));
         input.setAttribute('aria-controls', this.id + '-list');
         input.setAttribute('aria-autocomplete', 'list');
         input.addEventListener('input', function () {

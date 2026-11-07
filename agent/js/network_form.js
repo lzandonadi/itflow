@@ -151,7 +151,7 @@
                     overlap.className = 'text-warning-emphasis';
                     const warn = document.createElement('i');
                     warn.className = 'fas fa-fw fa-clone me-1';
-                    overlap.append(warn, 'Overlaps ' + data.overlaps.join(', '));
+                    overlap.append(warn, __('Overlaps %s', data.overlaps.join(', ')));
                     info.append(overlap);
                 }
                 suggest('gateway', gatewayInput, data.gateway);

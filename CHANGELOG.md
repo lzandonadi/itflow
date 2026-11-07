@@ -44,6 +44,7 @@ This release has one database change (3.5.5 to 3.5.6), which adds the interface 
 ### Bug Fixes
 
 - Editing a client's reply on a ticket no longer fills Time worked with the current time of day - a reply with no time worked shows 00:00:00.
+- Portuguese: the menu's All Client Docs reads "Contatos"; the dashboard charts' legends (opened and resolved tickets, income and expenses, billable time), the calendar's move and book confirmations with their Onsite/Remote choice and dates, the editor's Redact button and the [REDACTED] mark it leaves, and a few labels built from pieces in scripts (a user's client access summary, "Use ..." in the icon pickers, network overlaps, the notifications bell for screen readers, the default name of a client briefing and the purpose of a trip) were still in English and now follow the interface language.
 - Portuguese: the built-in ticket statuses' descriptions and the On Hold status now show translated everywhere (they stayed in English when the language was Portuguese), and the tooltips, confirmations, placeholders and sortable column headings that wrap a name ("Delete %s?", "Last activity ...") are translated as whole sentences.
 
 ### Developer Updates

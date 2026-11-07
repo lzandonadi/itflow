@@ -176,7 +176,7 @@
 
         const toggle = root && root.querySelector('[data-bs-toggle="dropdown"]');
         if (toggle) {
-            toggle.setAttribute('aria-label', count ? 'Notifications, ' + count + ' unread' : 'Notifications');
+            toggle.setAttribute('aria-label', count ? (count === 1 ? __('Notifications, 1 unread') : __('Notifications, %s unread', count)) : __('Notifications'));
         }
     }
 

@@ -93,7 +93,8 @@
             options.hour = 'numeric';
             options.minute = '2-digit';
         }
-        return date.toLocaleString(undefined, options);
+        // In the interface language (<html lang>), not the browser's
+        return date.toLocaleString(document.documentElement.lang || undefined, options);
     }
 
     function openModal(url, size) {
@@ -126,7 +127,7 @@
             theme: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light',
             icon: 'question',
             showCancelButton: true,
-            cancelButtonText: 'Cancel',
+            cancelButtonText: __('Cancel'),
             reverseButtons: true,
             buttonsStyling: false,
             customClass: {
@@ -310,7 +311,7 @@
 
         if (props.kind === 'ticket') {
             confirmDialog({
-                title: 'Move ' + event.title.split(' ')[0] + ' to ' + words(start, false) + '?',
+                title: __('Move %1$s to %2$s?', event.title.split(' ')[0], words(start, false)),
                 text: __('The agent and the contact are emailed the new time, as when it is rescheduled on the ticket.'),
                 confirmButtonText: __('Move it')
             }).then(function (result) {
@@ -380,10 +381,10 @@
             start.setHours(9, 0, 0, 0);
         }
         confirmDialog({
-            title: 'Book ' + item.dataset.reference + ' for ' + words(start, false) + '?',
+            title: __('Book %1$s for %2$s?', item.dataset.reference, words(start, false)),
             text: __('The agent and the contact are emailed the time, as when it is scheduled on the ticket.'),
             input: 'radio',
-            inputOptions: {1: 'Onsite', 0: 'Remote'},
+            inputOptions: {1: __('Onsite'), 0: __('Remote')},
             inputValue: item.dataset.onsite === '1' ? '1' : '0',
             confirmButtonText: __('Book it')
         }).then(function (result) {

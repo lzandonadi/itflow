@@ -362,7 +362,7 @@ $value = function ($key) use ($form) {
         var deny = root.querySelectorAll('[data-user-access-row] input[value="deny"]:checked').length;
         var text, tone;
         if (allow) {
-            text = 'Sees ' + allow + ' client' + (allow === 1 ? '' : 's') + ' only';
+            text = allow === 1 ? __('Sees 1 client only') : __('Sees %s clients only', allow);
             tone = 'text-warning-emphasis';
         } else if (deny) {
             text = deny === 1 ? __('Sees all but 1 client') : __('Sees all but %s clients', deny);

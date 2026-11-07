@@ -362,7 +362,7 @@ $unit = tripUnit();
             return;
         }
         if (purpose.value.trim() === '') {
-            purpose.value = 'Onsite - ' + found[1].replace(/^[^ ]+ - /, '');
+            purpose.value = __('Onsite - %s', found[1].replace(/^[^ ]+ - /, ''));
         }
         if (found[2] && site.value === '0' && site.querySelector('option[value="' + found[2] + '"]')) {
             site.value = String(found[2]);

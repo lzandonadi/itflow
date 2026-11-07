@@ -95,8 +95,8 @@
             data: {
                 labels: data.ticket_trend.map(function (w) { return w.label; }),
                 datasets: [
-                    { label: 'Opened', data: data.ticket_trend.map(function (w) { return w.opened; }), backgroundColor: colors.accent, borderRadius: 3, maxBarThickness: 14 },
-                    { label: 'Resolved', data: data.ticket_trend.map(function (w) { return w.resolved; }), backgroundColor: alpha(colors.success, 0.75), borderRadius: 3, maxBarThickness: 14 }
+                    { label: __('Opened'), data: data.ticket_trend.map(function (w) { return w.opened; }), backgroundColor: colors.accent, borderRadius: 3, maxBarThickness: 14 },
+                    { label: __('Resolved'), data: data.ticket_trend.map(function (w) { return w.resolved; }), backgroundColor: alpha(colors.success, 0.75), borderRadius: 3, maxBarThickness: 14 }
                 ]
             },
             options: {
@@ -125,12 +125,12 @@
         }
 
         const datasets = [
-            { label: 'Income', data: cf.income, backgroundColor: alpha(colors.success, 0.8), borderRadius: roundUnless(cf.expected_income), maxBarThickness: 22, stack: 'income' }
+            { label: __('Income'), data: cf.income, backgroundColor: alpha(colors.success, 0.8), borderRadius: roundUnless(cf.expected_income), maxBarThickness: 22, stack: 'income' }
         ];
         if (forecast) {
             datasets.push(Object.assign({ label: __('Expected income'), data: cf.expected_income, stack: 'income' }, ghost(colors.success)));
         }
-        datasets.push({ label: 'Expenses', data: cf.expenses, backgroundColor: alpha(colors.danger, 0.75), borderRadius: roundUnless(cf.expected_expenses), maxBarThickness: 22, stack: 'expenses' });
+        datasets.push({ label: __('Expenses'), data: cf.expenses, backgroundColor: alpha(colors.danger, 0.75), borderRadius: roundUnless(cf.expected_expenses), maxBarThickness: 22, stack: 'expenses' });
         if (forecast) {
             datasets.push(Object.assign({ label: __('Expected expenses'), data: cf.expected_expenses, stack: 'expenses' }, ghost(colors.danger)));
         }
@@ -168,7 +168,7 @@
             data: {
                 labels: tw.map(function (d) { return d.label; }),
                 datasets: [
-                    { label: 'Billable', data: tw.map(function (d) { return d.billable; }), backgroundColor: colors.accent, borderRadius: roundUnless(other), maxBarThickness: 18, stack: 'time' },
+                    { label: __('Billable'), data: tw.map(function (d) { return d.billable; }), backgroundColor: colors.accent, borderRadius: roundUnless(other), maxBarThickness: 18, stack: 'time' },
                     { label: __('Not billable'), data: other, backgroundColor: colors.faint, borderRadius: 3, maxBarThickness: 18, stack: 'time' }
                 ]
             },

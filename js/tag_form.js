@@ -99,7 +99,7 @@
             if (usable) {
                 custom.dataset.icon = term;
                 custom.querySelector('i').className = 'fas fa-fw fa-' + term + ' me-1';
-                custom.querySelector('span').textContent = 'Use ' + term;
+                custom.querySelector('span').textContent = __('Use %s', term);
                 custom.classList.toggle('active', icon.value === term);
             }
             none.hidden = shown > 0 || usable;

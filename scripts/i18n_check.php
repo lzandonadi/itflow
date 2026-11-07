@@ -192,8 +192,18 @@ function i18nCheckJs(string $code, string $file, int $first_line, array &$calls,
             }
             $line = $first_line + substr_count(substr($code, 0, $offset), "\n");
             $text = $literal[0] === '`' ? preg_replace('/\$\{[^}]*\}/', '', $value) : $value;
+            // A single word counts where it can only be shown: the value of a key a widget
+            // displays (a chart's label, a dialog's title or button), or a piece of a
+            // sentence glued on with + ('Move ' + ref + ' to ' ...)
+            $after = substr($code, $offset + strlen($literal), 20);
+            $shown_key = preg_match('/[{,]\s*(label|title|text|tooltip|placeholder|inputPlaceholder|\w+ButtonText|\d+)\s*:\s*$/', $before);
+            // ...but not an acronym or unit ('HTTP ' + status, ' MB') or a piece of CSS
+            $glued = (preg_match('/\+\s*$/', $before) || preg_match('/^\s*\+/', $after)) && preg_match('/^\s|\s$/', $text)
+                && preg_match('/[a-z]/', $text) && !preg_match('/[;{}]/', $text);
             if (strpos($text, '<') !== false && strpos($text, '>') !== false) {
                 i18nCheckHardcodedHtml($text, $lines, $first_line, $file, $line, $hardcoded);
+            } elseif (($shown_key || $glued) && i18nCheckIsProse($text, true)) {
+                i18nCheckHardcoded($hardcoded, $lines, $first_line, $file, $line, $text);
             } elseif (i18nCheckIsProse($text, false)) {
                 i18nCheckHardcoded($hardcoded, $lines, $first_line, $file, $line, $text);
             }

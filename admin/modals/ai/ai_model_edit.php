@@ -190,7 +190,7 @@ ob_start();
         modelList.innerHTML = '';
         var option = provider.options[provider.selectedIndex];
         var example = option ? option.getAttribute('data-example') : '';
-        modelName.placeholder = example ? 'Like ' + example : __('As the provider names it');
+        modelName.placeholder = example ? __('Like %s', example) : __('As the provider names it');
         if (!provider.value) {
             modelHint.textContent = __('As the provider names it.');
             return;
