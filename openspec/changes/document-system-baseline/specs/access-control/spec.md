@@ -29,15 +29,11 @@ O sistema SHALL dar ao papel de administrador acesso a todos os módulos, a todo
 - **THEN** nenhum handler de administração é executado, a configuração não muda e a requisição fica registrada no app log como não tratada
 
 ### Requirement: Restrição de técnicos a clientes
-O sistema SHALL permitir restringir um técnico a clientes por duas listas: uma de clientes liberados (quando existe, o técnico só acessa os clientes dela) e uma de clientes bloqueados (que o técnico nunca acessa, mesmo que também estejam liberados). Um técnico sem nenhuma das listas acessa todos os clientes. Administradores não são restringidos. Um técnico restrito não SHALL ver nem alterar registros de clientes fora do seu conjunto, em listas, buscas, exportações, na API ou abrindo um registro pelo ID na URL.
+O sistema SHALL permitir restringir um técnico a clientes. Um técnico restrito não SHALL ver nem alterar registros de clientes fora do seu conjunto, em listas, buscas, exportações, na API ou abrindo um registro pelo ID na URL.
 
 #### Scenario: ID de outro cliente na URL
 - **WHEN** um técnico restrito ao cliente A abre a URL de um ativo do cliente B
 - **THEN** o acesso é negado, ele volta para a lista de clientes e a tentativa fica registrada no audit log
-
-#### Scenario: Cliente bloqueado e liberado ao mesmo tempo
-- **WHEN** um cliente está nas duas listas de um técnico
-- **THEN** o técnico não acessa esse cliente
 
 #### Scenario: Chave de API de um técnico restrito
 - **WHEN** uma chave de API pertencente a um técnico restrito ao cliente A lista ativos
@@ -46,6 +42,17 @@ O sistema SHALL permitir restringir um técnico a clientes por duas listas: uma 
 #### Scenario: Lista de despesas
 - **WHEN** um técnico restrito ao cliente A abre a lista de despesas
 - **THEN** a lista mostra apenas despesas do cliente A e despesas sem cliente
+
+### Requirement: Listas de clientes liberados e bloqueados
+O sistema SHALL definir o conjunto de clientes de um técnico por duas listas. Quando há clientes liberados, o técnico só acessa esses. Os clientes bloqueados ele nunca acessa, mesmo que também estejam liberados. Sem nenhuma das listas, acessa todos. Administradores não são restringidos.
+
+#### Scenario: Cliente bloqueado e liberado ao mesmo tempo
+- **WHEN** um cliente está nas duas listas de um técnico
+- **THEN** o técnico não acessa esse cliente
+
+#### Scenario: Técnico sem listas
+- **WHEN** um técnico não tem clientes liberados nem bloqueados
+- **THEN** ele acessa todos os clientes
 
 ### Requirement: Registros sem cliente continuam visíveis
 O sistema SHALL manter visíveis para técnicos restritos os registros que não pertencem a nenhum cliente, porque a restrição separa dados de clientes e um registro sem cliente não é dado de nenhum cliente.
