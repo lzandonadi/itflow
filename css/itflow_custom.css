@@ -6947,6 +6947,14 @@ a.itflow-billing-stat:hover {
         min-width: 0;
     }
 }
+/* The header's buttons (New ticket) keep their label on one line: when the header is
+   tight, around 992px, the room comes out of the space around the menu instead. From
+   992 to 1199px the account shows only its initials (header.php), so a long contact
+   name cannot push the menu under the logo - the name is at the top of its menu. */
+.itflow-portal-header .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
 .itflow-portal-nav-link {
     display: inline-flex;
     align-items: center;

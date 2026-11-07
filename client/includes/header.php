@@ -161,8 +161,8 @@ $portal_contact_name = (string) ($contact['contact_name'] ?? '');
             <div class="dropdown">
                 <button type="button" class="itflow-portal-account" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<?= escapeHtml(__('Your account')) ?>">
                     <?= portalAvatarHtml($portal_contact_name, $session_contact_photo ? "/uploads/clients/$session_client_id/$session_contact_photo" : '') ?>
-                    <span class="d-none d-md-inline text-truncate"><?= escapeHtml($portal_contact_name) ?></span>
-                    <i class="fas fa-chevron-down small text-body-secondary d-none d-md-inline"></i>
+                    <span class="d-none d-md-inline d-lg-none d-xl-inline text-truncate"><?= escapeHtml($portal_contact_name) ?></span>
+                    <i class="fas fa-chevron-down small text-body-secondary d-none d-md-inline d-lg-none d-xl-inline"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <div class="dropdown-header">
