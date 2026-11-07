@@ -28,8 +28,8 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 ## 5. Fechamento
 
 - [ ] 5.1 Revisar com o usuário as 10 specs e os achados; verificar que nenhuma spec traz requisito marcado como não confirmado
-- [ ] 5.2 Documentar no `CLAUDE.md` a regra "documentar antes de mudar" (D4) e onde ficam as specs; verificar que o texto aponta para `openspec/specs/`
-- [ ] 5.3 Rodar `openspec validate document-system-baseline --strict` sem erros
+- [x] 5.2 Documentar no `CLAUDE.md` a regra "documentar antes de mudar" (D4) e onde ficam as specs; verificar que o texto aponta para `openspec/specs/`
+- [x] 5.3 Rodar `openspec validate document-system-baseline --strict` sem erros
 
 ## Achados
 

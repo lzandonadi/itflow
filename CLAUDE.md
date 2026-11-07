@@ -16,7 +16,7 @@ Plain procedural PHP 8.2+, MariaDB/MySQL via `mysqli` (string-built queries, no 
 - **Schema lint** (CI, when `db.sql` changes): import `db.sql` into an empty MariaDB database.
 - `index.php` routes to `/setup`, `/agent/<start page>`, `/client/`, or `/login.php`.
 - **Cron:** in production, a single crontab entry `* * * * * php /path/to/itflow/cron/cron.php`. Not scheduled in DDEV; run the dispatcher or a single job by hand, e.g. `ddev exec php cron/mail_queue.php`.
-- **Planning:** non-trivial work is planned with OpenSpec (`openspec/`, CLI `openspec`, slash commands `/opsx:*`); artifacts are written in pt-BR.
+- **Planning:** non-trivial work is planned with OpenSpec (`openspec/`, CLI `openspec`, slash commands `/opsx:*`); artifacts are written in pt-BR. The specs in `openspec/specs/<capability>/spec.md` describe how the system behaves **today** - they are the regression contract, since there is no test suite. **Document before changing:** a change that touches an area with no spec starts with a task that writes that area's baseline spec (ADDED, current behaviour, checked in the code), and only then adds its own delta. The list of areas and which are still undocumented is the capability map in `openspec/changes/archive/*-document-system-baseline/design.md`. A spec that disagrees with the code is a finding for its own change, not something to fix silently in either.
 - **CLI scripts:** `scripts/setup_cli.php`, `scripts/update_cli.php`, `scripts/restore_cli.php`.
 
 ## Architecture
