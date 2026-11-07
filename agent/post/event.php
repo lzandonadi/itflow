@@ -31,7 +31,18 @@ function calendarPostedAttendees() {
 
 /** " - invitation emailed to 3 people" (or just "emailed to") - nothing when nobody was. */
 function calendarSentText($count, $what = 'invitation') {
-    return $count ? ' - ' . ($what ? "$what " : '') . "emailed to $count " . ($count === 1 ? 'person' : 'people') : '';
+    if (!$count) {
+        return '';
+    }
+    switch ($what) {
+        case 'invitation':
+            return ' - ' . _n('invitation emailed to %d person', 'invitation emailed to %d people', $count);
+        case 'cancellation':
+            return ' - ' . _n('cancellation emailed to %d person', 'cancellation emailed to %d people', $count);
+        case 'update':
+            return ' - ' . _n('update emailed to %d person', 'update emailed to %d people', $count);
+    }
+    return ' - ' . _n('emailed to %d person', 'emailed to %d people', $count);
 }
 
 /*
@@ -45,7 +56,7 @@ if (isset($_POST['add_calendar'])) {
 
     $name = trim(strip_tags((string) ($_POST['name'] ?? '')));
     if ($name === '') {
-        flashAlert('A calendar needs a name.', 'error');
+        flashAlert(__('A calendar needs a name.'), 'error');
         redirect();
     }
     $color = calendarPostedColor($_POST['color'] ?? '');
@@ -55,7 +66,7 @@ if (isset($_POST['add_calendar'])) {
 
     logAudit("Calendar", "Create", "$session_name created calendar " . escapeSql($name), 0, $calendar_id);
 
-    flashAlert("Calendar <strong>" . escapeHtml($name) . "</strong> created");
+    flashAlert(__('Calendar <strong>%s</strong> created', escapeHtml($name)));
 
     redirect();
 
@@ -69,7 +80,7 @@ if (isset($_POST['edit_calendar'])) {
     $calendar_id = intval($_POST['calendar_id'] ?? 0);
     $name = trim(strip_tags((string) ($_POST['name'] ?? '')));
     if ($name === '') {
-        flashAlert('A calendar needs a name.', 'error');
+        flashAlert(__('A calendar needs a name.'), 'error');
         redirect();
     }
     $color = calendarPostedColor($_POST['color'] ?? '');
@@ -78,7 +89,7 @@ if (isset($_POST['edit_calendar'])) {
 
     logAudit("Calendar", "Edit", "$session_name edited calendar " . escapeSql($name), 0, $calendar_id);
 
-    flashAlert("Calendar <strong>" . escapeHtml($name) . "</strong> saved");
+    flashAlert(__('Calendar <strong>%s</strong> saved', escapeHtml($name)));
 
     redirect();
 
@@ -108,7 +119,7 @@ if (isset($_GET['delete_calendar'])) {
 
     logAudit("Calendar", "Delete", "$session_name deleted calendar " . escapeSql($calendar_name) . " and its events");
 
-    flashAlert("Calendar <strong>" . escapeHtml($calendar_name) . "</strong> and its events deleted" . calendarSentText($cancelled, 'cancellation'), 'error');
+    flashAlert(__('Calendar <strong>%s</strong> and its events deleted', escapeHtml($calendar_name)) . calendarSentText($cancelled, 'cancellation'), 'error');
 
     redirect();
 
@@ -142,7 +153,7 @@ if (isset($_POST['share_calendar'])) {
 
         logAudit("Calendar", "Share", "$session_name published calendar " . escapeSql($calendar_name) . " as a read-only feed", 0, $calendar_id);
 
-        flashAlert("Calendar <strong>" . escapeHtml($calendar_name) . "</strong> published - copy the subscription link from Share");
+        flashAlert(__('Calendar <strong>%s</strong> published - copy the subscription link from Share', escapeHtml($calendar_name)));
 
     } else {
 
@@ -152,7 +163,7 @@ if (isset($_POST['share_calendar'])) {
 
         logAudit("Calendar", "Edit", "$session_name updated feed settings for calendar " . escapeSql($calendar_name), 0, $calendar_id);
 
-        flashAlert("Sharing for <strong>" . escapeHtml($calendar_name) . "</strong> saved");
+        flashAlert(__('Sharing for <strong>%s</strong> saved', escapeHtml($calendar_name)));
     }
 
     redirect();
@@ -176,7 +187,7 @@ if (isset($_GET['regenerate_calendar_feed'])) {
 
     logAudit("Calendar", "Share", "$session_name regenerated the feed link for calendar " . escapeSql($calendar_name), 0, $calendar_id);
 
-    flashAlert("New link for <strong>" . escapeHtml($calendar_name) . "</strong> - the old one has stopped working, so subscribers must subscribe again", 'warning');
+    flashAlert(__('New link for <strong>%s</strong> - the old one has stopped working, so subscribers must subscribe again', escapeHtml($calendar_name)), 'warning');
 
     redirect();
 
@@ -199,7 +210,7 @@ if (isset($_GET['unshare_calendar'])) {
 
     logAudit("Calendar", "Share", "$session_name stopped sharing calendar " . escapeSql($calendar_name), 0, $calendar_id);
 
-    flashAlert("Calendar <strong>" . escapeHtml($calendar_name) . "</strong> is no longer shared", 'error');
+    flashAlert(__('Calendar <strong>%s</strong> is no longer shared', escapeHtml($calendar_name)), 'error');
 
     redirect();
 
@@ -236,7 +247,7 @@ if (isset($_POST['add_event'])) {
 
     logAudit("Calendar Event", "Create", "$session_name added the event " . escapeSql($event['event_title']) . " to calendar " . escapeSql($event['calendar_name']), $client_id, $event_id);
 
-    flashAlert("Event <strong>" . escapeHtml($event['event_title']) . "</strong> added" . calendarSentText($sent));
+    flashAlert(__('Event <strong>%s</strong> added', escapeHtml($event['event_title'])) . calendarSentText($sent));
 
     redirect();
 
@@ -306,7 +317,7 @@ if (isset($_POST['edit_event'])) {
 
     logAudit("Calendar Event", "Edit", "$session_name edited the event " . escapeSql($event['event_title']), $client_id, $event_id);
 
-    flashAlert("Event <strong>" . escapeHtml($event['event_title']) . "</strong> saved" . calendarSentText($sent + $cancelled, ''));
+    flashAlert(__('Event <strong>%s</strong> saved', escapeHtml($event['event_title'])) . calendarSentText($sent + $cancelled, ''));
 
     redirect();
 
@@ -320,7 +331,7 @@ if (isset($_POST['send_event_invites'])) {
     $event_id = intval($event['event_id']);
 
     if (!calendarCanEmail()) {
-        flashAlert('Email is not set up, so there is nothing to send the invitation with.', 'error');
+        flashAlert(__('Email is not set up, so there is nothing to send the invitation with.'), 'error');
         redirect();
     }
 
@@ -332,11 +343,11 @@ if (isset($_POST['send_event_invites'])) {
     $sent = calendarSendInvites($event, 'invite', $not_invited) + calendarSendInvites($event, 'update', $invited);
 
     if (!$sent) {
-        flashAlert('Nobody on this event has an email address to send it to.', 'warning');
+        flashAlert(__('Nobody on this event has an email address to send it to.'), 'warning');
         redirect();
     }
 
-    flashAlert("Invitation for <strong>" . escapeHtml($event['event_title']) . "</strong> emailed to $sent " . ($sent === 1 ? 'person' : 'people'));
+    flashAlert(_n('Invitation for <strong>%2$s</strong> emailed to %1$d person', 'Invitation for <strong>%2$s</strong> emailed to %1$d people', $sent, $sent, escapeHtml($event['event_title'])));
 
     redirect();
 
@@ -351,7 +362,7 @@ if (isset($_GET['skip_event_occurrence'])) {
     $date = (string) ($_GET['date'] ?? '');
 
     if (!calendarEventRepeats($event) || !calendarIsDate($date)) {
-        flashAlert('That is not one of its occurrences.', 'error');
+        flashAlert(__('That is not one of its occurrences.'), 'error');
         redirect();
     }
 
@@ -368,7 +379,7 @@ if (isset($_GET['skip_event_occurrence'])) {
     $when = date('D, M j', strtotime($date));
     logAudit("Calendar Event", "Edit", "$session_name skipped $when of the event " . escapeSql($event['event_title']), intval($event['event_client_id']), $event_id);
 
-    flashAlert("<strong>" . escapeHtml($event['event_title']) . "</strong> skipped on $when" . calendarSentText($sent, 'update'));
+    flashAlert(__('<strong>%1$s</strong> skipped on %2$s', escapeHtml($event['event_title']), formatDate($date, 'date_weekday')) . calendarSentText($sent, 'update'));
 
     redirect();
 
@@ -389,7 +400,7 @@ if (isset($_GET['delete_event'])) {
 
     logAudit("Calendar Event", "Delete", "$session_name deleted the event " . escapeSql($event['event_title']), intval($event['event_client_id']), $event_id);
 
-    flashAlert("Event <strong>" . escapeHtml($event['event_title']) . "</strong> deleted" . calendarSentText($cancelled, 'cancellation'), 'error');
+    flashAlert(__('Event <strong>%s</strong> deleted', escapeHtml($event['event_title'])) . calendarSentText($cancelled, 'cancellation'), 'error');
 
     redirect();
 
@@ -428,12 +439,12 @@ if (isset($_POST['calendar_feed_save'])) {
 
     if (calendarUserFeed($session_user_id)) {
         mysqli_query($mysqli, "UPDATE user_calendar_feeds SET $fields WHERE feed_user_id = $session_user_id");
-        flashAlert('Your calendar link is saved - subscribers pick up the change on their next refresh');
+        flashAlert(__('Your calendar link is saved - subscribers pick up the change on their next refresh'));
     } else {
         $feed_key = escapeSql(randomString(40));
         mysqli_query($mysqli, "INSERT INTO user_calendar_feeds SET feed_user_id = $session_user_id, feed_key = '$feed_key', $fields");
         logAudit("Calendar", "Share", "$session_name created a subscription link to their schedule");
-        flashAlert('Your calendar link is ready - copy it from My calendar link');
+        flashAlert(__('Your calendar link is ready - copy it from My calendar link'));
     }
 
     redirect();
@@ -449,7 +460,7 @@ if (isset($_GET['calendar_feed_regenerate'])) {
 
     logAudit("Calendar", "Share", "$session_name regenerated the subscription link to their schedule");
 
-    flashAlert('New calendar link made - the old one has stopped working, so subscribe again with the new one', 'warning');
+    flashAlert(__('New calendar link made - the old one has stopped working, so subscribe again with the new one'), 'warning');
 
     redirect();
 
@@ -463,7 +474,7 @@ if (isset($_GET['calendar_feed_stop'])) {
 
     logAudit("Calendar", "Share", "$session_name stopped the subscription link to their schedule");
 
-    flashAlert('Your calendar link has stopped working', 'error');
+    flashAlert(__('Your calendar link has stopped working'), 'error');
 
     redirect();
 

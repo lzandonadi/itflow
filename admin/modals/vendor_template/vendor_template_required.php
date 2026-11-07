@@ -16,10 +16,10 @@ ob_start();
 
 if (!$template) { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-clipboard-check me-2"></i>Who should have it</h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-clipboard-check me-2"></i><?= __('Who should have it') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
-    <div class="modal-body text-center text-secondary py-5">That vendor template no longer exists.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That vendor template no longer exists.') ?></div>
 <?php } else {
     $vendor_template_id = intval($template['vendor_template_id']);
     $required = intval($template['vendor_template_required']);
@@ -27,7 +27,7 @@ if (!$template) { ?>
     ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-clipboard-check me-2"></i>Who should have it <small class="ms-1 opacity-75"><?= escapeHtml($template['vendor_template_name']) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-clipboard-check me-2"></i><?= __('Who should have it') ?> <small class="ms-1 opacity-75"><?= escapeHtml($template['vendor_template_name']) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="/admin/post.php" method="post" autocomplete="off" data-vendor-template-required>
@@ -37,36 +37,36 @@ if (!$template) { ?>
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label">Every one of these should have it as a vendor</label>
+            <label class="form-label"><?= __('Every one of these should have it as a vendor') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
                 <select class="form-select select2" name="required" id="vendorTemplateRequired">
-                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_NONE ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_NONE ? 'selected' : '' ?>>No one in particular</option>
-                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_EVERY ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_EVERY ? 'selected' : '' ?>>Every client</option>
-                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_TAGGED ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_TAGGED ? 'selected' : '' ?>>Clients with a tag</option>
+                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_NONE ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_NONE ? 'selected' : '' ?>><?= __('No one in particular') ?></option>
+                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_EVERY ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_EVERY ? 'selected' : '' ?>><?= __('Every client') ?></option>
+                    <option value="<?= VENDOR_TEMPLATE_REQUIRED_TAGGED ?>" <?= $required === VENDOR_TEMPLATE_REQUIRED_TAGGED ? 'selected' : '' ?>><?= __('Clients with a tag') ?></option>
                 </select>
             </div>
-            <div class="form-text">Leads and archived clients don't count. The template's page, each client's Vendors and their overview show who is missing it.</div>
+            <div class="form-text"><?= __('Leads and archived clients don\'t count. The template\'s page, each client\'s Vendors and their overview show who is missing it.') ?></div>
         </div>
 
         <div class="mb-1" id="vendorTemplateRequiredTags" <?= $required === VENDOR_TEMPLATE_REQUIRED_TAGGED ? '' : 'hidden' ?>>
-            <label class="form-label">Client tags</label>
+            <label class="form-label"><?= __('Client tags') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-tags"></i></span>
-                <select class="form-select select2" name="tags[]" multiple data-placeholder="- Pick client tags -">
+                <select class="form-select select2" name="tags[]" multiple data-placeholder="<?= escapeHtml(__('- Pick client tags -')) ?>">
                     <?php foreach (tagOptionsFor('client', $tag_ids) as $tag) { ?>
                         <?= tagOptionHtml($tag, $tag_ids) ?>
                     <?php } ?>
                 </select>
             </div>
-            <div class="form-text">Clients with any of them - VoIP, say, for the phone carrier every client on your hosted phones has.</div>
+            <div class="form-text"><?= __('Clients with any of them - VoIP, say, for the phone carrier every client on your hosted phones has.') ?></div>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="save_vendor_template_required" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="save_vendor_template_required" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

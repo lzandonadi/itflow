@@ -16,14 +16,14 @@ $gs_todo = $gs_progress['total'] - $gs_progress['done'];
 ?>
 <div class="text-center mb-4" data-gs-summary="<?= $gs_progress['finished'] ? 'finished' : 'unfinished' ?>">
     <span class="itflow-gs-done-mark mb-3<?= $gs_left ? ' is-partial' : '' ?>" aria-hidden="true"><i class="fas <?= $gs_left ? 'fa-flag-checkered' : 'fa-check' ?>"></i></span>
-    <h1 class="h4 fw-semibold mb-1"><?= $gs_left ? ($gs_progress['finished'] ? "That's the lot for now" : ($gs_todo <= 2 ? 'Nearly there' : 'Still to set up')) : 'All set' ?></h1>
+    <h1 class="h4 fw-semibold mb-1"><?= $gs_left ? ($gs_progress['finished'] ? __("That's the lot for now") : ($gs_todo <= 2 ? __('Nearly there') : __('Still to set up'))) : __('All set') ?></h1>
     <p class="text-body-secondary mb-0">
         <?php if (!$gs_left) { ?>
-            Everything is set up. Each of these is in Admin whenever it needs changing.
+            <?= __('Everything is set up. Each of these is in Admin whenever it needs changing.') ?>
         <?php } elseif ($gs_progress['finished']) { ?>
-            What you skipped is here when you want it - in Admin &gt; Get started.
+            <?= __('What you skipped is here when you want it - in Admin &gt; Get started.') ?>
         <?php } else { ?>
-            <?= $gs_todo === 1 ? 'One step is' : $gs_todo . ' steps are' ?> still to do - each ticks itself off however it's set up.
+            <?= $gs_todo === 1 ? __('One step is') : $gs_todo . ' steps are' ?> still to do - each ticks itself off however it's set up.
         <?php } ?>
     </p>
 </div>
@@ -36,13 +36,13 @@ $gs_todo = $gs_progress['total'] - $gs_progress['done'];
             </span>
             <div class="min-w-0 flex-grow-1">
                 <div class="fw-semibold"><?= escapeHtml($gs_step_row['title']) ?></div>
-                <div class="small text-body-secondary"><?= escapeHtml($gs_step_row['status']) ?><?= !$gs_step_row['done'] && $gs_step_row['skipped'] ? ' - skipped for now' : '' ?></div>
+                <div class="small text-body-secondary"><?= escapeHtml($gs_step_row['status']) ?><?= !$gs_step_row['done'] && $gs_step_row['skipped'] ? __(' - skipped for now') : '' ?></div>
             </div>
-            <a href="<?= gettingStartedUrl($gs_key) ?>" class="btn btn-sm <?= $gs_step_row['done'] ? 'btn-link text-decoration-none' : 'btn-outline-primary' ?> flex-shrink-0"><?= $gs_step_row['done'] ? 'Change' : 'Set up' ?></a>
+            <a href="<?= gettingStartedUrl($gs_key) ?>" class="btn btn-sm <?= $gs_step_row['done'] ? 'btn-link text-decoration-none' : 'btn-outline-primary' ?> flex-shrink-0"><?= $gs_step_row['done'] ? __('Change') : __('Set up') ?></a>
         </li>
     <?php } ?>
 </ul>
 
 <div class="d-flex flex-wrap justify-content-center gap-2">
-    <a href="/agent/dashboard.php" class="btn btn-primary" data-gs-finish>Go to the dashboard<i class="fas fa-arrow-right ms-2"></i></a>
+    <a href="/agent/dashboard.php" class="btn btn-primary" data-gs-finish><?= __('Go to the dashboard') ?><i class="fas fa-arrow-right ms-2"></i></a>
 </div>

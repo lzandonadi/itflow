@@ -36,9 +36,9 @@ if (isset($_POST['add_transfer'])) {
     }
     $row = transferRow($transfer_id);
 
-    logAudit("Account Transfer", "Create", "$session_name transferred " . escapeSql(transferLabel($row)), 0, $transfer_id);
+    logAudit("Account Transfer", "Create", "$session_name transferred " . escapeSql(i18nEnglish(fn () => transferLabel($row))), 0, $transfer_id);
 
-    flashAlert("Moved <strong>" . escapeHtml(transferLabel($row)) . "</strong>");
+    flashAlert(__('Moved %s', '<strong>' . escapeHtml(transferLabel($row)) . '</strong>'));
 
     redirect();
 
@@ -57,9 +57,9 @@ if (isset($_POST['edit_transfer'])) {
     }
     $row = transferRow($transfer_id);
 
-    logAudit("Account Transfer", "Edit", "$session_name edited the transfer " . escapeSql(transferLabel($row)), 0, $transfer_id);
+    logAudit("Account Transfer", "Edit", "$session_name edited the transfer " . escapeSql(i18nEnglish(fn () => transferLabel($row))), 0, $transfer_id);
 
-    flashAlert("Transfer <strong>" . escapeHtml(transferLabel($row)) . "</strong> saved");
+    flashAlert(__('Transfer %s saved', '<strong>' . escapeHtml(transferLabel($row)) . '</strong>'));
 
     redirect();
 
@@ -77,9 +77,9 @@ if (isset($_GET['delete_transfer'])) {
         redirect();
     }
 
-    logAudit("Account Transfer", "Delete", "$session_name deleted the transfer " . escapeSql(transferLabel($row)));
+    logAudit("Account Transfer", "Delete", "$session_name deleted the transfer " . escapeSql(i18nEnglish(fn () => transferLabel($row))));
 
-    flashAlert("Transfer <strong>" . escapeHtml(transferLabel($row)) . "</strong> deleted", 'error');
+    flashAlert(__('Transfer %s deleted', '<strong>' . escapeHtml(transferLabel($row)) . '</strong>'), 'error');
 
     redirect();
 

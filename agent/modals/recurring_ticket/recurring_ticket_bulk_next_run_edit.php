@@ -13,7 +13,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-calendar-day me-2"></i>Set Next Run Date for <strong><?= $count ?></strong> Tickets</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-calendar-day me-2"></i><?= _n('Set the next run for <strong>%d</strong> recurring ticket', 'Set the next run for <strong>%d</strong> recurring tickets', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -24,7 +24,7 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Next Run Date <strong class="text-danger">*</strong></label>
+            <label><?= __('Next Run Date') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar-day"></i></span>
                 <input class="form-control" type="date" name="next_run_date" min="<?= date("Y-m-d"); ?>" max="2999-12-31">
@@ -34,8 +34,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_recurring_ticket_next_run_date" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Set Run Date</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_recurring_ticket_next_run_date" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Set Run Date') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

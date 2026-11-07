@@ -59,6 +59,27 @@ $sla_notification_email = trim(strval($sla_settings['notification_email']));
 $now = time();
 
 /*
+ * Undo the resolution of any ticket that has left Resolved but still carries a resolved
+ * date. Every path that moves a ticket out of Resolved clears it now (ticketUnresolve()),
+ * but replies from the portal, the agent reply form, bulk replies and the API used to
+ * leave it behind - with the resolution clock stopped on a ticket being worked again.
+ * This puts those tickets right once, as if reopened now, and catches any path that
+ * still slips through. A closed ticket keeps its resolved date.
+ */
+$sql_unresolve = mysqli_query($mysqli, "SELECT ticket_id FROM tickets
+    WHERE ticket_resolved_at IS NOT NULL
+    AND ticket_closed_at IS NULL
+    AND ticket_status NOT IN (" . TICKET_STATUS_RESOLVED . ", " . TICKET_STATUS_CLOSED . ")"
+);
+
+while ($unresolve = mysqli_fetch_assoc($sql_unresolve)) {
+    $unresolve_ticket_id = intval($unresolve['ticket_id']);
+    if (ticketUnresolve($unresolve_ticket_id)) {
+        logTicketHistory($unresolve_ticket_id, "ITFlow cleared the resolved date left on a ticket no longer resolved and restarted its resolution clock");
+    }
+}
+
+/*
  * Stop any clock that is running when it should not be.
  *
  * Every status change calls syncTicketSlaClock(), so this is normally a no-op. It

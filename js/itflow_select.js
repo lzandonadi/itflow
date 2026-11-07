@@ -421,7 +421,7 @@
                     remove.type = 'button';
                     remove.tabIndex = -1;
                     remove.setAttribute('data-remove', item.value);
-                    remove.setAttribute('aria-label', 'Remove ' + item.label);
+                    remove.setAttribute('aria-label', __('Remove %s', item.label));
                     remove.appendChild(make('i', 'fas fa-times'));
                     chip.appendChild(remove);
                 }
@@ -460,7 +460,7 @@
 
         if (this.footerCount) {
             var count = this.chosen().length;
-            this.footerCount.textContent = count ? count + ' selected' : 'None selected';
+            this.footerCount.textContent = count ? __('%d selected', count) : __('None selected');
             this.footerClear.disabled = !count;
         }
 
@@ -485,7 +485,7 @@
         head.appendChild(make('span', 'itflow-select-sheet-title', this.label || this.placeholder()));
         var done = make('button', 'btn btn-sm btn-link itflow-select-done', this.multiple ? 'Done' : 'Cancel');
         done.type = 'button';
-        done.title = this.multiple ? 'Close the list (Esc)' : 'Close without changing it (Esc)';
+        done.title = this.multiple ? __('Close the list (Esc)') : __('Close without changing it (Esc)');
         done.addEventListener('click', function () {
             if (self.multiple) {
                 self.close(true, false);
@@ -502,8 +502,8 @@
         input.type = 'text';
         input.autocomplete = 'off';
         input.spellcheck = false;
-        input.placeholder = this.tags ? 'Search or add' : 'Search';
-        input.setAttribute('aria-label', 'Search ' + (this.label || 'options'));
+        input.placeholder = this.tags ? __('Search or add') : __('Search');
+        input.setAttribute('aria-label', this.label ? __('Search %s', this.label) : __('Search options'));
         input.setAttribute('aria-controls', this.id + '-list');
         input.setAttribute('aria-autocomplete', 'list');
         input.addEventListener('input', function () {
@@ -797,9 +797,9 @@
         }
 
         if (!this.rows.length) {
-            frag.appendChild(make('div', 'itflow-select-empty', this.query.trim() ? 'No matches' : 'Nothing to choose from'));
+            frag.appendChild(make('div', 'itflow-select-empty', this.query.trim() ? __('No matches') : __('Nothing to choose from')));
         } else if (this.total > this.view.length) {
-            frag.appendChild(make('div', 'itflow-select-more', 'Showing ' + this.view.length + ' of ' + this.total.toLocaleString() + ' - type to narrow it down'));
+            frag.appendChild(make('div', 'itflow-select-more', __('Showing %1$s of %2$s - type to narrow it down', this.view.length, this.total.toLocaleString())));
         }
 
         list.appendChild(frag);

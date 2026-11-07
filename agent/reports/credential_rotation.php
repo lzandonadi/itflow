@@ -12,7 +12,7 @@
 require_once "includes/inc_report.php";
 reportEnforce('credential_rotation');
 
-$day_options = [30 => 'Not changed in 30 days', 60 => 'Not changed in 60 days', 90 => 'Not changed in 90 days', 180 => 'Not changed in 6 months', 365 => 'Not changed in a year'];
+$day_options = [30 => __('Not changed in 30 days'), 60 => __('Not changed in 60 days'), 90 => __('Not changed in 90 days'), 180 => __('Not changed in 6 months'), 365 => __('Not changed in a year')];
 $days = intval($_GET['days'] ?? CREDENTIAL_ROTATE_DAYS);
 if (!isset($day_options[$days])) {
     $days = CREDENTIAL_ROTATE_DAYS;
@@ -39,7 +39,7 @@ $due = array_values(array_filter($credentials, function ($c) { return $c['due'];
 // Every password by age
 $age_buckets = ['Under 90 days' => [0, 90, 'success'], '90 days to 6 months' => [90, 182, 'warning'], '6 to 12 months' => [182, 365, 'orange'],
     '1 to 2 years' => [365, 730, 'danger'], 'Over 2 years' => [730, PHP_INT_MAX, 'danger']];
-$age_counts = array_fill_keys(array_keys($age_buckets), 0) + ['Never recorded' => 0];
+$age_counts = array_fill_keys(array_keys($age_buckets), 0) + ['Never recorded' => 0]; // keys stay English, shown through __()
 
 $by_client = [];
 foreach ($credentials as $row) {
@@ -58,7 +58,7 @@ foreach ($credentials as $row) {
             }
         }
     } else {
-        $age_counts['Never recorded']++;
+        $age_counts['Never recorded']++; // i18n-ignore - keys - shown through __() where the counts are drawn
     }
 }
 foreach ($by_client as &$client) {
@@ -69,44 +69,44 @@ $by_client = array_values(array_filter($by_client, function ($c) { return $c['du
 usort($by_client, function ($a, $b) { return $b['overdue'] <=> $a['overdue'] ?: $b['due'] <=> $a['due']; });
 
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'credentials.php');
     }],
-    'total' => ['label' => 'Credentials', 'type' => 'count'],
-    'due' => ['label' => 'Due', 'type' => 'count', 'html' => function ($row) {
+    'total' => ['label' => __('Credentials'), 'type' => 'count'],
+    'due' => ['label' => __('Due'), 'type' => 'count', 'html' => function ($row) {
         return '<a class="itflow-report-amount text-warning-emphasis fw-semibold" href="/agent/credentials.php?client_id=' . intval($row['client_id']) . '&show=due&sort=credential_password_changed_at&order=ASC">'
             . reportCount($row['due']) . '</a>';
     }],
-    'overdue' => ['label' => 'Over a year or never', 'type' => 'count', 'html' => function ($row) {
+    'overdue' => ['label' => __('Over a year or never'), 'type' => 'count', 'html' => function ($row) {
         return $row['overdue'] ? '<span class="text-danger-emphasis fw-semibold">' . reportCount($row['overdue']) . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'oldest' => ['label' => 'Oldest change', 'type' => 'count', 'csv_label' => 'Oldest change (days ago)', 'html' => function ($row) {
+    'oldest' => ['label' => __('Oldest change'), 'type' => 'count', 'csv_label' => __('Oldest change (days ago)'), 'html' => function ($row) {
         return $row['oldest'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="text-nowrap">' . escapeHtml(timeAgo(date('Y-m-d', strtotime('-' . $row['oldest'] . ' days')))) . '</span>';
     }],
-    'otp_share' => ['label' => 'With 2FA', 'type' => 'percent', 'title' => 'Credentials holding a 2FA (TOTP) code', 'class' => 'text-body-secondary'],
+    'otp_share' => ['label' => __('With 2FA'), 'type' => 'percent', 'title' => __('Credentials holding a 2FA (TOTP) code'), 'class' => 'text-body-secondary'],
 ];
 
 $credential_columns = [
-    'credential_name' => ['label' => 'Credential', 'class' => 'itflow-report-text', 'html' => function ($row) {
+    'credential_name' => ['label' => __('Credential'), 'class' => 'itflow-report-text', 'html' => function ($row) {
         return '<div class="d-flex align-items-center gap-2">' . credentialTile($row, 'sm') . '<div class="min-w-0">'
             . '<a class="fw-semibold text-body" href="/agent/credentials.php?client_id=' . intval($row['credential_client_id']) . '&open=' . intval($row['credential_id']) . '">' . escapeHtml($row['credential_name']) . '</a>'
             . ($row['credential_description'] ? '<div class="small text-body-secondary">' . escapeHtml($row['credential_description']) . '</div>' : '') . '</div></div>';
     }],
-    'credential_description' => ['label' => 'Description', 'screen' => false],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'credential_description' => ['label' => __('Description'), 'screen' => false],
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['credential_client_id'], $row['client_name'], $row['client_abbreviation'], 'credentials.php');
     }],
-    'age_days' => ['label' => 'Password last changed', 'type' => 'count', 'csv_label' => 'Days since changed', 'html' => function ($row) {
+    'age_days' => ['label' => __('Password last changed'), 'type' => 'count', 'csv_label' => __('Days since changed'), 'html' => function ($row) {
         if (!$row['age']) {
-            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal">Never recorded</span>';
+            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal">' . __('Never recorded') . '</span>';
         }
         return credentialAgePill($row['age']) . '<div class="small text-body-secondary mt-1">' . escapeHtml($row['age']['date']) . '</div>';
     }],
-    'credential_password_changed_at' => ['label' => 'Changed on', 'type' => 'date', 'screen' => false],
-    'has_otp' => ['label' => '2FA', 'sort' => false, 'csv' => function ($row) { return $row['has_otp'] ? 'Yes' : 'No'; }, 'html' => function ($row) {
-        return $row['has_otp'] ? '<span class="text-success-emphasis small text-nowrap"><i class="fas fa-fw fa-shield-alt me-1"></i>Yes</span>' : '<span class="itflow-report-zero">–</span>';
+    'credential_password_changed_at' => ['label' => __('Changed on'), 'type' => 'date', 'screen' => false],
+    'has_otp' => ['label' => __('2FA'), 'sort' => false, 'csv' => function ($row) { return $row['has_otp'] ? 'Yes' : 'No'; }, 'html' => function ($row) {
+        return $row['has_otp'] ? '<span class="text-success-emphasis small text-nowrap"><i class="fas fa-fw fa-shield-alt me-1"></i>' . __('Yes') . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'credential_accessed_at' => ['label' => 'Last opened', 'type' => 'date', 'html' => function ($row) {
+    'credential_accessed_at' => ['label' => __('Last opened'), 'type' => 'date', 'html' => function ($row) {
         return $row['credential_accessed_at'] ? '<span class="small text-body-secondary text-nowrap" title="' . escapeHtml($row['credential_accessed_at']) . '">' . escapeHtml(timeAgo($row['credential_accessed_at'])) . '</span>'
             : '<span class="itflow-report-zero">–</span>';
     }],
@@ -124,7 +124,7 @@ require_once "includes/inc_report_layout.php";
 $overdue = count(array_filter($credentials, function ($c) { return $c['overdue']; }));
 $otp = count(array_filter($credentials, function ($c) { return $c['has_otp']; }));
 $clients_due = count($by_client);
-$span = ['30' => '30 days', '60' => '60 days', '90' => '90 days', '180' => '6 months', '365' => 'year'][(string) $days];
+$span = ['30' => __('30 days'), '60' => __('60 days'), '90' => __('90 days'), '180' => __('6 months'), '365' => __('year')][(string) $days];
 
 ?>
 
@@ -133,49 +133,49 @@ $span = ['30' => '30 days', '60' => '60 days', '90' => '90 days', '180' => '6 mo
     <?php reportHeader('credential_rotation', [
         'subtitle' => $day_options[$days],
         'controls' => reportSelectControl('days', $days, $day_options, 'fa-history') . reportClientControl($client_id),
-        'export' => ['credentials' => 'Credentials due', 'clients' => 'By client'],
+        'export' => ['credentials' => __('Credentials due'), 'clients' => __('By client')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Credentials', 'value' => reportCount(count($credentials)), 'url' => '/agent/credentials.php' . ($client_id ? "?client_id=$client_id" : ''),
-            'sub' => reportCount($otp) . ' <span class="text-body-tertiary">with a 2FA code</span>'],
-        ['label' => 'Due for rotation', 'value' => reportCount(count($due)), 'tone' => $due ? 'warning' : 'success',
-            'sub' => $credentials ? reportPercent(reportShare(count($due), count($credentials), 0)) . ' <span class="text-body-tertiary">of them</span>' : ''],
-        ['label' => 'Over a year or never', 'value' => reportCount($overdue), 'tone' => $overdue ? 'danger' : 'success',
-            'sub' => reportCount($age_counts['Never recorded']) . ' <span class="text-body-tertiary">never recorded</span>'],
-        ['label' => 'Clients with some due', 'value' => reportCount($clients_due), 'tone' => $clients_due ? 'warning' : ''],
+        ['label' => __('Credentials'), 'value' => reportCount(count($credentials)), 'url' => '/agent/credentials.php' . ($client_id ? "?client_id=$client_id" : ''),
+            'sub' => reportCount($otp) . ' <span class="text-body-tertiary">' . __('with a 2FA code') . '</span>'],
+        ['label' => __('Due for rotation'), 'value' => reportCount(count($due)), 'tone' => $due ? 'warning' : 'success',
+            'sub' => $credentials ? reportPercent(reportShare(count($due), count($credentials), 0)) . ' <span class="text-body-tertiary">' . __('of them') . '</span>' : ''],
+        ['label' => __('Over a year or never'), 'value' => reportCount($overdue), 'tone' => $overdue ? 'danger' : 'success',
+            'sub' => reportCount($age_counts['Never recorded']) . ' <span class="text-body-tertiary">' . __('never recorded') . '</span>'], // i18n-ignore - keys - shown through __() where the counts are drawn
+        ['label' => __('Clients with some due'), 'value' => reportCount($clients_due), 'tone' => $clients_due ? 'warning' : ''],
     ]) ?>
 
     <?php if ($credentials) { ?>
-        <?= reportSectionOpen('How old the passwords are', 'Every credential') ?>
+        <?= reportSectionOpen(__('How old the passwords are'), __('Every credential')) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
-                    'labels' => array_keys($age_counts),
-                    'series' => [['label' => 'Credentials', 'data' => array_values($age_counts),
+                    'labels' => array_map('__', array_keys($age_counts)), // i18n-dynamic - the bucket names above
+                    'series' => [['label' => __('Credentials'), 'data' => array_values($age_counts),
                         'tones' => array_merge(array_column(array_values($age_buckets), 2), ['muted'])]],
                     'format' => 'count',
                     'legend' => false,
-                ], 'sm', 'Credentials by how long since the password changed') ?>
+                ], 'sm', __('Credentials by how long since the password changed')) ?>
             </div>
         </div>
     <?php } ?>
 
     <?php if (!$due) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty("Every password has changed in the last $span.") ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty(__('Every password has changed in the last %s.', $span)) ?></div></div>
     <?php } else { ?>
 
         <?php if (!$client_id) { ?>
-            <?= reportSectionOpen('By client', 'The most overdue first') ?>
+            <?= reportSectionOpen(__('By client'), __('The most overdue first')) ?>
                 <?= reportTable($client_columns, $by_client, ['limit' => 50, 'export_table' => 'clients']) ?>
             </div>
         <?php } ?>
 
-        <?= reportSectionOpen('Due for rotation', 'Never recorded, then the oldest', 'itflow-report-long') ?>
+        <?= reportSectionOpen(__('Due for rotation'), __('Never recorded, then the oldest'), 'itflow-report-long') ?>
             <?= reportTable($credential_columns, $due, ['limit' => 300, 'export_table' => 'credentials']) ?>
             <div class="card-footer small text-body-secondary">
-                Credentials not archived, at active clients. A password counts from when it was last changed in ITFlow; one never recorded counts as due.
-                Open a credential to change it and the date updates on its own. Passwords and 2FA codes are never shown here or exported.
+                <?= __('Credentials not archived, at active clients. A password counts from when it was last changed in ITFlow; one never recorded counts as due.') ?>
+                <?= __('Open a credential to change it and the date updates on its own. Passwords and 2FA codes are never shown here or exported.') ?>
             </div>
         </div>
 

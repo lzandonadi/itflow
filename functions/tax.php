@@ -158,7 +158,8 @@ function taxIncluded($gross, $tax) {
  * each number is for => number, 'numbers' => label => its number]. With
  * no rate ($row null), it is all one part, $no_rate_label.
  */
-function taxSplit($amount, $row, $base, $no_rate_label = 'Tax') {
+function taxSplit($amount, $row, $base, $no_rate_label = null) {
+    $no_rate_label = $no_rate_label ?? __('Tax');
     $amount = round(floatval($amount), 2);
     if (!$row) {
         return ['parts' => [$no_rate_label => $amount], 'registrations' => [], 'numbers' => []];
@@ -244,12 +245,13 @@ function taxExemptText($client, $with_expiry = true) {
     if (empty($client['exempt'])) {
         return '';
     }
-    $text = 'Tax exempt';
+    $text = __('Tax exempt');
     if ($client['number'] !== '') {
-        $text .= ' - certificate ' . $client['number'];
+        $text .= ' - ' . __('certificate %s', $client['number']);
     }
     if ($with_expiry && $client['expires'] !== '') {
-        $text .= ($client['number'] !== '' ? ', ' : ' - ') . ($client['expired'] ? 'expired ' : 'expires ') . date('M j, Y', strtotime($client['expires']));
+        $expires = formatDate($client['expires'], 'date');
+        $text .= ($client['number'] !== '' ? ', ' : ' - ') . ($client['expired'] ? __('expired %s', $expires) : __('expires %s', $expires));
     }
     return $text;
 }
@@ -272,15 +274,17 @@ function taxDocWarning($type, $doc_id, $client_id, array $items, $open, $can_edi
         $taxed += floatval($item['item_tax']) != 0 ? 1 : 0;
     }
     if ($open && $taxed) {
-        $notes[] = 'The client is tax exempt, but ' . ($taxed === 1 ? '1 line here is' : "$taxed lines here are") . ' taxed.';
+        $notes[] = _n('The client is tax exempt, but %d line here is taxed.', 'The client is tax exempt, but %d lines here are taxed.', $taxed);
         if ($can_edit) {
             $action = '<a class="btn btn-sm btn-warning ms-auto text-nowrap confirm-link" href="post.php?billing_remove_tax=' . intval($doc_id) . '&type=' . urlencode($type) . '&csrf_token=' . urlencode($_SESSION['csrf_token'] ?? '') . '"'
-                . ' data-confirm-text="Every line here is set to no tax, and the totals worked out again.">Take the tax off</a>';
+                . ' data-confirm-text="' . escapeHtml(__('Every line here is set to no tax, and the totals worked out again.')) . '">' . __('Take the tax off') . '</a>';
         }
     }
     if ($open && $client['expired']) {
-        $notes[] = 'Its exemption certificate' . ($client['number'] !== '' ? ' (' . escapeHtml($client['number']) . ')' : '') . ' expired on ' . date('M j, Y', strtotime($client['expires']))
-            . ' - get a new one, or turn exemption off on the client\'s Billing tab.';
+        $expired_on = formatDate($client['expires'], 'date');
+        $notes[] = $client['number'] !== ''
+            ? __('Its exemption certificate (%1$s) expired on %2$s - get a new one, or turn exemption off on the client\'s Billing tab.', escapeHtml($client['number']), $expired_on)
+            : __('Its exemption certificate expired on %s - get a new one, or turn exemption off on the client\'s Billing tab.', $expired_on);
     }
     if (!$notes) {
         return '';
@@ -373,13 +377,13 @@ function taxFromInput(array $in) {
             continue;
         }
         if ($part_name === '' || !is_numeric($percent)) {
-            return [null, 'Each part needs a name and a percent.'];
+            return [null, __('Each part needs a name and a percent.')];
         }
         $components[] = ['name' => $part_name, 'percent' => round(floatval($percent), 4), 'compound' => !empty($compounds[$i]) && count($components) > 0,
             'registration' => trim(mb_substr((string) ($registrations[$i] ?? ''), 0, 100))];
     }
     if ($name === '') {
-        return [null, 'A tax needs a name.'];
+        return [null, __('A tax needs a name.')];
     }
     if (count($components) === 1) {
         // One part is just the rate - with its registration number, when the rate has none
@@ -389,7 +393,7 @@ function taxFromInput(array $in) {
     } elseif (!$components) {
         $percent = trim(str_replace(['%', ' '], '', (string) ($in['percent'] ?? '')));
         if (!is_numeric($percent)) {
-            return [null, 'A tax needs a percent.'];
+            return [null, __('A tax needs a percent.')];
         }
         $percent = round(floatval($percent), 4);
     } else {
@@ -397,7 +401,7 @@ function taxFromInput(array $in) {
     }
     foreach (array_merge([['percent' => $percent]], $components) as $part) {
         if ($part['percent'] < 0 || $part['percent'] > 100) {
-            return [null, 'A percent is between 0 and 100.'];
+            return [null, __('A percent is between 0 and 100.')];
         }
     }
     return [['name' => $name, 'description' => $description, 'registration' => $registration, 'percent' => $percent, 'components' => $components], ''];
@@ -668,18 +672,27 @@ function taxUsageAll() {
 
 /** "3 products, 2 clients and 4 recurring invoices" from what moved - '' for nothing. */
 function taxMovedText(array $moved) {
-    $words = ['products' => ['product', 'products'], 'clients' => ['client', 'clients'], 'recurring' => ['recurring invoice', 'recurring invoices'],
-        'invoices' => ['draft invoice', 'draft invoices'], 'quotes' => ['draft quote', 'draft quotes']];
     $parts = [];
-    foreach ($words as $key => [$one, $many]) {
+    foreach (['products', 'clients', 'recurring', 'invoices', 'quotes'] as $key) {
         $n = intval($moved[$key] ?? 0);
-        if ($n) {
-            $parts[] = "$n " . ($n === 1 ? $one : $many);
+        if (!$n) {
+            continue;
+        }
+        if ($key === 'products') {
+            $parts[] = _n('%d product', '%d products', $n);
+        } elseif ($key === 'clients') {
+            $parts[] = _n('%d client', '%d clients', $n);
+        } elseif ($key === 'recurring') {
+            $parts[] = _n('%d recurring invoice', '%d recurring invoices', $n);
+        } elseif ($key === 'invoices') {
+            $parts[] = _n('%d draft invoice', '%d draft invoices', $n);
+        } else {
+            $parts[] = _n('%d draft quote', '%d draft quotes', $n);
         }
     }
     if (count($parts) > 1) {
         $last = array_pop($parts);
-        return implode(', ', $parts) . ' and ' . $last;
+        return __('%1$s and %2$s', implode(', ', $parts), $last);
     }
     return $parts[0] ?? '';
 }
@@ -695,7 +708,7 @@ function taxOptionsHtml(array $taxes, $selected = 0, $usual_label = '', $usual_p
         $taxes[$selected] = $row;
     }
     $html = $usual_label !== '' ? '<option value="' . TAX_USUAL . '" data-percent="' . floatval($usual_percent) . '"' . ($selected === TAX_USUAL ? ' selected' : '') . '>' . escapeHtml($usual_label) . '</option>' : '';
-    $html .= '<option value="0" data-percent="0"' . ($selected === 0 ? ' selected' : '') . '>No tax</option>';
+    $html .= '<option value="0" data-percent="0"' . ($selected === 0 ? ' selected' : '') . '>' . escapeHtml(__('No tax')) . '</option>';
     foreach ($taxes as $tax_id => $tax) {
         $html .= '<option value="' . intval($tax_id) . '" data-percent="' . floatval($tax['tax_percent']) . '"' . ($selected === intval($tax_id) ? ' selected' : '') . '>'
             . escapeHtml(taxLabel($tax)) . '</option>';
@@ -854,7 +867,7 @@ function taxReportPurchases($from, $to) {
         $net = floatval($row['expense_amount']) - $tax;
         $out['purchases'][$m] += $net;
         $out['expenses']++;
-        foreach (taxSplit($tax, taxRow($row['expense_tax_id']), $net, 'Other tax')['parts'] as $part => $amount) {
+        foreach (taxSplit($tax, taxRow($row['expense_tax_id']), $net, __('Other tax'))['parts'] as $part => $amount) {
             $out['parts'][$part] = $out['parts'][$part] ?? ['months' => taxReportMonths(), 'total' => 0.0];
             $out['parts'][$part]['months'][$m] += $amount;
             $out['parts'][$part]['total'] += $amount;

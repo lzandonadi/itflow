@@ -59,13 +59,13 @@ function getIP() {
 function getWebBrowser($user_browser) {
     $browser        =   "-";
     $browser_array  =   array(
-        '/msie/i'       =>  "<i class='fab fa-fw fa-internet-explorer text-secondary'></i> Internet Explorer",
-        '/firefox/i'    =>  "<i class='fab fa-fw fa-firefox text-secondary'></i> Firefox",
-        '/safari/i'     =>  "<i class='fab fa-fw fa-safari text-secondary'></i> Safari",
-        '/chrome/i'     =>  "<i class='fab fa-fw fa-chrome text-secondary'></i> Chrome",
-        '/edg/i'        =>  "<i class='fab fa-fw fa-edge text-secondary'></i> Edge",
-        '/opr/i'        =>  "<i class='fab fa-fw fa-opera text-secondary'></i> Opera",
-        '/ddg/i'        =>  "<i class='fas fa-fw fa-globe text-secondary'></i> DuckDuckGo"
+        '/msie/i'       =>  "<i class='fab fa-fw fa-internet-explorer text-secondary'></i> Internet Explorer", // i18n-ignore - browser and system names
+        '/firefox/i'    =>  "<i class='fab fa-fw fa-firefox text-secondary'></i> Firefox", // i18n-ignore - browser and system names
+        '/safari/i'     =>  "<i class='fab fa-fw fa-safari text-secondary'></i> Safari", // i18n-ignore - browser and system names
+        '/chrome/i'     =>  "<i class='fab fa-fw fa-chrome text-secondary'></i> Chrome", // i18n-ignore - browser and system names
+        '/edg/i'        =>  "<i class='fab fa-fw fa-edge text-secondary'></i> Edge", // i18n-ignore - browser and system names
+        '/opr/i'        =>  "<i class='fab fa-fw fa-opera text-secondary'></i> Opera", // i18n-ignore - browser and system names
+        '/ddg/i'        =>  "<i class='fas fa-fw fa-globe text-secondary'></i> DuckDuckGo" // i18n-ignore - browser and system names
     );
     foreach ($browser_array as $regex => $value) {
         if (preg_match($regex, $user_browser)) {
@@ -78,14 +78,14 @@ function getWebBrowser($user_browser) {
 function getOS($user_os) {
     $os_platform    =   "-";
     $os_array       =   array(
-        '/windows/i'            =>  "<i class='fab fa-fw fa-windows text-secondary'></i> Windows",
-        '/macintosh|mac os x/i' =>  "<i class='fab fa-fw fa-apple text-secondary'></i> MacOS",
-        '/linux/i'              =>  "<i class='fab fa-fw fa-linux text-secondary'></i> Linux",
-        '/ubuntu/i'             =>  "<i class='fab fa-fw fa-ubuntu text-secondary'></i> Ubuntu",
-        '/fedora/i'             =>  "<i class='fab fa-fw fa-fedora text-secondary'></i> Fedora",
+        '/windows/i'            =>  "<i class='fab fa-fw fa-windows text-secondary'></i> Windows", // i18n-ignore - browser and system names
+        '/macintosh|mac os x/i' =>  "<i class='fab fa-fw fa-apple text-secondary'></i> MacOS", // i18n-ignore - browser and system names
+        '/linux/i'              =>  "<i class='fab fa-fw fa-linux text-secondary'></i> Linux", // i18n-ignore - browser and system names
+        '/ubuntu/i'             =>  "<i class='fab fa-fw fa-ubuntu text-secondary'></i> Ubuntu", // i18n-ignore - browser and system names
+        '/fedora/i'             =>  "<i class='fab fa-fw fa-fedora text-secondary'></i> Fedora", // i18n-ignore - browser and system names
         '/iphone/i'             =>  "<i class='fab fa-fw fa-apple text-secondary'></i> iPhone",
         '/ipad/i'               =>  "<i class='fab fa-fw fa-apple text-secondary'></i> iPad",
-        '/android/i'            =>  "<i class='fab fa-fw fa-android text-secondary'></i> Android"
+        '/android/i'            =>  "<i class='fab fa-fw fa-android text-secondary'></i> Android" // i18n-ignore - browser and system names
     );
     foreach ($os_array as $regex => $value) {
         if (preg_match($regex, $user_os)) {

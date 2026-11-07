@@ -82,37 +82,37 @@ $quote_link = function ($row) {
     return '<a class="font-monospace" href="/agent/quote.php?client_id=' . intval($row['quote_client_id']) . '&quote_id=' . intval($row['quote_id']) . '">' . escapeHtml($row['quote_prefix'] . $row['quote_number']) . '</a>';
 };
 $open_columns = [
-    'quote' => ['label' => 'Quote', 'csv' => function ($row) { return $row['quote_prefix'] . $row['quote_number']; }, 'html' => $quote_link],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'quote' => ['label' => __('Quote'), 'csv' => function ($row) { return $row['quote_prefix'] . $row['quote_number']; }, 'html' => $quote_link],
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['quote_client_id'], $row['client_name'], $row['client_abbreviation'], 'quotes.php');
     }],
-    'quote_scope' => ['label' => 'Scope', 'class' => 'small itflow-report-text'],
-    'quote_status' => ['label' => 'Status', 'html' => function ($row) {
+    'quote_scope' => ['label' => __('Scope'), 'class' => 'small itflow-report-text'],
+    'quote_status' => ['label' => __('Status'), 'html' => function ($row) {
         return '<span class="badge rounded-pill ' . ($row['quote_status'] === 'Viewed' ? 'text-bg-info' : 'text-bg-secondary') . '">' . escapeHtml($row['quote_status']) . '</span>';
     }],
-    'quote_date' => ['label' => 'Quoted', 'type' => 'date', 'class' => 'text-nowrap'],
-    'quote_expire' => ['label' => 'Expires', 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
+    'quote_date' => ['label' => __('Quoted'), 'type' => 'date', 'class' => 'text-nowrap'],
+    'quote_expire' => ['label' => __('Expires'), 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
         if ($row['quote_expire'] === null) {
-            return '<span class="text-body-secondary">No date</span>';
+            return '<span class="text-body-secondary">' . __('No date') . '</span>';
         }
         $left = intval($row['days_left']);
-        $date = escapeHtml(date('M j, Y', strtotime($row['quote_expire'])));
+        $date = escapeHtml(formatDate($row['quote_expire'], 'date'));
         if ($left < 0) {
-            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="' . $date . '">Expired ' . (-$left) . ' day' . ($left === -1 ? '' : 's') . ' ago</span>';
+            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="' . $date . '">' . _n('Expired %d day ago', 'Expired %d days ago', -$left) . '</span>';
         }
         if ($left <= 14) {
-            return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="' . $date . '">' . ($left === 0 ? 'Today' : "In $left day" . ($left === 1 ? '' : 's')) . '</span>';
+            return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="' . $date . '">' . ($left === 0 ? __('Today') : _n('In %d day', 'In %d days', $left)) . '</span>';
         }
         return $date;
     }],
-    'age' => ['label' => 'Waiting', 'type' => 'count', 'csv_label' => 'Days waiting', 'html' => function ($row) {
+    'age' => ['label' => __('Waiting'), 'type' => 'count', 'csv_label' => __('Days waiting'), 'html' => function ($row) {
         return intval($row['age']) . ' day' . (intval($row['age']) === 1 ? '' : 's');
     }],
     // Up front and monthly are in the CSV; on screen, one column - what it comes to in its first year, broken down under it
-    'quote_amount' => ['label' => 'Up front', 'type' => 'money', 'screen' => false],
-    'quote_monthly_amount' => ['label' => 'Monthly', 'type' => 'money', 'screen' => false],
-    'value' => ['label' => $open_monthly ? 'First year' : 'Amount', 'csv_label' => 'First year', 'type' => 'money', 'class' => 'fw-semibold',
-        'title' => $open_monthly ? 'Up front, and a year of its recurring lines' : '', 'html' => function ($row) {
+    'quote_amount' => ['label' => __('Up front'), 'type' => 'money', 'screen' => false],
+    'quote_monthly_amount' => ['label' => __('Monthly'), 'type' => 'money', 'screen' => false],
+    'value' => ['label' => $open_monthly ? __('First year') : __('Amount'), 'csv_label' => __('First year'), 'type' => 'money', 'class' => 'fw-semibold',
+        'title' => $open_monthly ? __('Up front, and a year of its recurring lines') : '', 'html' => function ($row) {
             $html = escapeHtml(reportMoney($row['value']));
             if (floatval($row['quote_monthly_amount']) != 0) {
                 $html .= '<div class="small fw-normal text-body-secondary">' . escapeHtml(reportMoney($row['quote_amount'])) . ' + ' . escapeHtml(reportMoney($row['quote_monthly_amount'])) . '/mo</div>';
@@ -121,15 +121,15 @@ $open_columns = [
         }],
 ];
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'quotes.php');
     }],
-    'quotes' => ['label' => 'Quotes', 'type' => 'count'],
-    'quoted' => ['label' => 'Quoted', 'type' => 'money'],
-    'won' => ['label' => 'Won', 'type' => 'money', 'class' => 'text-success-emphasis'],
-    'lost' => ['label' => 'Lost', 'type' => 'money', 'class' => 'text-danger-emphasis'],
-    'open' => ['label' => 'Still open', 'type' => 'money', 'class' => 'text-body-secondary'],
-    'rate' => ['label' => 'Win rate', 'type' => 'percent', 'html' => function ($row) {
+    'quotes' => ['label' => __('Quotes'), 'type' => 'count'],
+    'quoted' => ['label' => __('Quoted'), 'type' => 'money'],
+    'won' => ['label' => __('Won'), 'type' => 'money', 'class' => 'text-success-emphasis'],
+    'lost' => ['label' => __('Lost'), 'type' => 'money', 'class' => 'text-danger-emphasis'],
+    'open' => ['label' => __('Still open'), 'type' => 'money', 'class' => 'text-body-secondary'],
+    'rate' => ['label' => __('Win rate'), 'type' => 'percent', 'html' => function ($row) {
         return reportRateHtml($row['rate'], 60, 35);
     }],
 ];
@@ -138,13 +138,13 @@ if (reportExporting('clients')) {
     reportCsv('Quotes by Client ' . $period['start'] . ' to ' . $period['end'], $client_columns, $clients);
 }
 if (reportExporting()) {
-    reportCsv('Open Quotes', $open_columns, $open, ['quote' => 'Total', 'quote_amount' => array_sum(array_column($open, 'quote_amount')),
+    reportCsv('Open Quotes', $open_columns, $open, ['quote' => __('Total'), 'quote_amount' => array_sum(array_column($open, 'quote_amount')),
         'quote_monthly_amount' => array_sum(array_column($open, 'quote_monthly_amount')), 'value' => array_sum(array_column($open, 'value'))]);
 }
 
 $buckets = reportBuckets($period);
 $series = [];
-foreach (['won' => ['Won', 'success'], 'lost' => ['Lost', 'danger'], 'open' => ['Still open', 'info']] as $key => [$label, $tone]) {
+foreach (['won' => ['Won', 'success'], 'lost' => ['Lost', 'danger'], 'open' => [__('Still open'), 'info']] as $key => [$label, $tone]) {
     $series[] = ['label' => $label, 'tone' => $tone, 'stack' => 'q', 'data' => reportSeries("SELECT " . reportBucketSql('quote_date', $buckets['unit']) . " AS b, SUM($value_sql) AS v
         FROM quotes WHERE quote_archived_at IS NULL AND $outcome_sql = '$key' AND " . reportRangeSql('quote_date', $period) . " $client_sql GROUP BY b", $buckets['keys'])];
 }
@@ -159,39 +159,39 @@ require_once "includes/inc_report_layout.php";
         'period' => $period,
         'years' => reportPastYears("SELECT DISTINCT YEAR(quote_date) AS y FROM quotes"),
         'client' => $client_id,
-        'export' => ['open' => 'Open quotes', 'clients' => 'By client'],
+        'export' => ['open' => __('Open quotes'), 'clients' => __('By client')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Quoted', 'value' => reportMoney($quoted_v), 'sub' => reportCount($quoted_n) . ' <span class="text-body-tertiary">quote' . ($quoted_n === 1 ? '' : 's') . ' sent' . ($by['draft']['n'] ? ', ' . $by['draft']['n'] . ' still drafts' : '') . '</span>'],
-        ['label' => 'Won', 'value' => reportMoney($by['won']['v']), 'tone' => $by['won']['v'] > 0 ? 'success' : '', 'sub' => reportChangeHtml($by['won']['v'], $prev_won, 'up', $period['compare'])],
-        ['label' => 'Win rate', 'value' => reportPercent($win_rate), 'sub' => $win_rate_value !== null ? escapeHtml(reportPercent($win_rate_value)) . ' <span class="text-body-tertiary">by value, of quotes decided</span>' : '<span class="text-body-tertiary">No quote decided yet</span>'],
-        ['label' => 'Open now', 'value' => reportMoney(array_sum(array_column($open_live, 'value'))), 'url' => '/agent/quotes.php',
-            'sub' => count($expiring) ? '<span class="text-warning-emphasis fw-semibold">' . count($expiring) . ' expire within 14 days</span>' : reportCount(count($open_live)) . ' <span class="text-body-tertiary">waiting for an answer</span>'],
+        ['label' => __('Quoted'), 'value' => reportMoney($quoted_v), 'sub' => reportCount($quoted_n) . ' <span class="text-body-tertiary">quote' . ($quoted_n === 1 ? '' : 's') . ' sent' . ($by['draft']['n'] ? ', ' . $by['draft']['n'] . ' still drafts' : '') . '</span>'],
+        ['label' => __('Won'), 'value' => reportMoney($by['won']['v']), 'tone' => $by['won']['v'] > 0 ? 'success' : '', 'sub' => reportChangeHtml($by['won']['v'], $prev_won, 'up', $period['compare'])],
+        ['label' => __('Win rate'), 'value' => reportPercent($win_rate), 'sub' => $win_rate_value !== null ? escapeHtml(reportPercent($win_rate_value)) . ' <span class="text-body-tertiary">' . __('by value, of quotes decided') . '</span>' : '<span class="text-body-tertiary">' . __('No quote decided yet') . '</span>'],
+        ['label' => __('Open now'), 'value' => reportMoney(array_sum(array_column($open_live, 'value'))), 'url' => '/agent/quotes.php',
+            'sub' => count($expiring) ? '<span class="text-warning-emphasis fw-semibold">' . count($expiring) . ' expire within 14 days</span>' : reportCount(count($open_live)) . ' <span class="text-body-tertiary">' . __('waiting for an answer') . '</span>'],
     ]) ?>
 
-    <?= reportSectionOpen('Quoted, by how it went', escapeHtml($period['range'])) ?>
+    <?= reportSectionOpen(__('Quoted, by how it went'), escapeHtml($period['range'])) ?>
         <div class="card-body">
-            <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $series, 'stacked' => true, 'format' => 'money'], '', 'Value quoted over the period, won, lost and still open') ?>
+            <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $series, 'stacked' => true, 'format' => 'money'], '', __('Value quoted over the period, won, lost and still open')) ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('Waiting for an answer', count($open_expired) ? '<span class="text-danger-emphasis">' . count($open_expired) . ' past their expiry date - follow up or close them</span>' : 'Soonest to expire first') ?>
+    <?= reportSectionOpen(__('Waiting for an answer'), count($open_expired) ? '<span class="text-danger-emphasis">' . count($open_expired) . ' past their expiry date - follow up or close them</span>' : __('Soonest to expire first')) ?>
         <?= reportTable($open_columns, $open, [
-            'empty' => reportEmpty('No quote is waiting for an answer.'),
+            'empty' => reportEmpty(__('No quote is waiting for an answer.')),
             'limit' => 300, 'export_table' => 'open',
-            'totals' => ['quote' => 'Total', 'value' => array_sum(array_column($open, 'value'))],
+            'totals' => ['quote' => __('Total'), 'value' => array_sum(array_column($open, 'value'))],
         ]) ?>
     </div>
 
-    <?= reportSectionOpen('By client', escapeHtml($period['range'])) ?>
+    <?= reportSectionOpen(__('By client'), escapeHtml($period['range'])) ?>
         <?= reportTable($client_columns, $clients, [
-            'empty' => 'No quotes went out in this period.',
-            'totals' => ['client' => 'Total', 'quotes' => $quoted_n, 'quoted' => $quoted_v, 'won' => $by['won']['v'], 'lost' => $by['lost']['v'], 'open' => $by['open']['v'], 'rate' => $win_rate],
+            'empty' => __('No quotes went out in this period.'),
+            'totals' => ['client' => __('Total'), 'quotes' => $quoted_n, 'quoted' => $quoted_v, 'won' => $by['won']['v'], 'lost' => $by['lost']['v'], 'open' => $by['open']['v'], 'rate' => $win_rate],
             'totals_html' => ['rate' => reportRateHtml($win_rate, 60, 35)],
         ]) ?>
         <div class="card-footer small text-body-secondary">
-            By quote date. Won is accepted or invoiced, lost is declined, open is sent or viewed and not yet answered. The win rate counts only quotes that have been decided.
+            <?= __('By quote date. Won is accepted or invoiced, lost is declined, open is sent or viewed and not yet answered. The win rate counts only quotes that have been decided.') ?>
         </div>
     </div>
 

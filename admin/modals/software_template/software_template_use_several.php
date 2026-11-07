@@ -19,10 +19,10 @@ ob_start();
 
 if (!$template || $template['software_template_archived_at']) { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-copy me-2"></i>New licenses</h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-copy me-2"></i><?= __('New licenses') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
-    <div class="modal-body text-center text-secondary py-5">That license template is gone or archived.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That license template is gone or archived.') ?></div>
 <?php } else {
     $software_template_id = intval($template['software_template_id']);
     $term = (string) $template['software_template_term'];
@@ -44,7 +44,7 @@ if (!$template || $template['software_template_archived_at']) { ?>
     ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-copy me-2"></i>New licenses from <strong><?= escapeHtml($template['software_template_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-copy me-2"></i><?= __('New licenses from') ?> <strong><?= escapeHtml($template['software_template_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -54,10 +54,10 @@ if (!$template || $template['software_template_archived_at']) { ?>
     <div class="modal-body">
         <div class="row g-3">
             <div class="col-12">
-                <label class="form-label">Clients <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Clients') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-                    <select class="form-select select2" name="client_ids[]" multiple required data-placeholder="- Pick clients -">
+                    <select class="form-select select2" name="client_ids[]" multiple required data-placeholder="<?= escapeHtml(__('- Pick clients -')) ?>">
                         <?php
                         $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE client_archived_at IS NULL ORDER BY client_name ASC");
                         while ($row = mysqli_fetch_assoc($sql_clients)) {
@@ -67,50 +67,50 @@ if (!$template || $template['software_template_archived_at']) { ?>
                     </select>
                 </div>
                 <?php if (!empty($_GET['missing'])) { ?>
-                    <div class="form-text"><?= $picked ? 'The ' . count($picked) . ' client' . (count($picked) === 1 ? '' : 's') . ' it is required of with none yet.' : 'Every client it is required of has one.' ?></div>
+                    <div class="form-text"><?= $picked ? escapeHtml(_n('The %d client it is required of with none yet.', 'The %d clients it is required of with none yet.', count($picked))) : __('Every client it is required of has one.') ?></div>
                 <?php } ?>
             </div>
             <div class="col-12">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" name="skip_existing" value="1" id="softwareTemplateSkipExisting" checked>
-                    <label class="form-check-label" for="softwareTemplateSkipExisting">Skip clients that already have one</label>
+                    <label class="form-check-label" for="softwareTemplateSkipExisting"><?= __('Skip clients that already have one') ?></label>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Seats</label>
+                <label class="form-label"><?= __('Seats') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-                    <input type="number" class="form-control" name="seats" min="0" step="1" placeholder="No limit" value="<?= $template['software_template_seats'] === null ? '' : intval($template['software_template_seats']) ?>">
+                    <input type="number" class="form-control" name="seats" min="0" step="1" placeholder="<?= escapeHtml(__('No limit')) ?>" value="<?= $template['software_template_seats'] === null ? '' : intval($template['software_template_seats']) ?>">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Order reference</label>
+                <label class="form-label"><?= __('Order reference') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-receipt"></i></span>
                     <input type="text" class="form-control" name="purchase_reference" maxlength="200">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Purchased</label>
+                <label class="form-label"><?= __('Purchased') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-shopping-cart"></i></span>
                     <input type="date" class="form-control" name="purchase" max="2999-12-31">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Renews</label>
+                <label class="form-label"><?= __('Renews') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar-alt"></i></span>
                     <input type="date" class="form-control" name="expire" max="2999-12-31">
                 </div>
-                <?php if (isset(SOFTWARE_RENEWAL_TERMS[$term])) { ?><div class="form-text">Blank is <?= escapeHtml(SOFTWARE_RENEWAL_TERMS[$term]) ?> after it was bought (or today).</div><?php } ?>
+                <?php if (isset(SOFTWARE_RENEWAL_TERMS[$term])) { ?><div class="form-text"><?= __('Blank is %s after it was bought (or today).', escapeHtml(lcfirst(__(SOFTWARE_RENEWAL_TERMS[$term])))) // i18n-dynamic ?></div><?php } ?>
             </div>
         </div>
-        <div class="small text-secondary mt-3">Each client gets the same license: its name, type, license type, summary and notes from the template<?= $vendor_name !== '' ? ', and the client\'s <strong>' . escapeHtml($vendor_name) . '</strong> as its vendor - added for those that haven\'t got it' : '' ?>. Keys, devices and users go on from each client's Licenses.</div>
+        <div class="small text-secondary mt-3"><?= __('Each client gets the same license: its name, type, license type, summary and notes from the template') ?><?= $vendor_name !== '' ? __(", and the client's <strong>%s</strong> as its vendor - added for those that haven't got it", escapeHtml($vendor_name)) : '' ?>. <?= __("Keys, devices and users go on from each client's Licenses.") ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="make_licenses_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="make_licenses_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

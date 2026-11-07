@@ -92,10 +92,10 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
     <?php } ?>
 
     <ul class="nav nav-pills nav-justified mb-3" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#<?= $tab ?>Agreement" role="tab"><i class="fas fa-fw fa-file-contract me-1"></i>Agreement</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Cover" role="tab"><i class="fas fa-fw fa-shield-alt me-1"></i>Cover</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Terms" role="tab"><i class="fas fa-fw fa-file-alt me-1"></i>Terms</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Notes" role="tab"><i class="fas fa-fw fa-sticky-note me-1"></i>Notes</a></li>
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#<?= $tab ?>Agreement" role="tab"><i class="fas fa-fw fa-file-contract me-1"></i><?= __('Agreement') ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Cover" role="tab"><i class="fas fa-fw fa-shield-alt me-1"></i><?= __('Cover') ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Terms" role="tab"><i class="fas fa-fw fa-file-alt me-1"></i><?= __('Terms') ?></a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#<?= $tab ?>Notes" role="tab"><i class="fas fa-fw fa-sticky-note me-1"></i><?= __('Notes') ?></a></li>
     </ul>
 
     <div class="tab-content">
@@ -103,35 +103,35 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
         <div class="tab-pane fade show active" id="<?= $tab ?>Agreement" role="tabpanel">
             <?php if ($c_template_data) { ?>
                 <div class="mb-3">
-                    <label class="form-label">Start from a template</label>
+                    <label class="form-label"><?= __('Start from a template') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-clone"></i></span>
                         <select class="form-select" name="template_id" data-contract-template>
-                            <option value="0">- None -</option>
+                            <option value="0"><?= __('- None -') ?></option>
                             <?php foreach ($c_templates as $template_id => $template) { ?>
                                 <option value="<?= $template_id ?>"<?= intval($c_value('template_id', 0)) === $template_id ? ' selected' : '' ?>><?= escapeHtml($template['contract_template_name']) ?></option>
                             <?php } ?>
                         </select>
                     </div>
-                    <small class="text-secondary">Fills in the type, term, cover and terms from it - change any of them after.</small>
+                    <small class="text-secondary"><?= __('Fills in the type, term, cover and terms from it - change any of them after.') ?></small>
                 </div>
             <?php } else { ?>
                 <input type="hidden" name="template_id" value="<?= intval($c_value('template_id', 0)) ?>">
                 <?php if ($c_new && !empty($session_is_admin)) { ?>
                     <p class="small text-secondary" data-contract-no-templates>
-                        <i class="fas fa-fw fa-clone me-1"></i>No contract templates yet - a template fills in the type, term, cover and terms of a new contract.
-                        <a href="/admin/contract_templates.php">Make one in Admin &gt; Contract Templates</a>
+                        <i class="fas fa-fw fa-clone me-1"></i><?= __('No contract templates yet - a template fills in the type, term, cover and terms of a new contract.') ?>
+                        <a href="/admin/contract_templates.php"><?= __('Make one in Admin &gt; Contract Templates') ?></a>
                     </p>
                 <?php } ?>
             <?php } ?>
 
             <?php if (count($c_clients) > 1 || !$c_client_id) { ?>
                 <div class="mb-3">
-                    <label class="form-label">Client <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                         <select class="form-select select2" name="client_id" required data-contract-client>
-                            <option value="">- Pick a client -</option>
+                            <option value=""><?= __('- Pick a client -') ?></option>
                             <?php foreach ($c_clients as $client_option_id => $client_option) { ?>
                                 <option value="<?= $client_option_id ?>"<?= selectOptionClient($client_option_id, $client_option['client_name'], $client_option['client_abbreviation'] ?? '') ?>><?= escapeHtml($client_option['client_name']) ?></option>
                             <?php } ?>
@@ -144,19 +144,19 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
 
             <div class="row g-3 mb-3">
                 <div class="col-md-7">
-                    <label class="form-label">Name <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                        <input type="text" class="form-control" name="name" maxlength="255" placeholder="Managed Services Agreement" value="<?= escapeHtml($form_copy ? $c_value('name') . ' (copy)' : $c_value('name')) ?>" required<?= $c_new ? ' autofocus' : '' ?> data-contract-field="name">
+                        <input type="text" class="form-control" name="name" maxlength="255" placeholder="<?= escapeHtml(__('Managed Services Agreement')) ?>" value="<?= escapeHtml($form_copy ? __('%s (copy)', $c_value('name')) : $c_value('name')) ?>" required<?= $c_new ? ' autofocus' : '' ?> data-contract-field="name">
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Type</label>
+                    <label class="form-label"><?= __('Type') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                         <select class="form-select" name="type" data-contract-field="type">
                             <?php foreach (CONTRACT_TYPES as $key => $type) { ?>
-                                <option value="<?= $key ?>"<?= $c_value('type', 'managed') === $key ? ' selected' : '' ?> title="<?= escapeHtml($type['about']) ?>"><?= escapeHtml($type['label']) ?></option>
+                                <option value="<?= $key ?>"<?= $c_value('type', 'managed') === $key ? ' selected' : '' ?> title="<?= escapeHtml(contractTypeAbout($key)) ?>"><?= escapeHtml(contractTypeLabel($key)) ?></option>
                             <?php } ?>
                         </select>
                     </div>
@@ -165,11 +165,11 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Contact at the client</label>
+                    <label class="form-label"><?= __('Contact at the client') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-address-card"></i></span>
                         <select class="form-select" name="contact_id" data-contract-contact>
-                            <option value="0">- None -</option>
+                            <option value="0"><?= __('- None -') ?></option>
                             <?php foreach ($c_contacts as $contact) { ?>
                                 <option value="<?= intval($contact['contact_id']) ?>" data-client="<?= intval($contact['contact_client_id']) ?>"<?= intval($contact['contact_id']) === $c_contact_id ? ' selected' : '' ?><?= $c_client_id && intval($contact['contact_client_id']) !== $c_client_id ? ' hidden' : '' ?>><?= escapeHtml($contact['contact_name'] . ($contact['contact_title'] ? " - {$contact['contact_title']}" : '')) ?></option>
                             <?php } ?>
@@ -177,28 +177,28 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Owner</label>
+                    <label class="form-label"><?= __('Owner') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-user-tie"></i></span>
                         <select class="form-select" name="owner_id">
-                            <option value="0">- No one -</option>
+                            <option value="0"><?= __('- No one -') ?></option>
                             <?php foreach ($c_owners as $user_id => $user_name) { ?>
                                 <option value="<?= $user_id ?>"<?= $user_id === $c_owner_id ? ' selected' : '' ?>><?= escapeHtml($user_name) ?></option>
                             <?php } ?>
                         </select>
                     </div>
-                    <small class="text-secondary">Reminded before it renews or ends.</small>
+                    <small class="text-secondary"><?= __('Reminded before it renews or ends.') ?></small>
                 </div>
             </div>
 
             <?php if ($c_new) { ?>
                 <div class="mb-3">
-                    <label class="form-label">Status</label>
+                    <label class="form-label"><?= __('Status') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-flag"></i></span>
                         <select class="form-select" name="status">
-                            <option value="Active">Active - in force from its start date</option>
-                            <option value="Draft">Draft - not in force yet</option>
+                            <option value="Active"><?= __('Active - in force from its start date') ?></option>
+                            <option value="Draft"><?= __('Draft - not in force yet') ?></option>
                         </select>
                     </div>
                 </div>
@@ -206,27 +206,27 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
 
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label class="form-label">Starts</label>
+                    <label class="form-label"><?= __('Starts') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar-day"></i></span>
                         <input type="date" class="form-control" name="start_date" value="<?= escapeHtml($c_start) ?>" data-contract-start>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Term</label>
+                    <label class="form-label"><?= __('Term') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-history"></i></span>
                         <select class="form-select" name="term_months" data-contract-field="term_months" data-contract-term>
                             <?php $terms = CONTRACT_TERMS + ($c_term && !isset(CONTRACT_TERMS[$c_term]) ? [$c_term => contractTermLabel($c_term)] : []);
                             ksort($terms);
                             foreach ($terms as $months => $label) { ?>
-                                <option value="<?= $months ?>"<?= $months === $c_term ? ' selected' : '' ?>><?= escapeHtml($label) ?></option>
+                                <option value="<?= $months ?>"<?= $months === $c_term ? ' selected' : '' ?>><?= escapeHtml(contractTermLabel($months)) ?></option>
                             <?php } ?>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Ends</label>
+                    <label class="form-label"><?= __('Ends') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar-check"></i></span>
                         <input type="date" class="form-control" name="end_date" value="<?= escapeHtml($c_end) ?>" data-contract-end<?= $c_new ? '' : ' data-touched="1"' ?>>
@@ -238,15 +238,15 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
                 <div class="col-md-6">
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" role="switch" name="auto_renew" value="1" id="<?= $tab ?>AutoRenew"<?= intval($c_value('auto_renew', 1)) ? ' checked' : '' ?> data-contract-field="auto_renew">
-                        <label class="form-check-label" for="<?= $tab ?>AutoRenew">Renews itself for another term</label>
+                        <label class="form-check-label" for="<?= $tab ?>AutoRenew"><?= __('Renews itself for another term') ?></label>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Notice to end it</label>
+                    <label class="form-label"><?= __('Notice to end it') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-bell"></i></span>
                         <input type="number" class="form-control" name="notice_days" min="0" max="365" value="<?= intval($c_value('notice_days', 30)) ?>" data-contract-field="notice_days">
-                        <span class="input-group-text">days</span>
+                        <span class="input-group-text"><?= __('days') ?></span>
                     </div>
                 </div>
             </div>
@@ -255,85 +255,85 @@ $tab = 'contractTab' . bin2hex(random_bytes(3));
 
         <div class="tab-pane fade" id="<?= $tab ?>Cover" role="tabpanel">
             <div class="mb-3">
-                <label class="form-label">Support hours</label>
+                <label class="form-label"><?= __('Support hours') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-business-time"></i></span>
-                    <input type="text" class="form-control" name="support_hours" maxlength="100" placeholder="Mon-Fri 8am-6pm, emergencies 24/7" value="<?= escapeHtml($c_value('support_hours')) ?>" data-contract-field="support_hours">
+                    <input type="text" class="form-control" name="support_hours" maxlength="100" placeholder="<?= escapeHtml(__('Mon-Fri 8am-6pm, emergencies 24/7')) ?>" value="<?= escapeHtml($c_value('support_hours')) ?>" data-contract-field="support_hours">
                 </div>
             </div>
             <?php if (contractHoursReady()) { ?>
                 <div class="row g-3 mb-1">
                     <div class="col-md-6">
-                        <label class="form-label">Hours included each month</label>
+                        <label class="form-label"><?= __('Hours included each month') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-hourglass-half"></i></span>
-                            <input type="text" inputmode="decimal" class="form-control" name="monthly_hours" placeholder="None" value="<?= escapeHtml($c_hours($c_value('monthly_hours', 0))) ?>" data-contract-field="monthly_hours">
-                            <span class="input-group-text">hours</span>
+                            <input type="text" inputmode="decimal" class="form-control" name="monthly_hours" placeholder="<?= escapeHtml(__('None')) ?>" value="<?= escapeHtml($c_hours($c_value('monthly_hours', 0))) ?>" data-contract-field="monthly_hours">
+                            <span class="input-group-text"><?= __('hours') ?></span>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Tell the owner under</label>
+                        <label class="form-label"><?= __('Tell the owner under') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-bell"></i></span>
-                            <input type="text" inputmode="decimal" class="form-control" name="hours_alert" placeholder="Don't tell" value="<?= escapeHtml($c_hours($c_value('hours_alert', 0))) ?>" data-contract-field="hours_alert">
-                            <span class="input-group-text">hours left</span>
+                            <input type="text" inputmode="decimal" class="form-control" name="hours_alert" placeholder="<?= escapeHtml(__('Don\'t tell')) ?>" value="<?= escapeHtml($c_hours($c_value('hours_alert', 0))) ?>" data-contract-field="hours_alert">
+                            <span class="input-group-text"><?= __('hours left') ?></span>
                         </div>
                     </div>
                 </div>
-                <small class="text-secondary d-block mb-3">Tickets' time is drawn from the hours included each month - for that month only - and from any hours bought on the contract, before it is billed.</small>
+                <small class="text-secondary d-block mb-3"><?= __('Tickets\' time is drawn from the hours included each month - for that month only - and from any hours bought on the contract, before it is billed.') ?></small>
             <?php } ?>
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label class="form-label">Hourly rate</label>
+                    <label class="form-label"><?= __('Hourly rate') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
                         <input type="text" inputmode="decimal" class="form-control" name="rate_standard" placeholder="<?= escapeHtml($c_hints['rate']) ?>" value="<?= escapeHtml($c_money($c_value('rate_standard', ''))) ?>" data-contract-field="rate_standard">
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">After hours</label>
+                    <label class="form-label"><?= __('After hours') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-moon"></i></span>
                         <input type="text" inputmode="decimal" class="form-control" name="rate_after_hours" placeholder="<?= escapeHtml($c_hints['after_hours']) ?>" value="<?= escapeHtml($c_money($c_value('rate_after_hours', ''))) ?>" data-contract-field="rate_after_hours">
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Net terms</label>
+                    <label class="form-label"><?= __('Net terms') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                         <input type="number" class="form-control" name="net_terms" min="0" max="365" placeholder="<?= escapeHtml($c_hints['net_terms']) ?>" value="<?= escapeHtml((string) $c_value('net_terms', '')) ?>" data-contract-field="net_terms">
-                        <span class="input-group-text">days</span>
+                        <span class="input-group-text"><?= __('days') ?></span>
                     </div>
                 </div>
             </div>
-            <small class="text-secondary d-block mb-3">While the contract is in force, time bills at these rates - the after-hours one for tickets opened outside business hours - and new invoices are due on these terms. Leave one empty and the default in Admin > Settings > Defaults applies.</small>
+            <small class="text-secondary d-block mb-3"><?= escapeHtml(__('While the contract is in force, time bills at these rates - the after-hours one for tickets opened outside business hours - and new invoices are due on these terms. Leave one empty and the default in Admin > Settings > Defaults applies.')) ?></small>
 
-            <label class="form-label">SLA by ticket priority</label>
+            <label class="form-label"><?= __('SLA by ticket priority') ?></label>
             <?php foreach (CONTRACT_SLA_PRIORITIES as $priority => $part) { ?>
                 <div class="input-group mb-2">
-                    <span class="input-group-text" style="width: 7rem;"><i class="fa fa-fw fa-stopwatch me-2"></i><?= $priority ?></span>
-                    <select class="form-select" name="sla_<?= $part ?>" data-contract-field="sla_<?= $part ?>" aria-label="<?= $priority ?> priority SLA">
+                    <span class="input-group-text" style="width: 7rem;"><i class="fa fa-fw fa-stopwatch me-2"></i><?= escapeHtml(_x($priority, 'ticket priority')) // i18n-dynamic - Low, Medium, High, Urgent ?></span>
+                    <select class="form-select" name="sla_<?= $part ?>" data-contract-field="sla_<?= $part ?>" aria-label="<?= escapeHtml(__('%s priority SLA', _x($priority, 'ticket priority'))) // i18n-dynamic ?>">
                         <option value="0"><?= escapeHtml($c_hints['slas'][$priority]) ?></option>
                         <?php foreach ($c_slas as $sla_id => $sla) { ?>
-                            <option value="<?= $sla_id ?>"<?= intval($c_value("sla_{$part}_id", 0)) === $sla_id ? ' selected' : '' ?>><?= escapeHtml($sla['sla_name'] . ' - ' . contractSlaTargets($sla)) ?><?= $sla['sla_archived_at'] ? ' (archived)' : '' ?></option>
+                            <option value="<?= $sla_id ?>"<?= intval($c_value("sla_{$part}_id", 0)) === $sla_id ? ' selected' : '' ?>><?= escapeHtml($sla['sla_name'] . ' - ' . contractSlaTargets($sla)) ?><?= $sla['sla_archived_at'] ? ' ' . __('(archived)') : '' ?></option>
                         <?php } ?>
                     </select>
                 </div>
             <?php } ?>
-            <small class="text-secondary">From Admin > SLAs. While the contract is in force, the client's new tickets get them, and the default for a priority left on the default.</small>
+            <small class="text-secondary"><?= escapeHtml(__('From Admin > SLAs. While the contract is in force, the client\'s new tickets get them, and the default for a priority left on the default.')) ?></small>
         </div>
 
         <div class="tab-pane fade" id="<?= $tab ?>Terms" role="tabpanel">
-            <textarea class="form-control tinymce" name="details" rows="12" aria-label="Terms" data-contract-field="details"><?= escapeHtml(documentHtmlPurify((string) $c_value('details'))) ?></textarea>
+            <textarea class="form-control tinymce" name="details" rows="12" aria-label="<?= escapeHtml(__('Terms')) ?>" data-contract-field="details"><?= escapeHtml(documentHtmlPurify((string) $c_value('details'))) ?></textarea>
             <?php require $_SERVER['DOCUMENT_ROOT'] . '/includes/contract_placeholders.php'; ?>
         </div>
 
         <div class="tab-pane fade" id="<?= $tab ?>Notes" role="tabpanel">
             <div class="input-group">
                 <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-sticky-note"></i></span>
-                <textarea class="form-control" name="notes" rows="8" maxlength="10000" placeholder="For your team - what was agreed, who to talk to about renewing"><?= escapeHtml($c_value('notes')) ?></textarea>
+                <textarea class="form-control" name="notes" rows="8" maxlength="10000" placeholder="<?= escapeHtml(__('For your team - what was agreed, who to talk to about renewing')) ?>"><?= escapeHtml($c_value('notes')) ?></textarea>
             </div>
-            <small class="text-secondary">Only agents see these.</small>
+            <small class="text-secondary"><?= __('Only agents see these.') ?></small>
         </div>
     </div>
 </div>

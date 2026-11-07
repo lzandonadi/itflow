@@ -24,7 +24,7 @@ function reconcilePostInput() {
 
 /** "Operating Checking statement to Sep 30, 2026" */
 function reconcileLabel(array $row) {
-    return $row['account']['account_name'] . ' statement to ' . date('M j, Y', strtotime($row['reconciliation_statement_date']));
+    return __('%1$s statement to %2$s', $row['account']['account_name'], formatDate($row['reconciliation_statement_date'], 'date'));
 }
 
 if (isset($_POST['reconcile_start'])) {
@@ -45,12 +45,12 @@ if (isset($_POST['reconcile_start'])) {
     $opening = reconcileOpening($row['reconciliation_account_id']);
     if ($opening && !$had_opening) {
         logAudit("Reconciliation", "Create", "$session_name brought " . escapeSql($row['account']['account_name']) . " forward as reconciled to "
-            . date('M j, Y', strtotime($opening['reconciliation_statement_date'])) . " at a bank balance of " . escapeSql(reconcileBalanceText($row['account'], $opening['reconciliation_ending_balance'])), 0, intval($opening['reconciliation_id']));
+            . date('M j, Y', strtotime($opening['reconciliation_statement_date'])) . " at a bank balance of " . escapeSql(i18nEnglish(fn () => reconcileBalanceText($row['account'], $opening['reconciliation_ending_balance']))), 0, intval($opening['reconciliation_id']));
     }
 
-    logAudit("Reconciliation", "Create", "$session_name started reconciling the " . escapeSql(reconcileLabel($row)), 0, $id);
+    logAudit("Reconciliation", "Create", "$session_name started reconciling the " . escapeSql(i18nEnglish(fn () => reconcileLabel($row))), 0, $id);
 
-    flashAlert("Reconciling the <strong>" . escapeHtml(reconcileLabel($row)) . "</strong>" . ($totals['count'] ? " - {$totals['count']} line" . ($totals['count'] === 1 ? '' : 's') . ' from bank statements ticked already' : ''));
+    flashAlert(__('Reconciling the %s', '<strong>' . escapeHtml(reconcileLabel($row)) . '</strong>') . ($totals['count'] ? _n(' - %d line from bank statements ticked already', ' - %d lines from bank statements ticked already', $totals['count']) : ''));
 
     redirect("reconcile.php?account=$account_id");
 
@@ -70,10 +70,10 @@ if (isset($_POST['reconcile_update'])) {
     }
     $row = reconcileRow($id);
 
-    logAudit("Reconciliation", "Edit", "$session_name changed the statement being reconciled to the " . escapeSql(reconcileLabel($row)) . ", ending at "
-        . escapeSql(reconcileBalanceText($row['account'], $row['reconciliation_ending_balance'])), 0, $id);
+    logAudit("Reconciliation", "Edit", "$session_name changed the statement being reconciled to the " . escapeSql(i18nEnglish(fn () => reconcileLabel($row))) . ", ending at "
+        . escapeSql(i18nEnglish(fn () => reconcileBalanceText($row['account'], $row['reconciliation_ending_balance']))), 0, $id);
 
-    flashAlert("Statement changed - <strong>" . escapeHtml(reconcileLabel($row)) . "</strong>");
+    flashAlert(__('Statement changed - %s', '<strong>' . escapeHtml(reconcileLabel($row)) . '</strong>'));
 
     redirect('reconcile.php?account=' . intval($row['reconciliation_account_id']));
 
@@ -89,15 +89,14 @@ if (isset($_POST['reconcile_finish'])) {
     $row = reconcileRow($id);
     $totals = $row ? reconcileFinish($id, $error) : null;
     if (!$totals) {
-        flashAlert(escapeHtml($row ? $error : 'That reconciliation no longer exists'), 'error');
+        flashAlert(escapeHtml($row ? $error : __('That reconciliation no longer exists')), 'error');
         redirect($row ? 'reconcile.php?account=' . intval($row['reconciliation_account_id']) : 'accounts.php');
     }
 
-    logAudit("Reconciliation", "Finish", "$session_name reconciled the " . escapeSql(reconcileLabel($row)) . " - {$totals['count']} lines cleared, ending at "
-        . escapeSql(reconcileBalanceText($row['account'], $totals['ending'])), 0, $id);
+    logAudit("Reconciliation", "Finish", "$session_name reconciled the " . escapeSql(i18nEnglish(fn () => reconcileLabel($row))) . " - {$totals['count']} lines cleared, ending at "
+        . escapeSql(i18nEnglish(fn () => reconcileBalanceText($row['account'], $totals['ending']))), 0, $id);
 
-    flashAlert("<strong>" . escapeHtml($row['account']['account_name']) . "</strong> is reconciled to " . escapeHtml(date('M j, Y', strtotime($row['reconciliation_statement_date'])))
-        . " - {$totals['count']} line" . ($totals['count'] === 1 ? '' : 's') . " cleared");
+    flashAlert(_n('%2$s is reconciled to %3$s - %1$d line cleared', '%2$s is reconciled to %3$s - %1$d lines cleared', $totals['count'], $totals['count'], '<strong>' . escapeHtml($row['account']['account_name']) . '</strong>', escapeHtml(formatDate($row['reconciliation_statement_date'], 'date'))));
 
     redirect('reconcile.php?account=' . intval($row['reconciliation_account_id']));
 
@@ -115,9 +114,9 @@ if (isset($_GET['reconcile_discard'])) {
         redirect();
     }
 
-    logAudit("Reconciliation", "Delete", "$session_name discarded reconciling the " . escapeSql(reconcileLabel($row)), 0, intval($row['reconciliation_id']));
+    logAudit("Reconciliation", "Delete", "$session_name discarded reconciling the " . escapeSql(i18nEnglish(fn () => reconcileLabel($row))), 0, intval($row['reconciliation_id']));
 
-    flashAlert("Reconciling the <strong>" . escapeHtml(reconcileLabel($row)) . "</strong> discarded - its ticks are off", 'error');
+    flashAlert(__('Reconciling the %s discarded - its ticks are off', '<strong>' . escapeHtml(reconcileLabel($row)) . '</strong>'), 'error');
 
     redirect('reconcile.php?account=' . intval($row['reconciliation_account_id']));
 
@@ -137,14 +136,14 @@ if (isset($_GET['reconcile_undo'])) {
 
     if ($row['opening']) {
         logAudit("Reconciliation", "Undo", "$session_name took away " . escapeSql($row['account']['account_name']) . " being brought forward as reconciled to " . date('M j, Y', strtotime($row['reconciliation_statement_date']))
-            . (abs(floatval($row['reconciliation_adjustment'])) >= 0.005 ? ', the opening balance back to ' . escapeSql(billingMoney(accountRow($row['reconciliation_account_id'])['opening_balance'], $row['account']['account_currency_code'])) : ''), 0, intval($row['reconciliation_id']));
-        flashAlert("<strong>" . escapeHtml($row['account']['account_name']) . "</strong> is no longer brought forward - its next statement can start from either balance", 'warning');
+            . (abs(floatval($row['reconciliation_adjustment'])) >= 0.005 ? ', the opening balance back to ' . escapeSql(billingMoney(accountRow($row['reconciliation_account_id'])['opening_balance'], $row['account']['account_currency_code'])) : ''), 0, intval($row['reconciliation_id'])); // i18n-ignore - the audit log
+        flashAlert(__('%s is no longer brought forward - its next statement can start from either balance', '<strong>' . escapeHtml($row['account']['account_name']) . '</strong>'), 'warning');
         redirect('reconcile.php?account=' . intval($row['reconciliation_account_id']));
     }
 
-    logAudit("Reconciliation", "Undo", "$session_name undid the reconciliation of the " . escapeSql(reconcileLabel($row)) . " - back to in progress", 0, intval($row['reconciliation_id']));
+    logAudit("Reconciliation", "Undo", "$session_name undid the reconciliation of the " . escapeSql(i18nEnglish(fn () => reconcileLabel($row))) . " - back to in progress", 0, intval($row['reconciliation_id']));
 
-    flashAlert("The <strong>" . escapeHtml(reconcileLabel($row)) . "</strong> is being reconciled again - its lines can change, and it can be finished or discarded", 'warning');
+    flashAlert(__('The %s is being reconciled again - its lines can change, and it can be finished or discarded', '<strong>' . escapeHtml(reconcileLabel($row)) . '</strong>'), 'warning');
 
     redirect('reconcile.php?account=' . intval($row['reconciliation_account_id']));
 
@@ -163,7 +162,7 @@ if (isset($_GET['reconcile_correct_opening'])) {
     $row = reconcileRow(intval($_GET['reconcile_correct_opening']));
     $gap = $row ? reconcileCorrectOpening($row['reconciliation_id'], $error) : null;
     if ($gap === null) {
-        flashAlert(escapeHtml($row ? $error : 'That reconciliation no longer exists'), 'error');
+        flashAlert(escapeHtml($row ? $error : __('That reconciliation no longer exists')), 'error');
         redirect();
     }
     $account = accountRow($row['reconciliation_account_id']);
@@ -172,7 +171,7 @@ if (isset($_GET['reconcile_correct_opening'])) {
     logAudit("Account", "Edit", "$session_name corrected the opening balance of " . escapeSql($account['account_name']) . " by " . escapeSql($moved) . ", to "
         . escapeSql(billingMoney($account['opening_balance'], $account['account_currency_code'])) . ", to match the bank on " . date('M j, Y', strtotime($row['reconciliation_statement_date'])), 0, intval($account['account_id']));
 
-    flashAlert("<strong>" . escapeHtml($account['account_name']) . "</strong>'s opening balance is corrected by " . escapeHtml($moved) . " - ITFlow matches the bank from " . escapeHtml(date('M j, Y', strtotime($row['reconciliation_statement_date']))) . " on");
+    flashAlert(__("%1\$s's opening balance is corrected by %2\$s - ITFlow matches the bank from %3\$s on", '<strong>' . escapeHtml($account['account_name']) . '</strong>', escapeHtml($moved), escapeHtml(formatDate($row['reconciliation_statement_date'], 'date'))));
 
     redirect('reconcile.php?account=' . intval($account['account_id']));
 

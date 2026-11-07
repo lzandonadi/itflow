@@ -95,16 +95,16 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
 
 <ul class="nav nav-pills nav-fill flex-nowrap overflow-auto mb-3 itflow-asset-form-tabs" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-cube me-2 d-none d-lg-inline"></i>Details</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-cube me-2 d-none d-lg-inline"></i><?= __('Details') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>License"><i class="fas fa-fw fa-key me-2 d-none d-lg-inline"></i>License</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>License"><i class="fas fa-fw fa-key me-2 d-none d-lg-inline"></i><?= __('License') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Seats"><i class="fas fa-fw fa-users me-2 d-none d-lg-inline"></i>Seats <span class="badge rounded-pill text-bg-secondary ms-1" data-seat-badge></span></a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Seats"><i class="fas fa-fw fa-users me-2 d-none d-lg-inline"></i><?= __('Seats') ?> <span class="badge rounded-pill text-bg-secondary ms-1" data-seat-badge></span></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i>Notes</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i><?= __('Notes') ?></a>
     </li>
 </ul>
 
@@ -115,61 +115,61 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
     <div class="row g-3">
         <?php if (!$client_id) { ?>
             <div class="col-12">
-                <label class="form-label">Client <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="client_id" required>
-                        <option value="">- Select Client -</option>
+                        <option value=""><?= __('- Select Client -') ?></option>
                         <?php foreach ($client_options as $client_option) { ?>
                             <option value="<?= intval($client_option['client_id']) ?>"<?= selectOptionClient($client_option['client_id'], $client_option['client_name'], $client_option['client_abbreviation'] ?? '') ?>><?= escapeHtml($client_option['client_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">Pick the vendor and who is on it once it's saved.</div>
+                <div class="form-text"><?= __('Pick the vendor and who is on it once it\'s saved.') ?></div>
             </div>
         <?php } ?>
 
         <?php if ($template_options) { ?>
             <div class="col-12">
-                <label class="form-label">Start from a template</label>
+                <label class="form-label"><?= __('Start from a template') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-puzzle-piece"></i></span>
-                    <select class="form-select select2" name="software_template_id" data-software-template data-placeholder="- None - fill it in yourself -">
-                        <option value="">- None -</option>
+                    <select class="form-select select2" name="software_template_id" data-software-template data-placeholder="<?= escapeHtml(__('- None - fill it in yourself -')) ?>">
+                        <option value=""><?= __('- None -') ?></option>
                         <?php foreach ($template_options as $template_id => $template) { ?>
                             <option value="<?= $template_id ?>" <?= intval($_GET['template_id'] ?? 0) === $template_id ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . softwareTypeStyle($template['type'])['icon'], 'description' => implode(' · ', array_filter([$template['type'], $template['license_type']]))]) ?>><?= escapeHtml($template['name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">Fills in the name, type, license type, description, seats, vendor, renewal date and notes - change anything after. The license remembers it.</div>
+                <div class="form-text"><?= __('Fills in the name, type, license type, description, seats, vendor, renewal date and notes - change anything after. The license remembers it.') ?></div>
             </div>
         <?php } ?>
 
         <div class="col-md-8">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw <?= $software_type_style['icon'] ?>" data-software-type-icon></i></span>
-                <input type="text" class="form-control" name="name" placeholder="Microsoft 365 Business Premium" maxlength="200" value="<?= $software_name ?>" required <?= $software_form_mode === 'edit' ? '' : 'autofocus' ?>>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Microsoft 365 Business Premium')) ?>" maxlength="200" value="<?= $software_name ?>" required <?= $software_form_mode === 'edit' ? '' : 'autofocus' ?>>
                 <div class="input-group-text">
-                    <label class="star-toggle mb-0" title="Favorite - pinned to the client overview">
+                    <label class="star-toggle mb-0" title="<?= escapeHtml(__('Favorite - pinned to the client overview')) ?>">
                         <input class="form-check-input" type="checkbox" name="favorite" value="1" <?= $software_favorite ? 'checked' : '' ?>><i class="far fa-star"></i>
                     </label>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <label class="form-label">Version</label>
+            <label class="form-label"><?= __('Version') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-code-branch"></i></span>
-                <input type="text" class="form-control" name="version" placeholder="2024, 16.0, LTSC" maxlength="200" value="<?= $software_version ?>">
+                <input type="text" class="form-control" name="version" placeholder="<?= escapeHtml(__('2024, 16.0, LTSC')) ?>" maxlength="200" value="<?= $software_version ?>">
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Type <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Type') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-layer-group"></i></span>
                 <select class="form-select select2" name="type" required>
-                    <option value="">- Select Type -</option>
+                    <option value=""><?= __('- Select Type -') ?></option>
                     <?= categoryOptionsHtml('software_type', $software_type_raw) ?>
                 </select>
                 <?= categoryAddButtonHtml('software_type', 'btn btn-secondary') ?>
@@ -177,11 +177,11 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
         </div>
         <?php if ($client_id) { ?>
             <div class="col-md-6">
-                <label class="form-label">Vendor</label>
+                <label class="form-label"><?= __('Vendor') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                     <select class="form-select select2" name="vendor" data-software-vendor<?= $vendor_can_make ? ' data-vendor-can-make' : '' ?>>
-                        <option value="">- Select Vendor -</option>
+                        <option value=""><?= __('- Select Vendor -') ?></option>
                         <?php foreach ($vendor_options as $vendor_option) {
                             $vendor_option_id = intval($vendor_option['vendor_id']); ?>
                             <option value="<?= $vendor_option_id ?>" <?= $software_vendor_id === $vendor_option_id ? 'selected' : '' ?><?= selectOptionVendor($vendor_option['vendor_name'], $vendor_option['vendor_description']) ?> data-vendor-template-id="<?= intval($vendor_option['vendor_template_id']) ?>"><?= escapeHtml($vendor_option['vendor_name']) ?><?= $vendor_option['vendor_archived_at'] ? ' (archived)' : '' ?></option>
@@ -191,19 +191,19 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
             </div>
         <?php } ?>
         <div class="col-12">
-            <label class="form-label">Description</label>
+            <label class="form-label"><?= __('Description') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-                <input type="text" class="form-control" name="description" placeholder="Email, Office apps and Intune for the whole office" value="<?= $software_description ?>">
+                <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('Email, Office apps and Intune for the whole office')) ?>" value="<?= $software_description ?>">
             </div>
         </div>
         <div class="col-12">
-            <?= tagFormFieldHtml('license', $software_form_mode === 'edit' ? tagIdsForRecord('license', $software_id) : [], 'Core stack, Client-paid, Annual true-up') ?>
+            <?= tagFormFieldHtml('license', $software_form_mode === 'edit' ? tagIdsForRecord('license', $software_id) : [], __('Core stack, Client-paid, Annual true-up')) ?>
         </div>
     </div>
 
     <?php if ($software_form_mode === 'edit') { ?>
-        <p class="text-body-secondary small text-end mt-3 mb-0">License ID <span class="font-monospace"><?= $software_id ?></span></p>
+        <p class="text-body-secondary small text-end mt-3 mb-0"><?= __('License ID') ?> <span class="font-monospace"><?= $software_id ?></span></p>
     <?php } ?>
 </div>
 
@@ -211,64 +211,64 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
 <div class="tab-pane fade" id="<?= $form_id ?>License">
     <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label">License type</label>
+            <label class="form-label"><?= __('License type') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-certificate"></i></span>
                 <select class="form-select select2" name="license_type">
-                    <option value="">- Select License Type -</option>
+                    <option value=""><?= __('- Select License Type -') ?></option>
                     <?php foreach ($license_type_options as $license_type_option) { ?>
-                        <option <?= $license_type_option === $software_license_type_raw ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . softwareLicenseTypeIcon($license_type_option)]) ?>><?= escapeHtml($license_type_option) ?></option>
+                        <option value="<?= escapeHtml($license_type_option) ?>" <?= $license_type_option === $software_license_type_raw ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas ' . softwareLicenseTypeIcon($license_type_option)]) ?>><?= escapeHtml(softwareLicenseTypeLabel($license_type_option)) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Seats bought</label>
+            <label class="form-label"><?= __('Seats bought') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-users"></i></span>
-                <input type="number" class="form-control" name="seats" min="0" step="1" placeholder="No limit" value="<?= $software_seats ?>" data-seat-total>
+                <input type="number" class="form-control" name="seats" min="0" step="1" placeholder="<?= escapeHtml(__('No limit')) ?>" value="<?= $software_seats ?>" data-seat-total>
             </div>
-            <div class="form-text">Leave blank for a site or unlimited license.</div>
+            <div class="form-text"><?= __('Leave blank for a site or unlimited license.') ?></div>
         </div>
         <div class="col-12">
-            <label class="form-label">License key</label>
+            <label class="form-label"><?= __('License key') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-key"></i></span>
-                <input type="text" class="form-control font-monospace" name="key" placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" maxlength="200" value="<?= $software_key ?>">
+                <input type="text" class="form-control font-monospace" name="key" placeholder="<?= escapeHtml(__('XXXXX-XXXXX-XXXXX-XXXXX-XXXXX')) ?>" maxlength="200" value="<?= $software_key ?>">
             </div>
-            <div class="form-text">The one key for the whole license, if it has one.<?= $software_form_mode === 'edit' ? ' A key per device or user goes on the license\'s Keys tab.' : '' ?></div>
+            <div class="form-text"><?= __('The one key for the whole license, if it has one.') ?><?= $software_form_mode === 'edit' ? ' ' . __('A key per device or user goes on the license\'s Keys tab.') : '' ?></div>
         </div>
         <?php if ($software_form_mode === 'add') { ?>
             <div class="col-12">
-                <label class="form-label">Individual keys</label>
-                <textarea class="form-control font-monospace" name="keys" rows="3" placeholder="One key per line - for a license with a key for each device or user"></textarea>
-                <div class="form-text">Hand each one to a device or user from the license's Keys tab.</div>
+                <label class="form-label"><?= __('Individual keys') ?></label>
+                <textarea class="form-control font-monospace" name="keys" rows="3" placeholder="<?= escapeHtml(__('One key per line - for a license with a key for each device or user')) ?>"></textarea>
+                <div class="form-text"><?= __('Hand each one to a device or user from the license\'s Keys tab.') ?></div>
             </div>
         <?php } ?>
         <div class="col-md-6">
-            <label class="form-label">Order / invoice reference</label>
+            <label class="form-label"><?= __('Order / invoice reference') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-receipt"></i></span>
-                <input type="text" class="form-control" name="purchase_reference" placeholder="INV-1045, PO-7782, contract number" maxlength="200" value="<?= $software_purchase_reference ?>">
+                <input type="text" class="form-control" name="purchase_reference" placeholder="<?= escapeHtml(__('INV-1045, PO-7782, contract number')) ?>" maxlength="200" value="<?= $software_purchase_reference ?>">
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Purchased</label>
+            <label class="form-label"><?= __('Purchased') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-shopping-cart"></i></span>
                 <input type="date" class="form-control" name="purchase" max="2999-12-31" value="<?= $software_purchase ?>" data-software-purchase>
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Renews / expires</label>
+            <label class="form-label"><?= __('Renews / expires') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-calendar-alt"></i></span>
                 <input type="date" class="form-control" name="expire" max="2999-12-31" value="<?= $software_expire ?>" data-software-expire>
-                <button type="button" class="btn btn-outline-secondary" data-renew-term="1m" title="A month after it was bought (or today)">1 mo</button>
-                <button type="button" class="btn btn-outline-secondary" data-renew-term="1y" title="A year after it was bought (or today)">1 yr</button>
-                <button type="button" class="btn btn-outline-secondary" data-renew-term="3y" title="Three years after it was bought (or today)">3 yr</button>
+                <button type="button" class="btn btn-outline-secondary" data-renew-term="1m" title="<?= escapeHtml(__('A month after it was bought (or today)')) ?>"><?= __('1 mo') ?></button>
+                <button type="button" class="btn btn-outline-secondary" data-renew-term="1y" title="<?= escapeHtml(__('A year after it was bought (or today)')) ?>"><?= __('1 yr') ?></button>
+                <button type="button" class="btn btn-outline-secondary" data-renew-term="3y" title="<?= escapeHtml(__('Three years after it was bought (or today)')) ?>"><?= __('3 yr') ?></button>
             </div>
-            <div class="form-text">Shows on the client overview's renewals and the dashboard as it gets close.</div>
+            <div class="form-text"><?= __('Shows on the client overview\'s renewals and the dashboard as it gets close.') ?></div>
         </div>
     </div>
 </div>
@@ -278,15 +278,15 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
     <?php if ($client_id) { ?>
         <input type="hidden" name="seats_form" value="1">
         <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-            <span class="text-body-secondary small">Each device and user here takes a seat.</span>
+            <span class="text-body-secondary small"><?= __('Each device and user here takes a seat.') ?></span>
             <span class="badge rounded-pill fs-6 fw-normal" data-seat-count></span>
         </div>
         <div class="row g-3">
             <div class="col-12">
-                <label class="form-label">Devices</label>
+                <label class="form-label"><?= __('Devices') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-desktop"></i></span>
-                    <select class="form-select select2" name="assets[]" multiple data-placeholder="<?= $asset_options ? 'Pick the devices it is installed on' : 'This client has no assets yet' ?>" data-seat-pick>
+                    <select class="form-select select2" name="assets[]" multiple data-placeholder="<?= $asset_options ? __('Pick the devices it is installed on') : __('This client has no assets yet') ?>" data-seat-pick>
                         <?php foreach ($asset_options as $asset_option) {
                             $asset_option_id = intval($asset_option['asset_id']); ?>
                             <option value="<?= $asset_option_id ?>" <?= in_array($asset_option_id, $software_asset_ids, true) ? 'selected' : '' ?><?= selectOptionAsset($asset_option['asset_type'], implode(' · ', array_filter([trim($asset_option['asset_make'] . ' ' . $asset_option['asset_model']), $asset_option['contact_name']]))) ?>><?= escapeHtml($asset_option['asset_name']) ?></option>
@@ -295,10 +295,10 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
                 </div>
             </div>
             <div class="col-12">
-                <label class="form-label">Users</label>
+                <label class="form-label"><?= __('Users') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
-                    <select class="form-select select2" name="contacts[]" multiple data-placeholder="<?= $contact_options ? 'Pick the people licensed to use it' : 'This client has no contacts yet' ?>" data-seat-pick>
+                    <select class="form-select select2" name="contacts[]" multiple data-placeholder="<?= $contact_options ? __('Pick the people licensed to use it') : __('This client has no contacts yet') ?>" data-seat-pick>
                         <?php foreach ($contact_options as $contact_option) {
                             $contact_option_id = intval($contact_option['contact_id']); ?>
                             <option value="<?= $contact_option_id ?>" <?= in_array($contact_option_id, $software_contact_ids, true) ? 'selected' : '' ?><?= selectOptionContact($contact_option['contact_client_id'], $contact_option['contact_name'], $contact_option['contact_photo'], $contact_option['contact_title'], $contact_option_id) ?>><?= escapeHtml($contact_option['contact_name']) ?></option>
@@ -308,12 +308,12 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
             </div>
         </div>
     <?php } else { ?>
-        <p class="text-body-secondary text-center my-4">Pick the devices and users once it's saved - they come from the client.</p>
+        <p class="text-body-secondary text-center my-4"><?= __('Pick the devices and users once it\'s saved - they come from the client.') ?></p>
     <?php } ?>
 </div>
 
 <div class="tab-pane fade" id="<?= $form_id ?>Notes">
-    <textarea class="form-control" rows="12" placeholder="Admin portal, how it is billed, who to call to renew..." name="notes"><?= $software_notes ?></textarea>
+    <textarea class="form-control" rows="12" placeholder="<?= escapeHtml(__('Admin portal, how it is billed, who to call to renew...')) ?>" name="notes"><?= $software_notes ?></textarea>
 </div>
 
 </div>
@@ -429,7 +429,7 @@ $form_id = 'softwareForm' . ($software_form_mode === 'edit' ? $software_id : 'Ne
                 } else if (vendor.hasAttribute('data-vendor-can-make')) {
                     var option = new Option(t.vendor, 'template:' + t.vendor_template_id);
                     option.dataset.vendorFromTemplate = '1';
-                    option.dataset.description = 'New - added for the client from the vendor template';
+                    option.dataset.description = <?= json_encode(__('New - added for the client from the vendor template'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
                     option.dataset.icon = 'fas fa-plus';
                     vendor.add(option);
                     value = option.value;

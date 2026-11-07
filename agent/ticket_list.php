@@ -26,7 +26,7 @@ $sort_sql = [
     'client_name' => "client_name $order, ticket_number DESC",
     'contact_name' => "contact_name $order, ticket_number DESC",
     'ticket_billable' => "ticket_invoice_id > 0 $order, ticket_billable $order, ticket_number DESC",
-    'ticket_priority' => "CASE ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order, ticket_number DESC",
+    'ticket_priority' => "CASE ticket_priority WHEN 'Urgent' THEN 0 WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END $order, ticket_number DESC", // i18n-ignore - SQL
     'ticket_status' => "ticket_status_order $order, ticket_status $order, ticket_number DESC",
     'user_name' => "ticket_assigned_to = 0 $order, user_name $order, ticket_number DESC",
     'ticket_updated_at' => "COALESCE(ticket_updated_at, ticket_created_at) $order",
@@ -82,26 +82,26 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                 <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                 <?php } ?>
-                <th><?= $sort_link('ticket_number', 'Ticket') ?></th>
+                <th><?= $sort_link('ticket_number', __('Ticket')) ?></th>
                 <th>
                     <?php if (!$client_url) { ?>
-                        <?= $sort_link('client_name', 'Client') ?> <span class="text-body-secondary">/</span>
+                        <?= $sort_link('client_name', __('Client')) ?> <span class="text-body-secondary">/</span>
                     <?php } ?>
-                    <?= $sort_link('contact_name', 'Contact', $client_url ? '' : 'text-body-secondary') ?>
+                    <?= $sort_link('contact_name', __('Contact'), $client_url ? '' : 'text-body-secondary') ?>
                 </th>
-                <th><?= $sort_link('ticket_status', 'Status') ?></th>
-                <th><?= $sort_link('ticket_priority', 'Priority') ?></th>
-                <th><?= $sort_link('user_name', 'Assigned') ?></th>
+                <th><?= $sort_link('ticket_status', __('Status')) ?></th>
+                <th><?= $sort_link('ticket_priority', __('Priority')) ?></th>
+                <th><?= $sort_link('user_name', __('Assigned')) ?></th>
                 <?php if ($show_due) { ?>
-                    <th><?= $sort_link('ticket_sla', 'Due') ?></th>
+                    <th><?= $sort_link('ticket_sla', __('Due')) ?></th>
                 <?php } ?>
-                <th><?= $sort_link('ticket_updated_at', 'Activity') ?></th>
+                <th><?= $sort_link('ticket_updated_at', __('Activity')) ?></th>
                 <?php if ($show_billing) { ?>
-                    <th class="text-center"><?= $sort_link('ticket_billable', 'Billing') ?></th>
+                    <th class="text-center"><?= $sort_link('ticket_billable', __('Billing')) ?></th>
                 <?php } ?>
                 <th></th>
             </tr>
@@ -126,15 +126,15 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                 $ticket_invoice_id = intval($row['ticket_invoice_id']);
                 $ticket_quote_id = intval($row['ticket_quote_id']);
 
-                $row_title = ['danger' => $sla['key'] === 'breached' ? 'SLA breached' : 'Past its due date', 'warning' => $sla['key'] === 'at_risk' ? 'SLA at risk' : 'Due within a day'][$attention] ?? '';
+                $row_title = ['danger' => $sla['key'] === 'breached' ? __('SLA breached') : __('Past its due date'), 'warning' => $sla['key'] === 'at_risk' ? __('SLA at risk') : __('Due within a day')][$attention] ?? '';
 
                 ?>
-                <tr class="itflow-ticket-row <?= $attention ? "is-$attention" : '' ?> <?= $is_open ? '' : 'is-done' ?>"<?= $row_title ? ' title="' . $row_title . '"' : '' ?>>
+                <tr class="itflow-ticket-row <?= $attention ? "is-$attention" : '' ?> <?= $is_open ? '' : 'is-done' ?>"<?= $row_title ? ' title="' . escapeHtml($row_title) . '"' : '' ?>>
                     <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <?php if (!$is_closed) { ?>
                                 <div class="form-check">
-                                    <input class="form-check-input bulk-select" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" aria-label="Select <?= $reference ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="ticket_ids[]" value="<?= $ticket_id ?>" aria-label="<?= escapeHtml(__('Select %s', $reference)) ?>">
                                 </div>
                             <?php } ?>
                         </td>
@@ -143,25 +143,25 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                     <!-- What it is -->
                     <td class="itflow-ticket-main">
                         <div class="d-flex align-items-start gap-2">
-                            <span class="itflow-ticket-move <?= $move === 'us' ? 'is-ours' : '' ?>" <?= $move === 'us' ? 'title="Needs a reply from us"' : 'aria-hidden="true"' ?>></span>
+                            <span class="itflow-ticket-move <?= $move === 'us' ? 'is-ours' : '' ?>" <?= $move === 'us' ? 'title="' . escapeHtml(__('Needs a reply from us')) . '"' : 'aria-hidden="true"' ?>></span>
                             <div class="min-w-0">
                                 <a class="<?= $is_open ? 'fw-semibold text-body' : 'text-body-secondary' ?> itflow-ticket-subject" href="<?= $url ?>"><?= $subject ?></a>
                                 <div class="itflow-ticket-meta small text-body-secondary">
                                     <a class="font-monospace text-body-secondary" href="<?= $url ?>"><?= $reference ?></a>
-                                    <span title="Opened <?= escapeHtml($row['ticket_created_at']) ?>"><?= timeAgo($row['ticket_created_at']) ?></span>
+                                    <span title="<?= escapeHtml(__('Opened %s', $row['ticket_created_at'])) ?>"><?= timeAgo($row['ticket_created_at']) ?></span>
                                     <?= ticketSourceIcon($row['ticket_source']) ?>
                                     <?php if ($row['category_name'] !== null && $row['category_name'] !== '') { ?>
                                         <span class="text-nowrap"><?= categoryMarkHtml($row['category_color'], $row['category_icon'] ?? '', '<i class="fas fa-circle itflow-ticket-dot"%s aria-hidden="true"></i>') ?><?= escapeHtml($row['category_name']) ?></span>
                                     <?php } ?>
                                     <?php if (!empty($row['asset_name'])) { ?>
-                                        <span class="text-nowrap text-truncate itflow-ticket-asset" title="Asset"><i class="fas fa-desktop me-1"></i><?= escapeHtml($row['asset_name']) ?></span>
+                                        <span class="text-nowrap text-truncate itflow-ticket-asset" title="<?= escapeHtml(__('Asset')) ?>"><i class="fas fa-desktop me-1"></i><?= escapeHtml($row['asset_name']) ?></span>
                                     <?php } ?>
                                     <?php if (intval($row['ticket_project_id']) && $row['project_name'] !== null) { ?>
-                                        <a class="text-nowrap text-body-secondary ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/project/project.php?id=<?= intval($row['ticket_project_id']) ?>" title="Project <?= escapeHtml($row['project_prefix'] . intval($row['project_number'])) ?> - quick look"><i class="fas fa-project-diagram me-1"></i><?= escapeHtml($row['project_name']) ?></a>
+                                        <a class="text-nowrap text-body-secondary ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/project/project.php?id=<?= intval($row['ticket_project_id']) ?>" title="<?= escapeHtml(__('Project %s - quick look', $row['project_prefix'] . intval($row['project_number']))) ?>"><i class="fas fa-project-diagram me-1"></i><?= escapeHtml($row['project_name']) ?></a>
                                     <?php } ?>
                                     <?php if ($schedule && $is_open) { ?>
-                                        <span class="text-nowrap <?= $scheduled_today ? 'text-warning-emphasis fw-semibold' : '' ?>" title="Scheduled<?= intval($row['ticket_onsite']) ? ' on site' : '' ?>">
-                                            <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= $scheduled_today ? 'Today ' . date($config_time_format, strtotime($schedule)) : date('M j, ' . $config_time_format, strtotime($schedule)) ?>
+                                        <span class="text-nowrap <?= $scheduled_today ? 'text-warning-emphasis fw-semibold' : '' ?>" title="<?= escapeHtml(intval($row['ticket_onsite']) ? __('Scheduled on site') : __('Scheduled')) ?>">
+                                            <i class="fas fa-<?= intval($row['ticket_onsite']) ? 'truck' : 'calendar-check' ?> me-1"></i><?= escapeHtml($scheduled_today ? __('Today') . ' ' . formatDate($schedule, 'time') : formatDate($schedule, 'datetime_short')) ?>
                                         </span>
                                     <?php } ?>
                                     <?= ticketTasksHtml($task_counts[$ticket_id] ?? null) ?>
@@ -186,7 +186,7 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                             <?php if ($row_client_id) { ?>
                                 <a class="d-block text-truncate text-body fw-semibold small" href="tickets.php?client_id=<?= $row_client_id ?>"><?= escapeHtml($row['client_name']) ?></a>
                             <?php } else { ?>
-                                <div class="small text-body-secondary"><i class="fas fa-building me-1"></i>Internal</div>
+                                <div class="small text-body-secondary"><i class="fas fa-building me-1"></i><?= __('Internal') ?></div>
                             <?php } ?>
                         <?php } ?>
                         <?php if (intval($row['contact_id'])) { ?>
@@ -206,7 +206,7 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                             <?php } ?>
                         </span>
                         <?php if ($move === 'client') { ?>
-                            <div class="small text-body-secondary mt-1"><i class="fas fa-hourglass-half me-1"></i>With client</div>
+                            <div class="small text-body-secondary mt-1"><i class="fas fa-hourglass-half me-1"></i><?= __('With client') ?></div>
                         <?php } ?>
                     </td>
 
@@ -246,9 +246,9 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
                     <?php if ($show_billing) { ?>
                         <td class="text-center text-nowrap">
                             <?php if ($ticket_invoice_id) { ?>
-                                <a href="invoice.php?invoice_id=<?= $ticket_invoice_id ?>"><span class="badge rounded-pill text-bg-success">Invoiced</span></a>
+                                <a href="invoice.php?invoice_id=<?= $ticket_invoice_id ?>"><span class="badge rounded-pill text-bg-success"><?= __('Invoiced') ?></span></a>
                             <?php } elseif ($ticket_quote_id) { ?>
-                                <a href="quote.php?quote_id=<?= $ticket_quote_id ?>"><span class="badge rounded-pill text-bg-primary">Quoted</span></a>
+                                <a href="quote.php?quote_id=<?= $ticket_quote_id ?>"><span class="badge rounded-pill text-bg-primary"><?= __('Quoted') ?></span></a>
                             <?php } else { ?>
                                 <?= quickPick('billable', $ticket_id, intval($row['ticket_billable']) ? '1' : '0', ticketBillableHtml(intval($row['ticket_billable']), 'list')) ?>
                             <?php } ?>
@@ -257,38 +257,38 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
 
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket.php?id=<?= $ticket_id ?>">
-                                    <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                    <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                 </a>
                                 <a class="dropdown-item" href="<?= $url ?>" target="_blank">
-                                    <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i>Open in a new tab
+                                    <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i><?= __('Open in a new tab') ?>
                                 </a>
                                 <?php if ($can_edit && !$is_closed) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/ticket/ticket_edit.php?id=<?= $ticket_id ?>">
-                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                     </a>
                                     <?php if (!$mine) { ?>
                                         <a class="dropdown-item" href="post.php?assign_ticket_to_me=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="fas fa-fw fa-hand-paper text-secondary me-2"></i>Assign to me
+                                            <i class="fas fa-fw fa-hand-paper text-secondary me-2"></i><?= __('Assign to me') ?>
                                         </a>
                                     <?php } ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_merge.php?ticket_id=<?= $ticket_id ?>">
-                                        <i class="fas fa-fw fa-clone text-secondary me-2"></i>Merge into a ticket
+                                        <i class="fas fa-fw fa-clone text-secondary me-2"></i><?= __('Merge into a ticket') ?>
                                     </a>
                                     <?php if ($is_open) { ?>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item confirm-link" href="post.php?resolve_ticket=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                            data-confirm-text="<?= $reference ?> is marked resolved<?= intval($config_ticket_client_general_notifications) === 1 && intval($row['contact_id']) ? ' and the contact is told' : '' ?>.">
-                                            <i class="fas fa-fw fa-check text-success me-2"></i>Resolve
+                                            data-confirm-text="<?= escapeHtml(intval($config_ticket_client_general_notifications) === 1 && intval($row['contact_id']) ? __('%s is marked resolved and the contact is told.', $reference) : __('%s is marked resolved.', $reference)) ?>">
+                                            <i class="fas fa-fw fa-check text-success me-2"></i><?= __('Resolve') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_delete) { ?>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_ticket=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                            data-confirm-text="<?= $reference ?> goes for good, with its replies, tasks and attachments.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('%s goes for good, with its replies, tasks and attachments.', $reference)) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </a>
                                     <?php } ?>
                                 <?php } ?>
@@ -305,13 +305,13 @@ $sort_link = function ($column, $label, $class = '') use ($url_query_strings_sor
 </form>
 <?php
 $empty_state = [
-    'thing' => 'tickets',
+    'thing' => __('tickets'),
     'icon' => 'fa-life-ring',
     'filtered' => $q !== '' || $active_filters || $assigned_filter !== '' || $client_filter,
     'views' => ['show', 'view'],
-    'view' => $show === 'open' ? ['title' => 'No open tickets', 'text' => 'Nothing is waiting to be worked on.', 'icon' => 'fa-check'] : emptyStatePill($shows, $show),
-    'text' => 'Tickets come in by email and from the client portal, or add one here.',
-    'actions' => $can_edit ? [['label' => 'New Ticket', 'modal' => "modals/ticket/ticket_add.php?$client_url", 'size' => 'lg']] : [],
+    'view' => $show === 'open' ? ['title' => __('No open tickets'), 'text' => __('Nothing is waiting to be worked on.'), 'icon' => 'fa-check'] : emptyStatePill($shows, $show),
+    'text' => __('Tickets come in by email and from the client portal, or add one here.'),
+    'actions' => $can_edit ? [['label' => __('New Ticket'), 'modal' => "modals/ticket/ticket_add.php?$client_url", 'size' => 'lg']] : [],
 ];
 require_once "../includes/filter_footer.php";
 ?>

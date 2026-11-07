@@ -87,6 +87,12 @@ if (!empty($ticket_id) && !empty($reply)) {
             // Optional status change alongside the reply
             if (!empty($reply_ticket_status)) {
                 mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $reply_ticket_status WHERE ticket_id = $ticket_id LIMIT 1");
+                syncTicketSlaClock($ticket_id);
+
+                // Moving out of Resolved reopens it - the resolved date and the resolution SLA with it
+                if ($original_ticket_status === TICKET_STATUS_RESOLVED && !in_array($reply_ticket_status, [TICKET_STATUS_RESOLVED, TICKET_STATUS_CLOSED], true)) {
+                    ticketUnresolve($ticket_id);
+                }
 
                 // Only record a status change when the status actually changed -
                 // Resolved is left out because the resolve block below logs it

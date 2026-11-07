@@ -80,7 +80,7 @@ function contactCan($capability) {
  */
 function enforceContactCan($capability) {
     if (!contactCan($capability)) {
-        flashAlert("That part of the portal isn't open to you", 'error');
+        flashAlert(__("That part of the portal isn't open to you"), 'error');
         redirect("/client/index.php");
     }
 }
@@ -148,14 +148,14 @@ function portalDateTime($datetime) {
     $day = date('Y-m-d', $timestamp);
 
     if ($day === date('Y-m-d')) {
-        return escapeHtml("Today at $time");
+        return escapeHtml(__("Today at %s", $time));
     }
 
     if ($day === date('Y-m-d', strtotime('-1 day'))) {
-        return escapeHtml("Yesterday at $time");
+        return escapeHtml(__("Yesterday at %s", $time));
     }
 
-    return escapeHtml(date($config_date_format, $timestamp) . " at $time");
+    return escapeHtml(__('%1$s at %2$s', date($config_date_format, $timestamp), $time));
 }
 
 /*
@@ -182,42 +182,42 @@ function portalNav() {
     global $mysqli, $config_module_enable_accounting, $config_module_enable_itdoc;
 
     $nav = [
-        'home' => ['label' => 'Home', 'icon' => 'fa-home', 'href' => '/client/index.php', 'pages' => ['index.php']],
-        'tickets' => ['label' => 'Tickets', 'icon' => 'fa-life-ring', 'href' => '/client/tickets.php', 'pages' => ['tickets.php', 'ticket.php', 'ticket_add.php', 'ticket_view_all.php']],
+        'home' => ['label' => __('Home'), 'icon' => 'fa-home', 'href' => '/client/index.php', 'pages' => ['index.php']],
+        'tickets' => ['label' => __('Tickets'), 'icon' => 'fa-life-ring', 'href' => '/client/tickets.php', 'pages' => ['tickets.php', 'ticket.php', 'ticket_add.php', 'ticket_view_all.php']],
     ];
 
     if (contactCan('accounting') && $config_module_enable_accounting == 1) {
         $cards = billingStripeProvider() !== null;
         $children = [
-            ['label' => 'Invoices', 'icon' => 'fa-file-invoice-dollar', 'href' => '/client/invoices.php', 'pages' => ['invoices.php', 'invoice.php']],
+            ['label' => __('Invoices'), 'icon' => 'fa-file-invoice-dollar', 'href' => '/client/invoices.php', 'pages' => ['invoices.php', 'invoice.php']],
         ];
         if ($cards) {
-            $children[] = ['label' => 'Pay invoices', 'icon' => 'fa-hand-holding-usd', 'href' => '/client/unpaid_invoices.php', 'pages' => ['unpaid_invoices.php', 'pay.php']];
+            $children[] = ['label' => __('Pay invoices'), 'icon' => 'fa-hand-holding-usd', 'href' => '/client/unpaid_invoices.php', 'pages' => ['unpaid_invoices.php', 'pay.php']];
         }
-        $children[] = ['label' => 'Quotes', 'icon' => 'fa-comment-dollar', 'href' => '/client/quotes.php', 'pages' => ['quotes.php', 'quote.php']];
-        $children[] = ['label' => 'Recurring invoices', 'icon' => 'fa-redo-alt', 'href' => '/client/recurring_invoices.php', 'pages' => ['recurring_invoices.php', 'recurring_invoice.php']];
+        $children[] = ['label' => __('Quotes'), 'icon' => 'fa-comment-dollar', 'href' => '/client/quotes.php', 'pages' => ['quotes.php', 'quote.php']];
+        $children[] = ['label' => __('Recurring invoices'), 'icon' => 'fa-redo-alt', 'href' => '/client/recurring_invoices.php', 'pages' => ['recurring_invoices.php', 'recurring_invoice.php']];
         if (contractsReady() && intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM contracts WHERE " . portalContractScopeSql()))[0] ?? 0)) {
-            $children[] = ['label' => 'Contracts', 'icon' => 'fa-file-contract', 'href' => '/client/contracts.php', 'pages' => ['contracts.php', 'contract.php']];
+            $children[] = ['label' => __('Contracts'), 'icon' => 'fa-file-contract', 'href' => '/client/contracts.php', 'pages' => ['contracts.php', 'contract.php']];
         }
-        $children[] = ['label' => 'Payments', 'icon' => 'fa-receipt', 'href' => '/client/payments.php', 'pages' => ['payments.php', 'receipt.php']];
-        $children[] = ['label' => 'Statement', 'icon' => 'fa-file-alt', 'href' => '/client/statement.php', 'pages' => ['statement.php']];
+        $children[] = ['label' => __('Payments'), 'icon' => 'fa-receipt', 'href' => '/client/payments.php', 'pages' => ['payments.php', 'receipt.php']];
+        $children[] = ['label' => __('Statement'), 'icon' => 'fa-file-alt', 'href' => '/client/statement.php', 'pages' => ['statement.php']];
         if ($cards) {
-            $children[] = ['label' => 'Cards & autopay', 'icon' => 'fa-credit-card', 'href' => '/client/saved_payment_methods.php', 'pages' => ['saved_payment_methods.php']];
+            $children[] = ['label' => __('Cards & autopay'), 'icon' => 'fa-credit-card', 'href' => '/client/saved_payment_methods.php', 'pages' => ['saved_payment_methods.php']];
         }
-        $nav['billing'] = ['label' => 'Billing', 'icon' => 'fa-file-invoice-dollar', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
+        $nav['billing'] = ['label' => __('Billing'), 'icon' => 'fa-file-invoice-dollar', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
     }
 
     if ($config_module_enable_itdoc && contactCan('itdoc')) {
         $children = [
-            ['label' => 'Devices', 'icon' => 'fa-desktop', 'href' => '/client/assets.php', 'pages' => ['assets.php', 'asset.php']],
-            ['label' => 'Licenses', 'icon' => 'fa-cube', 'href' => '/client/licenses.php', 'pages' => ['licenses.php']],
-            ['label' => 'Domains & certificates', 'icon' => 'fa-globe', 'href' => '/client/domains.php', 'pages' => ['domains.php', 'certificates.php']],
-            ['label' => 'Documents', 'icon' => 'fa-folder-open', 'href' => '/client/documents.php', 'pages' => ['documents.php', 'document.php', 'document_add.php', 'file.php']],
+            ['label' => __('Devices'), 'icon' => 'fa-desktop', 'href' => '/client/assets.php', 'pages' => ['assets.php', 'asset.php']],
+            ['label' => __('Licenses'), 'icon' => 'fa-cube', 'href' => '/client/licenses.php', 'pages' => ['licenses.php']],
+            ['label' => __('Domains & certificates'), 'icon' => 'fa-globe', 'href' => '/client/domains.php', 'pages' => ['domains.php', 'certificates.php']],
+            ['label' => __('Documents'), 'icon' => 'fa-folder-open', 'href' => '/client/documents.php', 'pages' => ['documents.php', 'document.php', 'document_add.php', 'file.php']],
         ];
         if (contactCan('contacts')) {
-            $children[] = ['label' => 'Contacts', 'icon' => 'fa-address-book', 'href' => '/client/contacts.php', 'pages' => ['contacts.php', 'contact.php', 'contact_add.php', 'contact_edit.php']];
+            $children[] = ['label' => __('Contacts'), 'icon' => 'fa-address-book', 'href' => '/client/contacts.php', 'pages' => ['contacts.php', 'contact.php', 'contact_add.php', 'contact_edit.php']];
         }
-        $nav['it'] = ['label' => 'Your IT', 'icon' => 'fa-laptop', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
+        $nav['it'] = ['label' => __('Your IT'), 'icon' => 'fa-laptop', 'children' => $children, 'pages' => array_merge(...array_column($children, 'pages'))];
     }
 
     // The links an admin set to show in the portal (Admin > Custom Links)
@@ -278,21 +278,21 @@ function portalTicketScopeSql($mine_only = false) {
  */
 function portalTicketState($row) {
     if (!empty($row['ticket_closed_at'])) {
-        return ['key' => 'closed', 'label' => 'Closed', 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'closed', 'label' => _x('Closed', 'portal ticket state'), 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-closed'];
     }
     if (!empty($row['ticket_resolved_at'])) {
-        return ['key' => 'resolved', 'label' => 'Resolved', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+        return ['key' => 'resolved', 'label' => _x('Resolved', 'portal ticket state'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
     }
     if (($row['ticket_last_spoke'] ?? null) === 'Public') {
-        return ['key' => 'you', 'label' => 'Waiting on you', 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
+        return ['key' => 'you', 'label' => _x('Waiting on you', 'portal ticket state'), 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
     }
     if (intval($row['ticket_status_pauses_sla'] ?? 0) === 1) {
-        return ['key' => 'hold', 'label' => $row['ticket_status_name'] ?: 'On hold', 'icon' => 'fa-pause', 'class' => 'itflow-portal-state-hold'];
+        return ['key' => 'hold', 'label' => !empty($row['ticket_status_name']) ? ticketStatusLabel(intval($row['ticket_status'] ?? 0), $row['ticket_status_name']) : _x('On hold', 'portal ticket state'), 'icon' => 'fa-pause', 'class' => 'itflow-portal-state-hold'];
     }
     if (intval($row['ticket_status'] ?? 0) === 1 && empty($row['ticket_last_spoke'])) {
-        return ['key' => 'new', 'label' => 'Received', 'icon' => 'fa-inbox', 'class' => 'itflow-portal-state-new'];
+        return ['key' => 'new', 'label' => _x('Received', 'portal ticket state'), 'icon' => 'fa-inbox', 'class' => 'itflow-portal-state-new'];
     }
-    return ['key' => 'progress', 'label' => 'In progress', 'icon' => 'fa-tools', 'class' => 'itflow-portal-state-progress'];
+    return ['key' => 'progress', 'label' => _x('In progress', 'portal ticket state'), 'icon' => 'fa-tools', 'class' => 'itflow-portal-state-progress'];
 }
 
 /** The state as a badge. */
@@ -305,11 +305,11 @@ function portalTicketStateHtml($row) {
 function portalTicketTabs() {
     $spoke = ticketLastSpokeSql();
     return [
-        'open' => ['label' => 'Open', 'icon' => 'fa-folder-open', 'where' => TICKET_OPEN_SQL],
-        'you' => ['label' => 'Waiting on you', 'icon' => 'fa-reply', 'where' => TICKET_OPEN_SQL . " AND $spoke = 'Public'"],
-        'resolved' => ['label' => 'Resolved', 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL AND tickets.ticket_closed_at IS NULL'],
-        'closed' => ['label' => 'Closed', 'icon' => 'fa-check-circle', 'where' => 'tickets.ticket_closed_at IS NOT NULL'],
-        'all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1'],
+        'open' => ['label' => _x('Open', 'portal tickets tab'), 'icon' => 'fa-folder-open', 'where' => TICKET_OPEN_SQL],
+        'you' => ['label' => _x('Waiting on you', 'portal ticket state'), 'icon' => 'fa-reply', 'where' => TICKET_OPEN_SQL . " AND $spoke = 'Public'"],
+        'resolved' => ['label' => _x('Resolved', 'portal tickets tab'), 'icon' => 'fa-check', 'where' => 'tickets.ticket_resolved_at IS NOT NULL AND tickets.ticket_closed_at IS NULL'],
+        'closed' => ['label' => _x('Closed', 'portal tickets tab'), 'icon' => 'fa-check-circle', 'where' => 'tickets.ticket_closed_at IS NOT NULL'],
+        'all' => ['label' => _x('All', 'portal tickets tab'), 'icon' => 'fa-list', 'where' => '1 = 1'],
     ];
 }
 
@@ -317,7 +317,7 @@ function portalTicketTabs() {
 function portalTicketColumnsSql() {
     return "tickets.ticket_id, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, tickets.ticket_status, tickets.ticket_priority,
         tickets.ticket_created_at, tickets.ticket_updated_at, tickets.ticket_resolved_at, tickets.ticket_closed_at, tickets.ticket_contact_id,
-        ticket_statuses.ticket_status_name, ticket_statuses.ticket_status_pauses_sla, " . ticketLastSpokeSql() . " AS ticket_last_spoke";
+        ticket_statuses.ticket_status_name, ticket_statuses.ticket_status_pauses_sla, " . ticketLastSpokeSql() . " AS ticket_last_spoke"; // i18n-ignore - SQL
 }
 
 /** Whether what the editor sent says nothing - only tags, spaces and non-breaking spaces, and no picture. */
@@ -332,7 +332,7 @@ function portalHtmlIsEmpty($html) {
 /** The reply lines the portal writes itself when a contact resolves, reopens or closes - shown as a line in the conversation, not a message. */
 function portalTicketEventText($html) {
     $text = trim(html_entity_decode(strip_tags((string) $html), ENT_QUOTES, 'UTF-8'));
-    return preg_match('/^Ticket (resolved|reopened|closed) by .{1,200}\.$/', $text) ? $text : '';
+    return ticketIsClientEventLine($text) ? $text : '';
 }
 
 /*
@@ -367,38 +367,38 @@ function portalInvoiceState(array $row, $paid) {
     $days = $state['days'];
     switch ($state['state']) {
         case 'paid':
-            return $state + ['label' => 'Paid', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+            return $state + ['label' => _x('Paid', 'invoice status'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
         case 'cancelled':
-            return $state + ['label' => 'Cancelled', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => _x('Cancelled', 'invoice status'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
         case 'nonbillable':
-            return $state + ['label' => 'No charge', 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => __('No charge'), 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
         case 'draft':
-            return $state + ['label' => 'Draft', 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-closed'];
+            return $state + ['label' => _x('Draft', 'invoice status'), 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-closed'];
         case 'overdue':
-            return $state + ['label' => -$days . ' ' . (-$days === 1 ? 'day' : 'days') . ' overdue', 'icon' => 'fa-exclamation-circle', 'class' => 'itflow-portal-state-late'];
+            return $state + ['label' => _n('%d day overdue', '%d days overdue', -$days), 'icon' => 'fa-exclamation-circle', 'class' => 'itflow-portal-state-late'];
     }
     if ($days === 0) {
-        return $state + ['label' => 'Due today', 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
+        return $state + ['label' => __('Due today'), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
     }
     if ($days <= 7) {
-        return $state + ['label' => "Due in $days " . ($days === 1 ? 'day' : 'days'), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
+        return $state + ['label' => _n('Due in %d day', 'Due in %d days', $days), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-you'];
     }
-    return $state + ['label' => 'Due ' . date('M j', strtotime((string) $row['invoice_due'])), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-new'];
+    return $state + ['label' => _x('Due %s', 'invoice due', formatDate((string) $row['invoice_due'], 'date_short')), 'icon' => 'fa-clock', 'class' => 'itflow-portal-state-new'];
 }
 
 /** Where a quote stands for the client - waiting for their answer, run out, accepted or declined - with a label, icon and class. */
 function portalQuoteState(array $row) {
     $status = (string) $row['quote_status'];
     if (in_array($status, ['Accepted', 'Invoiced'], true)) {
-        return ['key' => 'accepted', 'label' => 'Accepted', 'icon' => 'fa-thumbs-up', 'class' => 'itflow-portal-state-resolved'];
+        return ['key' => 'accepted', 'label' => _x('Accepted', 'quote status'), 'icon' => 'fa-thumbs-up', 'class' => 'itflow-portal-state-resolved'];
     }
     if ($status === 'Declined') {
-        return ['key' => 'declined', 'label' => 'Declined', 'icon' => 'fa-thumbs-down', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'declined', 'label' => _x('Declined', 'quote status'), 'icon' => 'fa-thumbs-down', 'class' => 'itflow-portal-state-closed'];
     }
     if (quoteExpired($row)) {
-        return ['key' => 'expired', 'label' => 'Expired', 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
+        return ['key' => 'expired', 'label' => _x('Expired', 'quote status'), 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
     }
-    return ['key' => 'waiting', 'label' => 'Waiting for you', 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
+    return ['key' => 'waiting', 'label' => __('Waiting for you'), 'icon' => 'fa-reply', 'class' => 'itflow-portal-state-you'];
 }
 
 /** SQL: quotes waiting for the client's answer - sent or viewed, and not run out. */
@@ -484,25 +484,25 @@ function portalContractRound($contract_id) {
 function portalContractState(array $row, $round = null) {
     $signing = contractSignatureState($round);
     if ($signing && in_array($signing['key'], ['sent', 'viewed'], true)) {
-        return ['key' => 'waiting', 'label' => 'Waiting for your signature', 'icon' => 'fa-file-signature', 'class' => 'itflow-portal-state-you'];
+        return ['key' => 'waiting', 'label' => __('Waiting for your signature'), 'icon' => 'fa-file-signature', 'class' => 'itflow-portal-state-you'];
     }
     if ($signing && $signing['key'] === 'countersign') {
-        return ['key' => 'countersign', 'label' => 'Signed - with us to countersign', 'icon' => 'fa-pen-nib', 'class' => 'itflow-portal-state-progress'];
+        return ['key' => 'countersign', 'label' => __('Signed - with us to countersign'), 'icon' => 'fa-pen-nib', 'class' => 'itflow-portal-state-progress'];
     }
     $state = contractState($row);
     switch ($state['key']) {
         case 'draft':
-            return ['key' => 'draft', 'label' => 'Being prepared', 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-hold'];
+            return ['key' => 'draft', 'label' => __('Being prepared'), 'icon' => 'fa-pencil-alt', 'class' => 'itflow-portal-state-hold'];
         case 'upcoming':
             return ['key' => 'upcoming', 'label' => $state['when'], 'icon' => 'fa-hourglass-start', 'class' => 'itflow-portal-state-new'];
         case 'ending':
             return ['key' => 'ending', 'label' => $state['when'], 'icon' => 'fa-hourglass-end', 'class' => 'itflow-portal-state-hold'];
         case 'ended':
-            return ['key' => 'ended', 'label' => 'Ended', 'icon' => 'fa-flag-checkered', 'class' => 'itflow-portal-state-closed'];
+            return ['key' => 'ended', 'label' => _x('Ended', 'contract state'), 'icon' => 'fa-flag-checkered', 'class' => 'itflow-portal-state-closed'];
         case 'cancelled':
-            return ['key' => 'cancelled', 'label' => 'Cancelled', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+            return ['key' => 'cancelled', 'label' => _x('Cancelled', 'contract state'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
     }
-    return ['key' => 'active', 'label' => 'In force', 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-resolved'];
+    return ['key' => 'active', 'label' => __('In force'), 'icon' => 'fa-check-circle', 'class' => 'itflow-portal-state-resolved'];
 }
 
 /*
@@ -536,20 +536,20 @@ function portalAssetScopeSql() {
 function portalAssetGroups() {
     // By the type's group (ASSET_TYPES, functions/asset_type.php)
     $kinds = [
-        'computers' => ['Computers', 'fa-desktop', assetTypesInGroup('workstation')],
-        'servers' => ['Servers', 'fa-server', assetTypesInGroup('server', 'virtual')],
-        'network' => ['Network', 'fa-network-wired', assetTypesInGroup('network')],
-        'power' => ['Power', 'fa-car-battery', assetTypesInGroup('power')],
-        'phones' => ['Phones & tablets', 'fa-mobile-alt', assetTypesInGroup('mobile')],
+        'computers' => [__('Computers'), 'fa-desktop', assetTypesInGroup('workstation')],
+        'servers' => [__('Servers'), 'fa-server', assetTypesInGroup('server', 'virtual')],
+        'network' => [__('Network'), 'fa-network-wired', assetTypesInGroup('network')],
+        'power' => [__('Power'), 'fa-car-battery', assetTypesInGroup('power')],
+        'phones' => [__('Phones & tablets'), 'fa-mobile-alt', assetTypesInGroup('mobile')],
     ];
-    $groups = ['all' => ['label' => 'All', 'icon' => 'fa-list', 'where' => '1 = 1']];
+    $groups = ['all' => ['label' => __('All'), 'icon' => 'fa-list', 'where' => '1 = 1']];
     $taken = [];
     foreach ($kinds as $key => [$label, $icon, $types]) {
         $in = "'" . implode("', '", array_map('escapeSql', $types)) . "'";
         $groups[$key] = ['label' => $label, 'icon' => $icon, 'where' => "asset_type IN ($in)"];
         $taken[] = $in;
     }
-    $groups['other'] = ['label' => 'Other', 'icon' => 'fa-print', 'where' => "asset_type NOT IN (" . implode(', ', $taken) . ")"];
+    $groups['other'] = ['label' => __('Other'), 'icon' => 'fa-print', 'where' => "asset_type NOT IN (" . implode(', ', $taken) . ")"];
     return $groups;
 }
 
@@ -575,14 +575,14 @@ function portalRenewalState($renewal, $active_label = '') {
 /** A contact's roles in words - Primary contact, Billing, Technical - or [] for none. */
 function portalContactRoles(array $row) {
     if (intval($row['contact_primary'] ?? 0)) {
-        return ['Primary contact'];
+        return [__('Primary contact')];
     }
     $roles = [];
     if (intval($row['contact_billing'] ?? 0)) {
-        $roles[] = 'Billing';
+        $roles[] = __('Billing');
     }
     if (intval($row['contact_technical'] ?? 0)) {
-        $roles[] = 'Technical';
+        $roles[] = __('Technical');
     }
     return $roles;
 }
@@ -602,7 +602,7 @@ function portalContactInvite($contact_id, $method, $by) {
         FROM contacts JOIN clients ON client_id = contact_client_id LEFT JOIN users ON user_id = contact_user_id
         WHERE contact_id = $contact_id AND contact_client_id = $client_id AND contact_archived_at IS NULL LIMIT 1"));
     if (!$contact) {
-        return ['ok' => false, 'error' => "That person isn't here", 'emailed' => false];
+        return ['ok' => false, 'error' => __("That person isn't here"), 'emailed' => false];
     }
     if (!isset(portalSignInMethods()[$method])) {
         $method = 'local';

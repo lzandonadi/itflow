@@ -19,7 +19,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-building me-2"></i>Vendor <small class="ms-1 opacity-75"><?= "$ticket_prefix$ticket_number" ?></small></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-building me-2"></i><?= __('Vendor') ?> <small class="ms-1 opacity-75"><?= "$ticket_prefix$ticket_number" ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -28,11 +28,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Vendor</label>
+            <label><?= __('Vendor') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                 <select class="form-select select2" name="vendor">
-                    <option value="0">No vendor</option>
+                    <option value="0"><?= __('No vendor') ?></option>
                     <?php
 
                     // The client's vendors, starred first - and the one already set, even if archived since
@@ -53,18 +53,18 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Vendor's ticket number</label>
+            <label><?= __('Vendor\'s ticket number') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-                <input type="text" class="form-control" name="vendor_ticket_number" placeholder="Their reference for this issue" maxlength="255" value="<?= $vendor_ticket_number ?>">
+                <input type="text" class="form-control" name="vendor_ticket_number" placeholder="<?= escapeHtml(__('Their reference for this issue')) ?>" maxlength="255" value="<?= $vendor_ticket_number ?>">
             </div>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket_vendor" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_ticket_vendor" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

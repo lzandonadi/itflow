@@ -15,7 +15,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-user-tag me-2"></i>Role for <strong><?= $count ?></strong> user<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-user-tag me-2"></i><?= __('Role for') ?> <strong><?= $count ?></strong> user<?= $count === 1 ? '' : 's' ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -23,21 +23,21 @@ ob_start();
     <?php foreach ($user_ids as $user_id) { ?><input type="hidden" name="user_ids[]" value="<?= $user_id ?>"><?php } ?>
 
     <div class="modal-body">
-        <label class="form-label">Role <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Role') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-user-shield"></i></span>
             <select class="form-select select2" name="role" required>
-                <option value="">- Pick a role -</option>
+                <option value=""><?= __('- Pick a role -') ?></option>
                 <?php foreach ($roles as $role_id => $role) { ?>
                     <option value="<?= $role_id ?>"<?= selectOptionRole($role) ?>><?= escapeHtml($role['role_name']) ?></option>
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">The only active admin keeps an admin role, so there is always someone to run ITFlow.</div>
+        <div class="form-text"><?= __('The only active admin keeps an admin role, so there is always someone to run ITFlow.') ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="bulk_role_users" class="btn btn-primary text-bold" <?= $count ? '' : 'disabled' ?>><i class="fas fa-check me-2"></i>Set role</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_role_users" class="btn btn-primary text-bold" <?= $count ? '' : 'disabled' ?>><i class="fas fa-check me-2"></i><?= __('Set role') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

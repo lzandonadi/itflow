@@ -4,7 +4,7 @@
     <div class="sidebar-brand">
         <a class="brand-link" href="/agent/<?= escapeHtml($config_start_page) ?>">
             <i class="fas fa-arrow-left me-2"></i>
-            <span class="brand-text h5 mb-0">Back | <strong>Account</strong></span>
+            <span class="brand-text h5 mb-0"><?= __('Back | <strong>Account</strong>') ?></span>
         </a>
     </div>
 
@@ -25,14 +25,14 @@
             <ul class="nav nav-pills sidebar-menu flex-column mt-2" data-lte-toggle="treeview" role="menu" data-accordion="false">
                 <?php
                 $account_pages = [
-                    'user_details.php' => ['fa-id-badge', 'Profile'],
-                    'user_security.php' => ['fa-shield-alt', 'Security'],
-                    'user_preferences.php' => ['fa-sliders-h', 'Preferences'],
-                    'user_activity.php' => ['fa-history', 'Activity'],
+                    'user_details.php' => ['fa-id-badge', __('Profile')],
+                    'user_security.php' => ['fa-shield-alt', __('Security')],
+                    'user_preferences.php' => ['fa-sliders-h', __('Preferences')],
+                    'user_activity.php' => ['fa-history', __('Activity')],
                 ];
                 // Your own canned responses - for those who reply on tickets
                 if (intval(lookupUserPermission('module_support')) >= 2) {
-                    $account_pages = array_slice($account_pages, 0, 3, true) + ['user_canned_responses.php' => ['fa-comment-dots', 'Canned Responses']] + $account_pages;
+                    $account_pages = array_slice($account_pages, 0, 3, true) + ['user_canned_responses.php' => ['fa-comment-dots', __('Canned Responses')]] + $account_pages;
                 }
                 foreach ($account_pages as $page => [$icon, $label]) { ?>
                     <li class="nav-item">
@@ -43,11 +43,11 @@
                     </li>
                 <?php } ?>
                 <?php if ($session_is_admin) { ?>
-                    <li class="nav-header">ADMINISTRATION</li>
+                    <li class="nav-header"><?= __('ADMINISTRATION') ?></li>
                     <li class="nav-item">
                         <a href="/admin/users.php" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
-                            <p>Users</p>
+                            <p><?= __('Users') ?></p>
                         </a>
                     </li>
                 <?php } ?>

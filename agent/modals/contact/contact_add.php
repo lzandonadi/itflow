@@ -40,7 +40,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i>New Contact</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i><?= __('New Contact') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off"
@@ -54,8 +54,8 @@ ob_start();
         <?php require 'contact_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_contact" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_contact" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

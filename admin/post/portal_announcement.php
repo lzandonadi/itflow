@@ -29,13 +29,13 @@ function portalAnnouncementFromPost() {
     $ends = $when($_POST['ends_at'] ?? '');
     $fields = compact('title', 'body', 'tone', 'client_id', 'starts', 'ends');
     if ($title === '') {
-        return [$fields, 'An announcement needs a title'];
+        return [$fields, __('An announcement needs a title')];
     }
     if ($starts === false || $ends === false) {
-        return [$fields, 'That date is not one'];
+        return [$fields, __('That date is not one')];
     }
     if ($starts && $ends && strtotime($ends) <= strtotime($starts)) {
-        return [$fields, 'It has to end after it starts'];
+        return [$fields, __('It has to end after it starts')];
     }
     return [$fields, ''];
 }
@@ -66,7 +66,7 @@ if (isset($_POST['add_portal_announcement'])) {
 
     logAudit("Announcement", "Create", "$session_name posted the client portal announcement $title", intval($fields['client_id']), $announcement_id);
 
-    flashAlert("Announcement <strong>" . escapeHtml($fields['title']) . "</strong> posted");
+    flashAlert(__('Announcement <strong>%s</strong> posted', escapeHtml($fields['title'])));
 
     redirect();
 
@@ -88,7 +88,7 @@ if (isset($_POST['edit_portal_announcement'])) {
 
     logAudit("Announcement", "Edit", "$session_name edited the client portal announcement $title", intval($fields['client_id']), $announcement_id);
 
-    flashAlert("Announcement <strong>" . escapeHtml($fields['title']) . "</strong> saved");
+    flashAlert(__('Announcement <strong>%s</strong> saved', escapeHtml($fields['title'])));
 
     redirect();
 
@@ -110,7 +110,7 @@ if (isset($_GET['archive_portal_announcement']) || isset($_GET['restore_portal_a
 
     logAudit("Announcement", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " the client portal announcement $title", intval($row['announcement_client_id']), $announcement_id);
 
-    flashAlert("Announcement <strong>" . escapeHtml($row['announcement_title']) . "</strong> " . ($archive ? 'archived - the portal no longer shows it' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert($archive ? __('Announcement <strong>%s</strong> archived - the portal no longer shows it', escapeHtml($row['announcement_title'])) : __('Announcement <strong>%s</strong> restored', escapeHtml($row['announcement_title'])), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -131,7 +131,7 @@ if (isset($_GET['delete_portal_announcement'])) {
 
     logAudit("Announcement", "Delete", "$session_name deleted the client portal announcement $title", intval($row['announcement_client_id']), $announcement_id);
 
-    flashAlert("Announcement <strong>" . escapeHtml($row['announcement_title']) . "</strong> deleted", 'error');
+    flashAlert(__('Announcement <strong>%s</strong> deleted', escapeHtml($row['announcement_title'])), 'error');
 
     redirect();
 

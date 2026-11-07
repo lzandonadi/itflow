@@ -21,7 +21,7 @@ if (!empty($_SESSION['portal_view_as']) && (isset($_GET['exit_view_as']) || isse
     redirect($back);
 }
 if (portalViewingAs() && !isset($_GET['export_statement_pdf'])) {
-    flashAlert("You're viewing the portal as " . escapeHtml($portal_view_as['contact_name']) . " - nothing can be changed", 'error');
+    flashAlert(__("You're viewing the portal as %s - nothing can be changed", escapeHtml($portal_view_as['contact_name'])), 'error');
     redirect();
 }
 
@@ -36,7 +36,7 @@ if (isset($_POST['add_ticket'])) {
     // a page that never loaded it would send them blank
     $raw_details = (string) ($_POST['details'] ?? '');
     if (trim((string) ($_POST['subject'] ?? '')) === '' || portalHtmlIsEmpty($raw_details)) {
-        flashAlert("Give the ticket a subject and tell us what is happening", 'error');
+        flashAlert(__('Give the ticket a subject and tell us what is happening'), 'error');
         redirect('ticket_add.php');
     }
 
@@ -115,7 +115,7 @@ if (isset($_POST['add_ticket_from_form'])) {
     $sees_all = portalSeesAllTickets();
     $template = ticketTemplatePortalForm(intval($_POST['form'] ?? 0), $session_client_id, $sees_all);
     if (!$template) {
-        flashAlert("That request form isn't available any more - tell us what you need here", 'error');
+        flashAlert(__("That request form isn't available any more - tell us what you need here"), 'error');
         redirect('ticket_add.php');
     }
     $template_id = intval($template['ticket_template_id']);
@@ -165,7 +165,7 @@ if (isset($_POST['add_ticket_comment'])) {
     // Nothing but empty paragraphs from the editor is no reply - a picture on
     // its own is
     if (portalHtmlIsEmpty($raw_comment)) {
-        flashAlert("Write a reply first", 'error');
+        flashAlert(__('Write a reply first'), 'error');
         redirect();
     }
 
@@ -185,6 +185,10 @@ if (isset($_POST['add_ticket_comment'])) {
         $new_ticket_status = ticketStatusAfterClientReply($original_ticket_status);
         mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $new_ticket_status WHERE ticket_id = $ticket_id AND ticket_client_id = $session_client_id LIMIT 1");
         syncTicketSlaClock($ticket_id);
+        // A reply to a resolved ticket reopens it - as an emailed reply does
+        if ($original_ticket_status === TICKET_STATUS_RESOLVED && $new_ticket_status !== TICKET_STATUS_RESOLVED) {
+            ticketUnresolve($ticket_id);
+        }
 
         // Only record the reopen when the ticket was not already open
         if ($original_ticket_status !== $new_ticket_status) {
@@ -259,7 +263,7 @@ if (isset($_POST['set_contact_phone'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name updated their phone numbers in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Phone numbers updated");
+    flashAlert(__("Phone numbers updated"));
 
     redirect('profile.php');
 
@@ -282,7 +286,7 @@ if (isset($_POST['set_contact_pin'])) {
     // re-authenticated for password logins. SSO contacts are exempt: they have
     // no local password to check, and the identity provider already did this.
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That password was not right - your PIN has not been changed", 'error');
+        flashAlert(__("That password was not right - your PIN has not been changed"), 'error');
         redirect('profile.php');
     }
 
@@ -296,7 +300,7 @@ if (isset($_POST['set_contact_pin'])) {
     $pin = escapeSql(substr(trim($_POST['pin'] ?? ''), 0, 255));
 
     if (strlen($pin) < 4) {
-        flashAlert("Your PIN needs to be at least 4 characters, and cannot contain < or >", 'error');
+        flashAlert(__("Your PIN needs to be at least 4 characters, and cannot contain < or >"), 'error');
         redirect('profile.php');
     }
 
@@ -306,7 +310,7 @@ if (isset($_POST['set_contact_pin'])) {
     // an audit trail an agent can read would defeat the point of having one
     logAudit("Contact", "Edit", "Client contact $session_contact_name set their phone PIN in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Phone PIN updated");
+    flashAlert(__("Phone PIN updated"));
 
     redirect('profile.php');
 
@@ -331,7 +335,7 @@ if (isset($_GET['approve_ticket_task'])) {
     $ticket_id = intval($approval_row['task_ticket_id']);
 
     if (!$approval_row) {
-        flashAlert("Cannot find/approve that task", 'warning');
+        flashAlert(__('Cannot find/approve that task'), 'warning');
         redirect();
         exit;
     }
@@ -341,13 +345,13 @@ if (isset($_GET['approve_ticket_task'])) {
 
 
     // Notify tech
-    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '$session_contact_email approved ticket task $task_name', notification_action = 'ticket.php?ticket_id=$ticket_id&client_id=$session_client_id', notification_client_id = $session_client_id, notification_user_id = $created_by");
+    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . vsprintf(escapeSql(__('%1$s approved ticket task %2$s')), [$session_contact_email, $task_name]) . "', notification_action = 'ticket.php?ticket_id=$ticket_id&client_id=$session_client_id', notification_client_id = $session_client_id, notification_user_id = $created_by");
     // TODO: Email agent
 
     // Logging
     logAudit("Task", "Edit", "Contact $session_contact_email approved task $task_name (approval $approval_id)", $session_client_id, $task_id);
 
-    flashAlert("Task Approved");
+    flashAlert(__('Task Approved'));
     redirect();
 
 }
@@ -370,7 +374,7 @@ if (isset($_POST['add_ticket_feedback'])) {
         if ($feedback == "Bad") {
             $ticket_details = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_number FROM tickets WHERE ticket_id = $ticket_id LIMIT 1"));
             $ticket_number = intval($ticket_details['ticket_number']);
-            appNotify("Feedback", "$session_contact_name rated ticket $config_ticket_prefix$ticket_number as bad (ID: $ticket_id)", "/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id", $session_client_id, $ticket_id);
+            appNotify("Feedback", vsprintf(escapeSql(__('%1$s rated ticket %2$s as bad (ID: %3$d)')), [$session_contact_name, "$config_ticket_prefix$ticket_number", $ticket_id]), "/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id", $session_client_id, $ticket_id);
         }
 
         // Custom action/notif handler
@@ -407,7 +411,7 @@ if (isset($_GET['resolve_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name resolved the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket resolved by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('resolved', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name marked ticket $ticket_prefix$ticket_number as resolved in the client portal", $session_client_id, $ticket_id);
 
@@ -445,7 +449,7 @@ if (isset($_GET['reopen_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name reopened the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket reopened by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('reopened', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name reopend ticket $ticket_prefix$ticket_number in the client portal", $session_client_id, $ticket_id);
 
@@ -482,7 +486,7 @@ if (isset($_GET['close_ticket'])) {
         logTicketHistory($ticket_id, "$session_contact_name closed the ticket from the client portal");
 
         // Add reply
-        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket closed by $session_contact_name.', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
+        mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(ticketClientEventLine('closed', stripslashes($session_contact_name))) . "', ticket_reply_type = 'Client', ticket_reply_by = $session_contact_id, ticket_reply_ticket_id = $ticket_id");
 
         logAudit("Ticket", "Edit", "$session_contact_name closed ticket $ticket_prefix$ticket_number in the client portal", $session_client_id, $ticket_id);
 
@@ -517,7 +521,7 @@ if (isset($_GET['export_statement_pdf'])) {
     $statement = billingStatement($session_client_id, $with_paid ? date('Y-m-d', strtotime('-12 months')) : '', '', $with_paid);
 
     if (!$statement['invoices']) {
-        flashAlert("There is nothing to put on a statement", 'error');
+        flashAlert(escapeHtml(__('There is nothing to put on a statement')), 'error');
         redirect("statement.php");
     }
 
@@ -548,15 +552,15 @@ if (isset($_POST['portal_password_change'])) {
     }
     $new_password = (string) ($_POST['new_password'] ?? '');
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That is not your current password - your password has not been changed", 'error');
+        flashAlert(__("That is not your current password - your password has not been changed"), 'error');
         redirect('profile.php#security');
     }
     if (($problem = userPasswordProblem($new_password)) !== '') {
-        flashAlert(escapeHtml($problem) . ' Your password has not been changed.', 'error');
+        flashAlert(escapeHtml($problem) . ' ' . __('Your password has not been changed.'), 'error');
         redirect('profile.php#security');
     }
     if ($new_password !== (string) ($_POST['confirm_password'] ?? '')) {
-        flashAlert('The two new passwords are not the same - your password has not been changed', 'error');
+        flashAlert(__('The two new passwords are not the same - your password has not been changed'), 'error');
         redirect('profile.php#security');
     }
 
@@ -569,7 +573,7 @@ if (isset($_POST['portal_password_change'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name changed their password in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'password');
 
-    flashAlert("Your password is changed");
+    flashAlert(__("Your password is changed"));
     redirect('profile.php');
 
 }
@@ -588,7 +592,7 @@ if (isset($_POST['portal_mfa_enable'])) {
         redirect('profile.php');
     }
     if (!preg_match('/^[0-9]{6}$/', $code) || !TokenAuth6238::verify($secret, $code, 1)) {
-        flashAlert("That code did not match - check the time on your phone is right, and enter the newest code", 'error');
+        flashAlert(__("That code did not match - check the time on your phone is right, and enter the newest code"), 'error');
         redirect('profile.php?mfa=setup#security');
     }
 
@@ -599,7 +603,7 @@ if (isset($_POST['portal_mfa_enable'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name turned on two-step sign-in in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'mfa_on');
 
-    flashAlert("Two-step sign-in is on - signing in will ask for a code from your app");
+    flashAlert(__("Two-step sign-in is on - signing in will ask for a code from your app"));
     redirect('profile.php');
 
 }
@@ -612,11 +616,11 @@ if (isset($_POST['portal_mfa_disable'])) {
         redirect('profile.php');
     }
     if (intval($config_client_portal_require_mfa) === 1) {
-        flashAlert(escapeHtml($session_company_name) . " asks everyone to use two-step sign-in, so it stays on", 'error');
+        flashAlert(__("%s asks everyone to use two-step sign-in, so it stays on", escapeHtml($session_company_name)), 'error');
         redirect('profile.php#security');
     }
     if (!portalReauthenticate($_POST['current_password'] ?? '')) {
-        flashAlert("That is not your current password - two-step sign-in is still on", 'error');
+        flashAlert(__("That is not your current password - two-step sign-in is still on"), 'error');
         redirect('profile.php#security');
     }
 
@@ -625,7 +629,7 @@ if (isset($_POST['portal_mfa_disable'])) {
     logAudit("Contact", "Edit", "Client contact $session_contact_name turned off two-step sign-in in the client portal", $session_client_id, $session_contact_id);
     portalMailAccountChange(stripslashes($session_contact_email), stripslashes($session_contact_name), 'mfa_off');
 
-    flashAlert("Two-step sign-in is off");
+    flashAlert(__("Two-step sign-in is off"));
     redirect('profile.php');
 
 }
@@ -640,7 +644,7 @@ if (isset($_POST['portal_forget_browsers'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name made their remembered browsers ask for a code again", $session_client_id, $session_contact_id);
 
-    flashAlert("Done - every browser asks for a code next time");
+    flashAlert(__("Done - every browser asks for a code next time"));
     redirect('profile.php#security');
 
 }
@@ -665,7 +669,7 @@ if (isset($_POST['portal_email_prefs'])) {
 
     logAudit("Contact", "Edit", "Client contact $session_contact_name changed the ticket emails they get in the client portal", $session_client_id, $session_contact_id);
 
-    flashAlert("Saved - those are the emails you will get");
+    flashAlert(__("Saved - those are the emails you will get"));
     redirect('profile.php#emails');
 
 }
@@ -689,7 +693,7 @@ if (isset($_POST['portal_contact_save'])) {
             LEFT JOIN users ON user_id = contact_user_id
             WHERE contact_id = $contact_id AND contact_client_id = $session_client_id AND contact_archived_at IS NULL LIMIT 1"));
         if (!$existing || intval($existing['contact_primary']) || $contact_id === $session_contact_id) {
-            flashAlert("That contact can't be changed here", 'error');
+            flashAlert(__("That contact can't be changed here"), 'error');
             redirect('contacts.php');
         }
     }
@@ -724,9 +728,9 @@ if (isset($_POST['portal_contact_save'])) {
 
     $error = '';
     if ($in['contact_name'] === '') {
-        $error = 'A contact needs a name';
+        $error = __('A contact needs a name');
     } elseif (!filter_var($in['contact_email'], FILTER_VALIDATE_EMAIL)) {
-        $error = ($in['contact_email'] === '' ? 'Nothing' : escapeHtml($in['contact_email'])) . ' is not an email address';
+        $error = __('%s is not an email address', $in['contact_email'] === '' ? __('Nothing') : escapeHtml($in['contact_email']));
     } elseif (($in['invite'] || intval($existing['user_id'] ?? 0)) && userCheckIdentity(['name' => $in['contact_name'], 'email' => $in['contact_email']], intval($existing['user_id'] ?? 0), $identity_error) === null) {
         $error = rtrim($identity_error, '.');
     }
@@ -752,24 +756,24 @@ if (isset($_POST['portal_contact_save'])) {
         }
         logAudit("Contact", "Edit", "Client contact $session_contact_name changed contact $name_sql in the client portal", $session_client_id, $contact_id);
         triggerCustomAction('contact_update', $contact_id);
-        flashAlert("Saved <strong>" . escapeHtml($in['contact_name']) . "</strong>");
+        flashAlert(__('Saved <strong>%s</strong>', escapeHtml($in['contact_name'])));
         redirect("contact.php?id=$contact_id");
     }
 
     mysqli_query($mysqli, "INSERT INTO contacts SET $set, contact_client_id = $session_client_id, contact_user_id = 0");
     $contact_id = intval(mysqli_insert_id($mysqli));
     logAudit("Contact", "Create", "Client contact $session_contact_name added contact $name_sql in the client portal", $session_client_id, $contact_id);
-    appNotify("Contact", "$session_contact_name added $name_sql as a contact for $session_client_name in the client portal", "/agent/contact.php?client_id=$session_client_id&contact_id=$contact_id", $session_client_id, $contact_id);
+    appNotify("Contact", __('%1$s added %2$s as a contact for %3$s in the client portal', $session_contact_name, $name_sql, $session_client_name), "/agent/contact.php?client_id=$session_client_id&contact_id=$contact_id", $session_client_id, $contact_id);
     triggerCustomAction('contact_create', $contact_id);
 
-    $message = "Added <strong>" . escapeHtml($in['contact_name']) . "</strong>";
+    $message = __('Added <strong>%s</strong>', escapeHtml($in['contact_name']));
     if ($in['invite']) {
         $invite = portalContactInvite($contact_id, $in['method'], (string) ($contact['contact_name'] ?? ''));
         if (!$invite['ok']) {
-            $message .= ' - but their portal access could not be set up: ' . escapeHtml($invite['error']);
+            $message .= ' ' . __('- but their portal access could not be set up: %s', escapeHtml($invite['error']));
         } else {
             logAudit("Contact", "Edit", "Client contact $session_contact_name gave $name_sql portal access in the client portal", $session_client_id, $contact_id);
-            $message .= $invite['emailed'] ? ' and emailed them an invite to the portal' : ' and gave them portal access - email is not set up here, so ask us to send them how to sign in';
+            $message .= ' ' . ($invite['emailed'] ? __('and emailed them an invite to the portal') : __('and gave them portal access - email is not set up here, so ask us to send them how to sign in'));
         }
     }
     flashAlert($message);
@@ -789,7 +793,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     $target = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_email, contact_primary FROM contacts
         WHERE contact_id = $contact_id AND contact_client_id = $session_client_id AND contact_archived_at IS NULL LIMIT 1"));
     if (!$target || intval($target['contact_primary']) || $contact_id === $session_contact_id) {
-        flashAlert("That contact's access can't be changed here", 'error');
+        flashAlert(__("That contact's access can't be changed here"), 'error');
         redirect('contacts.php');
     }
     $name = (string) $target['contact_name'];
@@ -799,7 +803,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     if (isset($_POST['portal_contact_left'])) {
         portalContactAccessOff($contact_id);
         logAudit("Contact", "Edit", "Client contact $session_contact_name said $name_sql has left and turned off their portal access", $session_client_id, $contact_id);
-        appNotify("Contact", "$session_contact_name says $name_sql has left $session_client_name - their portal access is off", $agent_link, $session_client_id, $contact_id);
+        appNotify("Contact", __('%1$s says %2$s has left %3$s - their portal access is off', $session_contact_name, $name_sql, $session_client_name), $agent_link, $session_client_id, $contact_id);
         flashAlert(escapeHtml($name) . "'s portal access is off. Tell us below what else to close down - their email, accounts and devices - and their last day.");
         redirect('ticket_add.php?' . http_build_query(['subject' => "Offboarding: $name has left"]));
     }
@@ -807,7 +811,7 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
     if ($_POST['portal_contact_access'] === 'off') {
         portalContactAccessOff($contact_id);
         logAudit("Contact", "Edit", "Client contact $session_contact_name turned off portal access for $name_sql", $session_client_id, $contact_id);
-        appNotify("Contact", "$session_contact_name turned off client portal access for $name_sql", $agent_link, $session_client_id, $contact_id);
+        appNotify("Contact", __('%1$s turned off client portal access for %2$s', $session_contact_name, $name_sql), $agent_link, $session_client_id, $contact_id);
         flashAlert(escapeHtml($name) . "'s portal access is off");
         redirect("contact.php?id=$contact_id");
     }
@@ -818,8 +822,8 @@ if (isset($_POST['portal_contact_access']) || isset($_POST['portal_contact_left'
         redirect("contact.php?id=$contact_id");
     }
     logAudit("Contact", "Edit", "Client contact $session_contact_name gave $name_sql portal access and sent an invite", $session_client_id, $contact_id);
-    appNotify("Contact", "$session_contact_name gave $name_sql client portal access", $agent_link, $session_client_id, $contact_id);
-    flashAlert($invite['emailed'] ? "Invite emailed to <strong>" . escapeHtml($target['contact_email']) . "</strong>" : escapeHtml($name) . " can sign in now - email is not set up here, so ask us to send them how");
+    appNotify("Contact", __('%1$s gave %2$s client portal access', $session_contact_name, $name_sql), $agent_link, $session_client_id, $contact_id);
+    flashAlert($invite['emailed'] ? __('Invite emailed to <strong>%s</strong>', escapeHtml($target['contact_email'])) : __('%s can sign in now - email is not set up here, so ask us to send them how', escapeHtml($name)));
     redirect("contact.php?id=$contact_id");
 
 }
@@ -832,15 +836,15 @@ if (isset($_POST['portal_invites_send'])) {
     enforceContactCan('contacts_manage');
 
     if (!portalInvitesReady() || !portalMailReady()) {
-        flashAlert("Invites can't be sent just now - add the person instead, or ask us", 'error');
+        flashAlert(__("Invites can't be sent just now - add the person instead, or ask us"), 'error');
         redirect('contacts.php');
     }
     $typed = mb_substr((string) ($_POST['emails'] ?? ''), 0, 20000);
     $parsed = portalInviteParse($typed);
     if (!$parsed['people'] || count($parsed['people']) > PORTAL_INVITE_MAX) {
         $_SESSION['portal_invite_form'] = $typed;
-        flashAlert(!$parsed['people'] ? ($parsed['bad'] ? escapeHtml($parsed['bad'][0]) . ' is not an email address' : 'Put in an email address to invite')
-            : 'That is ' . count($parsed['people']) . ' addresses - invite up to ' . PORTAL_INVITE_MAX . ' at a time', 'error');
+        flashAlert(!$parsed['people'] ? ($parsed['bad'] ? __('%s is not an email address', escapeHtml($parsed['bad'][0])) : __('Put in an email address to invite'))
+            : __('That is %1$d addresses - invite up to %2$d at a time', count($parsed['people']), PORTAL_INVITE_MAX), 'error');
         redirect('invite.php');
     }
 
@@ -855,10 +859,10 @@ if (isset($_POST['portal_invites_send'])) {
     }
     $lines = [];
     if ($sent) {
-        $lines[] = 'Invited <strong>' . (count($sent) === 1 ? escapeHtml($sent[0]) : count($sent) . ' people') . '</strong> - we email you when they join';
+        $lines[] = count($sent) === 1 ? __('Invited <strong>%s</strong> - we email you when they join', escapeHtml($sent[0])) : __('Invited <strong>%d people</strong> - we email you when they join', count($sent));
     }
     if ($left_out) {
-        $lines[] = 'Left out: ' . implode(', ', $left_out);
+        $lines[] = __('Left out: %s', implode(', ', $left_out));
     }
     flashAlert(implode('<br>', $lines), $sent ? 'success' : 'error');
     redirect('contacts.php');
@@ -875,24 +879,24 @@ if (isset($_POST['portal_invite_resend']) || isset($_POST['portal_invite_cancel'
     $invite = portalInvitesReady() ? portalInviteRow($_POST['invite_id'] ?? 0) : null;
     if (!$invite || intval($invite['invite_client_id']) !== $session_client_id || $invite['invite_kind'] !== 'invite'
         || !in_array(portalInviteState($invite), ['pending', 'expired'], true)) {
-        flashAlert("That invite isn't waiting any more - they may have joined already", 'error');
+        flashAlert(__("That invite isn't waiting any more - they may have joined already"), 'error');
         redirect('contacts.php');
     }
     $email = (string) $invite['invite_email'];
 
     if (isset($_POST['portal_invite_resend'])) {
         if (!portalInviteResend($invite['invite_id'], $session_client_id)) {
-            flashAlert("The invite couldn't be sent just now - try again later, or ask us", 'error');
+            flashAlert(__("The invite couldn't be sent just now - try again later, or ask us"), 'error');
             redirect('contacts.php');
         }
         logAudit("Contact", "Invite", "Client contact $session_contact_name sent the client portal invite to " . escapeSql($email) . " again", $session_client_id);
-        flashAlert('Sent the invite to <strong>' . escapeHtml($email) . '</strong> again, with a new link');
+        flashAlert(__('Sent the invite to <strong>%s</strong> again, with a new link', escapeHtml($email)));
         redirect('contacts.php');
     }
 
     portalInviteCancel($invite['invite_id'], $session_client_id);
     logAudit("Contact", "Cancel", "Client contact $session_contact_name cancelled the client portal invite to " . escapeSql($email), $session_client_id);
-    flashAlert('Cancelled the invite to <strong>' . escapeHtml($email) . '</strong>');
+    flashAlert(__('Cancelled the invite to <strong>%s</strong>', escapeHtml($email)));
     redirect('contacts.php');
 
 }
@@ -912,11 +916,11 @@ if (isset($_POST['portal_quote_answer'])) {
 
     $quote = billingRow('quote', $quote_id, false);
     if (!$quote || intval($quote['client_id']) !== $session_client_id || $quote['quote_status'] === 'Draft') {
-        flashAlert("That quote isn't here", 'error');
+        flashAlert(__("That quote isn't here"), 'error');
         redirect('quotes.php');
     }
     if ($name === '' || ($accept && empty($_POST['authorised']))) {
-        flashAlert($name === '' ? 'Put your name to your answer' : 'Tick to confirm you can accept the quote', 'error');
+        flashAlert($name === '' ? __('Put your name to your answer') : __('Tick to confirm you can accept the quote'), 'error');
         redirect("quote.php?id=$quote_id");
     }
 
@@ -927,7 +931,7 @@ if (isset($_POST['portal_quote_answer'])) {
     }
 
     $number = escapeHtml(billingNumber('quote', $quote));
-    flashAlert($accept ? "Thank you - quote <strong>$number</strong> is accepted and our team has been told" : "Quote <strong>$number</strong> declined - thank you for letting us know");
+    flashAlert($accept ? __('Thank you - quote %s is accepted and our team has been told', "<strong>$number</strong>") : __('Quote %s declined - thank you for letting us know', "<strong>$number</strong>"));
 
     redirect("quote.php?id=$quote_id");
 
@@ -943,29 +947,29 @@ if (isset($_POST['portal_sign_contract'])) {
     $round = contractSignaturesReady() ? contractSignatureRow(intval($_POST['contract_signature_id'] ?? 0)) : null;
     $visible = $round && mysqli_num_rows(mysqli_query($mysqli, "SELECT contract_id FROM contracts WHERE contract_id = " . intval($round['contract_id']) . " AND " . portalContractScopeSql()));
     if (!$visible) {
-        flashAlert("That contract isn't here", 'error');
+        flashAlert(__('That contract isn\'t here'), 'error');
         redirect('contracts.php');
     }
     $back = 'contract.php?id=' . intval($round['contract_id']);
     $state = contractSignatureState($round);
     if (!in_array($state['key'], ['sent', 'viewed'], true) || (string) $round['contract_signature_url_key'] === '') {
-        flashAlert($state['key'] === 'withdrawn' ? "That request was withdrawn, so it wasn't signed" : 'It has already been signed', 'error');
+        flashAlert($state['key'] === 'withdrawn' ? __('That request was withdrawn, so it wasn\'t signed') : __('It has already been signed'), 'error');
         redirect($back);
     }
     if (!hash_equals((string) $round['contract_signature_document_hash'], (string) ($_POST['document_hash'] ?? ''))) {
-        flashAlert('The contract changed while you had it open - read it again before signing', 'error');
+        flashAlert(__('The contract changed while you had it open - read it again before signing'), 'error');
         redirect($back);
     }
     [$f, $error] = contractSignatureFromInput($_POST);
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' It was not signed yet.', 'error');
+        flashAlert(__('%s It was not signed yet.', escapeHtml($error)), 'error');
         redirect($back);
     }
     if (!contractSignatureClientSign($round, $f, 'portal', $session_contact_id)) {
-        flashAlert("It couldn't be signed - it may have just been withdrawn", 'error');
+        flashAlert(__('It couldn\'t be signed - it may have just been withdrawn'), 'error');
         redirect($back);
     }
-    flashAlert("Signed - thank you. We'll countersign <strong>" . escapeHtml($round['contract_name']) . "</strong> and email you a copy.");
+    flashAlert(__('Signed - thank you. We\'ll countersign <strong>%s</strong> and email you a copy.', escapeHtml($round['contract_name'])));
 
     redirect($back);
 
@@ -981,17 +985,17 @@ if (isset($_POST['portal_quote_file'])) {
     $quote_id = intval($_POST['quote_id'] ?? 0);
     $quote = billingRow('quote', $quote_id, false);
     if (!$quote || intval($quote['client_id']) !== $session_client_id || $quote['quote_status'] !== 'Accepted') {
-        flashAlert("Files can only be sent with an accepted quote", 'error');
+        flashAlert(__('Files can only be sent with an accepted quote'), 'error');
         redirect($quote ? "quote.php?id=$quote_id" : 'quotes.php');
     }
 
     $upload = billingQuoteAddFiles($quote_id, $_FILES['file'] ?? [], ['name' => (string) ($contact['contact_name'] ?? '')]);
     if ($upload['added'] && !$upload['failed']) {
-        flashAlert('Sent - thank you. ' . escapeHtml(implode(', ', $upload['added'])) . ' is with us now');
+        flashAlert(__('Sent - thank you. %s is with us now', escapeHtml(implode(', ', $upload['added']))));
     } elseif ($upload['added']) {
-        flashAlert('Sent ' . escapeHtml(implode(', ', $upload['added'])) . ' - but ' . $upload['failed'] . ' could not be taken. Only PDFs can be sent', 'error');
+        flashAlert(_n('Sent %2$s - but %1$d could not be taken. Only PDFs can be sent', 'Sent %2$s - but %1$d could not be taken. Only PDFs can be sent', $upload['failed'], $upload['failed'], escapeHtml(implode(', ', $upload['added']))), 'error');
     } else {
-        flashAlert('That file could not be taken - only PDFs can be sent', 'error');
+        flashAlert(__('That file could not be taken - only PDFs can be sent'), 'error');
     }
 
     redirect("quote.php?id=$quote_id");
@@ -1015,7 +1019,7 @@ if (isset($_POST['portal_pay'])) {
     $back = 'unpaid_invoices.php' . ($invoice_ids ? '?' . http_build_query(['select' => implode(',', $invoice_ids)]) : '');
 
     if (!billingStripeProvider()) {
-        flashAlert('Card payments are not set up', 'error');
+        flashAlert(escapeHtml(__('Card payments are not set up')), 'error');
         redirect('invoices.php');
     }
 
@@ -1033,7 +1037,7 @@ if (isset($_POST['portal_pay'])) {
     // A saved card, charged now - the form's token keeps a double click to one charge
     $token = (string) ($_POST['pay_token'] ?? '');
     if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
-        flashAlert('That page was out of date - check the invoices and try again', 'error');
+        flashAlert(escapeHtml(__('That page was out of date - check the invoices and try again')), 'error');
         redirect($back);
     }
     $contact_name = (string) ($contact['contact_name'] ?? '');
@@ -1043,16 +1047,16 @@ if (isset($_POST['portal_pay'])) {
         redirect($back);
     }
 
-    $booked = billingStripeBook($charge['pi'], $session_client_id, ['name' => $contact_name, 'how' => 'Saved card', 'via' => 'in the client portal']);
+    $booked = billingStripeBook($charge['pi'], $session_client_id, ['name' => $contact_name, 'how' => 'Saved card', 'via' => 'in the client portal']); // i18n-ignore - the payment history stays English
     if (!$booked['ok']) {
         $pi_id = escapeSql((string) $charge['pi']->id);
         logApp("Stripe", "error", "Saved card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", "A card payment of " . escapeSql(billingMoney($selection['total'], $selection['currency'])) . " from $session_client_name went through in the client portal but could not be recorded - $pi_id", "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
-        flashAlert('Your card was charged, but we could not record the payment here - we have been told and will put it right', 'error');
+        appNotify("Invoice Payment", escapeSql(__('A card payment of %1$s from %2$s went through in the client portal but could not be recorded - %3$s', billingMoney($selection['total'], $selection['currency']), $session_client_name, $pi_id)), "/agent/invoices.php?client_id=$session_client_id", $session_client_id); // i18n-ignore - the notification kind is a key
+        flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
 
-    flashAlert('Thank you - your payment of <strong>' . escapeHtml(billingMoney($selection['total'], $selection['currency'])) . '</strong> went through');
+    flashAlert(__('Thank you - your payment of %s went through', '<strong>' . escapeHtml(billingMoney($selection['total'], $selection['currency'])) . '</strong>'));
     redirect('receipt.php?id=' . $booked['payment_id']);
 
 }
@@ -1071,7 +1075,7 @@ if (isset($_GET['portal_pay_return'])) {
     $secret = (string) ($_GET['payment_intent_client_secret'] ?? '');
     $stripe = billingStripeClient();
     if (!$stripe || !preg_match('/^pi_[A-Za-z0-9_]+$/', $pi_id)) {
-        flashAlert('That payment could not be found', 'error');
+        flashAlert(escapeHtml(__('That payment could not be found')), 'error');
         redirect('invoices.php');
     }
 
@@ -1079,36 +1083,36 @@ if (isset($_GET['portal_pay_return'])) {
         $pi = $stripe->paymentIntents->retrieve($pi_id);
     } catch (Throwable $e) {
         logApp("Stripe", "error", "Could not retrieve $pi_id on return to the client portal: " . $e->getMessage());
-        flashAlert('We could not check that payment just now - if your card was charged, it will show here shortly', 'error');
+        flashAlert(escapeHtml(__('We could not check that payment just now - if your card was charged, it will show here shortly')), 'error');
         redirect('invoices.php');
     }
 
     if (!hash_equals((string) $pi->client_secret, $secret) || intval($pi->metadata['itflow_client_id'] ?? 0) !== $session_client_id) {
-        flashAlert('That payment could not be found', 'error');
+        flashAlert(escapeHtml(__('That payment could not be found')), 'error');
         redirect('invoices.php');
     }
 
     if ($pi->status === 'processing') {
-        flashAlert('Your payment is processing - the invoices show as paid once it clears');
+        flashAlert(escapeHtml(__('Your payment is processing - the invoices show as paid once it clears')));
         redirect('invoices.php');
     }
     if ($pi->status !== 'succeeded') {
-        flashAlert('That payment did not go through - nothing was charged. Try again, or use another card', 'error');
+        flashAlert(escapeHtml(__('That payment did not go through - nothing was charged. Try again, or use another card')), 'error');
         redirect('pay.php');
     }
 
-    $booked = billingStripeBook($pi, $session_client_id, ['name' => (string) ($contact['contact_name'] ?? ''), 'how' => 'Online card', 'via' => 'in the client portal']);
+    $booked = billingStripeBook($pi, $session_client_id, ['name' => (string) ($contact['contact_name'] ?? ''), 'how' => 'Online card', 'via' => 'in the client portal']); // i18n-ignore - the payment history stays English
     if (!$booked['ok']) {
         $pi_id_sql = escapeSql($pi_id);
         logApp("Stripe", "error", "Card payment $pi_id for client $session_client_id went through but could not be booked: " . $booked['error']);
-        appNotify("Invoice Payment", "A card payment from $session_client_name went through in the client portal but could not be recorded - $pi_id_sql", "/agent/invoices.php?client_id=$session_client_id", $session_client_id);
-        flashAlert('Your card was charged, but we could not record the payment here - we have been told and will put it right', 'error');
+        appNotify("Invoice Payment", vsprintf(escapeSql(__('A card payment from %1$s went through in the client portal but could not be recorded - %2$s')), [$session_client_name, $pi_id_sql]), "/agent/invoices.php?client_id=$session_client_id", $session_client_id); // i18n-ignore - the notification kind is a key
+        flashAlert(escapeHtml(__('Your card was charged, but we could not record the payment here - we have been told and will put it right')), 'error');
         redirect('invoices.php');
     }
 
     unset($_SESSION['portal_checkout']);
     if (!$booked['already']) {
-        flashAlert('Thank you - your payment of <strong>' . escapeHtml(billingMoney(intval($pi->amount_received) / 100, strtoupper((string) $pi->currency))) . '</strong> went through');
+        flashAlert(__('Thank you - your payment of %s went through', '<strong>' . escapeHtml(billingMoney(intval($pi->amount_received) / 100, strtoupper((string) $pi->currency))) . '</strong>'));
     }
     redirect('receipt.php?id=' . $booked['payment_id']);
 
@@ -1130,7 +1134,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
-        flashAlert("Stripe provider is not configured in the system.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider is not configured in the system.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1138,7 +1142,7 @@ if (isset($_POST['create_stripe_customer'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials missing. Please contact support.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials missing. Please contact support.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1180,7 +1184,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
             logAudit("Stripe", "Create", "$session_contact_name created Stripe customer for $session_client_name as $stripe_customer_id and authorized future automatic payments", $session_client_id, $session_client_id);
 
-            flashAlert("Thank you - now add your card.");
+            flashAlert(escapeHtml(__('Thank you - now add your card.')));
 
             redirect('saved_payment_methods.php?add=1');
 
@@ -1191,7 +1195,7 @@ if (isset($_POST['create_stripe_customer'])) {
 
             logApp("Stripe", "error", "Failed to create Stripe customer for $session_client_name: $error");
 
-            flashAlert("An error occurred while creating your Stripe customer. Please try again.", 'danger');
+            flashAlert(escapeHtml(__('An error occurred while creating your Stripe customer. Please try again.')), 'danger');
 
         }
 
@@ -1222,7 +1226,7 @@ if (isset($_GET['create_stripe_checkout'])) {
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
         http_response_code(400);
-        echo json_encode(['error' => 'Stripe provider not configured']);
+        echo json_encode(['error' => __('Stripe provider not configured')]);
         exit();
     }
 
@@ -1231,7 +1235,7 @@ if (isset($_GET['create_stripe_checkout'])) {
 
     if (empty($stripe_secret_key)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Stripe secret key missing']);
+        echo json_encode(['error' => __('Stripe secret key missing')]);
         exit();
     }
 
@@ -1282,7 +1286,7 @@ if (isset($_GET['create_stripe_checkout'])) {
         error_log("Stripe error creating checkout session: $error");
         logApp("Stripe", "error", "Exception creating checkout session: $error");
         http_response_code(500);
-        echo json_encode(['error' => 'Stripe Checkout session failed']);
+        echo json_encode(['error' => __('Stripe Checkout session failed')]);
     }
 
     exit;
@@ -1304,7 +1308,7 @@ if (isset($_GET['stripe_save_card'])) {
 
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
     if (!$stripe_provider) {
-        flashAlert("Stripe provider not configured.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider not configured.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1312,7 +1316,7 @@ if (isset($_GET['stripe_save_card'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials missing.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials missing.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1328,7 +1332,7 @@ if (isset($_GET['stripe_save_card'])) {
     $stripe_customer_id = escapeSql($client_provider['payment_provider_client'] ?? '');
 
     if (empty($stripe_customer_id)) {
-        flashAlert("Stripe customer ID not found for client.", 'danger');
+        flashAlert(escapeHtml(__('Stripe customer ID not found for client.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1373,7 +1377,7 @@ if (isset($_GET['stripe_save_card'])) {
         error_log("Stripe error while saving payment method: $error");
         logApp("Stripe", "error", "Exception saving payment method: $error");
 
-        flashAlert("An error occurred while saving your payment method.", 'danger');
+        flashAlert(escapeHtml(__('An error occurred while saving your payment method.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1385,7 +1389,7 @@ if (isset($_GET['stripe_save_card'])) {
 
     logAudit("Stripe", "Create", "$session_contact_name saved payment method ($saved_payment_description) (PM: $payment_method_id)", $session_client_id);
 
-    flashAlert("Payment method saved – thank you.");
+    flashAlert(escapeHtml(__('Payment method saved – thank you.')));
     redirect("saved_payment_methods.php");
 }
 
@@ -1407,7 +1411,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $stripe_provider = mysqli_fetch_assoc($stripe_provider_result);
 
     if (!$stripe_provider) {
-        flashAlert("Stripe provider is not configured.", 'danger');
+        flashAlert(escapeHtml(__('Stripe provider is not configured.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1415,7 +1419,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $stripe_secret_key = escapeHtml($stripe_provider['payment_provider_private_key']);
 
     if (empty($stripe_secret_key)) {
-        flashAlert("Stripe credentials are missing.", 'danger');
+        flashAlert(escapeHtml(__('Stripe credentials are missing.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1431,7 +1435,7 @@ if (isset($_GET['delete_saved_payment'])) {
     $saved_payment = mysqli_fetch_assoc($saved_payment_result);
 
     if (!$saved_payment) {
-        flashAlert("Payment method not found or does not belong to you.", 'danger');
+        flashAlert(escapeHtml(__('Payment method not found or does not belong to you.')), 'danger');
         redirect("saved_payment_methods.php");
     }
 
@@ -1455,7 +1459,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
         logApp("Stripe", "error", "Exception removing payment method $payment_method_id: $error");
 
-        flashAlert("An error occurred while removing your payment method.", 'danger');
+        flashAlert(escapeHtml(__('An error occurred while removing your payment method.')), 'danger');
 
         redirect("saved_payment_methods.php");
 
@@ -1486,7 +1490,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
     logAudit("Stripe", "Delete", "$session_contact_name deleted Stripe payment method $saved_payment_description (PM: $payment_method_id)", $session_client_id);
 
-    flashAlert("Payment method $saved_payment_description removed.");
+    flashAlert(escapeHtml(__('Payment method %s removed.', $saved_payment_description)));
 
     redirect("saved_payment_methods.php");
 }
@@ -1506,7 +1510,7 @@ if (isset($_POST['set_recurring_payment'])) {
     $row = mysqli_fetch_assoc($sql);
 
     if (!$row) {
-        flashAlert("Recurring invoice not found.", 'danger');
+        flashAlert(escapeHtml(__('Recurring invoice not found.')), 'danger');
         redirect("recurring_invoices.php");
     }
 
@@ -1530,7 +1534,7 @@ if (isset($_POST['set_recurring_payment'])) {
         $row = mysqli_fetch_assoc($sql);
 
         if (!$row) {
-            flashAlert("Payment method not found or does not belong to you.", 'danger');
+            flashAlert(escapeHtml(__('Payment method not found or does not belong to you.')), 'danger');
             redirect("recurring_invoices.php");
         }
 
@@ -1546,14 +1550,14 @@ if (isset($_POST['set_recurring_payment'])) {
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_contact_name created Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $session_client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment $saved_payment_description enabled for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number");
+        flashAlert(escapeHtml(__('Automatic Payment %1$s enabled for Recurring Invoice %2$s', $saved_payment_description, "$recurring_invoice_prefix$recurring_invoice_number")));
     } else {
         // Delete
         mysqli_query($mysqli, "DELETE FROM recurring_payments WHERE recurring_payment_recurring_invoice_id = $recurring_invoice_id");
 
         logAudit("Recurring Invoice", "Auto Payment", "$session_contact_name removed Auto Pay for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number in the amount of " . numfmt_format_currency($currency_format, $recurring_invoice_amount, $recurring_invoice_currency_code), $session_client_id, $recurring_invoice_id);
 
-        flashAlert("Automatic Payment Disabled for Recurring Invoice $recurring_invoice_prefix$recurring_invoice_number");
+        flashAlert(escapeHtml(__('Automatic Payment Disabled for Recurring Invoice %s', "$recurring_invoice_prefix$recurring_invoice_number")));
     }
 
     redirect();
@@ -1571,7 +1575,7 @@ if (isset($_POST['client_add_document'])) {
     $name = trim(mb_substr((string) ($_POST['document_name'] ?? ''), 0, 200));
     $description = trim(mb_substr((string) ($_POST['document_description'] ?? ''), 0, 255));
     if ($name === '' || portalHtmlIsEmpty($raw_content)) {
-        flashAlert('Give the document a name and write something in it', 'error');
+        flashAlert(__('Give the document a name and write something in it'), 'error');
         redirect('document_add.php');
     }
 
@@ -1596,9 +1600,9 @@ if (isset($_POST['client_add_document'])) {
     mysqli_query($mysqli, "UPDATE documents SET document_content = '$processed_content' WHERE document_id = $document_id");
 
     logAudit("Document", "Create", "Client contact $session_contact_name created document $document_name in the client portal", $session_client_id, $document_id);
-    appNotify("Document", "$session_contact_name added the document $document_name in the client portal", "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
+    appNotify("Document", __('%1$s added the document %2$s in the client portal', $session_contact_name, $document_name), "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($name) . "</strong> saved");
+    flashAlert(__('Document <strong>%s</strong> saved', escapeHtml($name)));
 
     redirect("document.php?id=$document_id");
 
@@ -1614,13 +1618,13 @@ if (isset($_POST['client_upload_document'])) {
     $name = trim(mb_substr((string) ($_POST['document_name'] ?? ''), 0, 200));
     $description = trim(mb_substr((string) ($_POST['document_description'] ?? ''), 0, 255));
     if ($name === '' || empty($_FILES['document_file']) || intval($_FILES['document_file']['error']) !== 0) {
-        flashAlert('Give the document a name and choose a file', 'error');
+        flashAlert(__('Give the document a name and choose a file'), 'error');
         redirect('document_add.php?upload=1');
     }
 
     $file_reference_name = checkFileUpload($_FILES['document_file'], ['pdf', 'doc', 'docx', 'txt', 'md', 'odt', 'rtf']);
     if (!$file_reference_name) {
-        flashAlert('That file could not be taken - upload a PDF, Word, OpenDocument, RTF or text file', 'error');
+        flashAlert(__('That file could not be taken - upload a PDF, Word, OpenDocument, RTF or text file'), 'error');
         redirect('document_add.php?upload=1');
     }
 
@@ -1629,7 +1633,7 @@ if (isset($_POST['client_upload_document'])) {
         mkdir($client_dir, 0755, true);
     }
     if (!move_uploaded_file($_FILES['document_file']['tmp_name'], "$client_dir/$file_reference_name")) {
-        flashAlert('Something went wrong uploading the file - please try again', 'error');
+        flashAlert(__('Something went wrong uploading the file - please try again'), 'error');
         redirect('document_add.php?upload=1');
     }
 
@@ -1669,9 +1673,9 @@ if (isset($_POST['client_upload_document'])) {
     mysqli_query($mysqli, "INSERT INTO document_files SET document_id = $document_id, file_id = $file_id");
 
     logAudit("Document", "Upload", "Client contact $session_contact_name uploaded document $document_name with file $file_name in the client portal", $session_client_id, $document_id);
-    appNotify("Document", "$session_contact_name uploaded the document $document_name in the client portal", "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
+    appNotify("Document", __('%1$s uploaded the document %2$s in the client portal', $session_contact_name, $document_name), "/agent/document.php?document_id=$document_id", $session_client_id, $document_id);
 
-    flashAlert("Document <strong>" . escapeHtml($name) . "</strong> uploaded");
+    flashAlert(__('Document <strong>%s</strong> uploaded', escapeHtml($name)));
 
     redirect("document.php?id=$document_id");
 }

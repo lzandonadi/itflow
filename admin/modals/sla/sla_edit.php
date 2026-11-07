@@ -14,7 +14,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-stopwatch me-2"></i>Editing SLA: <strong><?= $sla_name ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-stopwatch me-2"></i><?= __('Editing SLA:') ?> <strong><?= $sla_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -23,7 +23,7 @@ ob_start();
 
     <div class="modal-body">
         <div class="mb-3">
-            <label>Name <strong class="text-danger">*</strong></label>
+            <label><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-stopwatch"></i></span>
                 <input type="text" class="form-control" name="name" value="<?= $sla_name ?>" maxlength="200" required>
@@ -31,7 +31,7 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Description</label>
+            <label><?= __('Description') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-comment"></i></span>
                 <input type="text" class="form-control" name="description" value="<?= $sla_description ?>" maxlength="500">
@@ -39,7 +39,7 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Response target (business minutes) <strong class="text-danger">*</strong></label>
+            <label><?= __('Response target (business minutes)') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-reply"></i></span>
                 <input type="number" class="form-control" name="response_minutes" min="1" value="<?= $sla_response_minutes ?>" required>
@@ -47,18 +47,18 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Resolution target (business minutes)</label>
+            <label><?= __('Resolution target (business minutes)') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-flag-checkered"></i></span>
-                <input type="number" class="form-control" name="resolution_minutes" min="1" value="<?= $sla_resolution_minutes ?: '' ?>" placeholder="Leave empty for response-only">
+                <input type="number" class="form-control" name="resolution_minutes" min="1" value="<?= $sla_resolution_minutes ?: '' ?>" placeholder="<?= escapeHtml(__('Leave empty for response-only')) ?>">
             </div>
-            <small class="text-muted">Saving recalculates targets on open tickets using this SLA.</small>
+            <small class="text-muted"><?= __('Saving recalculates targets on open tickets using this SLA.') ?></small>
         </div>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_sla" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_sla" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

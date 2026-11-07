@@ -97,11 +97,11 @@ function userInviteState(array $row) {
 /** How a waiting invite stands, as a badge: Waiting (and how long it has left) or Ran out. ['label', 'title', 'tone'] */
 function userInviteStateLabel(array $row) {
     if (userInviteState($row) === 'expired') {
-        return ['label' => 'Ran out', 'title' => 'The link ran out on ' . date('M j, Y', strtotime($row['invite_expires_at'])) . ' - send it again for a new one', 'tone' => 'warning'];
+        return ['label' => __('Ran out'), 'title' => __('The link ran out on %s - send it again for a new one', formatDate($row['invite_expires_at'], 'date')), 'tone' => 'warning'];
     }
     $left = strtotime((string) $row['invite_expires_at']) - time();
     $days = intval(floor($left / 86400));
-    return ['label' => 'Waiting', 'title' => 'The link works for ' . ($days >= 1 ? $days . ' more day' . ($days === 1 ? '' : 's') : 'less than a day'), 'tone' => 'info'];
+    return ['label' => __('Waiting'), 'title' => $days >= 1 ? _n('The link works for %d more day', 'The link works for %d more days', $days) : __('The link works for less than a day'), 'tone' => 'info'];
 }
 
 /** The client rules an invite gives - ['allow' => [client_id => name], 'deny' => [...]], as userClientAccess(). */
@@ -332,11 +332,11 @@ function userInviteSend($invite_id, $mail, &$error = '') {
     $error = '';
     $token = userInviteNewToken($invite_id);
     if ($token === '') {
-        $error = 'Your session can\'t open the credential vault, so the invite can\'t carry their copy of it. Sign out and in again, then send it.';
+        $error = __("Your session can't open the credential vault, so the invite can't carry their copy of it. Sign out and in again, then send it.");
         return null;
     }
     if ($mail && !userInviteMail($invite_id, $token)) {
-        $error = 'The invite email could not be queued - check Admin &gt; Mail, or get the link and send it to them yourself.';
+        $error = __('The invite email could not be queued - check Admin &gt; Mail, or get the link and send it to them yourself.');
         return null;
     }
     return ['url' => userInviteUrl($invite_id, $token), 'mailed' => (bool) $mail];
@@ -375,29 +375,33 @@ function userInviteMail($invite_id, $token) {
     }
     $company_name = trim((string) (billingCompany()['company_name'] ?? ''));
     $app = userMailAppName();
-    $where = $company_name !== '' ? "$company_name on $app" : $app;
+    $where = $company_name !== '' ? __('%1$s on %2$s', $company_name, $app) : $app;
     $by = userInviteBy($row);
     $role = trim((string) ($row['role_name'] ?? ''));
     $name = trim((string) $row['invite_name']);
 
-    $intro = [($by !== '' ? "$by has invited you" : 'You are invited') . " to join $where" . ($role !== '' ? ", as $role" : '') . '.',
-        'Accept with the button below - you choose your own password there, and you are ready to sign in. It takes a minute.'];
-    if (intval($row['invite_force_mfa'])) {
-        $intro[] = 'Have an authenticator app on your phone ready: you set up multi-factor authentication the first time you sign in.';
-    }
-    $summary = ['Invited' => (string) $row['invite_email']];
     if ($role !== '') {
-        $summary['Role'] = $role;
+        $invited = $by !== '' ? __('%1$s has invited you to join %2$s, as %3$s.', $by, $where, $role) : __('You are invited to join %1$s, as %2$s.', $where, $role);
+    } else {
+        $invited = $by !== '' ? __('%1$s has invited you to join %2$s.', $by, $where) : __('You are invited to join %s.', $where);
+    }
+    $intro = [$invited, __('Accept with the button below - you choose your own password there, and you are ready to sign in. It takes a minute.')];
+    if (intval($row['invite_force_mfa'])) {
+        $intro[] = __('Have an authenticator app on your phone ready: you set up multi-factor authentication the first time you sign in.');
+    }
+    $summary = [__('Invited') => (string) $row['invite_email']];
+    if ($role !== '') {
+        $summary[__('Role')] = $role;
     }
     $sent = (bool) emailQueue([['email' => (string) $row['invite_email'], 'name' => $name, 'greet' => $name !== '' ? $name : null,
-        'footnote' => 'You received this because ' . ($by !== '' ? $by : 'an administrator') . " invited this address to $where."]],
-        ($by !== '' ? "$by invited you" : 'You are invited') . " to $where", [
-            'kind' => 'Your account', 'tone' => 'primary', 'preview' => 'Choose your password and you are in',
-            'title' => "Join $where",
+        'footnote' => __('You received this because %1$s invited this address to %2$s.', $by !== '' ? $by : __('an administrator'), $where)]],
+        $by !== '' ? __('%1$s invited you to %2$s', $by, $where) : __('You are invited to %s', $where), [
+            'kind' => __('Your account'), 'tone' => 'primary', 'preview' => __('Choose your password and you are in'),
+            'title' => __('Join %s', $where),
             'intro' => $intro,
             'summary' => $summary,
-            'button' => ['label' => 'Accept the invite', 'url' => userInviteUrl($row['invite_id'], $token)],
-            'after' => ['The invite works for ' . USER_INVITE_LINK_DAYS . ' days. If you were not expecting it, you can ignore this email - nothing is set up unless the link is used.'],
+            'button' => ['label' => __('Accept the invite'), 'url' => userInviteUrl($row['invite_id'], $token)],
+            'after' => [_n('The invite works for %d day. If you were not expecting it, you can ignore this email - nothing is set up unless the link is used.', 'The invite works for %d days. If you were not expecting it, you can ignore this email - nothing is set up unless the link is used.', USER_INVITE_LINK_DAYS)],
         ]);
     if ($sent && !emailCapturing()) {
         mysqli_query($mysqli, "UPDATE user_invites SET invite_sent_at = NOW(), invite_sent_count = invite_sent_count + 1 WHERE invite_id = " . intval($row['invite_id']));
@@ -435,12 +439,12 @@ function userInviteAccept(array $invite, $token, array $in, &$error = '') {
     $invite_id = intval($invite['invite_id']);
     $email = trim((string) $invite['invite_email']);
     $by = userInviteBy($invite);
-    $ask = $by !== '' ? "ask $by" : 'ask your administrator';
+    $ask = $by !== '' ? __('ask %s', $by) : __('ask your administrator');
 
     $name = trim(preg_replace('/\s+/', ' ', strip_tags(mb_substr((string) ($in['name'] ?? ''), 0, 200))));
     $password = (string) ($in['password'] ?? '');
     if ($name === '') {
-        $error = 'Put in your name.';
+        $error = __('Put in your name.');
         return 0;
     }
     if (($problem = userPasswordProblem($password)) !== '') {
@@ -448,7 +452,7 @@ function userInviteAccept(array $invite, $token, array $in, &$error = '') {
         return 0;
     }
     if ($password !== (string) ($in['confirm'] ?? '')) {
-        $error = 'The two passwords are not the same - type it again in both.';
+        $error = __('The two passwords are not the same - type it again in both.');
         return 0;
     }
 
@@ -456,22 +460,22 @@ function userInviteAccept(array $invite, $token, array $in, &$error = '') {
     $taken = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_id, user_type FROM users WHERE user_email = '" . escapeSql($email) . "' AND user_archived_at IS NULL LIMIT 1"));
     if ($taken) {
         $error = intval($taken['user_type']) === 1
-            ? 'This address signs in already - sign in with it. Forgotten the password? ' . ucfirst($ask) . ' to set a new one.'
-            : 'This address signs in to the client portal, so it can\'t be an agent\'s too - ' . $ask . ' about it.';
+            ? __('This address signs in already - sign in with it. Forgotten the password? %s to set a new one.', ucfirst($ask))
+            : __("This address signs in to the client portal, so it can't be an agent's too - %s about it.", $ask);
         return 0;
     }
     if (($invite['role_name'] ?? null) === null) {
-        $error = 'The role you were invited with has been removed - ' . $ask . ' to invite you again.';
+        $error = __('The role you were invited with has been removed - %s to invite you again.', $ask);
         return 0;
     }
     $limit = getAgentUserLimit();
     if ($limit > 0 && getActiveAgentUserCount() + userInvitesHoldingSeats($invite_id) >= $limit) {
-        $error = 'Every agent seat is taken - ' . $ask . ' to free one, then open this link again.';
+        $error = __('Every agent seat is taken - %s to free one, then open this link again.', $ask);
         return 0;
     }
     $master = decryptUserSpecificKey((string) $invite['invite_vault'], (string) $token);
     if (!is_string($master) || $master === '') {
-        $error = 'This invite can\'t be used - ' . $ask . ' to send it again.';
+        $error = __("This invite can't be used - %s to send it again.", $ask);
         return 0;
     }
 
@@ -480,7 +484,7 @@ function userInviteAccept(array $invite, $token, array $in, &$error = '') {
         WHERE invite_id = $invite_id AND invite_accepted_at IS NULL AND invite_cancelled_at IS NULL AND invite_expires_at > NOW()
           AND invite_token_hash = '" . mysqli_real_escape_string($mysqli, (string) $invite['invite_token_hash']) . "'");
     if (mysqli_affected_rows($mysqli) !== 1) {
-        $error = 'That link has been used already.';
+        $error = __('That link has been used already.');
         return 0;
     }
 
@@ -522,7 +526,7 @@ function userInviteAccept(array $invite, $token, array $in, &$error = '') {
     $role = (string) $invite['role_name'];
     logAudit("User", "Create", escapeSql("$name ($email) accepted " . ($by !== '' ? "$by's" : 'an') . " invite and joined as $role"), 0, $user_id);
     if (intval($invite['invite_created_by']) && intval($invite['invite_by_status'] ?? 0) === 1 && empty($invite['invite_by_archived_at'])) {
-        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'User', notification = '" . escapeSql(mb_substr("$name accepted your invite and joined as $role", 0, 1000)) . "',
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'User', notification = '" . escapeSql(mb_substr(__('%1$s accepted your invite and joined as %2$s', $name, $role), 0, 1000)) . "',
             notification_action = '" . escapeSql('/admin/users.php?q=' . rawurlencode($email)) . "', notification_entity_id = $user_id, notification_user_id = " . intval($invite['invite_created_by']));
     }
     return $user_id;

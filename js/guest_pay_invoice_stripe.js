@@ -54,7 +54,7 @@ async function handleSubmit(e) {
   if (error.type === "card_error" || error.type === "validation_error") {
     showMessage(error.message);
   } else {
-    showMessage("An unexpected error occurred.");
+    showMessage(__("An unexpected error occurred."));
   }
 
   setLoading(false);
@@ -74,16 +74,16 @@ async function checkStatus() {
 
   switch (paymentIntent.status) {
     case "succeeded":
-      showMessage("Payment succeeded!");
+      showMessage(__("Payment succeeded!"));
       break;
     case "processing":
-      showMessage("Your payment is processing.");
+      showMessage(__("Your payment is processing."));
       break;
     case "requires_payment_method":
-      showMessage("Your payment was not successful, please try again.");
+      showMessage(__("Your payment was not successful, please try again."));
       break;
     default:
-      showMessage("Something went wrong.");
+      showMessage(__("Something went wrong."));
       break;
   }
 }

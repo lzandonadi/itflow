@@ -23,24 +23,24 @@ echo settingsPageStart('telemetry');
     <div class="card itflow-settings-card">
         <div class="card-body">
 
-            <?= settingsSectionStart('report', 'Nightly report', 'Knowing how ITFlow is used - how many installs, how big, which parts of it - tells the ITFlow project where its time goes furthest. <a href="https://docs.itflow.org/telemetry" target="_blank" rel="noopener">More<i class="fas fa-external-link-alt small ms-1"></i></a>') ?>
-                <?= settingsSwitch('config_telemetry', $config_telemetry, ['value' => 2, 'help' => 'Once a night, when cron runs the nightly jobs. Nothing is sent while it is off.']) ?>
+            <?= settingsSectionStart('report', __('Nightly report'), __('Knowing how ITFlow is used - how many installs, how big, which parts of it - tells the ITFlow project where its time goes furthest. <a href="https://docs.itflow.org/telemetry" target="_blank" rel="noopener">More<i class="fas fa-external-link-alt small ms-1"></i></a>')) ?>
+                <?= settingsSwitch('config_telemetry', $config_telemetry, ['value' => 2, 'help' => __('Once a night, when cron runs the nightly jobs. Nothing is sent while it is off.')]) ?>
 
                 <div class="mt-3 small" data-telemetry-what>
-                    <div class="fw-semibold mb-1">What the report holds</div>
+                    <div class="fw-semibold mb-1"><?= __('What the report holds') ?></div>
                     <dl class="itflow-settings-list mb-2">
-                        <dt>This install</dt>
-                        <dd><span class="font-monospace"><?= escapeHtml((string) ($installation_id ?? '')) ?></span>, and the version it is on</dd>
+                        <dt><?= __('This install') ?></dt>
+                        <dd><span class="font-monospace"><?= escapeHtml((string) ($installation_id ?? '')) ?></span><?= __(', and the version it is on') ?></dd>
                         <?php foreach (['company_name' => 'Company', 'company_website' => 'Website', 'company_city' => 'City', 'company_state' => 'State', 'company_country' => 'Country', 'company_currency' => 'Currency'] as $column => $label) { ?>
                             <dt><?= $label ?></dt>
                             <dd><?= trim((string) $company[$column]) !== '' ? escapeHtml($company[$column]) : '<span class="text-body-secondary">-</span>' ?></dd>
                         <?php } ?>
-                        <dt>How many</dt>
-                        <dd>clients, contacts, tickets, invoices, quotes, assets, credentials, documents, users and the rest - counts only, never what is in them</dd>
-                        <dt>Switched on</dt>
-                        <dd>which modules are in use, cron, email to ticket, and the theme</dd>
+                        <dt><?= __('How many') ?></dt>
+                        <dd><?= __('clients, contacts, tickets, invoices, quotes, assets, credentials, documents, users and the rest - counts only, never what is in them') ?></dd>
+                        <dt><?= __('Switched on') ?></dt>
+                        <dd><?= __('which modules are in use, cron, email to ticket, and the theme') ?></dd>
                     </dl>
-                    <div class="text-body-secondary">No names of clients or contacts, no email addresses, nothing anyone wrote.</div>
+                    <div class="text-body-secondary"><?= __('No names of clients or contacts, no email addresses, nothing anyone wrote.') ?></div>
                 </div>
             <?= settingsSectionEnd() ?>
 

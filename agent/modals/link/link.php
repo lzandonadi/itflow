@@ -19,7 +19,7 @@ $link_from = (string) ($_GET['from'] ?? '');
 $link_id = intval($_GET['id'] ?? 0);
 $link_source = linkRecord($link_from, $link_id);
 if (!$link_source) {
-    echo json_encode(['error' => 'That record no longer exists.']);
+    echo json_encode(['error' => __('That record no longer exists.')]);
     exit;
 }
 
@@ -31,7 +31,7 @@ $link_types = array_values(array_filter(linkTypesFor($link_from), function ($to)
     return linkCanEdit($link_from, $to);
 }));
 if (!$link_types) {
-    echo json_encode(['error' => 'You do not have permission to change these links.']);
+    echo json_encode(['error' => __('You do not have permission to change these links.')]);
     exit;
 }
 $link_to = in_array($_GET['to'] ?? '', $link_types, true) ? $_GET['to'] : $link_types[0];
@@ -53,7 +53,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-link me-2"></i>Link to <strong><?= $link_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-link me-2"></i><?= __('Link to %s', '<strong>' . $link_name . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-link-form>
@@ -68,8 +68,8 @@ ob_start();
             <nav class="nav nav-pills itflow-asset-pills itflow-link-types mb-3" role="tablist">
                 <?php foreach ($panes as $to => $pane) { ?>
                     <button type="button" class="nav-link <?= $to === $link_to ? 'active' : '' ?>" data-bs-toggle="pill" data-bs-target="#linkPane-<?= $to ?>" data-link-type="<?= $to ?>" role="tab">
-                        <i class="fas fa-fw <?= $pane['entity']['icon'] ?> me-1"></i><?= $pane['entity']['plural'] ?>
-                        <?php if ($pane['linked']) { ?><span class="badge rounded-pill ms-1" title="Already linked"><?= $pane['linked'] ?></span><?php } ?>
+                        <i class="fas fa-fw <?= $pane['entity']['icon'] ?> me-1"></i><?= linkEntityPlural($to) ?>
+                        <?php if ($pane['linked']) { ?><span class="badge rounded-pill ms-1" title="<?= escapeHtml(__('Already linked')) ?>"><?= $pane['linked'] ?></span><?php } ?>
                     </button>
                 <?php } ?>
             </nav>
@@ -80,20 +80,20 @@ ob_start();
                 $entity = $pane['entity']; ?>
                 <div class="tab-pane fade <?= $to === $link_to ? 'show active' : '' ?>" id="linkPane-<?= $to ?>" role="tabpanel">
                     <?php if ($pane['candidates']) { ?>
-                        <label class="form-label">Which <?= strtolower($entity['plural']) ?>?</label>
+                        <label class="form-label"><?= linkEntityText($to, 'which') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-fw <?= $entity['icon'] ?>"></i></span>
-                            <select class="form-select select2" name="ids[]" multiple data-placeholder="Pick one or more <?= strtolower($entity['plural']) ?>" <?= $to === $link_to ? '' : 'disabled' ?> data-link-select="<?= $to ?>">
+                            <select class="form-select select2" name="ids[]" multiple data-placeholder="<?= escapeHtml(linkEntityText($to, 'pick')) ?>" <?= $to === $link_to ? '' : 'disabled' ?> data-link-select="<?= $to ?>">
                                 <?php foreach ($pane['candidates'] as $row) { ?>
                                     <option value="<?= intval($row['id']) ?>"<?= linkOptionData($to, $row, $client_id) ?>><?= escapeHtml($row['name']) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
-                        <div class="form-text"><?= count($pane['candidates']) ?> <?= count($pane['candidates']) === 1 ? $entity['label'] : strtolower($entity['plural']) ?> not linked yet<?= $pane['linked'] ? ', ' . $pane['linked'] . ' already linked' : '' ?>.</div>
+                        <div class="form-text"><?= $pane['linked'] ? linkEntityText($to, 'free_linked', count($pane['candidates']), count($pane['candidates']), $pane['linked']) : linkEntityText($to, 'free', count($pane['candidates'])) ?></div>
                     <?php } else { ?>
                         <div class="itflow-asset-empty py-4">
                             <i class="fas <?= $entity['icon'] ?> fa-2x mb-2"></i>
-                            <div><?= $pane['linked'] ? 'Every ' . $entity['label'] . ' this client has is already linked.' : 'This client has no ' . strtolower($entity['plural']) . ' to link.' ?></div>
+                            <div><?= $pane['linked'] ? linkEntityText($to, 'every') : linkEntityText($to, 'none') ?></div>
                         </div>
                     <?php } ?>
                 </div>
@@ -102,8 +102,8 @@ ob_start();
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="link_items" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i>Link</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="link_items" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

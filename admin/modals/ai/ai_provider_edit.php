@@ -15,7 +15,7 @@ require_once '../../includes/modal_header.php';
 $provider_id = intval($_GET['id'] ?? 0);
 $row = $provider_id ? aiProviderRow($provider_id) : null;
 if ($provider_id && !$row) {
-    echo json_encode(['error' => 'That AI provider no longer exists.']);
+    echo json_encode(['error' => __('That AI provider no longer exists.')]);
     exit;
 }
 
@@ -43,7 +43,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-robot me-2"></i><?= $row ? '<strong>' . escapeHtml($row['ai_provider_name']) . '</strong>' : 'Add AI Provider' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-robot me-2"></i><?= $row ? '<strong>' . escapeHtml($row['ai_provider_name']) . '</strong>' : __('Add AI Provider') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" novalidate data-ai-provider-form data-kinds="<?= escapeHtml(json_encode($kinds_js)) ?>" data-has-key="<?= $has_key ? '1' : '0' ?>">
@@ -54,12 +54,12 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label" for="aiProviderKind">Kind <strong class="text-danger">*</strong></label>
+            <label class="form-label" for="aiProviderKind"><?= __('Kind') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group has-validation">
                 <span class="input-group-text"><i class="fa fa-fw fa-shapes"></i></span>
                 <select class="form-select select2" name="kind" id="aiProviderKind" data-ai-kind>
                     <?php foreach ($kinds as $key => $info) { ?>
-                        <option value="<?= $key ?>" <?= $key === $kind_key ? 'selected' : '' ?><?= selectOptionData(['icon' => aiProviderIcon($key), 'description' => $info['local'] ? 'Runs on your own network - nothing leaves it' : ($key === 'custom' ? 'Any other service that speaks the OpenAI API' : (string) parse_url($info['url'], PHP_URL_HOST))]) ?>><?= escapeHtml($info['name']) ?></option>
+                        <option value="<?= $key ?>" <?= $key === $kind_key ? 'selected' : '' ?><?= selectOptionData(['icon' => aiProviderIcon($key), 'description' => $info['local'] ? __('Runs on your own network - nothing leaves it') : ($key === 'custom' ? __('Any other service that speaks the OpenAI API') : (string) parse_url($info['url'], PHP_URL_HOST))]) ?>><?= escapeHtml($info['name']) ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -67,37 +67,37 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="aiProviderName">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label" for="aiProviderName"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group has-validation">
                 <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="name" id="aiProviderName" maxlength="200" value="<?= escapeHtml($row ? $row['ai_provider_name'] : $kind['name']) ?>" placeholder="What you call it">
+                <input type="text" class="form-control" name="name" id="aiProviderName" maxlength="200" value="<?= escapeHtml($row ? $row['ai_provider_name'] : $kind['name']) ?>" placeholder="<?= escapeHtml(__('What you call it')) ?>">
             </div>
             <?= $error_for('name') ?>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="aiProviderUrl">Address <strong class="text-danger">*</strong></label>
+            <label class="form-label" for="aiProviderUrl"><?= __('Address') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group has-validation">
                 <span class="input-group-text"><i class="fa fa-fw fa-globe"></i></span>
                 <input type="url" class="form-control font-monospace small" name="url" id="aiProviderUrl" maxlength="500" spellcheck="false" value="<?= escapeHtml($row ? $row['ai_provider_api_url'] : $kind['url']) ?>" placeholder="https://.../v1/chat/completions">
             </div>
             <?= $error_for('url') ?>
-            <div class="form-text">Its chat completions address - filled in for the kind picked. One ending /v1 has /chat/completions put on.</div>
+            <div class="form-text"><?= __('Its chat completions address - filled in for the kind picked. One ending /v1 has /chat/completions put on.') ?></div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="aiProviderKey">API key <strong class="text-danger <?= $kind['key'] && !$has_key ? '' : 'd-none' ?>" data-ai-key-required>*</strong></label>
+            <label class="form-label" for="aiProviderKey"><?= __('API key') ?> <strong class="text-danger <?= $kind['key'] && !$has_key ? '' : 'd-none' ?>" data-ai-key-required>*</strong></label>
             <div class="input-group has-validation">
                 <span class="input-group-text"><i class="fa fa-fw fa-key"></i></span>
                 <input type="password" class="form-control font-monospace" name="api_key" id="aiProviderKey" maxlength="500" spellcheck="false" autocomplete="new-password"
-                    placeholder="<?= $has_key ? 'Saved - type a new one to replace it' : 'Paste its API key' ?>">
+                    placeholder="<?= $has_key ? __('Saved - type a new one to replace it') : __('Paste its API key') ?>">
             </div>
             <?= $error_for('api_key') ?>
             <div class="form-text" data-ai-key-hint></div>
             <?php if ($has_key) { ?>
                 <div class="form-check mt-1">
                     <input class="form-check-input" type="checkbox" name="clear_key" value="1" id="aiProviderClearKey">
-                    <label class="form-check-label small" for="aiProviderClearKey">Remove the saved key</label>
+                    <label class="form-check-label small" for="aiProviderClearKey"><?= __('Remove the saved key') ?></label>
                 </div>
             <?php } ?>
         </div>
@@ -105,35 +105,35 @@ ob_start();
         <div class="mb-3">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" name="redact" value="1" id="aiProviderRedact" <?= $redact ? 'checked' : '' ?>>
-                <label class="form-check-label" for="aiProviderRedact">Take passwords and keys out of what is sent</label>
+                <label class="form-check-label" for="aiProviderRedact"><?= __('Take passwords and keys out of what is sent') ?></label>
             </div>
-            <div class="form-text ps-5">Passwords, PINs, API keys, private keys, 2FA links and card numbers in a reply or ticket go as placeholders, and are put back in the answer - the provider never sees them.</div>
+            <div class="form-text ps-5"><?= __('Passwords, PINs, API keys, private keys, 2FA links and card numbers in a reply or ticket go as placeholders, and are put back in the answer - the provider never sees them.') ?></div>
         </div>
 
         <?php if ($offer_first_model) { ?>
             <div class="mb-3">
-                <label class="form-label" for="aiProviderFirstModel">Model to use</label>
+                <label class="form-label" for="aiProviderFirstModel"><?= __('Model to use') ?></label>
                 <div class="input-group has-validation">
                     <span class="input-group-text"><i class="fa fa-fw fa-brain"></i></span>
                     <input type="text" class="form-control font-monospace" name="first_model" id="aiProviderFirstModel" maxlength="200" spellcheck="false" list="aiProviderModelList" placeholder="<?= escapeHtml($kind['example']) ?>" data-ai-first-model>
                 </div>
                 <?= $error_for('first_model') ?>
-                <div class="form-text">For everything - Reword, ticket summaries and document drafts. Test lists the ones it has; more can be added in AI Models.</div>
+                <div class="form-text"><?= __('For everything - Reword, ticket summaries and document drafts. Test lists the ones it has; more can be added in AI Models.') ?></div>
             </div>
         <?php } ?>
         <datalist id="aiProviderModelList" data-ai-model-list></datalist>
 
         <div class="d-flex align-items-start gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm text-nowrap" data-ai-test><i class="fas fa-fw fa-plug me-1"></i>Test</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm text-nowrap" data-ai-test><i class="fas fa-fw fa-plug me-1"></i><?= __('Test') ?></button>
             <div class="small pt-1" data-ai-test-result></div>
         </div>
 
     </div>
     <div class="modal-footer">
         <button type="submit" name="<?= $row ? 'edit_ai_provider' : 'add_ai_provider' ?>" class="btn btn-primary text-bold" data-ai-save>
-            <i class="fa fa-check me-2"></i><?= $row ? 'Save' : 'Add' ?>
+            <i class="fa fa-check me-2"></i><?= $row ? __('Save') : __('Add') ?>
         </button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -176,11 +176,11 @@ ob_start();
         var info = kinds[kind];
         keyRequired.classList.toggle('d-none', !info.key || hasKey);
         if (info.local) {
-            keyHint.textContent = info.name + ' runs on your own network and needs no key unless you set one. ITFlow has to be able to reach it - localhost is the ITFlow server itself.';
+            keyHint.textContent = __('%s runs on your own network and needs no key unless you set one. ITFlow has to be able to reach it - localhost is the ITFlow server itself.', info.name);
         } else if (info.keysUrl) {
-            keyHint.innerHTML = 'Made in <a href="' + escapeText(info.keysUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeText(info.name) + '\'s console <i class="fas fa-external-link-alt fa-xs"></i></a> - give ITFlow a key of its own, so it can be turned off on its own.';
+            keyHint.innerHTML = __('Made in <a href="') + escapeText(info.keysUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeText(info.name) + '\'s console <i class="fas fa-external-link-alt fa-xs"></i></a> - give ITFlow a key of its own, so it can be turned off on its own.';
         } else {
-            keyHint.textContent = 'If it needs one - sent as a bearer token.';
+            keyHint.textContent = __('If it needs one - sent as a bearer token.');
         }
         if (firstModel) {
             firstModel.placeholder = info.example;
@@ -257,8 +257,8 @@ ob_start();
         if (!answer.listed) {
             testResult.innerHTML = '<span class="text-body-secondary" data-ai-test-unlisted><i class="fas fa-fw fa-info-circle me-1"></i>' + escapeText(kinds[kind].name) + ' doesn\'t list its models - use Try it on its model once it is added.</span>';
         } else {
-            testResult.innerHTML = '<span class="text-success-emphasis" data-ai-test-ok><i class="fas fa-fw fa-check-circle me-1"></i>It answered - ' + count + ' model' + (count === 1 ? '' : 's') + ' there.</span>'
-                + (firstModel && count ? ' <span class="text-body-secondary">Pick the one to use above.</span>' : '');
+            testResult.innerHTML = '<span class="text-success-emphasis" data-ai-test-ok><i class="fas fa-fw fa-check-circle me-1"></i>' + (count === 1 ? __('It answered - %s model there.', count) : __('It answered - %s models there.', count)) + '</span>'
+                + (firstModel && count ? ' <span class="text-body-secondary">' + __('Pick the one to use above.') + '</span>' : '');
         }
     }
 
@@ -275,7 +275,7 @@ ob_start();
     testButton.addEventListener('click', function () {
         var label = testButton.innerHTML;
         testButton.disabled = true;
-        testButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Testing';
+        testButton.innerHTML = __('<i class="fas fa-spinner fa-spin me-1"></i>Testing');
         testResult.innerHTML = '';
         ask(true)
             .then(function (answer) {
@@ -284,11 +284,11 @@ ob_start();
                     showModels(answer);
                 } else {
                     showErrors(answer.errors || {});
-                    testResult.innerHTML = '<span class="text-danger-emphasis" data-ai-test-failed><i class="fas fa-fw fa-times-circle me-1"></i>Not yet - see above.</span>';
+                    testResult.innerHTML = __('<span class="text-danger-emphasis" data-ai-test-failed><i class="fas fa-fw fa-times-circle me-1"></i>Not yet - see above.</span>');
                 }
             })
             .catch(function () {
-                testResult.innerHTML = '<span class="text-danger-emphasis">Couldn\'t test it - try again.</span>';
+                testResult.innerHTML = __('<span class="text-danger-emphasis">Couldn\'t test it - try again.</span>');
             })
             .finally(function () {
                 testButton.disabled = false;
@@ -304,7 +304,7 @@ ob_start();
         }
         e.preventDefault();
         save.disabled = true;
-        save.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Checking';
+        save.innerHTML = __('<i class="fas fa-spinner fa-spin me-2"></i>Checking');
         ask(false)
             .then(function (answer) {
                 clearErrors();
@@ -314,7 +314,7 @@ ob_start();
                         showModels(answer);
                     }
                     checked = true;
-                    save.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving';
+                    save.innerHTML = __('<i class="fas fa-spinner fa-spin me-2"></i>Saving');
                     form.requestSubmit(save);
                     save.disabled = true;
                     return;
@@ -324,7 +324,7 @@ ob_start();
                 // Only that it didn't answer - it can be saved anyway
                 if (answer.soft) {
                     saveAnyway.value = '1';
-                    save.innerHTML = '<i class="fa fa-check me-2"></i>Save anyway';
+                    save.innerHTML = __('<i class="fa fa-check me-2"></i>Save anyway');
                     save.classList.remove('btn-primary');
                     save.classList.add('btn-warning');
                 }

@@ -35,7 +35,7 @@ function userAvatar($user_id, $name, $avatar, $size = '') {
 /** A user's status as a pill. */
 function userStatusPill($status, $archived = false) {
     if ($archived) {
-        return '<span class="badge rounded-pill text-bg-secondary fw-normal"><i class="fas fa-archive me-1"></i>Archived</span>';
+        return __('<span class="badge rounded-pill text-bg-secondary fw-normal"><i class="fas fa-archive me-1"></i>Archived</span>');
     }
     [$label, $tone] = USER_STATUSES[intval($status)] ?? USER_STATUSES[0];
     $icon = ['success' => 'fa-check-circle', 'secondary' => 'fa-ban', 'info' => 'fa-paper-plane'][$tone];
@@ -48,12 +48,12 @@ function userStatusPill($status, $archived = false) {
  */
 function userMfaPill($token, $forced) {
     if (trim((string) $token) !== '') {
-        return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="Signs in with a code from an authenticator app' . (intval($forced) ? ' - required' : '') . '"><i class="fas fa-lock me-1"></i>MFA' . (intval($forced) ? ' · required' : '') . '</span>';
+        return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="' . escapeHtml(intval($forced) ? __('Signs in with a code from an authenticator app - required') : __('Signs in with a code from an authenticator app')) . '"><i class="fas fa-lock me-1"></i>' . (intval($forced) ? __('MFA · required') : 'MFA') . '</span>';
     }
     if (intval($forced)) {
-        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="Required - they set it up at their next sign in"><i class="fas fa-hourglass-half me-1"></i>MFA pending</span>';
+        return '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="' . escapeHtml(__('Required - they set it up at their next sign in')) . '"><i class="fas fa-hourglass-half me-1"></i>' . __('MFA pending') . '</span>';
     }
-    return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal" title="Password only"><i class="fas fa-unlock me-1"></i>No MFA</span>';
+    return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal" title="' . escapeHtml(__('Password only')) . '"><i class="fas fa-unlock me-1"></i>' . __('No MFA') . '</span>';
 }
 
 /** One agent by id, with their settings and role - raw, or null. */
@@ -83,11 +83,11 @@ function userForRequest($user_id, $not_self = true) {
     global $session_user_id;
     $row = userRow($user_id);
     if (!$row) {
-        flashAlert('That user no longer exists.', 'error');
+        flashAlert(__('That user no longer exists.'), 'error');
         redirect();
     }
     if ($not_self && intval($row['user_id']) === intval($session_user_id)) {
-        flashAlert('Change your own account from <strong>Account</strong> in the top right.', 'error');
+        flashAlert(__('Change your own account from <strong>Account</strong> in the top right.'), 'error');
         redirect();
     }
     return $row;
@@ -97,7 +97,7 @@ function userForRequest($user_id, $not_self = true) {
 function userForModal($user_id) {
     $row = userRow($user_id);
     if (!$row) {
-        echo json_encode(['error' => 'That user no longer exists.']);
+        echo json_encode(['error' => __('That user no longer exists.')]);
         exit;
     }
     return $row;
@@ -133,7 +133,7 @@ function userRoles($include_role_id = 0) {
 function selectOptionRole($role) {
     return selectOptionData([
         'icon' => 'fas ' . (intval($role['role_is_admin']) ? 'fa-user-shield' : 'fa-user-tag'),
-        'description' => implode(' · ', array_filter([intval($role['role_is_admin']) ? 'Administrator - every client, every setting' : '', $role['role_description']])),
+        'description' => implode(' · ', array_filter([intval($role['role_is_admin']) ? __('Administrator - every client, every setting') : '', $role['role_description']])),
     ]);
 }
 
@@ -160,7 +160,7 @@ function userCheckIdentity($post, $user_id, &$error = '') {
     $name = trim((string) ($post['name'] ?? ''));
     $email = trim((string) ($post['email'] ?? ''));
     if ($name === '') {
-        $error = 'A user needs a name.';
+        $error = __('A user needs a name.');
         return null;
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -170,7 +170,7 @@ function userCheckIdentity($post, $user_id, &$error = '') {
     $email_sql = escapeSql($email);
     $taken = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_id, user_type FROM users WHERE user_email = '$email_sql' AND user_archived_at IS NULL AND user_id <> " . intval($user_id) . " LIMIT 1"));
     if ($taken) {
-        $error = '<strong>' . $email . '</strong> already signs in to ' . (intval($taken['user_type']) === 1 ? 'another agent account' : 'a client portal account') . ' - each account needs its own email.';
+        $error = intval($taken['user_type']) === 1 ? __('<strong>%s</strong> already signs in to another agent account - each account needs its own email.', $email) : __('<strong>%s</strong> already signs in to a client portal account - each account needs its own email.', $email);
         return null;
     }
     return [mb_substr($name, 0, 200), mb_substr($email, 0, 200)];
@@ -181,7 +181,7 @@ function userCheckRole($role_id, $current_role_id, &$error = '') {
     $roles = userRoles($current_role_id);
     $role_id = intval($role_id);
     if (!isset($roles[$role_id]) || ($roles[$role_id]['role_archived_at'] && $role_id !== intval($current_role_id))) {
-        $error = 'Pick a role for them.';
+        $error = __('Pick a role for them.');
         return null;
     }
     return $roles[$role_id];
@@ -190,7 +190,7 @@ function userCheckRole($role_id, $current_role_id, &$error = '') {
 /** Is this a password ITFlow takes? '' when it is, the reason when not. */
 function userPasswordProblem($password) {
     if (strlen((string) $password) < USER_PASSWORD_MIN) {
-        return 'A password is at least ' . USER_PASSWORD_MIN . ' characters.';
+        return __('A password is at least %d characters.', USER_PASSWORD_MIN);
     }
     return '';
 }
@@ -269,18 +269,18 @@ function userAvatarStore($file, $dir, &$error = '') {
     $new_name = checkFileUpload($file, ['jpg', 'jpeg', 'gif', 'png', 'webp']);
     $image = $new_name ? @getimagesize($file['tmp_name']) : false;
     if (!$new_name || !$image || !in_array($image[2], [IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
-        $error = 'The avatar has to be a JPG, PNG, GIF or WebP picture.';
+        $error = __('The avatar has to be a JPG, PNG, GIF or WebP picture.');
         return '';
     }
     if ($file['size'] > 5 * 1024 * 1024) {
-        $error = 'The avatar can be up to 5 MB.';
+        $error = __('The avatar can be up to 5 MB.');
         return '';
     }
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
     if (!move_uploaded_file($file['tmp_name'], "$dir/$new_name")) {
-        $error = 'The avatar could not be saved.';
+        $error = __('The avatar could not be saved.');
         return '';
     }
     return $new_name;
@@ -340,14 +340,14 @@ function userClientAccess(array $user_ids) {
 /** What an agent can see, in words: "All clients", "3 clients", "All but 1". An admin sees everything. */
 function userClientAccessText($access, $is_admin) {
     if ($is_admin) {
-        return 'All clients (admin)';
+        return __('All clients (admin)');
     }
     $allow = count($access['allow']);
     $deny = count($access['deny']);
     if ($allow) {
-        return $allow . ' client' . ($allow === 1 ? '' : 's') . ($deny ? ", $deny kept out" : '');
+        return _n('%d client', '%d clients', $allow) . ($deny ? ', ' . __('%d kept out', $deny) : '');
     }
-    return $deny ? "All but $deny client" . ($deny === 1 ? '' : 's') : 'All clients';
+    return $deny ? _n('All but %d client', 'All but %d clients', $deny) : __('All clients');
 }
 
 /**
@@ -456,13 +456,13 @@ function userDeviceHtml($user_agent) {
     $parts = array_filter([getOS((string) $user_agent), getWebBrowser((string) $user_agent)], function ($part) {
         return $part !== '-';
     });
-    return $parts ? implode(' ', $parts) : 'Unknown device';
+    return $parts ? implode(' ', $parts) : __('Unknown device');
 }
 
 /** A sign in, in words: when, and from what - "2 hours ago · Windows · Chrome · 203.0.113.9". Raw values in, HTML out. */
 function userLoginHtml($log, $with_ip = true) {
     if (!$log) {
-        return '<span class="text-body-secondary">Never signed in</span>';
+        return '<span class="text-body-secondary">' . __('Never signed in') . '</span>';
     }
     return '<span title="' . escapeHtml($log['log_created_at']) . '">' . escapeHtml(timeAgo($log['log_created_at'])) . '</span>'
         . '<div class="small text-body-secondary text-nowrap">' . userDeviceHtml($log['log_user_agent'])
@@ -487,7 +487,7 @@ function userMfaQrSvg($secret, $email) {
     $svg = $generator->render_svg('qr', $uri, ['w' => 200, 'h' => 200, 'p' => 0]);
     // Shown inline in the page, not as an image - the XML prolog has to go, and it scales with its box
     $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', (string) $svg);
-    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="QR code for your authenticator app" ', $svg, 1);
+    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="' . escapeHtml(__('QR code for your authenticator app')) . '" ', $svg, 1);
 }
 
 /** An agent's work not finished - [tickets not closed, recurring tickets] assigned to them. */
@@ -540,12 +540,12 @@ function userMailAppName() {
 /** An agent's own email, sent from the system - their account was changed ($what, raw). Queued; nothing when mail is not set up. */
 function userNotifyChange($name, $email, $what) {
     $app = userMailAppName();
-    emailQueue([['email' => $email, 'name' => $name, 'footnote' => "You get this about your own $app account."]], "$app account update for $name", [
-        'kind' => 'Your account', 'tone' => 'warning', 'preview' => "Your $app account was changed",
-        'title' => 'Your account was changed',
-        'intro' => ["Your $app account was changed: " . $what . '.'],
-        'callout' => "If this was not you, tell your $app administrator straight away.",
-        'button' => ['label' => "Sign in to $app", 'url' => userSignInUrl()],
+    emailQueue([['email' => $email, 'name' => $name, 'footnote' => __('You get this about your own %s account.', $app)]], __('%1$s account update for %2$s', $app, $name), [
+        'kind' => __('Your account'), 'tone' => 'warning', 'preview' => __('Your %s account was changed', $app),
+        'title' => __('Your account was changed'),
+        'intro' => [__('Your %1$s account was changed: %2$s.', $app, $what)],
+        'callout' => __('If this was not you, tell your %s administrator straight away.', $app),
+        'button' => ['label' => __('Sign in to %s', $app), 'url' => userSignInUrl()],
     ]);
 }
 
@@ -559,16 +559,16 @@ function userMailSignInAlert($name, $email, $kind, $ip, $user_agent) {
     $app = userMailAppName();
     $mfa = $kind === 'mfa';
     $device = trim(strip_tags(userDeviceHtml((string) $user_agent)));
-    emailQueue([['email' => $email, 'name' => $name, 'footnote' => "You get this about your own $app account."]],
-        $mfa ? "Important: $app failed 2FA login attempt for $name" : "$app new login for $name", [
-            'kind' => 'Security', 'tone' => $mfa ? 'danger' : 'warning',
-            'preview' => $mfa ? 'Your password was used, but the 2FA code was wrong' : 'A sign in from a new device',
-            'title' => $mfa ? 'Someone used your password' : 'A new sign in to your account',
+    emailQueue([['email' => $email, 'name' => $name, 'footnote' => __('You get this about your own %s account.', $app)]],
+        $mfa ? __('Important: %1$s failed 2FA login attempt for %2$s', $app, $name) : __('%1$s new login for %2$s', $app, $name), [
+            'kind' => __('Security'), 'tone' => $mfa ? 'danger' : 'warning',
+            'preview' => $mfa ? __('Your password was used, but the 2FA code was wrong') : __('A sign in from a new device'),
+            'title' => $mfa ? __('Someone used your password') : __('A new sign in to your account'),
             'intro' => [$mfa
-                ? "Someone signed in to your $app account with your password, but the multi-factor code was wrong, so they were stopped."
-                : "Someone signed in to your $app account from a device and address it hasn't seen before. If that was you, there is nothing to do."],
-            'summary' => ['When' => date('D j M Y, g:i A'), 'Device' => $device !== '' ? $device : 'Unknown device', 'IP address' => (string) $ip],
-            'callout' => $mfa ? 'If that was not you, your password is known to someone else - change it now.' : 'If that was not you, change your password now and tell your administrator.',
-            'button' => ['label' => 'Review your sign in security', 'url' => "https://$config_base_url/agent/user/user_security.php"],
+                ? __('Someone signed in to your %s account with your password, but the multi-factor code was wrong, so they were stopped.', $app)
+                : __("Someone signed in to your %s account from a device and address it hasn't seen before. If that was you, there is nothing to do.", $app)],
+            'summary' => [__('When') => formatDate(time(), 'datetime_weekday'), __('Device') => $device !== '' ? $device : __('Unknown device'), __('IP address') => (string) $ip],
+            'callout' => $mfa ? __('If that was not you, your password is known to someone else - change it now.') : __('If that was not you, change your password now and tell your administrator.'),
+            'button' => ['label' => __('Review your sign in security'), 'url' => "https://$config_base_url/agent/user/user_security.php"],
         ]);
 }

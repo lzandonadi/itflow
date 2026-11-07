@@ -2,7 +2,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark">
-                <h5 class="modal-title"><i class="fa fa-fw fa-archive me-2"></i>Archiving contact: <strong><?= $contact_name ?></strong></h5>
+                <h5 class="modal-title"><i class="fa fa-fw fa-archive me-2"></i><?= __('Archiving contact:') ?> <strong><?= $contact_name ?></strong></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="post.php" method="post" autocomplete="off">
@@ -11,43 +11,43 @@
                 <div class="modal-body">
 
                     <div class="alert alert-warning">
-                        Client Portal Access will be revoked upon archiving
+                        <?= __('Client Portal Access will be revoked upon archiving') ?>
                     </div>
 
-                    <label>Unassign:</label>
+                    <label><?= __('Unassign:') ?></label>
 
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="unassignAssetsCheckbox<?= $contact_id ?>" name="unassign_assets" value="1">
-                            <label class="form-check-label" for="unassignAssetsCheckbox<?= $contact_id ?>">Assets</label>
+                            <label class="form-check-label" for="unassignAssetsCheckbox<?= $contact_id ?>"><?= __('Assets') ?></label>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="unassignLicensesCheckbox<?= $contact_id ?>" name="unassign_licenses" value="1">
-                            <label class="form-check-label" for="unassignLicensesCheckbox<?= $contact_id ?>">Licenses</label>
+                            <label class="form-check-label" for="unassignLicensesCheckbox<?= $contact_id ?>"><?= __('Licenses') ?></label>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="unassignDocumentsCheckbox<?= $contact_id ?>" name="unassign_documents" value="1">
-                            <label class="form-check-label" for="unassignDocumentsCheckbox<?= $contact_id ?>">Documents</label>
+                            <label class="form-check-label" for="unassignDocumentsCheckbox<?= $contact_id ?>"><?= __('Documents') ?></label>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="anonymizeCheckbox<?= $contact_id ?>" name="anonymize_contact" value="1">
-                            <label class="form-check-label" for="anonymizeCheckbox<?= $contact_id ?>">Anonymize Contact</label>
+                            <label class="form-check-label" for="anonymizeCheckbox<?= $contact_id ?>"><?= __('Anonymize Contact') ?></label>
                         </div>
                     </div>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="archive_contact" class="btn btn-danger text-bold"><i class="fas fa-check me-2"></i>Arhive</button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+                    <button type="submit" name="archive_contact" class="btn btn-danger text-bold"><i class="fas fa-check me-2"></i><?= __('Arhive') ?></button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
                 </div>
             </form>
         </div>

@@ -129,40 +129,40 @@ $csrf = $_SESSION['csrf_token'];
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $view === 'active' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['show' => 'active'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-check-circle me-1"></i>In force</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-check-circle me-1"></i><?= __('In force') ?></div>
             <div class="itflow-billing-stat-value"><?= intval($stats['active']) ?></div>
-            <div class="itflow-billing-stat-note">Active contracts</div>
+            <div class="itflow-billing-stat-note"><?= __('Active contracts') ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $view === 'soon' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['show' => 'soon'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-exclamation-triangle me-1"></i>Ending soon</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-exclamation-triangle me-1"></i><?= __('Ending soon') ?></div>
             <div class="itflow-billing-stat-value <?= $stats['ending'] ? 'text-warning-emphasis' : '' ?>"><?= intval($stats['ending']) ?></div>
-            <div class="itflow-billing-stat-note">Won't renew themselves</div>
+            <div class="itflow-billing-stat-note"><?= __('Won\'t renew themselves') ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat" href="<?= escapeHtml($filter_url(['show' => 'soon'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-sync-alt me-1"></i>Renewing soon</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-sync-alt me-1"></i><?= __('Renewing soon') ?></div>
             <div class="itflow-billing-stat-value"><?= intval($stats['renewing']) ?></div>
-            <div class="itflow-billing-stat-note">Time to review them with the client</div>
+            <div class="itflow-billing-stat-note"><?= __('Time to review them with the client') ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $view === 'draft' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['show' => 'draft'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-pencil-alt me-1"></i>Drafts</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-pencil-alt me-1"></i><?= __('Drafts') ?></div>
             <div class="itflow-billing-stat-value"><?= intval($stats['draft']) ?></div>
-            <div class="itflow-billing-stat-note">Not in force yet</div>
+            <div class="itflow-billing-stat-note"><?= __('Not in force yet') ?></div>
         </a>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-file-contract me-2"></i>Contracts</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-file-contract me-2"></i><?= __('Contracts') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit) { ?>
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($add_url) ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Contract</span></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($add_url) ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Contract') ?></span></button>
             <?php } ?>
         </div>
     </div>
@@ -176,22 +176,22 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-8' : 'col-lg-6' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search contracts..." title="Name, client, support hours or notes">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search contracts...')) ?>" title="<?= escapeHtml(__('Name, client, support hours or notes')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="<?= $client_url ? 'col-lg-4' : 'col-lg-3' ?> col-md-6">
-                    <select class="form-select select2" name="type" onchange="this.form.submit()" aria-label="Type">
-                        <option value="">- Any type -</option>
+                    <select class="form-select select2" name="type" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Type')) ?>">
+                        <option value=""><?= __('- Any type -') ?></option>
                         <?php foreach (CONTRACT_TYPES as $key => $type) { ?>
-                            <option value="<?= $key ?>" <?= $type_filter === $key ? 'selected' : '' ?> data-icon="fas <?= $type['icon'] ?>"><?= escapeHtml($type['label']) ?></option>
+                            <option value="<?= $key ?>" <?= $type_filter === $key ? 'selected' : '' ?> data-icon="fas <?= $type['icon'] ?>"><?= escapeHtml(contractTypeLabel($key)) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                     <div class="col-lg-3 col-md-6">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             if (contractsReady()) {
                                 $sql_clients_filter = mysqli_query($mysqli, "SELECT DISTINCT client_id, client_name, client_abbreviation FROM clients
@@ -221,13 +221,13 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="<?= $num_rows[0] ? '' : 'd-none' ?> text-nowrap table-light">
             <tr>
-                <th class="ps-3"><?= $sort_link('contract_name', 'Contract') ?></th>
+                <th class="ps-3"><?= $sort_link('contract_name', __('Contract')) ?></th>
                 <?php if (!$client_url) { ?>
-                    <th><?= $sort_link('client_name', 'Client') ?></th>
+                    <th><?= $sort_link('client_name', __('Client')) ?></th>
                 <?php } ?>
-                <th class="d-none d-md-table-cell"><?= $sort_link('contract_start_date', 'Term') ?></th>
-                <th><?= $sort_link('contract_end_date', 'Renewal') ?></th>
-                <th class="d-none d-xl-table-cell"><?= $sort_link('owner_name', 'Owner') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('contract_start_date', __('Term')) ?></th>
+                <th><?= $sort_link('contract_end_date', __('Renewal')) ?></th>
+                <th class="d-none d-xl-table-cell"><?= $sort_link('owner_name', __('Owner')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -243,7 +243,7 @@ $csrf = $_SESSION['csrf_token'];
                 <tr data-contract-id="<?= $contract_id ?>">
                     <td class="ps-3">
                         <div class="d-flex align-items-center gap-3">
-                            <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true" title="<?= escapeHtml($type['label']) ?>"><i class="fas fa-fw <?= $type['icon'] ?>"></i></span>
+                            <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true" title="<?= escapeHtml(contractTypeLabel($row['contract_type'])) ?>"><i class="fas fa-fw <?= $type['icon'] ?>"></i></span>
                             <div class="min-w-0">
                                 <a class="fw-semibold" href="<?= $row_url ?>"><?= escapeHtml($row['contract_name']) ?></a>
                                 <div class="small text-body-secondary"><?= escapeHtml(contractTypeLabel($row['contract_type'])) ?>
@@ -251,12 +251,12 @@ $csrf = $_SESSION['csrf_token'];
                                     if ($sign && in_array($sign['key'], ['sent', 'viewed', 'countersign'], true)) { ?>
                                         · <span class="text-<?= $sign['key'] === 'countersign' ? 'warning' : 'primary' ?>-emphasis" title="<?= escapeHtml($sign['when']) ?>"><i class="fas fa-fw <?= $sign['icon'] ?>"></i><?= escapeHtml($sign['label']) ?></span>
                                     <?php } elseif ($sign && $sign['key'] === 'signed') { ?>
-                                        · <span class="text-success-emphasis" title="<?= escapeHtml($sign['when']) ?>"><i class="fas fa-fw fa-file-signature"></i>Signed</span>
+                                        · <span class="text-success-emphasis" title="<?= escapeHtml($sign['when']) ?>"><i class="fas fa-fw fa-file-signature"></i><?= __('Signed') ?></span>
                                     <?php } ?>
                                     <?php if (isset($hours_left[$contract_id])) {
                                         $left = $hours_left[$contract_id]['left'];
                                         $low = $row['contract_status'] === 'Active' && ($left <= 0 || $left < floatval($row['contract_hours_alert'] ?? 0)); ?>
-                                        · <span class="<?= $low ? 'text-warning-emphasis' : '' ?>" title="Prepaid hours left, of <?= escapeHtml(contractHoursText($hours_left[$contract_id]['bought'])) ?>" data-contract-hours-chip><i class="fas fa-fw fa-hourglass-half"></i><?= escapeHtml(contractHoursText($left)) ?> left</span>
+                                        · <span class="<?= $low ? 'text-warning-emphasis' : '' ?>" title="<?= escapeHtml(__('Prepaid hours left, of %s', contractHoursText($hours_left[$contract_id]['bought']))) ?>" data-contract-hours-chip><i class="fas fa-fw fa-hourglass-half"></i><?= escapeHtml(__('%s left', contractHoursText($left))) ?></span>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -267,39 +267,39 @@ $csrf = $_SESSION['csrf_token'];
                     <?php } ?>
                     <td class="d-none d-md-table-cell text-nowrap small">
                         <?php if ($row['contract_start_date']) { ?>
-                            <?= escapeHtml(date('M j, Y', strtotime($row['contract_start_date']))) ?><?= $row['contract_end_date'] ? ' - ' . escapeHtml(date('M j, Y', strtotime($row['contract_end_date']))) : '' ?>
+                            <?= escapeHtml(formatDate($row['contract_start_date'], 'date')) ?><?= $row['contract_end_date'] ? ' - ' . escapeHtml(formatDate($row['contract_end_date'], 'date')) : '' ?>
                         <?php } else { ?>
-                            <span class="text-body-tertiary">Not started</span>
+                            <span class="text-body-tertiary"><?= __('Not started') ?></span>
                         <?php } ?>
-                        <div class="text-body-secondary"><?= escapeHtml(contractTermLabel($row['contract_term_months'])) ?><?= intval($row['contract_auto_renew']) ? ', renews itself' : '' ?></div>
+                        <div class="text-body-secondary"><?= escapeHtml(contractTermLabel($row['contract_term_months'])) ?><?= intval($row['contract_auto_renew']) ? escapeHtml(__(', renews itself')) : '' ?></div>
                     </td>
                     <td class="text-nowrap">
                         <?= contractStateHtml($row) ?>
                         <div class="small text-body-secondary"><?= escapeHtml($state['when']) ?></div>
                         <?php if ($notice !== '' && in_array($state['key'], ['renewing', 'ending', 'active'], true) && $notice >= date('Y-m-d')) { ?>
-                            <div class="small <?= in_array($state['key'], ['renewing', 'ending'], true) ? 'text-warning-emphasis' : 'text-body-tertiary' ?>">Notice by <?= escapeHtml(date('M j, Y', strtotime($notice))) ?></div>
+                            <div class="small <?= in_array($state['key'], ['renewing', 'ending'], true) ? 'text-warning-emphasis' : 'text-body-tertiary' ?>"><?= escapeHtml(__('Notice by %s', formatDate($notice, 'date'))) ?></div>
                         <?php } ?>
                     </td>
-                    <td class="d-none d-xl-table-cell small"><?= $row['owner_name'] ? escapeHtml($row['owner_name']) : '<span class="text-body-tertiary">No one</span>' ?></td>
+                    <td class="d-none d-xl-table-cell small"><?= $row['owner_name'] ? escapeHtml($row['owner_name']) : '<span class="text-body-tertiary">' . __('No one') . '</span>' ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
+                                <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
                                 <?php if ($can_edit) { ?>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/contract/contract_edit.php?id=<?= $contract_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/contract/contract_edit.php?id=<?= $contract_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
                                     <?php if ($row['contract_status'] !== 'Draft' && $row['contract_end_date']) { ?>
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contract/contract_renew.php?id=<?= $contract_id ?>"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Renew</a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/contract/contract_renew.php?id=<?= $contract_id ?>"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i><?= __('Renew') ?></a>
                                     <?php } ?>
                                 <?php } ?>
                                 <?php if ($can_delete) { ?>
                                     <div class="dropdown-divider"></div>
                                     <?php if (isset($delete_blocked[$contract_id])) { ?>
-                                        <div class="dropdown-item-text small text-body-secondary text-wrap" style="max-width: 18rem;" data-delete-blocked><i class="fas fa-fw fa-lock me-1"></i>Can't be deleted. <?= escapeHtml($delete_blocked[$contract_id]) ?></div>
+                                        <div class="dropdown-item-text small text-body-secondary text-wrap" style="max-width: 18rem;" data-delete-blocked><i class="fas fa-fw fa-lock me-1"></i><?= escapeHtml(__('Can\'t be deleted. %s', $delete_blocked[$contract_id])) ?></div>
                                     <?php } else { ?>
                                         <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_contract=<?= $contract_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Delete <?= escapeHtml($row['contract_name']) ?>?" data-confirm-text="<?= escapeHtml(contractDeleteWarning($row)) ?>" data-confirm-button="Delete">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-title="<?= escapeHtml(__('Delete %s?', $row['contract_name'])) ?>" data-confirm-text="<?= escapeHtml(contractDeleteWarning($row)) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </a>
                                     <?php } ?>
                                 <?php } ?>
@@ -313,13 +313,13 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'contracts',
+        'thing' => __('contracts'),
         'icon' => 'fa-file-contract',
         'filtered' => (bool) $q || $type_filter !== '',
         'views' => ['show'],
         'view' => emptyStatePill($views, $view, 'active', ['soon']),
-        'text' => 'The agreement with each client - what it covers, its SLAs and rates, and when it renews.',
-        'actions' => $can_edit ? [['label' => 'New Contract', 'modal' => $add_url, 'size' => 'lg']] : [],
+        'text' => __('The agreement with each client - what it covers, its SLAs and rates, and when it renews.'),
+        'actions' => $can_edit ? [['label' => __('New Contract'), 'modal' => $add_url, 'size' => 'lg']] : [],
     ];
     require_once "../includes/filter_footer.php";
     ?>

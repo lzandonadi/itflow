@@ -21,11 +21,11 @@ require_once "includes/inc_all_admin.php";
 $locations = customLinkLocations();
 
 // The tabs: every menu, each menu, and the archived ones
-$views = ['' => ['label' => 'All menus', 'icon' => 'fa-th-list', 'where' => 'custom_link_archived_at IS NULL', 'title' => 'Every link that shows in a menu']];
+$views = ['' => ['label' => __('All menus'), 'icon' => 'fa-th-list', 'where' => 'custom_link_archived_at IS NULL', 'title' => __('Every link that shows in a menu')]];
 foreach ($locations as $location => $location_config) {
     $views[(string) $location] = ['label' => $location_config['label'], 'icon' => $location_config['icon'], 'where' => "custom_link_archived_at IS NULL AND custom_link_location = $location", 'title' => $location_config['about']];
 }
-$views['archived'] = ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'custom_link_archived_at IS NOT NULL', 'title' => 'Kept, but not shown in any menu'];
+$views['archived'] = ['label' => __('Archived'), 'icon' => 'fa-archive', 'where' => 'custom_link_archived_at IS NOT NULL', 'title' => __('Kept, but not shown in any menu')];
 $show = (string) ($_GET['show'] ?? '');
 $show = isset($views[$show]) ? $show : '';
 $show_location = $show !== '' && $show !== 'archived' ? intval($show) : 0;
@@ -75,10 +75,10 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-external-link-alt me-2"></i>Custom Links</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-external-link-alt me-2"></i><?= __('Custom Links') ?></h3>
         <div class="card-tools">
             <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= escapeHtml($add_url) ?>">
-                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Link</span>
+                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Link') ?></span>
             </button>
         </div>
     </div>
@@ -88,8 +88,8 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search links..." title="Name, address or description">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search links...')) ?>" title="<?= escapeHtml(__('Name, address or description')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -104,12 +104,12 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden">Order</span></th><?php } ?>
-                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('custom_link_name', 'Link') ?></th>
+                <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden"><?= __('Order') ?></span></th><?php } ?>
+                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('custom_link_name', __('Link')) ?></th>
                 <?php if (!$show_location) { ?>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('custom_link_location', 'Shows in') ?></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('custom_link_location', __('Shows in')) ?></th>
                 <?php } ?>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('custom_link_uri', 'Goes to') ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('custom_link_uri', __('Goes to')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -123,30 +123,30 @@ $csrf = $_SESSION['csrf_token'];
                 $description = trim((string) $row['custom_link_description']);
                 $edit_url = "modals/custom_link/custom_link_edit.php?id=$custom_link_id";
                 $location = intval($row['custom_link_location']);
-                $location_config = $locations[$location] ?? ['label' => "Menu $location", 'icon' => 'fa-question-circle', 'about' => 'Not a menu ITFlow has - it shows nowhere'];
+                $location_config = $locations[$location] ?? ['label' => "Menu $location", 'icon' => 'fa-question-circle', 'about' => __('Not a menu ITFlow has - it shows nowhere')];
                 $new_tab = intval($row['custom_link_new_tab']) === 1;
                 $problem = customLinkUriProblem($row['custom_link_uri']);
                 $where_html = '<span class="badge rounded-pill text-bg-light border fw-normal" title="' . escapeHtml($location_config['about']) . '"><i class="fas fa-fw ' . $location_config['icon'] . ' text-secondary me-1"></i>' . escapeHtml($location_config['label']) . '</span>';
                 $goes_html = '<span class="font-monospace small text-break">' . escapeHtml(customLinkUriDisplay($row['custom_link_uri'])) . '</span>'
-                    . ($new_tab ? ' <i class="fas fa-fw fa-external-link-alt small text-body-secondary" title="Opens in a new tab"></i>' : '');
+                    . ($new_tab ? ' <i class="fas fa-fw fa-external-link-alt small text-body-secondary" title="' . escapeHtml(__('Opens in a new tab')) . '"></i>' : '');
                 ?>
                 <tr data-custom-link-id="<?= $custom_link_id ?>">
                     <?php if ($can_reorder) { ?>
-                        <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="Drag to move" data-custom-link-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
+                        <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="<?= escapeHtml(__('Drag to move')) ?>" data-custom-link-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
                     <?php } ?>
                     <td class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>">
                         <div class="d-flex align-items-center gap-3">
                             <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true"><i class="fas fa-fw fa-<?= escapeHtml(customLinkIcon($row['custom_link_icon'])) ?>"></i></span>
                             <div class="min-w-0">
-                                <a class="ajax-modal fw-semibold text-body" href="#" data-modal-url="<?= $edit_url ?>" title="Edit <?= $name ?>"><?= $name ?></a>
+                                <a class="ajax-modal fw-semibold text-body" href="#" data-modal-url="<?= $edit_url ?>" title="<?= __('Edit %s', $name) ?>"><?= $name ?></a>
                                 <?php if ($description !== '') { ?>
                                     <div class="small text-body-secondary"><?= escapeHtml($description) ?></div>
                                 <?php } ?>
                                 <?php if ($problem !== '') { ?>
-                                    <div class="small text-danger" title="<?= escapeHtml($problem) ?>"><i class="fas fa-fw fa-exclamation-triangle me-1"></i>Goes nowhere in its menu - edit its address</div>
+                                    <div class="small text-danger" title="<?= escapeHtml($problem) ?>"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Goes nowhere in its menu - edit its address') ?></div>
                                 <?php } ?>
                                 <?php if ($row['custom_link_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['custom_link_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['custom_link_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                                 <!-- On smaller screens where it shows and where it goes come along under the name -->
                                 <div class="d-lg-none mt-1 d-flex flex-wrap align-items-center gap-2">
@@ -162,44 +162,44 @@ $csrf = $_SESSION['csrf_token'];
                     <td class="d-none d-lg-table-cell text-body-secondary"><?= $goes_html ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if ($problem === '') { ?>
-                                    <a class="dropdown-item" href="<?= escapeHtml(customLinkHref($row['custom_link_uri'])) ?>" target="_blank" rel="noopener noreferrer" title="Try it, in a new tab">
-                                        <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i>Open
+                                    <a class="dropdown-item" href="<?= escapeHtml(customLinkHref($row['custom_link_uri'])) ?>" target="_blank" rel="noopener noreferrer" title="<?= escapeHtml(__('Try it, in a new tab')) ?>">
+                                        <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i><?= __('Open') ?>
                                     </a>
                                 <?php } ?>
-                                <a class="dropdown-item" href="post.php?copy_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="The same link again - to put it in another menu too">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                <a class="dropdown-item" href="post.php?copy_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('The same link again - to put it in another menu too')) ?>">
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                 </a>
                                 <?php if ($can_reorder) { ?>
                                     <?php if ($position > 0) { ?>
                                         <a class="dropdown-item" href="post.php?move_custom_link=<?= $custom_link_id ?>&direction=up&csrf_token=<?= $csrf ?>">
-                                            <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i>Move up
+                                            <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i><?= __('Move up') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($position < $num_rows[0] - 1) { ?>
                                         <a class="dropdown-item" href="post.php?move_custom_link=<?= $custom_link_id ?>&direction=down&csrf_token=<?= $csrf ?>">
-                                            <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i>Move down
+                                            <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i><?= __('Move down') ?>
                                         </a>
                                     <?php } ?>
                                 <?php } ?>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['custom_link_archived_at']) { ?>
-                                    <a class="dropdown-item" href="post.php?restore_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="Back at the end of the <?= escapeHtml($location_config['label']) ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                    <a class="dropdown-item" href="post.php?restore_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="<?= __('Back at the end of the %s', escapeHtml($location_config['label'])) ?>">
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="Kept, but no longer shown">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <a class="dropdown-item text-danger" href="post.php?archive_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Kept, but no longer shown')) ?>">
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_custom_link=<?= $custom_link_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="It goes from the <?= escapeHtml($location_config['label']) ?> for good. Archive it instead to keep it." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= __('It goes from the %s for good. Archive it instead to keep it.', escapeHtml($location_config['label'])) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -210,26 +210,26 @@ $csrf = $_SESSION['csrf_token'];
         </table>
     </div>
     <?php if ($can_reorder) { ?>
-        <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i>Drag them into the order the <?= escapeHtml($locations[$show_location]['label']) ?> shows them in.</div>
+        <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i><?= __('Drag them into the order the %s shows them in.', escapeHtml($locations[$show_location]['label'])) ?></div>
     <?php } elseif ($show_location && $q !== '') { ?>
-        <div class="small text-body-secondary px-3 py-2 border-top">Clear the search to drag them into order.</div>
+        <div class="small text-body-secondary px-3 py-2 border-top"><?= __('Clear the search to drag them into order.') ?></div>
     <?php } elseif ($show === '' && $num_rows[0] > 1 && $sort === 'custom_link_order') { ?>
-        <div class="small text-body-secondary px-3 py-2 border-top">In the order each menu shows them - open a menu's tab to drag them into another.</div>
+        <div class="small text-body-secondary px-3 py-2 border-top"><?= __('In the order each menu shows them - open a menu\'s tab to drag them into another.') ?></div>
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'custom links',
+        'thing' => __('custom links'),
         'icon' => 'fa-external-link-alt',
         'filtered' => $q !== '',
         'archived' => $show === 'archived',
         'views' => ['show'],
         'view' => $show_location ? [
-            'title' => 'Nothing in the ' . escapeHtml($locations[$show_location]['label']) . ' yet',
+            'title' => __('Nothing in the %s yet', escapeHtml($locations[$show_location]['label'])),
             'icon' => $locations[$show_location]['icon'],
             'text' => escapeHtml($locations[$show_location]['about']) . '.',
         ] : [],
-        'text' => 'Your own links in ITFlow\'s menus - your RMM, your documentation, a page for booking time with you in the client portal.',
-        'actions' => [['label' => 'New Link', 'modal' => $add_url]],
+        'text' => __('Your own links in ITFlow\'s menus - your RMM, your documentation, a page for booking time with you in the client portal.'),
+        'actions' => [['label' => __('New Link'), 'modal' => $add_url]],
     ];
     require_once "../includes/filter_footer.php";
     ?>
@@ -256,9 +256,9 @@ $csrf = $_SESSION['csrf_token'];
                         .then(function (text) {
                             const result = JSON.parse(text);
                             if (!result.ok) {
-                                throw new Error(result.error || 'Not saved');
+                                throw new Error(result.error || __('Not saved'));
                             }
-                            itflowToast('Order saved', 'success');
+                            itflowToast(__('Order saved'), 'success');
                         })
                         .catch(function () {
                             window.location.reload();

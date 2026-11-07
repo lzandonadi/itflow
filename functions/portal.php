@@ -13,21 +13,21 @@ const PORTAL_RESET_REQUEST_GAP_MINUTES = 5;    // one Forgot password email per 
 
 /** The ticket emails a contact can ask for about their own tickets (contacts.contact_ticket_emails). */
 const PORTAL_TICKET_EMAILS = [
-    'all' => ['label' => 'Every email', 'text' => 'When a ticket is raised for you, every reply and update, when it is fixed and when it is closed'],
-    'replies' => ['label' => 'Replies and fixes only', 'text' => 'Our replies and when it is fixed - not the emails saying a ticket was raised or closed'],
+    'all' => ['label' => 'Every email', 'text' => 'When a ticket is raised for you, every reply and update, when it is fixed and when it is closed'], // i18n-ignore - shown through __()
+    'replies' => ['label' => 'Replies and fixes only', 'text' => 'Our replies and when it is fixed - not the emails saying a ticket was raised or closed'], // i18n-ignore - shown through __()
 ];
 
 /** About the company's other tickets - primary and technical contacts (contacts.contact_company_ticket_emails). */
 const PORTAL_COMPANY_TICKET_EMAILS = [
-    'none' => ['label' => 'Only the tickets I am on', 'text' => 'Nothing about tickets other people raise'],
-    'new' => ['label' => 'New tickets', 'text' => 'An email when anyone raises one - in the portal, by email or by calling us'],
-    'all' => ['label' => 'New tickets and every update', 'text' => 'As if you were copied in on all of them'],
+    'none' => ['label' => 'Only the tickets I am on', 'text' => 'Nothing about tickets other people raise'], // i18n-ignore - shown through __()
+    'new' => ['label' => 'New tickets', 'text' => 'An email when anyone raises one - in the portal, by email or by calling us'], // i18n-ignore - shown through __()
+    'all' => ['label' => 'New tickets and every update', 'text' => 'As if you were copied in on all of them'], // i18n-ignore - shown through __()
 ];
 
 /** How an announcement looks - its badge and icon. */
 const PORTAL_ANNOUNCEMENT_TONES = [
     'info' => ['label' => 'Notice', 'icon' => 'fa-info-circle'],
-    'warning' => ['label' => 'Heads up', 'icon' => 'fa-exclamation-triangle'],
+    'warning' => ['label' => 'Heads up', 'icon' => 'fa-exclamation-triangle'], // i18n-ignore - shown through __()
     'danger' => ['label' => 'Urgent', 'icon' => 'fa-exclamation-circle'],
 ];
 
@@ -107,21 +107,21 @@ function portalContactLastSignIn($user_id) {
  */
 function portalContactAccess(array $row) {
     if (empty($row['user_id'])) {
-        return ['key' => 'none', 'label' => 'No portal access', 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'none', 'label' => __('No portal access'), 'icon' => 'fa-minus-circle', 'class' => 'itflow-portal-state-closed'];
     }
     $method = (string) ($row['user_auth_method'] ?? '');
     if (!in_array($method, ['local', 'azure'], true) || intval($row['user_status'] ?? 0) !== 1 || !empty($row['user_archived_at'])) {
-        return ['key' => 'off', 'label' => 'Portal access off', 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
+        return ['key' => 'off', 'label' => __('Portal access off'), 'icon' => 'fa-ban', 'class' => 'itflow-portal-state-closed'];
     }
-    return ['key' => $method, 'label' => $method === 'azure' ? 'Signs in with Microsoft' : 'Signs in with a password', 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
+    return ['key' => $method, 'label' => $method === 'azure' ? __('Signs in with Microsoft') : __('Signs in with a password'), 'icon' => 'fa-check', 'class' => 'itflow-portal-state-resolved'];
 }
 
 /** The ways a portal user can sign in here - a password, and Microsoft when it is set up. method => label. */
 function portalSignInMethods() {
     global $config_azure_client_id;
-    $methods = ['local' => 'With a password'];
+    $methods = ['local' => 'With a password']; // i18n-ignore - shown through __()
     if (!empty($config_azure_client_id)) {
-        $methods['azure'] = 'With their Microsoft 365 account';
+        $methods['azure'] = 'With their Microsoft 365 account'; // i18n-ignore - shown through __()
     }
     return $methods;
 }
@@ -158,11 +158,11 @@ function portalMfaQrSvg($secret, $email) {
     }
     require_once dirname(__DIR__) . '/libs/barcode/barcode.php';
     $company = mysqli_fetch_row(mysqli_query($mysqli, "SELECT company_name FROM companies WHERE company_id = 1"));
-    $issuer = trim((string) ($company[0] ?? '')) ?: 'Client portal';
+    $issuer = trim((string) ($company[0] ?? '')) ?: 'Client portal'; // i18n-ignore - shown through __()
     $uri = 'otpauth://totp/' . rawurlencode($issuer) . ':' . rawurlencode((string) $email) . '?secret=' . rawurlencode((string) $secret) . '&issuer=' . rawurlencode($issuer);
     $svg = (new barcode_generator())->render_svg('qr', $uri, ['w' => 200, 'h' => 200, 'p' => 0]);
     $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', (string) $svg);
-    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="QR code for your authenticator app" ', $svg, 1);
+    return preg_replace('/<svg /', '<svg class="itflow-mfa-qr" role="img" aria-label="' . escapeHtml(__('QR code for your authenticator app')) . '" ', $svg, 1);
 }
 
 /*
@@ -184,8 +184,8 @@ function portalAccountEmail($email, $name, $subject, $intro, $button = null) {
         return false;
     }
     return (bool) emailQueue([['email' => (string) $email, 'name' => (string) $name, 'greet' => trim((string) $name) !== '' ? (string) $name : null,
-        'footnote' => 'You received this because of a change to your client portal account. If it was not you, reply to this email straight away.']], (string) $subject, array_filter([
-        'kind' => 'Client portal', 'tone' => 'primary', 'title' => (string) $subject, 'preview' => (string) ((array) $intro)[0],
+        'footnote' => __('You received this because of a change to your client portal account. If it was not you, reply to this email straight away.')]], (string) $subject, array_filter([
+        'kind' => __('Client portal'), 'tone' => 'primary', 'title' => (string) $subject, 'preview' => (string) ((array) $intro)[0],
         'intro' => (array) $intro,
         'button' => $button,
     ]));
@@ -199,11 +199,11 @@ function portalAccountEmail($email, $name, $subject, $intro, $button = null) {
 function portalMailAccountChange($email, $name, $change) {
     $company = (string) (billingCompany()['company_name'] ?? '');
     $changes = [
-        'password' => ["Your $company client portal password was changed", ["The password for your $company client portal account was just changed from Your account.", 'If that was you, there is nothing more to do.']],
-        'password_link' => ["Your $company client portal password was changed", ["The password for your $company client portal account ($email) was just set from an emailed link.", 'If that was you, there is nothing more to do.']],
-        'mfa_on' => ['Two-step sign-in is on for your client portal account', ["Signing in to the $company client portal now asks for a code from your authenticator app, as well as your password.", 'Lost your phone? Ask us and we will reset it.']],
-        'mfa_off' => ['Two-step sign-in is off for your client portal account', ["Signing in to the $company client portal now asks for your password alone.", 'You can turn two-step sign-in back on from Your account.']],
-        'mfa_off_by_us' => ['Two-step sign-in was turned off for your client portal account', ['We turned off two-step sign-in for your client portal account, so it asks only for your password now.', 'You can turn it back on from Your account in the portal.']],
+        'password' => [__('Your %s client portal password was changed', $company), [__('The password for your %s client portal account was just changed from Your account.', $company), __('If that was you, there is nothing more to do.')]],
+        'password_link' => [__('Your %s client portal password was changed', $company), [__('The password for your %1$s client portal account (%2$s) was just set from an emailed link.', $company, $email), __('If that was you, there is nothing more to do.')]],
+        'mfa_on' => [__('Two-step sign-in is on for your client portal account'), [__('Signing in to the %s client portal now asks for a code from your authenticator app, as well as your password.', $company), __('Lost your phone? Ask us and we will reset it.')]],
+        'mfa_off' => [__('Two-step sign-in is off for your client portal account'), [__('Signing in to the %s client portal now asks for your password alone.', $company), __('You can turn two-step sign-in back on from Your account.')]],
+        'mfa_off_by_us' => [__('Two-step sign-in was turned off for your client portal account'), [__('We turned off two-step sign-in for your client portal account, so it asks only for your password now.'), __('You can turn it back on from Your account in the portal.')]],
     ];
     if (!isset($changes[$change])) {
         return false;
@@ -231,21 +231,23 @@ function portalMailInvite($user_id, $by = '') {
     $by = trim((string) $by);
     $who = $by !== '' ? $by : $company_name;
     if ($row['user_auth_method'] === 'local') {
-        $button = ['label' => 'Set your password', 'url' => portalPasswordLink($user_id, PORTAL_INVITE_LINK_DAYS * 1440)];
-        $how = 'Set a password with the button below, then sign in with this email address.';
-        $after = 'The link works once, for ' . PORTAL_INVITE_LINK_DAYS . ' days. After that, choose Forgot password on the sign-in page.';
+        $button = ['label' => __('Set your password'), 'url' => portalPasswordLink($user_id, PORTAL_INVITE_LINK_DAYS * 1440)];
+        $how = __('Set a password with the button below, then sign in with this email address.');
+        $after = _n('The link works once, for %d day. After that, choose Forgot password on the sign-in page.', 'The link works once, for %d days. After that, choose Forgot password on the sign-in page.', PORTAL_INVITE_LINK_DAYS);
     } else {
         portalPasswordLinkClear($user_id);
-        $button = ['label' => 'Sign in', 'url' => "https://$config_base_url/login.php"];
-        $how = 'Sign in with your Microsoft 365 account - choose Login with Microsoft on the sign-in page.';
-        $after = 'Questions? Reply to this email.';
+        $button = ['label' => __('Sign in'), 'url' => "https://$config_base_url/login.php"];
+        $how = __('Sign in with your Microsoft 365 account - choose Login with Microsoft on the sign-in page.');
+        $after = __('Questions? Reply to this email.');
     }
     return (bool) emailQueue([['email' => $row['user_email'], 'name' => $row['contact_name'],
-        'footnote' => "You received this because $who added you to the $company_name client portal."]], "Your $company_name client portal", [
-        'kind' => 'Client portal', 'tone' => 'primary', 'preview' => "Your access to the $company_name client portal",
-        'title' => "Your $company_name client portal",
-        'intro' => [($by !== '' ? "$by has" : 'We have') . " given you access to the $company_name client portal for " . $row['client_name'] . ' - where you can raise and follow support tickets.', $how],
-        'summary' => ['Sign in as' => (string) $row['user_email']],
+        'footnote' => __('You received this because %1$s added you to the %2$s client portal.', $who, $company_name)]], __('Your %s client portal', $company_name), [
+        'kind' => __('Client portal'), 'tone' => 'primary', 'preview' => __('Your access to the %s client portal', $company_name),
+        'title' => __('Your %s client portal', $company_name),
+        'intro' => [$by !== ''
+            ? __('%1$s has given you access to the %2$s client portal for %3$s - where you can raise and follow support tickets.', $by, $company_name, $row['client_name'])
+            : __('We have given you access to the %1$s client portal for %2$s - where you can raise and follow support tickets.', $company_name, $row['client_name']), $how],
+        'summary' => [__('Sign in as') => (string) $row['user_email']],
         'button' => $button,
         'after' => [$after],
     ]);
@@ -262,13 +264,13 @@ function portalMailPasswordReset($user_id) {
     }
     $company_name = (string) (billingCompany()['company_name'] ?? '');
     return (bool) emailQueue([['email' => $row['user_email'], 'name' => $row['contact_name'],
-        'footnote' => 'You received this because someone asked to reset the password for this client portal account.']], "Reset your $company_name client portal password", [
-        'kind' => 'Client portal', 'tone' => 'primary', 'preview' => 'A link to choose a new password',
-        'title' => "Reset your $company_name client portal password",
-        'intro' => ["Someone - probably you - asked to reset the password for your $company_name client portal account.", 'Choose a new one with the button below.'],
-        'summary' => ['Account' => (string) $row['user_email']],
-        'button' => ['label' => 'Set a new password', 'url' => portalPasswordLink($user_id, PORTAL_RESET_LINK_MINUTES)],
-        'after' => ['The link works once, for the next ' . PORTAL_RESET_LINK_MINUTES . ' minutes. If you did not ask for it, ignore this email - your password stays as it is.'],
+        'footnote' => __('You received this because someone asked to reset the password for this client portal account.')]], __('Reset your %s client portal password', $company_name), [
+        'kind' => __('Client portal'), 'tone' => 'primary', 'preview' => __('A link to choose a new password'),
+        'title' => __('Reset your %s client portal password', $company_name),
+        'intro' => [__('Someone - probably you - asked to reset the password for your %s client portal account.', $company_name), __('Choose a new one with the button below.')],
+        'summary' => [__('Account') => (string) $row['user_email']],
+        'button' => ['label' => __('Set a new password'), 'url' => portalPasswordLink($user_id, PORTAL_RESET_LINK_MINUTES)],
+        'after' => [_n('The link works once, for the next %d minute. If you did not ask for it, ignore this email - your password stays as it is.', 'The link works once, for the next %d minutes. If you did not ask for it, ignore this email - your password stays as it is.', PORTAL_RESET_LINK_MINUTES)],
     ]);
 }
 
@@ -400,4 +402,42 @@ function portalViewAsAccess($agent_user_id, $contact_id) {
         'agent_session_stamp' => userSessionStamp($agent['user_password'] ?? ''), // client/includes/check_login.php
         'billing' => $level('module_sales') >= 1 && $level('module_financial') >= 1,
     ];
+}
+
+/** Has the 3.5.7 update run? Until it has, the footer text setting is neither read nor offered. */
+function portalFooterTextReady() {
+    global $mysqli;
+    static $ready = null;
+    if ($ready === null) {
+        if (defined('CURRENT_DATABASE_VERSION')) {
+            $version = CURRENT_DATABASE_VERSION;
+        } else {
+            $result = mysqli_query($mysqli, "SELECT config_current_database_version FROM settings WHERE company_id = 1");
+            $version = $result && ($row = mysqli_fetch_row($result)) ? (string) $row[0] : '0';
+        }
+        $ready = version_compare($version, '3.5.7', '>=');
+    }
+    return $ready;
+}
+
+/**
+ * The text the portal's footer shows next to the company name - the company's own
+ * wording, shown as typed and never translated. '' when none is set (the footer then
+ * shows Powered by ITFlow, unless white-label is on) or before the 3.5.7 update.
+ * Read here rather than in load_global_settings.php, so pages keep working while the
+ * code is ahead of the database.
+ */
+function portalFooterText() {
+    global $mysqli;
+    static $text = null;
+    if ($text === null) {
+        $text = '';
+        if (portalFooterTextReady()) {
+            $result = mysqli_query($mysqli, "SELECT config_client_portal_footer_text FROM settings WHERE company_id = 1");
+            if ($result && ($row = mysqli_fetch_row($result))) {
+                $text = trim((string) $row[0]);
+            }
+        }
+    }
+    return $text;
 }

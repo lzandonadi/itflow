@@ -18,7 +18,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function softwareTemplateForRequest($software_template_id) {
     $row = softwareTemplateRow($software_template_id);
     if (!$row) {
-        flashAlert('That license template no longer exists.', 'error');
+        flashAlert(__('That license template no longer exists.'), 'error');
         redirect('software_templates.php');
     }
     return $row;
@@ -40,7 +40,7 @@ if (isset($_POST['add_software_template']) || isset($_POST['edit_software_templa
 
     logAudit("Software Template", $editing ? "Edit" : "Create", "$session_name " . ($editing ? 'edited' : 'created') . " license template " . escapeSql($fields['name']), 0, $software_template_id);
 
-    flashAlert("License template <strong>" . escapeHtml($fields['name']) . "</strong> " . ($editing ? 'saved' : 'created'));
+    flashAlert(($editing ? __('License template <strong>%s</strong> saved', escapeHtml($fields['name'])) : __('License template <strong>%s</strong> created', escapeHtml($fields['name']))));
 
     // A new one opens on its page
     redirect($editing ? null : "software_template.php?software_template_id=$software_template_id");
@@ -55,12 +55,12 @@ if (isset($_POST['make_licenses_from_template'])) {
     $row = softwareTemplateForRequest($_POST['software_template_id'] ?? 0);
     $software_template_id = intval($row['software_template_id']);
     if ($row['software_template_archived_at']) {
-        flashAlert('That template is archived - restore it to make licenses from it.', 'error');
+        flashAlert(__('That template is archived - restore it to make licenses from it.'), 'error');
         redirect();
     }
     $client_ids = array_values(array_filter(array_map('intval', (array) ($_POST['client_ids'] ?? []))));
     if (!$client_ids) {
-        flashAlert('Pick the clients to make one for.', 'error');
+        flashAlert(__('Pick the clients to make one for.'), 'error');
         redirect();
     }
 
@@ -83,9 +83,9 @@ if (isset($_POST['make_licenses_from_template'])) {
     $made = count($result['made']);
     $skipped = count($result['skipped']);
     $vendors = count($result['vendors']);
-    flashAlert(($made ? "Made $made license" . ($made === 1 ? '' : 's') : 'Made no licenses') . " from <strong>" . escapeHtml($row['software_template_name']) . "</strong>"
-        . ($vendors ? ", adding vendor <strong>" . escapeHtml((string) $row['vendor_template_name']) . "</strong> for $vendors client" . ($vendors === 1 ? '' : 's') : '')
-        . ($skipped ? " - skipped " . ($skipped === 1 ? escapeHtml(reset($result['skipped'])) . ", which already has one" : "$skipped clients that already have one") : ''), $made ? 'success' : 'warning');
+    flashAlert(($made ? _n('Made %1$d license from <strong>%2$s</strong>', 'Made %1$d licenses from <strong>%2$s</strong>', $made, $made, escapeHtml($row['software_template_name'])) : __('Made no licenses from <strong>%s</strong>', escapeHtml($row['software_template_name'])))
+        . ($vendors ? _n(', adding vendor <strong>%1$s</strong> for %2$d client', ', adding vendor <strong>%1$s</strong> for %2$d clients', $vendors, escapeHtml((string) $row['vendor_template_name']), $vendors) : '')
+        . ($skipped ? ($skipped === 1 ? __(' - skipped %s, which already has one', escapeHtml(reset($result['skipped']))) : __(' - skipped %d clients that already have one', $skipped)) : ''), $made ? 'success' : 'warning');
 
     redirect("software_template.php?software_template_id=$software_template_id");
 
@@ -101,18 +101,22 @@ if (isset($_POST['save_software_template_required'])) {
     $required = intval($_POST['required'] ?? 0);
     $tag_ids = array_map('intval', (array) ($_POST['tags'] ?? []));
     if ($required === SOFTWARE_TEMPLATE_REQUIRED_TAGGED && !array_filter($tag_ids)) {
-        flashAlert('Pick the client tags - or Every client.', 'error');
+        flashAlert(__('Pick the client tags - or Every client.'), 'error');
         redirect();
     }
     softwareTemplateSetRequired($software_template_id, $required, $tag_ids);
 
     $saved = softwareTemplateRow($software_template_id);
-    $scope = softwareTemplateScopeText($saved['software_template_required'], softwareTemplateRequiredTags([$software_template_id])[$software_template_id]);
-    $said = $scope !== '' ? "required of " . lcfirst($scope) : 'not required of anyone';
+    $required_tags = softwareTemplateRequiredTags([$software_template_id])[$software_template_id];
+    $said_in = function () use ($saved, $required_tags) {
+        $scope = softwareTemplateScopeText($saved['software_template_required'], $required_tags);
+        return $scope !== '' ? __('required of %s', lcfirst($scope)) : __('not required of anyone');
+    };
+    $said = i18nEnglish($said_in);
 
     logAudit("Software Template", "Edit", "$session_name set license template " . escapeSql($row['software_template_name']) . " " . escapeSql($said), 0, $software_template_id);
 
-    flashAlert("<strong>" . escapeHtml($row['software_template_name']) . "</strong> is " . escapeHtml($said));
+    flashAlert(__('<strong>%1$s</strong> is %2$s', escapeHtml($row['software_template_name']), escapeHtml($said_in())));
 
     redirect();
 
@@ -130,21 +134,21 @@ if (isset($_POST['true_up_software_template'])) {
         $seats[$software_id] = $_POST['seats'][$software_id] ?? '';
     }
     if (!$seats) {
-        flashAlert('Tick the licenses to true up.', 'error');
+        flashAlert(__('Tick the licenses to true up.'), 'error');
         redirect();
     }
 
     $changes = softwareTemplateTrueUp($software_template_id, $seats);
     foreach ($changes as $software_id => $change) {
-        logAudit("Software", "Edit", "$session_name trued up license " . escapeSql($change['name']) . " from " . softwareTemplateSeatsText($change['from']) . " to " . softwareTemplateSeatsText($change['to']), $change['client_id'], $software_id);
+        logAudit("Software", "Edit", "$session_name trued up license " . escapeSql($change['name']) . " from " . i18nEnglish(fn () => softwareTemplateSeatsText($change['from'])) . " to " . i18nEnglish(fn () => softwareTemplateSeatsText($change['to'])), $change['client_id'], $software_id);
     }
 
     $count = count($changes);
     if ($count === 1) {
         $change = reset($changes);
-        flashAlert("<strong>" . escapeHtml($change['client_name']) . "</strong> trued up from " . softwareTemplateSeatsText($change['from']) . " to " . softwareTemplateSeatsText($change['to']));
+        flashAlert(__('<strong>%1$s</strong> trued up from %2$s to %3$s', escapeHtml($change['client_name']), softwareTemplateSeatsText($change['from']), softwareTemplateSeatsText($change['to'])));
     } else {
-        flashAlert($count ? "Trued up <strong>$count</strong> licenses from <strong>" . escapeHtml($row['software_template_name']) . "</strong>" : 'Nothing to change - they have those seats already', $count ? 'success' : 'warning');
+        flashAlert($count ? __('Trued up <strong>%1$d</strong> licenses from <strong>%2$s</strong>', $count, escapeHtml($row['software_template_name'])) : __('Nothing to change - they have those seats already'), $count ? 'success' : 'warning');
     }
 
     redirect();
@@ -160,7 +164,7 @@ if (isset($_POST['bill_software_template'])) {
     $software_template_id = intval($row['software_template_id']);
     $software_ids = array_values(array_unique(array_filter(array_map('intval', (array) ($_POST['software_ids'] ?? [])))));
     if (!$software_ids) {
-        flashAlert('Tick the licenses to bill.', 'error');
+        flashAlert(__('Tick the licenses to bill.'), 'error');
         redirect();
     }
     $count = ($_POST['count'] ?? '') === 'used' ? 'used' : 'total';
@@ -192,8 +196,8 @@ if (isset($_POST['bill_software_template'])) {
         flashAlert(escapeHtml(implode(' ', array_keys($errors))), 'error');
         redirect();
     }
-    flashAlert("Billed <strong>$added</strong> license" . ($added === 1 ? '' : 's') . " as <strong>" . escapeHtml((string) $row['product_name']) . "</strong>"
-        . ($skipped ? " - $skipped billed already" : '') . ($errors ? ' - ' . escapeHtml(implode(' ', array_keys($errors))) : ''), $errors ? 'warning' : 'success');
+    flashAlert(_n('Billed <strong>%1$d</strong> license as <strong>%2$s</strong>', 'Billed <strong>%1$d</strong> licenses as <strong>%2$s</strong>', $added, $added, escapeHtml((string) $row['product_name']))
+        . ($skipped ? __(' - %d billed already', $skipped) : '') . ($errors ? ' - ' . escapeHtml(implode(' ', array_keys($errors))) : ''), $errors ? 'warning' : 'success');
 
     redirect();
 
@@ -209,7 +213,7 @@ if (isset($_GET['copy_software_template'])) {
 
     logAudit("Software Template", "Create", "$session_name copied license template " . escapeSql($row['software_template_name']) . " as " . escapeSql($new_name), 0, $new_id);
 
-    flashAlert("License template <strong>" . escapeHtml($row['software_template_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>");
+    flashAlert(__('License template <strong>%1$s</strong> copied as <strong>%2$s</strong>', escapeHtml($row['software_template_name']), escapeHtml($new_name)));
 
     redirect("software_template.php?software_template_id=$new_id");
 
@@ -229,7 +233,7 @@ if (isset($_GET['archive_software_template']) || isset($_GET['restore_software_t
 
     logAudit("Software Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " license template " . escapeSql($row['software_template_name']), 0, $software_template_id);
 
-    flashAlert("License template <strong>" . escapeHtml($row['software_template_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('License template <strong>%s</strong> archived', escapeHtml($row['software_template_name'])) : __('License template <strong>%s</strong> restored', escapeHtml($row['software_template_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -246,7 +250,7 @@ if (isset($_GET['delete_software_template'])) {
 
     logAudit("Software Template", "Delete", "$session_name deleted license template " . escapeSql($row['software_template_name']));
 
-    flashAlert("License template <strong>" . escapeHtml($row['software_template_name']) . "</strong> deleted", 'error');
+    flashAlert(__('License template <strong>%s</strong> deleted', escapeHtml($row['software_template_name'])), 'error');
 
     // From its own page, back to the list
     redirect(!empty($_GET['from_page']) ? 'software_templates.php' : null);
@@ -265,7 +269,7 @@ if (isset($_POST['export_software_templates']) || isset($_GET['export_software_t
         $export = softwareTemplatesExport((array) ($_POST['software_template_ids'] ?? []), !empty($_POST['archived']));
     }
     if (!$export['templates']) {
-        flashAlert('There are no license templates to export.', 'error');
+        flashAlert(__('There are no license templates to export.'), 'error');
         redirect();
     }
 
@@ -287,15 +291,15 @@ if (isset($_POST['import_software_templates'])) {
 
     $file = $_FILES['file'] ?? null;
     if ($file && in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
-        flashAlert('That file is bigger than this server takes in an upload - export a few at a time.', 'error');
+        flashAlert(__('That file is bigger than this server takes in an upload - export a few at a time.'), 'error');
         redirect('software_templates.php');
     }
     if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert('Pick the file to import.', 'error');
+        flashAlert(__('Pick the file to import.'), 'error');
         redirect('software_templates.php');
     }
     if ($file['size'] > 20 * 1024 * 1024) {
-        flashAlert('That file is too big to be license templates.', 'error');
+        flashAlert(__('That file is too big to be license templates.'), 'error');
         redirect('software_templates.php');
     }
     $templates = softwareTemplatesImportRead(file_get_contents($file['tmp_name']), $import_error);

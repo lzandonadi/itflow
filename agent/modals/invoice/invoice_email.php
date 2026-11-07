@@ -24,7 +24,7 @@ $sql = mysqli_query($mysqli, "SELECT invoice_client_id, invoice_number, invoice_
     FROM invoices WHERE invoice_id = $invoice_id LIMIT 1");
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    exit(json_encode(['error' => 'That invoice no longer exists.']));
+    exit(json_encode(['error' => __('That invoice no longer exists.')]));
 }
 $invoice_prefix = escapeHtml($row['invoice_prefix']);
 $invoice_number = intval($row['invoice_number']);
@@ -74,7 +74,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i><?= $can_send_invoice ? 'Send Invoice' : 'Send Reminder' ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $doc)) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i><?= $can_send_invoice ? __('Send Invoice') : __('Send Reminder') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $doc)) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -86,9 +86,7 @@ ob_start();
         <?php if ($contact_count == 0) { ?>
 
             <p class="text-body-secondary mb-0">
-                This client has no primary or billing contact with an email address, so there is
-                nobody to send an invoice to. Flag a contact as billing, or use Mark Sent to record
-                that the invoice went out some other way.
+                <?= __('This client has no primary or billing contact with an email address, so there is nobody to send an invoice to. Flag a contact as billing, or use Mark Sent to record that the invoice went out some other way.') ?>
             </p>
 
         <?php } else { ?>
@@ -103,18 +101,18 @@ ob_start();
             } ?>
             <?php if ($can_remind && !$can_send_invoice) { ?>
                 <input type="hidden" name="kind" value="reminder">
-                <div class="small text-body-secondary mb-2"><i class="fas fa-fw fa-bell me-1"></i>A payment reminder - it is <?= escapeHtml($reminder_when) ?>.</div>
+                <div class="small text-body-secondary mb-2"><i class="fas fa-fw fa-bell me-1"></i><?= __('A payment reminder - it is %s.', escapeHtml($reminder_when)) ?></div>
             <?php } elseif ($can_remind) { ?>
-                <div class="btn-group w-100 itflow-product-type mb-3" role="group" aria-label="What to send">
+                <div class="btn-group w-100 itflow-product-type mb-3" role="group" aria-label="<?= __('What to send') ?>">
                     <input type="radio" class="btn-check" name="kind" value="invoice" id="invoiceEmailKindInvoice<?= $invoice_id ?>" autocomplete="off" <?= $kind === 'invoice' ? 'checked' : '' ?>>
                     <label class="btn btn-outline-secondary text-start d-flex align-items-center gap-2" for="invoiceEmailKindInvoice<?= $invoice_id ?>">
                         <i class="fas fa-fw fa-file-invoice-dollar fa-lg"></i>
-                        <span><span class="fw-semibold d-block">The invoice</span><span class="small opacity-75 d-none d-sm-block">Here is your invoice</span></span>
+                        <span><span class="fw-semibold d-block"><?= __('The invoice') ?></span><span class="small opacity-75 d-none d-sm-block"><?= __('Here is your invoice') ?></span></span>
                     </label>
                     <input type="radio" class="btn-check" name="kind" value="reminder" id="invoiceEmailKindReminder<?= $invoice_id ?>" autocomplete="off" <?= $kind === 'reminder' ? 'checked' : '' ?>>
                     <label class="btn btn-outline-secondary text-start d-flex align-items-center gap-2" for="invoiceEmailKindReminder<?= $invoice_id ?>">
                         <i class="fas fa-fw fa-bell fa-lg"></i>
-                        <span><span class="fw-semibold d-block">A reminder</span><span class="small opacity-75 d-none d-sm-block">It is <?= escapeHtml($reminder_when) ?></span></span>
+                        <span><span class="fw-semibold d-block"><?= __('A reminder') ?></span><span class="small opacity-75 d-none d-sm-block"><?= __('It is %s', escapeHtml($reminder_when)) ?></span></span>
                     </label>
                 </div>
             <?php } ?>
@@ -122,15 +120,15 @@ ob_start();
                 <?= billingTile('invoice') ?>
                 <div class="flex-grow-1 min-w-0">
                     <div class="fw-semibold"><?= escapeHtml(billingNumber('invoice', $doc)) ?><?= trim((string) $doc['invoice_scope']) !== '' ? ' - ' . escapeHtml($doc['invoice_scope']) : '' ?></div>
-                    <div class="small text-body-secondary">An email with a link to view<?= billingOnlinePayments() && !in_array($doc['invoice_status'], ['Paid', 'Cancelled', 'Non-Billable'], true) ? ', pay' : '' ?> and download it as a PDF.</div>
+                    <div class="small text-body-secondary"><?= billingOnlinePayments() && !in_array($doc['invoice_status'], ['Paid', 'Cancelled', 'Non-Billable'], true) ? __('An email with a link to view, pay and download it as a PDF.') : __('An email with a link to view and download it as a PDF.') ?></div>
                 </div>
                 <div class="text-end">
                     <div class="fw-semibold itflow-money"><?= escapeHtml(billingMoney($doc_state['balance'] > 0 ? $doc_state['balance'] : $doc['invoice_amount'], $doc['invoice_currency_code'])) ?></div>
-                    <div class="small text-body-secondary"><?= $doc_state['balance'] > 0 ? 'due ' . escapeHtml($doc['invoice_due']) : 'total' ?></div>
+                    <div class="small text-body-secondary"><?= $doc_state['balance'] > 0 ? __('due %s', escapeHtml(formatDate($doc['invoice_due']))) : _x('total', 'invoice amount') ?></div>
                 </div>
             </div>
 
-            <label class="form-label">Send to <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Send to') ?> <strong class="text-danger">*</strong></label>
 
             <div class="list-group mb-3">
 
@@ -169,21 +167,20 @@ ob_start();
 
             </div>
 
-            <label class="form-label">Message <span class="text-body-secondary fw-normal small">in the email, above the invoice</span></label>
+            <label class="form-label"><?= __('Message') ?> <span class="text-body-secondary fw-normal small"><?= __('in the email, above the invoice') ?></span></label>
             <div class="input-group mb-3">
                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-comment"></i></span>
-                <textarea class="form-control" name="note" rows="3" maxlength="2000" placeholder="Optional - a word of your own: what it covers, a thank you, how to pay"></textarea>
+                <textarea class="form-control" name="note" rows="3" maxlength="2000" placeholder="<?= __('Optional - a word of your own: what it covers, a thank you, how to pay') ?>"></textarea>
             </div>
 
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" role="switch" name="attach_pdf" value="1" id="invoiceEmailPdf<?= $invoice_id ?>" <?= billingReminderRules()['attach_pdf'] ? 'checked' : '' ?>>
-                <label class="form-check-label" for="invoiceEmailPdf<?= $invoice_id ?>">Attach the PDF</label>
+                <label class="form-check-label" for="invoiceEmailPdf<?= $invoice_id ?>"><?= __('Attach the PDF') ?></label>
             </div>
 
             <?php if ($invoice_status !== 'Draft') { ?>
                 <p class="text-body-secondary small mb-0">
-                    <i class="fa fa-fw fa-info-circle me-1"></i>This invoice is
-                    <strong><?= $invoice_status ?></strong>, so sending it will not change its status.
+                    <i class="fa fa-fw fa-info-circle me-1"></i><?= __('This invoice is %s, so sending it will not change its status.', '<strong>' . escapeHtml(invoiceStatusLabel($doc['invoice_status'])) . '</strong>') ?>
                 </p>
             <?php } ?>
 
@@ -193,11 +190,11 @@ ob_start();
     <div class="modal-footer">
         <?php if ($contact_count > 0) { ?>
             <button type="submit" name="email_invoice" class="btn btn-primary text-bold">
-                <i class="fa fa-fw fa-paper-plane me-2"></i>Send
+                <i class="fa fa-fw fa-paper-plane me-2"></i><?= __('Send') ?>
             </button>
         <?php } ?>
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-            <i class="fa fa-fw fa-times me-2"></i>Cancel
+            <i class="fa fa-fw fa-times me-2"></i><?= __('Cancel') ?>
         </button>
     </div>
 </form>

@@ -19,7 +19,7 @@ function credentialForRequest($credential_id, $level) {
     enforceUserPermission('module_credential', $level);
     $row = credentialRow($credential_id);
     if (!$row) {
-        flashAlert('That credential no longer exists.', 'error');
+        flashAlert(__('That credential no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['credential_client_id']);
@@ -55,7 +55,7 @@ if (isset($_POST['add_credential'])) {
     enforceClientAccess();
 
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('Pick the client this credential is for.', 'error');
+        flashAlert(__('Pick the client this credential is for.'), 'error');
         redirect();
     }
 
@@ -79,7 +79,7 @@ if (isset($_POST['add_credential'])) {
     $name = trim($_POST['name']);
     logAudit("Credential", "Create", "$session_name created credential " . escapeSql($name), $client_id, $credential_id);
 
-    flashAlert("Credential <strong>$name</strong> created");
+    flashAlert(__('Credential <strong>%s</strong> created', $name));
 
     redirect();
 
@@ -111,7 +111,7 @@ if (isset($_POST['edit_credential'])) {
     $name = trim($_POST['name']);
     logAudit("Credential", "Edit", "$session_name edited credential " . escapeSql($name) . ($password_changed ? ' and changed its password' : ''), $client_id, $credential_id);
 
-    flashAlert("Credential <strong>$name</strong> updated");
+    flashAlert(__('Credential <strong>%s</strong> updated', $name));
 
     redirect();
 
@@ -127,16 +127,16 @@ if (isset($_POST['rotate_credential'])) {
 
     $password = trim((string) ($_POST['password'] ?? ''));
     if ($password === '') {
-        flashAlert('Type or make up the new password.', 'error');
+        flashAlert(__('Type or make up the new password.'), 'error');
         redirect();
     }
     if (checkCredentialLengths(['password' => $password])) {
-        flashAlert('That password is too long to store.', 'error');
+        flashAlert(__('That password is too long to store.'), 'error');
         redirect();
     }
     $encrypted = encryptCredentialEntry($password);
     if ($encrypted === false) {
-        flashAlert('Your vault session has expired, so the password could not be encrypted - sign out and back in, then try again.', 'error');
+        flashAlert(__('Your vault session has expired, so the password could not be encrypted - sign out and back in, then try again.'), 'error');
         redirect();
     }
 
@@ -144,7 +144,7 @@ if (isset($_POST['rotate_credential'])) {
 
     logAudit("Credential", "Rotate", "$session_name changed the password on credential " . escapeSql($row['credential_name']), $client_id, $credential_id);
 
-    flashAlert("Password changed on <strong>{$row['credential_name']}</strong>");
+    flashAlert(__('Password changed on <strong>%s</strong>', $row['credential_name']));
 
     redirect();
 
@@ -177,7 +177,7 @@ if (isset($_GET['archive_credential'])) {
 
     logAudit("Credential", "Archive", "$session_name archived credential " . escapeSql($row['credential_name']), $client_id, $credential_id);
 
-    flashAlert("Credential <strong>{$row['credential_name']}</strong> archived", 'error');
+    flashAlert(__('Credential <strong>%s</strong> archived', $row['credential_name']), 'error');
 
     redirect();
 
@@ -194,7 +194,7 @@ if (isset($_GET['restore_credential'])) {
 
     logAudit("Credential", "Restore", "$session_name restored credential " . escapeSql($row['credential_name']), $client_id, $credential_id);
 
-    flashAlert("Credential <strong>{$row['credential_name']}</strong> restored");
+    flashAlert(__('Credential <strong>%s</strong> restored', $row['credential_name']));
 
     redirect();
 
@@ -210,7 +210,7 @@ if (isset($_GET['delete_credential'])) {
 
     logAudit("Credential", "Delete", "$session_name deleted credential " . escapeSql($row['credential_name']), $client_id);
 
-    flashAlert("Credential <strong>{$row['credential_name']}</strong> deleted", 'error');
+    flashAlert(__('Credential <strong>%s</strong> deleted', $row['credential_name']), 'error');
 
     redirect();
 
@@ -228,7 +228,7 @@ if (isset($_POST['bulk_favorite_credentials']) || isset($_POST['bulk_unfavorite_
         $count++;
     }
 
-    flashAlert(($favorite ? 'Starred' : 'Unstarred') . " <strong>$count</strong> credential" . ($count === 1 ? '' : 's'));
+    flashAlert($favorite ? _n('Starred %s credential', 'Starred %s credentials', $count, "<strong>$count</strong>") : _n('Unstarred %s credential', 'Unstarred %s credentials', $count, "<strong>$count</strong>"));
 
     redirect();
 
@@ -245,7 +245,7 @@ if (isset($_POST['bulk_archive_credentials'])) {
         $count++;
     }
 
-    flashAlert("Archived <strong>$count</strong> credential" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Archived <strong>%d</strong> credential', 'Archived <strong>%d</strong> credentials', $count), 'error');
 
     redirect();
 
@@ -262,7 +262,7 @@ if (isset($_POST['bulk_restore_credentials'])) {
         $count++;
     }
 
-    flashAlert("Restored <strong>$count</strong> credential" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored <strong>%d</strong> credential', 'Restored <strong>%d</strong> credentials', $count));
 
     redirect();
 
@@ -279,7 +279,7 @@ if (isset($_POST['bulk_delete_credentials'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> credential" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> credential', 'Deleted <strong>%d</strong> credentials', $count), 'error');
 
     redirect();
 
@@ -300,7 +300,7 @@ if (isExportRequest('export_credentials')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -308,7 +308,7 @@ if (isExportRequest('export_credentials')) {
         $client_query = "AND credential_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
 
@@ -322,7 +322,7 @@ if (isExportRequest('export_credentials')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (credential_client_id = $filter_client_id)";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
 
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR credential_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND credential_archived_at IS NULL)";
@@ -339,13 +339,13 @@ if (isExportRequest('export_credentials')) {
         while ($tag_row = mysqli_fetch_assoc($sql_tags)) {
             $tag_names[] = $tag_row['tag_name'];
         }
-        $filter_summary['Tags'] = implode(', ', $tag_names);
+        $filter_summary[__('Tags')] = implode(', ', $tag_names);
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query(
@@ -368,13 +368,13 @@ if (isExportRequest('export_credentials')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'credentials');
+    guardExportHasRows($num_rows, __('credentials'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('credentials', $format, $file_name_prepend . 'Credentials', 'Credentials', summarizeExportFilters($filter_summary));
+        $export = beginExport('credentials', $format, $file_name_prepend . 'Credentials', __('Credentials'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $row['credential_username'] = decryptCredentialEntry($row['credential_username']);
@@ -402,17 +402,17 @@ if (isset($_POST["import_credentials_csv"])) {
     enforceClientAccess();
 
     if (empty($_FILES["file"]["tmp_name"])) {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
     $file_name = $_FILES["file"]["tmp_name"];
 
     if (strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        flashAlert("Bad file extension", 'error');
+        flashAlert(__('Bad file extension'), 'error');
         redirect();
     }
     if ($_FILES["file"]["size"] < 1) {
-        flashAlert("Bad file size (empty?)", 'error');
+        flashAlert(__('Bad file size (empty?)'), 'error');
         redirect();
     }
 
@@ -420,14 +420,14 @@ if (isset($_POST["import_credentials_csv"])) {
     $f_columns = fgetcsv($file, 1000, ",");
     if (!is_array($f_columns) || count($f_columns) != 6) {
         fclose($file);
-        flashAlert("Bad column count.", 'error');
+        flashAlert(__('Bad column count.'), 'error');
         redirect();
     }
 
     // The vault must be open, or every imported password would be saved empty
     if (encryptCredentialEntry('') === false) {
         fclose($file);
-        flashAlert('Your vault session has expired, so nothing could be encrypted - sign out and back in, then import again.', 'error');
+        flashAlert(__('Your vault session has expired, so nothing could be encrypted - sign out and back in, then import again.'), 'error');
         redirect();
     }
 
@@ -471,7 +471,7 @@ if (isset($_POST["import_credentials_csv"])) {
 
     logAudit("Credential", "Import", "$session_name imported $row_count credential(s) via CSV file. $duplicate_count duplicate(s) found and not imported, $too_long_count row(s) skipped for over-length fields", $client_id);
 
-    flashAlert("<strong>$row_count</strong> credential(s) imported, <strong>$duplicate_count</strong> duplicate(s) detected and not imported, <strong>$too_long_count</strong> row(s) skipped for over-length fields" . ($bad_otp_count ? ", <strong>$bad_otp_count</strong> 2FA secret(s) left off - they were not secrets" : ''), 'warning');
+    flashAlert(__('<strong>%1$d</strong> credential(s) imported, <strong>%2$d</strong> duplicate(s) detected and not imported, <strong>%3$d</strong> row(s) skipped for over-length fields', $row_count, $duplicate_count, $too_long_count) . ($bad_otp_count ? __(', <strong>%d</strong> 2FA secret(s) left off - they were not secrets', $bad_otp_count) : ''), 'warning');
 
     redirect();
 

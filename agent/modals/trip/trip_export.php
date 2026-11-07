@@ -34,7 +34,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Trips</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Trips') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -49,33 +49,33 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <?php if (!$see_all) { ?>
-            <div class="small text-body-secondary mb-3"><i class="fas fa-user me-1"></i>The trips you drove or logged</div>
+            <div class="small text-body-secondary mb-3"><i class="fas fa-user me-1"></i><?= __('The trips you drove or logged') ?></div>
         <?php } ?>
         <?php if ($location_name !== null) { ?>
             <input type="hidden" name="location_id" value="<?= $location_filter ?>">
-            <div class="small text-body-secondary mb-3"><i class="fas fa-map-marker-alt me-1"></i>Only the trips to <?= escapeHtml($location_name) ?></div>
+            <div class="small text-body-secondary mb-3"><i class="fas fa-map-marker-alt me-1"></i><?= escapeHtml(__('Only the trips to %s', $location_name)) ?></div>
         <?php } ?>
         <?php if ($ticket_row) { ?>
             <input type="hidden" name="ticket_id" value="<?= $ticket_filter ?>">
-            <div class="small text-body-secondary mb-3"><i class="fas fa-life-ring me-1"></i>Only the trips for <?= escapeHtml(ticketReference($ticket_row) . ' - ' . $ticket_row['ticket_subject']) ?></div>
+            <div class="small text-body-secondary mb-3"><i class="fas fa-life-ring me-1"></i><?= escapeHtml(__('Only the trips for %s', ticketReference($ticket_row) . ' - ' . $ticket_row['ticket_subject'])) ?></div>
         <?php } ?>
 
         <div class="mb-3">
-            <label class="form-label">Search</label>
+            <label class="form-label"><?= __('Search') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Purpose, from, to, client, site, driver, ticket">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Purpose, from, to, client, site, driver, ticket')) ?>">
             </div>
         </div>
 
         <div class="row g-3 mb-3">
             <?php if ($see_all) { ?>
                 <div class="col-md-6">
-                    <label class="form-label">Driver</label>
+                    <label class="form-label"><?= __('Driver') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                         <select class="form-select select2" name="driver">
-                            <option value="">- Anyone -</option>
+                            <option value=""><?= __('- Anyone -') ?></option>
                             <?php
                             $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE EXISTS (SELECT 1 FROM trips WHERE trip_user_id = user_id) ORDER BY user_name ASC");
                             while ($row = mysqli_fetch_assoc($sql)) {
@@ -88,11 +88,11 @@ ob_start();
             <?php } ?>
             <?php if (!$client_id) { ?>
                 <div class="col-md-6">
-                    <label class="form-label">Client</label>
+                    <label class="form-label"><?= __('Client') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                         <select class="form-select select2" name="client">
-                            <option value="">- Any client -</option>
+                            <option value=""><?= __('- Any client -') ?></option>
                             <?php
                             $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE EXISTS (SELECT 1 FROM trips WHERE trip_client_id = client_id) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
                             while ($row = mysqli_fetch_assoc($sql)) {
@@ -104,25 +104,25 @@ ob_start();
                 </div>
             <?php } ?>
             <div class="col-md-6">
-                <label class="form-label">Showing</label>
+                <label class="form-label"><?= __('Showing') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-filter"></i></span>
                     <select class="form-select select2" name="show">
                         <?php foreach ($shows as $key => $s) { ?>
-                            <option <?= $show_filter === $key ? 'selected' : '' ?> value="<?= escapeHtml($key) ?>"><?= escapeHtml($key === '' ? 'All trips' : $s['label']) ?></option>
+                            <option <?= $show_filter === $key ? 'selected' : '' ?> value="<?= escapeHtml($key) ?>"><?= escapeHtml($key === '' ? __('All trips') : $s['label']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated from</label>
+                <label class="form-label"><?= __('Dated from') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Dated to</label>
+                <label class="form-label"><?= __('Dated to') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                     <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

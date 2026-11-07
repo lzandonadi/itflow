@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the briefing context and prompt are for the model, in English (what agents see goes through __() here and in the modals)
 
 /*
  * ITFlow - AI client briefing
@@ -16,6 +16,11 @@
 /* The periods a briefing can look back over - days => what the window calls it. */
 function aiBriefingPeriods() {
     return [30 => 'the last 30 days', 90 => 'the last 90 days - a quarterly review', 365 => 'the last year'];
+}
+
+/* A briefing period as its button's title shows it - aiBriefingPeriods() stays English. */
+function aiBriefingPeriodTitle($days) {
+    return [30 => __('The last 30 days'), 90 => __('The last 90 days - a quarterly review'), 365 => __('The last year')][intval($days)] ?? '';
 }
 
 /*
@@ -176,7 +181,7 @@ function aiClientBriefing($client_id, $days = 90) {
     }
     $client = aiClientBriefingContext($client_id, $days);
     if (!$client) {
-        return ['ok' => false, 'error' => 'That client no longer exists.'];
+        return ['ok' => false, 'error' => __('That client no longer exists.')];
     }
     $result = callAiApi($model, [
         ['role' => 'system', 'content' => 'You brief a managed service provider\'s account manager or engineer on one of their clients, before a call, a visit or a quarterly review. Use only the facts given, and say plainly when there is little to go on.'
@@ -192,5 +197,5 @@ function aiClientBriefing($client_id, $days = 90) {
         return $result;
     }
     $html = aiCleanHtml($result['content']);
-    return $html === '' ? ['ok' => false, 'error' => 'The AI provider answered with nothing - try again.'] : ['ok' => true, 'html' => $html];
+    return $html === '' ? ['ok' => false, 'error' => __('The AI provider answered with nothing - try again.')] : ['ok' => true, 'html' => $html];
 }

@@ -37,7 +37,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-puzzle-piece me-2"></i>New document from a template</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-puzzle-piece me-2"></i><?= __('New document from a template') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-doc-template-make>
@@ -48,22 +48,22 @@ ob_start();
         <?php if (!$templates) { ?>
             <div class="itflow-asset-empty py-4">
                 <i class="fas fa-puzzle-piece fa-2x mb-2"></i>
-                <div>No document templates yet.</div>
+                <div><?= __('No document templates yet.') ?></div>
                 <?php if (!empty($session_is_admin)) { ?>
-                    <a class="small" href="/admin/document_templates.php">Add one in Admin &rsaquo; Document Templates</a>
+                    <a class="small" href="/admin/document_templates.php"><?= __('Add one in Admin &rsaquo; Document Templates') ?></a>
                 <?php } ?>
             </div>
         <?php } else { ?>
 
             <div class="mb-3">
-                <label class="form-label">Template <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Template') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-puzzle-piece"></i></span>
                     <select class="form-select select2" name="document_template_id" required data-doc-template-select>
-                        <option value="">- Pick a template -</option>
+                        <option value=""><?= __('- Pick a template -') ?></option>
                         <?php foreach ($templates as $template_id => $template) {
                             $used = $usage[$template_id]['count'] ?? 0;
-                            $about = trim(implode(' · ', array_filter([isset($missing[$template_id]) ? 'this client should have one' : '', trim((string) $template['document_template_description']), $used ? 'used ' . $used . ' time' . ($used === 1 ? '' : 's') : '']))); ?>
+                            $about = trim(implode(' · ', array_filter([isset($missing[$template_id]) ? __('this client should have one') : '', trim((string) $template['document_template_description']), $used ? _n('used %d time', 'used %d times', $used) : '']))); ?>
                             <option value="<?= $template_id ?>"<?= $template_id === $picked ? ' selected' : '' ?><?= selectOptionData(['icon' => isset($missing[$template_id]) ? 'fas fa-clipboard-check' : 'fas fa-file-alt', 'description' => $about]) ?>><?= escapeHtml($template['document_template_name']) ?></option>
                         <?php } ?>
                     </select>
@@ -74,23 +74,23 @@ ob_start();
             <div class="mb-3" data-doc-template-asks hidden></div>
 
             <div class="mb-3">
-                <label class="form-label">Name</label>
+                <label class="form-label"><?= __('Name') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-file-alt"></i></span>
-                    <input type="text" class="form-control" name="name" placeholder="The template's name, unless you give it another" maxlength="200">
+                    <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('The template\'s name, unless you give it another')) ?>" maxlength="200">
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Summary</label>
+                <label class="form-label"><?= __('Summary') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-align-left"></i></span>
-                    <input type="text" class="form-control" name="description" placeholder="The template's summary, unless you give it another" maxlength="500">
+                    <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('The template\'s summary, unless you give it another')) ?>" maxlength="500">
                 </div>
             </div>
 
             <div class="mb-2">
-                <label class="form-label">Folder</label>
+                <label class="form-label"><?= __('Folder') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
                     <select class="form-select select2" name="folder">
@@ -104,9 +104,9 @@ ob_start();
     </div>
     <div class="modal-footer">
         <?php if ($templates) { ?>
-            <button type="submit" name="add_document_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create</button>
+            <button type="submit" name="add_document_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $templates ? 'Cancel' : 'Close' ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $templates ? __('Cancel') : __('Close') ?></button>
     </div>
 </form>
 

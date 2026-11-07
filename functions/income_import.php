@@ -45,9 +45,9 @@ function incomeImportCanPay() {
 /** What a deposit can be brought in as. */
 function incomeImportActions() {
     return [
-        'payment' => 'Payment on invoices',
-        'income' => 'Other income',
-        'transfer' => 'Transfer from an account',
+        'payment' => __('Payment on invoices'),
+        'income' => __('Other income'),
+        'transfer' => __('Transfer from an account'),
     ];
 }
 
@@ -125,10 +125,10 @@ function incomeImportMethod($text, $default = '') {
     $methods = paymentMethods('in');
     $text = mb_strtolower((string) $text);
     $wants = [
-        '/\b(ach|direct dep|direct deposit|ccd|ppd|eft)\b/' => ['ACH', 'Bank Transfer', 'EFT'],
-        '/\b(wire|fedwire|swift)\b/' => ['Wire', 'Wire Transfer', 'Bank Transfer'],
+        '/\b(ach|direct dep|direct deposit|ccd|ppd|eft)\b/' => ['ACH', __('Bank Transfer'), 'EFT'],
+        '/\b(wire|fedwire|swift)\b/' => ['Wire', __('Wire Transfer'), __('Bank Transfer')],
         '/\b(check|cheque|chk|mobile deposit|remote deposit|rdc|counter deposit)\b/' => ['Check', 'Cheque'],
-        '/\b(zelle|venmo|cash app)\b/' => ['Zelle', 'Bank Transfer'],
+        '/\b(zelle|venmo|cash app)\b/' => ['Zelle', __('Bank Transfer')],
         '/\b(cash)\b/' => ['Cash'],
     ];
     foreach ($wants as $pattern => $names) {
@@ -391,7 +391,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
             $owed = (int) round(array_sum(array_column($named, 'balance')) * 100);
             $line['how'] = $owed === $cents ? (count($named) > 1 ? 'sum' : 'exact') : ($owed > $cents ? 'oldest' : 'over');
             $line['matched'] = 'number';
-            $line['match_note'] = "$refs in the text";
+            $line['match_note'] = __('%s in the text', $refs);
             $lines[$i] = $line;
             continue;
         }
@@ -408,7 +408,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
         }
         $kind = incomeImportKind($text);
         if ($rule) {
-            $note = 'As last time';
+            $note = __('As last time');
             if ($rule['action'] === 'transfer' && isset($accounts[$rule['account_id']]) && $rule['account_id'] !== $account_id) {
                 $line['action'] = 'transfer';
                 $line['from_account_id'] = $rule['account_id'];
@@ -421,7 +421,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
                 $line['client_id'] = $rule['client_id'];
                 $line['category_id'] = isset($categories[$rule['category_id']]) ? $rule['category_id'] : 0;
                 $line['matched'] = 'rule';
-                $line['match_note'] = $rule['action'] === 'payment' ? 'From them before - nothing of theirs is owed now' : $note;
+                $line['match_note'] = $rule['action'] === 'payment' ? __('From them before - nothing of theirs is owed now') : $note;
             }
             if ($line['matched'] !== '') {
                 $lines[$i] = $line;
@@ -435,12 +435,12 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
             $line['action'] = 'transfer';
             if (isset($providers[$account_id])) {
                 $line['recorded'] = true;
-                $line['match_note'] = 'A payout of ' . $providers[$account_id] . ' payments, recorded in this account already';
+                $line['match_note'] = __('A payout of %s payments, recorded in this account already', $providers[$account_id]);
             } elseif ($providers) {
                 $line['from_account_id'] = array_key_first($providers);
-                $line['match_note'] = 'A payout from ' . reset($providers);
+                $line['match_note'] = __('A payout from %s', reset($providers));
             } else {
-                $line['match_note'] = 'Looks like a payout of card payments';
+                $line['match_note'] = __('Looks like a payout of card payments');
             }
             $lines[$i] = $line;
             continue;
@@ -455,7 +455,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
                     break;
                 }
             }
-            $line['match_note'] = $line['from_account_id'] ? 'Looks like a transfer from ' . $accounts[$line['from_account_id']]['account_name'] : 'Looks like a transfer';
+            $line['match_note'] = $line['from_account_id'] ? __('Looks like a transfer from %s', $accounts[$line['from_account_id']]['account_name']) : __('Looks like a transfer');
             $lines[$i] = $line;
             continue;
         }
@@ -464,11 +464,11 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
         $client_id = incomeImportNameMatch(expenseImportWords($text), $client_names);
         if ($client_id) {
             if (!empty($by_client[$client_id])) {
-                $pay($client_id, $by_client[$client_id], 'name', $clients[$client_id] . ' is named in it');
+                $pay($client_id, $by_client[$client_id], 'name', __('%s is named in it', $clients[$client_id]));
             } else {
                 $line['client_id'] = $client_id;
                 $line['matched'] = 'name';
-                $line['match_note'] = $clients[$client_id] . ' is named in it - nothing of theirs is owed';
+                $line['match_note'] = __('%s is named in it - nothing of theirs is owed', $clients[$client_id]);
             }
             $lines[$i] = $line;
             continue;
@@ -482,7 +482,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
             $line['invoice_ids'] = [$invoice['invoice_id']];
             $line['how'] = 'exact';
             $line['matched'] = 'amount';
-            $line['match_note'] = 'The only invoice owing ' . $money($amount, $invoice['currency']);
+            $line['match_note'] = __('The only invoice owing %s', $money($amount, $invoice['currency']));
         } elseif (count($client_totals[$cents] ?? []) === 1 && count($by_client[$client_totals[$cents][0]]) > 1) {
             $client_id = $client_totals[$cents][0];
             $line['action'] = 'payment';
@@ -490,7 +490,7 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
             $line['invoice_ids'] = array_column($by_client[$client_id], 'invoice_id');
             $line['how'] = 'sum';
             $line['matched'] = 'amount';
-            $line['match_note'] = 'All ' . $clients[$client_id] . ' owes';
+            $line['match_note'] = __('All %s owes', $clients[$client_id]);
         } elseif (count($balances[$cents] ?? []) > 1 && count(array_unique(array_map(function ($id) use ($open) { return $open[$id]['client_id']; }, $balances[$cents]))) === 1) {
             // Several of one client's invoices owe it - the oldest due
             $invoice = $open[$balances[$cents][0]];
@@ -499,9 +499,9 @@ function incomeImportMatch(array $lines, $account_id, $default_method = '') {
             $line['invoice_ids'] = [$invoice['invoice_id']];
             $line['how'] = 'exact';
             $line['matched'] = 'amount';
-            $line['match_note'] = 'The oldest of ' . count($balances[$cents]) . ' ' . $clients[$invoice['client_id']] . ' invoices owing ' . $money($amount, $invoice['currency']);
+            $line['match_note'] = __('The oldest of %1$d %2$s invoices owing %3$s', count($balances[$cents]), $clients[$invoice['client_id']], $money($amount, $invoice['currency']));
         } elseif (count($balances[$cents] ?? []) > 1) {
-            $line['match_note'] = count($balances[$cents]) . ' invoices owe ' . $money($amount) . ' - pick the one';
+            $line['match_note'] = __('%1$d invoices owe %2$s - pick the one', count($balances[$cents]), $money($amount));
         }
         $lines[$i] = $line;
     }
@@ -544,7 +544,7 @@ function incomeImportDuplicates($account_id, array $lines) {
             ORDER BY payment_date, payment_id");
         while ($row = mysqli_fetch_assoc($sql)) {
             $singles[] = ['type' => 'payment', 'ids' => [intval($row['payment_id'])], 'date' => $row['payment_date'], 'cents' => (int) round($row['payment_amount'] * 100),
-                'label' => 'Payment on ' . ($row['what'] !== '' ? $row['what'] : 'an invoice') . ' on ' . $row['payment_date']];
+                'label' => __('Payment on %1$s on %2$s', $row['what'] !== '' ? $row['what'] : __('an invoice'), $row['payment_date'])];
             $days[$row['payment_date']][] = ['id' => intval($row['payment_id']), 'cents' => (int) round($row['payment_amount'] * 100), 'what' => $row['what']];
         }
         $sql = mysqli_query($mysqli, "SELECT revenue_id, revenue_date, revenue_amount, revenue_description, category_name, transfer_id FROM revenues
@@ -553,9 +553,9 @@ function incomeImportDuplicates($account_id, array $lines) {
             WHERE revenue_account_id = $account_id AND revenue_import_key IS NULL AND revenue_archived_at IS NULL AND revenue_date BETWEEN '$from' AND '$to'
             ORDER BY revenue_date, revenue_id");
         while ($row = mysqli_fetch_assoc($sql)) {
-            $what = $row['transfer_id'] !== null ? 'A transfer in' : (trim(strtok((string) $row['revenue_description'], "\n")) ?: ($row['category_name'] ?: 'Other income'));
+            $what = $row['transfer_id'] !== null ? __('A transfer in') : (trim(strtok((string) $row['revenue_description'], "\n")) ?: ($row['category_name'] ?: __('Other income')));
             $singles[] = ['type' => 'revenue', 'ids' => [intval($row['revenue_id'])], 'date' => $row['revenue_date'], 'cents' => (int) round($row['revenue_amount'] * 100),
-                'label' => $what . ' on ' . $row['revenue_date'], 'transfer' => $row['transfer_id'] !== null];
+                'label' => __('%1$s on %2$s', $what, $row['revenue_date']), 'transfer' => $row['transfer_id'] !== null];
         }
     }
     // A day's payments together - one check for several invoices
@@ -563,7 +563,7 @@ function incomeImportDuplicates($account_id, array $lines) {
     foreach ($days as $date => $payments) {
         if (count($payments) > 1) {
             $groups[] = ['type' => 'payment', 'ids' => array_column($payments, 'id'), 'date' => $date, 'cents' => array_sum(array_column($payments, 'cents')),
-                'label' => 'Payments on ' . implode(', ', array_filter(array_column($payments, 'what'))) . ' on ' . $date];
+                'label' => __('Payments on %1$s on %2$s', implode(', ', array_filter(array_column($payments, 'what'))), $date)];
         }
     }
 
@@ -655,7 +655,7 @@ function incomeImportSave(array $import, array $picks, array $opts, &$error = ''
     $account_id = intval($import['account_id']);
     $accounts = paymentAccounts();
     if (!isset($accounts[$account_id])) {
-        $error = 'The account the statement is for no longer exists';
+        $error = __('The account the statement is for no longer exists');
         return null;
     }
     $currency = (string) ($accounts[$account_id]['account_currency_code'] ?: $session_company_currency);
@@ -678,28 +678,28 @@ function incomeImportSave(array $import, array $picks, array $opts, &$error = ''
         if (!$pick || empty($pick['take']) || !in_array($line['state'], ['new', 'entered', 'recorded'], true)) {
             continue;
         }
-        $what = date('M j', strtotime($line['date'])) . ' ' . billingMoney($line['amount'], $currency);
+        $what = formatDate($line['date'], 'date_short') . ' ' . billingMoney($line['amount'], $currency);
         $action = (string) ($pick['action'] ?? '');
         $client = intval($pick['client'] ?? 0);
         if ($client && !isset($clients[$client])) {
-            $error = "The client picked for $what isn't one you can open";
+            $error = __("The client picked for %s isn't one you can open", $what);
             return null;
         }
         $item = ['line' => $line, 'action' => $action, 'client' => $client, 'category' => 0, 'account' => 0, 'payments' => []];
         if ($action === 'payment') {
             if (!$can_pay) {
-                $error = 'Recording payments on invoices takes write access to Sales - ' . $what . ' can come in as other income';
+                $error = __('Recording payments on invoices takes write access to Sales - %s can come in as other income', $what);
                 return null;
             }
             $ids = array_values(array_unique(array_filter(array_map('intval', (array) ($pick['invoices'] ?? [])))));
             if (!$client || !$ids) {
-                $error = "Pick the client and the invoices $what pays";
+                $error = __('Pick the client and the invoices %s pays', $what);
                 return null;
             }
             $invoices = [];
             foreach ($ids as $id) {
                 if (!isset($open[$id]) || $open[$id]['client_id'] !== $client) {
-                    $error = "An invoice picked for $what isn't one of the client's still owed";
+                    $error = __("An invoice picked for %s isn't one of the client's still owed", $what);
                     return null;
                 }
                 $invoices[] = $open[$id];
@@ -717,25 +717,25 @@ function incomeImportSave(array $import, array $picks, array $opts, &$error = ''
                 $left -= $take;
             }
             if ($left > 0) {
-                $error = "$what is " . billingMoney($left / 100, $currency) . ' more than the invoices picked owe - pick another, or bring it in as other income';
+                $error = __('%1$s is %2$s more than the invoices picked owe - pick another, or bring it in as other income', $what, billingMoney($left / 100, $currency));
                 return null;
             }
         } elseif ($action === 'income') {
             $category = intval($pick['category'] ?? 0);
             if (!isset($categories[$category])) {
-                $error = "Pick the category for $what";
+                $error = __('Pick the category for %s', $what);
                 return null;
             }
             $item['category'] = $category;
         } elseif ($action === 'transfer') {
             $from = intval($pick['account'] ?? 0);
             if (!isset($accounts[$from]) || $from === $account_id) {
-                $error = "Pick the account $what came from";
+                $error = __('Pick the account %s came from', $what);
                 return null;
             }
             $item['account'] = $from;
         } else {
-            $error = "Pick what $what is";
+            $error = __('Pick what %s is', $what);
             return null;
         }
         $bring[] = $item;
@@ -785,7 +785,7 @@ function incomeImportSave(array $import, array $picks, array $opts, &$error = ''
             $result['income']++;
             $result['income_total'] += $line['amount'];
         } else {
-            incomeImportTransfer($item['account'], $account_id, $date, $line['amount'], $currency, $method !== '' ? $method : 'Bank Transfer', $line['description'], $line['key_hash']);
+            incomeImportTransfer($item['account'], $account_id, $date, $line['amount'], $currency, $method !== '' ? $method : 'Bank Transfer' /* i18n-ignore - stored */, $line['description'], $line['key_hash']);
             logAudit("Account Transfer", "Create", "$who brought in a transfer of " . escapeSql(billingMoney($line['amount'], $currency)) . " from " . escapeSql($accounts[$item['account']]['account_name'])
                 . " to " . escapeSql($accounts[$account_id]['account_name']) . " from a bank statement");
             $result['transfers']++;

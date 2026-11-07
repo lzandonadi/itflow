@@ -18,21 +18,22 @@ $document_ids = array_values(array_unique(array_filter(array_map('intval', (arra
 $total = count($file_ids) + count($document_ids);
 
 if (!$total) {
-    echo json_encode(['error' => 'Tick the files or documents to move first.']);
+    echo json_encode(['error' => __('Tick the files or documents to move first.')]);
     exit;
 }
 
-$summary = implode(' and ', array_filter([
-    $document_ids ? count($document_ids) . ' document' . (count($document_ids) === 1 ? '' : 's') : '',
-    $file_ids ? count($file_ids) . ' file' . (count($file_ids) === 1 ? '' : 's') : '',
+$summary_parts = array_values(array_filter([
+    $document_ids ? _n('%d document', '%d documents', count($document_ids)) : '',
+    $file_ids ? _n('%d file', '%d files', count($file_ids)) : '',
 ]));
+$summary = count($summary_parts) === 2 ? __('%1$s and %2$s', $summary_parts[0], $summary_parts[1]) : $summary_parts[0];
 
 ob_start();
 
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-folder-open me-2"></i>Move <?= $summary ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-folder-open me-2"></i><?= __('Move %s', $summary) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -46,7 +47,7 @@ ob_start();
     <?php } ?>
 
     <div class="modal-body">
-        <label class="form-label">To folder</label>
+        <label class="form-label"><?= __('To folder') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
             <select class="form-select select2" name="bulk_folder_id">
@@ -56,8 +57,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_move_files" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Move</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_move_files" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Move') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

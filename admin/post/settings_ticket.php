@@ -46,16 +46,16 @@ if (isset($_POST['edit_ticket_settings'])) {
     }
     $hours = $after['config_ticket_autoclose_hours'];
     if ($hours !== intval($before['config_ticket_autoclose_hours']) && ($hours < 24 || $hours > 8760)) {
-        $errors['config_ticket_autoclose_hours'] = 'From 24 hours (a day) to 8760 (a year).';
+        $errors['config_ticket_autoclose_hours'] = __('From 24 hours (a day) to 8760 (a year).');
     }
     if (!in_array($after['config_ticket_default_view'], [0, 1, 2], true)) {
-        $errors['config_ticket_default_view'] = 'Pick how it opens from the list.';
+        $errors['config_ticket_default_view'] = __('Pick how it opens from the list.');
     }
     // AI triage - once the database has it
     if (aiTriageReady()) {
         $after['config_ticket_ai_triage'] = intval($in['config_ticket_ai_triage']);
         if (!isset(aiTriageModes()[$after['config_ticket_ai_triage']])) {
-            $errors['config_ticket_ai_triage'] = 'Pick how new tickets are triaged from the list.';
+            $errors['config_ticket_ai_triage'] = __('Pick how new tickets are triaged from the list.');
         }
     }
     if ($errors) {

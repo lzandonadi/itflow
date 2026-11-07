@@ -79,19 +79,19 @@ function searchResultBadge($badge) {
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-search me-2"></i>Search</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-search me-2"></i><?= __('Search') ?></h3>
     </div>
     <div class="card-header py-3">
         <form autocomplete="off">
             <div class="input-group">
                 <input type="search" class="form-control" name="query" value="<?= $search_query_display ?>"
-                    placeholder="Search clients, tickets, assets, credentials, documents and more" maxlength="100" autofocus>
-                <button class="btn btn-primary" type="submit" title="Search"><i class="fas fa-search"></i></button>
+                    placeholder="<?= escapeHtml(__('Search clients, tickets, assets, credentials, documents and more')) ?>" maxlength="100" autofocus>
+                <button class="btn btn-primary" type="submit" title="<?= escapeHtml(__('Search')) ?>"><i class="fas fa-search"></i></button>
             </div>
         </form>
 
         <?php if (count($search_results) > 1) { ?>
-            <nav class="d-flex flex-wrap gap-1 mt-3" aria-label="Jump to a result type">
+            <nav class="d-flex flex-wrap gap-1 mt-3" aria-label="<?= escapeHtml(__('Jump to a result type')) ?>">
                 <?php foreach ($search_results as $search_group) { ?>
                     <a class="btn btn-sm btn-light border" href="#search-<?= escapeHtml($search_group['key']) ?>">
                         <i class="fas fa-fw fa-<?= escapeHtml($search_group['icon']) ?> me-1"></i><?= escapeHtml($search_group['label']) ?>
@@ -108,11 +108,10 @@ function searchResultBadge($badge) {
 
             <div class="text-center text-secondary py-5">
                 <i class="fas fa-4x fa-search mb-3 d-block" aria-hidden="true"></i>
-                <h5>Search everything in one place</h5>
+                <h5><?= __('Search everything in one place') ?></h5>
                 <p class="mb-0">
-                    Names, emails, phone numbers, IP and MAC addresses, serials, ticket, invoice and quote numbers -
-                    plus ticket conversations and document text.<br>
-                    Press <kbd>Ctrl</kbd> + <kbd>K</kbd> on any page to search without leaving it.
+                    <?= __('Names, emails, phone numbers, IP and MAC addresses, serials, ticket, invoice and quote numbers - plus ticket conversations and document text.') ?><br>
+                    <?= __('Press') ?> <kbd><?= __('Ctrl') ?></kbd> + <kbd>K</kbd> <?= __('on any page to search without leaving it.') ?>
                 </p>
             </div>
 
@@ -120,21 +119,21 @@ function searchResultBadge($badge) {
 
             <div class="text-center text-secondary py-5">
                 <i class="fas fa-4x fa-keyboard mb-3 d-block" aria-hidden="true"></i>
-                <h5>Type at least two characters</h5>
+                <h5><?= __('Type at least two characters') ?></h5>
             </div>
 
         <?php } elseif (!$search_results) { ?>
 
             <div class="text-center text-secondary py-5">
                 <i class="fas fa-4x fa-search mb-3 d-block" aria-hidden="true"></i>
-                <h5>Nothing matches "<?= $search_query_display ?>"</h5>
-                <p class="mb-0">Check the spelling, or try part of a name, a number or an address.</p>
+                <h5><?= __('Nothing matches "%s"', $search_query_display) ?></h5>
+                <p class="mb-0"><?= __('Check the spelling, or try part of a name, a number or an address.') ?></p>
             </div>
 
         <?php } else { ?>
 
             <p class="text-secondary mb-3">
-                <?= $search_total ?> result<?= $search_total === 1 ? '' : 's' ?> for "<strong><?= $search_query_display ?></strong>"
+                <?= _n('%1$d result for "<strong>%2$s</strong>"', '%1$d results for "<strong>%2$s</strong>"', $search_total, $search_total, $search_query_display) ?>
             </p>
 
             <?php foreach ($search_results as $search_group) {
@@ -153,7 +152,7 @@ function searchResultBadge($badge) {
                         </h3>
                         <?php if ($search_group['list_url']) { ?>
                             <a class="small" href="<?= escapeHtml($search_group['list_url']) ?>">
-                                Open in <?= $group_label ?><i class="fas fa-fw fa-arrow-right ms-1"></i>
+                                <?= __('Open in %s', $group_label) ?><i class="fas fa-fw fa-arrow-right ms-1"></i>
                             </a>
                         <?php } ?>
                     </div>
@@ -226,11 +225,11 @@ function searchResultBadge($badge) {
 
                     <?php if ($group_total > $group_shown) { ?>
                         <div class="card-footer small text-secondary py-2">
-                            Showing <?= $group_shown ?> of <?= $group_total ?>.
+                            <?= __('Showing %1$d of %2$d.', $group_shown, $group_total) ?>
                             <?php if ($search_group['list_url']) { ?>
-                                <a href="<?= escapeHtml($search_group['list_url']) ?>">See them all in <?= $group_label ?></a>
+                                <a href="<?= escapeHtml($search_group['list_url']) ?>"><?= __('See them all in %s', $group_label) ?></a>
                             <?php } else { ?>
-                                Add more words to narrow it down.
+                                <?= __('Add more words to narrow it down.') ?>
                             <?php } ?>
                         </div>
                     <?php } ?>

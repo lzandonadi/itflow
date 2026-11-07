@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the context and prompts are for the model, in English (what agents see goes through __() here and in the modals)
 
 /*
  * ITFlow - AI on quotes and invoices
@@ -140,7 +140,7 @@ function aiTicketInvoiceDescription($ticket_id) {
     }
     $work = aiTicketWorkText($ticket_id);
     if (!$work) {
-        return ['ok' => false, 'error' => 'That ticket no longer exists.'];
+        return ['ok' => false, 'error' => __('That ticket no longer exists.')];
     }
     $model['ai_provider_redact'] = 1;
     $result = callAiApi($model, [
@@ -155,7 +155,7 @@ function aiTicketInvoiceDescription($ticket_id) {
     }
     $points = aiBillingPoints($result['content'], 6);
     if (!$points) {
-        return ['ok' => false, 'error' => 'The AI provider answered with nothing to use - try again.'];
+        return ['ok' => false, 'error' => __('The AI provider answered with nothing to use - try again.')];
     }
     return ['ok' => true, 'text' => billingTimeDescription($work['row']) . "\n" . implode("\n", $points)];
 }
@@ -255,7 +255,7 @@ function aiBillingDraft($type, array $row, $prompt, $use_ticket = true, $use_cli
     }
     $prompt = trim((string) $prompt);
     if ($prompt === '') {
-        return ['ok' => false, 'error' => 'Say what it is for first.'];
+        return ['ok' => false, 'error' => __('Say what it is for first.')];
     }
     $t = billingType($type);
     $c = $t['col'];
@@ -303,7 +303,7 @@ function aiBillingDraft($type, array $row, $prompt, $use_ticket = true, $use_cli
     }
     $answer = aiJsonFromText($result['content']);
     if (!$answer || !is_array($answer['lines'] ?? null)) {
-        return ['ok' => false, 'error' => "The AI provider's answer couldn't be read - try again."];
+        return ['ok' => false, 'error' => __("The AI provider's answer couldn't be read - try again.")];
     }
     $lines = [];
     foreach (array_slice($answer['lines'], 0, 20) as $line) {
@@ -313,7 +313,7 @@ function aiBillingDraft($type, array $row, $prompt, $use_ticket = true, $use_cli
         }
     }
     if (!$lines) {
-        return ['ok' => false, 'error' => 'The AI provider answered with no lines to use - say a little more about what it is for.'];
+        return ['ok' => false, 'error' => __('The AI provider answered with no lines to use - say a little more about what it is for.')];
     }
     $checks = [];
     foreach (array_slice((array) ($answer['checks'] ?? []), 0, 6) as $check) {

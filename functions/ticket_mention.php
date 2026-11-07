@@ -232,8 +232,8 @@ function ticketMailMentioned($ticket_id, $reply_id, $html, $user_id, $by) {
     if (!$agent) {
         return 0;
     }
-    $agent['footnote'] = 'You get this because ' . ($by !== '' ? $by : 'someone') . ' mentioned you in an internal note on ' . ticketReference($row) . '.';
-    return ticketMailAgents([$agent], ($config_app_name ?: 'ITFlow') . " - Mentioned on ticket [" . ticketReference($row) . "] " . $row['ticket_subject'],
+    $agent['footnote'] = __('You get this because %1$s mentioned you in an internal note on %2$s.', $by !== '' ? $by : __('someone'), ticketReference($row));
+    return ticketMailAgents([$agent], __('%1$s - Mentioned on ticket [%2$s] %3$s', $config_app_name ?: 'ITFlow', ticketReference($row), $row['ticket_subject']),
         ticketAgentEmailContent($row, 'mentioned', ['by' => $by, 'message' => (string) $html, 'reply_id' => intval($reply_id)]));
 }
 
@@ -241,5 +241,5 @@ function ticketMailMentioned($ticket_id, $reply_id, $html, $user_id, $by) {
 function ticketMentionNames(array $names) {
     $names = array_values($names);
     $last = array_pop($names);
-    return $names ? implode(', ', $names) . ' and ' . $last : (string) $last;
+    return $names ? __('%1$s and %2$s', implode(', ', $names), $last) : (string) $last;
 }

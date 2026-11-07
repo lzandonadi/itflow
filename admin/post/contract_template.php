@@ -13,7 +13,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function contractTemplatePostRow($id) {
     $row = contractTemplateRow($id);
     if (!$row) {
-        flashAlert("That contract template is gone - it may have been deleted.", 'error');
+        flashAlert(__('That contract template is gone - it may have been deleted.'), 'error');
         redirect();
     }
     return $row;
@@ -26,7 +26,7 @@ if (isset($_POST['add_contract_template']) || isset($_POST['edit_contract_templa
     $row = isset($_POST['edit_contract_template']) ? contractTemplatePostRow($_POST['contract_template_id'] ?? 0) : null;
     [$fields, $error] = contractFromInput($_POST, 'template');
     if ($error !== '') {
-        flashAlert(escapeHtml($error) . ' The template was not saved.', 'error');
+        flashAlert(__('%s The template was not saved.', escapeHtml($error)), 'error');
         redirect();
     }
 
@@ -36,12 +36,12 @@ if (isset($_POST['add_contract_template']) || isset($_POST['edit_contract_templa
         $contract_template_id = intval($row['contract_template_id']);
         mysqli_query($mysqli, "UPDATE contract_templates SET $set WHERE contract_template_id = $contract_template_id");
         logAudit("Contract Template", "Edit", "$session_name changed contract template $name", 0, $contract_template_id);
-        flashAlert("Contract template <strong>" . escapeHtml($fields['name']) . "</strong> saved");
+        flashAlert(__('Contract template <strong>%s</strong> saved', escapeHtml($fields['name'])));
     } else {
         mysqli_query($mysqli, "INSERT INTO contract_templates SET $set");
         $contract_template_id = mysqli_insert_id($mysqli);
-        logAudit("Contract Template", "Create", "$session_name created contract template $name (" . escapeSql(contractTypeLabel($fields['type'])) . ")", 0, $contract_template_id);
-        flashAlert("Contract template <strong>" . escapeHtml($fields['name']) . "</strong> created");
+        logAudit("Contract Template", "Create", "$session_name created contract template $name (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($fields['type']))) . ")", 0, $contract_template_id);
+        flashAlert(__('Contract template <strong>%s</strong> created', escapeHtml($fields['name'])));
     }
 
     redirect();
@@ -73,7 +73,7 @@ if (isset($_GET['copy_contract_template'])) {
     $new_id = mysqli_insert_id($mysqli);
 
     logAudit("Contract Template", "Create", "$session_name copied contract template " . escapeSql($row['contract_template_name']) . " as " . escapeSql($new_name), 0, $new_id);
-    flashAlert("Contract template <strong>" . escapeHtml($row['contract_template_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>");
+    flashAlert(__('Contract template <strong>%1$s</strong> copied as <strong>%2$s</strong>', escapeHtml($row['contract_template_name']), escapeHtml($new_name)));
 
     redirect();
 
@@ -91,7 +91,7 @@ if (isset($_GET['archive_contract_template']) || isset($_GET['restore_contract_t
     mysqli_query($mysqli, "UPDATE contract_templates SET contract_template_archived_at = " . ($archive ? 'NOW()' : 'NULL') . " WHERE contract_template_id = $contract_template_id");
 
     logAudit("Contract Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " contract template " . escapeSql($row['contract_template_name']), 0, $contract_template_id);
-    flashAlert("Contract template <strong>" . escapeHtml($row['contract_template_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Contract template <strong>%s</strong> archived', escapeHtml($row['contract_template_name'])) : __('Contract template <strong>%s</strong> restored', escapeHtml($row['contract_template_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -109,7 +109,7 @@ if (isset($_GET['delete_contract_template'])) {
     mysqli_query($mysqli, "DELETE FROM contract_templates WHERE contract_template_id = $contract_template_id");
 
     logAudit("Contract Template", "Delete", "$session_name deleted contract template " . escapeSql($row['contract_template_name']), 0, $contract_template_id);
-    flashAlert("Contract template <strong>" . escapeHtml($row['contract_template_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Contract template <strong>%s</strong> deleted', escapeHtml($row['contract_template_name'])), 'error');
 
     redirect();
 

@@ -17,11 +17,11 @@ function shareForRequest($item_id) {
     global $client_id;
     $row = shareRow($item_id);
     if (!$row) {
-        flashAlert('That link no longer exists.', 'error');
+        flashAlert(__('That link no longer exists.'), 'error');
         redirect();
     }
     if (!shareCanMake($row['item_type'])) {
-        flashAlert("You don't have access to that link.", 'error');
+        flashAlert(__('You don\'t have access to that link.'), 'error');
         redirect();
     }
     $client_id = intval($row['item_client_id']);
@@ -35,17 +35,17 @@ if (isset($_GET['share_revoke'])) {
     validateCSRFToken();
 
     $row = shareForRequest($_GET['share_revoke']);
-    $name = escapeSql(shareName($row));
+    $name = escapeSql(i18nEnglish(fn () => shareName($row)));
 
     if (shareEnd($row['item_id'], 'Revoked', $session_user_id)) {
-        logAudit('Share', 'Revoke', "$session_name turned off the shared link for " . escapeSql(shareTypes()[$row['item_type']]['label'] ?? 'item') . " $name", $client_id, $row['item_id']);
+        logAudit('Share', 'Revoke', "$session_name turned off the shared link for " . escapeSql(i18nEnglish(fn () => shareTypes()[$row['item_type']]['label'] ?? 'item')) . " $name", $client_id, $row['item_id']);
         if ($row['item_type'] === 'Credential') {
             // In the credential's own history too
             logAudit('Credential', 'Unshare', "$session_name turned off a share link" . ($row['item_recipient'] ? ' for ' . escapeSql($row['item_recipient']) : ''), $client_id, $row['item_related_id']);
         }
-        flashAlert('The link is turned off - it no longer opens.');
+        flashAlert(__('The link is turned off - it no longer opens.'));
     } else {
-        flashAlert('That link had already ended.', 'info');
+        flashAlert(__('That link had already ended.'), 'info');
     }
 
     redirect();
@@ -77,7 +77,7 @@ if (isset($_POST['share_revoke_all'])) {
     }
 
     logAudit('Share', 'Revoke', "$session_name turned off all $ended open shared " . ($ended === 1 ? 'link' : 'links') . " for the client", $client_id);
-    flashAlert($ended ? "Turned off $ended " . ($ended === 1 ? 'link' : 'links') . ' - none of them open any more.' : 'There were no open links to turn off.', $ended ? 'success' : 'info');
+    flashAlert($ended ? _n('Turned off %d link - none of them open any more.', 'Turned off %d links - none of them open any more.', $ended) : __('There were no open links to turn off.'), $ended ? 'success' : 'info');
 
     redirect();
 }
@@ -95,14 +95,14 @@ if (isset($_POST['share_bulk_revoke'])) {
         }
         if (shareEnd($item_id, 'Revoked', $session_user_id)) {
             $ended++;
-            logAudit('Share', 'Revoke', "$session_name turned off the shared link for " . escapeSql(shareName($row)), $row['item_client_id'], $item_id);
+            logAudit('Share', 'Revoke', "$session_name turned off the shared link for " . escapeSql(i18nEnglish(fn () => shareName($row))), $row['item_client_id'], $item_id);
             if ($row['item_type'] === 'Credential') {
                 logAudit('Credential', 'Unshare', "$session_name turned off a share link", $row['item_client_id'], $row['item_related_id']);
             }
         }
     }
 
-    flashAlert($ended ? "Turned off $ended " . ($ended === 1 ? 'link' : 'links') : 'None of those links were still open.', $ended ? 'success' : 'info');
+    flashAlert($ended ? _n('Turned off %d link', 'Turned off %d links', $ended) : __('None of those links were still open.'), $ended ? 'success' : 'info');
 
     redirect();
 }
@@ -116,7 +116,7 @@ if (isset($_POST['share_request_save'])) {
 
     $row = shareForRequest($_POST['item_id'] ?? 0);
     if ($row['item_type'] !== 'Request' || shareState($row) !== 'received') {
-        flashAlert('There is nothing to save on that link.', 'error');
+        flashAlert(__('There is nothing to save on that link.'), 'error');
         redirect();
     }
 
@@ -126,7 +126,7 @@ if (isset($_POST['share_request_save'])) {
         redirect();
     }
 
-    flashAlert('Saved to credentials as <strong>' . escapeHtml(shareName($row)) . '</strong>');
+    flashAlert(__('Saved to credentials as %s', '<strong>' . escapeHtml(shareName($row)) . '</strong>'));
 
     redirect("credentials.php?client_id=$client_id&q=" . urlencode(shareName($row)));
 }
@@ -138,15 +138,15 @@ if (isset($_GET['share_request_discard'])) {
 
     $row = shareForRequest($_GET['share_request_discard']);
     if ($row['item_type'] !== 'Request') {
-        flashAlert('That link is not a request.', 'error');
+        flashAlert(__('That link is not a request.'), 'error');
         redirect();
     }
 
     if (shareEnd($row['item_id'], 'Discarded', $session_user_id)) {
-        logAudit('Share', 'Discard', "$session_name discarded the login request " . escapeSql(shareName($row)) . ($row['item_received_at'] ? ' and what was sent' : ''), $client_id, $row['item_id']);
-        flashAlert('Discarded - what was sent is gone.');
+        logAudit('Share', 'Discard', "$session_name discarded the login request " . escapeSql(i18nEnglish(fn () => shareName($row))) . ($row['item_received_at'] ? ' and what was sent' : ''), $client_id, $row['item_id']);
+        flashAlert(__('Discarded - what was sent is gone.'));
     } else {
-        flashAlert('That request had already ended.', 'info');
+        flashAlert(__('That request had already ended.'), 'info');
     }
 
     redirect();

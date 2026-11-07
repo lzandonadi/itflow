@@ -82,16 +82,16 @@ function documentTemplateFields(array $post, &$error = '') {
     $error = '';
     $name = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($post['name'] ?? ''))));
     if ($name === '') {
-        $error = 'A document template needs a name';
+        $error = __('A document template needs a name');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'Keep the name to 200 characters';
+        $error = __('Keep the name to 200 characters');
         return null;
     }
     $description = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($post['description'] ?? ''))));
     if (mb_strlen($description) > 500) {
-        $error = 'Keep the summary to 500 characters';
+        $error = __('Keep the summary to 500 characters');
         return null;
     }
     return ['name' => $name, 'description' => $description, 'content' => (string) ($post['content'] ?? '')];
@@ -252,6 +252,7 @@ function documentTemplateMarkBrackets($html) {
 /* ---------------------------------------------------------------- filled in as a document is made */
 
 /** The placeholders filled in from the client as a document is made - what each becomes. */
+// i18n-ignore-start - shown through documentTemplateWordHelp()
 const DOCUMENT_TEMPLATE_PLACEHOLDERS = [
     'Client' => "the client's name",
     'Website' => "the client's website",
@@ -268,6 +269,7 @@ const DOCUMENT_TEMPLATE_PLACEHOLDERS = [
     'Quarter' => 'the quarter - Q4 2026',
     'Year' => 'the year',
 ];
+// i18n-ignore-end
 
 /** The placeholders that come from the site picked, and from the contact picked - lowercase. */
 const DOCUMENT_TEMPLATE_SITE_PLACEHOLDERS = ['site', 'address', 'site phone'];
@@ -278,6 +280,7 @@ const DOCUMENT_TEMPLATE_CONTACT_PLACEHOLDERS = ['contact', 'first name', 'contac
  * made - what each holds. On a line of its own, [Networks] becomes the table;
  * in a sentence, their names.
  */
+// i18n-ignore-start - shown through documentTemplateWordHelp()
 const DOCUMENT_TEMPLATE_TABLES = [
     'Contacts' => 'the contacts - name, title, email and phone',
     'Locations' => 'the sites - name, address, phone and hours',
@@ -293,6 +296,7 @@ const DOCUMENT_TEMPLATE_TABLES = [
     'Vendors' => 'vendors - name, phone, email, website and account number',
     'Services' => 'services - name, category and importance',
 ];
+// i18n-ignore-end
 
 /*
  * A fill-in's name, tidied - as it goes in square brackets - or '' when it
@@ -479,20 +483,20 @@ function documentTemplateTableData($table, $client_id) {
     global $mysqli;
     $client_id = intval($client_id);
     $date = function ($value) {
-        return $value && strtotime($value) ? date('M j, Y', strtotime($value)) : '';
+        return $value && strtotime($value) ? formatDate($value, 'date') : '';
     };
     $phone = function ($number, $code) {
         return trim((string) $number) !== '' ? (string) formatPhoneNumber($number, $code) : '';
     };
     $assets = function (array $types, array $columns) use ($mysqli, $client_id) {
-        $where = $types ? " AND asset_type IN ('" . implode("','", array_map('escapeSql', $types)) . "')" : '';
+        $where = $types ? " AND asset_type IN ('" . implode("','", array_map('escapeSql', $types)) . "')" : ''; // i18n-ignore - SQL
         $sql = mysqli_query($mysqli, "SELECT asset_name, asset_type, asset_make, asset_model, asset_serial, asset_os, location_name, contact_name,
                 (SELECT interface_ip FROM asset_interfaces WHERE interface_asset_id = asset_id AND interface_archived_at IS NULL ORDER BY interface_primary DESC, interface_id ASC LIMIT 1) AS ip
             FROM assets
             LEFT JOIN locations ON location_id = asset_location_id AND asset_location_id > 0
             LEFT JOIN contacts ON contact_id = asset_contact_id AND asset_contact_id > 0
             WHERE asset_client_id = $client_id AND asset_archived_at IS NULL$where ORDER BY asset_name ASC");
-        $labels = ['name' => 'Name', 'type' => 'Type', 'model' => 'Make and model', 'serial' => 'Serial', 'os' => 'Operating system', 'ip' => 'IP address', 'site' => 'Site', 'who' => 'Assigned to'];
+        $labels = ['name' => __('Name'), 'type' => __('Type'), 'model' => __('Make and model'), 'serial' => __('Serial'), 'os' => __('Operating system'), 'ip' => __('IP address'), 'site' => __('Site'), 'who' => __('Assigned to')];
         $data = ['head' => array_map(function ($column) use ($labels) {
             return $labels[$column];
         }, $columns), 'rows' => [], 'names' => []];
@@ -519,12 +523,12 @@ function documentTemplateTableData($table, $client_id) {
     switch ($table) {
         case 'contacts':
             return $rows("SELECT contact_name, contact_title, contact_email, contact_phone, contact_phone_country_code, contact_mobile, contact_mobile_country_code, contact_primary FROM contacts
-                WHERE contact_client_id = $client_id AND contact_archived_at IS NULL ORDER BY contact_primary DESC, contact_name ASC", ['Name', 'Title', 'Email', 'Phone', 'Mobile'], function ($r) use ($phone) {
+                WHERE contact_client_id = $client_id AND contact_archived_at IS NULL ORDER BY contact_primary DESC, contact_name ASC", [__('Name'), __('Title'), __('Email'), __('Phone'), __('Mobile')], function ($r) use ($phone) {
                 return [$r['contact_name'] . (intval($r['contact_primary']) ? ' (primary)' : ''), $r['contact_title'], $r['contact_email'], $phone($r['contact_phone'], $r['contact_phone_country_code']), $phone($r['contact_mobile'], $r['contact_mobile_country_code'])];
             }, 'contact_name');
         case 'locations':
             return $rows("SELECT location_name, location_address, location_city, location_state, location_zip, location_country, location_phone, location_phone_country_code, location_hours, location_primary FROM locations
-                WHERE location_client_id = $client_id AND location_archived_at IS NULL ORDER BY location_primary DESC, location_name ASC", ['Site', 'Address', 'Phone', 'Hours'], function ($r) use ($phone) {
+                WHERE location_client_id = $client_id AND location_archived_at IS NULL ORDER BY location_primary DESC, location_name ASC", [__('Site'), __('Address'), __('Phone'), __('Hours')], function ($r) use ($phone) {
                 return [$r['location_name'] . (intval($r['location_primary']) ? ' (primary)' : ''), formatAddress($r['location_address'], $r['location_city'], $r['location_state'], $r['location_zip'], $r['location_country'], ', '),
                     $phone($r['location_phone'], $r['location_phone_country_code']), $r['location_hours']];
             }, 'location_name');
@@ -541,33 +545,33 @@ function documentTemplateTableData($table, $client_id) {
         case 'networks':
             return $rows("SELECT network_name, network_vlan, network, network_gateway, network_dhcp_range, location_name FROM networks
                 LEFT JOIN locations ON location_id = network_location_id AND network_location_id > 0
-                WHERE network_client_id = $client_id AND network_archived_at IS NULL ORDER BY network_name ASC", ['Name', 'VLAN', 'Network', 'Gateway', 'DHCP range', 'Site'], function ($r) {
+                WHERE network_client_id = $client_id AND network_archived_at IS NULL ORDER BY network_name ASC", [__('Name'), 'VLAN', __('Network'), __('Gateway'), __('DHCP range'), __('Site')], function ($r) {
                 return [$r['network_name'], $r['network_vlan'], $r['network'], $r['network_gateway'], $r['network_dhcp_range'], $r['location_name']];
             }, 'network_name');
         case 'domains':
             return $rows("SELECT domain_name, vendor_name, domain_expire FROM domains
                 LEFT JOIN vendors ON vendor_id = domain_registrar AND domain_registrar > 0
-                WHERE domain_client_id = $client_id AND domain_archived_at IS NULL ORDER BY domain_name ASC", ['Domain', 'Registrar', 'Expires'], function ($r) use ($date) {
+                WHERE domain_client_id = $client_id AND domain_archived_at IS NULL ORDER BY domain_name ASC", [__('Domain'), __('Registrar'), __('Expires')], function ($r) use ($date) {
                 return [$r['domain_name'], $r['vendor_name'], $date($r['domain_expire'])];
             }, 'domain_name');
         case 'certificates':
             return $rows("SELECT certificate_name, certificate_domain, certificate_issued_by, certificate_expire FROM certificates
-                WHERE certificate_client_id = $client_id AND certificate_archived_at IS NULL ORDER BY certificate_name ASC", ['Name', 'Domain', 'Issued by', 'Expires'], function ($r) use ($date) {
+                WHERE certificate_client_id = $client_id AND certificate_archived_at IS NULL ORDER BY certificate_name ASC", [__('Name'), __('Domain'), __('Issued by'), __('Expires')], function ($r) use ($date) {
                 return [$r['certificate_name'], $r['certificate_domain'], $r['certificate_issued_by'], $date($r['certificate_expire'])];
             }, 'certificate_name');
         case 'licenses':
             return $rows("SELECT software_name, software_type, software_license_type, software_seats, software_expire FROM software
-                WHERE software_client_id = $client_id AND software_archived_at IS NULL ORDER BY software_name ASC", ['Name', 'Type', 'License', 'Seats', 'Expires'], function ($r) use ($date) {
+                WHERE software_client_id = $client_id AND software_archived_at IS NULL ORDER BY software_name ASC", [__('Name'), __('Type'), __('License'), __('Seats'), __('Expires')], function ($r) use ($date) {
                 return [$r['software_name'], $r['software_type'], $r['software_license_type'], $r['software_seats'], $date($r['software_expire'])];
             }, 'software_name');
         case 'vendors':
             return $rows("SELECT vendor_name, vendor_phone, vendor_phone_country_code, vendor_email, vendor_website, vendor_account_number FROM vendors
-                WHERE vendor_client_id = $client_id AND vendor_archived_at IS NULL ORDER BY vendor_name ASC", ['Name', 'Phone', 'Email', 'Website', 'Account number'], function ($r) use ($phone) {
+                WHERE vendor_client_id = $client_id AND vendor_archived_at IS NULL ORDER BY vendor_name ASC", [__('Name'), __('Phone'), __('Email'), __('Website'), __('Account number')], function ($r) use ($phone) {
                 return [$r['vendor_name'], $phone($r['vendor_phone'], $r['vendor_phone_country_code']), $r['vendor_email'], $r['vendor_website'], $r['vendor_account_number']];
             }, 'vendor_name');
         case 'services':
             return $rows("SELECT service_name, service_category, service_importance FROM services
-                WHERE service_client_id = $client_id AND service_archived_at IS NULL ORDER BY service_name ASC", ['Name', 'Category', 'Importance'], function ($r) {
+                WHERE service_client_id = $client_id AND service_archived_at IS NULL ORDER BY service_name ASC", [__('Name'), __('Category'), __('Importance')], function ($r) {
                 return [$r['service_name'], $r['service_category'], $r['service_importance']];
             }, 'service_name');
     }
@@ -628,7 +632,22 @@ const DOCUMENT_TEMPLATE_REQUIRED_EVERY = 1;
 const DOCUMENT_TEMPLATE_REQUIRED_TAGGED = 2;
 
 /** How often the documents made from a template are reviewed - months => what it says; 0 never. */
-const DOCUMENT_TEMPLATE_REVIEW_MONTHS = [0 => 'Never', 3 => 'Every 3 months', 6 => 'Every 6 months', 12 => 'Every year', 24 => 'Every 2 years'];
+const DOCUMENT_TEMPLATE_REVIEW_MONTHS = [0 => 'Never', 3 => 'Every 3 months', 6 => 'Every 6 months', 12 => 'Every year', 24 => 'Every 2 years']; // i18n-ignore - shown through __() in documentTemplateReviewLabel()
+
+/** How often a template's documents are reviewed (DOCUMENT_TEMPLATE_REVIEW_MONTHS), in the interface language - lower case to go in a sentence, with $lower. */
+function documentTemplateReviewLabel($months, $lower = false) {
+    $label = DOCUMENT_TEMPLATE_REVIEW_MONTHS[intval($months)] ?? '';
+    if ($label === '') {
+        return '';
+    }
+    $label = __($label); // i18n-dynamic - DOCUMENT_TEMPLATE_REVIEW_MONTHS, entries in lang/pt_BR/catalogs.php
+    return $lower ? lcfirst($label) : $label;
+}
+
+/** What a placeholder or table word (DOCUMENT_TEMPLATE_PLACEHOLDERS, DOCUMENT_TEMPLATE_TABLES) becomes, in the interface language. */
+function documentTemplateWordHelp($text) {
+    return __((string) $text); // i18n-dynamic - DOCUMENT_TEMPLATE_PLACEHOLDERS / TABLES, entries in lang/pt_BR/catalogs.php
+}
 
 /** The client tags templates are required by - [template id => [tag id => tag name]], in name order. */
 function documentTemplateRequiredTags(array $document_template_ids) {
@@ -689,12 +708,12 @@ function documentTemplateScopeSql($required, array $tag_ids) {
 /** Who a template is required of, in words - '' when it isn't. */
 function documentTemplateScopeText($required, array $tags) {
     if (intval($required) === DOCUMENT_TEMPLATE_REQUIRED_EVERY) {
-        return 'Every client';
+        return __('Every client');
     }
     if (intval($required) !== DOCUMENT_TEMPLATE_REQUIRED_TAGGED) {
         return '';
     }
-    return $tags ? 'Clients tagged ' . implode(' or ', $tags) : 'Clients with a tag - none picked';
+    return $tags ? __('Clients tagged %s', implode(__(' or '), $tags)) : __('Clients with a tag - none picked');
 }
 
 /*
@@ -744,7 +763,7 @@ function documentTemplatesMissingFor($client_id) {
 
 /* When a document was last looked at - made, edited or marked as reviewed - as SQL on documents. */
 function documentReviewedAtSql() {
-    return "GREATEST(documents.document_created_at, COALESCE(documents.document_updated_at, documents.document_created_at), COALESCE(documents.document_reviewed_at, documents.document_created_at))";
+    return "GREATEST(documents.document_created_at, COALESCE(documents.document_updated_at, documents.document_created_at), COALESCE(documents.document_reviewed_at, documents.document_created_at))"; // i18n-ignore - SQL
 }
 
 /*

@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             body: itflowSerialize(data)
         }).then(function (res) {
             return res.json().catch(function () {
-                return { error: 'Could not save that - reload and try again.' };
+                return { error: __('Could not save that - reload and try again.') };
             });
         });
     }
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).catch(function () {
                     card.classList.remove('is-saving');
                     putBack();
-                    itflowToast('Could not save that - check your connection and try again.', 'error');
+                    itflowToast(__('Could not save that - check your connection and try again.'), 'error');
                 });
             }
         });

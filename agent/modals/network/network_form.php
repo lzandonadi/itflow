@@ -49,13 +49,13 @@ $value = function ($key) use ($form) {
 
 <ul class="nav nav-pills nav-fill flex-nowrap overflow-auto mb-3 itflow-asset-form-tabs" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-network-wired me-2 d-none d-lg-inline"></i>Details</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-network-wired me-2 d-none d-lg-inline"></i><?= __('Details') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Addressing"><i class="fas fa-fw fa-sitemap me-2 d-none d-lg-inline"></i>Addressing</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Addressing"><i class="fas fa-fw fa-sitemap me-2 d-none d-lg-inline"></i><?= __('Addressing') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-pen me-2 d-none d-lg-inline"></i>Notes</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-pen me-2 d-none d-lg-inline"></i><?= __('Notes') ?></a>
     </li>
 </ul>
 
@@ -66,57 +66,57 @@ $value = function ($key) use ($form) {
     <div class="row g-3">
         <?php if (!$form_client_id) { ?>
             <div class="col-12">
-                <label class="form-label">Client <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="client_id" required>
-                        <option value="">- Select Client -</option>
+                        <option value=""><?= __('- Select Client -') ?></option>
                         <?php foreach ($client_options as $client_option) { ?>
                             <option value="<?= intval($client_option['client_id']) ?>"<?= selectOptionClient($client_option['client_id'], $client_option['client_name'], $client_option['client_abbreviation'] ?? '') ?>><?= escapeHtml($client_option['client_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">Pick its site and provider once it's saved.</div>
+                <div class="form-text"><?= __('Pick its site and provider once it\'s saved.') ?></div>
             </div>
         <?php } elseif ($is_new) { ?>
             <input type="hidden" name="client_id" value="<?= $form_client_id ?>">
         <?php } ?>
 
         <div class="col-md-7">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="Office LAN, Guest Wireless, Comcast Fiber" maxlength="200" value="<?= $value('network_name') ?>" required <?= $is_new ? 'autofocus' : '' ?> data-network-name>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Office LAN, Guest Wireless, Comcast Fiber')) ?>" maxlength="200" value="<?= $value('network_name') ?>" required <?= $is_new ? 'autofocus' : '' ?> data-network-name>
             </div>
         </div>
         <div class="col-md-5">
-            <label class="form-label">Type</label>
+            <label class="form-label"><?= __('Type') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-shapes"></i></span>
                 <select class="form-select select2" name="type" data-network-type data-type-picked="<?= $is_new && empty($form['network_type']) ? 0 : 1 ?>"
                     data-type-rules="<?= escapeHtml(json_encode(array_map(function ($patterns) { return $patterns[0]; }, NETWORK_TYPE_RULES))) ?>">
-                    <?php foreach (NETWORK_TYPES as $type => [$icon, $tone, $hint]) { ?>
-                        <option value="<?= $type ?>" <?= $form_type === $type ? 'selected' : '' ?> data-icon="fas <?= $icon ?>" data-color="<?= networkToneColor($tone) ?>" data-description="<?= escapeHtml($hint) ?>"><?= $type ?></option>
+                    <?php foreach (networkTypes() as $type => [$icon, $tone, $hint]) { ?>
+                        <option value="<?= $type ?>" <?= $form_type === $type ? 'selected' : '' ?> data-icon="fas <?= $icon ?>" data-color="<?= networkToneColor($tone) ?>" data-description="<?= escapeHtml($hint) ?>"><?= escapeHtml(networkTypeName($type)) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
 
         <div class="col-12">
-            <label class="form-label">Description</label>
+            <label class="form-label"><?= __('Description') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-align-left"></i></span>
-                <input type="text" class="form-control" name="description" placeholder="Workstations and printers, internet only, 500/500 fiber" value="<?= $value('network_description') ?>">
+                <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('Workstations and printers, internet only, 500/500 fiber')) ?>" value="<?= $value('network_description') ?>">
             </div>
         </div>
 
         <?php if ($form_client_id) { ?>
             <div class="col-md-8">
-                <label class="form-label">Site</label>
+                <label class="form-label"><?= __('Site') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>
                     <select class="form-select select2" name="location_id">
-                        <option value="0">- No site -</option>
+                        <option value="0"><?= __('- No site -') ?></option>
                         <?php foreach ($location_options as $location) { ?>
                             <option value="<?= intval($location['location_id']) ?>" <?= $form_location_id === intval($location['location_id']) ? 'selected' : '' ?>
                                 data-icon="fas fa-<?= intval($location['location_primary']) ? 'building' : 'map-marker-alt' ?>"<?= $location['location_archived_at'] ? ' data-description="Archived"' : (intval($location['location_primary']) ? ' data-description="Primary"' : '') ?>><?= escapeHtml($location['location_name']) ?></option>
@@ -126,7 +126,7 @@ $value = function ($key) use ($form) {
             </div>
         <?php } ?>
         <div class="<?= $form_client_id ? 'col-md-4' : 'col-md-5' ?>">
-            <label class="form-label">VLAN</label>
+            <label class="form-label"><?= __('VLAN') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-layer-group"></i></span>
                 <input type="number" class="form-control" name="vlan" min="1" max="4094" placeholder="e.g. 10" value="<?= $value('network_vlan') ?>">
@@ -135,12 +135,12 @@ $value = function ($key) use ($form) {
 
         <?php if ($form_client_id) { ?>
             <div class="col-12" data-network-provider <?= $form_type === 'WAN' || $form_vendor_id ? '' : 'hidden' ?>>
-                <label class="form-label">Provider <span class="small text-body-secondary fw-normal">- who to call when it is down</span></label>
+                <label class="form-label"><?= __('Provider') ?> <span class="small text-body-secondary fw-normal"><?= __('- who to call when it is down') ?></span></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-building"></i></span>
                     <select class="form-select select2" name="vendor_id">
-                        <option value="0">- No provider -</option>
-                        <?php foreach (['client' => escapeHtml($form['client_name'] ?? 'The client') . "'s vendors", 'ours' => 'Your vendors'] as $group => $label) {
+                        <option value="0"><?= __('- No provider -') ?></option>
+                        <?php foreach (['client' => __('%s\'s vendors', escapeHtml($form['client_name'] ?? __('The client'))), 'ours' => __('Your vendors')] as $group => $label) {
                             if (empty($vendor_options[$group])) {
                                 continue;
                             } ?>
@@ -152,11 +152,11 @@ $value = function ($key) use ($form) {
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">The ISP - its phone, account number and hours show on the network.</div>
+                <div class="form-text"><?= __('The ISP - its phone, account number and hours show on the network.') ?></div>
             </div>
         <?php } ?>
         <div class="col-12">
-            <?= tagFormFieldHtml('network', $is_new ? [] : tagIdsForRecord('network', $form['network_id']), 'Managed, Segmented, PCI') ?>
+            <?= tagFormFieldHtml('network', $is_new ? [] : tagIdsForRecord('network', $form['network_id']), __('Managed, Segmented, PCI')) ?>
         </div>
     </div>
 </div>
@@ -165,17 +165,17 @@ $value = function ($key) use ($form) {
 <div class="tab-pane fade" id="<?= $form_id ?>Addressing">
     <div class="row g-3">
         <div class="col-12">
-            <label class="form-label">Subnet <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Subnet') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-network-wired"></i></span>
                 <input type="text" class="form-control font-monospace" name="network" placeholder="192.168.1.0/24" maxlength="200" value="<?= $value('network') ?>" required data-network-cidr>
             </div>
             <div class="small mt-1 itflow-net-cidr-info" data-network-cidr-info>
-                <span class="text-body-secondary">An address and its prefix - 192.168.1.0/24, 10.20.0.0/255.255.252.0 or 2001:db8::/64.</span>
+                <span class="text-body-secondary"><?= __('An address and its prefix - 192.168.1.0/24, 10.20.0.0/255.255.252.0 or 2001:db8::/64.') ?></span>
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Gateway</label>
+            <label class="form-label"><?= __('Gateway') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-door-open"></i></span>
                 <input type="text" class="form-control font-monospace" name="gateway" placeholder="192.168.1.1" maxlength="200" value="<?= $value('network_gateway') ?>" data-network-gateway>
@@ -183,7 +183,7 @@ $value = function ($key) use ($form) {
             <div class="form-text" data-network-suggest="gateway" hidden></div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">DHCP range</label>
+            <label class="form-label"><?= __('DHCP range') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-random"></i></span>
                 <input type="text" class="form-control font-monospace" name="dhcp_range" placeholder="192.168.1.100 - 192.168.1.199" maxlength="200" value="<?= $value('network_dhcp_range') ?>" data-network-range>
@@ -191,14 +191,14 @@ $value = function ($key) use ($form) {
             <div class="form-text" data-network-suggest="range" hidden></div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Primary DNS</label>
+            <label class="form-label"><?= __('Primary DNS') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search-location"></i></span>
                 <input type="text" class="form-control font-monospace" name="primary_dns" placeholder="192.168.1.10" maxlength="200" value="<?= $value('network_primary_dns') ?>">
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Secondary DNS</label>
+            <label class="form-label"><?= __('Secondary DNS') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search-location"></i></span>
                 <input type="text" class="form-control font-monospace" name="secondary_dns" placeholder="1.1.1.1" maxlength="200" value="<?= $value('network_secondary_dns') ?>">
@@ -208,7 +208,7 @@ $value = function ($key) use ($form) {
 </div>
 
 <div class="tab-pane fade" id="<?= $form_id ?>Notes">
-    <textarea class="form-control" name="notes" rows="10" placeholder="Firewall rules, what it can reach, the switch ports it is on, the DHCP server"><?= $value('network_notes') ?></textarea>
+    <textarea class="form-control" name="notes" rows="10" placeholder="<?= escapeHtml(__('Firewall rules, what it can reach, the switch ports it is on, the DHCP server')) ?>"><?= $value('network_notes') ?></textarea>
 </div>
 
 </div>

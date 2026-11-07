@@ -29,11 +29,11 @@ function aiProviderKinds() {
     return [
         'openai' => ['name' => 'OpenAI', 'url' => 'https://api.openai.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
             'keys_url' => 'https://platform.openai.com/api-keys', 'example' => 'gpt-5-mini'],
-        'anthropic' => ['name' => 'Anthropic (Claude)', 'url' => 'https://api.anthropic.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'anthropic', 'local' => false,
+        'anthropic' => ['name' => 'Anthropic (Claude)', 'url' => 'https://api.anthropic.com/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'anthropic', 'local' => false, // i18n-ignore - provider names
             'keys_url' => 'https://console.anthropic.com/settings/keys', 'example' => 'claude-sonnet-5-5'],
-        'azure' => ['name' => 'Azure OpenAI', 'url' => 'https://YOUR-RESOURCE.openai.azure.com/openai/v1/chat/completions', 'key' => true, 'auth' => 'api-key', 'models' => '', 'local' => false,
-            'keys_url' => 'https://portal.azure.com', 'example' => 'your deployment name'],
-        'gemini' => ['name' => 'Google Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
+        'azure' => ['name' => 'Azure OpenAI', 'url' => 'https://YOUR-RESOURCE.openai.azure.com/openai/v1/chat/completions', 'key' => true, 'auth' => 'api-key', 'models' => '', 'local' => false, // i18n-ignore - provider names
+            'keys_url' => 'https://portal.azure.com', 'example' => __('your deployment name')],
+        'gemini' => ['name' => 'Google Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false, // i18n-ignore - provider names
             'keys_url' => 'https://aistudio.google.com/apikey', 'example' => 'gemini-2.5-flash'],
         'mistral' => ['name' => 'Mistral', 'url' => 'https://api.mistral.ai/v1/chat/completions', 'key' => true, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
             'keys_url' => 'https://console.mistral.ai/api-keys', 'example' => 'mistral-small-latest'],
@@ -43,10 +43,10 @@ function aiProviderKinds() {
             'keys_url' => 'https://openrouter.ai/keys', 'example' => 'openai/gpt-5-mini'],
         'ollama' => ['name' => 'Ollama', 'url' => 'http://localhost:11434/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true,
             'keys_url' => '', 'example' => 'llama3.1'],
-        'lmstudio' => ['name' => 'LM Studio', 'url' => 'http://localhost:1234/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true,
-            'keys_url' => '', 'example' => 'the model loaded in LM Studio'],
-        'custom' => ['name' => 'Other (OpenAI-compatible)', 'url' => '', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
-            'keys_url' => '', 'example' => 'its model name'],
+        'lmstudio' => ['name' => 'LM Studio', 'url' => 'http://localhost:1234/v1/chat/completions', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => true, // i18n-ignore - provider names
+            'keys_url' => '', 'example' => __('the model loaded in LM Studio')],
+        'custom' => ['name' => __('Other (OpenAI-compatible)'), 'url' => '', 'key' => false, 'auth' => 'bearer', 'models' => 'openai', 'local' => false,
+            'keys_url' => '', 'example' => __('its model name')],
     ];
 }
 
@@ -59,30 +59,30 @@ function aiProviderKind($kind) {
 /* What a model can be for, and the features each covers. A use case with no model of its own uses General. */
 function aiUseCases() {
     return [
-        'General' => 'Everything without a model of its own - Reword and translate in any editor, and client briefings.',
-        'Tickets' => 'Drafting replies, triage, summaries, and Reword and translate in the ticket reply editor.',
-        'Documentation' => 'Drafting and reviewing documents, writing a ticket up as a document, and drafting document templates.',
-        'Billing' => 'Writing quotes and invoices - their lines from your catalog, labor at the client\'s rate - and the work done on a ticket for its invoice line.',
+        'General' => __('Everything without a model of its own - Reword and translate in any editor, and client briefings.'),
+        'Tickets' => __('Drafting replies, triage, summaries, and Reword and translate in the ticket reply editor.'),
+        'Documentation' => __('Drafting and reviewing documents, writing a ticket up as a document, and drafting document templates.'),
+        'Billing' => __('Writing quotes and invoices - their lines from your catalog, labor at the client\'s rate - and the work done on a ticket for its invoice line.'),
     ];
 }
 
 /* Each AI feature - its name as Admin > AI Usage shows it. */
 function aiFeatures() {
     return [
-        'reword' => 'Reword',
-        'reword_ticket' => 'Reword a ticket reply',
-        'translate' => 'Translate',
-        'ticket_draft' => 'Draft a reply',
-        'ticket_triage' => 'Triage',
-        'ticket_summary' => 'Ticket summary',
-        'document_template' => 'Document template draft',
-        'ticket_document' => 'Ticket written up as a document',
-        'document_draft' => 'Document draft',
-        'document_review' => 'Document review',
-        'client_briefing' => 'Client briefing',
-        'billing_draft' => 'Quote or invoice written',
-        'invoice_description' => 'Ticket time described for its invoice',
-        'test' => 'Test',
+        'reword' => __('Reword'),
+        'reword_ticket' => __('Reword a ticket reply'),
+        'translate' => __('Translate'),
+        'ticket_draft' => __('Draft a reply'),
+        'ticket_triage' => __('Triage'),
+        'ticket_summary' => __('Ticket summary'),
+        'document_template' => __('Document template draft'),
+        'ticket_document' => __('Ticket written up as a document'),
+        'document_draft' => __('Document draft'),
+        'document_review' => __('Document review'),
+        'client_briefing' => __('Client briefing'),
+        'billing_draft' => __('Quote or invoice written'),
+        'invoice_description' => __('Ticket time described for its invoice'),
+        'test' => __('Test'),
     ];
 }
 
@@ -148,28 +148,44 @@ function aiClientConfig() {
     }
     // Draft is on the ticket reply editor only - its textarea says which ticket
     return ['reword' => $general, 'rewordTicket' => $tickets, 'draft' => $tickets, 'endpoint' => '/agent/ajax.php',
-        'tones' => aiRewordTones(), 'languages' => aiLanguages()];
+        'tones' => aiRewordTones(), 'languages' => aiLanguages(), 'language_labels' => aiLanguageLabels()];
 }
 
 /* What Reword can do to text - tone => what the editor's menu calls it. Reword is the button itself; Translate asks which language. */
 function aiRewordTones() {
     return [
-        'reword' => 'Reword - clearer and more professional',
-        'shorter' => 'Make it shorter',
-        'formal' => 'More formal',
-        'friendly' => 'Friendlier',
-        'plain' => 'Plain English, for someone non-technical',
-        'structure' => 'Organize it - headings and lists',
-        'proofread' => 'Just fix spelling and grammar',
-        'translate' => 'Translate...',
+        'reword' => __('Reword - clearer and more professional'),
+        'shorter' => __('Make it shorter'),
+        'formal' => __('More formal'),
+        'friendly' => __('Friendlier'),
+        'plain' => __('Plain English, for someone non-technical'),
+        'structure' => __('Organize it - headings and lists'),
+        'proofread' => __('Just fix spelling and grammar'),
+        'translate' => __('Translate...'),
     ];
 }
 
 /* The languages Translate offers. */
 function aiLanguages() {
+    // i18n-ignore-start - the names the model is asked for; aiLanguageLabels() shows them
     return ['English', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Polish', 'Swedish', 'Danish', 'Norwegian', 'Finnish', 'Czech', 'Romanian',
         'Hungarian', 'Greek', 'Turkish', 'Russian', 'Ukrainian', 'Arabic', 'Hebrew', 'Hindi', 'Vietnamese', 'Thai', 'Indonesian', 'Filipino', 'Chinese (Simplified)',
         'Chinese (Traditional)', 'Japanese', 'Korean'];
+    // i18n-ignore-end
+}
+
+/* The languages Translate offers as the menu shows them - the English name (what the model is asked for) => its name in the interface language. */
+function aiLanguageLabels() {
+    $labels = [];
+    foreach (aiLanguages() as $language) {
+        $labels[$language] = _x($language, 'language'); // i18n-dynamic - aiLanguages(), entries in lang/pt_BR/ai.php
+    }
+    return $labels;
+}
+
+/* A use case's name as shown - aiUseCases() keys stay English (they are stored). */
+function aiUseCaseLabel($use_case) {
+    return _x((string) $use_case, 'ai use case'); // i18n-dynamic - aiUseCases() keys, entries in lang/pt_BR/ai.php
 }
 
 /*
@@ -179,6 +195,7 @@ function aiLanguages() {
  * placeholders, and the HTML formatting.
  */
 function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
+    // i18n-ignore-start - what the model is told, in English
     $what = $use_case === 'Tickets' ? 'the replies an IT services company sends on support tickets' : 'what an IT services company writes';
     $asks = [
         'reword' => $use_case === 'Tickets'
@@ -198,6 +215,7 @@ function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
         . ' Don\'t add anything it doesn\'t say. Keep its HTML formatting - paragraphs, line breaks, lists, bold and links' . ($tone === 'structure' ? ', adding the headings and lists asked for' : '')
         . ' - and answer with the HTML only: no introduction, no notes, no code fences.';
     return $instructions;
+    // i18n-ignore-end
 }
 
 /*
@@ -206,7 +224,7 @@ function aiRewordInstructions($use_case, $tone = 'reword', $language = '') {
  */
 function aiModelMissingError($use_case) {
     logApp('AI', 'warning', "No AI model configured for use case '$use_case' and no General model to fall back on");
-    return "No AI model is set up for $use_case. Add one in Admin > AI Providers.";
+    return __('No AI model is set up for %s. Add one in Admin > AI Providers.', aiUseCaseLabel($use_case));
 }
 
 /* ------------------------------------------------------------- Keeping secrets out */
@@ -302,10 +320,10 @@ function aiRestore($text, array $secrets) {
 
 /* The headers a provider is sent - its key, as its kind takes it. */
 function aiProviderHeaders($kind, $api_key, $json = true) {
-    $headers = $json ? ['Content-Type: application/json'] : [];
+    $headers = $json ? ['Content-Type: application/json'] : []; // i18n-ignore - HTTP headers
     $api_key = trim((string) $api_key);
     if ($api_key !== '') {
-        $headers[] = aiProviderKind($kind)['auth'] === 'api-key' ? "api-key: $api_key" : "Authorization: Bearer $api_key";
+        $headers[] = aiProviderKind($kind)['auth'] === 'api-key' ? "api-key: $api_key" : "Authorization: Bearer $api_key"; // i18n-ignore - HTTP headers
     }
     return $headers;
 }
@@ -326,6 +344,7 @@ function aiProviderHeaders($kind, $api_key, $json = true) {
  * diagnosable. The API key and the message bodies never do.
  */
 function callAiApi($model, $messages, array $context = []) {
+    // i18n-ignore-start - the system messages and what is recorded in AI usage are English
     $messages = array_values($messages);
     if (($messages[0]['role'] ?? '') !== 'system') {
         array_unshift($messages, ['role' => 'system', 'content' => 'You are a helpful assistant for an IT services company.']);
@@ -383,7 +402,7 @@ function callAiApi($model, $messages, array $context = []) {
     if ($response === false) {
         logApp('AI', 'error', "$label - could not reach the provider: $transport_error");
         aiUsageRecord($usage + ['ok' => false, 'error' => 'Could not reach the provider']);
-        return ['ok' => false, 'error' => 'Could not reach the AI provider.'];
+        return ['ok' => false, 'error' => __('Could not reach the AI provider.')];
     }
 
     $decoded = json_decode($response, true);
@@ -402,14 +421,15 @@ function callAiApi($model, $messages, array $context = []) {
         }
         logApp('AI', 'error', $detail);
         aiUsageRecord($usage + ['ok' => false, 'error' => "HTTP $status" . (!empty($provider_error['message']) && is_scalar($provider_error['message']) ? ' - ' . $provider_error['message'] : '')]);
-        return ['ok' => false, 'error' => "The AI provider turned the request away (HTTP $status) - see Admin > App Logs."];
+        return ['ok' => false, 'error' => __('The AI provider turned the request away (HTTP %d) - see Admin > App Logs.', $status)];
     }
 
     $content = $decoded['choices'][0]['message']['content'] ?? null;
     if (!is_string($content)) {
         logApp('AI', 'error', "$label - HTTP $status but the response carried no choices[0].message.content");
         aiUsageRecord($usage + ['ok' => false, 'error' => 'No answer in the response']);
-        return ['ok' => false, 'error' => 'The AI provider returned an unexpected response - see Admin > App Logs.'];
+    // i18n-ignore-end
+        return ['ok' => false, 'error' => __('The AI provider returned an unexpected response - see Admin > App Logs.')];
     }
 
     aiUsageRecord($usage + ['ok' => true, 'tokens_in' => intval($decoded['usage']['prompt_tokens'] ?? 0), 'tokens_out' => intval($decoded['usage']['completion_tokens'] ?? 0)]);
@@ -554,15 +574,15 @@ function aiProviderTest($kind, $url, $api_key) {
     curl_close($ch);
 
     if ($response === false) {
-        return ['ok' => false, 'models' => [], 'error' => "It couldn't be reached - $transport_error.", 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __("It couldn't be reached - %s.", $transport_error), 'listed' => true];
     }
     $decoded = json_decode($response, true);
     if ($status === 401 || $status === 403) {
-        return ['ok' => false, 'models' => [], 'error' => "It turned the key away (HTTP $status) - check it is right and still active.", 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __('It turned the key away (HTTP %s) - check it is right and still active.', $status), 'listed' => true];
     }
     if ($status < 200 || $status > 299 || !is_array($decoded)) {
         $message = is_array($decoded['error'] ?? null) ? (string) ($decoded['error']['message'] ?? '') : (is_string($decoded['error'] ?? null) ? $decoded['error'] : '');
-        return ['ok' => false, 'models' => [], 'error' => "It answered HTTP $status" . ($message !== '' ? " - " . mb_substr($message, 0, 200) : '') . ' - check the address.', 'listed' => true];
+        return ['ok' => false, 'models' => [], 'error' => __('It answered HTTP %1$s%2$s - check the address.', $status, $message !== '' ? ' - ' . mb_substr($message, 0, 200) : ''), 'listed' => true];
     }
     $models = [];
     foreach ((array) ($decoded['data'] ?? $decoded['models'] ?? []) as $item) {
@@ -631,34 +651,34 @@ function aiProviderCheck(array $post, $before = null) {
     $errors = [];
     $kind = (string) ($post['kind'] ?? ($before['ai_provider_kind'] ?? 'custom'));
     if (!isset($kinds[$kind])) {
-        $errors['kind'] = 'Pick what kind of provider it is.';
+        $errors['kind'] = __('Pick what kind of provider it is.');
         $kind = 'custom';
     }
     $info = $kinds[$kind];
 
     $name = trim(preg_replace('/\s+/', ' ', (string) ($post['name'] ?? '')));
     if ($name === '') {
-        $errors['name'] = 'Give it a name - ' . $info['name'] . ', or what you call it.';
+        $errors['name'] = __('Give it a name - %s, or what you call it.', $info['name']);
     } elseif (mb_strlen($name) > 200) {
-        $errors['name'] = 'That name is longer than 200 characters.';
+        $errors['name'] = __('That name is longer than 200 characters.');
     } else {
         global $mysqli;
         $taken = mysqli_fetch_row(mysqli_query($mysqli, "SELECT ai_provider_id FROM ai_providers WHERE ai_provider_name = '" . mysqli_real_escape_string($mysqli, $name) . "'
             AND ai_provider_id <> " . intval($before['ai_provider_id'] ?? 0) . " LIMIT 1"));
         if ($taken) {
-            $errors['name'] = 'There is a provider called that already - give this one a name of its own.';
+            $errors['name'] = __('There is a provider called that already - give this one a name of its own.');
         }
     }
 
     $url = aiProviderUrl($kind, $post['url'] ?? '');
     if ($url === '') {
-        $errors['url'] = 'Its address is needed - where ITFlow sends requests.';
+        $errors['url'] = __('Its address is needed - where ITFlow sends requests.');
     } elseif (mb_strlen($url) > 500) {
-        $errors['url'] = 'That address is longer than 500 characters.';
+        $errors['url'] = __('That address is longer than 500 characters.');
     } elseif (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $url)) {
-        $errors['url'] = "That isn't a web address - it starts https:// (or http:// for one on your own network).";
+        $errors['url'] = __("That isn't a web address - it starts https:// (or http:// for one on your own network).");
     } elseif (stripos($url, 'YOUR-RESOURCE') !== false) {
-        $errors['url'] = 'Put your Azure resource name in place of YOUR-RESOURCE - it is in the Azure portal, under Keys and Endpoint.';
+        $errors['url'] = __('Put your Azure resource name in place of YOUR-RESOURCE - it is in the Azure portal, under Keys and Endpoint.');
     }
 
     $key = (string) ($post['api_key'] ?? '');
@@ -670,11 +690,11 @@ function aiProviderCheck(array $post, $before = null) {
         $key_after = $key !== '' ? $key : $saved_key;
     }
     if (mb_strlen($key_after) > 500) {
-        $errors['api_key'] = 'That key is longer than 500 characters.';
+        $errors['api_key'] = __('That key is longer than 500 characters.');
     } elseif ($key !== '' && preg_match('/\s/', $key)) {
-        $errors['api_key'] = "A key has no spaces in it - check it was copied whole.";
+        $errors['api_key'] = __('A key has no spaces in it - check it was copied whole.');
     } elseif ($info['key'] && $key_after === '') {
-        $errors['api_key'] = $info['name'] . ' needs an API key' . ($info['keys_url'] !== '' ? ' - make one in its console.' : '.');
+        $errors['api_key'] = $info['keys_url'] !== '' ? __('%s needs an API key - make one in its console.', $info['name']) : __('%s needs an API key.', $info['name']);
     }
 
     $after = [
@@ -712,24 +732,24 @@ function aiProviderWrite(array $after, $provider_id = 0) {
     return intval(mysqli_insert_id($mysqli));
 }
 
-/* What changed on a provider, a line each, from what to what - the key only as changed. Plain text. */
+/* What changed on a provider, a line each, from what to what - the key only as changed. Plain text, in the interface language (the audit log's copy through i18nEnglish()). */
 function aiProviderChangeLines(array $before, array $after) {
     $lines = [];
     if ((string) $before['ai_provider_name'] !== $after['ai_provider_name']) {
         $lines[] = "Name {$before['ai_provider_name']} → {$after['ai_provider_name']}";
     }
     if ((string) $before['ai_provider_kind'] !== $after['ai_provider_kind']) {
-        $lines[] = 'Kind ' . aiProviderKind($before['ai_provider_kind'])['name'] . ' → ' . aiProviderKind($after['ai_provider_kind'])['name'];
+        $lines[] = __('Kind %1$s → %2$s', aiProviderKind($before['ai_provider_kind'])['name'], aiProviderKind($after['ai_provider_kind'])['name']);
     }
     if ((string) $before['ai_provider_api_url'] !== $after['ai_provider_api_url']) {
-        $lines[] = "Address {$before['ai_provider_api_url']} → {$after['ai_provider_api_url']}";
+        $lines[] = __('Address %1$s → %2$s', $before['ai_provider_api_url'], $after['ai_provider_api_url']);
     }
     $was_key = (string) $before['ai_provider_api_key'];
     if ($was_key !== $after['ai_provider_api_key']) {
-        $lines[] = $was_key === '' ? 'API key added' : ($after['ai_provider_api_key'] === '' ? 'API key removed' : 'API key changed');
+        $lines[] = $was_key === '' ? __('API key added') : ($after['ai_provider_api_key'] === '' ? __('API key removed') : __('API key changed'));
     }
     if (intval($before['ai_provider_redact']) !== $after['ai_provider_redact']) {
-        $lines[] = $after['ai_provider_redact'] ? 'Passwords and keys taken out of what is sent' : 'Passwords and keys sent as they are';
+        $lines[] = $after['ai_provider_redact'] ? __('Passwords and keys taken out of what is sent') : __('Passwords and keys sent as they are');
     }
     return $lines;
 }
@@ -739,27 +759,27 @@ function aiModelCheck(array $post) {
     $errors = [];
     $provider = aiProviderRow($post['provider'] ?? 0);
     if (!$provider) {
-        $errors['provider'] = 'Pick the provider it is on.';
+        $errors['provider'] = __('Pick the provider it is on.');
     }
     $name = trim((string) ($post['model'] ?? ''));
     if ($name === '') {
-        $errors['model'] = "Its name is needed, as the provider knows it" . ($provider ? ' - like ' . aiProviderKind($provider['ai_provider_kind'])['example'] : '') . '.';
+        $errors['model'] = $provider ? __('Its name is needed, as the provider knows it - like %s.', aiProviderKind($provider['ai_provider_kind'])['example']) : __('Its name is needed, as the provider knows it.');
     } elseif (mb_strlen($name) > 200) {
-        $errors['model'] = 'That name is longer than 200 characters.';
+        $errors['model'] = __('That name is longer than 200 characters.');
     } elseif (preg_match('/\s/', $name) && !in_array($provider['ai_provider_kind'] ?? '', ['azure', 'custom'], true)) {
-        $errors['model'] = "A model's name has no spaces - " . aiProviderKind($provider['ai_provider_kind'] ?? 'custom')['example'] . ', say.';
+        $errors['model'] = __("A model's name has no spaces - %s, say.", aiProviderKind($provider['ai_provider_kind'] ?? 'custom')['example']);
     }
     $use_case = (string) ($post['use_case'] ?? '');
     if (!isset(aiUseCases()[$use_case])) {
-        $errors['use_case'] = 'Pick what it is for.';
+        $errors['use_case'] = __('Pick what it is for.');
     }
     $temperature = trim((string) ($post['temperature'] ?? ''));
     if ($temperature !== '' && (!is_numeric($temperature) || floatval($temperature) < 0 || floatval($temperature) > 2)) {
-        $errors['temperature'] = 'A temperature is from 0 to 2 - or leave it empty for the model\'s own.';
+        $errors['temperature'] = __('A temperature is from 0 to 2 - or leave it empty for the model\'s own.');
     }
     $prompt = trim(str_replace("\r\n", "\n", (string) ($post['prompt'] ?? '')));
     if (mb_strlen($prompt) > 4000) {
-        $errors['prompt'] = 'Keep the instructions under 4,000 characters - they go with every request.';
+        $errors['prompt'] = __('Keep the instructions under 4,000 characters - they go with every request.');
     }
     $after = [
         'ai_model_ai_provider_id' => intval($provider['ai_provider_id'] ?? 0),
@@ -790,27 +810,27 @@ function aiModelWrite(array $after, $model_id = 0) {
 
 /* A temperature as it reads - "the model's own" when there is none. */
 function aiTemperatureText($temperature) {
-    return $temperature === null || $temperature === '' ? "the model's own" : rtrim(rtrim(number_format(floatval($temperature), 2, '.', ''), '0'), '.');
+    return $temperature === null || $temperature === '' ? __("the model's own") : rtrim(rtrim(number_format(floatval($temperature), 2, '.', ''), '0'), '.');
 }
 
-/* What changed on a model, a line each, from what to what - the instructions only as changed. Plain text. */
+/* What changed on a model, a line each, from what to what - the instructions only as changed. Plain text, in the interface language (the audit log's copy through i18nEnglish()). */
 function aiModelChangeLines(array $before, array $after) {
     $lines = [];
     if (intval($before['ai_model_ai_provider_id']) !== $after['ai_model_ai_provider_id']) {
-        $lines[] = 'Provider ' . ($before['ai_provider_name'] ?? '#' . $before['ai_model_ai_provider_id']) . ' → ' . (aiProviderRow($after['ai_model_ai_provider_id'])['ai_provider_name'] ?? '');
+        $lines[] = __('Provider %1$s → %2$s', $before['ai_provider_name'] ?? '#' . $before['ai_model_ai_provider_id'], aiProviderRow($after['ai_model_ai_provider_id'])['ai_provider_name'] ?? '');
     }
     if ((string) $before['ai_model_name'] !== $after['ai_model_name']) {
-        $lines[] = "Model {$before['ai_model_name']} → {$after['ai_model_name']}";
+        $lines[] = __('Model %1$s → %2$s', $before['ai_model_name'], $after['ai_model_name']);
     }
     if ((string) $before['ai_model_use_case'] !== $after['ai_model_use_case']) {
-        $lines[] = "For {$before['ai_model_use_case']} → {$after['ai_model_use_case']}";
+        $lines[] = __('For %1$s → %2$s', aiUseCaseLabel($before['ai_model_use_case']), aiUseCaseLabel($after['ai_model_use_case']));
     }
     $was = $before['ai_model_temperature'] === null ? null : round(floatval($before['ai_model_temperature']), 2);
     if ($was !== $after['ai_model_temperature']) {
-        $lines[] = 'Temperature ' . aiTemperatureText($was) . ' → ' . aiTemperatureText($after['ai_model_temperature']);
+        $lines[] = __('Temperature %1$s → %2$s', aiTemperatureText($was), aiTemperatureText($after['ai_model_temperature']));
     }
     if (trim((string) $before['ai_model_prompt']) !== $after['ai_model_prompt']) {
-        $lines[] = $after['ai_model_prompt'] === '' ? 'Instructions removed' : (trim((string) $before['ai_model_prompt']) === '' ? 'Instructions added' : 'Instructions changed');
+        $lines[] = $after['ai_model_prompt'] === '' ? __('Instructions removed') : (trim((string) $before['ai_model_prompt']) === '' ? __('Instructions added') : __('Instructions changed'));
     }
     return $lines;
 }
@@ -878,18 +898,18 @@ function aiUseCaseStripHtml() {
     foreach (aiUseCaseMap()['map'] as $use_case => $lands) {
         $model = $lands['model'];
         if (!$model) {
-            $says = '<span class="text-warning-emphasis">nothing set up</span>';
+            $says = '<span class="text-warning-emphasis">' . __('nothing set up') . '</span>';
             $tone = 'border-warning-subtle bg-warning-subtle';
         } elseif ($lands['own']) {
-            $says = '<span class="fw-semibold">' . escapeHtml($model['ai_model_name']) . '</span> <span class="text-body-secondary">on ' . escapeHtml($model['ai_provider_name']) . '</span>';
+            $says = '<span class="fw-semibold">' . escapeHtml($model['ai_model_name']) . '</span> <span class="text-body-secondary">' . __('on %s', escapeHtml($model['ai_provider_name'])) . '</span>';
             $tone = 'bg-body';
         } else {
-            $says = '<span class="text-body-secondary">General\'s - ' . escapeHtml($model['ai_model_name']) . '</span>';
+            $says = '<span class="text-body-secondary">' . __('%1$s\'s - %2$s', aiUseCaseLabel('General'), escapeHtml($model['ai_model_name'])) . '</span>';
             $tone = 'bg-body';
         }
         $html .= '<div class="border rounded-pill px-3 py-1 small text-nowrap ' . $tone . '" data-ai-use-case="' . escapeHtml($use_case) . '" title="' . escapeHtml(aiUseCases()[$use_case]) . '">'
             . '<i class="fas fa-fw ' . (['General' => 'fa-magic', 'Tickets' => 'fa-life-ring', 'Documentation' => 'fa-file-alt', 'Billing' => 'fa-file-invoice-dollar'][$use_case] ?? 'fa-robot') . ' text-secondary me-1"></i>'
-            . escapeHtml($use_case) . ' <i class="fas fa-long-arrow-alt-right text-secondary mx-1"></i>' . $says . '</div>';
+            . escapeHtml(aiUseCaseLabel($use_case)) . ' <i class="fas fa-long-arrow-alt-right text-secondary mx-1"></i>' . $says . '</div>';
     }
     return $html . '</div>';
 }
@@ -913,7 +933,7 @@ function aiProblems() {
     if (!$last || intval($last['ai_usage_ok']) === 1) {
         return [];
     }
-    return [['warning', 'fa-robot', $failed . ' AI request' . ($failed === 1 ? '' : 's') . ' failed today',
-        'The last, to ' . $last['ai_usage_provider_name'] . ', too' . ($last['ai_usage_error'] ? ' - ' . $last['ai_usage_error'] : '') . '. Reword and summaries fail for agents until it is put right.',
-        'ai_usage.php?view=failed', 'See why']];
+    return [['warning', 'fa-robot', _n('%d AI request failed today', '%d AI requests failed today', $failed),
+        __('The last, to %1$s, too%2$s. Reword and summaries fail for agents until it is put right.', $last['ai_usage_provider_name'], $last['ai_usage_error'] ? ' - ' . $last['ai_usage_error'] : ''),
+        'ai_usage.php?view=failed', __('See why')]];
 }

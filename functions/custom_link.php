@@ -13,11 +13,11 @@
 /** Where a link can show - [location => label, icon, what it is]. */
 function customLinkLocations() {
     return [
-        1 => ['label' => 'Agent menu', 'icon' => 'fa-bars', 'about' => 'The menu down the left of every agent page, under Tools'],
-        2 => ['label' => 'Top bar', 'icon' => 'fa-window-maximize', 'about' => 'An icon in the bar along the top of every agent page - its name shows on hover'],
-        3 => ['label' => 'Client portal', 'icon' => 'fa-user-friends', 'about' => 'The client portal\'s menu, for every contact who signs in'],
-        4 => ['label' => 'Admin menu', 'icon' => 'fa-user-shield', 'about' => 'The menu down the left of the admin pages, for admins only'],
-        5 => ['label' => 'Reports menu', 'icon' => 'fa-chart-line', 'about' => 'The menu down the left of the reports'],
+        1 => ['label' => __('Agent menu'), 'icon' => 'fa-bars', 'about' => __('The menu down the left of every agent page, under Tools')],
+        2 => ['label' => __('Top bar'), 'icon' => 'fa-window-maximize', 'about' => __('An icon in the bar along the top of every agent page - its name shows on hover')],
+        3 => ['label' => __('Client portal'), 'icon' => 'fa-user-friends', 'about' => __('The client portal\'s menu, for every contact who signs in')],
+        4 => ['label' => __('Admin menu'), 'icon' => 'fa-user-shield', 'about' => __('The menu down the left of the admin pages, for admins only')],
+        5 => ['label' => __('Reports menu'), 'icon' => 'fa-chart-line', 'about' => __('The menu down the left of the reports')],
     ];
 }
 
@@ -53,19 +53,19 @@ function customLinkIcon($icon) {
 function customLinkUriProblem($uri) {
     $uri = trim((string) $uri);
     if ($uri === '') {
-        return 'Add the address it goes to.';
+        return __('Add the address it goes to.');
     }
     if (mb_strlen($uri) > 500) {
-        return 'That address is longer than 500 characters.';
+        return __('That address is longer than 500 characters.');
     }
     if (preg_match('/[\x00-\x1F\x7F]/', $uri)) {
-        return 'That address has a line break or another control character in it.';
+        return __('That address has a line break or another control character in it.');
     }
     if (preg_match('/^([a-z][a-z0-9+.-]*):/i', $uri, $m)) {
         $allowed = ['http', 'https', 'mailto', 'tel', 'file', 'ftp', 'ftps', 'sftp', 'dav', 'webdav', 'caldav', 'carddav', 'ssh', 'telnet', 'smb', 'rdp', 'vnc',
             'rustdesk', 'anydesk', 'connectwise', 'splashtop', 'sip', 'sips', 'ldap', 'ldaps'];
         if (!in_array(strtolower($m[1]), $allowed, true)) {
-            return 'A link can\'t start with "' . $m[1] . ':" - use a web address (https://...), a page of ITFlow (/agent/...), mailto: or tel:.';
+            return __('A link can\'t start with "%s:" - use a web address (https://...), a page of ITFlow (/agent/...), mailto: or tel:.', $m[1]);
         }
     }
     return '';
@@ -130,7 +130,7 @@ function customLinkFromInput(array $in) {
 /** What is wrong with a link's fields - '' when nothing. */
 function customLinkProblem(array $f) {
     if ($f['name'] === '') {
-        return 'Give the link a name.';
+        return __('Give the link a name.');
     }
     return customLinkUriProblem($f['uri']);
 }
@@ -163,7 +163,7 @@ function customLinkUpdate(array $row, array $f) {
     global $mysqli;
     $order = intval($row['custom_link_location']) !== $f['location'] ? ", custom_link_order = " . customLinkNextOrder($f['location']) : '';
     mysqli_query($mysqli, "UPDATE custom_links SET " . customLinkSetSql($f) . "$order WHERE custom_link_id = " . intval($row['custom_link_id']));
-    $locations = customLinkLocations();
+    $locations = i18nEnglish(fn () => customLinkLocations()); // the changes are for the audit log
     $changes = [];
     $was = [
         'name' => (string) $row['custom_link_name'], 'description' => (string) $row['custom_link_description'], 'uri' => (string) $row['custom_link_uri'],
@@ -175,10 +175,10 @@ function customLinkUpdate(array $row, array $f) {
         }
     }
     if ($was['location'] !== $f['location']) {
-        $changes[] = 'moved from the ' . ($locations[$was['location']]['label'] ?? 'menu ' . $was['location']) . ' to the ' . $locations[$f['location']]['label'];
+        $changes[] = 'moved from the ' . ($locations[$was['location']]['label'] ?? 'menu ' . $was['location']) . ' to the ' . $locations[$f['location']]['label']; // i18n-ignore - the audit log
     }
     if ($was['new_tab'] !== $f['new_tab']) {
-        $changes[] = $f['new_tab'] ? 'opens in a new tab' : 'opens in the same tab';
+        $changes[] = $f['new_tab'] ? 'opens in a new tab' : 'opens in the same tab'; // i18n-ignore - the audit log
     }
     return $changes;
 }
@@ -255,7 +255,7 @@ function customLinkNavItemHtml(array $row) {
         . ($new_tab ? ' target="_blank" rel="noopener noreferrer"' : '') . ($about !== '' ? ' title="' . escapeHtml($about) . '"' : '') . '>'
         . '<i class="nav-icon fas fa-' . escapeHtml($row['icon']) . '"></i>'
         . '<p>' . escapeHtml($row['custom_link_name']) . '</p>'
-        . ($new_tab ? '<i class="fas fa-external-link-alt ms-auto ps-2 small opacity-50" title="Opens in a new tab" aria-hidden="true"></i>' : '')
+        . ($new_tab ? '<i class="fas fa-external-link-alt ms-auto ps-2 small opacity-50" title="' . escapeHtml(__('Opens in a new tab')) . '" aria-hidden="true"></i>' : '')
         . '</a></li>';
 }
 

@@ -6,10 +6,10 @@ require_once '../../../includes/modal_header.php';
 
 $form_row = tripRow(intval($_GET['id'] ?? 0));
 if (!$form_row) {
-    exit(json_encode(['error' => 'That trip no longer exists, or is not one you can see.']));
+    exit(json_encode(['error' => __('That trip no longer exists, or is not one you can see.')]));
 }
 if (!tripCanEdit($form_row)) {
-    exit(json_encode(['error' => "That is someone else's trip - changing it needs write access to Financial."]));
+    exit(json_encode(['error' => __('That is someone else\'s trip - changing it needs write access to Financial.')]));
 }
 $form_mode = 'edit';
 
@@ -17,7 +17,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-route me-2"></i>Edit Trip <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($form_row['trip_date']) ?></span></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-route me-2"></i><?= __('Edit Trip') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($form_row['trip_date']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -27,8 +27,8 @@ ob_start();
         <?php require __DIR__ . '/trip_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_trip" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_trip" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

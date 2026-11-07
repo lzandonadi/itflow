@@ -25,14 +25,14 @@
 /** The distance a trip is measured in - "miles" ("mi" short) or "kilometers" ("km"). */
 function tripUnit($short = false) {
     if (tripRules()['unit'] === 'km') {
-        return $short ? 'km' : 'kilometers';
+        return $short ? 'km' : __('kilometers');
     }
-    return $short ? 'mi' : 'miles';
+    return $short ? 'mi' : __('miles');
 }
 
 /** One of them, for a rate - "mile" or "km". */
 function tripUnitOne() {
-    return tripRules()['unit'] === 'km' ? 'km' : 'mile';
+    return tripRules()['unit'] === 'km' ? 'km' : __('mile');
 }
 
 /** "12.4 mi" */
@@ -116,7 +116,7 @@ function tripOneWay(array $row) {
 
 /** A trip in a sentence - "Office to Ravenwood Dental on 2026-10-14 (24.6 mi)". Raw. */
 function tripLabel(array $row) {
-    return $row['trip_source'] . ' to ' . $row['trip_destination'] . ' on ' . $row['trip_date'] . ' (' . tripMilesText($row['trip_miles']) . ')';
+    return __('%1$s to %2$s on %3$s (%4$s)', $row['trip_source'], $row['trip_destination'], $row['trip_date'], tripMilesText($row['trip_miles']));
 }
 
 /** A directions link for the trip - to the address, from where it started. */
@@ -146,15 +146,15 @@ function tripShows() {
     global $session_user_id;
     $me = intval($session_user_id);
     return [
-        '' => ['label' => 'All', 'where' => ''],
-        'mine' => ['label' => 'Mine', 'icon' => 'fa-user', 'where' => "trips.trip_user_id = $me", 'title' => 'Trips you drove'],
-        'client' => ['label' => 'For a client', 'icon' => 'fa-building', 'where' => 'trips.trip_client_id > 0', 'title' => 'Driving for a client'],
-        'ticket' => ['label' => 'For a ticket', 'icon' => 'fa-life-ring', 'where' => 'trips.trip_ticket_id > 0', 'title' => 'Onsite work on a ticket'],
-        'own' => ['label' => 'Our own', 'icon' => 'fa-store', 'where' => 'trips.trip_client_id = 0', 'title' => "Errands for the business - the bank, the post office, a supplier"],
+        '' => ['label' => __('All'), 'where' => ''],
+        'mine' => ['label' => __('Mine'), 'icon' => 'fa-user', 'where' => "trips.trip_user_id = $me", 'title' => __('Trips you drove')],
+        'client' => ['label' => __('For a client'), 'icon' => 'fa-building', 'where' => 'trips.trip_client_id > 0', 'title' => __('Driving for a client')],
+        'ticket' => ['label' => __('For a ticket'), 'icon' => 'fa-life-ring', 'where' => 'trips.trip_ticket_id > 0', 'title' => __('Onsite work on a ticket')],
+        'own' => ['label' => __('Our own'), 'icon' => 'fa-store', 'where' => 'trips.trip_client_id = 0', 'title' => __('Errands for the business - the bank, the post office, a supplier')],
     ] + (tripPayBackOn() ? [
-        'to_pay' => ['label' => 'To pay back', 'icon' => 'fa-hand-holding-usd', 'where' => tripClaimSql(), 'title' => 'In their own vehicle, not paid back for yet'],
+        'to_pay' => ['label' => __('To pay back'), 'icon' => 'fa-hand-holding-usd', 'where' => tripClaimSql(), 'title' => __('In their own vehicle, not paid back for yet')],
     ] : []) + (tripBillingOn() ? [
-        'to_bill' => ['label' => 'To bill', 'icon' => 'fa-file-invoice-dollar', 'where' => tripUnbilledSql(), 'title' => 'Billable to the client, on no invoice yet'],
+        'to_bill' => ['label' => __('To bill'), 'icon' => 'fa-file-invoice-dollar', 'where' => tripUnbilledSql(), 'title' => __('Billable to the client, on no invoice yet')],
     ] : []);
 }
 
@@ -175,7 +175,7 @@ function tripFiltersSql(array $src, &$summary = []) {
     }
     foreach (['driver' => ['trips.trip_user_id', 'users', 'user_name', 'Driver'], 'client' => ['trips.trip_client_id', 'clients', 'client_name', 'Client'],
         'location_id' => ['trips.trip_location_id', 'locations', 'location_name', 'Site'], 'ticket_id' => ['trips.trip_ticket_id', 'tickets', 'ticket_subject', 'Ticket'],
-        'expense_id' => ['trips.trip_expense_id', 'expenses', 'expense_date', 'Mileage paid on'], 'invoice_id' => ['trips.trip_invoice_id', 'invoices', 'invoice_number', 'Billed on']] as $key => $f) {
+        'expense_id' => ['trips.trip_expense_id', 'expenses', 'expense_date', __('Mileage paid on')], 'invoice_id' => ['trips.trip_invoice_id', 'invoices', 'invoice_number', __('Billed on')]] as $key => $f) {
         $id = intval($src[$key] ?? 0);
         if ($id) {
             $sql .= " AND {$f[0]} = $id";
@@ -358,28 +358,28 @@ function tripSave(array $in, $trip_id = 0, &$error = '') {
     $trip_id = intval($trip_id);
     $existing = $trip_id ? tripRow($trip_id) : null;
     if ($trip_id && !$existing) {
-        $error = 'That trip no longer exists, or is not one you can see';
+        $error = __('That trip no longer exists, or is not one you can see');
         return 0;
     }
     if ($existing && !tripCanEdit($existing)) {
-        $error = "That is someone else's trip - changing it needs write access to Financial";
+        $error = __('That is someone else\'s trip - changing it needs write access to Financial');
         return 0;
     }
 
     $date = trim((string) ($in['date'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date of the trip';
+        $error = __('Enter the date of the trip');
         return 0;
     }
     $source = mb_substr(trim(preg_replace('/\s+/u', ' ', (string) ($in['source'] ?? ''))), 0, 200);
     $destination = mb_substr(trim(preg_replace('/\s+/u', ' ', (string) ($in['destination'] ?? ''))), 0, 200);
     if ($source === '' || $destination === '') {
-        $error = 'Enter where the trip started and where it went';
+        $error = __('Enter where the trip started and where it went');
         return 0;
     }
     $purpose = mb_substr(trim((string) ($in['purpose'] ?? '')), 0, 200);
     if ($purpose === '') {
-        $error = 'Enter what the trip was for';
+        $error = __('Enter what the trip was for');
         return 0;
     }
 
@@ -397,7 +397,7 @@ function tripSave(array $in, $trip_id = 0, &$error = '') {
     $odo_start_text = trim(str_replace(',', '', (string) ($in['odometer_start'] ?? '')));
     $odo_end_text = trim(str_replace(',', '', (string) ($in['odometer_end'] ?? '')));
     if (($odo_start_text !== '' && !ctype_digit($odo_start_text)) || ($odo_end_text !== '' && !ctype_digit($odo_end_text))) {
-        $error = 'The odometer readings are whole numbers';
+        $error = __('The odometer readings are whole numbers');
         return 0;
     }
     $odo_start = $odo_start_text === '' ? null : intval($odo_start_text);
@@ -406,14 +406,14 @@ function tripSave(array $in, $trip_id = 0, &$error = '') {
         $miles = round(floatval($existing['trip_miles']), 1);
     } elseif ($odo_start !== null && $odo_end !== null) {
         if ($odo_end < $odo_start) {
-            $error = 'The odometer at the end is lower than at the start';
+            $error = __('The odometer at the end is lower than at the start');
             return 0;
         }
         $miles = round($odo_end - $odo_start, 1);
     } else {
         $miles_text = trim(str_replace([',', ' '], '', (string) ($in['miles'] ?? '')));
         if (!is_numeric($miles_text) || floatval($miles_text) < 0 || floatval($miles_text) >= 100000) {
-            $error = 'Enter the ' . tripUnit() . ' one way';
+            $error = __('Enter the %s one way', tripUnit());
             return 0;
         }
         $miles = round(round(floatval($miles_text), 1) * ($round ? 2 : 1), 1);
@@ -425,18 +425,18 @@ function tripSave(array $in, $trip_id = 0, &$error = '') {
     if ($ticket_id) {
         $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_id, ticket_client_id FROM tickets WHERE ticket_id = $ticket_id AND ticket_client_id > 0 " . clientScopeSql('ticket_client_id')));
         if (!$ticket || ($client_id && intval($ticket['ticket_client_id']) !== $client_id) || (lookupUserPermission('module_support') < 1 && (!$existing || intval($existing['trip_ticket_id']) !== $ticket_id))) {
-            $error = "That ticket isn't one of the client's";
+            $error = __('That ticket isn\'t one of the client\'s');
             return 0;
         }
         $client_id = intval($ticket['ticket_client_id']);
     }
     if ($client_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $client_id " . clientScopeSql('client_id')))) {
-        $error = "That client isn't one you can log trips for";
+        $error = __('That client isn\'t one you can log trips for');
         return 0;
     }
     $location_id = $client_id ? intval($in['location_id'] ?? 0) : 0;
     if ($location_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT location_id FROM locations WHERE location_id = $location_id AND location_client_id = $client_id"))) {
-        $error = "That site isn't one of the client's";
+        $error = __('That site isn\'t one of the client\'s');
         return 0;
     }
 
@@ -444,11 +444,11 @@ function tripSave(array $in, $trip_id = 0, &$error = '') {
     $driver = $claimed ? intval($existing['trip_user_id']) : intval($in['driver'] ?? 0);
     $drivers = tripDrivers($existing ? $existing['trip_user_id'] : 0);
     if (!isset($drivers[$driver])) {
-        $error = 'Pick who drove';
+        $error = __('Pick who drove');
         return 0;
     }
     if (!tripCanManage() && $driver !== intval($session_user_id) && !($existing && $driver === intval($existing['trip_user_id']))) {
-        $error = 'You can log your own trips - logging one for someone else needs write access to Financial';
+        $error = __('You can log your own trips - logging one for someone else needs write access to Financial');
         return 0;
     }
 
@@ -474,19 +474,19 @@ function tripDelete($trip_id, &$error = '') {
     $error = '';
     $row = tripRow($trip_id);
     if (!$row) {
-        $error = 'That trip no longer exists, or is not one you can see';
+        $error = __('That trip no longer exists, or is not one you can see');
         return null;
     }
     if (!tripCanDelete($row)) {
-        $error = "That is someone else's trip - deleting it needs full access to Financial";
+        $error = __('That is someone else\'s trip - deleting it needs full access to Financial');
         return null;
     }
     if ($row['claim_expense_id'] !== null) {
-        $error = 'That trip is paid back for on a mileage expense - delete that expense first';
+        $error = __('That trip is paid back for on a mileage expense - delete that expense first');
         return null;
     }
     if ($row['invoice_number'] !== null) {
-        $error = 'That trip is billed on ' . $row['invoice_prefix'] . $row['invoice_number'] . ' - take it off the invoice first';
+        $error = __('That trip is billed on %s - take it off the invoice first', $row['invoice_prefix'] . $row['invoice_number']);
         return null;
     }
     mysqli_query($mysqli, "DELETE FROM trips WHERE trip_id = " . intval($row['trip_id']));
@@ -525,17 +525,17 @@ function tripTotalsFor($column, $id) {
 /** A small table of trips - from tripsFor() - each opening its quick look. For a site's Trips tab. */
 function tripTableHtml(array $rows) {
     $html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0 itflow-trip-table">'
-        . '<thead class="text-nowrap table-light"><tr><th>Date</th><th>Trip</th><th>Driver</th><th class="text-end">' . ucfirst(tripUnit()) . '</th></tr></thead><tbody>';
+        . '<thead class="text-nowrap table-light"><tr><th>' . __('Date') . '</th><th>' . __('Trip') . '</th><th>' . __('Driver') . '</th><th class="text-end">' . ucfirst(tripUnit()) . '</th></tr></thead><tbody>';
     foreach ($rows as $row) {
         $open = 'href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/trip/trip.php?id=' . intval($row['trip_id']) . '"';
         $ticket = $row['ticket_number'] !== null && intval($row['trip_ticket_id']) ? '<span class="font-monospace text-body-secondary me-1">' . escapeHtml(ticketReference($row)) . '</span>' : '';
         $html .= '<tr>'
-            . '<td class="text-nowrap"><a ' . $open . '>' . escapeHtml(date('M j, Y', strtotime($row['trip_date']))) . '</a></td>'
+            . '<td class="text-nowrap"><a ' . $open . '>' . escapeHtml(formatDate($row['trip_date'], 'date')) . '</a></td>'
             . '<td class="itflow-trip-route"><div class="text-truncate">' . escapeHtml($row['trip_source']) . ' &rarr; ' . escapeHtml($row['trip_destination']) . '</div>'
             . '<div class="small text-body-secondary text-truncate">' . $ticket . escapeHtml($row['trip_purpose']) . '</div></td>'
-            . '<td class="text-nowrap">' . formatAssignee($row['trip_user_id'], $row['driver_name'] ?? '', $row['driver_avatar'] ?? '', false, 'No driver') . '</td>'
+            . '<td class="text-nowrap">' . formatAssignee($row['trip_user_id'], $row['driver_name'] ?? '', $row['driver_avatar'] ?? '', false, __('No driver')) . '</td>'
             . '<td class="text-end text-nowrap">' . escapeHtml(tripMilesText($row['trip_miles']))
-            . (intval($row['round_trip']) ? '<i class="fas fa-sync-alt text-body-secondary ms-1" title="Round trip"></i>' : '') . '</td>'
+            . (intval($row['round_trip']) ? '<i class="fas fa-sync-alt text-body-secondary ms-1" title="' . escapeHtml(__('Round trip')) . '"></i>' : '') . '</td>'
             . '</tr>';
     }
     return $html . '</tbody></table></div>';
@@ -628,7 +628,7 @@ function tripRateMoney($rate) {
 
 /** "$0.70 a mile" */
 function tripRateText($rate) {
-    return tripRateMoney($rate) . ' a ' . tripUnitOne();
+    return __('%1$s a %2$s', tripRateMoney($rate), tripUnitOne());
 }
 
 /** A distance without a trailing .0 - "20 mi", "12.5 km". */
@@ -645,13 +645,13 @@ function tripBillPrice(array $row) {
 /** How a trip is billed, in words - "$45.00 a trip, covering the first 20 mi, then $0.85 a mile". '' when trips don't bill. */
 function tripBillRuleText() {
     $rules = tripRules();
-    $charge = $rules['charge'] > 0 ? billingMoney($rules['charge']) . ' a trip' : '';
+    $charge = $rules['charge'] > 0 ? __('%s a trip', billingMoney($rules['charge'])) : '';
     $rate = $rules['bill_rate'] > 0 ? tripRateText($rules['bill_rate']) : '';
     if ($charge !== '' && $rate !== '') {
-        return $rules['included'] > 0 ? "$charge, covering the first " . tripDistanceText($rules['included']) . ", then $rate" : "$charge plus $rate";
+        return $rules['included'] > 0 ? __('%1$s, covering the first %2$s, then %3$s', $charge, tripDistanceText($rules['included']), $rate) : __('%1$s plus %2$s', $charge, $rate);
     }
     if ($rate !== '') {
-        return $rules['included'] > 0 ? "$rate beyond the first " . tripDistanceText($rules['included']) : $rate;
+        return $rules['included'] > 0 ? __('%1$s beyond the first %2$s', $rate, tripDistanceText($rules['included'])) : $rate;
     }
     return $charge;
 }
@@ -694,7 +694,7 @@ function tripMileageVendor() {
     if ($row) {
         $id = intval($row[0]);
     } else {
-        mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => 'Mileage', 'description' => 'Agents paid back for driving their own vehicles']) . ", vendor_client_id = 0");
+        mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => 'Mileage', 'description' => 'Agents paid back for driving their own vehicles'] /* i18n-ignore - stored */) . ", vendor_client_id = 0");
         $id = mysqli_insert_id($mysqli);
     }
     mysqli_query($mysqli, "UPDATE settings SET config_mileage_vendor_id = $id WHERE company_id = 1");
@@ -764,17 +764,17 @@ function tripClaim($user_id, array $trip_ids, array $opts, &$error = '') {
     $user_id = intval($user_id);
     $driver = $trip_ids ? (tripsToClaim($user_id, $trip_ids)[$user_id] ?? null) : null;
     if (!$user_id || !$driver) {
-        $error = 'Nothing to pay - those trips are paid back for already, or not in their own vehicle.';
+        $error = __('Nothing to pay - those trips are paid back for already, or not in their own vehicle.');
         return null;
     }
     $rate = tripRateInput($opts['rate'] ?? '');
     if ($rate === null || $rate <= 0) {
-        $error = 'Enter the rate a ' . tripUnitOne() . ', more than nothing';
+        $error = __('Enter the rate a %s, more than nothing', tripUnitOne());
         return null;
     }
     $date = (string) ($opts['date'] ?? '');
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate(intval(substr($date, 5, 2)), intval(substr($date, 8, 2)), intval(substr($date, 0, 4)))) {
-        $error = 'Enter the date of the mileage expense';
+        $error = __('Enter the date of the mileage expense');
         return null;
     }
     $by = (string) ($opts['by'] ?? 'ITFlow');
@@ -805,10 +805,10 @@ function tripClaim($user_id, array $trip_ids, array $opts, &$error = '') {
         $group_count = intval($got[0]);
         $group_miles = round(floatval($got[1]), 1);
         $group_amount = round($group_miles * $rate, 2);
-        $dates = $got[2] === $got[3] ? date('M j, Y', strtotime($got[2])) : date('M j', strtotime($got[2])) . ' to ' . date('M j, Y', strtotime($got[3]));
-        $description = 'Mileage - ' . ($group_count === 1 ? '1 trip' : "$group_count trips") . ', ' . tripDistanceText($group_miles) . "\n" . 'At ' . tripRateText($rate) . ", $dates";
+        $dates = $got[2] === $got[3] ? formatDate($got[2], 'date') : __('%1$s to %2$s', formatDate($got[2], 'date_short'), formatDate($got[3], 'date'));
+        $description = _n('Mileage - %1$d trip, %2$s', 'Mileage - %1$d trips, %2$s', $group_count, $group_count, tripDistanceText($group_miles)) . "\n" . __('At %1$s, %2$s', tripRateText($rate), $dates);
         mysqli_query($mysqli, "UPDATE expenses SET expense_amount = $group_amount, expense_description = '" . escapeSql($description) . "' WHERE expense_id = $expense_id");
-        logAudit('Expense', 'Create', escapeSql("$by paid {$driver['user_name']} mileage for " . ($group_count === 1 ? '1 trip' : "$group_count trips") . ', ' . tripDistanceText($group_miles) . ' at ' . tripRateText($rate)
+        logAudit('Expense', 'Create', escapeSql("$by paid {$driver['user_name']} mileage for " . ($group_count === 1 ? '1 trip' : "$group_count trips") . ', ' . i18nEnglish(fn () => tripDistanceText($group_miles)) . ' at ' . i18nEnglish(fn () => tripRateText($rate))
             . ' - ' . billingMoney($group_amount, $currency) . ' to pay back'), $client_id, $expense_id);
         $expense_ids[] = $expense_id;
         $count += $group_count;
@@ -816,7 +816,7 @@ function tripClaim($user_id, array $trip_ids, array $opts, &$error = '') {
         $amount += $group_amount;
     }
     if (!$expense_ids) {
-        $error = 'Nothing to pay - someone else paid for those trips just now.';
+        $error = __('Nothing to pay - someone else paid for those trips just now.');
         return null;
     }
     return ['expense_ids' => $expense_ids, 'count' => $count, 'miles' => round($miles, 1), 'amount' => round($amount, 2), 'rate' => $rate,
@@ -910,9 +910,9 @@ function tripUnbilledMerge(array $clients, $client_id = 0) {
 function tripBillLine(array $trip) {
     $description = trim((string) $trip['trip_purpose']);
     $detail = implode(' - ', array_filter([
-        $trip['trip_source'] . ' to ' . $trip['trip_destination'],
+        __('%1$s to %2$s', $trip['trip_source'], $trip['trip_destination']),
         date('m/d/Y', strtotime((string) $trip['trip_date'])),
-        tripDistanceText($trip['trip_miles']) . (intval($trip['round_trip']) ? ' round trip' : ''),
+        intval($trip['round_trip']) ? __('%s round trip', tripDistanceText($trip['trip_miles'])) : tripDistanceText($trip['trip_miles']),
         intval($trip['trip_ticket_id']) && ($trip['ticket_number'] ?? null) !== null ? ticketReference($trip) : '',
     ]));
     return [mb_substr(tripRules()['item_name'], 0, 200), $description !== '' ? "$description\n$detail" : $detail];
@@ -933,7 +933,7 @@ function tripBillInvoice($client_id, array $prices, array $opts, &$error = '') {
     $by = (string) ($opts['by'] ?? 'ITFlow');
     $trips = $prices ? tripUnbilled($client_id, array_keys($prices)) : [];
     if (!$client_id || !$trips) {
-        $error = 'Nothing to bill - those trips are already on an invoice, or no longer billable.';
+        $error = __('Nothing to bill - those trips are already on an invoice, or no longer billable.');
         return null;
     }
 
@@ -942,14 +942,14 @@ function tripBillInvoice($client_id, array $prices, array $opts, &$error = '') {
         $value = $prices[$id] ?? null;
         $price = ($value === null || trim((string) $value) === '') ? $trip['price'] : billingNumberInput($value);
         if ($price === null || $price < 0 || $price >= 1e9) {
-            $error = 'The price for the trip to ' . $trip['trip_destination'] . ' on ' . $trip['trip_date'] . ' has to be a number, zero or more.';
+            $error = __('The price for the trip to %1$s on %2$s has to be a number, zero or more.', $trip['trip_destination'], $trip['trip_date']);
             return null;
         }
         $bill[$id] = round($price, 2);
     }
     $tax_id = taxChoice($opts['tax_id'] ?? 0, $client_id, 'trip');
     if ($tax_id && !taxRow($tax_id)) {
-        $error = 'That tax no longer exists.';
+        $error = __('That tax no longer exists.');
         return null;
     }
 
@@ -958,13 +958,13 @@ function tripBillInvoice($client_id, array $prices, array $opts, &$error = '') {
     if ($invoice_id) {
         $invoice = billingRow('invoice', $invoice_id);
         if (!$invoice || intval($invoice['client_id']) !== $client_id || !billingCanEditItems('invoice', $invoice)) {
-            $error = "That invoice isn't one of the client's you can still add to.";
+            $error = __('That invoice isn\'t one of the client\'s you can still add to.');
             return null;
         }
     } else {
         $invoice_id = billingInvoiceCreate($client_id, $opts['date'] ?? '', $opts['category_id'] ?? 0, $opts['scope'] ?? '', $by);
         if (!$invoice_id) {
-            $error = "The invoice couldn't be made.";
+            $error = __('The invoice couldn\'t be made.');
             return null;
         }
         $new = true;
@@ -984,7 +984,7 @@ function tripBillInvoice($client_id, array $prices, array $opts, &$error = '') {
             mysqli_query($mysqli, "DELETE FROM history WHERE history_invoice_id = $invoice_id");
             mysqli_query($mysqli, "DELETE FROM invoices WHERE invoice_id = $invoice_id");
         }
-        $error = 'Nothing to bill - someone else billed those trips just now.';
+        $error = __('Nothing to bill - someone else billed those trips just now.');
         return null;
     }
 
@@ -1008,13 +1008,13 @@ function tripBillInvoice($client_id, array $prices, array $opts, &$error = '') {
         $lines++;
         $amount += $price;
         $miles += floatval($trip['trip_miles']);
-        logAudit('Trip', 'Bill', escapeSql("$by billed the trip " . tripLabel($trip) . " on invoice $number at " . billingMoney($price, $currency)), $client_id, $id);
+        logAudit('Trip', 'Bill', escapeSql("$by billed the trip " . i18nEnglish(fn () => tripLabel($trip)) . " on invoice $number at " . billingMoney($price, $currency)), $client_id, $id);
     }
     billingRecalc('invoice', $invoice_id);
 
     $invoice = billingRow('invoice', $invoice_id, false);
     $what = $lines === 1 ? '1 trip' : "$lines trips";
-    billingLog('invoice', $invoice_id, $invoice['invoice_status'], ucfirst($what) . " billed by $by - " . billingMoney($amount, $currency) . ' for ' . tripDistanceText($miles));
+    billingLog('invoice', $invoice_id, $invoice['invoice_status'], ucfirst($what) . " billed by $by - " . billingMoney($amount, $currency) . ' for ' . i18nEnglish(fn () => tripDistanceText($miles)));
     logAudit('Invoice', $new ? 'Create' : 'Edit', escapeSql("$by billed $what on invoice $number - " . billingMoney($amount, $currency)), $client_id, $invoice_id);
     if ($new) {
         triggerCustomAction('invoice_create', $invoice_id);
@@ -1038,18 +1038,18 @@ function tripUnbill($trip_id, &$error = '') {
     $error = '';
     $row = tripRow($trip_id);
     if (!$row || !intval($row['trip_invoice_id'])) {
-        $error = "That trip isn't on an invoice";
+        $error = __('That trip isn\'t on an invoice');
         return '';
     }
     $id = intval($row['trip_id']);
     $invoice = billingRow('invoice', intval($row['trip_invoice_id']), false);
     if (!$invoice) {
         mysqli_query($mysqli, "UPDATE trips SET trip_invoice_id = 0, trip_invoice_item_id = 0 WHERE trip_id = $id");
-        return 'an invoice since deleted';
+        return __('an invoice since deleted');
     }
     $number = billingNumber('invoice', $invoice);
     if (!tripCanUnbill($invoice['invoice_status'])) {
-        $error = "$number is " . strtolower($invoice['invoice_status']) . " - its lines can't change any more";
+        $error = __("%1\$s is %2\$s - its lines can't change any more", $number, mb_strtolower(invoiceStatusLabel($invoice['invoice_status'])));
         return '';
     }
     if (intval($row['trip_invoice_item_id']) && $invoice['invoice_status'] !== 'Cancelled') {
@@ -1086,7 +1086,7 @@ function tripWriteOff($client_id, array $trip_ids, $by) {
     foreach ($trips as $trip_id => $trip) {
         mysqli_query($mysqli, "UPDATE trips SET trip_billable = 0 WHERE trip_id = $trip_id AND trip_invoice_id = 0 AND trip_billable = 1");
         if (mysqli_affected_rows($mysqli) === 1) {
-            logAudit('Trip', 'Edit', escapeSql("$by marked the trip " . tripLabel($trip) . ' not billable'), intval($client_id), $trip_id);
+            logAudit('Trip', 'Edit', escapeSql("$by marked the trip " . i18nEnglish(fn () => tripLabel($trip)) . ' not billable'), intval($client_id), $trip_id);
             $done[] = tripLabel($trip);
         }
     }

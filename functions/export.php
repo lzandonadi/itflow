@@ -45,461 +45,461 @@ function getExportColumns($export_type) {
 
         // Clients - handler joins the primary contact and primary location
         'clients' => [
-            'client_name'          => ['label' => 'Client Name', 'weight' => 2],
-            'client_type'          => ['label' => 'Industry'],
-            'client_referral'      => ['label' => 'Referral'],
-            'client_website'       => ['label' => 'Website', 'weight' => 2],
-            'location_name'        => ['label' => 'Primary Location Name'],
-            'location_phone'       => ['label' => 'Location Phone', 'format' => 'phone'],
-            'location_address'     => ['label' => 'Location Address', 'weight' => 2],
-            'location_city'        => ['label' => 'City'],
-            'location_state'       => ['label' => 'State'],
-            'location_zip'         => ['label' => 'Postal Code'],
-            'location_country'     => ['label' => 'Country'],
-            'contact_name'         => ['label' => 'Primary Contact Name'],
-            'contact_title'        => ['label' => 'Title'],
-            'contact_phone'        => ['label' => 'Contact Phone', 'format' => 'phone'],
-            'contact_extension'    => ['label' => 'Extension'],
-            'contact_mobile'       => ['label' => 'Contact Mobile', 'format' => 'phone'],
-            'contact_email'        => ['label' => 'Contact Email', 'weight' => 2],
-            'client_currency_code' => ['label' => 'Currency'],
-            'client_tax_id_number' => ['label' => 'Tax ID'],
-            'client_tax_rate'      => ['label' => 'Tax Rate', 'default' => false],
-            'client_tax_exempt_display' => ['label' => 'Tax Exempt', 'default' => false],
-            'client_tax_exempt_number' => ['label' => 'Exemption Certificate', 'default' => false],
-            'client_tax_exempt_expires' => ['label' => 'Exemption Expires', 'default' => false],
-            'client_abbreviation'  => ['label' => 'Abbreviation'],
+            'client_name'          => ['label' => __('Client Name'), 'weight' => 2],
+            'client_type'          => ['label' => __('Industry')],
+            'client_referral'      => ['label' => __('Referral')],
+            'client_website'       => ['label' => __('Website'), 'weight' => 2],
+            'location_name'        => ['label' => __('Primary Location Name')],
+            'location_phone'       => ['label' => __('Location Phone'), 'format' => 'phone'],
+            'location_address'     => ['label' => __('Location Address'), 'weight' => 2],
+            'location_city'        => ['label' => __('City')],
+            'location_state'       => ['label' => __('State')],
+            'location_zip'         => ['label' => __('Postal Code')],
+            'location_country'     => ['label' => __('Country')],
+            'contact_name'         => ['label' => __('Primary Contact Name')],
+            'contact_title'        => ['label' => __('Title')],
+            'contact_phone'        => ['label' => __('Contact Phone'), 'format' => 'phone'],
+            'contact_extension'    => ['label' => __('Extension')],
+            'contact_mobile'       => ['label' => __('Contact Mobile'), 'format' => 'phone'],
+            'contact_email'        => ['label' => __('Contact Email'), 'weight' => 2],
+            'client_currency_code' => ['label' => __('Currency')],
+            'client_tax_id_number' => ['label' => __('Tax ID')],
+            'client_tax_rate'      => ['label' => __('Tax Rate'), 'default' => false],
+            'client_tax_exempt_display' => ['label' => __('Tax Exempt'), 'default' => false],
+            'client_tax_exempt_number' => ['label' => __('Exemption Certificate'), 'default' => false],
+            'client_tax_exempt_expires' => ['label' => __('Exemption Expires'), 'default' => false],
+            'client_abbreviation'  => ['label' => __('Abbreviation')],
         ],
 
         'contacts' => [
-            'contact_name'       => ['label' => 'Name', 'weight' => 2],
-            'contact_title'      => ['label' => 'Title'],
-            'contact_department' => ['label' => 'Department'],
-            'contact_email'      => ['label' => 'Email', 'weight' => 2],
-            'contact_phone'      => ['label' => 'Phone', 'format' => 'phone'],
-            'contact_extension'  => ['label' => 'Ext'],
-            'contact_mobile'     => ['label' => 'Mobile', 'format' => 'phone'],
-            'location_name'      => ['label' => 'Location'],
+            'contact_name'       => ['label' => __('Name'), 'weight' => 2],
+            'contact_title'      => ['label' => __('Title')],
+            'contact_department' => ['label' => __('Department')],
+            'contact_email'      => ['label' => __('Email'), 'weight' => 2],
+            'contact_phone'      => ['label' => __('Phone'), 'format' => 'phone'],
+            'contact_extension'  => ['label' => __('Ext')],
+            'contact_mobile'     => ['label' => __('Mobile'), 'format' => 'phone'],
+            'location_name'      => ['label' => __('Location')],
         ],
 
         // location_primary_text, contact_name and the counts are built by the handler's query
         'locations' => [
-            'location_name'        => ['label' => 'Name', 'weight' => 2],
-            'location_primary_text' => ['label' => 'Primary'],
-            'location_description' => ['label' => 'Description', 'weight' => 3],
-            'location_address'     => ['label' => 'Address', 'weight' => 2],
-            'location_city'        => ['label' => 'City'],
-            'location_state'       => ['label' => 'State'],
-            'location_zip'         => ['label' => 'Postal Code'],
-            'location_country'     => ['label' => 'Country', 'default' => false],
-            'location_phone'       => ['label' => 'Phone', 'format' => 'phone'],
-            'location_hours'       => ['label' => 'Hours'],
-            'contact_name'         => ['label' => 'On-site Contact'],
-            'contact_count'        => ['label' => 'People', 'format' => 'number', 'default' => false],
-            'asset_count'          => ['label' => 'Assets', 'format' => 'number', 'default' => false],
-            'location_notes'       => ['label' => 'Access Notes', 'weight' => 3, 'default' => false],
-            'client_name'          => ['label' => 'Client', 'default' => false],
+            'location_name'        => ['label' => __('Name'), 'weight' => 2],
+            'location_primary_text' => ['label' => __('Primary')],
+            'location_description' => ['label' => __('Description'), 'weight' => 3],
+            'location_address'     => ['label' => __('Address'), 'weight' => 2],
+            'location_city'        => ['label' => __('City')],
+            'location_state'       => ['label' => __('State')],
+            'location_zip'         => ['label' => __('Postal Code')],
+            'location_country'     => ['label' => __('Country'), 'default' => false],
+            'location_phone'       => ['label' => __('Phone'), 'format' => 'phone'],
+            'location_hours'       => ['label' => __('Hours')],
+            'contact_name'         => ['label' => __('On-site Contact')],
+            'contact_count'        => ['label' => __('People'), 'format' => 'number', 'default' => false],
+            'asset_count'          => ['label' => __('Assets'), 'format' => 'number', 'default' => false],
+            'location_notes'       => ['label' => __('Access Notes'), 'weight' => 3, 'default' => false],
+            'client_name'          => ['label' => __('Client'), 'default' => false],
         ],
 
         'vendors' => [
-            'vendor_name'           => ['label' => 'Name', 'weight' => 2],
-            'vendor_description'    => ['label' => 'Description', 'weight' => 3],
-            'vendor_tags'           => ['label' => 'Tags', 'default' => false],
-            'vendor_phone'          => ['label' => 'Support Phone', 'format' => 'phone'],
-            'vendor_extension'      => ['label' => 'Extension', 'default' => false],
-            'vendor_email'          => ['label' => 'Support Email', 'weight' => 2],
-            'vendor_website'        => ['label' => 'Website', 'weight' => 2],
-            'vendor_status_page'    => ['label' => 'Status Page', 'weight' => 2, 'default' => false],
-            'vendor_portal'         => ['label' => 'Support Portal', 'weight' => 2, 'default' => false],
-            'vendor_hours'          => ['label' => 'Hours'],
-            'vendor_sla'            => ['label' => 'SLA', 'default' => false],
-            'vendor_account_number' => ['label' => 'Account Number'],
-            'vendor_code'           => ['label' => 'PIN / Code', 'default' => false],
-            'vendor_contact_name'   => ['label' => 'Account Manager'],
-            'vendor_contact_phone'  => ['label' => 'Account Manager Phone', 'format' => 'phone', 'default' => false],
-            'vendor_contact_email'  => ['label' => 'Account Manager Email', 'default' => false],
-            'open_case_count'       => ['label' => 'Open Cases', 'format' => 'number', 'default' => false],
-            'vendor_notes'          => ['label' => 'Notes', 'weight' => 3],
-            'client_name'           => ['label' => 'Client', 'default' => false],
+            'vendor_name'           => ['label' => __('Name'), 'weight' => 2],
+            'vendor_description'    => ['label' => __('Description'), 'weight' => 3],
+            'vendor_tags'           => ['label' => __('Tags'), 'default' => false],
+            'vendor_phone'          => ['label' => __('Support Phone'), 'format' => 'phone'],
+            'vendor_extension'      => ['label' => __('Extension'), 'default' => false],
+            'vendor_email'          => ['label' => __('Support Email'), 'weight' => 2],
+            'vendor_website'        => ['label' => __('Website'), 'weight' => 2],
+            'vendor_status_page'    => ['label' => __('Status Page'), 'weight' => 2, 'default' => false],
+            'vendor_portal'         => ['label' => __('Support Portal'), 'weight' => 2, 'default' => false],
+            'vendor_hours'          => ['label' => __('Hours')],
+            'vendor_sla'            => ['label' => __('SLA'), 'default' => false],
+            'vendor_account_number' => ['label' => __('Account Number')],
+            'vendor_code'           => ['label' => __('PIN / Code'), 'default' => false],
+            'vendor_contact_name'   => ['label' => __('Account Manager')],
+            'vendor_contact_phone'  => ['label' => __('Account Manager Phone'), 'format' => 'phone', 'default' => false],
+            'vendor_contact_email'  => ['label' => __('Account Manager Email'), 'default' => false],
+            'open_case_count'       => ['label' => __('Open Cases'), 'format' => 'number', 'default' => false],
+            'vendor_notes'          => ['label' => __('Notes'), 'weight' => 3],
+            'client_name'           => ['label' => __('Client'), 'default' => false],
         ],
 
         'assets' => [
-            'asset_name'              => ['label' => 'Name', 'weight' => 2],
-            'asset_description'       => ['label' => 'Description', 'weight' => 3],
-            'asset_type'              => ['label' => 'Type'],
-            'asset_make'              => ['label' => 'Make'],
-            'asset_model'             => ['label' => 'Model'],
-            'asset_serial'            => ['label' => 'Serial Number'],
-            'asset_os'                => ['label' => 'Operating System', 'weight' => 2],
-            'asset_purchase_date'     => ['label' => 'Purchase Date'],
-            'asset_warranty_expire'   => ['label' => 'Warranty Expire'],
-            'asset_install_date'      => ['label' => 'Install Date'],
-            'contact_name'            => ['label' => 'Assigned To'],
-            'location_name'           => ['label' => 'Location'],
-            'asset_physical_location' => ['label' => 'Physical Location'],
-            'asset_notes'             => ['label' => 'Notes', 'weight' => 3],
+            'asset_name'              => ['label' => __('Name'), 'weight' => 2],
+            'asset_description'       => ['label' => __('Description'), 'weight' => 3],
+            'asset_type'              => ['label' => __('Type')],
+            'asset_make'              => ['label' => __('Make')],
+            'asset_model'             => ['label' => __('Model')],
+            'asset_serial'            => ['label' => __('Serial Number')],
+            'asset_os'                => ['label' => __('Operating System'), 'weight' => 2],
+            'asset_purchase_date'     => ['label' => __('Purchase Date')],
+            'asset_warranty_expire'   => ['label' => __('Warranty Expire')],
+            'asset_install_date'      => ['label' => __('Install Date')],
+            'contact_name'            => ['label' => __('Assigned To')],
+            'location_name'           => ['label' => __('Location')],
+            'asset_physical_location' => ['label' => __('Physical Location')],
+            'asset_notes'             => ['label' => __('Notes'), 'weight' => 3],
             // Available from the handler's join but not exported historically
-            'client_name'             => ['label' => 'Client', 'default' => false],
-            'interface_ip'            => ['label' => 'Primary IP', 'default' => false],
-            'interface_mac'           => ['label' => 'Primary MAC', 'default' => false],
-            'asset_status'            => ['label' => 'Status', 'default' => false],
+            'client_name'             => ['label' => __('Client'), 'default' => false],
+            'interface_ip'            => ['label' => __('Primary IP'), 'default' => false],
+            'interface_mac'           => ['label' => __('Primary MAC'), 'default' => false],
+            'asset_status'            => ['label' => __('Status'), 'default' => false],
         ],
 
         'asset_interfaces' => [
             // The first eight are the import's columns, in its order - VLANs ninth and optional
-            'interface_name'        => ['label' => 'Name'],
-            'interface_description' => ['label' => 'Description', 'weight' => 3],
-            'interface_type'        => ['label' => 'Type'],
-            'interface_mac'         => ['label' => 'MAC'],
-            'interface_ip'          => ['label' => 'IP'],
-            'interface_nat_ip'      => ['label' => 'NAT IP'],
-            'interface_ipv6'        => ['label' => 'IPv6', 'weight' => 2],
-            'network_name'          => ['label' => 'Network'],
-            'interface_vlans'       => ['label' => 'VLANs'],
-            'network'               => ['label' => 'Subnet', 'default' => false],
-            'connected_to'          => ['label' => 'Connected To', 'weight' => 2, 'default' => false],
-            'interface_notes'       => ['label' => 'Notes', 'weight' => 3, 'default' => false],
+            'interface_name'        => ['label' => __('Name')],
+            'interface_description' => ['label' => __('Description'), 'weight' => 3],
+            'interface_type'        => ['label' => __('Type')],
+            'interface_mac'         => ['label' => __('MAC')],
+            'interface_ip'          => ['label' => __('IP')],
+            'interface_nat_ip'      => ['label' => __('NAT IP')],
+            'interface_ipv6'        => ['label' => __('IPv6'), 'weight' => 2],
+            'network_name'          => ['label' => __('Network')],
+            'interface_vlans'       => ['label' => __('VLANs')],
+            'network'               => ['label' => __('Subnet'), 'default' => false],
+            'connected_to'          => ['label' => __('Connected To'), 'weight' => 2, 'default' => false],
+            'interface_notes'       => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
         ],
 
         'networks' => [
             // The first nine are the import's columns, in its order
-            'network_name'          => ['label' => 'Name', 'weight' => 2],
-            'network_description'   => ['label' => 'Description', 'weight' => 3],
-            'network_vlan'          => ['label' => 'VLAN'],
-            'network'               => ['label' => 'Network (CIDR)'],
-            'network_gateway'       => ['label' => 'Gateway'],
-            'network_dhcp_range'    => ['label' => 'IP Range'],
-            'network_primary_dns'   => ['label' => 'Primary DNS'],
-            'network_secondary_dns' => ['label' => 'Secondary DNS'],
-            'network_type'          => ['label' => 'Type'],
-            'location_name'         => ['label' => 'Site', 'default' => false],
-            'vendor_name'           => ['label' => 'Provider', 'default' => false],
-            'network_notes'         => ['label' => 'Notes', 'weight' => 3, 'default' => false],
-            'network_tags'          => ['label' => 'Tags', 'weight' => 2, 'default' => false],
-            'client_name'           => ['label' => 'Client', 'weight' => 2, 'default' => false],
+            'network_name'          => ['label' => __('Name'), 'weight' => 2],
+            'network_description'   => ['label' => __('Description'), 'weight' => 3],
+            'network_vlan'          => ['label' => __('VLAN')],
+            'network'               => ['label' => __('Network (CIDR)')],
+            'network_gateway'       => ['label' => __('Gateway')],
+            'network_dhcp_range'    => ['label' => __('IP Range')],
+            'network_primary_dns'   => ['label' => __('Primary DNS')],
+            'network_secondary_dns' => ['label' => __('Secondary DNS')],
+            'network_type'          => ['label' => __('Type')],
+            'location_name'         => ['label' => __('Site'), 'default' => false],
+            'vendor_name'           => ['label' => __('Provider'), 'default' => false],
+            'network_notes'         => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
+            'network_tags'          => ['label' => __('Tags'), 'weight' => 2, 'default' => false],
+            'client_name'           => ['label' => __('Client'), 'weight' => 2, 'default' => false],
         ],
 
         'network_ips' => [
             // The import's columns, in its order - Type and MAC after the original three
-            'ip_address'     => ['label' => 'IP Address'],
-            'ip_hostname'    => ['label' => 'Hostname', 'weight' => 2],
-            'ip_description' => ['label' => 'Description', 'weight' => 3],
-            'ip_type'        => ['label' => 'Type'],
-            'ip_mac'         => ['label' => 'MAC'],
+            'ip_address'     => ['label' => __('IP Address')],
+            'ip_hostname'    => ['label' => __('Hostname'), 'weight' => 2],
+            'ip_description' => ['label' => __('Description'), 'weight' => 3],
+            'ip_type'        => ['label' => __('Type')],
+            'ip_mac'         => ['label' => __('MAC')],
             // Available from the handler's join but not exported by default -
             // the export is always scoped to one network of one client
-            'network_name'   => ['label' => 'Network', 'default' => false],
-            'client_name'    => ['label' => 'Client', 'default' => false],
+            'network_name'   => ['label' => __('Network'), 'default' => false],
+            'client_name'    => ['label' => __('Client'), 'default' => false],
         ],
 
         'certificates' => [
-            'certificate_name'        => ['label' => 'Name', 'weight' => 2],
-            'certificate_description' => ['label' => 'Description', 'weight' => 3],
-            'certificate_domain'      => ['label' => 'Host', 'weight' => 2],
-            'certificate_issued_by'   => ['label' => 'Issuer', 'weight' => 2],
-            'certificate_expire'      => ['label' => 'Expiration Date'],
+            'certificate_name'        => ['label' => __('Name'), 'weight' => 2],
+            'certificate_description' => ['label' => __('Description'), 'weight' => 3],
+            'certificate_domain'      => ['label' => __('Host'), 'weight' => 2],
+            'certificate_issued_by'   => ['label' => __('Issuer'), 'weight' => 2],
+            'certificate_expire'      => ['label' => __('Expiration Date')],
             // The status column holds a key; the handler aliases its label
-            'certificate_check_status' => ['label' => 'Last Check', 'field' => 'certificate_check_label'],
-            'certificate_issued_at'   => ['label' => 'Issued', 'default' => false],
-            'certificate_names'       => ['label' => 'Names Covered', 'field' => 'certificate_names_list', 'weight' => 3, 'default' => false],
-            'certificate_fingerprint' => ['label' => 'SHA-256 Fingerprint', 'weight' => 3, 'default' => false],
-            'certificate_checked_at'  => ['label' => 'Checked At', 'default' => false],
-            'domain_name'             => ['label' => 'Domain', 'default' => false],
-            'certificate_notes'       => ['label' => 'Notes', 'weight' => 3, 'default' => false],
-            'client_name'             => ['label' => 'Client', 'weight' => 2, 'default' => false],
+            'certificate_check_status' => ['label' => __('Last Check'), 'field' => 'certificate_check_label'],
+            'certificate_issued_at'   => ['label' => __('Issued'), 'default' => false],
+            'certificate_names'       => ['label' => __('Names Covered'), 'field' => 'certificate_names_list', 'weight' => 3, 'default' => false],
+            'certificate_fingerprint' => ['label' => __('SHA-256 Fingerprint'), 'weight' => 3, 'default' => false],
+            'certificate_checked_at'  => ['label' => __('Checked At'), 'default' => false],
+            'domain_name'             => ['label' => __('Domain'), 'default' => false],
+            'certificate_notes'       => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
+            'client_name'             => ['label' => __('Client'), 'weight' => 2, 'default' => false],
         ],
 
         'domains' => [
-            'domain_name'        => ['label' => 'Domain', 'weight' => 2],
-            'domain_description' => ['label' => 'Description', 'weight' => 3],
+            'domain_name'        => ['label' => __('Domain'), 'weight' => 2],
+            'domain_description' => ['label' => __('Description'), 'weight' => 3],
             // The columns hold vendor IDs; the handler aliases the joined names
-            'domain_registrar'   => ['label' => 'Registrar', 'field' => 'domain_registrar_name'],
-            'domain_webhost'     => ['label' => 'Web Host', 'field' => 'domain_webhost_name'],
-            'domain_expire'      => ['label' => 'Expiration Date'],
-            'domain_dnshost'     => ['label' => 'DNS Host', 'field' => 'domain_dnshost_name', 'default' => false],
-            'domain_mailhost'    => ['label' => 'Mail Host', 'field' => 'domain_mailhost_name', 'default' => false],
-            'domain_auto_renew'  => ['label' => 'Auto-renew', 'field' => 'domain_auto_renew_label', 'default' => false],
-            'domain_name_servers' => ['label' => 'Name Servers', 'weight' => 2, 'default' => false],
-            'domain_mail_servers' => ['label' => 'MX Records', 'weight' => 2, 'default' => false],
-            'domain_dmarc'       => ['label' => 'DMARC', 'weight' => 2, 'default' => false],
-            'domain_tags'        => ['label' => 'Tags', 'weight' => 2, 'default' => false],
-            'domain_notes'       => ['label' => 'Notes', 'weight' => 3, 'default' => false],
-            'client_name'        => ['label' => 'Client', 'weight' => 2, 'default' => false],
+            'domain_registrar'   => ['label' => __('Registrar'), 'field' => 'domain_registrar_name'],
+            'domain_webhost'     => ['label' => __('Web Host'), 'field' => 'domain_webhost_name'],
+            'domain_expire'      => ['label' => __('Expiration Date')],
+            'domain_dnshost'     => ['label' => __('DNS Host'), 'field' => 'domain_dnshost_name', 'default' => false],
+            'domain_mailhost'    => ['label' => __('Mail Host'), 'field' => 'domain_mailhost_name', 'default' => false],
+            'domain_auto_renew'  => ['label' => __('Auto-renew'), 'field' => 'domain_auto_renew_label', 'default' => false],
+            'domain_name_servers' => ['label' => __('Name Servers'), 'weight' => 2, 'default' => false],
+            'domain_mail_servers' => ['label' => __('MX Records'), 'weight' => 2, 'default' => false],
+            'domain_dmarc'       => ['label' => __('DMARC'), 'weight' => 2, 'default' => false],
+            'domain_tags'        => ['label' => __('Tags'), 'weight' => 2, 'default' => false],
+            'domain_notes'       => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
+            'client_name'        => ['label' => __('Client'), 'weight' => 2, 'default' => false],
         ],
 
         // Defaults match what this export has always emitted, secrets included.
         // The handler decrypts into credential_username / credential_password.
         'credentials' => [
-            'credential_name'        => ['label' => 'Name', 'weight' => 2],
-            'credential_description' => ['label' => 'Description', 'weight' => 3],
-            'credential_username'    => ['label' => 'Username'],
-            'credential_password'    => ['label' => 'Password'],
-            'credential_otp_secret'  => ['label' => 'TOTP'],
-            'credential_uri'         => ['label' => 'URI', 'weight' => 2],
-            'credential_uri_2'       => ['label' => 'URI 2', 'default' => false],
-            'credential_tags'        => ['label' => 'Tags', 'default' => false],
-            'asset_name'             => ['label' => 'Asset', 'default' => false],
-            'contact_name'           => ['label' => 'Contact', 'default' => false],
-            'credential_password_changed' => ['label' => 'Password Changed', 'default' => false],
-            'credential_note'        => ['label' => 'Notes', 'weight' => 3, 'default' => false],
-            'client_name'            => ['label' => 'Client', 'default' => false],
+            'credential_name'        => ['label' => __('Name'), 'weight' => 2],
+            'credential_description' => ['label' => __('Description'), 'weight' => 3],
+            'credential_username'    => ['label' => __('Username')],
+            'credential_password'    => ['label' => __('Password')],
+            'credential_otp_secret'  => ['label' => __('TOTP')],
+            'credential_uri'         => ['label' => __('URI'), 'weight' => 2],
+            'credential_uri_2'       => ['label' => __('URI 2'), 'default' => false],
+            'credential_tags'        => ['label' => __('Tags'), 'default' => false],
+            'asset_name'             => ['label' => __('Asset'), 'default' => false],
+            'contact_name'           => ['label' => __('Contact'), 'default' => false],
+            'credential_password_changed' => ['label' => __('Password Changed'), 'default' => false],
+            'credential_note'        => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
+            'client_name'            => ['label' => __('Client'), 'default' => false],
         ],
 
         // seats_used, assigned_to_assets / assigned_to_contacts, software_keys_list and software_tags are built by the handler's query
         'software' => [
-            'software_name'         => ['label' => 'Name', 'weight' => 2],
-            'software_version'      => ['label' => 'Version'],
-            'software_description'  => ['label' => 'Description', 'weight' => 3],
-            'software_type'         => ['label' => 'Type'],
-            'software_license_type' => ['label' => 'License Type'],
-            'software_seats'        => ['label' => 'Seats', 'format' => 'number'],
-            'seats_used'            => ['label' => 'Seats Used', 'format' => 'number'],
-            'software_key'          => ['label' => 'Key', 'weight' => 2],
-            'software_keys_list'    => ['label' => 'Individual Keys', 'weight' => 3, 'default' => false],
-            'assigned_to_assets'    => ['label' => 'Assets', 'weight' => 2],
-            'assigned_to_contacts'  => ['label' => 'Contacts', 'weight' => 2],
-            'vendor_name'           => ['label' => 'Vendor', 'default' => false],
-            'software_purchase_reference' => ['label' => 'Order Ref', 'default' => false],
-            'software_purchase'     => ['label' => 'Purchased'],
-            'software_expire'       => ['label' => 'Expires'],
-            'client_name'           => ['label' => 'Client', 'default' => false],
-            'software_tags'         => ['label' => 'Tags', 'weight' => 2, 'default' => false],
-            'software_notes'        => ['label' => 'Notes', 'weight' => 3],
+            'software_name'         => ['label' => __('Name'), 'weight' => 2],
+            'software_version'      => ['label' => __('Version')],
+            'software_description'  => ['label' => __('Description'), 'weight' => 3],
+            'software_type'         => ['label' => __('Type')],
+            'software_license_type' => ['label' => __('License Type')],
+            'software_seats'        => ['label' => __('Seats'), 'format' => 'number'],
+            'seats_used'            => ['label' => __('Seats Used'), 'format' => 'number'],
+            'software_key'          => ['label' => __('Key'), 'weight' => 2],
+            'software_keys_list'    => ['label' => __('Individual Keys'), 'weight' => 3, 'default' => false],
+            'assigned_to_assets'    => ['label' => __('Assets'), 'weight' => 2],
+            'assigned_to_contacts'  => ['label' => __('Contacts'), 'weight' => 2],
+            'vendor_name'           => ['label' => __('Vendor'), 'default' => false],
+            'software_purchase_reference' => ['label' => __('Order Ref'), 'default' => false],
+            'software_purchase'     => ['label' => __('Purchased')],
+            'software_expire'       => ['label' => __('Expires')],
+            'client_name'           => ['label' => __('Client'), 'default' => false],
+            'software_tags'         => ['label' => __('Tags'), 'weight' => 2, 'default' => false],
+            'software_notes'        => ['label' => __('Notes'), 'weight' => 3],
         ],
 
         // ticket_number_display is prefixed by the handler
         'tickets' => [
-            'ticket_number_display' => ['label' => 'Ticket Number'],
-            'ticket_priority'       => ['label' => 'Priority'],
-            'ticket_status_name'    => ['label' => 'Status'],
-            'ticket_subject'        => ['label' => 'Subject', 'weight' => 3],
-            'ticket_created_at'     => ['label' => 'Date Opened'],
-            'ticket_resolved_at'    => ['label' => 'Date Resolved'],
-            'ticket_closed_at'      => ['label' => 'Date Closed'],
-            'client_name'           => ['label' => 'Client', 'default' => false],
-            'contact_name'          => ['label' => 'Contact', 'default' => false],
-            'ticket_assigned_to'    => ['label' => 'Assigned To', 'default' => false],
-            'ticket_category_name'  => ['label' => 'Category', 'default' => false],
-            'ticket_billable'       => ['label' => 'Billable', 'default' => false],
-            'ticket_tags'           => ['label' => 'Tags', 'weight' => 2, 'default' => false],
+            'ticket_number_display' => ['label' => __('Ticket Number')],
+            'ticket_priority'       => ['label' => __('Priority')],
+            'ticket_status_name'    => ['label' => __('Status')],
+            'ticket_subject'        => ['label' => __('Subject'), 'weight' => 3],
+            'ticket_created_at'     => ['label' => __('Date Opened')],
+            'ticket_resolved_at'    => ['label' => __('Date Resolved')],
+            'ticket_closed_at'      => ['label' => __('Date Closed')],
+            'client_name'           => ['label' => __('Client'), 'default' => false],
+            'contact_name'          => ['label' => __('Contact'), 'default' => false],
+            'ticket_assigned_to'    => ['label' => __('Assigned To'), 'default' => false],
+            'ticket_category_name'  => ['label' => __('Category'), 'default' => false],
+            'ticket_billable'       => ['label' => __('Billable'), 'default' => false],
+            'ticket_tags'           => ['label' => __('Tags'), 'weight' => 2, 'default' => false],
         ],
 
         // Projects - the handler adds the state, progress and hours (projectStats())
         'projects' => [
-            'project_reference'   => ['label' => 'Number'],
-            'project_name'        => ['label' => 'Project', 'weight' => 3],
-            'client_name'         => ['label' => 'Client', 'weight' => 2],
-            'project_state'       => ['label' => 'State'],
-            'user_name'           => ['label' => 'Manager'],
-            'contact_name'        => ['label' => 'Client Contact', 'default' => false],
-            'project_start'       => ['label' => 'Start', 'default' => false],
-            'project_due'         => ['label' => 'Due'],
-            'project_completed'   => ['label' => 'Completed'],
-            'tickets_done'        => ['label' => 'Tickets Done', 'format' => 'number'],
-            'tickets_total'       => ['label' => 'Tickets', 'format' => 'number'],
-            'tasks_done'          => ['label' => 'Tasks Done', 'format' => 'number', 'default' => false],
-            'tasks_total'         => ['label' => 'Tasks', 'format' => 'number', 'default' => false],
-            'hours_logged'        => ['label' => 'Hours Logged', 'format' => 'number'],
-            'project_budget_hours' => ['label' => 'Budget Hours', 'format' => 'number'],
-            'hours_unbilled'      => ['label' => 'Hours Not Invoiced', 'format' => 'number', 'default' => false],
-            'project_description' => ['label' => 'Scope', 'weight' => 3, 'default' => false],
+            'project_reference'   => ['label' => __('Number')],
+            'project_name'        => ['label' => __('Project'), 'weight' => 3],
+            'client_name'         => ['label' => __('Client'), 'weight' => 2],
+            'project_state'       => ['label' => __('State')],
+            'user_name'           => ['label' => __('Manager')],
+            'contact_name'        => ['label' => __('Client Contact'), 'default' => false],
+            'project_start'       => ['label' => __('Start'), 'default' => false],
+            'project_due'         => ['label' => __('Due')],
+            'project_completed'   => ['label' => __('Completed')],
+            'tickets_done'        => ['label' => __('Tickets Done'), 'format' => 'number'],
+            'tickets_total'       => ['label' => __('Tickets'), 'format' => 'number'],
+            'tasks_done'          => ['label' => __('Tasks Done'), 'format' => 'number', 'default' => false],
+            'tasks_total'         => ['label' => __('Tasks'), 'format' => 'number', 'default' => false],
+            'hours_logged'        => ['label' => __('Hours Logged'), 'format' => 'number'],
+            'project_budget_hours' => ['label' => __('Budget Hours'), 'format' => 'number'],
+            'hours_unbilled'      => ['label' => __('Hours Not Invoiced'), 'format' => 'number', 'default' => false],
+            'project_description' => ['label' => __('Scope'), 'weight' => 3, 'default' => false],
         ],
 
         // Services - the counts, attention and review columns are built by the handler
         'services' => [
-            'service_name'        => ['label' => 'Service', 'weight' => 2],
-            'client_name'         => ['label' => 'Client', 'weight' => 2],
-            'service_category'    => ['label' => 'Category'],
-            'service_importance'  => ['label' => 'Importance'],
-            'service_description' => ['label' => 'Description', 'weight' => 3],
-            'service_assets'      => ['label' => 'Runs On', 'weight' => 3],
-            'service_vendors'     => ['label' => 'Vendors', 'weight' => 2],
-            'service_contacts'    => ['label' => 'People', 'weight' => 2, 'default' => false],
-            'service_domains'     => ['label' => 'Domains', 'weight' => 2, 'default' => false],
-            'service_backup'      => ['label' => 'Backup and Recovery', 'weight' => 3],
-            'service_attention'   => ['label' => 'Needs Attention', 'weight' => 3],
-            'service_review'      => ['label' => 'Next Review'],
-            'service_reviewed'    => ['label' => 'Last Reviewed', 'default' => false],
-            'service_review_every' => ['label' => 'Review Every', 'default' => false],
-            'open_tickets'        => ['label' => 'Open Tickets', 'format' => 'number', 'default' => false],
-            'service_state'       => ['label' => 'State', 'default' => false],
-            'service_tags'        => ['label' => 'Tags', 'weight' => 2, 'default' => false],
+            'service_name'        => ['label' => __('Service'), 'weight' => 2],
+            'client_name'         => ['label' => __('Client'), 'weight' => 2],
+            'service_category'    => ['label' => __('Category')],
+            'service_importance'  => ['label' => __('Importance')],
+            'service_description' => ['label' => __('Description'), 'weight' => 3],
+            'service_assets'      => ['label' => __('Runs On'), 'weight' => 3],
+            'service_vendors'     => ['label' => __('Vendors'), 'weight' => 2],
+            'service_contacts'    => ['label' => __('People'), 'weight' => 2, 'default' => false],
+            'service_domains'     => ['label' => __('Domains'), 'weight' => 2, 'default' => false],
+            'service_backup'      => ['label' => __('Backup and Recovery'), 'weight' => 3],
+            'service_attention'   => ['label' => __('Needs Attention'), 'weight' => 3],
+            'service_review'      => ['label' => __('Next Review')],
+            'service_reviewed'    => ['label' => __('Last Reviewed'), 'default' => false],
+            'service_review_every' => ['label' => __('Review Every'), 'default' => false],
+            'open_tickets'        => ['label' => __('Open Tickets'), 'format' => 'number', 'default' => false],
+            'service_state'       => ['label' => __('State'), 'default' => false],
+            'service_tags'        => ['label' => __('Tags'), 'weight' => 2, 'default' => false],
         ],
 
         // invoice_number_display is prefix . number, built by the handler
         'invoices' => [
-            'invoice_number_display' => ['label' => 'Invoice Number'],
-            'invoice_scope'          => ['label' => 'Scope', 'weight' => 3],
-            'invoice_subtotal'       => ['label' => 'Subtotal', 'format' => 'money', 'default' => false],
-            'invoice_discount_amount' => ['label' => 'Discount', 'format' => 'money', 'default' => false],
-            'invoice_tax'            => ['label' => 'Tax', 'format' => 'money', 'default' => false],
-            'invoice_tax_parts'      => ['label' => 'Tax by Part', 'weight' => 2, 'default' => false],
-            'invoice_amount'         => ['label' => 'Amount', 'format' => 'money'],
-            'invoice_date'           => ['label' => 'Issued Date'],
-            'invoice_due'            => ['label' => 'Due Date'],
-            'invoice_status'         => ['label' => 'Status'],
-            'client_name'            => ['label' => 'Client', 'weight' => 2],
-            'category_name'          => ['label' => 'Category', 'default' => false],
-            'invoice_currency_code'  => ['label' => 'Currency', 'default' => false],
-            'amount_paid'            => ['label' => 'Paid', 'format' => 'money', 'default' => false],
-            'invoice_balance'        => ['label' => 'Balance', 'format' => 'money', 'default' => false],
+            'invoice_number_display' => ['label' => __('Invoice Number')],
+            'invoice_scope'          => ['label' => __('Scope'), 'weight' => 3],
+            'invoice_subtotal'       => ['label' => __('Subtotal'), 'format' => 'money', 'default' => false],
+            'invoice_discount_amount' => ['label' => __('Discount'), 'format' => 'money', 'default' => false],
+            'invoice_tax'            => ['label' => __('Tax'), 'format' => 'money', 'default' => false],
+            'invoice_tax_parts'      => ['label' => __('Tax by Part'), 'weight' => 2, 'default' => false],
+            'invoice_amount'         => ['label' => __('Amount'), 'format' => 'money'],
+            'invoice_date'           => ['label' => __('Issued Date')],
+            'invoice_due'            => ['label' => __('Due Date')],
+            'invoice_status'         => ['label' => __('Status')],
+            'client_name'            => ['label' => __('Client'), 'weight' => 2],
+            'category_name'          => ['label' => __('Category'), 'default' => false],
+            'invoice_currency_code'  => ['label' => __('Currency'), 'default' => false],
+            'amount_paid'            => ['label' => __('Paid'), 'format' => 'money', 'default' => false],
+            'invoice_balance'        => ['label' => __('Balance'), 'format' => 'money', 'default' => false],
         ],
 
         'quotes' => [
-            'quote_number_display' => ['label' => 'Quote Number'],
-            'quote_scope'          => ['label' => 'Scope', 'weight' => 3],
-            'quote_amount'         => ['label' => 'Amount', 'format' => 'money'],
-            'quote_tax'            => ['label' => 'Tax', 'format' => 'money', 'default' => false],
-            'quote_monthly_amount' => ['label' => 'Monthly', 'format' => 'money'],
-            'quote_date'           => ['label' => 'Date'],
-            'quote_status'         => ['label' => 'Status'],
-            'client_name'          => ['label' => 'Client', 'weight' => 2, 'default' => false],
-            'category_name'        => ['label' => 'Category', 'default' => false],
+            'quote_number_display' => ['label' => __('Quote Number')],
+            'quote_scope'          => ['label' => __('Scope'), 'weight' => 3],
+            'quote_amount'         => ['label' => __('Amount'), 'format' => 'money'],
+            'quote_tax'            => ['label' => __('Tax'), 'format' => 'money', 'default' => false],
+            'quote_monthly_amount' => ['label' => __('Monthly'), 'format' => 'money'],
+            'quote_date'           => ['label' => __('Date')],
+            'quote_status'         => ['label' => __('Status')],
+            'client_name'          => ['label' => __('Client'), 'weight' => 2, 'default' => false],
+            'category_name'        => ['label' => __('Category'), 'default' => false],
         ],
 
         'recurring_invoices' => [
-            'recurring_invoice_number_display' => ['label' => 'Recurring Number'],
-            'recurring_invoice_scope'          => ['label' => 'Scope', 'weight' => 3],
-            'recurring_invoice_amount'         => ['label' => 'Amount', 'format' => 'money'],
-            'recurring_invoice_tax'            => ['label' => 'Tax', 'format' => 'money', 'default' => false],
-            'recurring_invoice_frequency_display' => ['label' => 'Frequency'],
-            'recurring_invoice_created_at'     => ['label' => 'Date Created'],
-            'client_name'                      => ['label' => 'Client', 'weight' => 2, 'default' => false],
-            'category_name'                    => ['label' => 'Category', 'default' => false],
+            'recurring_invoice_number_display' => ['label' => __('Recurring Number')],
+            'recurring_invoice_scope'          => ['label' => __('Scope'), 'weight' => 3],
+            'recurring_invoice_amount'         => ['label' => __('Amount'), 'format' => 'money'],
+            'recurring_invoice_tax'            => ['label' => __('Tax'), 'format' => 'money', 'default' => false],
+            'recurring_invoice_frequency_display' => ['label' => __('Frequency')],
+            'recurring_invoice_created_at'     => ['label' => __('Date Created')],
+            'client_name'                      => ['label' => __('Client'), 'weight' => 2, 'default' => false],
+            'category_name'                    => ['label' => __('Category'), 'default' => false],
         ],
 
         'products' => [
-            'product_name'          => ['label' => 'Product', 'weight' => 2],
-            'product_type_label'    => ['label' => 'Type', 'default' => false],
-            'product_code'          => ['label' => 'Code'],
-            'product_description'   => ['label' => 'Description', 'weight' => 3],
-            'product_price'         => ['label' => 'Price', 'format' => 'money'],
-            'product_cost'          => ['label' => 'Cost', 'format' => 'money', 'default' => false],
-            'product_margin'        => ['label' => 'Margin', 'default' => false],
-            'product_billed'        => ['label' => 'Billed'],
-            'product_currency_code' => ['label' => 'Currency', 'default' => false],
-            'category_name'         => ['label' => 'Category'],
-            'product_tax'           => ['label' => 'Tax'],
-            'vendor_name'           => ['label' => 'Vendor', 'default' => false],
-            'product_vendor_part'   => ['label' => 'Part Number', 'default' => false],
-            'product_stock_display' => ['label' => 'In Stock', 'default' => false],
-            'product_stock_value'   => ['label' => 'Stock Value', 'format' => 'money', 'default' => false],
-            'product_reorder_display' => ['label' => 'Reorder At', 'default' => false],
-            'product_order_display' => ['label' => 'Order', 'default' => false],
-            'product_location'      => ['label' => 'Location', 'default' => false],
-            'product_asset_type'    => ['label' => 'Asset Type', 'default' => false],
-            'product_make'          => ['label' => 'Make', 'default' => false],
-            'product_model'         => ['label' => 'Model', 'default' => false],
-            'product_warranty_display' => ['label' => 'Warranty', 'default' => false],
-            'product_notes'         => ['label' => 'Notes', 'weight' => 3, 'default' => false],
+            'product_name'          => ['label' => __('Product'), 'weight' => 2],
+            'product_type_label'    => ['label' => __('Type'), 'default' => false],
+            'product_code'          => ['label' => __('Code')],
+            'product_description'   => ['label' => __('Description'), 'weight' => 3],
+            'product_price'         => ['label' => __('Price'), 'format' => 'money'],
+            'product_cost'          => ['label' => __('Cost'), 'format' => 'money', 'default' => false],
+            'product_margin'        => ['label' => __('Margin'), 'default' => false],
+            'product_billed'        => ['label' => __('Billed')],
+            'product_currency_code' => ['label' => __('Currency'), 'default' => false],
+            'category_name'         => ['label' => __('Category')],
+            'product_tax'           => ['label' => __('Tax')],
+            'vendor_name'           => ['label' => __('Vendor'), 'default' => false],
+            'product_vendor_part'   => ['label' => __('Part Number'), 'default' => false],
+            'product_stock_display' => ['label' => __('In Stock'), 'default' => false],
+            'product_stock_value'   => ['label' => __('Stock Value'), 'format' => 'money', 'default' => false],
+            'product_reorder_display' => ['label' => __('Reorder At'), 'default' => false],
+            'product_order_display' => ['label' => __('Order'), 'default' => false],
+            'product_location'      => ['label' => __('Location'), 'default' => false],
+            'product_asset_type'    => ['label' => __('Asset Type'), 'default' => false],
+            'product_make'          => ['label' => __('Make'), 'default' => false],
+            'product_model'         => ['label' => __('Model'), 'default' => false],
+            'product_warranty_display' => ['label' => __('Warranty'), 'default' => false],
+            'product_notes'         => ['label' => __('Notes'), 'weight' => 3, 'default' => false],
         ],
 
         'expenses' => [
-            'expense_date'        => ['label' => 'Date'],
-            'expense_amount'      => ['label' => 'Amount', 'format' => 'money'],
-            'expense_before_tax'  => ['label' => 'Before Tax', 'format' => 'money', 'default' => false],
-            'expense_tax_amount'  => ['label' => 'Tax', 'format' => 'money', 'default' => false],
-            'expense_tax_rate'    => ['label' => 'Tax Rate', 'default' => false],
-            'vendor_name'         => ['label' => 'Vendor', 'weight' => 2],
-            'expense_description' => ['label' => 'Description', 'weight' => 3],
-            'category_name'       => ['label' => 'Category'],
-            'account_name'        => ['label' => 'Account'],
-            'client_name'         => ['label' => 'Client', 'weight' => 2, 'default' => false],
-            'expense_payment_method' => ['label' => 'Paid By', 'default' => false],
-            'expense_reference'   => ['label' => 'Reference', 'default' => false],
-            'expense_receipt_display' => ['label' => 'Receipt', 'default' => false],
-            'expense_paid_by_display' => ['label' => 'Paid Personally', 'default' => false],
-            'expense_billing_display' => ['label' => 'Billing', 'default' => false],
-            'expense_billed_on'   => ['label' => 'Billed On', 'default' => false],
-            'user_name'           => ['label' => 'Entered By', 'default' => false],
+            'expense_date'        => ['label' => __('Date')],
+            'expense_amount'      => ['label' => __('Amount'), 'format' => 'money'],
+            'expense_before_tax'  => ['label' => __('Before Tax'), 'format' => 'money', 'default' => false],
+            'expense_tax_amount'  => ['label' => __('Tax'), 'format' => 'money', 'default' => false],
+            'expense_tax_rate'    => ['label' => __('Tax Rate'), 'default' => false],
+            'vendor_name'         => ['label' => __('Vendor'), 'weight' => 2],
+            'expense_description' => ['label' => __('Description'), 'weight' => 3],
+            'category_name'       => ['label' => __('Category')],
+            'account_name'        => ['label' => __('Account')],
+            'client_name'         => ['label' => __('Client'), 'weight' => 2, 'default' => false],
+            'expense_payment_method' => ['label' => __('Paid By'), 'default' => false],
+            'expense_reference'   => ['label' => __('Reference'), 'default' => false],
+            'expense_receipt_display' => ['label' => __('Receipt'), 'default' => false],
+            'expense_paid_by_display' => ['label' => __('Paid Personally'), 'default' => false],
+            'expense_billing_display' => ['label' => __('Billing'), 'default' => false],
+            'expense_billed_on'   => ['label' => __('Billed On'), 'default' => false],
+            'user_name'           => ['label' => __('Entered By'), 'default' => false],
         ],
 
         'income' => [
-            'income_date'          => ['label' => 'Date'],
-            'income_type'          => ['label' => 'Type'],
-            'income_invoice'       => ['label' => 'Invoice'],
-            'income_source'        => ['label' => 'What for', 'weight' => 3],
-            'income_category'      => ['label' => 'Category'],
-            'income_client'        => ['label' => 'Client', 'weight' => 2],
-            'income_amount'        => ['label' => 'Amount', 'format' => 'money'],
-            'income_currency_code' => ['label' => 'Currency'],
-            'income_method'        => ['label' => 'Payment Method'],
-            'income_reference'     => ['label' => 'Reference'],
-            'income_account'       => ['label' => 'Account'],
-            'income_online'        => ['label' => 'Paid Online'],
+            'income_date'          => ['label' => __('Date')],
+            'income_type'          => ['label' => __('Type')],
+            'income_invoice'       => ['label' => __('Invoice')],
+            'income_source'        => ['label' => __('What for'), 'weight' => 3],
+            'income_category'      => ['label' => __('Category')],
+            'income_client'        => ['label' => __('Client'), 'weight' => 2],
+            'income_amount'        => ['label' => __('Amount'), 'format' => 'money'],
+            'income_currency_code' => ['label' => __('Currency')],
+            'income_method'        => ['label' => __('Payment Method')],
+            'income_reference'     => ['label' => __('Reference')],
+            'income_account'       => ['label' => __('Account')],
+            'income_online'        => ['label' => __('Paid Online')],
         ],
 
         'transactions' => [
-            'transaction_date'           => ['label' => 'Date'],
-            'transaction_account'        => ['label' => 'Account'],
-            'transaction_type'           => ['label' => 'Type'],
-            'transaction_what'           => ['label' => 'Who or What', 'weight' => 2],
-            'transaction_description'    => ['label' => 'Description', 'weight' => 3],
-            'transaction_other_account'  => ['label' => 'Transfer Account'],
-            'transaction_reference'      => ['label' => 'Reference'],
-            'transaction_category'       => ['label' => 'Category'],
-            'transaction_client'         => ['label' => 'Client', 'weight' => 2],
-            'transaction_payment_method' => ['label' => 'Payment Method'],
-            'transaction_in'             => ['label' => 'In', 'format' => 'money'],
-            'transaction_out'            => ['label' => 'Out', 'format' => 'money'],
-            'transaction_amount'         => ['label' => 'Amount', 'format' => 'money', 'default' => false],
-            'transaction_balance'        => ['label' => 'Balance', 'format' => 'money'],
-            'transaction_cleared'        => ['label' => 'Cleared', 'default' => false],
+            'transaction_date'           => ['label' => __('Date')],
+            'transaction_account'        => ['label' => __('Account')],
+            'transaction_type'           => ['label' => __('Type')],
+            'transaction_what'           => ['label' => __('Who or What'), 'weight' => 2],
+            'transaction_description'    => ['label' => __('Description'), 'weight' => 3],
+            'transaction_other_account'  => ['label' => __('Transfer Account')],
+            'transaction_reference'      => ['label' => __('Reference')],
+            'transaction_category'       => ['label' => __('Category')],
+            'transaction_client'         => ['label' => __('Client'), 'weight' => 2],
+            'transaction_payment_method' => ['label' => __('Payment Method')],
+            'transaction_in'             => ['label' => __('In'), 'format' => 'money'],
+            'transaction_out'            => ['label' => __('Out'), 'format' => 'money'],
+            'transaction_amount'         => ['label' => __('Amount'), 'format' => 'money', 'default' => false],
+            'transaction_balance'        => ['label' => __('Balance'), 'format' => 'money'],
+            'transaction_cleared'        => ['label' => __('Cleared'), 'default' => false],
         ],
 
         'trips' => [
-            'trip_date'        => ['label' => 'Date'],
-            'user_name'        => ['label' => 'Driver', 'weight' => 2],
-            'trip_purpose'     => ['label' => 'Purpose', 'weight' => 3],
-            'trip_source'      => ['label' => 'From', 'weight' => 2],
-            'trip_destination' => ['label' => 'To', 'weight' => 2],
+            'trip_date'        => ['label' => __('Date')],
+            'user_name'        => ['label' => __('Driver'), 'weight' => 2],
+            'trip_purpose'     => ['label' => __('Purpose'), 'weight' => 3],
+            'trip_source'      => ['label' => __('From'), 'weight' => 2],
+            'trip_destination' => ['label' => __('To'), 'weight' => 2],
             'trip_miles'       => ['label' => ucfirst(tripUnit()), 'format' => 'number'],
-            'round_trip_display' => ['label' => 'Round Trip', 'default' => false],
-            'trip_one_way'     => ['label' => 'One Way', 'format' => 'number', 'default' => false],
-            'client_name'      => ['label' => 'Client', 'weight' => 2, 'default' => false],
-            'location_name'    => ['label' => 'Site', 'weight' => 2, 'default' => false],
-            'ticket_display'   => ['label' => 'Ticket', 'weight' => 2, 'default' => false],
-            'trip_start_odometer' => ['label' => 'Odometer Start', 'default' => false],
-            'trip_end_odometer' => ['label' => 'Odometer End', 'default' => false],
-            'vehicle_display'  => ['label' => 'Vehicle', 'default' => false],
-            'paid_back_display' => ['label' => 'Paid Back', 'weight' => 2, 'default' => false],
-            'billing_display'  => ['label' => 'Billing', 'weight' => 2, 'default' => false],
+            'round_trip_display' => ['label' => __('Round Trip'), 'default' => false],
+            'trip_one_way'     => ['label' => __('One Way'), 'format' => 'number', 'default' => false],
+            'client_name'      => ['label' => __('Client'), 'weight' => 2, 'default' => false],
+            'location_name'    => ['label' => __('Site'), 'weight' => 2, 'default' => false],
+            'ticket_display'   => ['label' => __('Ticket'), 'weight' => 2, 'default' => false],
+            'trip_start_odometer' => ['label' => __('Odometer Start'), 'default' => false],
+            'trip_end_odometer' => ['label' => __('Odometer End'), 'default' => false],
+            'vehicle_display'  => ['label' => __('Vehicle'), 'default' => false],
+            'paid_back_display' => ['label' => __('Paid Back'), 'weight' => 2, 'default' => false],
+            'billing_display'  => ['label' => __('Billing'), 'weight' => 2, 'default' => false],
         ],
 
         // user_status_display is the status word, built by the handler
         'users' => [
-            'user_name'          => ['label' => 'Name', 'weight' => 2],
-            'user_email'         => ['label' => 'Email', 'weight' => 2],
-            'role_name'          => ['label' => 'Role'],
-            'user_status_display' => ['label' => 'Status'],
-            'user_mfa_display'   => ['label' => 'MFA'],
-            'user_last_login'    => ['label' => 'Last Sign In'],
-            'user_client_access' => ['label' => 'Client Access', 'weight' => 2, 'default' => false],
-            'user_created_at'    => ['label' => 'Creation Date'],
+            'user_name'          => ['label' => __('Name'), 'weight' => 2],
+            'user_email'         => ['label' => __('Email'), 'weight' => 2],
+            'role_name'          => ['label' => __('Role')],
+            'user_status_display' => ['label' => __('Status')],
+            'user_mfa_display'   => ['label' => __('MFA')],
+            'user_last_login'    => ['label' => __('Last Sign In')],
+            'user_client_access' => ['label' => __('Client Access'), 'weight' => 2, 'default' => false],
+            'user_created_at'    => ['label' => __('Creation Date')],
         ],
 
         // Audit log entries - handler adds who did it, the record and the device (functions/audit_log.php)
         'audit_logs' => [
-            'log_created_at'     => ['label' => 'When'],
-            'audit_who'          => ['label' => 'Who'],
-            'user_email'         => ['label' => 'Email', 'default' => false],
-            'client_name'        => ['label' => 'Client'],
-            'log_type'           => ['label' => 'Type'],
-            'log_action'         => ['label' => 'Action'],
-            'log_description'    => ['label' => 'Description', 'weight' => 3],
-            'audit_record'       => ['label' => 'Record', 'weight' => 2, 'default' => false],
-            'log_ip'             => ['label' => 'IP Address'],
-            'audit_device'       => ['label' => 'Device'],
-            'log_user_agent'     => ['label' => 'User Agent', 'weight' => 2, 'default' => false],
-            'log_id'             => ['label' => 'Entry', 'default' => false],
+            'log_created_at'     => ['label' => __('When')],
+            'audit_who'          => ['label' => __('Who')],
+            'user_email'         => ['label' => __('Email'), 'default' => false],
+            'client_name'        => ['label' => __('Client')],
+            'log_type'           => ['label' => __('Type')],
+            'log_action'         => ['label' => __('Action')],
+            'log_description'    => ['label' => __('Description'), 'weight' => 3],
+            'audit_record'       => ['label' => __('Record'), 'weight' => 2, 'default' => false],
+            'log_ip'             => ['label' => __('IP Address')],
+            'audit_device'       => ['label' => __('Device')],
+            'log_user_agent'     => ['label' => __('User Agent'), 'weight' => 2, 'default' => false],
+            'log_id'             => ['label' => __('Entry'), 'default' => false],
         ],
 
         'app_logs' => [
-            'app_log_created_at' => ['label' => 'When'],
-            'app_log_type'       => ['label' => 'Level'],
-            'app_log_category'   => ['label' => 'Category'],
-            'app_log_details'    => ['label' => 'Details', 'weight' => 4],
-            'app_log_id'         => ['label' => 'Entry', 'default' => false],
+            'app_log_created_at' => ['label' => __('When')],
+            'app_log_type'       => ['label' => __('Level')],
+            'app_log_category'   => ['label' => __('Category')],
+            'app_log_details'    => ['label' => __('Details'), 'weight' => 4],
+            'app_log_id'         => ['label' => __('Entry'), 'default' => false],
         ],
 
     ];
@@ -507,7 +507,7 @@ function getExportColumns($export_type) {
     // An asset's details, a column each - off until picked (ASSET_SPECS, functions/asset_type.php)
     if ($export_type === 'assets' && defined('ASSET_SPECS')) {
         foreach (ASSET_SPECS as $spec_key => $spec) {
-            $registry['assets']['spec_' . $spec_key] = ['label' => $spec['label'] . (isset($spec['unit']) ? ' (' . $spec['unit'] . ')' : ''), 'default' => false];
+            $registry['assets']['spec_' . $spec_key] = ['label' => (function_exists('assetSpecLabel') ? assetSpecLabel($spec_key) : $spec['label']) . (isset($spec['unit']) ? ' (' . $spec['unit'] . ')' : ''), 'default' => false];
         }
     }
 
@@ -576,7 +576,7 @@ function isExportRequest($trigger) {
  */
 function guardExportHasRows($num_rows, $what) {
     if ($num_rows < 1) {
-        flashAlert("No $what match - nothing to export.", 'error');
+        flashAlert(__('No %s match - nothing to export.', $what), 'error');
         redirect();
     }
 }
@@ -587,7 +587,7 @@ function guardExportHasRows($num_rows, $what) {
  */
 function guardExportPdfRowCount($format, $num_rows) {
     if (resolveExportFormat($format) === 'pdf' && $num_rows > EXPORT_PDF_MAX_ROWS) {
-        flashAlert("That's " . number_format($num_rows) . " rows - too many for a PDF. Narrow the filters or export to CSV instead.", 'error');
+        flashAlert(__('That\'s %s rows - too many for a PDF. Narrow the filters or export to CSV instead.', number_format($num_rows)), 'error');
         redirect();
     }
 }
@@ -645,10 +645,10 @@ function renderExportColumnPicker($export_type) {
 
     <div class="mb-3">
         <label class="d-flex justify-content-between align-items-center">
-            <span>Columns</span>
+            <span><?= __('Columns') ?></span>
             <span>
-                <button type="button" class="btn btn-link btn-sm p-0 me-2 export-columns-all">Select all</button>
-                <button type="button" class="btn btn-link btn-sm p-0 export-columns-none">None</button>
+                <button type="button" class="btn btn-link btn-sm p-0 me-2 export-columns-all"><?= __('Select all') ?></button>
+                <button type="button" class="btn btn-link btn-sm p-0 export-columns-none"><?= __('None') ?></button>
             </span>
         </label>
         <div id="<?= $picker_id ?>" class="export-column-picker border rounded p-2" style="max-height: 220px; overflow-y: auto;">
@@ -680,6 +680,11 @@ function renderExportColumnPicker($export_type) {
         var counter = group.querySelector('.export-columns-count');
         var form = picker.closest('form');
 
+        var text = <?= json_encode(['selected' => __('%1$s of %2$s columns selected'), 'many' => __('%1$s of %2$s columns selected - a lot for a PDF, CSV will read better'), 'none' => __('Select at least one column to export')], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+        function fill(pattern, a, b) {
+            return pattern.replace('%1$s', a).replace('%2$s', b);
+        }
+
         function setAll(state) {
             for (var i = 0; i < boxes.length; i++) {
                 boxes[i].checked = state;
@@ -690,8 +695,7 @@ function renderExportColumnPicker($export_type) {
         function update() {
             var checked = picker.querySelectorAll('input[name="columns[]"]:checked').length;
             counter.classList.remove('text-danger');
-            counter.textContent = checked + ' of ' + boxes.length + ' columns selected'
-                + (checked > 10 ? ' - a lot for a PDF, CSV will read better' : '');
+            counter.textContent = fill(checked > 10 ? text.many : text.selected, checked, boxes.length);
         }
 
         picker.addEventListener('change', update);
@@ -704,7 +708,7 @@ function renderExportColumnPicker($export_type) {
             form.addEventListener('submit', function (e) {
                 if (picker.querySelectorAll('input[name="columns[]"]:checked').length === 0) {
                     e.preventDefault();
-                    counter.textContent = 'Select at least one column to export';
+                    counter.textContent = text.none;
                     counter.classList.add('text-danger');
                 }
             });
@@ -765,7 +769,13 @@ function formatExportDateRange($date_from, $date_to) {
         return '';
     }
 
-    return $date_from . ' to ' . $date_to;
+    if ($all_time_from) {
+        return __('Up to %s', formatDate($date_to, 'date'));
+    }
+    if ($all_time_to) {
+        return __('From %s', formatDate($date_from, 'date'));
+    }
+    return __('%1$s to %2$s', formatDate($date_from, 'date'), formatDate($date_to, 'date'));
 }
 
 /*
@@ -806,7 +816,7 @@ function summarizeExportFilters($filters) {
         }
     }
 
-    return empty($parts) ? '' : 'Filters - ' . implode(' | ', $parts);
+    return empty($parts) ? '' : __('Filters - %s', implode(' | ', $parts));
 }
 
 /*
@@ -837,15 +847,16 @@ function exportTabsId() {
     return $current;
 }
 
-function exportTabsNav($filters_label = 'Filters') {
+function exportTabsNav($filters_label = '') {
     $id = exportTabsId('next');
+    $filters_label = $filters_label !== '' ? $filters_label : __('Filters');
     ?>
     <ul class="modal-header nav nav-pills nav-justified">
         <li class="nav-item">
             <a class="nav-link active" data-bs-toggle="pill" href="#<?= $id ?>-filters"><?= escapeHtml($filters_label) ?></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="pill" href="#<?= $id ?>-columns">Columns</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#<?= $id ?>-columns"><?= __('Columns') ?></a>
         </li>
     </ul>
     <?php
@@ -876,9 +887,9 @@ function exportTabsColumns($export_type) {
  */
 function renderExportButtons($trigger) {
     ?>
-    <button type="submit" name="<?= $trigger ?>" value="csv" class="btn btn-primary text-bold"><i class="fas fa-fw fa-file-csv me-2"></i>Download CSV</button>
-    <button type="submit" name="<?= $trigger ?>" value="pdf" class="btn btn-secondary text-bold"><i class="fas fa-fw fa-file-pdf me-2"></i>Download PDF</button>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+    <button type="submit" name="<?= $trigger ?>" value="csv" class="btn btn-primary text-bold"><i class="fas fa-fw fa-file-csv me-2"></i><?= __('Download CSV') ?></button>
+    <button type="submit" name="<?= $trigger ?>" value="pdf" class="btn btn-secondary text-bold"><i class="fas fa-fw fa-file-pdf me-2"></i><?= __('Download PDF') ?></button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     <?php
 }
 
@@ -908,7 +919,8 @@ function beginExport($export_type, $format, $filename_base, $title = '', $subtit
 
     if ($format === 'csv') {
         $export['fp'] = fopen('php://memory', 'w');
-        fputcsv($export['fp'], array_column($columns, 'label'), ',', '"', '\\');
+        // Headings stay English in every language - an export opens straight back in by them
+        fputcsv($export['fp'], i18nEnglish(fn () => array_column(resolveExportColumns($export_type), 'label')), ',', '"', '\\');
     } else {
         // TCPDF sizes a table from the cells it sees, so every row needs the widths -
         // putting them on the header alone leaves the body offset from its headings
@@ -1048,7 +1060,7 @@ function finishExport(&$export) {
         $html .= '<p class="meta">' . escapeHtml($export['subtitle']) . '</p>';
     }
 
-    $html .= '<p class="meta">' . $export['rows'] . ' record(s) - generated ' . date('Y-m-d H:i') . '</p><br>
+    $html .= '<p class="meta">' . escapeHtml(_n('%1$s record - generated %2$s', '%1$s records - generated %2$s', $export['rows'], number_format($export['rows']), formatDate(date('Y-m-d H:i:s'), 'datetime'))) . '</p><br>
     <table cellspacing="0" cellpadding="2">
         <thead><tr>' . $head . '</tr></thead>
         <tbody>' . $export['body'] . '</tbody>

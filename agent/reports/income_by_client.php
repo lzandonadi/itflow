@@ -63,27 +63,27 @@ unset($row);
 $clients = array_values($clients);
 
 $columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr']);
     }],
-    'paid' => ['label' => 'Paid', 'type' => 'money', 'class' => 'fw-semibold', 'html' => function ($row) use ($period) {
+    'paid' => ['label' => __('Paid'), 'type' => 'money', 'class' => 'fw-semibold', 'html' => function ($row) use ($period) {
         return '<a class="itflow-report-amount" href="/agent/income.php?client_id=' . $row['client_id'] . '&canned_date=custom&dtf=' . $period['start'] . '&dtt=' . $period['end'] . '">' . reportMoney($row['paid']) . '</a>';
     }],
-    'share' => ['label' => 'Share', 'type' => 'percent', 'html' => function ($row) {
+    'share' => ['label' => __('Share'), 'type' => 'percent', 'html' => function ($row) {
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="itflow-report-meter d-none d-lg-flex" style="width: 5rem"><span style="width: ' . min(100, floatval($row['share'])) . '%"></span></div>'
             . '<span class="small text-body-secondary">' . reportPercent($row['share']) . '</span></div>';
     }],
-    'prev' => ['label' => 'Period before', 'type' => 'money', 'class' => 'text-body-secondary'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
-        return $row['change'] === null ? '<span class="itflow-report-zero">New</span>' : '<span class="small">' . reportChangeHtml($row['paid'], $row['prev'], 'up') . '</span>';
+    'prev' => ['label' => __('Period before'), 'type' => 'money', 'class' => 'text-body-secondary'],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+        return $row['change'] === null ? '<span class="itflow-report-zero">' . __('New') . '</span>' : '<span class="small">' . reportChangeHtml($row['paid'], $row['prev'], 'up') . '</span>';
     }],
-    'payments' => ['label' => 'Payments', 'type' => 'count'],
-    'mrr' => ['label' => 'Recurring / month', 'type' => 'money', 'html' => function ($row) {
+    'payments' => ['label' => __('Payments'), 'type' => 'count'],
+    'mrr' => ['label' => __('Recurring / month'), 'type' => 'money', 'html' => function ($row) {
         return $row['mrr'] > 0 ? reportMoney($row['mrr']) : '<span class="itflow-report-zero">–</span>';
     }],
-    'last_paid' => ['label' => 'Last paid', 'type' => 'date', 'class' => 'text-nowrap'],
+    'last_paid' => ['label' => __('Last paid'), 'type' => 'date', 'class' => 'text-nowrap'],
 ];
-$totals = ['client' => 'Total', 'paid' => array_sum(array_column($clients, 'paid')), 'prev' => array_sum(array_column($clients, 'prev')),
+$totals = ['client' => __('Total'), 'paid' => array_sum(array_column($clients, 'paid')), 'prev' => array_sum(array_column($clients, 'prev')),
     'payments' => array_sum(array_column($clients, 'payments')), 'mrr' => array_sum(array_column($clients, 'mrr'))];
 
 if (reportExporting()) {
@@ -102,38 +102,38 @@ $top_five_share = reportShare(array_sum(array_column(array_slice($clients, 0, 5)
     <?php reportHeader('income_by_client', [
         'period' => $period,
         'years' => reportPastYears("SELECT DISTINCT YEAR(payment_date) AS y FROM payments"),
-        'controls' => reportSwitchControl('over600', $only_600, 'Only clients who paid 600 or more'),
+        'controls' => reportSwitchControl('over600', $only_600, __('Only clients who paid 600 or more')),
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Paid by clients', 'value' => reportMoney($total), 'sub' => reportChangeHtml($total, $prev_total, 'up', $period['compare'])],
-        ['label' => 'Clients who paid', 'value' => reportCount(count($clients)), 'sub' => '<span class="text-body-tertiary">' . ($only_600 ? 'Paid 600 or more' : 'In the period') . '</span>'],
-        ['label' => 'Average per client', 'value' => count($clients) ? reportMoney(array_sum(array_column($clients, 'paid')) / count($clients)) : '-', 'sub' => '<span class="text-body-tertiary">Over the period</span>'],
-        ['label' => 'Top five', 'value' => reportPercent($top_five_share), 'sub' => '<span class="text-body-tertiary">of income - how much rides on a few clients</span>',
+        ['label' => __('Paid by clients'), 'value' => reportMoney($total), 'sub' => reportChangeHtml($total, $prev_total, 'up', $period['compare'])],
+        ['label' => __('Clients who paid'), 'value' => reportCount(count($clients)), 'sub' => '<span class="text-body-tertiary">' . ($only_600 ? __('Paid 600 or more') : __('In the period')) . '</span>'],
+        ['label' => __('Average per client'), 'value' => count($clients) ? reportMoney(array_sum(array_column($clients, 'paid')) / count($clients)) : '-', 'sub' => '<span class="text-body-tertiary">' . __('Over the period') . '</span>'],
+        ['label' => __('Top five'), 'value' => reportPercent($top_five_share), 'sub' => '<span class="text-body-tertiary">' . __('of income - how much rides on a few clients') . '</span>',
             'tone' => $top_five_share !== null && $top_five_share >= 60 ? 'warning' : ''],
     ]) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Who paid the most', escapeHtml($period['range'])) ?>
+        <?= reportSectionOpen(__('Who paid the most'), escapeHtml($period['range'])) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
                     'labels' => array_map(function ($c) { return $c['client']; }, $top),
                     'series' => [
-                        ['label' => 'This period', 'data' => array_map(function ($c) { return round($c['paid'], 2); }, $top), 'tone' => 'accent'],
-                        ['label' => 'Period before', 'data' => array_map(function ($c) { return round($c['prev'], 2); }, $top), 'tone' => 'faint'],
+                        ['label' => __('This period'), 'data' => array_map(function ($c) { return round($c['paid'], 2); }, $top), 'tone' => 'accent'],
+                        ['label' => __('Period before'), 'data' => array_map(function ($c) { return round($c['prev'], 2); }, $top), 'tone' => 'faint'],
                     ],
                     'format' => 'money',
-                ], '', 'What each of the biggest clients paid, this period and the period before') ?>
+                ], '', __('What each of the biggest clients paid, this period and the period before')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Most paid first') ?>
-        <?= reportTable($columns, $clients, ['empty' => 'No client paid anything in this period.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By client'), __('Most paid first')) ?>
+        <?= reportTable($columns, $clients, ['empty' => __('No client paid anything in this period.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Invoice payments by the date they arrived, plus revenue entered against the client. "Period before" is <?= escapeHtml($period['compare']) ?>.
+            <?= __('Invoice payments by the date they arrived, plus revenue entered against the client. "Period before" is %s.', escapeHtml($period['compare'])) ?>
         </div>
     </div>
 

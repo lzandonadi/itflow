@@ -134,7 +134,7 @@ function generateUserSessionKey($site_encryption_master_key) {
         setcookie("user_encryption_session_key", base64_encode($user_encryption_session_key), ['path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'None']);
     } else {
         setcookie("user_encryption_session_key", base64_encode($user_encryption_session_key), 0, "/");
-        $_SESSION['alert_message'] = "Unencrypted connection flag set: Using non-secure cookies.";
+        $_SESSION['alert_message'] = __('Unencrypted connection flag set: Using non-secure cookies.');
     }
 }
 
@@ -289,17 +289,18 @@ function validateCSRFToken(?string $token = null) {
         header("Cache-Control: no-store");
     }
 
-    echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
-        . '<title>403 Forbidden</title></head><body>'
-        . '<h1>403 Forbidden</h1>'
-        . '<p>CSRF token verification failed. Your session may have expired.</p>'
-        . '<p><a href="/">Return to ITFlow</a> and try again.</p>'
+    echo '<!DOCTYPE html><html lang="' . i18nHtmlLang() . '"><head><meta charset="UTF-8">'
+        . '<title>' . __('403 Forbidden') . '</title></head><body>'
+        . '<h1>' . __('403 Forbidden') . '</h1>'
+        . '<p>' . __('CSRF token verification failed. Your session may have expired.') . '</p>'
+        . '<p>' . __('<a href="/">Return to ITFlow</a> and try again.') . '</p>'
         . '</body></html>';
 
     exit();
 }
 
 function validateWhitelabelKey($key) {
+    // i18n-ignore-start - a public key
     $public_key = "-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0k+4ZJudkdGMCFLx5b9
 H/sOozvWphFJsjVIF0vPVx9J0bTdml65UdS+32JagIHfPtEUTohaMnI3IAxxCDzl
@@ -309,6 +310,7 @@ lEljN2UVJ3FZ/LkXeg8ORkV+IHs/toRIfPs/4VQnjEwk5BU6DX2STOvbeZnTqwP3
 zgjRYR/zGN5l+az6RB3+0mJRdZdv/y2aRkBlwTxx2gOrPbQAco4a/IOmkE3EbHe7
 6wIDAQAP
 -----END PUBLIC KEY-----";
+    // i18n-ignore-end
 
     if (openssl_public_decrypt(base64_decode($key), $decrypted, $public_key)) {
         $key_info = json_decode($decrypted, true);

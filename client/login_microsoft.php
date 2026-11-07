@@ -69,13 +69,13 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
     unset($_SESSION['azure_oauth_state'], $_SESSION['azure_oauth_state_expires_at']);
 
     if (!empty($_GET['error'])) {
-        $_SESSION['login_message'] = 'Something went wrong with logging you in: Microsoft returned an error. Please try again.';
+        $_SESSION['login_message'] = __('Something went wrong with logging you in: Microsoft returned an error. Please try again.');
         header("Location: ../login.php");
         exit();
     }
 
     if (empty($state) || empty($session_state) || !hash_equals($session_state, $state) || time() > $session_state_expires) {
-        $_SESSION['login_message'] = 'Something went wrong with logging you in: the sign-in request could not be verified. Please try again.';
+        $_SESSION['login_message'] = __('Something went wrong with logging you in: the sign-in request could not be verified. Please try again.');
         header("Location: ../login.php");
         exit();
     }
@@ -107,8 +107,8 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
     if (isset($access_token_response['access_token'])) {
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array ('Authorization: Bearer '.$access_token_response['access_token'],
-            'Content-type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array ('Authorization: Bearer '.$access_token_response['access_token'], // i18n-ignore - HTTP headers
+            'Content-type: application/json')); // i18n-ignore - HTTP headers
         curl_setopt($ch, CURLOPT_URL, "https://graph.microsoft.com/v1.0/me/");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         #curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // DEBUG ONLY - WAMP
@@ -118,7 +118,7 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
         if (isset($msgraph_response['error'])) {
             // Something went wrong verifying the token/using the Graph API - quit
             error_log("ITFlow: MS Graph API error during client portal Entra login: " . json_encode($msgraph_response['error']));
-            $_SESSION['login_message'] = 'Something went wrong with logging you in: could not read your profile from Microsoft. Please try again.';
+            $_SESSION['login_message'] = __('Something went wrong with logging you in: could not read your profile from Microsoft. Please try again.');
             header("Location: ../login.php");
             exit();
 
@@ -168,10 +168,10 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
             } else {
 
                 // Logged with why, against the account when there is one (functions/sign_in.php)
-                $entra_why = $row ? ['user_id' => $user_id, 'client_id' => $client_id, 'reason' => 'the account signs in with a password, not Microsoft 365'] : signInFailureReason($msgraph_response['userPrincipalName']);
+                $entra_why = $row ? ['user_id' => $user_id, 'client_id' => $client_id, 'reason' => 'the account signs in with a password, not Microsoft 365'] : signInFailureReason($msgraph_response['userPrincipalName']); // i18n-ignore - the sign-in log
                 signInLogFailure('Client Login', 'Failed', "Failed client portal sign in via Entra as $upn - " . escapeSql($entra_why['reason']), $entra_why['user_id'], $entra_why['client_id']);
 
-                $_SESSION['login_message'] = 'Something went wrong with logging you in: Your account is not configured for Entra SSO. Please ensure you are setup in ITFlow as a contact and have Entra SSO configured.';
+                $_SESSION['login_message'] = __('Something went wrong with logging you in: Your account is not configured for Entra SSO. Please ensure you are setup in ITFlow as a contact and have Entra SSO configured.');
 
                 header("Location: ../login.php");
             }
@@ -186,7 +186,7 @@ if (isset($_GET['code']) || isset($_GET['error'])) {
     } else {
 
         error_log("ITFlow: no access_token returned during client portal Entra login");
-        $_SESSION['login_message'] = 'Something went wrong with logging you in: Microsoft did not return an access token. Please try again.';
+        $_SESSION['login_message'] = __('Something went wrong with logging you in: Microsoft did not return an access token. Please try again.');
         header("Location: ../login.php");
         exit();
 

@@ -22,4 +22,4 @@ if (!isset($num_rows) || intval($num_rows[0]) > 0 || !empty($empty_state_skip)) 
     return;
 }
 
-echo emptyStateHtml(($empty_state ?? []) + ['thing' => strtolower($page_title ?? 'records'), 'archived' => !empty($archived)]);
+echo emptyStateHtml(($empty_state ?? []) + ['thing' => mb_strtolower($page_title ?? __('records')), 'archived' => !empty($archived)]);

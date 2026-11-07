@@ -16,7 +16,7 @@ $client_id = intval($row['ticket_client_id']);
 $reference = escapeHtml($row['ticket_prefix'] . $row['ticket_number']);
 
 if (!$client_id) {
-    echo json_encode(['error' => 'A ticket with no client has no services to link.']);
+    echo json_encode(['error' => __('A ticket with no client has no services to link.')]);
     exit;
 }
 
@@ -35,7 +35,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-stream me-2"></i>Link a service <small class="ms-1 opacity-75"><?= $reference ?></small></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-stream me-2"></i><?= __('Link a service') ?> <small class="ms-1 opacity-75"><?= $reference ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -44,21 +44,21 @@ ob_start();
     <div class="modal-body">
 
         <?php if ($candidates) { ?>
-            <label class="form-label">Which service is this ticket about?</label>
+            <label class="form-label"><?= __('Which service is this ticket about?') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-stream"></i></span>
-                <select class="form-select select2" name="service_ids[]" multiple required data-placeholder="Pick one or more services">
+                <select class="form-select select2" name="service_ids[]" multiple required data-placeholder="<?= escapeHtml(__('Pick one or more services')) ?>">
                     <?php foreach ($candidates as $candidate) {
                         $via_asset = isset($linked[intval($candidate['service_id'])]); ?>
                         <option value="<?= intval($candidate['service_id']) ?>"<?= selectOptionService($candidate) ?>><?= escapeHtml($candidate['service_name']) ?><?= $via_asset ? ' (through its asset)' : '' ?></option>
                     <?php } ?>
                 </select>
             </div>
-            <div class="form-text">The ticket shows on the service's page, in its Tickets tab.</div>
+            <div class="form-text"><?= __('The ticket shows on the service\'s page, in its Tickets tab.') ?></div>
         <?php } else { ?>
             <div class="itflow-asset-empty py-4">
                 <i class="fas fa-stream fa-2x mb-2"></i>
-                <div><?= $linked ? 'Every service this client has is already linked.' : 'This client has no services yet.' ?></div>
+                <div><?= $linked ? __('Every service this client has is already linked.') : __('This client has no services yet.') ?></div>
             </div>
         <?php } ?>
 
@@ -66,9 +66,9 @@ ob_start();
 
     <div class="modal-footer">
         <?php if ($candidates) { ?>
-            <button type="submit" name="link_ticket_services" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i>Link</button>
+            <button type="submit" name="link_ticket_services" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -10,10 +10,11 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 
 /** "2 documents and 3 files" - for the bulk messages. */
 function filesCountPhrase($document_count, $file_count) {
-    return implode(' and ', array_filter([
-        $document_count ? "<strong>$document_count</strong> document" . ($document_count === 1 ? '' : 's') : '',
-        $file_count ? "<strong>$file_count</strong> file" . ($file_count === 1 ? '' : 's') : '',
-    ])) ?: 'nothing';
+    $parts = array_values(array_filter([
+        $document_count ? _n('%s document', '%s documents', $document_count, "<strong>$document_count</strong>") : '',
+        $file_count ? _n('%s file', '%s files', $file_count, "<strong>$file_count</strong>") : '',
+    ]));
+    return count($parts) === 2 ? __('%1$s and %2$s', $parts[0], $parts[1]) : ($parts[0] ?? __('nothing'));
 }
 
 if (isset($_POST['upload_files'])) {
@@ -117,11 +118,11 @@ if (isset($_POST['upload_files'])) {
     }
 
     if ($uploaded && !$skipped) {
-        flashAlert(count($uploaded) === 1 ? "Uploaded <strong>{$uploaded[0]}</strong>" : "Uploaded <strong>" . count($uploaded) . "</strong> files");
+        flashAlert(count($uploaded) === 1 ? __('Uploaded <strong>%s</strong>', $uploaded[0]) : __('Uploaded <strong>%d</strong> files', count($uploaded)));
     } elseif ($uploaded) {
-        flashAlert("Uploaded <strong>" . count($uploaded) . "</strong>, skipped <strong>" . count($skipped) . "</strong> (not an allowed type, empty or too big): " . implode(', ', $skipped), 'warning');
+        flashAlert(__('Uploaded <strong>%1$s</strong>, skipped <strong>%2$s</strong> (not an allowed type, empty or too big): %3$s', count($uploaded), count($skipped), implode(', ', $skipped)), 'warning');
     } else {
-        flashAlert($skipped ? "Nothing uploaded - not an allowed type, empty or too big: " . implode(', ', $skipped) : 'Choose a file to upload.', 'error');
+        flashAlert($skipped ? __('Nothing uploaded - not an allowed type, empty or too big: %s', implode(', ', $skipped)) : __('Choose a file to upload.'), 'error');
     }
 
     redirect();
@@ -140,7 +141,7 @@ if (isset($_POST['rename_file'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_name, file_client_id FROM files WHERE file_id = $file_id"));
     if (!$row) {
-        flashAlert('That file no longer exists.', 'error');
+        flashAlert(__('That file no longer exists.'), 'error');
         redirect();
     }
     $old_file_name = escapeSql($row['file_name']);
@@ -149,7 +150,7 @@ if (isset($_POST['rename_file'])) {
     enforceClientAccess();
 
     if ($file_name === '') {
-        flashAlert('A file needs a name.', 'error');
+        flashAlert(__('A file needs a name.'), 'error');
         redirect();
     }
 
@@ -157,7 +158,7 @@ if (isset($_POST['rename_file'])) {
 
     logAudit("File", "Rename", "$session_name renamed file $old_file_name to $file_name", $client_id, $file_id);
 
-    flashAlert("File <strong>" . trim($_POST['file_name']) . "</strong> saved");
+    flashAlert(__('File <strong>%s</strong> saved', trim($_POST['file_name'])));
 
     redirect();
 
@@ -173,7 +174,7 @@ if (isset($_POST['move_file'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_name, file_client_id FROM files WHERE file_id = $file_id"));
     if (!$row) {
-        flashAlert('That file no longer exists.', 'error');
+        flashAlert(__('That file no longer exists.'), 'error');
         redirect();
     }
     $file_name = escapeSql($row['file_name']);
@@ -189,7 +190,7 @@ if (isset($_POST['move_file'])) {
 
     logAudit("File", "Move", "$session_name moved file $file_name to " . escapeSql($folder_name), $client_id, $file_id);
 
-    flashAlert("File <strong>{$row['file_name']}</strong> moved to <strong>$folder_name</strong>");
+    flashAlert(__('File <strong>%1$s</strong> moved to <strong>%2$s</strong>', $row['file_name'], $folder_id ? $folder_name : __('Top level')));
 
     redirect();
 
@@ -205,7 +206,7 @@ if (isset($_GET['archive_file'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_name, file_client_id FROM files WHERE file_id = $file_id"));
     if (!$row) {
-        flashAlert('That file no longer exists.', 'error');
+        flashAlert(__('That file no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['file_client_id']);
@@ -216,7 +217,7 @@ if (isset($_GET['archive_file'])) {
 
     logAudit("File", "Archive", "$session_name archived file " . escapeSql($row['file_name']), $client_id, $file_id);
 
-    flashAlert("File <strong>{$row['file_name']}</strong> archived", 'error');
+    flashAlert(__('File <strong>%s</strong> archived', $row['file_name']), 'error');
 
     redirect();
 
@@ -232,7 +233,7 @@ if (isset($_GET['restore_file'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_name, file_client_id FROM files WHERE file_id = $file_id"));
     if (!$row) {
-        flashAlert('That file no longer exists.', 'error');
+        flashAlert(__('That file no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['file_client_id']);
@@ -243,7 +244,7 @@ if (isset($_GET['restore_file'])) {
 
     logAudit("File", "Restore", "$session_name restored file " . escapeSql($row['file_name']), $client_id, $file_id);
 
-    flashAlert("File <strong>{$row['file_name']}</strong> restored");
+    flashAlert(__('File <strong>%s</strong> restored', $row['file_name']));
 
     redirect();
 
@@ -258,9 +259,9 @@ if (isset($_POST['delete_file'])) {
     $file_name = fileDeleteForGood(intval($_POST['file_id']));
 
     if ($file_name === null) {
-        flashAlert('That file no longer exists.', 'error');
+        flashAlert(__('That file no longer exists.'), 'error');
     } else {
-        flashAlert("File <strong>$file_name</strong> deleted", 'error');
+        flashAlert(__('File <strong>%s</strong> deleted', $file_name), 'error');
     }
 
     redirect();
@@ -306,7 +307,7 @@ if (isset($_POST['bulk_archive_files'])) {
         $document_count++;
     }
 
-    flashAlert("Archived " . filesCountPhrase($document_count, $file_count), 'error');
+    flashAlert(__('Archived %s', filesCountPhrase($document_count, $file_count)), 'error');
 
     redirect();
 
@@ -345,7 +346,7 @@ if (isset($_POST['bulk_restore_files'])) {
         $document_count++;
     }
 
-    flashAlert("Restored " . filesCountPhrase($document_count, $file_count));
+    flashAlert(__('Restored %s', filesCountPhrase($document_count, $file_count)));
 
     redirect();
 
@@ -372,7 +373,7 @@ if (isset($_POST['bulk_delete_files'])) {
         }
     }
 
-    flashAlert("Deleted " . filesCountPhrase($document_count, $file_count), 'error');
+    flashAlert(__('Deleted %s', filesCountPhrase($document_count, $file_count)), 'error');
 
     redirect();
 
@@ -388,7 +389,7 @@ if (isset($_POST['bulk_move_files'])) {
     // A folder of a client this agent can reach - another's name isn't said back
     $folder_client_id = $target_folder ? intval(getFieldById('folders', $target_folder, 'folder_client_id')) : 0;
     if ($target_folder && (!$folder_client_id || !hasClientAccess($folder_client_id))) {
-        flashAlert('That folder no longer exists.', 'error');
+        flashAlert(__('That folder no longer exists.'), 'error');
         redirect();
     }
     $folder_name = folderDisplayName($target_folder);
@@ -428,7 +429,7 @@ if (isset($_POST['bulk_move_files'])) {
         $document_count++;
     }
 
-    flashAlert("Moved " . filesCountPhrase($document_count, $file_count) . " to <strong>$folder_name</strong>");
+    flashAlert(__('Moved %1$s to <strong>%2$s</strong>', filesCountPhrase($document_count, $file_count), $target_folder ? $folder_name : __('Top level')));
 
     redirect();
 

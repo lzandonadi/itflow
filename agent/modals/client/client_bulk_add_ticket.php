@@ -12,7 +12,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i>New Tickets for <strong><?= $count ?></strong> client<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i><?= _n('New Tickets for <strong>%d</strong> client', 'New Tickets for <strong>%d</strong> clients', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -24,15 +24,15 @@ ob_start();
 
         <?php
         $ticket_template_field = 'bulk_ticket_template_id';
-        $ticket_template_hint = "Picking one fills in the tickets - change anything before they are made. <span class=\"font-monospace\">[Client]</span>, <span class=\"font-monospace\">[Month]</span> and the like are filled in for each. What the template asks for is answered once, for them all.";
+        $ticket_template_hint = __('Picking one fills in the tickets - change anything before they are made. %1$s, %2$s and the like are filled in for each. What the template asks for is answered once, for them all.', '<span class="font-monospace">[Client]</span>', '<span class="font-monospace">[Month]</span>');
         require_once '../../includes/inc_ticket_template_select.php';
         ?>
 
         <div class="mb-3">
-            <label>Subject <strong class="text-danger">*</strong></label>
+            <label><?= __('Subject') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="bulk_subject" data-template-field="subject" placeholder="Enter a subject" maxlength="500" required>
+                <input type="text" class="form-control" name="bulk_subject" data-template-field="subject" placeholder="<?= escapeHtml(__('Enter a subject')) ?>" maxlength="500" required>
             </div>
         </div>
 
@@ -44,14 +44,14 @@ ob_start();
 
             <div class="col">
                 <div class="mb-3">
-                    <label>Priority <strong class="text-danger">*</strong></label>
+                    <label><?= __('Priority') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-thermometer-half"></i></span>
                         <select class="form-select select2" name="bulk_priority" data-template-field="priority" required>
-                            <option data-color="var(--bs-info)">Low</option>
-                            <option selected data-color="var(--bs-warning)">Medium</option>
-                            <option data-color="var(--bs-danger)">High</option>
-                            <option data-color="var(--bs-emphasis-color)">Urgent</option>
+                            <option data-color="var(--bs-info)"><?= __('Low') ?></option>
+                            <option selected data-color="var(--bs-warning)"><?= __('Medium') ?></option>
+                            <option data-color="var(--bs-danger)"><?= __('High') ?></option>
+                            <option data-color="var(--bs-emphasis-color)"><?= __('Urgent') ?></option>
                         </select>
                     </div>
                 </div>
@@ -59,11 +59,11 @@ ob_start();
 
             <div class="col">
                 <div class="mb-3">
-                    <label>Category</label>
+                    <label><?= __('Category') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                         <select class="form-select select2" name="bulk_category" data-template-field="category">
-                            <option value="0">- Not Categorized -</option>
+                            <option value="0"><?= __('- Not Categorized -') ?></option>
                             <?= categoryOptionsHtml('Ticket') ?>
                         </select>
                         <?= categoryAddButtonHtml('Ticket', 'btn btn-secondary') ?>
@@ -77,11 +77,11 @@ ob_start();
             <div class="col">
 
                 <div class="mb-3">
-                    <label>Assign to</label>
+                    <label><?= __('Assign to') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                         <select class="form-select select2" name="bulk_assigned_to" data-template-field="assigned">
-                            <option value="0">Not Assigned</option>
+                            <option value="0"><?= __('Not Assigned') ?></option>
                             <?php
 
                             $sql = mysqli_query(
@@ -102,11 +102,11 @@ ob_start();
             <div class="col">
 
                 <div class="mb-3">
-                    <label>Project</label>
+                    <label><?= __('Project') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-project-diagram"></i></span>
                         <select class="form-select select2" name="bulk_project">
-                            <option value="0">- None -</option>
+                            <option value="0"><?= __('- None -') ?></option>
                             <?php
 
                             // Tickets for several clients can only share an internal project
@@ -127,7 +127,7 @@ ob_start();
         <div class="mb-3">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" name="use_primary_contact" value="1" id="bulkTicketPrimaryContact">
-                <label class="form-check-label" for="bulkTicketPrimaryContact">For each client's primary contact</label>
+                <label class="form-check-label" for="bulkTicketPrimaryContact"><?= __('For each client\'s primary contact') ?></label>
             </div>
         </div>
 
@@ -135,7 +135,7 @@ ob_start();
         <div class="mb-3">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" name="bulk_billable" data-template-field="billable" <?php if ($config_ticket_default_billable == 1) { echo "checked"; } ?> value="1" id="billableSwitch">
-                <label class="form-check-label" for="billableSwitch">Billable</label>
+                <label class="form-check-label" for="billableSwitch"><?= __('Billable') ?></label>
             </div>
         </div>
         <?php } ?>
@@ -143,8 +143,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_add_client_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_add_client_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

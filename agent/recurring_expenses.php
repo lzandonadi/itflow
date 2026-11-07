@@ -104,47 +104,47 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat" href="<?= escapeHtml($filter_url(['status' => 'active'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-sync-alt me-1"></i>A month</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-sync-alt me-1"></i><?= __('A month') ?></div>
             <div class="itflow-billing-stat-value"><?= $stat_money($money['monthly']) ?></div>
             <div class="itflow-billing-stat-note"><?= $stat_money($money['monthly'] * 12) ?> a year</div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $status === 'soon' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['status' => 'soon'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i>Next 30 days</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i><?= __('Next 30 days') ?></div>
             <div class="itflow-billing-stat-value"><?= $stat_money($soon_amount) ?></div>
-            <div class="itflow-billing-stat-note"><?= $soon_runs ?> to be recorded</div>
+            <div class="itflow-billing-stat-note"><?= __('%d to be recorded', $soon_runs) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $status === 'active' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['status' => 'active'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-play me-1"></i>Running</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-play me-1"></i><?= __('Running') ?></div>
             <div class="itflow-billing-stat-value"><?= intval($money['running']) ?></div>
             <div class="itflow-billing-stat-note"><?= intval($money['stopped']) ?> paused or ended</div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $status === 'late' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['status' => 'late'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-exclamation-triangle me-1"></i>Need a look</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-exclamation-triangle me-1"></i><?= __('Need a look') ?></div>
             <div class="itflow-billing-stat-value <?= $money['late'] ? 'text-danger-emphasis' : '' ?>"><?= intval($money['late']) ?></div>
-            <div class="itflow-billing-stat-note"><?= $money['late'] ? 'Next date passed' : 'All on schedule' ?></div>
+            <div class="itflow-billing-stat-note"><?= $money['late'] ? __('Next date passed') : __('All on schedule') ?></div>
         </a>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-redo-alt me-2"></i>Recurring Expenses</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-redo-alt me-2"></i><?= __('Recurring Expenses') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_add.php<?= $vendor_filter ? "?vendor_id=$vendor_filter" : '' ?>"><i class="fas fa-plus me-2"></i>New Recurring Expense</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_add.php<?= $vendor_filter ? "?vendor_id=$vendor_filter" : '' ?>"><i class="fas fa-plus me-2"></i><?= __('New Recurring Expense') ?></button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="expenses.php"><i class="fa fa-fw fa-shopping-cart text-secondary me-2"></i>Expenses</a>
+                    <a class="dropdown-item" href="expenses.php"><i class="fa fa-fw fa-shopping-cart text-secondary me-2"></i><?= __('Expenses') ?></a>
                     <?php if (reportCanOpen('expense_by_vendor')) { ?>
-                        <a class="dropdown-item" href="reports/expense_by_vendor.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i>Spend by Vendor</a>
+                        <a class="dropdown-item" href="reports/expense_by_vendor.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Spend by Vendor') ?></a>
                     <?php } ?>
                 </div>
             </div>
@@ -157,13 +157,13 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
             <div class="row g-2 align-items-center">
                 <div class="col-lg-3 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search recurring expenses" title="Vendor, description, reference, amount, client, category">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search recurring expenses')) ?>" title="<?= escapeHtml(__('Vendor, description, reference, amount, client, category')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="Vendor">
-                        <option value="">- Any vendor -</option>
+                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Vendor')) ?>">
+                        <option value=""><?= __('- Any vendor -') ?></option>
                         <?php
                         $sql_filter = mysqli_query($mysqli, "SELECT vendor_id, vendor_name, vendor_description FROM vendors
                             WHERE EXISTS (SELECT 1 FROM recurring_expenses WHERE recurring_expense_vendor_id = vendor_id AND recurring_expense_archived_at IS NULL) ORDER BY vendor_name ASC");
@@ -174,14 +174,14 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Category">
-                        <option value="">- Any category -</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Category')) ?>">
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?= categoryFilterOptionsHtml('Expense', $category_filter, "SELECT DISTINCT recurring_expense_category_id FROM recurring_expenses WHERE recurring_expense_archived_at IS NULL") ?>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="Client">
-                        <option value="">- Any client -</option>
+                    <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Client')) ?>">
+                        <option value=""><?= __('- Any client -') ?></option>
                         <?php
                         $sql_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                             WHERE EXISTS (SELECT 1 FROM recurring_expenses WHERE recurring_expense_client_id = client_id AND recurring_expense_archived_at IS NULL) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
@@ -208,13 +208,13 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
         <table class="table table-hover align-middle mb-0 itflow-billing-table">
             <thead class="<?= $num_rows[0] ? '' : 'd-none' ?> text-nowrap table-light">
             <tr>
-                <th class="ps-3"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>">Vendor <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=category_name&order=<?= $disp ?>">Category <?php if ($sort == 'category_name') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">Client <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
-                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_amount&order=<?= $disp ?>">Amount <?php if ($sort == 'recurring_expense_amount') { echo $order_icon; } ?></a></th>
-                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=monthly&order=<?= $disp ?>">A month <?php if ($sort == 'monthly') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_next_date&order=<?= $disp ?>">Next <?php if ($sort == 'recurring_expense_next_date') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_last_sent&order=<?= $disp ?>">Last <?php if ($sort == 'recurring_expense_last_sent') { echo $order_icon; } ?></a></th>
+                <th class="ps-3"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>"><?= __('Vendor') ?> <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=category_name&order=<?= $disp ?>"><?= __('Category') ?> <?php if ($sort == 'category_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>"><?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
+                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_amount&order=<?= $disp ?>"><?= __('Amount') ?> <?php if ($sort == 'recurring_expense_amount') { echo $order_icon; } ?></a></th>
+                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=monthly&order=<?= $disp ?>"><?= __('A month') ?> <?php if ($sort == 'monthly') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_next_date&order=<?= $disp ?>"><?= _x('Next', 'next run') ?> <?php if ($sort == 'recurring_expense_next_date') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=recurring_expense_last_sent&order=<?= $disp ?>"><?= __('Last') ?> <?php if ($sort == 'recurring_expense_last_sent') { echo $order_icon; } ?></a></th>
                 <th></th>
             </tr>
             </thead>
@@ -233,7 +233,7 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                     <td class="ps-3">
                         <div class="d-flex align-items-center gap-1">
                             <?= vendorTile((string) $row['vendor_name'], 'xs') ?>
-                            <a class="fw-semibold ajax-modal text-truncate" style="max-width: 16rem;" href="#" <?= $row_open ?>><?= escapeHtml($row['vendor_name'] ?: 'No vendor') ?></a>
+                            <a class="fw-semibold ajax-modal text-truncate" style="max-width: 16rem;" href="#" <?= $row_open ?>><?= escapeHtml($row['vendor_name'] ?: __('No vendor')) ?></a>
                         </div>
                         <div class="small text-body-secondary text-truncate" style="max-width: 18rem;" title="<?= escapeHtml((string) $row['recurring_expense_description']) ?>"><?= escapeHtml((string) $row['recurring_expense_description']) ?: '&nbsp;' ?></div>
                     </td>
@@ -242,9 +242,9 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                         <?php if (intval($row['recurring_expense_client_id'])) { ?>
                             <div class="text-truncate" style="max-width: 10rem;"><a class="text-reset" href="<?= escapeHtml($filter_url(['client' => intval($row['recurring_expense_client_id'])])) ?>"><?= escapeHtml($row['client_name']) ?></a></div>
                             <?php if ($row['recurring_invoice_number'] !== null) { ?>
-                                <div class="small text-success-emphasis text-truncate" style="max-width: 10rem;" title="Covered by their recurring invoice"><i class="fas fa-shield-alt me-1"></i>Covered by <?= escapeHtml($row['recurring_invoice_prefix'] . $row['recurring_invoice_number']) ?></div>
+                                <div class="small text-success-emphasis text-truncate" style="max-width: 10rem;" title="<?= escapeHtml(__('Covered by their recurring invoice')) ?>"><i class="fas fa-shield-alt me-1"></i><?= escapeHtml(__('Covered by %s', $row['recurring_invoice_prefix'] . $row['recurring_invoice_number'])) ?></div>
                             <?php } elseif (intval($row['recurring_expense_billable'])) { ?>
-                                <div class="small text-warning-emphasis" title="Each one it records is billed on to them at <?= escapeHtml(rtrim(rtrim(number_format(floatval($row['recurring_expense_markup']), 2, '.', ''), '0'), '.')) ?>% markup"><i class="fas fa-file-invoice-dollar me-1"></i>Billed on</div>
+                                <div class="small text-warning-emphasis" title="<?= __('Each one it records is billed on to them at %s%% markup', escapeHtml(rtrim(rtrim(number_format(floatval($row['recurring_expense_markup']), 2, '.', ''), '0'), '.'))) ?>"><i class="fas fa-file-invoice-dollar me-1"></i><?= __('Billed on') ?></div>
                             <?php } ?>
                         <?php } else { ?>
                             <span class="text-body-secondary">-</span>
@@ -258,48 +258,48 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
                     <td class="text-nowrap">
                         <?= $row_state === 'ended' ? '' : escapeHtml($row_next) ?>
                         <div><?= recurringExpenseNextPill($row) ?></div>
-                        <?php if ($row['recurring_expense_end_date'] && $row_state !== 'ended') { ?><div class="small text-body-secondary" title="Its last run is on or before this date">Ends <?= escapeHtml($row['recurring_expense_end_date']) ?></div><?php } ?>
+                        <?php if ($row['recurring_expense_end_date'] && $row_state !== 'ended') { ?><div class="small text-body-secondary" title="<?= escapeHtml(__('Its last run is on or before this date')) ?>"><?= escapeHtml(__('Ends %s', $row['recurring_expense_end_date'])) ?></div><?php } ?>
                     </td>
                     <td class="text-nowrap small">
                         <?php if ($row['recurring_expense_last_sent']) { ?>
-                            <a class="text-reset" href="expenses.php?recurring_expense_id=<?= $id ?>" title="The expenses it recorded"><?= escapeHtml($row['recurring_expense_last_sent']) ?></a>
+                            <a class="text-reset" href="expenses.php?recurring_expense_id=<?= $id ?>" title="<?= escapeHtml(__('The expenses it recorded')) ?>"><?= escapeHtml($row['recurring_expense_last_sent']) ?></a>
                         <?php } else { ?>
-                            <span class="text-body-secondary">Not yet</span>
+                            <span class="text-body-secondary"><?= __('Not yet') ?></span>
                         <?php } ?>
                     </td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
-                                <a class="dropdown-item" href="expenses.php?recurring_expense_id=<?= $id ?>"><i class="fas fa-fw fa-shopping-cart text-secondary me-2"></i>Expenses Recorded</a>
+                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
+                                <a class="dropdown-item" href="expenses.php?recurring_expense_id=<?= $id ?>"><i class="fas fa-fw fa-shopping-cart text-secondary me-2"></i><?= __('Expenses Recorded') ?></a>
                                 <?php if ($can_edit) { ?>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($row_state !== 'ended') { ?>
                                         <a class="dropdown-item confirm-link" href="<?= $row_post('recurring_expense_record', '&amp;run=' . $row_next) ?>"
-                                            data-confirm-title="Record the <?= escapeHtml(date('M j', strtotime($row_next))) ?> run now?"
-                                            data-confirm-text="An expense of <?= escapeHtml(billingMoney($row['recurring_expense_amount'], $row_currency)) ?>, and the next one moves to <?= escapeHtml(date('M j, Y', strtotime(recurringExpenseAfter($row, $row_next)))) ?>." data-confirm-button="Record">
-                                            <i class="fas fa-fw fa-bolt text-secondary me-2"></i>Record Now
+                                            data-confirm-title="<?= escapeHtml(__('Record the %s run now?', formatDate($row_next, 'date_short'))) ?>"
+                                            data-confirm-text="<?= escapeHtml(__('An expense of %1$s, and the next one moves to %2$s.', billingMoney($row['recurring_expense_amount'], $row_currency), formatDate(recurringExpenseAfter($row, $row_next), 'date'))) ?>" data-confirm-button="<?= escapeHtml(__('Record')) ?>">
+                                            <i class="fas fa-fw fa-bolt text-secondary me-2"></i><?= __('Record Now') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($row_state === 'active' && $row_next < date('Y-m-d')) { ?>
                                         <a class="dropdown-item confirm-link" href="<?= $row_post('recurring_expense_catch_up') ?>"
-                                            data-confirm-title="Skip the missed runs?" data-confirm-text="The next date moves on to <?= escapeHtml(recurringExpenseCatchUp($row)) ?>. Nothing is recorded for the runs it missed." data-confirm-button="Move on">
-                                            <i class="fas fa-fw fa-forward text-secondary me-2"></i>Move On to <?= escapeHtml(recurringExpenseCatchUp($row)) ?>
+                                            data-confirm-title="<?= escapeHtml(__('Skip the missed runs?')) ?>" data-confirm-text="<?= __('The next date moves on to %s. Nothing is recorded for the runs it missed.', escapeHtml(recurringExpenseCatchUp($row))) ?>" data-confirm-button="<?= escapeHtml(__('Move on')) ?>">
+                                            <i class="fas fa-fw fa-forward text-secondary me-2"></i><?= __('Move On to %s', escapeHtml(recurringExpenseCatchUp($row))) ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($row_state === 'active') { ?>
-                                        <a class="dropdown-item" href="<?= $row_post('recurring_expense_set_status', '&amp;status=0') ?>"><i class="fas fa-fw fa-pause text-secondary me-2"></i>Pause</a>
+                                        <a class="dropdown-item" href="<?= $row_post('recurring_expense_set_status', '&amp;status=0') ?>"><i class="fas fa-fw fa-pause text-secondary me-2"></i><?= __('Pause') ?></a>
                                     <?php } elseif ($row_state === 'paused') { ?>
-                                        <a class="dropdown-item" href="<?= $row_post('recurring_expense_set_status', '&amp;status=1') ?>"><i class="fas fa-fw fa-play text-secondary me-2"></i>Resume</a>
+                                        <a class="dropdown-item" href="<?= $row_post('recurring_expense_set_status', '&amp;status=1') ?>"><i class="fas fa-fw fa-play text-secondary me-2"></i><?= __('Resume') ?></a>
                                     <?php } ?>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_edit.php?id=<?= $id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense_edit.php?id=<?= $id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
                                 <?php } ?>
                                 <?php if ($can_delete) { ?>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="<?= $row_post('delete_recurring_expense') ?>"
-                                        data-confirm-text="<?= escapeHtml(recurringExpenseLabel($row)) ?> goes for good. The expenses it recorded stay.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        data-confirm-text="<?= escapeHtml(__('%s goes for good. The expenses it recorded stay.', recurringExpenseLabel($row))) ?>">
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -312,13 +312,13 @@ $any_filter = $q || $vendor_filter || $category_filter || $client_filter;
     </div>
     <?php
     $empty_state = [
-        'thing' => 'recurring expenses',
+        'thing' => __('recurring expenses'),
         'icon' => 'fa-redo-alt',
         'filtered' => $any_filter,
         'views' => ['status'],
         'view' => emptyStatePill($statuses, $status, 'active', ['late']),
-        'text' => 'Rent, colocation, licensing and insurance - recorded for you each time they come round.',
-        'actions' => $can_edit ? [['label' => 'New Recurring Expense', 'modal' => 'modals/recurring_expense/recurring_expense_add.php' . ($vendor_filter ? "?vendor_id=$vendor_filter" : ''), 'size' => 'lg']] : [],
+        'text' => __('Rent, colocation, licensing and insurance - recorded for you each time they come round.'),
+        'actions' => $can_edit ? [['label' => __('New Recurring Expense'), 'modal' => 'modals/recurring_expense/recurring_expense_add.php' . ($vendor_filter ? "?vendor_id=$vendor_filter" : ''), 'size' => 'lg']] : [],
     ];
     require_once "../includes/filter_footer.php";
     ?>

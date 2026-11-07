@@ -25,16 +25,16 @@
 function notificationTypeModules() {
     return [
         'module_sales' => [
-            'Invoice', 'Invoice Paid', 'Invoice Viewed', 'Invoice Overdue', 'Invoice Late Charge',
-            'Draft Invoices', 'Recurring Sent', 'Recurring Generated',
-            'Quote Viewed', 'Quote Accepted', 'Quote Declined', 'Quote File', 'Low Stock',
+            'Invoice', 'Invoice Paid', 'Invoice Viewed', 'Invoice Overdue', 'Invoice Late Charge', // i18n-ignore - notification kinds are keys
+            'Draft Invoices', 'Recurring Sent', 'Recurring Generated', // i18n-ignore - notification kinds are keys
+            'Quote Viewed', 'Quote Accepted', 'Quote Declined', 'Quote File', 'Low Stock', // i18n-ignore - notification kinds are keys
         ],
-        'module_financial' => ['Expense', 'Expense Created'],
+        'module_financial' => ['Expense', 'Expense Created'], // i18n-ignore - notification kinds are keys
         'module_support' => [
-            'Ticket', 'Ticket SLA', 'Pending Tickets', 'Feedback', 'Recurring Ticket', 'Project',
-            'Domain Expiring', 'Certificate Expiring', 'Asset Warranty Expiring', 'UPS Battery Due', 'Service Review',
+            'Ticket', 'Ticket SLA', 'Pending Tickets', 'Feedback', 'Recurring Ticket', 'Project', // i18n-ignore - notification kinds are keys
+            'Domain Expiring', 'Certificate Expiring', 'Asset Warranty Expiring', 'UPS Battery Due', 'Service Review', // i18n-ignore - notification kinds are keys
             // Shared links - they open Shared Links (agent/shares.php), which is Support's
-            'Shared link opened', 'Shared link locked', 'Login sent back', 'Share Viewed',
+            'Shared link opened', 'Shared link locked', 'Login sent back', 'Share Viewed', // i18n-ignore - notification kinds are keys
         ],
     ];
 }
@@ -121,6 +121,11 @@ function notificationActionUrl($action) {
     return $action;
 }
 
+/** A notification's type as shown - stored and filtered in English. */
+function notificationTypeLabel($type) {
+    return _x((string) $type, 'notification type'); // i18n-dynamic - notification_type, entries in lang/pt_BR/dashboard.php
+}
+
 function notificationItem($row) {
     $style = notificationTypeStyle($row['notification_type']);
 
@@ -135,13 +140,14 @@ function notificationItem($row) {
     return [
         'id' => intval($row['notification_id']),
         'type' => $row['notification_type'],
+        'type_label' => notificationTypeLabel($row['notification_type']),
         'text' => $row['notification'],
         'url' => notificationActionUrl($row['notification_action']),
         'client' => $row['client_name'] ?: null,
         'client_id' => intval($row['notification_client_id']),
         'unread' => $row['notification_dismissed_at'] === null,
         'time' => $timestamp ? date('c', $timestamp) : null,
-        'time_full' => $timestamp ? date('D, M j Y g:i A', $timestamp) : '',
+        'time_full' => $timestamp ? formatDate($timestamp, 'datetime_weekday') : '',
         'icon' => $style['icon'],
         'tone' => $style['tone'],
     ];

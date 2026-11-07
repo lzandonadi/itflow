@@ -1,4 +1,4 @@
-<?php
+<?php // i18n-ignore-file - the ticket context and prompts are for the model, in English (what agents see goes through __() here and in the modals)
 
 /*
  * ITFlow - AI on tickets
@@ -142,7 +142,7 @@ function aiTicketSummary($ticket_id) {
     }
     $ticket = aiTicketContext($ticket_id, true);
     if (!$ticket) {
-        return ['ok' => false, 'error' => 'That ticket no longer exists.'];
+        return ['ok' => false, 'error' => __('That ticket no longer exists.')];
     }
     $result = callAiApi($model, [
         ['role' => 'system', 'content' => 'You summarize IT support tickets for the agents of a managed service provider, so a colleague can pick a ticket up cold. Use only what the ticket says - never guess at causes, steps or dates it doesn\'t give.'
@@ -156,7 +156,7 @@ function aiTicketSummary($ticket_id) {
         return $result;
     }
     $html = aiCleanHtml($result['content']);
-    return $html === '' ? ['ok' => false, 'error' => 'The AI provider answered with nothing - try again.'] : ['ok' => true, 'html' => $html];
+    return $html === '' ? ['ok' => false, 'error' => __('The AI provider answered with nothing - try again.')] : ['ok' => true, 'html' => $html];
 }
 
 /*
@@ -175,7 +175,7 @@ function aiTicketDraft($ticket_id, $notes = '', $type = 'email') {
     $type = in_array($type, ['internal', 'public', 'email'], true) ? $type : 'email';
     $ticket = aiTicketContext($ticket_id, $type === 'internal');
     if (!$ticket) {
-        return ['ok' => false, 'error' => 'That ticket no longer exists.'];
+        return ['ok' => false, 'error' => __('That ticket no longer exists.')];
     }
     $notes = aiHtmlToText($notes, 6000);
 
@@ -201,7 +201,7 @@ function aiTicketDraft($ticket_id, $notes = '', $type = 'email') {
         return $result;
     }
     $html = aiCleanHtml($result['content']);
-    return $html === '' ? ['ok' => false, 'error' => 'The AI provider answered with nothing - try again.'] : ['ok' => true, 'html' => $html];
+    return $html === '' ? ['ok' => false, 'error' => __('The AI provider answered with nothing - try again.')] : ['ok' => true, 'html' => $html];
 }
 
 /*
@@ -220,7 +220,7 @@ function aiTicketDocument($ticket_id) {
     }
     $ticket = aiTicketContext($ticket_id, true);
     if (!$ticket) {
-        return ['ok' => false, 'error' => 'That ticket no longer exists.'];
+        return ['ok' => false, 'error' => __('That ticket no longer exists.')];
     }
     // Every model is set to take them out for this, whatever its provider says - a document is kept
     $model['ai_provider_redact'] = 1;
@@ -239,7 +239,7 @@ function aiTicketDocument($ticket_id) {
     // Its title and summary come off the top
     [$title, $description, $html] = aiDocumentSplit(aiCleanHtml($result['content']));
     if (trim(strip_tags($html)) === '') {
-        return ['ok' => false, 'error' => 'The AI provider answered with nothing to keep - try again.'];
+        return ['ok' => false, 'error' => __('The AI provider answered with nothing to keep - try again.')];
     }
     return ['ok' => true, 'title' => mb_substr($title !== '' ? $title : (string) $ticket['row']['ticket_subject'], 0, 200), 'description' => mb_substr($description, 0, 250),
         'html' => $html, 'removed' => intval($result['removed'] ?? 0)];
@@ -292,9 +292,9 @@ function aiTriageMode() {
 /* The ways new tickets can be triaged, for Settings > Tickets. */
 function aiTriageModes() {
     return [
-        0 => 'Off',
-        1 => 'Suggest - shown on the ticket, to apply or dismiss',
-        2 => 'Fill in - set as each comes in',
+        0 => __('Off'),
+        1 => __('Suggest - shown on the ticket, to apply or dismiss'),
+        2 => __('Fill in - set as each comes in'),
     ];
 }
 
@@ -321,7 +321,7 @@ function aiTriageRow($ticket_id) {
 function aiTicketTriage($ticket_id) {
     global $mysqli;
     if (!aiTriageReady()) {
-        return ['ok' => false, 'error' => 'The database needs updating first - Maintenance > Update.'];
+        return ['ok' => false, 'error' => __('The database needs updating first - Maintenance > Update.')];
     }
     $model = getAiModel('Tickets');
     if (!$model) {
@@ -329,7 +329,7 @@ function aiTicketTriage($ticket_id) {
     }
     $ticket = aiTicketContext($ticket_id, false);
     if (!$ticket) {
-        return ['ok' => false, 'error' => 'That ticket no longer exists.'];
+        return ['ok' => false, 'error' => __('That ticket no longer exists.')];
     }
 
     $categories = [];
@@ -358,7 +358,7 @@ function aiTicketTriage($ticket_id) {
     $answer = aiJsonFromText($result['content']);
     if (!$answer) {
         logApp('AI', 'warning', 'Triage of ticket ' . ticketReference($ticket['row']) . ' - the answer was not JSON');
-        return ['ok' => false, 'error' => "The AI provider's answer couldn't be read - try again."];
+        return ['ok' => false, 'error' => __("The AI provider's answer couldn't be read - try again.")];
     }
     $category_id = 0;
     $wanted = mb_strtolower(trim((string) ($answer['category'] ?? '')));
@@ -373,7 +373,7 @@ function aiTicketTriage($ticket_id) {
     $summary = mb_substr(trim(preg_replace('/\s+/', ' ', strip_tags((string) ($answer['summary'] ?? '')))), 0, 300);
     $reason = mb_substr(trim(preg_replace('/\s+/', ' ', strip_tags((string) ($answer['reason'] ?? '')))), 0, 200);
     if (!$category_id && $priority === '') {
-        return ['ok' => false, 'error' => 'The AI provider suggested no category or priority it could use - try again.'];
+        return ['ok' => false, 'error' => __('The AI provider suggested no category or priority it could use - try again.')];
     }
 
     $esc = function ($value) use ($mysqli) {
@@ -419,21 +419,28 @@ function aiTriageApply($ticket_id, $who, array $only = ['category', 'priority'],
         return [];
     }
     $changes = aiTriageChanges($triage, $ticket, $only);
-    $words = [];
     if (isset($changes['category'])) {
         mysqli_query($mysqli, "UPDATE tickets SET ticket_category = {$changes['category'][2]} WHERE ticket_id = $ticket_id");
-        $words[] = "the category from {$changes['category'][0]} to {$changes['category'][1]}";
     }
     if (isset($changes['priority'])) {
         mysqli_query($mysqli, "UPDATE tickets SET ticket_priority = '" . escapeSql($changes['priority'][1]) . "' WHERE ticket_id = $ticket_id");
         applyTicketSla($ticket_id);
-        $words[] = "the priority from {$changes['priority'][0]} to {$changes['priority'][1]}";
     }
     mysqli_query($mysqli, "UPDATE ai_ticket_triage SET ai_triage_state = '" . escapeSql($state) . "', ai_triage_by = " . intval($by) . " WHERE ai_triage_ticket_id = $ticket_id");
-    if ($words) {
-        $said = escapeSql("$who set " . implode(' and ', $words) . ', as AI triage suggested');
-        logTicketHistory($ticket_id, $said);
-        logAudit("Ticket", "Edit", $said . ' on ticket ' . escapeSql(ticketReference($ticket)), intval($ticket['ticket_client_id']), $ticket_id);
+    if ($changes) {
+        // The ticket's history in the language of the moment, the audit log in English
+        $say = function () use ($changes, $who) {
+            $words = [];
+            if (isset($changes['category'])) {
+                $words[] = __('the category from %1$s to %2$s', $changes['category'][0] === 'none' ? _x('none', 'category') : $changes['category'][0], $changes['category'][1]);
+            }
+            if (isset($changes['priority'])) {
+                $words[] = __('the priority from %1$s to %2$s', ticketPriorityLabel($changes['priority'][0]), ticketPriorityLabel($changes['priority'][1]));
+            }
+            return __('%1$s set %2$s, as AI triage suggested', $who === 'AI triage' ? __('AI triage') : $who, implode(' ' . __('and') . ' ', $words));
+        };
+        logTicketHistory($ticket_id, escapeSql($say()));
+        logAudit("Ticket", "Edit", escapeSql(i18nEnglish($say)) . ' on ticket ' . escapeSql(ticketReference($ticket)), intval($ticket['ticket_client_id']), $ticket_id);
         triggerCustomAction('ticket_update', $ticket_id);
     }
     return $changes;

@@ -25,22 +25,22 @@
 
 /** The steps, in order - key => nav label, title, icon and what it is for. Billing and Support go with their modules. */
 const GETTING_STARTED_STEPS = [
-    'cron' => ['label' => 'Cron', 'title' => 'Background jobs', 'icon' => 'fa-clock',
-        'about' => 'Everything that happens without someone clicking - email going out, mail turned into tickets, invoices made, backups taken - is run by cron, once a minute.'],
+    'cron' => ['label' => 'Cron', 'title' => 'Background jobs', 'icon' => 'fa-clock', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'Everything that happens without someone clicking - email going out, mail turned into tickets, invoices made, backups taken - is run by cron, once a minute.'], // i18n-ignore - shown through __(), or the audit log
     'mail' => ['label' => 'Email', 'title' => 'Email', 'icon' => 'fa-envelope',
-        'about' => 'The mailbox ITFlow sends from - ticket updates, invoices, quotes and alerts - and, if you like, a support mailbox it turns into tickets.'],
+        'about' => 'The mailbox ITFlow sends from - ticket updates, invoices, quotes and alerts - and, if you like, a support mailbox it turns into tickets.'], // i18n-ignore - shown through __(), or the audit log
     'backups' => ['label' => 'Backups', 'title' => 'Backups', 'icon' => 'fa-save',
-        'about' => 'A backup every night - the database and your files, locked with your backup key - and how many to keep.'],
+        'about' => 'A backup every night - the database and your files, locked with your backup key - and how many to keep.'], // i18n-ignore - shown through __(), or the audit log
     'billing' => ['label' => 'Billing', 'title' => 'Billing', 'icon' => 'fa-file-invoice-dollar', 'module' => 'accounting',
-        'about' => 'What you charge an hour, when invoices are due, how invoices and quotes are numbered, your tax, and card payments.'],
+        'about' => 'What you charge an hour, when invoices are due, how invoices and quotes are numbered, your tax, and card payments.'], // i18n-ignore - shown through __(), or the audit log
     'support' => ['label' => 'Support', 'title' => 'Support', 'icon' => 'fa-life-ring', 'module' => 'ticketing',
-        'about' => 'Your business hours, how fast you answer each priority, how tickets are numbered, and the client portal.'],
-    'team' => ['label' => 'Team', 'title' => 'Your team', 'icon' => 'fa-users',
-        'about' => 'The people who work tickets, send invoices and look after clients with you.'],
-    'content' => ['label' => 'Content', 'title' => 'Starter content', 'icon' => 'fa-seedling',
-        'about' => 'Ticket and project templates, canned responses, documents, vendors, licenses and products to start from - all yours to change.'],
-    'client' => ['label' => 'First client', 'title' => 'Your first client', 'icon' => 'fa-user-friends',
-        'about' => 'A client to raise tickets and send invoices for - or the demo data, to look around first.'],
+        'about' => 'Your business hours, how fast you answer each priority, how tickets are numbered, and the client portal.'], // i18n-ignore - shown through __(), or the audit log
+    'team' => ['label' => 'Team', 'title' => 'Your team', 'icon' => 'fa-users', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'The people who work tickets, send invoices and look after clients with you.'], // i18n-ignore - shown through __(), or the audit log
+    'content' => ['label' => 'Content', 'title' => 'Starter content', 'icon' => 'fa-seedling', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'Ticket and project templates, canned responses, documents, vendors, licenses and products to start from - all yours to change.'], // i18n-ignore - shown through __(), or the audit log
+    'client' => ['label' => 'First client', 'title' => 'Your first client', 'icon' => 'fa-user-friends', // i18n-ignore - shown through __(), or the audit log
+        'about' => 'A client to raise tickets and send invoices for - or the demo data, to look around first.'], // i18n-ignore - shown through __(), or the audit log
 ];
 
 /**
@@ -137,44 +137,47 @@ function gettingStartedSteps() {
                 $running = $heard && time() - strtotime($heard) < 300;
                 $on = intval($settings['config_enable_cron'] ?? 0) === 1;
                 $done = $running && $on;
-                $status = !$heard ? 'Not heard from yet' : ($running ? 'Ran ' . timeAgo($heard) : 'Last ran ' . timeAgo($heard)) . ($on ? '' : ' - switched off');
+                $status = !$heard ? __('Not heard from yet') : ($running ? __('Ran %s', timeAgo($heard)) : __('Last ran %s', timeAgo($heard))) . ($on ? '' : __(' - switched off'));
                 break;
             case 'mail':
                 $provider = (string) ($settings['config_smtp_provider'] ?? '');
                 $done = $provider !== '' && trim((string) ($settings['config_mail_from_email'] ?? '')) !== '';
-                $status = $done ? 'Sends as ' . $settings['config_mail_from_email'] : ($provider !== '' ? 'No address to send from' : 'Nothing is emailed yet');
+                $status = $done ? __('Sends as %s', $settings['config_mail_from_email']) : ($provider !== '' ? __('No address to send from') : __('Nothing is emailed yet'));
                 break;
             case 'backups':
                 $job = gettingStartedBackupJob();
                 $done = $job['enabled'];
-                $status = $done ? 'Every night at ' . date('g:i A', strtotime($job['daily_at'])) : 'Not scheduled';
+                $status = $done ? __('Every night at %s', formatDate($job['daily_at'], 'time')) : __('Not scheduled');
                 break;
             case 'billing':
                 $rate = floatval($settings['config_default_hourly_rate'] ?? 0);
                 $done = $rate > 0;
-                $status = $done ? billingMoney($rate, (string) ($settings['company_currency'] ?? '')) . ' an hour, ' . (intval($settings['config_default_net_terms'] ?? 0) ? 'due in ' . intval($settings['config_default_net_terms']) . ' days' : 'due on receipt') : 'No hourly rate yet';
+                $status = $done ? __('%1$s an hour, %2$s', billingMoney($rate, (string) ($settings['company_currency'] ?? '')), intval($settings['config_default_net_terms'] ?? 0) ? _n('due in %d day', 'due in %d days', intval($settings['config_default_net_terms'])) : __('due on receipt')) : __('No hourly rate yet');
                 break;
             case 'support':
                 $slas = $count("SELECT COUNT(*) FROM sla_assignments JOIN slas ON sla_id = sla_assignment_sla_id WHERE sla_assignment_client_id = 0 AND sla_archived_at IS NULL");
                 $done = $slas > 0;
-                $status = $done ? 'Response times for ' . $slas . ' ' . ($slas === 1 ? 'priority' : 'priorities') : 'No response times yet';
+                $status = $done ? _n('Response times for %d priority', 'Response times for %d priorities', $slas) : __('No response times yet');
                 break;
             case 'team':
                 $agents = $count("SELECT COUNT(*) FROM users WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL");
                 $invited = userInvitesHoldingSeats();
                 $done = $agents > 1 || $invited > 0;
-                $status = ($agents === 1 ? 'Just you' : "$agents people") . ($invited ? ", $invited invited" : '');
+                $status = ($agents === 1 ? __('Just you') : __('%d people', $agents)) . ($invited ? __(', %d invited', $invited) : '');
                 break;
             case 'content':
                 $templates = $count("SELECT (SELECT COUNT(*) FROM ticket_templates) + (SELECT COUNT(*) FROM canned_responses) + (SELECT COUNT(*) FROM document_templates)");
                 $done = $templates > 0;
-                $status = $done ? 'Templates to start from' : 'Nothing added yet';
+                $status = $done ? __('Templates to start from') : __('Nothing added yet');
                 break;
             case 'client':
                 $clients = $count("SELECT COUNT(*) FROM clients WHERE client_archived_at IS NULL");
                 $done = $clients > 0;
-                $status = $clients ? $clients . ' ' . ($clients === 1 ? 'client' : 'clients') : 'No clients yet';
+                $status = $clients ? _n('%d client', '%d clients', $clients) : __('No clients yet');
                 break;
+        }
+        foreach (['label', 'title', 'about'] as $field) {
+            $step[$field] = __($step[$field]); // i18n-dynamic - GETTING_STARTED_STEPS, entries in lang/pt_BR/maintenance.php
         }
         $steps[$key] = $step + ['key' => $key, 'done' => $done, 'skipped' => !$done && in_array($key, $state['skipped'], true), 'status' => $status];
     }
@@ -182,7 +185,7 @@ function gettingStartedSteps() {
 }
 
 /** How far it has got - done (or skipped), of how many, the next step to do ('' when none is left) and whether it is finished. */
-function gettingStartedProgress(array $steps = null) {
+function gettingStartedProgress(?array $steps = null) {
     $steps = $steps ?? gettingStartedSteps();
     $done = 0;
     $next = '';
@@ -197,7 +200,7 @@ function gettingStartedProgress(array $steps = null) {
 }
 
 /** The step after this one, in order - 'done' (the summary) after the last. */
-function gettingStartedAfter($key, array $steps = null) {
+function gettingStartedAfter($key, ?array $steps = null) {
     $keys = array_keys($steps ?? gettingStartedSteps());
     $at = array_search($key, $keys, true);
     return $at === false || !isset($keys[$at + 1]) ? 'done' : $keys[$at + 1];
@@ -303,7 +306,7 @@ function gettingStartedBackupSave($enabled, $daily_at, $type, $keep_count, $keep
 
     $lines = [];
     if ($before['enabled'] !== (bool) $enabled) {
-        $lines[] = $enabled ? 'nightly backups on' : 'nightly backups off';
+        $lines[] = $enabled ? 'nightly backups on' : 'nightly backups off'; // i18n-ignore - shown through __(), or the audit log
     }
     if ($enabled && $before['daily_at'] !== $daily_at) {
         $lines[] = "at $daily_at";
@@ -312,7 +315,7 @@ function gettingStartedBackupSave($enabled, $daily_at, $type, $keep_count, $keep
         $lines[] = (function_exists('backupTypeLabel') ? strtolower(backupTypeLabel($type)) : $type);
     }
     if (intval($settings['config_backup_retention_count'] ?? 0) !== intval($keep_count) || intval($settings['config_backup_retention_days'] ?? 0) !== intval($keep_days)) {
-        $lines[] = 'keeping ' . intval($keep_count) . ($keep_days ? ' for up to ' . intval($keep_days) . ' days' : '');
+        $lines[] = 'keeping ' . intval($keep_count) . ($keep_days ? ' for up to ' . intval($keep_days) . ' days' : ''); // i18n-ignore - shown through __(), or the audit log
     }
     return $lines;
 }

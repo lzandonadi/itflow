@@ -7,7 +7,7 @@ $stripe_provider = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT payment_prov
 
 // Stripe switched off (Admin > Payment Providers) saves no new cards
 if (!$stripe_provider) {
-    echo "<br><h2>Saving a card isn't available just now. Please get in touch.</h2>";
+    echo '<br><h2>' . escapeHtml(__("Saving a card isn't available just now. Please get in touch.")) . '</h2>';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';
     exit();
 }
@@ -38,7 +38,7 @@ if (isset($_GET['invoice_id'], $_GET['url_key'])) {
 
     // Ensure valid invoice
     if (!$sql || mysqli_num_rows($sql) !== 1) {
-        echo "<br><h2>Oops, something went wrong! Please ensure you have the correct URL and have not already paid this invoice.</h2>";
+        echo '<br><h2>' . escapeHtml(__('Oops, something went wrong! Please ensure you have the correct URL and have not already paid this invoice.')) . '</h2>';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';
         error_log("Stripe payment error - Invoice with ID $invoice_id not found or not eligible.");
         exit();
@@ -67,9 +67,9 @@ if (isset($_GET['invoice_id'], $_GET['url_key'])) {
 
     if (!$stripe_customer_id) { ?>
             <br><br>
-            <h2>Setup Stripe payments for <?php echo $client_name; ?></h2>
-            In order to make online payments, please create a Stripe customer record for <?php echo $client_name; ?>.
-            <p>If you save payment details in future, you also grant consent for automatic payments.</p>
+            <h2><?= __('Setup Stripe payments for %s', $client_name) ?></h2>
+            <?= __('In order to make online payments, please create a Stripe customer record for %s.', $client_name) ?>
+            <p><?= escapeHtml(__('If you save payment details in future, you also grant consent for automatic payments.')) ?></p>
 
             <div class="row g-3">
                 <div class="col-12 col-md-8 col-lg-6">
@@ -80,30 +80,30 @@ if (isset($_GET['invoice_id'], $_GET['url_key'])) {
                         <div class="mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="stripe_cust_name" disabled value="<?php echo $client_name; ?>">
-                                <label for="stripe_cust_name">Client</label>
+                                <label for="stripe_cust_name"><?= escapeHtml(__('Client')) ?></label>
                             </div>
                         </div>                        
 
                         <div class="mb-3">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="stripe_name" name="name" placeholder="Name" autocomplete="name" maxlength="80" required>
-                                <label for="stripe_name">Your Name</label>
+                                <input type="text" class="form-control" id="stripe_name" name="name" placeholder="<?= escapeHtml(__('Name')) ?>" autocomplete="name" maxlength="80" required>
+                                <label for="stripe_name"><?= escapeHtml(__('Your Name')) ?></label>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <div class="form-floating">
-                                <input type="email" class="form-control" id="stripe_email" name="email" placeholder="Email" autocomplete="email" maxlength="80" required>
-                                <label for="stripe_email">Your Email</label>
+                                <input type="email" class="form-control" id="stripe_email" name="email" placeholder="<?= escapeHtml(__('Email')) ?>" autocomplete="email" maxlength="80" required>
+                                <label for="stripe_email"><?= escapeHtml(__('Your Email')) ?></label>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block mt-2">Stripe processes your information in accordance with its Privacy Policy and Terms.</small>
+                            <small class="text-muted d-block mt-2"><?= escapeHtml(__('Stripe processes your information in accordance with its Privacy Policy and Terms.')) ?></small>
                         </div>
 
                         <div class="mb-3">
-                            <button type="submit" class="btn btn-success" name="create_stripe_customer"><strong><i class="fas fa-check me-2"></i>Continue</strong></button>
+                            <button type="submit" class="btn btn-success" name="create_stripe_customer"><strong><i class="fas fa-check me-2"></i><?= escapeHtml(__('Continue')) ?></strong></button>
                         </div>
                     </form>
                 </div>
@@ -111,13 +111,13 @@ if (isset($_GET['invoice_id'], $_GET['url_key'])) {
 
         <?php }
         else {
-            echo "<br><h2>Stripe customer record already exists.</h2>";
-            echo "<p>You can now proceed to pay your invoice.</p>";
-            echo "<a href='guest_view_invoice.php?invoice_id=$invoice_id&url_key=" . urlencode($invoice_url_key) . "' class='btn btn-primary'>View Invoice</a>";
+            echo '<br><h2>' . escapeHtml(__('Stripe customer record already exists.')) . '</h2>';
+            echo '<p>' . escapeHtml(__('You can now proceed to pay your invoice.')) . '</p>';
+            echo "<a href='guest_view_invoice.php?invoice_id=$invoice_id&url_key=" . urlencode($invoice_url_key) . "' class='btn btn-primary'>" . escapeHtml(__('View Invoice')) . "</a>";
         }
 
 } else {
-    exit("Error.");
+    exit(escapeHtml(__('Error.')));
 }
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';

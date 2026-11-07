@@ -20,7 +20,7 @@ $header = $import['header'];
 $two = $guess['amount'] === null && ($guess['debit'] !== null || $guess['credit'] !== null);
 $column_select = function ($name, $selected, $optional, $attrs = '') use ($header) {
     $html = '<select class="form-select" name="' . $name . '" ' . $attrs . '>';
-    $html .= '<option value="">' . ($optional ? '- None -' : '- Pick the column -') . '</option>';
+    $html .= '<option value="">' . escapeHtml($optional ? __('- None -') : __('- Pick the column -')) . '</option>';
     foreach ($header as $c => $label) {
         $html .= '<option value="' . $c . '"' . ($selected !== null && intval($selected) === $c ? ' selected' : '') . '>' . escapeHtml($label) . '</option>';
     }
@@ -28,27 +28,27 @@ $column_select = function ($name, $selected, $optional, $attrs = '') use ($heade
 };
 // The sign is kept as which way round a charge is; the income side asks it from the deposit's side
 $sign_options = $columns_side === 'income'
-    ? ['negative' => 'Positive - 25.00 came in', 'positive' => 'Negative - -25.00 came in']
-    : ['positive' => 'Positive - 25.00 is spent', 'negative' => 'Negative - -25.00 is spent'];
+    ? ['negative' => __('Positive - 25.00 came in'), 'positive' => __('Negative - -25.00 came in')]
+    : ['positive' => __('Positive - 25.00 is spent'), 'negative' => __('Negative - -25.00 is spent')];
 ?>
 
 <div class="card mb-3">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-columns me-2"></i>Which column is which <span class="fw-normal text-white-50 ms-1"><?= count($import['rows']) ?> lines</span></h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-columns me-2"></i><?= __('Which column is which') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(_n('%d line', '%d lines', count($import['rows']))) ?></span></h3>
     </div>
     <form action="post.php" method="post" autocomplete="off" id="<?= escapeHtml($columns_form_id) ?>">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">Date <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                         <?= $column_select('date', $guess['date'], false, 'required') ?>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Date format</label>
+                    <label class="form-label"><?= __('Date format') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar-alt"></i></span>
                         <select class="form-select" name="date_format">
@@ -59,64 +59,64 @@ $sign_options = $columns_side === 'income'
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Reference</label>
+                    <label class="form-label"><?= __('Reference') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
                         <?= $column_select('reference', $guess['reference'], true) ?>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Description <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Description') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
                         <?= $column_select('description', $guess['description'], false, 'required') ?>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">More description</label>
+                    <label class="form-label"><?= __('More description') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-comment"></i></span>
                         <?= $column_select('memo', $guess['memo'], true) ?>
                     </div>
-                    <div class="form-text">A memo or notes column, added after the description.</div>
+                    <div class="form-text"><?= __('A memo or notes column, added after the description.') ?></div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">The amounts are in</label>
+                    <label class="form-label"><?= __('The amounts are in') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-coins"></i></span>
                         <select class="form-select" name="amounts" data-import-amounts>
-                            <option value="one" <?= $two ? '' : 'selected' ?>>One column</option>
-                            <option value="two" <?= $two ? 'selected' : '' ?>>Money out and money in columns</option>
+                            <option value="one" <?= $two ? '' : 'selected' ?>><?= __('One column') ?></option>
+                            <option value="two" <?= $two ? 'selected' : '' ?>><?= __('Money out and money in columns') ?></option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4" data-import-amounts-for="one">
-                    <label class="form-label">Amount <strong class="text-danger">*</strong></label>
+                    <label class="form-label"><?= __('Amount') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
                         <?= $column_select('amount', $guess['amount'], false) ?>
                     </div>
                 </div>
                 <div class="col-md-4" data-import-amounts-for="one">
-                    <label class="form-label"><?= $columns_side === 'income' ? 'Money in is' : 'A charge is' ?></label>
+                    <label class="form-label"><?= $columns_side === 'income' ? __('Money in is') : __('A charge is') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-balance-scale"></i></span>
                         <select class="form-select" name="sign">
                             <?php foreach ($sign_options as $value => $label) { ?>
-                                <option value="<?= $value ?>" <?= $guess['sign'] === $value ? 'selected' : '' ?>><?= $label ?></option>
+                                <option value="<?= $value ?>" <?= $guess['sign'] === $value ? 'selected' : '' ?>><?= escapeHtml($label) ?></option>
                             <?php } ?>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4" data-import-amounts-for="two">
-                    <label class="form-label">Money out</label>
+                    <label class="form-label"><?= __('Money out') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-arrow-up"></i></span>
                         <?= $column_select('debit', $guess['debit'], true) ?>
                     </div>
                 </div>
                 <div class="col-md-4" data-import-amounts-for="two">
-                    <label class="form-label">Money in</label>
+                    <label class="form-label"><?= __('Money in') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-arrow-down"></i></span>
                         <?= $column_select('credit', $guess['credit'], true) ?>
@@ -147,8 +147,8 @@ $sign_options = $columns_side === 'income'
             </table>
         </div>
         <div class="card-footer d-flex flex-wrap gap-2 align-items-center">
-            <button type="submit" name="<?= escapeHtml($columns_submit) ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i>Review the Lines</button>
-            <span class="small text-body-secondary">The first <?= min(8, count($import['rows'])) ?> of <?= count($import['rows']) ?> lines. These columns are kept for the next statement of <?= escapeHtml($account['account_name'] ?? 'this account') ?>, for expenses and deposits alike.</span>
+            <button type="submit" name="<?= escapeHtml($columns_submit) ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i><?= __('Review the Lines') ?></button>
+            <span class="small text-body-secondary"><?= escapeHtml(__('The first %1$d of %2$d lines. These columns are kept for the next statement of %3$s, for expenses and deposits alike.', min(8, count($import['rows'])), count($import['rows']), $account['account_name'] ?? __('this account'))) ?></span>
         </div>
     </form>
 </div>
@@ -157,7 +157,7 @@ $sign_options = $columns_side === 'income'
 (function () {
     var form = document.getElementById(<?= json_encode($columns_form_id) ?>);
     var amounts = form.querySelector('[data-import-amounts]');
-    var labels = { date: 'Date', description: 'Description', memo: 'More', amount: 'Amount', debit: 'Out', credit: 'In', reference: 'Reference' };
+    var labels = <?= json_encode(['date' => __('Date'), 'description' => __('Description'), 'memo' => _x('More', 'statement column'), 'amount' => __('Amount'), 'debit' => _x('Out', 'statement column'), 'credit' => _x('In', 'statement column'), 'reference' => __('Reference')], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
     function update() {
         form.querySelectorAll('[data-import-amounts-for]').forEach(function (el) {
             el.hidden = el.getAttribute('data-import-amounts-for') !== amounts.value;

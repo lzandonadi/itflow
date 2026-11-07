@@ -39,8 +39,8 @@
     var sheetMedia = window.matchMedia('(max-width: 575.98px)');
     var finePointer = window.matchMedia('(pointer: fine)');
     var titles = {
-        priority: 'Priority', assignee: 'Assign to', billable: 'Billing', status: 'Status', project_manager: 'Project manager', recurring_assignee: 'Assign to',
-        asset_status: 'Status', asset_location: 'Location', asset_contact: 'Assign to', contact_location: 'Location'
+        priority: __('Priority'), assignee: __('Assign to'), billable: __('Billing'), status: __('Status'), project_manager: __('Project manager'), recurring_assignee: __('Assign to'),
+        asset_status: __('Status'), asset_location: __('Location'), asset_contact: __('Assign to'), contact_location: __('Location')
     };
     // People and places get a wider menu
     var wideFields = ['assignee', 'project_manager', 'recurring_assignee', 'asset_location', 'asset_contact', 'contact_location'];
@@ -129,13 +129,13 @@
 
         var panel = this.panel = make('div', 'itflow-select-panel itflow-quick-panel');
         panel.setAttribute('role', 'dialog');
-        panel.setAttribute('aria-label', titles[this.field] || 'Change');
+        panel.setAttribute('aria-label', titles[this.field] || __('Change'));
 
         var head = make('div', 'itflow-select-sheet-head');
-        head.appendChild(make('span', 'itflow-select-sheet-title', titles[this.field] || 'Change'));
-        var done = make('button', 'btn btn-sm btn-link itflow-select-done', 'Cancel');
+        head.appendChild(make('span', 'itflow-select-sheet-title', titles[this.field] || __('Change')));
+        var done = make('button', 'btn btn-sm btn-link itflow-select-done', __('Cancel'));
         done.type = 'button';
-        done.title = 'Close without changing it (Esc)';
+        done.title = __('Close without changing it (Esc)');
         done.addEventListener('click', function () {
             self.close(true);
         });
@@ -149,8 +149,8 @@
         input.type = 'text';
         input.autocomplete = 'off';
         input.spellcheck = false;
-        input.placeholder = 'Search';
-        input.setAttribute('aria-label', 'Search');
+        input.placeholder = __('Search');
+        input.setAttribute('aria-label', __('Search'));
         input.addEventListener('input', function () {
             self.query = input.value;
             self.draw();
@@ -163,8 +163,8 @@
 
         var list = this.list = make('div', 'itflow-select-list');
         list.setAttribute('role', 'listbox');
-        list.setAttribute('aria-label', titles[this.field] || 'Choices');
-        list.appendChild(make('div', 'itflow-select-empty', 'Loading...'));
+        list.setAttribute('aria-label', titles[this.field] || __('Choices'));
+        list.appendChild(make('div', 'itflow-select-empty', __('Loading...')));
         list.addEventListener('click', function (e) {
             var node = e.target.closest('[data-row]');
             if (node) {
@@ -212,7 +212,7 @@
                 self.input.focus({ preventScroll: true });
             }
         }, function () {
-            self.fail('Could not load the choices.');
+            self.fail(__('Could not load the choices.'));
             self.close(false);
         });
     };
@@ -305,7 +305,7 @@
         });
 
         if (!this.rows.length) {
-            list.appendChild(make('div', 'itflow-select-empty', 'No matches'));
+            list.appendChild(make('div', 'itflow-select-empty', __('No matches')));
         }
 
         var active = 0;
@@ -399,7 +399,7 @@
                 result = null;
             }
             if (!result || !result.records) {
-                self.fail((result && result.error) || 'That change was not saved - try again.');
+                self.fail((result && result.error) || __('That change was not saved - try again.'));
                 return;
             }
             Object.keys(result.records).forEach(function (id) {
@@ -456,7 +456,7 @@
             }
         }, function () {
             button.classList.remove('is-saving');
-            self.fail('That change was not saved - try again.');
+            self.fail(__('That change was not saved - try again.'));
         });
     };
 

@@ -108,7 +108,7 @@ function credentialAge($changed_at) {
         $state = 'fresh';
         $tone = 'success';
     }
-    $text = $days === 0 ? 'Changed today' : ($days === 1 ? 'Changed yesterday' : ($days < 60 ? "Changed $days days ago" : 'Changed ' . timeAgo(date('Y-m-d', $changed))));
+    $text = $days === 0 ? __('Changed today') : ($days === 1 ? __('Changed yesterday') : ($days < 60 ? _n('Changed %d day ago', 'Changed %d days ago', $days) : __('Changed %s', timeAgo(date('Y-m-d', $changed)))));
     return ['state' => $state, 'tone' => $tone, 'days' => $days, 'text' => $text, 'date' => date('Y-m-d', $changed)];
 }
 
@@ -119,7 +119,7 @@ function credentialAgePill($age, $short = false) {
     }
     $tone = $age['tone'];
     $label = $short ? ($age['days'] < 60 ? $age['days'] . 'd' : ($age['days'] < 730 ? round($age['days'] / 30) . 'mo' : round($age['days'] / 365) . 'y')) : $age['text'];
-    $title = $age['text'] . ($age['state'] === 'fresh' ? '' : ' - due for rotation');
+    $title = $age['state'] === 'fresh' ? $age['text'] : __('%s - due for rotation', $age['text']);
     return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal" title="' . escapeHtml($title) . '">'
         . '<i class="fas fa-' . ($age['state'] === 'fresh' ? 'check' : 'history') . ' me-1"></i>' . escapeHtml($label) . '</span>';
 }
@@ -159,22 +159,22 @@ function credentialOtpSeed($input) {
 function credentialFormSet($post, $client_id, &$error = '') {
     $error = '';
     if (trim((string) ($post['name'] ?? '')) === '') {
-        $error = 'A credential needs a name.';
+        $error = __('A credential needs a name.');
         return null;
     }
     if ($too_long = checkCredentialLengths($post)) {
-        $error = "The $too_long is too long to store.";
+        $error = __('The %s is too long to store.', ['username' => __('username'), 'password' => __('password'), 'name' => __('name'), 'description' => __('description'), 'uri' => __('URI'), 'uri_2' => __('URI 2'), 'otp_secret' => __('2FA secret')][$too_long] ?? $too_long);
         return null;
     }
     $otp = credentialOtpSeed($post['otp_secret'] ?? '');
     if ($otp === false) {
-        $error = "That 2FA secret is not one - paste the key the site shows under \"can't scan the code\", or the otpauth:// link.";
+        $error = __('That 2FA secret is not one - paste the key the site shows under "can\'t scan the code", or the otpauth:// link.');
         return null;
     }
     $username = encryptCredentialEntry(trim((string) ($post['username'] ?? '')));
     $password = encryptCredentialEntry(trim((string) ($post['password'] ?? '')));
     if ($username === false || $password === false) {
-        $error = 'Your vault session has expired, so the login could not be encrypted - sign out and back in, then try again.';
+        $error = __('Your vault session has expired, so the login could not be encrypted - sign out and back in, then try again.');
         return null;
     }
     $text = function ($field, $length) use ($post) {
@@ -221,7 +221,7 @@ function credentialUsernameHtml($username, $empty = '-') {
     if ($username === '') {
         return '<span class="text-body-secondary">' . $empty . '</span>';
     }
-    return '<span class="itflow-credential-user text-truncate">' . $username . '</span><button type="button" class="itflow-copy clipboardjs" title="Copy username" data-clipboard-text="' . $username . '"><i class="far fa-copy"></i></button>';
+    return '<span class="itflow-credential-user text-truncate">' . $username . '</span><button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy username')) . '" data-clipboard-text="' . $username . '"><i class="far fa-copy"></i></button>';
 }
 
 /**
@@ -235,8 +235,8 @@ function credentialPasswordHtml($credential_id) {
     return '<span class="itflow-credential-pw itflow-copy-always" data-credential-id="' . $credential_id . '">'
         . '<span class="itflow-credential-pw-mask" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>'
         . '<span class="itflow-credential-pw-value font-monospace" hidden></span>'
-        . '<button type="button" class="itflow-credential-reveal" title="Show password" aria-label="Show password" aria-pressed="false"><i class="fas fa-eye"></i></button>'
-        . '<button type="button" class="itflow-copy itflow-credential-copy" title="Copy password"><i class="far fa-copy"></i></button>'
+        . '<button type="button" class="itflow-credential-reveal" title="' . escapeHtml(__('Show password')) . '" aria-label="' . escapeHtml(__('Show password')) . '" aria-pressed="false"><i class="fas fa-eye"></i></button>'
+        . '<button type="button" class="itflow-copy itflow-credential-copy" title="' . escapeHtml(__('Copy password')) . '"><i class="far fa-copy"></i></button>'
         . '</span>';
 }
 
@@ -251,7 +251,7 @@ function credentialOtpHtml($credential_id, $has_otp) {
     }
     $credential_id = intval($credential_id);
     return '<button type="button" class="itflow-credential-otp" data-credential-otp="' . $credential_id . '" title="Show the 2FA code">'
-        . '<i class="far fa-clock me-1"></i><span class="itflow-credential-otp-code">2FA</span><span class="itflow-credential-otp-time"></span></button>';
+        . '<i class="far fa-clock me-1"></i><span class="itflow-credential-otp-code">' . __('2FA') . '</span><span class="itflow-credential-otp-time"></span></button>';
 }
 
 /** Where the login is used - the link, opening in a new tab, and a copy button. '' without one. Raw in. */
@@ -326,7 +326,7 @@ function credentialTableHtml(array $rows, array $options = []) {
     $unlink = $options['unlink'] ?? null;
     $csrf = $_SESSION['csrf_token'] ?? '';
     $html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0 itflow-credential-table">'
-        . '<thead class="text-nowrap table-light"><tr><th>Credential</th><th>Login</th><th>Changed</th><th></th></tr></thead><tbody>';
+        . '<thead class="text-nowrap table-light"><tr><th>' . __('Credential') . '</th><th>' . __('Login') . '</th><th>' . __('Changed') . '</th><th></th></tr></thead><tbody>';
     foreach ($rows as $row) {
         $id = intval($row['credential_id']);
         $name = escapeHtml($row['credential_name']);
@@ -337,7 +337,7 @@ function credentialTableHtml(array $rows, array $options = []) {
 
         $html .= '<tr><td class="itflow-credential-name-cell"><div class="d-flex align-items-center gap-2">' . credentialTile($row, 'sm') . '<div class="min-w-0">'
             . '<a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="' . $quick . '">' . $name . '</a>'
-            . (intval($row['credential_favorite']) ? '<i class="fas fa-star text-warning small ms-1" title="Starred"></i>' : '')
+            . (intval($row['credential_favorite']) ? '<i class="fas fa-star text-warning small ms-1" title="' . escapeHtml(__('Starred')) . '"></i>' : '')
             . ($description !== '' ? '<div class="small text-body-secondary text-truncate itflow-asset-desc" title="' . $description . '">' . $description . '</div>' : '');
         $owners = $show_for ? credentialOwnersHtml($row) : [];
         if ($owners) {
@@ -354,25 +354,25 @@ function credentialTableHtml(array $rows, array $options = []) {
 
         $html .= '<td class="text-nowrap">' . (credentialAgePill(credentialAge($row['credential_password_changed_at']), true) ?: '<span class="text-body-secondary">-</span>') . '</td>';
 
-        $actions = '<a class="dropdown-item ajax-modal" href="#" data-modal-url="' . $quick . '"><i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look</a>';
+        $actions = '<a class="dropdown-item ajax-modal" href="#" data-modal-url="' . $quick . '"><i class="fas fa-fw fa-eye text-secondary me-2"></i>' . __('Quick look') . '</a>';
         if ($can_edit && !$archived) {
-            $actions .= '<a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/credential/credential_edit.php?id=' . $id . '"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>'
-                . '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/credential/credential_rotate.php?id=' . $id . '"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Change password</a>';
+            $actions .= '<a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/credential/credential_edit.php?id=' . $id . '"><i class="fas fa-fw fa-edit text-secondary me-2"></i>' . __('Edit') . '</a>'
+                . '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/credential/credential_rotate.php?id=' . $id . '"><i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>' . __('Change password') . '</a>';
         }
         if ($can_share && !$archived) {
-            $actions .= '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/share/share_add.php?type=Credential&amp;id=' . $id . '"><i class="fas fa-fw fa-share-alt text-secondary me-2"></i>Share</a>';
+            $actions .= '<a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/share/share_add.php?type=Credential&amp;id=' . $id . '"><i class="fas fa-fw fa-share-alt text-secondary me-2"></i>' . __('Share') . '</a>';
         }
         $unlink_url = $unlink ? (string) $unlink($row) : '';
         if ($unlink_url !== '' || ($can_edit && !$archived)) {
             $actions .= '<div class="dropdown-divider"></div>';
         }
         if ($unlink_url !== '') {
-            $actions .= '<a class="dropdown-item" href="' . escapeHtml($unlink_url) . '"><i class="fas fa-fw fa-unlink text-secondary me-2"></i>Unlink</a>';
+            $actions .= '<a class="dropdown-item" href="' . escapeHtml($unlink_url) . '"><i class="fas fa-fw fa-unlink text-secondary me-2"></i>' . __('Unlink') . '</a>';
         }
         if ($can_edit && !$archived) {
-            $actions .= '<a class="dropdown-item text-danger confirm-link" href="post.php?archive_credential=' . $id . '&amp;csrf_token=' . escapeHtml($csrf) . '"><i class="fas fa-fw fa-archive me-2"></i>Archive</a>';
+            $actions .= '<a class="dropdown-item text-danger confirm-link" href="post.php?archive_credential=' . $id . '&amp;csrf_token=' . escapeHtml($csrf) . '"><i class="fas fa-fw fa-archive me-2"></i>' . __('Archive') . '</a>';
         }
-        $html .= '<td class="text-end"><div class="dropdown dropstart"><button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>'
+        $html .= '<td class="text-end"><div class="dropdown dropstart"><button class="btn btn-sm btn-light" title="' . escapeHtml(__('More actions')) . '" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>'
             . '<div class="dropdown-menu">' . $actions . '</div></div></td></tr>';
     }
     return $html . '</tbody></table></div>';

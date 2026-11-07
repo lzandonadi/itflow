@@ -23,27 +23,84 @@
  * Shown as the tile on every list and page.
  */
 const NETWORK_TYPES = [
-    'LAN' => ['fa-network-wired', 'network', 'The main wired network - workstations, printers'],
-    'Wireless' => ['fa-wifi', 'wireless', 'Staff wireless'],
-    'Guest' => ['fa-user-friends', 'wireless', 'Visitors - kept apart from everything else'],
-    'Voice' => ['fa-phone', 'phone', 'Phones and the phone system'],
-    'Servers' => ['fa-server', 'server', 'Servers and hypervisors'],
-    'Storage' => ['fa-hdd', 'virtual', 'SAN, iSCSI and backup traffic'],
-    'Management' => ['fa-tools', 'peripheral', 'Switch, firewall and iDRAC / iLO management'],
-    'IoT' => ['fa-microchip', 'other', 'Cameras, door access, HVAC - what should not talk to the LAN'],
-    'DMZ' => ['fa-shield-alt', 'firewall', 'Public-facing servers'],
-    'VPN' => ['fa-lock', 'workstation', 'Remote access and site-to-site tunnels'],
-    'WAN' => ['fa-globe', 'firewall', 'An internet connection - the circuit, the provider and its public addresses'],
+    'LAN' => ['fa-network-wired', 'network', 'The main wired network - workstations, printers'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Wireless' => ['fa-wifi', 'wireless', 'Staff wireless'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Guest' => ['fa-user-friends', 'wireless', 'Visitors - kept apart from everything else'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Voice' => ['fa-phone', 'phone', 'Phones and the phone system'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Servers' => ['fa-server', 'server', 'Servers and hypervisors'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Storage' => ['fa-hdd', 'virtual', 'SAN, iSCSI and backup traffic'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Management' => ['fa-tools', 'peripheral', 'Switch, firewall and iDRAC / iLO management'], // i18n-ignore - shown through networkIpTypes() and __()
+    'IoT' => ['fa-microchip', 'other', 'Cameras, door access, HVAC - what should not talk to the LAN'], // i18n-ignore - shown through networkIpTypes() and __()
+    'DMZ' => ['fa-shield-alt', 'firewall', 'Public-facing servers'], // i18n-ignore - shown through networkIpTypes() and __()
+    'VPN' => ['fa-lock', 'workstation', 'Remote access and site-to-site tunnels'], // i18n-ignore - shown through networkIpTypes() and __()
+    'WAN' => ['fa-globe', 'firewall', 'An internet connection - the circuit, the provider and its public addresses'], // i18n-ignore - shown through networkIpTypes() and __()
     'Other' => ['fa-project-diagram', 'other', ''],
 ];
 
 /** What a documented address is: [type => icon, tone, what it means, what it is called]. */
 const NETWORK_IP_TYPES = [
-    'Static' => ['fa-thumbtack', 'secondary', 'Set on the device itself', 'Fixed'],
-    'Reservation' => ['fa-bookmark', 'info', 'DHCP hands this device the same address every time', 'DHCP reservation'],
-    'Reserved' => ['fa-ban', 'warning', 'Held back - not in use, do not hand it out', 'Held back'],
-    'Virtual' => ['fa-clone', 'primary', 'A floating address - a cluster, VRRP / CARP or a load balancer', 'Floating'],
+    'Static' => ['fa-thumbtack', 'secondary', 'Set on the device itself', 'Fixed'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Reservation' => ['fa-bookmark', 'info', 'DHCP hands this device the same address every time', 'DHCP reservation'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Reserved' => ['fa-ban', 'warning', 'Held back - not in use, do not hand it out', 'Held back'], // i18n-ignore - shown through networkIpTypes() and __()
+    'Virtual' => ['fa-clone', 'primary', 'A floating address - a cluster, VRRP / CARP or a load balancer', 'Floating'], // i18n-ignore - shown through networkIpTypes() and __()
 ];
+
+/** A network type's name in the interface language (LAN, Wireless, Guest...). */
+function networkTypeName($type) {
+    $type = (string) $type;
+    return [
+        'LAN' => 'LAN',
+        'Wireless' => _x('Wireless', 'network type'),
+        'Guest' => _x('Guest', 'network type'),
+        'Voice' => _x('Voice', 'network type'),
+        'Servers' => _x('Servers', 'network type'),
+        'Storage' => _x('Storage', 'network type'),
+        'Management' => _x('Management', 'network type'),
+        'IoT' => 'IoT',
+        'DMZ' => 'DMZ',
+        'VPN' => 'VPN',
+        'WAN' => 'WAN',
+        'Other' => _x('Other', 'network type'),
+    ][$type] ?? $type;
+}
+
+/** NETWORK_TYPES with each type's meaning in the interface language - for lists and pickers. */
+function networkTypes() {
+    $hints = [
+        'LAN' => __('The main wired network - workstations, printers'),
+        'Wireless' => __('Staff wireless'),
+        'Guest' => __('Visitors - kept apart from everything else'),
+        'Voice' => __('Phones and the phone system'),
+        'Servers' => __('Servers and hypervisors'),
+        'Storage' => __('SAN, iSCSI and backup traffic'),
+        'Management' => __('Switch, firewall and iDRAC / iLO management'),
+        'IoT' => __('Cameras, door access, HVAC - what should not talk to the LAN'),
+        'DMZ' => __('Public-facing servers'),
+        'VPN' => __('Remote access and site-to-site tunnels'),
+        'WAN' => __('An internet connection - the circuit, the provider and its public addresses'),
+        'Other' => '',
+    ];
+    $types = NETWORK_TYPES;
+    foreach ($types as $type => $style) {
+        $types[$type][2] = $hints[$type] ?? $style[2];
+    }
+    return $types;
+}
+
+/** NETWORK_IP_TYPES with what each means and is called in the interface language. */
+function networkIpTypes() {
+    $words = [
+        'Static' => [__('Set on the device itself'), _x('Fixed', 'address type')],
+        'Reservation' => [__('DHCP hands this device the same address every time'), _x('DHCP reservation', 'address type')],
+        'Reserved' => [__('Held back - not in use, do not hand it out'), _x('Held back', 'address type')],
+        'Virtual' => [__('A floating address - a cluster, VRRP / CARP or a load balancer'), _x('Floating', 'address type')],
+    ];
+    $types = NETWORK_IP_TYPES;
+    foreach ($types as $type => $style) {
+        [$types[$type][2], $types[$type][3]] = $words[$type] ?? [$style[2], $style[3]];
+    }
+    return $types;
+}
 
 /** May this agent do this with networks? 1 is to see them, 2 to change them, 3 to delete them. */
 function networkCan($level) {
@@ -98,13 +155,13 @@ function networkType($row) {
 function networkTile($type, $size = '') {
     $style = NETWORK_TYPES[$type] ?? NETWORK_TYPES['LAN'];
     $size_class = in_array($size, ['xs', 'sm', 'lg'], true) ? " itflow-asset-icon-$size" : '';
-    return '<span class="itflow-asset-icon' . $size_class . ' itflow-asset-tone-' . $style[1] . '" aria-hidden="true" title="' . escapeHtml($type) . '"><i class="fas fa-fw ' . $style[0] . '"></i></span>';
+    return '<span class="itflow-asset-icon' . $size_class . ' itflow-asset-tone-' . $style[1] . '" aria-hidden="true" title="' . escapeHtml(networkTypeName($type)) . '"><i class="fas fa-fw ' . $style[0] . '"></i></span>';
 }
 
 /** A network's type as a label - its icon in its colour, then the name. */
 function networkTypeLabel($type) {
     $style = NETWORK_TYPES[$type] ?? NETWORK_TYPES['LAN'];
-    return '<span class="itflow-net-type itflow-asset-tone-' . $style[1] . '"><i class="fas fa-fw ' . $style[0] . '"></i>' . escapeHtml($type) . '</span>';
+    return '<span class="itflow-net-type itflow-asset-tone-' . $style[1] . '"><i class="fas fa-fw ' . $style[0] . '"></i>' . escapeHtml(networkTypeName($type)) . '</span>';
 }
 
 /** Where the network page is - inside its client. */
@@ -156,7 +213,7 @@ function networkForRequest($network_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = networkRow($network_id);
     if (!$row) {
-        flashAlert('That network no longer exists.', 'error');
+        flashAlert(__('That network no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['network_client_id']);
@@ -168,17 +225,17 @@ function networkForRequest($network_id, $level) {
 function networkForModal($network_id, $level = 1) {
     global $client_id;
     if (!networkCan($level)) {
-        echo json_encode(['error' => 'Your role cannot ' . ($level > 1 ? 'change' : 'see') . ' networks.']);
+        echo json_encode(['error' => $level > 1 ? __('Your role cannot change networks.') : __('Your role cannot see networks.')]);
         exit;
     }
     $row = networkRow($network_id);
     if (!$row) {
-        echo json_encode(['error' => 'That network no longer exists.']);
+        echo json_encode(['error' => __('That network no longer exists.')]);
         exit;
     }
     $client_id = intval($row['network_client_id']);
     if (!hasClientAccess($client_id)) {
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     return $row;
@@ -239,7 +296,7 @@ function networkIpForRequest($ip_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = networkIpRow($ip_id);
     if (!$row) {
-        flashAlert('That address is no longer documented.', 'error');
+        flashAlert(__('That address is no longer documented.'), 'error');
         redirect();
     }
     $client_id = intval($row['network_client_id']);
@@ -256,11 +313,11 @@ function networkIpFieldsSet($post, &$error = '') {
     $type = isset(NETWORK_IP_TYPES[$post['type'] ?? '']) ? $post['type'] : 'Static';
     $mac = normalizeMacAddress($post['mac'] ?? '');
     if ($mac === false) {
-        $error = '<strong>' . trim((string) $post['mac']) . '</strong> is not a MAC address - it is six pairs, like 00:1A:2B:3C:4D:5E.';
+        $error = __('%s is not a MAC address - it is six pairs, like 00:1A:2B:3C:4D:5E.', '<strong>' . trim((string) $post['mac']) . '</strong>');
         return '';
     }
     if ($type === 'Reservation' && $mac === '' && empty($post['allow_no_mac'])) {
-        $error = 'A DHCP reservation is for a device - add the MAC address it is reserved for.';
+        $error = __('A DHCP reservation is for a device - add the MAC address it is reserved for.');
         return '';
     }
     return "ip_type = '$type',
@@ -271,7 +328,7 @@ function networkIpFieldsSet($post, &$error = '') {
 
 /** A documented address's type as a small pill - its icon and name. */
 function networkIpTypePill($type) {
-    $style = NETWORK_IP_TYPES[$type] ?? NETWORK_IP_TYPES['Static'];
+    $style = networkIpTypes()[$type] ?? networkIpTypes()['Static'];
     return '<span class="badge rounded-pill bg-' . $style[1] . '-subtle text-' . $style[1] . '-emphasis fw-normal" title="' . escapeHtml($style[2]) . '"><i class="fas ' . $style[0] . ' me-1"></i>' . $style[3] . '</span>';
 }
 
@@ -350,7 +407,7 @@ function networkSizeText($info) {
     if ($info['family'] === 6) {
         return 'IPv6 /' . $info['prefix'];
     }
-    return number_format($info['usable']) . ' host' . ($info['usable'] === 1 ? '' : 's') . ' · ' . $info['mask'];
+    return _n('%s host', '%s hosts', $info['usable'], number_format($info['usable'])) . ' · ' . $info['mask'];
 }
 
 /**
@@ -538,10 +595,10 @@ function networkUsage(array $networks, $addresses = null) {
 /** How full a network is, as a small bar - "47 of 254" - or the count alone for IPv6 / an unparsed subnet. */
 function networkUsageBar($usage) {
     if ($usage['percent'] === null) {
-        return '<span class="small text-body-secondary">' . number_format($usage['used']) . ' in use</span>';
+        return '<span class="small text-body-secondary">' . __('%s in use', number_format($usage['used'])) . '</span>';
     }
     $tone = $usage['percent'] >= 90 ? 'danger' : ($usage['percent'] >= 75 ? 'warning' : 'success');
-    return '<div class="itflow-net-usage" title="' . $usage['used'] . ' of ' . number_format($usage['hosts']) . ' addresses in use - ' . $usage['percent'] . '%">'
+    return '<div class="itflow-net-usage" title="' . escapeHtml(__('%1$s of %2$s addresses in use - %3$s%%', $usage['used'], number_format($usage['hosts']), $usage['percent'])) . '">'
         . '<div class="progress" role="progressbar" aria-valuenow="' . $usage['percent'] . '" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-' . $tone . '" style="width: ' . max($usage['used'] ? 3 : 0, $usage['percent']) . '%"></div></div>'
         . '<span class="small text-body-secondary text-nowrap">' . number_format($usage['used']) . ' / ' . number_format($usage['hosts']) . '</span></div>';
 }
@@ -593,10 +650,10 @@ function networkAddressPlan(array $network, $addresses = null) {
             if ($raw === '') {
                 $plan['unaddressed'][] = $row;
             } else {
-                $plan['outside'][] = $row + ['problem' => 'is not an address'];
+                $plan['outside'][] = $row + ['problem' => __('is not an address')];
             }
         } elseif ($info && !isIpInSubnet($ip, $info['cidr'])) {
-            $plan['outside'][] = $row + ['problem' => 'is outside ' . $info['cidr']];
+            $plan['outside'][] = $row + ['problem' => __('is outside %s', $info['cidr'])];
         } else {
             $add($ip);
             $by_ip[$ip]['interfaces'][] = $row;
@@ -618,35 +675,35 @@ function networkAddressPlan(array $network, $addresses = null) {
             return intval($row['asset_id']);
         }, $entry['interfaces']));
         if (count($assets) > 1) {
-            $entry['flags'][] = ['danger', 'Conflict - ' . count($assets) . ' devices have this address'];
+            $entry['flags'][] = ['danger', __('Conflict - %d devices have this address', count($assets))];
         }
         if (count($entry['documented']) > 1) {
-            $entry['flags'][] = ['warning', 'Documented ' . count($entry['documented']) . ' times'];
+            $entry['flags'][] = ['warning', __('Documented %d times', count($entry['documented']))];
         }
         if ($info && !isIpInSubnet($ip, $info['cidr'])) {
-            $entry['flags'][] = ['warning', 'Outside ' . $info['cidr'] . ' - documented on the wrong network'];
+            $entry['flags'][] = ['warning', __('Outside %s - documented on the wrong network', $info['cidr'])];
         } elseif ($info && $info['family'] === 4 && $info['prefix'] <= 30) {
             if ($ip === $info['network']) {
-                $entry['flags'][] = ['danger', 'This is the network address - no device can use it'];
+                $entry['flags'][] = ['danger', __('This is the network address - no device can use it')];
             } elseif ($ip === $info['last']) {
-                $entry['flags'][] = ['danger', 'This is the broadcast address - no device can use it'];
+                $entry['flags'][] = ['danger', __('This is the broadcast address - no device can use it')];
             }
         }
         foreach ($entry['documented'] as $doc) {
             if ($entry['in_pool'] && in_array($doc['ip_type'], ['Static', 'Virtual'], true)) {
-                $entry['flags'][] = ['warning', 'Inside the DHCP range - DHCP can hand it to something else'];
+                $entry['flags'][] = ['warning', __('Inside the DHCP range - DHCP can hand it to something else')];
             }
             $doc_mac = normalizeMacAddress($doc['ip_mac'] ?? '');
             if ($doc['ip_type'] === 'Reservation' && $doc_mac) {
                 foreach ($entry['interfaces'] as $interface) {
                     $mac = normalizeMacAddress($interface['interface_mac']);
                     if ($mac && $mac !== $doc_mac) {
-                        $entry['flags'][] = ['warning', 'Reserved for ' . $doc_mac . ', but ' . $interface['asset_name'] . ' has ' . $mac];
+                        $entry['flags'][] = ['warning', __('Reserved for %1$s, but %2$s has %3$s', $doc_mac, $interface['asset_name'], $mac)];
                     }
                 }
             }
             if ($doc['ip_type'] === 'Reserved' && $entry['interfaces']) {
-                $entry['flags'][] = ['warning', 'Held back, but ' . $entry['interfaces'][0]['asset_name'] . ' is using it'];
+                $entry['flags'][] = ['warning', __('Held back, but %s is using it', $entry['interfaces'][0]['asset_name'])];
             }
         }
         if ($entry['flags']) {
@@ -750,26 +807,26 @@ function networkFormSet($post, $client_id, &$error = '', &$note = '') {
 
     $name = trim((string) ($post['name'] ?? ''));
     if ($name === '') {
-        $error = 'A network needs a name.';
+        $error = __('A network needs a name.');
         return '';
     }
 
     $typed = trim((string) ($post['network'] ?? ''));
     $info = networkSubnetInfo($typed);
     if (!$info) {
-        $error = '<strong>' . ($typed ?: 'Nothing') . '</strong> is not a subnet - write it as an address and its prefix, like 192.168.1.0/24.';
+        $error = __('%s is not a subnet - write it as an address and its prefix, like 192.168.1.0/24.', '<strong>' . ($typed ?: __('Nothing')) . '</strong>');
         return '';
     }
     $typed_address = trim(explode('/', $typed)[0]);
     if (normalizeIpAddress($typed_address) !== $info['network']) {
-        $note = $typed . ' is stored as the subnet it is in, <strong>' . $info['cidr'] . '</strong>.';
+        $note = __('%1$s is stored as the subnet it is in, %2$s.', $typed, '<strong>' . $info['cidr'] . '</strong>');
     }
 
     $gateway = trim((string) ($post['gateway'] ?? ''));
     if ($gateway !== '') {
         $gateway_ip = normalizeIpAddress($gateway);
         if ($gateway_ip === false || !isIpInSubnet($gateway_ip, $info['cidr'])) {
-            $error = 'The gateway <strong>' . $gateway . '</strong> ' . ($gateway_ip === false ? 'is not an address.' : 'is outside ' . $info['cidr'] . '.');
+            $error = $gateway_ip === false ? __('The gateway %s is not an address.', '<strong>' . $gateway . '</strong>') : __('The gateway %1$s is outside %2$s.', '<strong>' . $gateway . '</strong>', $info['cidr']);
             return '';
         }
         $gateway = $gateway_ip;
@@ -779,7 +836,7 @@ function networkFormSet($post, $client_id, &$error = '', &$note = '') {
     foreach (['primary_dns', 'secondary_dns'] as $field) {
         $value = trim((string) ($post[$field] ?? ''));
         if ($value !== '' && normalizeIpAddress($value) === false) {
-            $error = 'The DNS server <strong>' . $value . '</strong> is not an address.';
+            $error = __('The DNS server %s is not an address.', '<strong>' . $value . '</strong>');
             return '';
         }
         $dns[$field] = $value === '' ? '' : normalizeIpAddress($value);
@@ -790,7 +847,7 @@ function networkFormSet($post, $client_id, &$error = '', &$note = '') {
     if ($range !== '' && preg_match('/\d+\.\d+|:/', $range)) {
         $parsed = networkParseRange($range, $info);
         if (!$parsed && $info['family'] === 4) {
-            $error = 'The DHCP range <strong>' . $range . '</strong> is not a range inside ' . $info['cidr'] . ' - write it as 192.168.1.100 - 192.168.1.200.';
+            $error = __('The DHCP range %1$s is not a range inside %2$s - write it as 192.168.1.100 - 192.168.1.200.', '<strong>' . $range . '</strong>', $info['cidr']);
             return '';
         }
         if ($parsed) {
@@ -800,7 +857,7 @@ function networkFormSet($post, $client_id, &$error = '', &$note = '') {
 
     $vlan = trim((string) ($post['vlan'] ?? ''));
     if ($vlan !== '' && (!ctype_digit($vlan) || intval($vlan) < 1 || intval($vlan) > 4094)) {
-        $error = 'A VLAN is a number from 1 to 4094.';
+        $error = __('A VLAN is a number from 1 to 4094.');
         return '';
     }
 

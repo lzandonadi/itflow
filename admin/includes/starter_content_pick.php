@@ -69,8 +69,8 @@ function starterPreviewFillIns(array $fill_ins) {
     if (!$fill_ins) {
         return '';
     }
-    $kinds = ['text' => 'text', 'textarea' => 'longer text', 'date' => 'a date', 'number' => 'a number', 'yesno' => 'yes or no', 'list' => 'one of', 'email' => 'an email address'];
-    $html = '<h3 class="itflow-starter-preview-head">What it asks for</h3><ul class="itflow-starter-preview-list">';
+    $kinds = ['text' => __('text'), 'textarea' => __('longer text'), 'date' => __('a date'), 'number' => __('a number'), 'yesno' => __('yes or no'), 'list' => __('one of'), 'email' => __('an email address')];
+    $html = '<h3 class="itflow-starter-preview-head">' . __('What it asks for') . '</h3><ul class="itflow-starter-preview-list">';
     foreach ($fill_ins as $fill_in) {
         $type = (string) ($fill_in['type'] ?? 'text');
         $options = (array) ($fill_in['options'] ?? []);
@@ -110,88 +110,88 @@ function starterItemPreview($pack, $row) {
             }, (array) ($row['tags'] ?? [])));
             $due = intval($row['due_hours'] ?? 0);
             $portal = !empty($row['portal']) ? '<span class="fw-semibold">' . escapeHtml((string) $row['portal']['title']) . '</span> - ' . escapeHtml((string) ($row['portal']['description'] ?? ''))
-                . '<div class="small text-body-secondary">A request form in the client portal - it comes in turned off.</div>' : '';
+                . '<div class="small text-body-secondary">' . __('A request form in the client portal - it comes in turned off.') . '</div>' : '';
             $html .= '<dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Subject', starterPreviewFills(escapeHtml((string) $row['subject'])))
-                . starterPreviewFact('Category', $category)
-                . starterPreviewFact('Priority', escapeHtml((string) ($row['priority'] ?? '')))
-                . starterPreviewFact('Due', $due ? ($due % 24 === 0 ? ($due / 24) . ' day' . ($due === 24 ? '' : 's') : "$due hour" . ($due === 1 ? '' : 's')) . ' after it is raised' : '')
-                . starterPreviewFact('Tags', $tags)
-                . starterPreviewFact('Clients ask with', $portal)
+                . starterPreviewFact(__('Subject'), starterPreviewFills(escapeHtml((string) $row['subject'])))
+                . starterPreviewFact(__('Category'), $category)
+                . starterPreviewFact(__('Priority'), escapeHtml((string) ($row['priority'] ?? '')))
+                . starterPreviewFact(__('Due'), $due ? ($due % 24 === 0 ? _n('%d day after it is raised', '%d days after it is raised', $due / 24) : _n('%d hour after it is raised', '%d hours after it is raised', $due)) : '')
+                . starterPreviewFact(__('Tags'), $tags)
+                . starterPreviewFact(__('Clients ask with'), $portal)
                 . '</dl>';
-            $html .= '<h3 class="itflow-starter-preview-head">What it says</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['details'] ?? '') . '</div>';
+            $html .= '<h3 class="itflow-starter-preview-head">' . __('What it says') . '</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['details'] ?? '') . '</div>';
             $html .= starterPreviewFillIns((array) ($row['fill_ins'] ?? []));
             if (!empty($row['tasks'])) {
                 $minutes = array_sum(array_map(function ($task) {
                     return intval($task['estimate'] ?? 0);
                 }, $row['tasks']));
-                $html .= '<h3 class="itflow-starter-preview-head">Tasks <span class="fw-normal text-body-secondary">- ' . count($row['tasks']) . ', about ' . escapeHtml(starterMinutesText($minutes)) . '</span></h3><ol class="itflow-starter-preview-list">';
+                $html .= '<h3 class="itflow-starter-preview-head">' . __('Tasks') . ' <span class="fw-normal text-body-secondary">- ' . escapeHtml(__('%1$d, about %2$s', count($row['tasks']), starterMinutesText($minutes))) . '</span></h3><ol class="itflow-starter-preview-list">';
                 foreach ($row['tasks'] as $task) {
-                    $when = !empty($task['when']) ? ' <span class="badge rounded-pill bg-body-tertiary text-body border fw-normal">when ' . escapeHtml($task['when']['fill_in'] . ' is ' . $task['when']['value']) . '</span>' : '';
+                    $when = !empty($task['when']) ? ' <span class="badge rounded-pill bg-body-tertiary text-body border fw-normal">' . escapeHtml(__('when %1$s is %2$s', $task['when']['fill_in'], $task['when']['value'])) . '</span>' : '';
                     $html .= '<li>' . starterPreviewFills(escapeHtml((string) $task['name'])) . $when
-                        . (!empty($task['estimate']) ? ' <span class="text-body-secondary small">' . intval($task['estimate']) . ' min</span>' : '') . '</li>';
+                        . (!empty($task['estimate']) ? ' <span class="text-body-secondary small">' . escapeHtml(__('%d min', intval($task['estimate']))) . '</span>' : '') . '</li>';
                 }
                 $html .= '</ol>';
             }
             return $html;
 
         case 'canned_responses':
-            $types = ['internal' => 'An internal note', 'public' => 'A public note', 'email' => 'An email reply'];
+            $types = ['internal' => __('An internal note'), 'public' => __('A public note'), 'email' => __('An email reply')];
             $categories = implode(' ', array_map(function ($category) {
                 return categoryChip(['category_name' => $category['name'], 'category_type' => 'Ticket', 'category_color' => $category['color'] ?? '', 'category_icon' => $category['icon'] ?? '']);
             }, (array) ($row['categories'] ?? [])));
             $html .= '<dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Goes in as', escapeHtml($types[$row['reply_type'] ?? ''] ?? ucfirst((string) ($row['reply_type'] ?? ''))))
-                . starterPreviewFact('Offered on', $categories !== '' ? $categories : '<span class="text-body-secondary">Every ticket</span>')
-                . starterPreviewFact('Sets the status to', escapeHtml((string) ($row['status'] ?? '')))
-                . starterPreviewFact('Adds time worked', !empty($row['minutes']) ? intval($row['minutes']) . ' minutes' : '')
+                . starterPreviewFact(__('Goes in as'), escapeHtml($types[$row['reply_type'] ?? ''] ?? ucfirst((string) ($row['reply_type'] ?? ''))))
+                . starterPreviewFact(__('Offered on'), $categories !== '' ? $categories : '<span class="text-body-secondary">' . __('Every ticket') . '</span>')
+                . starterPreviewFact(__('Sets the status to'), escapeHtml((string) ($row['status'] ?? '')))
+                . starterPreviewFact(__('Adds time worked'), !empty($row['minutes']) ? escapeHtml(_n('%d minute', '%d minutes', intval($row['minutes']))) : '')
                 . '</dl>';
-            return $html . '<h3 class="itflow-starter-preview-head">What it says</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['body'] ?? '') . '</div>';
+            return $html . '<h3 class="itflow-starter-preview-head">' . __('What it says') . '</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['body'] ?? '') . '</div>';
 
         case 'project_templates':
-            $html .= '<h3 class="itflow-starter-preview-head">Its tickets, in order</h3><ol class="itflow-starter-preview-list">';
+            $html .= '<h3 class="itflow-starter-preview-head">' . __('Its tickets, in order') . '</h3><ol class="itflow-starter-preview-list">';
             foreach ((array) ($row['ticket_templates'] ?? []) as $ticket_template) {
                 $html .= '<li>' . escapeHtml((string) $ticket_template) . '</li>';
             }
-            return $html . '</ol><p class="small text-body-secondary mb-0">Each from the ticket template of that name - one that isn\'t here is left out.</p>';
+            return $html . '</ol><p class="small text-body-secondary mb-0">' . __('Each from the ticket template of that name - one that isn\'t here is left out.') . '</p>';
 
         case 'vendor_templates':
             $html .= '<dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Support site', starterPreviewLink($row['website'] ?? ''))
-                . starterPreviewFact('Status page', starterPreviewLink($row['status_page'] ?? ''))
-                . starterPreviewFact('Cases opened at', starterPreviewLink($row['portal'] ?? ''))
+                . starterPreviewFact(__('Support site'), starterPreviewLink($row['website'] ?? ''))
+                . starterPreviewFact(__('Status page'), starterPreviewLink($row['status_page'] ?? ''))
+                . starterPreviewFact(__('Cases opened at'), starterPreviewLink($row['portal'] ?? ''))
                 . '</dl>';
-            return $html . (!empty($row['notes']) ? '<h3 class="itflow-starter-preview-head">What support asks for</h3><div class="itflow-starter-preview-notes">' . nl2br(escapeHtml((string) $row['notes'])) . '</div>' : '');
+            return $html . (!empty($row['notes']) ? '<h3 class="itflow-starter-preview-head">' . __('What support asks for') . '</h3><div class="itflow-starter-preview-notes">' . nl2br(escapeHtml((string) $row['notes'])) . '</div>' : '');
 
         case 'document_templates':
             $review = intval($row['review_months'] ?? 0);
             $html .= '<dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Reviewed', $review ? 'Every ' . ($review === 1 ? 'month' : "$review months") : '')
+                . starterPreviewFact(__('Reviewed'), $review ? ($review === 1 ? __('Every month') : __('Every %d months', $review)) : '')
                 . '</dl>';
             $html .= starterPreviewFillIns((array) ($row['fill_ins'] ?? []));
-            return $html . '<h3 class="itflow-starter-preview-head">What it says</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['content'] ?? '') . '</div>';
+            return $html . '<h3 class="itflow-starter-preview-head">' . __('What it says') . '</h3><div class="itflow-starter-preview-doc">' . starterPreviewFills($row['content'] ?? '') . '</div>';
 
         case 'license_templates':
             $html .= '<dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Type', escapeHtml((string) ($row['type'] ?? '')))
-                . starterPreviewFact('Licensed per', escapeHtml((string) ($row['license_type'] ?? '')))
-                . starterPreviewFact('Renews every', escapeHtml(SOFTWARE_RENEWAL_TERMS[(string) ($row['term'] ?? '')] ?? ''))
-                . starterPreviewFact('Vendor', escapeHtml((string) ($row['vendor']['name'] ?? '')))
-                . starterPreviewFact('Sold as', escapeHtml((string) ($row['product'] ?? '')))
+                . starterPreviewFact(__('Type'), escapeHtml((string) ($row['type'] ?? '')))
+                . starterPreviewFact(__('Licensed per'), escapeHtml((string) ($row['license_type'] ?? '')))
+                . starterPreviewFact(__('Renews every'), escapeHtml(isset(SOFTWARE_RENEWAL_TERMS[(string) ($row['term'] ?? '')]) ? __(SOFTWARE_RENEWAL_TERMS[(string) $row['term']]) : '') /* i18n-dynamic */)
+                . starterPreviewFact(__('Vendor'), escapeHtml((string) ($row['vendor']['name'] ?? '')))
+                . starterPreviewFact(__('Sold as'), escapeHtml((string) ($row['product'] ?? '')))
                 . '</dl>';
-            return $html . (!empty($row['notes']) ? '<h3 class="itflow-starter-preview-head">What to know</h3><div class="itflow-starter-preview-notes">' . nl2br(escapeHtml((string) $row['notes'])) . '</div>' : '');
+            return $html . (!empty($row['notes']) ? '<h3 class="itflow-starter-preview-head">' . __('What to know') . '</h3><div class="itflow-starter-preview-notes">' . nl2br(escapeHtml((string) $row['notes'])) . '</div>' : '');
 
         case 'products':
             [$frequency, $seat] = array_pad(explode(':', (string) ($row[6] ?? '')), 2, '');
             $types = productTypes();
             return '<p class="text-body-secondary">' . escapeHtml((string) $row[5]) . '</p><dl class="itflow-starter-preview-facts">'
-                . starterPreviewFact('Type', escapeHtml($types[$row[1]]['label'] ?? ucfirst((string) $row[1])))
-                . starterPreviewFact('Code', escapeHtml((string) $row[2]))
-                . starterPreviewFact('Price', escapeHtml(billingMoney(floatval($row[3]))) . (floatval($row[3]) == 0 ? ' <span class="text-body-secondary">- priced on each quote</span>' : ''))
-                . starterPreviewFact('Billed', escapeHtml(productBilledText($frequency, $seat)))
-                . starterPreviewFact('Income category', escapeHtml((string) $row[4]))
-                . starterPreviewFact('Becomes', !empty($row[7]) ? escapeHtml('A client asset (' . $row[7] . ') when sold' . (!empty($row[8]) ? ', with ' . intval($row[8]) . ' months of warranty' : '')) : '')
-                . '</dl><p class="small text-body-secondary mb-0">Prices are starting points - change them once it is here.</p>';
+                . starterPreviewFact(__('Type'), escapeHtml($types[$row[1]]['label'] ?? ucfirst((string) $row[1])))
+                . starterPreviewFact(__('Code'), escapeHtml((string) $row[2]))
+                . starterPreviewFact(__('Price'), escapeHtml(billingMoney(floatval($row[3]))) . (floatval($row[3]) == 0 ? ' <span class="text-body-secondary">' . __('- priced on each quote') . '</span>' : ''))
+                . starterPreviewFact(__('Billed'), escapeHtml(productBilledText($frequency, $seat)))
+                . starterPreviewFact(__('Income category'), escapeHtml((string) $row[4]))
+                . starterPreviewFact(__('Becomes'), !empty($row[7]) ? escapeHtml(!empty($row[8]) ? __('A client asset (%1$s) when sold, with %2$d months of warranty', $row[7], intval($row[8])) : __('A client asset (%s) when sold', $row[7])) : '')
+                . '</dl><p class="small text-body-secondary mb-0">' . __('Prices are starting points - change them once it is here.') . '</p>';
     }
     return '';
 }
@@ -222,12 +222,12 @@ function starterPickHtml($pack, array $items, $form = '') {
     $kind = $pack === 'tags' ? ' is-pills' : '';
     ob_start(); ?>
     <details class="itflow-starter-pick mt-1" data-starter-pick-list>
-        <summary class="small">Pick which</summary>
+        <summary class="small"><?= __('Pick which') ?></summary>
         <input type="hidden" name="picked[<?= escapeHtml($pack) ?>]" value="1"<?= $form_attr ?>>
         <div class="itflow-starter-pick-tools small mt-2">
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-all>All</button>
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-all><?= __('All') ?></button>
             <span class="text-body-secondary" aria-hidden="true">·</span>
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-none>None</button>
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-starter-none><?= __('None') ?></button>
         </div>
         <div class="itflow-starter-pick-box mt-2">
             <div class="itflow-starter-pick-items<?= $kind ?>">
@@ -249,7 +249,7 @@ function starterPickHtml($pack, array $items, $form = '') {
                         </label>
                         <?php if ($previews) { ?>
                             <button type="button" class="btn btn-link btn-sm text-decoration-none flex-shrink-0 ms-auto py-0" data-starter-preview="<?= escapeHtml($pack) ?>" data-starter-key="<?= escapeHtml($item['key']) ?>"
-                                title="See all of <?= escapeHtml($item['name']) ?>"><i class="far fa-eye me-1"></i>Preview</button>
+                                title="<?= __('See all of %s', escapeHtml($item['name'])) ?>"><i class="far fa-eye me-1"></i><?= __('Preview') ?></button>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -266,13 +266,13 @@ function starterPreviewModalHtml() {
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title h5" id="starterPreviewTitle">Preview</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title h5" id="starterPreviewTitle"><?= __('Preview') ?></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
                 </div>
                 <div class="modal-body itflow-starter-preview" data-starter-preview-body></div>
                 <div class="modal-footer">
-                    <span class="small text-body-secondary me-auto">As it comes in - yours to change once it is here.</span>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <span class="small text-body-secondary me-auto"><?= __('As it comes in - yours to change once it is here.') ?></span>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><?= __('Close') ?></button>
                 </div>
             </div>
         </div>

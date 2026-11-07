@@ -19,14 +19,14 @@ $mfa_secret = $_SESSION['mfa_token'];
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html <?= i18nHtmlAttributes() ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
 
-    <title>MFA Enforcement | <?= $session_company_name ?></title>
+    <title><?= __('MFA Enforcement') ?> | <?= $session_company_name ?></title>
 
     <!--
     Favicon
@@ -45,15 +45,16 @@ $mfa_secret = $_SESSION['mfa_token'];
 
     <!-- jQuery -->
 
+<script src="/js/i18n.js"></script>
 </head>
 <body class="hold-transition login-page">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <div class="login-logo">
             <?php if (!empty($company_logo)) { ?>
-                <img alt="<?= escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "../../uploads/settings/$company_logo" ?>">
+                <img alt="<?= escapeHtml(__('%s logo', $company_name)) ?>" height="110" width="380" class="img-fluid" src="<?= "../../uploads/settings/$company_logo" ?>">
             <?php } else { ?>
-                <span class="text-primary text-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow
+                <?php /* i18n-ignore: the product name */ ?><span class="text-primary text-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow
             <?php } ?>
         </div>
 
@@ -61,8 +62,8 @@ $mfa_secret = $_SESSION['mfa_token'];
         <div class="card">
             <div class="card-body login-card-body text-center">
 
-                <p class="login-box-msg fw-semibold mb-1">Set up multi-factor authentication</p>
-                <p class="small text-body-secondary">Your administrator requires it - once it's set up, signing in takes your password and a code from your phone.</p>
+                <p class="login-box-msg fw-semibold mb-1"><?= __('Set up multi-factor authentication') ?></p>
+                <p class="small text-body-secondary"><?= __('Your administrator requires it - once it\'s set up, signing in takes your password and a code from your phone.') ?></p>
 
                 <form action="post.php" method="post" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -70,8 +71,8 @@ $mfa_secret = $_SESSION['mfa_token'];
                     <?php require __DIR__ . '/includes/mfa_setup.php'; ?>
 
                     <div class="mb-3"></div>
-                    <button type="submit" name="enable_mfa" class="btn btn-primary w-100 mb-2"><i class="fa fa-check me-2"></i>Turn on MFA</button>
-                    <a class="small text-body-secondary" href="post.php?logout">Sign out</a>
+                    <button type="submit" name="enable_mfa" class="btn btn-primary w-100 mb-2"><i class="fa fa-check me-2"></i><?= __('Turn on MFA') ?></button>
+                    <a class="small text-body-secondary" href="post.php?logout"><?= __('Sign out') ?></a>
                 </form>
 
             </div>
@@ -134,11 +135,11 @@ $mfa_secret = $_SESSION['mfa_token'];
     var clipboard = new ClipboardJS('.clipboardjs');
 
     clipboard.on('success', function(e) {
-        flashTooltip(e.trigger, 'Copied!');
+        flashTooltip(e.trigger, __('Copied!'));
     });
 
     clipboard.on('error', function(e) {
-        flashTooltip(e.trigger, 'Failed!');
+        flashTooltip(e.trigger, __('Failed!'));
     });
 
     // Enable Popovers

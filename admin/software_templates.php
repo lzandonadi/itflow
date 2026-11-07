@@ -35,7 +35,7 @@ $show_where = [
 ][$show];
 
 // Tab title - the file is named for the table, the page for what it holds
-$page_title = 'License Templates';
+$page_title = __('License Templates');
 
 // Only these sort - an unknown column would take the page down
 $sortable_columns = [
@@ -110,24 +110,24 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-cube me-2"></i>License Templates</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-cube me-2"></i><?= __('License Templates') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New License Template</span></button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New License Template') ?></span></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/software_template/software_template_import.php">
-                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i>Import
+                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i><?= __('Import') ?>
                     </a>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/software_template/software_template_export.php">
-                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="/agent/reports/license_templates.php">
-                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>How they are used
+                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('How they are used') ?>
                     </a>
                     <a class="dropdown-item" href="starter_content.php">
-                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i>Starter license templates
+                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i><?= __('Starter license templates') ?>
                     </a>
                 </div>
             </div>
@@ -139,28 +139,28 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search license templates..." title="Name, version, summary, type, license type, notes, vendor or product">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search license templates...')) ?>" title="<?= escapeHtml(__('Name, version, summary, type, license type, notes, vendor or product')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs mt-2">
-            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-cube me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="Every client, or the clients with a tag, should have it"><i class="fas fa-fw fa-clipboard-check me-1"></i>Required <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
-            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="Not offered for new licenses - the licenses made from them stay"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-cube me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="<?= escapeHtml(__('Every client, or the clients with a tag, should have it')) ?>"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= __('Required') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="<?= escapeHtml(__('Not offered for new licenses - the licenses made from them stay')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('software_template_name', 'Template') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('software_template_type', 'Type') ?></th>
-                <th class="d-none d-xl-table-cell"><?= $sort_link('software_template_license_type', 'License type') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', 'Last used') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', 'Changed') ?></th>
+                <th class="ps-3"><?= $sort_link('software_template_name', __('Template')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('software_template_type', __('Type')) ?></th>
+                <th class="d-none d-xl-table-cell"><?= $sort_link('software_template_license_type', __('License type')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', __('Used')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', __('Changed')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -169,8 +169,8 @@ $csrf = $_SESSION['csrf_token'];
                 $name = escapeHtml($row['software_template_name']);
                 $use = $usage[$template_id] ?? null;
                 $used_count = $use['count'] ?? 0;
-                $used_text = $used_count ? $used_count . ' license' . ($used_count === 1 ? '' : 's') . ($use['clients'] > 1 ? ' · ' . $use['clients'] . ' clients' : '') : '';
-                $seats_text = $use && $use['seats'] ? $use['used'] . ' of ' . $use['seats'] . ' seats in use' : ($use && $use['used'] ? $use['used'] . ' seats in use' : '');
+                $used_text = $used_count ? _n('%d license', '%d licenses', $used_count) . ($use['clients'] > 1 ? ' · ' . __('%d clients', $use['clients']) : '') : '';
+                $seats_text = $use && $use['seats'] ? __('%1$d of %2$d seats in use', $use['used'], $use['seats']) : ($use && $use['used'] ? __('%d seats in use', $use['used']) : '');
                 $summary = trim((string) $row['software_template_description']);
                 $edit_url = "modals/software_template/software_template_edit.php?id=$template_id";
                 // What a license from it starts with
@@ -204,11 +204,11 @@ $csrf = $_SESSION['csrf_token'];
                                     </div>
                                 <?php } ?>
                                 <?php if ($row['software_template_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['software_template_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['software_template_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                                 <!-- On smaller screens its type and use come along under the name -->
                                 <div class="d-lg-none small text-body-secondary mt-1"><?= escapeHtml(implode(' · ', array_filter([$row['software_template_type'], $row['software_template_license_type']]))) ?></div>
-                                <div class="d-md-none small text-body-secondary"><?= $used_count ? escapeHtml($used_text) . ' · last ' . timeAgo($use['last']) : 'Not used yet' ?></div>
+                                <div class="d-md-none small text-body-secondary"><?= $used_count ? escapeHtml($used_text) . ' · last ' . timeAgo($use['last']) : __('Not used yet') ?></div>
                             </div>
                         </div>
                     </td>
@@ -219,7 +219,7 @@ $csrf = $_SESSION['csrf_token'];
                             <?= escapeHtml($used_text) ?>
                             <?php if ($seats_text !== '') { ?><div class="text-body-secondary"><?= escapeHtml($seats_text) ?></div><?php } ?>
                         <?php } else { ?>
-                            <span class="text-body-secondary">Not yet</span>
+                            <span class="text-body-secondary"><?= __('Not yet') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-body-secondary text-nowrap"<?= $row['last_used'] ? ' title="' . escapeHtml($row['last_used']) . '"' : '' ?>><?= $row['last_used'] ? timeAgo($row['last_used']) : '-' ?></td>
@@ -229,41 +229,41 @@ $csrf = $_SESSION['csrf_token'];
                     </td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if (!$row['software_template_archived_at']) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/software_template/software_template_use.php?id=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i>New license for a client
+                                        <i class="fas fa-fw fa-plus text-secondary me-2"></i><?= __('New license for a client') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/software_template/software_template_use_several.php?id=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>For several clients
+                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('For several clients') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/software_template/software_template_required.php?id=<?= $template_id ?>">
-                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Who should have it
+                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Who should have it') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?copy_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A new template starting from this one">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                <a class="dropdown-item" href="post.php?copy_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new template starting from this one')) ?>">
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?export_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A file to import into another ITFlow">
-                                    <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                                <a class="dropdown-item" href="post.php?export_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A file to import into another ITFlow')) ?>">
+                                    <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['software_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="post.php?restore_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="Not offered for new licenses - the licenses made from it stay">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <a class="dropdown-item text-danger" href="post.php?archive_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Not offered for new licenses - the licenses made from it stay')) ?>">
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_software_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="Licenses made from it stay as they are." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('Licenses made from it stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -275,15 +275,15 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'license templates',
+        'thing' => __('license templates'),
         'icon' => 'fa-cube',
         'filtered' => $q !== '',
         'archived' => $show_archived,
         'views' => ['show'],
-        'view' => $show === 'required' ? ['title' => 'No required templates', 'text' => 'Set one up from its page - <strong>Who should have it</strong> - to see which clients are missing a license from it.'] : null,
-        'text' => 'A license you sell or look after again and again - Microsoft 365 Business Premium, an endpoint protection agent, a backup product - ready to start a client\'s from. Agents start one from <strong>New License</strong> on a client\'s Licenses.',
-        'actions' => [['label' => 'New License Template', 'modal' => $add_url, 'size' => 'lg'], ['label' => 'Import', 'modal' => 'modals/software_template/software_template_import.php', 'icon' => 'fa-file-upload'],
-            ['label' => 'Starter license templates', 'href' => 'starter_content.php', 'icon' => 'fa-seedling']],
+        'view' => $show === 'required' ? ['title' => __('No required templates'), 'text' => __('Set one up from its page - <strong>Who should have it</strong> - to see which clients are missing a license from it.')] : null,
+        'text' => __('A license you sell or look after again and again - Microsoft 365 Business Premium, an endpoint protection agent, a backup product - ready to start a client\'s from. Agents start one from <strong>New License</strong> on a client\'s Licenses.'),
+        'actions' => [['label' => __('New License Template'), 'modal' => $add_url, 'size' => 'lg'], ['label' => __('Import'), 'modal' => 'modals/software_template/software_template_import.php', 'icon' => 'fa-file-upload'],
+            ['label' => __('Starter license templates'), 'href' => 'starter_content.php', 'icon' => 'fa-seedling']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

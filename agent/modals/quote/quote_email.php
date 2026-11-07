@@ -15,7 +15,7 @@ $sql = mysqli_query($mysqli, "SELECT quote_client_id, quote_number, quote_prefix
     FROM quotes WHERE quote_id = $quote_id LIMIT 1");
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    exit(json_encode(['error' => 'That quote no longer exists.']));
+    exit(json_encode(['error' => __('That quote no longer exists.')]));
 }
 $quote_prefix = escapeHtml($row['quote_prefix']);
 $quote_number = intval($row['quote_number']);
@@ -64,7 +64,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i>Send Quote <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('quote', $doc)) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i><?= __('Send Quote') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('quote', $doc)) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -76,9 +76,7 @@ ob_start();
         <?php if ($contact_count == 0) { ?>
 
             <p class="text-body-secondary mb-0">
-                This client has no primary, billing, technical or important contact with an email
-                address, so there is nobody to send a quote to. Flag a contact with one of those
-                roles, or use Mark Sent to record that the quote went out some other way.
+                <?= __('This client has no primary, billing, technical or important contact with an email address, so there is nobody to send a quote to. Flag a contact with one of those roles, or use Mark Sent to record that the quote went out some other way.') ?>
             </p>
 
         <?php } else { ?>
@@ -88,15 +86,15 @@ ob_start();
                 <?= billingTile('quote') ?>
                 <div class="flex-grow-1 min-w-0">
                     <div class="fw-semibold"><?= escapeHtml(billingNumber('quote', $doc)) ?><?= trim((string) $doc['quote_scope']) !== '' ? ' - ' . escapeHtml($doc['quote_scope']) : '' ?></div>
-                    <div class="small text-body-secondary">An email with a link to view it, accept or decline it, and download it as a PDF.</div>
+                    <div class="small text-body-secondary"><?= __('An email with a link to view it, accept or decline it, and download it as a PDF.') ?></div>
                 </div>
                 <div class="text-end">
                     <div class="fw-semibold itflow-money"><?= escapeHtml(quoteAmountText(quoteGroups($doc), $doc['quote_currency_code'])) ?></div>
-                    <div class="small text-body-secondary">valid until <?= escapeHtml($doc['quote_expire']) ?></div>
+                    <div class="small text-body-secondary"><?= escapeHtml(__('valid until %s', formatDate($doc['quote_expire'], 'date'))) ?></div>
                 </div>
             </div>
 
-            <label class="form-label">Send to <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Send to') ?> <strong class="text-danger">*</strong></label>
 
             <div class="list-group mb-3">
 
@@ -135,21 +133,20 @@ ob_start();
 
             </div>
 
-            <label class="form-label">Message <span class="text-body-secondary fw-normal small">in the email, above the quote</span></label>
+            <label class="form-label"><?= __('Message') ?> <span class="text-body-secondary fw-normal small"><?= __('in the email, above the quote') ?></span></label>
             <div class="input-group mb-3">
                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-comment"></i></span>
-                <textarea class="form-control" name="note" rows="3" maxlength="2000" placeholder="Optional - a word of your own: what it covers, what happens next"></textarea>
+                <textarea class="form-control" name="note" rows="3" maxlength="2000" placeholder="<?= escapeHtml(__('Optional - a word of your own: what it covers, what happens next')) ?>"></textarea>
             </div>
 
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" role="switch" name="attach_pdf" value="1" id="quoteEmailPdf<?= $quote_id ?>" <?= billingReminderRules()['attach_pdf'] ? 'checked' : '' ?>>
-                <label class="form-check-label" for="quoteEmailPdf<?= $quote_id ?>">Attach the PDF</label>
+                <label class="form-check-label" for="quoteEmailPdf<?= $quote_id ?>"><?= __('Attach the PDF') ?></label>
             </div>
 
             <?php if ($quote_status !== 'Draft') { ?>
                 <p class="text-body-secondary small mb-0">
-                    <i class="fa fa-fw fa-info-circle me-1"></i>This quote is
-                    <strong><?= $quote_status ?></strong>, so sending it will not change its status.
+                    <i class="fa fa-fw fa-info-circle me-1"></i><?= __('This quote is %s, so sending it will not change its status.', '<strong>' . escapeHtml(quoteStatusLabel($doc['quote_status'])) . '</strong>') ?>
                 </p>
             <?php } ?>
 
@@ -159,11 +156,11 @@ ob_start();
     <div class="modal-footer">
         <?php if ($contact_count > 0) { ?>
             <button type="submit" name="email_quote" class="btn btn-primary text-bold">
-                <i class="fa fa-fw fa-paper-plane me-2"></i>Send
+                <i class="fa fa-fw fa-paper-plane me-2"></i><?= __('Send') ?>
             </button>
         <?php } ?>
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-            <i class="fa fa-fw fa-times me-2"></i>Cancel
+            <i class="fa fa-fw fa-times me-2"></i><?= __('Cancel') ?>
         </button>
     </div>
 </form>

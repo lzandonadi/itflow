@@ -22,20 +22,20 @@ ob_start();
 
 $refuse = '';
 if (!$client) {
-    $refuse = 'Invite people from a client\'s Contacts.';
+    $refuse = __('Invite people from a client\'s Contacts.');
 } elseif (!portalInvitesReady()) {
-    $refuse = 'Inviting people needs the database update - run it from Maintenance > Update first.';
+    $refuse = __('Inviting people needs the database update - run it from Maintenance > Update first.');
 } elseif (intval($config_client_portal_enable) !== 1) {
-    $refuse = 'The client portal is off - turn it on in Admin > Settings > Modules.';
+    $refuse = __('The client portal is off - turn it on in Admin > Settings > Modules.');
 } elseif ($client['client_archived_at']) {
-    $refuse = 'This client is archived - restore it to invite people.';
+    $refuse = __('This client is archived - restore it to invite people.');
 } elseif (!portalMailReady()) {
-    $refuse = 'Outgoing mail isn\'t set up, so an invite can\'t be sent - set it up in Admin > Settings > Mail.';
+    $refuse = __('Outgoing mail isn\'t set up, so an invite can\'t be sent - set it up in Admin > Settings > Mail.');
 }
 
 if ($refuse !== '') { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i>Invite people</h5>
+        <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i><?= __('Invite people') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body text-center text-secondary py-5"><?= escapeHtml($refuse) ?></div>
@@ -43,7 +43,7 @@ if ($refuse !== '') { ?>
     $field = 'contactInvite' . bin2hex(random_bytes(3)); ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i>Invite people to the portal for <strong><?= escapeHtml($client['client_name']) ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-user-plus me-2"></i><?= __('Invite people to the portal for %s', '<strong>' . escapeHtml($client['client_name']) . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -52,40 +52,40 @@ if ($refuse !== '') { ?>
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
 
     <div class="modal-body">
-        <p class="small text-body-secondary">Each gets an email with a link to join - they put in their own name, phone and password there, and are added to the contacts when they do. The link works for <?= PORTAL_INVITE_LINK_DAYS ?> days.</p>
+        <p class="small text-body-secondary"><?= __('Each gets an email with a link to join - they put in their own name, phone and password there, and are added to the contacts when they do. The link works for %d days.', PORTAL_INVITE_LINK_DAYS) ?></p>
 
         <div class="mb-3">
-            <label class="form-label" for="<?= $field ?>Emails">Email addresses <strong class="text-danger">*</strong></label>
+            <label class="form-label" for="<?= $field ?>Emails"><?= __('Email addresses') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-envelope"></i></span>
                 <textarea class="form-control" id="<?= $field ?>Emails" name="emails" rows="4" maxlength="20000" placeholder="jamie@example.com&#10;Sam Lee &lt;sam@example.com&gt;" required autofocus></textarea>
             </div>
-            <div class="form-text">One to a line, or separated by commas - up to <?= PORTAL_INVITE_MAX ?>. A name in front is optional. Someone who is already a contact here is given access when they accept.</div>
+            <div class="form-text"><?= __('One to a line, or separated by commas - up to %d. A name in front is optional. Someone who is already a contact here is given access when they accept.', PORTAL_INVITE_MAX) ?></div>
         </div>
 
-        <label class="form-label">What else they see</label>
+        <label class="form-label"><?= __('What else they see') ?></label>
         <div class="row g-2">
             <div class="col-sm-6">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="<?= $field ?>Technical" name="technical" value="1">
-                    <label class="form-check-label" for="<?= $field ?>Technical"><i class="fas fa-fw fa-tools text-secondary me-1"></i>Technical</label>
+                    <label class="form-check-label" for="<?= $field ?>Technical"><i class="fas fa-fw fa-tools text-secondary me-1"></i><?= __('Technical') ?></label>
                 </div>
-                <div class="form-text mt-0">Every ticket at the company, and its documentation</div>
+                <div class="form-text mt-0"><?= __('Every ticket at the company, and its documentation') ?></div>
             </div>
             <div class="col-sm-6">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="<?= $field ?>Billing" name="billing" value="1">
-                    <label class="form-check-label" for="<?= $field ?>Billing"><i class="fas fa-fw fa-file-invoice-dollar text-secondary me-1"></i>Billing</label>
+                    <label class="form-check-label" for="<?= $field ?>Billing"><i class="fas fa-fw fa-file-invoice-dollar text-secondary me-1"></i><?= __('Billing') ?></label>
                 </div>
-                <div class="form-text mt-0">Invoices, quotes and payments</div>
+                <div class="form-text mt-0"><?= __('Invoices, quotes and payments') ?></div>
             </div>
         </div>
-        <div class="form-text">Without either, they see the tickets they raise.</div>
+        <div class="form-text"><?= __('Without either, they see the tickets they raise.') ?></div>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="send_portal_invites" class="btn btn-primary text-bold"><i class="fas fa-paper-plane me-2"></i>Send invites</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="send_portal_invites" class="btn btn-primary text-bold"><i class="fas fa-paper-plane me-2"></i><?= __('Send invites') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -16,7 +16,7 @@
          just content again. */ ?>
 <?php if (basename(dirname($_SERVER['REQUEST_URI'])) === 'admin') { ?>
 <footer class="app-footer py-2 d-flex align-items-center">
-    <div class="w-100 text-end fw-light">ITFlow <?= APP_VERSION ?> &nbsp; · &nbsp; <a target="_blank" href="https://docs.itflow.org">Docs</a> &nbsp; · &nbsp; <a target="_blank" href="https://forum.itflow.org">Forum</a> &nbsp; · &nbsp; <a target="_blank" href="https://services.itflow.org">Services</a></div>
+    <div class="w-100 text-end fw-light">ITFlow <?= APP_VERSION ?> &nbsp; · &nbsp; <a target="_blank" href="https://docs.itflow.org"><?= __('Docs') ?></a> &nbsp; · &nbsp; <a target="_blank" href="https://forum.itflow.org"><?= __('Forum') ?></a> &nbsp; · &nbsp; <a target="_blank" href="https://services.itflow.org"><?= __('Services') ?></a></div> <?php // i18n-ignore - product name ?>
 </footer>
 <?php } ?>
 
@@ -31,7 +31,7 @@
     <?php
         echo escapeHtml($session_company_name);
         if (!$config_whitelabel_enabled) {
-            echo '<br><small class="text-muted">Powered by ITFlow</small>';
+            echo '<br><small class="text-muted">' . __('Powered by ITFlow') . '</small>';
         }
     ?>
 </footer>

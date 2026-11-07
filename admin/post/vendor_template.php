@@ -18,7 +18,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function vendorTemplateForRequest($vendor_template_id) {
     $row = vendorTemplateInfo($vendor_template_id);
     if (!$row) {
-        flashAlert('That vendor template no longer exists.', 'error');
+        flashAlert(__('That vendor template no longer exists.'), 'error');
         redirect('vendor_templates.php');
     }
     return $row;
@@ -41,7 +41,7 @@ if (isset($_POST['add_vendor_template']) || isset($_POST['edit_vendor_template']
     $name = $fields['name'];
 
     if ($editing) {
-        $changed = vendorTemplateChanged(vendorTemplateRowFields($before), $fields);
+        $changed = i18nEnglish(fn () => vendorTemplateChanged(vendorTemplateRowFields($before), $fields));
         $renamed = $before['vendor_template_name'] !== $name ? ' (was ' . $before['vendor_template_name'] . ')' : '';
         logAudit("Vendor Template", "Edit", "$session_name edited vendor template " . escapeSql($name . $renamed) . ($changed ? ' - ' . escapeSql(mb_strtolower(implode(', ', $changed))) : ''), 0, $vendor_template_id);
 
@@ -52,8 +52,8 @@ if (isset($_POST['add_vendor_template']) || isset($_POST['edit_vendor_template']
         }
         $out_of_step = $followed || !empty($_POST['follow']) ? (vendorTemplateOutOfStep([$vendor_template_id])[$vendor_template_id] ?? 0) : 0;
 
-        flashAlert("Vendor template <strong>" . escapeHtml($name) . "</strong> saved" . ($followed ? ", and " . count($followed) . " vendor" . (count($followed) === 1 ? '' : 's') . " made from it changed with it" : '')
-            . ($out_of_step ? " - $out_of_step out of step" : ''));
+        flashAlert(__('Vendor template <strong>%s</strong> saved', escapeHtml($name)) . ($followed ? _n(', and %d vendor made from it changed with it', ', and %d vendors made from it changed with it', count($followed)) : '')
+            . ($out_of_step ? __(' - %d out of step', $out_of_step) : ''));
 
         redirect();
     }
@@ -66,7 +66,7 @@ if (isset($_POST['add_vendor_template']) || isset($_POST['edit_vendor_template']
 
     logAudit("Vendor Template", "Create", "$session_name created vendor template " . escapeSql($name) . ($from_vendor ? " from vendor " . escapeSql($from_vendor['vendor_name']) . ($from_vendor['client_name'] !== null ? " of " . escapeSql($from_vendor['client_name']) : '') : ''), 0, $vendor_template_id);
 
-    flashAlert("Vendor template <strong>" . escapeHtml($name) . "</strong> created");
+    flashAlert(__('Vendor template <strong>%s</strong> created', escapeHtml($name)));
 
     // A new one opens on its page
     redirect("vendor_template.php?vendor_template_id=$vendor_template_id");
@@ -83,7 +83,7 @@ if (isset($_GET['copy_vendor_template'])) {
 
     logAudit("Vendor Template", "Create", "$session_name copied vendor template " . escapeSql($row['vendor_template_name']) . " as " . escapeSql($new_name), 0, $new_id);
 
-    flashAlert("Vendor template <strong>" . escapeHtml($row['vendor_template_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>");
+    flashAlert(__('Vendor template <strong>%1$s</strong> copied as <strong>%2$s</strong>', escapeHtml($row['vendor_template_name']), escapeHtml($new_name)));
 
     redirect("vendor_template.php?vendor_template_id=$new_id");
 
@@ -103,7 +103,7 @@ if (isset($_GET['archive_vendor_template']) || isset($_GET['restore_vendor_templ
 
     logAudit("Vendor Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " vendor template " . escapeSql($row['vendor_template_name']), 0, $vendor_template_id);
 
-    flashAlert("Vendor template <strong>" . escapeHtml($row['vendor_template_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Vendor template <strong>%s</strong> archived', escapeHtml($row['vendor_template_name'])) : __('Vendor template <strong>%s</strong> restored', escapeHtml($row['vendor_template_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -120,7 +120,7 @@ if (isset($_GET['delete_vendor_template'])) {
 
     logAudit("Vendor Template", "Delete", "$session_name deleted vendor template " . escapeSql($row['vendor_template_name']), 0, intval($row['vendor_template_id']));
 
-    flashAlert("Vendor template <strong>" . escapeHtml($row['vendor_template_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Vendor template <strong>%s</strong> deleted', escapeHtml($row['vendor_template_name'])), 'error');
 
     // From its own page, back to the list
     redirect(!empty($_GET['from_page']) ? 'vendor_templates.php' : null);
@@ -137,18 +137,22 @@ if (isset($_POST['save_vendor_template_required'])) {
     $required = intval($_POST['required'] ?? 0);
     $tag_ids = array_map('intval', array_filter((array) ($_POST['tags'] ?? []), 'is_scalar'));
     if ($required === VENDOR_TEMPLATE_REQUIRED_TAGGED && !array_filter($tag_ids)) {
-        flashAlert('Pick the client tags - or Every client.', 'error');
+        flashAlert(__('Pick the client tags - or Every client.'), 'error');
         redirect();
     }
     vendorTemplateSetRequired($vendor_template_id, $required, $tag_ids);
 
     $saved = vendorTemplateInfo($vendor_template_id);
-    $scope = vendorTemplateScopeText($saved['vendor_template_required'], vendorTemplateRequiredTags([$vendor_template_id])[$vendor_template_id]);
-    $said = $scope !== '' ? "required of " . lcfirst($scope) : 'not required of anyone';
+    $required_tags = vendorTemplateRequiredTags([$vendor_template_id])[$vendor_template_id];
+    $said_in = function () use ($saved, $required_tags) {
+        $scope = vendorTemplateScopeText($saved['vendor_template_required'], $required_tags);
+        return $scope !== '' ? __('required of %s', lcfirst($scope)) : __('not required of anyone');
+    };
+    $said = i18nEnglish($said_in);
 
     logAudit("Vendor Template", "Edit", "$session_name set vendor template " . escapeSql($row['vendor_template_name']) . " " . escapeSql($said), 0, $vendor_template_id);
 
-    flashAlert("<strong>" . escapeHtml($row['vendor_template_name']) . "</strong> is " . escapeHtml($said));
+    flashAlert(__('<strong>%1$s</strong> is %2$s', escapeHtml($row['vendor_template_name']), escapeHtml($said_in())));
 
     redirect();
 
@@ -166,7 +170,7 @@ if (isset($_POST['export_vendor_templates']) || isset($_GET['export_vendor_templ
         $export = vendorTemplatesExport((array) ($_POST['vendor_template_ids'] ?? []), !empty($_POST['archived']), !empty($_POST['manager']));
     }
     if (!$export['templates']) {
-        flashAlert('There are no vendor templates to export.', 'error');
+        flashAlert(__('There are no vendor templates to export.'), 'error');
         redirect();
     }
 
@@ -189,15 +193,15 @@ if (isset($_POST['import_vendor_templates'])) {
 
     $file = $_FILES['file'] ?? null;
     if ($file && in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
-        flashAlert('That file is bigger than this server takes in an upload - export a few at a time.', 'error');
+        flashAlert(__('That file is bigger than this server takes in an upload - export a few at a time.'), 'error');
         redirect('vendor_templates.php');
     }
     if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert('Pick the file to import.', 'error');
+        flashAlert(__('Pick the file to import.'), 'error');
         redirect('vendor_templates.php');
     }
     if ($file['size'] > 10 * 1024 * 1024) {
-        flashAlert('That file is too big to be vendor templates.', 'error');
+        flashAlert(__('That file is too big to be vendor templates.'), 'error');
         redirect('vendor_templates.php');
     }
     $templates = vendorTemplatesImportRead(file_get_contents($file['tmp_name']), $import_error);

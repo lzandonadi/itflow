@@ -14,7 +14,7 @@ enforceUserPermission('module_client');
 $location_id = intval($_GET['id'] ?? 0);
 $location = locationRow($location_id);
 if (!$location) {
-    echo json_encode(['error' => 'That location no longer exists.']);
+    echo json_encode(['error' => __('That location no longer exists.')]);
     exit;
 }
 $client_id = intval($location['location_client_id']);
@@ -55,10 +55,10 @@ if ($can_support) {
 }
 
 $quick_tabs = array_filter([
-    'people' => ['label' => 'People', 'count' => count($people)],
-    'assets' => ['label' => 'Assets', 'count' => count($assets)],
-    'networks' => ['label' => 'Networks', 'count' => count($networks)],
-    'tickets' => ['label' => 'Open tickets', 'count' => count($open_tickets)],
+    'people' => ['label' => __('People'), 'count' => count($people)],
+    'assets' => ['label' => __('Assets'), 'count' => count($assets)],
+    'networks' => ['label' => __('Networks'), 'count' => count($networks)],
+    'tickets' => ['label' => __('Open tickets'), 'count' => count($open_tickets)],
 ], function ($tab) {
     return $tab['count'] > 0;
 });
@@ -75,8 +75,8 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $location_name ?></span>
-                <?php if (intval($location['location_primary'])) { ?><span class="badge rounded-pill text-bg-primary fw-normal fs-6">Primary</span><?php } ?>
-                <?php if ($location_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if (intval($location['location_primary'])) { ?><span class="badge rounded-pill text-bg-primary fw-normal fs-6"><?= __('Primary') ?></span><?php } ?>
+                <?php if ($location_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
                 <span><?= escapeHtml($location['client_name']) ?></span>
@@ -84,7 +84,7 @@ ob_start();
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -92,18 +92,18 @@ ob_start();
     <!-- Getting there - the icons say what each line is -->
     <div class="row g-2 itflow-asset-glance">
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Address">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Address')) ?>">
                 <i class="fas fa-fw fa-map-marker-alt"></i>
                 <?php if ($location_address_text !== '') { ?>
                     <span class="min-w-0">
-                        <a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="Open in maps"><?= escapeHtml($location_address_text) ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy address" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
+                        <a class="text-reset" href="<?= escapeHtml($location_map_url) ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open in maps')) ?>"><?= escapeHtml($location_address_text) ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy address')) ?>" data-clipboard-text="<?= escapeHtml($location_address_text) ?>"><i class="far fa-copy"></i></button>
                     </span>
                 <?php } else { ?>
-                    <span class="text-body-secondary">No address</span>
+                    <span class="text-body-secondary"><?= __('No address') ?></span>
                 <?php } ?>
             </div>
             <?php if ($location_hours) { ?>
-                <div class="itflow-glance-item" title="Hours">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Hours')) ?>">
                     <i class="fas fa-fw fa-clock"></i>
                     <span><?= $location_hours ?></span>
                 </div>
@@ -111,14 +111,14 @@ ob_start();
         </div>
         <div class="col-sm-6">
             <?php if ($location_phone) { ?>
-                <div class="itflow-glance-item" title="Phone">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Phone')) ?>">
                     <i class="fas fa-fw fa-phone"></i>
                     <span><?= $location_phone ?></span>
                 </div>
             <?php } ?>
             <?php if ($location['contact_id']) {
                 $onsite_phone = contactPhoneLink($location['contact_mobile'] ?: $location['contact_phone'], $location['contact_mobile'] ? $location['contact_mobile_country_code'] : $location['contact_phone_country_code']); ?>
-                <div class="itflow-glance-item" title="Ask for">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Ask for')) ?>">
                     <i class="fas fa-fw fa-user"></i>
                     <span class="min-w-0"><?= contactLink($client_id, $location['contact_id'], $location['contact_name'], $location['contact_photo']) ?><?php if ($onsite_phone) { ?> <span class="text-body-secondary">&middot;</span> <?= $onsite_phone ?><?php } ?></span>
                 </div>
@@ -128,13 +128,13 @@ ob_start();
 
     <?php if ($location_directions_url) { ?>
         <div class="d-flex flex-wrap gap-2 mt-3">
-            <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-1"></i>Directions</a>
+            <a class="btn btn-sm btn-outline-primary" href="<?= escapeHtml($location_directions_url) ?>" target="_blank" rel="noopener"><i class="fas fa-directions me-1"></i><?= __('Directions') ?></a>
         </div>
     <?php } ?>
 
     <?php if ($can_edit || $location_notes) { ?>
-        <label class="form-label small text-body-secondary mt-3 mb-1"><i class="fas fa-door-open me-1"></i>Access notes</label>
-        <textarea class="form-control form-control-sm itflow-location-notes" rows="3" placeholder="Parking, which door, codes, where the comms cupboard is - saves when you click away" aria-label="Access notes"
+        <label class="form-label small text-body-secondary mt-3 mb-1"><i class="fas fa-door-open me-1"></i><?= __('Access notes') ?></label>
+        <textarea class="form-control form-control-sm itflow-location-notes" rows="3" placeholder="<?= escapeHtml(__('Parking, which door, codes, where the comms cupboard is - saves when you click away')) ?>" aria-label="<?= escapeHtml(__('Access notes')) ?>"
             data-location-id="<?= $location_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token'] ?? '') ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $location_notes ?></textarea>
     <?php } ?>
 
@@ -180,7 +180,7 @@ ob_start();
                                         <div class="d-flex"><a class="ajax-modal text-truncate" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= intval($asset['asset_id']) ?>"><?= escapeHtml($asset['asset_name']) ?></a></div>
                                         <div class="small text-body-secondary text-truncate"><?= escapeHtml(trim($asset['asset_make'] . ' ' . $asset['asset_model']) ?: $asset['asset_type']) ?></div>
                                     </div>
-                                    <?php if ($asset_ip) { ?><span class="small text-nowrap font-monospace"><?= $asset_ip ?><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?></span><?php } ?>
+                                    <?php if ($asset_ip) { ?><span class="small text-nowrap font-monospace"><?= $asset_ip ?><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?></span><?php } ?>
                                 </li>
                             <?php } ?>
                         </ul>
@@ -212,11 +212,11 @@ ob_start();
 </div>
 
 <div class="modal-footer">
-    <a href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i>Open location</a>
+    <a href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i><?= __('Open location') ?></a>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/location/location_edit.php?id=<?= $location_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <script>

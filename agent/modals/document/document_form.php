@@ -14,23 +14,23 @@
 
 <div class="row g-3 mb-3">
     <div class="col-md-6">
-        <label class="form-label">Name <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-file-alt"></i></span>
-            <input type="text" class="form-control" name="name" maxlength="200" value="<?= $document_name ?>" placeholder="e.g. Backup and recovery plan" required <?= $document_form_mode === 'add' ? 'autofocus' : '' ?>>
+            <input type="text" class="form-control" name="name" maxlength="200" value="<?= $document_name ?>" placeholder="<?= escapeHtml(__('e.g. Backup and recovery plan')) ?>" required <?= $document_form_mode === 'add' ? 'autofocus' : '' ?>>
         </div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Summary</label>
+        <label class="form-label"><?= __('Summary') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-align-left"></i></span>
-            <input type="text" class="form-control" name="description" value="<?= $document_description ?>" placeholder="One line on what it covers">
+            <input type="text" class="form-control" name="description" value="<?= $document_description ?>" placeholder="<?= escapeHtml(__('One line on what it covers')) ?>">
         </div>
     </div>
 
     <?php if ($document_form_mode === 'add') { ?>
         <div class="col-md-6">
-            <label class="form-label">Folder</label>
+            <label class="form-label"><?= __('Folder') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
                 <select class="form-select select2" name="folder">
@@ -41,7 +41,7 @@
     <?php } ?>
 
     <div class="col-md-6">
-        <?= tagFormFieldHtml('document', $document_form_mode === 'edit' ? tagIdsForRecord('document', $document_id) : [], 'Procedure, Onboarding, Needs review') ?>
+        <?= tagFormFieldHtml('document', $document_form_mode === 'edit' ? tagIdsForRecord('document', $document_id) : [], __('Procedure, Onboarding, Needs review')) ?>
     </div>
 
     <?php if (!empty($config_client_portal_enable)) { ?>
@@ -50,15 +50,15 @@
                 <input type="hidden" name="client_visible" value="0">
                 <input class="form-check-input" type="checkbox" role="switch" name="client_visible" value="1" id="documentFormVisible" <?= $document_client_visible ? 'checked' : '' ?>>
                 <label class="form-check-label" for="documentFormVisible">
-                    <i class="fas fa-fw fa-eye text-body-secondary me-1"></i>Show in the client portal <span class="text-body-secondary small">- to their technical contacts</span>
+                    <i class="fas fa-fw fa-eye text-body-secondary me-1"></i><?= __('Show in the client portal') ?> <span class="text-body-secondary small"><?= __('- to their technical contacts') ?></span>
                 </label>
             </div>
         </div>
     <?php } ?>
 </div>
 
-<textarea class="form-control tinymce" name="content" aria-label="Content"><?= $document_content ?></textarea>
+<textarea class="form-control tinymce" name="content" aria-label="<?= escapeHtml(__('Content')) ?>"><?= $document_content ?></textarea>
 
 <?php if ($document_form_mode === 'edit') { ?>
-    <div class="form-text"><i class="fas fa-history me-1"></i>Saving keeps what it says now in the document's history, so it can be put back.</div>
+    <div class="form-text"><i class="fas fa-history me-1"></i><?= __('Saving keeps what it says now in the document\'s history, so it can be put back.') ?></div>
 <?php } ?>

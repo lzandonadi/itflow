@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-lte-print="plain">
+<html <?= i18nHtmlAttributes() ?> data-lte-print="plain">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,6 +41,7 @@
 
     <!-- Scripts -->
 
+<script src="/js/i18n.js"></script>
 </head>
 <body class="layout-fixed bg-body-tertiary theme-<?= escapeHtml($config_theme) ?>" data-lte-primary="<?= escapeHtml($config_theme) ?>">
     <div class="app-wrapper text-sm">

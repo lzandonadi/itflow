@@ -14,7 +14,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-list me-2"></i>Set Category for <strong><?= $count ?></strong> Products</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-list me-2"></i><?= _n('Set Category for <strong>%d</strong> product', 'Set Category for <strong>%d</strong> products', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -24,7 +24,7 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label">Category <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
                 <select class="form-select select2" name="bulk_category_id">
@@ -36,8 +36,8 @@ ob_start();
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_product_category" class="btn btn-primary text-bold"><i class="fa fa-fw fa-check me-2"></i>Set</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_product_category" class="btn btn-primary text-bold"><i class="fa fa-fw fa-check me-2"></i><?= __('Set') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

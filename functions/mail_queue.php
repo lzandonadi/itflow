@@ -27,13 +27,13 @@ const MAIL_QUEUE_CANCELLED = 4;
 function mailQueueTabs() {
     $tries = MAIL_QUEUE_TRIES;
     return [
-        '' => ['All', 'fa-inbox', '1 = 1'],
-        'waiting' => ['Waiting', 'fa-hourglass-half', 'email_status = 0'],
-        'sending' => ['Sending', 'fa-paper-plane', 'email_status = 1'],
-        'retrying' => ['Retrying', 'fa-redo-alt', "email_status = 2 AND email_attempts < $tries"],
-        'failed' => ['Failed', 'fa-exclamation-circle', "email_status = 2 AND email_attempts >= $tries"],
-        'sent' => ['Sent', 'fa-check', 'email_status = 3'],
-        'cancelled' => ['Cancelled', 'fa-ban', 'email_status = ' . MAIL_QUEUE_CANCELLED],
+        '' => [__('All'), 'fa-inbox', '1 = 1'],
+        'waiting' => [_x('Waiting', 'mail queue status'), 'fa-hourglass-half', 'email_status = 0'],
+        'sending' => [_x('Sending', 'mail queue status'), 'fa-paper-plane', 'email_status = 1'],
+        'retrying' => [_x('Retrying', 'mail queue status'), 'fa-redo-alt', "email_status = 2 AND email_attempts < $tries"],
+        'failed' => [_x('Failed', 'mail queue status'), 'fa-exclamation-circle', "email_status = 2 AND email_attempts >= $tries"],
+        'sent' => [_x('Sent', 'mail queue status'), 'fa-check', 'email_status = 3'],
+        'cancelled' => [_x('Cancelled', 'mail queue status'), 'fa-ban', 'email_status = ' . MAIL_QUEUE_CANCELLED],
     ];
 }
 
@@ -54,40 +54,40 @@ function mailQueueStateOf(array $row) {
     $status = intval($row['email_status']);
     $tries = intval($row['email_attempts']);
     $when = function ($datetime) {
-        return $datetime ? date('M j, Y g:i A', strtotime($datetime)) : '';
+        return $datetime ? formatDate($datetime, 'datetime') : '';
     };
     $queued = (string) $row['email_queued_at'];
     $failed = (string) ($row['email_failed_at'] ?? '');
 
     if ($status === 0 && $queued !== '' && strtotime($queued) > time()) {
-        return ['key' => 'waiting', 'label' => 'Scheduled', 'badge' => 'text-bg-info', 'icon' => 'fa-calendar-alt',
-            'detail' => 'Goes ' . date('M j, g:i A', strtotime($queued)), 'title' => 'Not before ' . $when($queued)];
+        return ['key' => 'waiting', 'label' => _x('Scheduled', 'mail queue status'), 'badge' => 'text-bg-info', 'icon' => 'fa-calendar-alt',
+            'detail' => __('Goes %s', formatDate($queued, 'datetime_short')), 'title' => __('Not before %s', $when($queued))];
     }
     if ($status === 0) {
-        return ['key' => 'waiting', 'label' => 'Waiting', 'badge' => 'text-bg-primary', 'icon' => 'fa-hourglass-half',
-            'detail' => 'Queued ' . timeAgo($queued), 'title' => 'Queued ' . $when($queued)];
+        return ['key' => 'waiting', 'label' => _x('Waiting', 'mail queue status'), 'badge' => 'text-bg-primary', 'icon' => 'fa-hourglass-half',
+            'detail' => __('Queued %s', timeAgo($queued)), 'title' => __('Queued %s', $when($queued))];
     }
     if ($status === 1) {
-        return ['key' => 'sending', 'label' => 'Sending', 'badge' => 'text-bg-warning', 'icon' => 'fa-paper-plane',
-            'detail' => 'Going now', 'title' => ''];
+        return ['key' => 'sending', 'label' => _x('Sending', 'mail queue status'), 'badge' => 'text-bg-warning', 'icon' => 'fa-paper-plane',
+            'detail' => __('Going now'), 'title' => ''];
     }
     if ($status === 2 && $tries < MAIL_QUEUE_TRIES) {
         $next = $failed !== '' ? strtotime($failed) + MAIL_QUEUE_RETRY_MINUTES * 60 : time();
-        return ['key' => 'retrying', 'label' => 'Retrying', 'badge' => 'text-bg-warning', 'icon' => 'fa-redo-alt',
-            'detail' => 'Tried ' . max(1, $tries) . ' of ' . MAIL_QUEUE_TRIES . ' · next ' . ($next > time() ? 'about ' . date('g:i A', $next) : 'any minute'),
-            'title' => $failed !== '' ? 'Last failed ' . $when($failed) : ''];
+        return ['key' => 'retrying', 'label' => _x('Retrying', 'mail queue status'), 'badge' => 'text-bg-warning', 'icon' => 'fa-redo-alt',
+            'detail' => __('Tried %1$d of %2$d · next %3$s', max(1, $tries), MAIL_QUEUE_TRIES, $next > time() ? __('about %s', formatDate(date('Y-m-d H:i:s', $next), 'time')) : __('any minute')),
+            'title' => $failed !== '' ? __('Last failed %s', $when($failed)) : ''];
     }
     if ($status === 2) {
-        return ['key' => 'failed', 'label' => 'Failed', 'badge' => 'text-bg-danger', 'icon' => 'fa-exclamation-circle',
-            'detail' => ($tries > MAIL_QUEUE_TRIES ? 'Not tried again' : 'Gave up after ' . MAIL_QUEUE_TRIES . ' tries') . ($failed !== '' ? ' · ' . timeAgo($failed) : ''),
-            'title' => $failed !== '' ? 'Failed ' . $when($failed) : ''];
+        return ['key' => 'failed', 'label' => _x('Failed', 'mail queue status'), 'badge' => 'text-bg-danger', 'icon' => 'fa-exclamation-circle',
+            'detail' => ($tries > MAIL_QUEUE_TRIES ? __('Not tried again') : __('Gave up after %d tries', MAIL_QUEUE_TRIES)) . ($failed !== '' ? ' · ' . timeAgo($failed) : ''),
+            'title' => $failed !== '' ? __('Failed %s', $when($failed)) : ''];
     }
     if ($status === 3) {
         $sent = (string) ($row['email_sent_at'] ?? '');
-        return ['key' => 'sent', 'label' => 'Sent', 'badge' => 'text-bg-success', 'icon' => 'fa-check',
-            'detail' => $sent !== '' ? 'Sent ' . timeAgo($sent) : '', 'title' => $sent !== '' ? 'Sent ' . $when($sent) : ''];
+        return ['key' => 'sent', 'label' => _x('Sent', 'mail queue status'), 'badge' => 'text-bg-success', 'icon' => 'fa-check',
+            'detail' => $sent !== '' ? __('Sent %s', timeAgo($sent)) : '', 'title' => $sent !== '' ? __('Sent %s', $when($sent)) : ''];
     }
-    return ['key' => 'cancelled', 'label' => 'Cancelled', 'badge' => 'text-bg-secondary', 'icon' => 'fa-ban',
+    return ['key' => 'cancelled', 'label' => _x('Cancelled', 'mail queue status'), 'badge' => 'text-bg-secondary', 'icon' => 'fa-ban',
         'detail' => $failed !== '' ? 'Cancelled ' . timeAgo($failed) : '', 'title' => $failed !== '' ? 'Cancelled ' . $when($failed) : ''];
 }
 
@@ -172,36 +172,36 @@ function mailQueueHealth() {
     $heard = $settings['config_cron_last_dispatch_at'] ?? null;
     $ago = function ($datetime) {
         if (!$datetime) {
-            return 'never';
+            return __('never');
         }
-        return abs(time() - strtotime($datetime)) < 60 ? 'less than a minute ago' : timeAgo($datetime);
+        return abs(time() - strtotime($datetime)) < 60 ? __('less than a minute ago') : timeAgo($datetime);
     };
-    $held = $waiting ? " $waiting " . ($waiting === 1 ? 'email has' : 'emails have') . ' been waiting since ' . date('M j, g:i A', strtotime($oldest)) . '.' : '';
+    $held = $waiting ? ' ' . _n('%1$d email has been waiting since %2$s.', '%1$d emails have been waiting since %2$s.', $waiting, $waiting, formatDate($oldest, 'datetime_short')) : '';
 
     if (empty($config_smtp_provider)) {
-        return ['level' => 'danger', 'key' => 'smtp', 'title' => 'Mail sending is off', 'text' => 'Nothing in the queue goes until it is set up.' . $held,
-            'url' => 'settings_mail.php?tab=sending', 'action' => 'Set up sending', 'waiting' => $waiting];
+        return ['level' => 'danger', 'key' => 'smtp', 'title' => __('Mail sending is off'), 'text' => __('Nothing in the queue goes until it is set up.') . $held,
+            'url' => 'settings_mail.php?tab=sending', 'action' => __('Set up sending'), 'waiting' => $waiting];
     }
     if (empty($settings['config_enable_cron'])) {
-        return ['level' => 'danger', 'key' => 'cron_off', 'title' => 'Cron is switched off', 'text' => 'No job runs, so no email is sent.' . $held,
-            'url' => 'cron.php', 'action' => 'Maintenance > Cron', 'waiting' => $waiting];
+        return ['level' => 'danger', 'key' => 'cron_off', 'title' => __('Cron is switched off'), 'text' => __('No job runs, so no email is sent.') . $held,
+            'url' => 'cron.php', 'action' => __('Maintenance > Cron'), 'waiting' => $waiting];
     }
     if (!$heard || time() - strtotime($heard) >= 300) {
-        return ['level' => 'danger', 'key' => 'cron_stopped', 'title' => 'Cron isn\'t running', 'text' => 'ITFlow last heard from it ' . $ago($heard) . ', so no email is being sent.' . $held,
-            'url' => 'cron.php', 'action' => 'See how to set it up', 'waiting' => $waiting];
+        return ['level' => 'danger', 'key' => 'cron_stopped', 'title' => __('Cron isn\'t running'), 'text' => __('ITFlow last heard from it %s, so no email is being sent.', $ago($heard)) . $held,
+            'url' => 'cron.php', 'action' => __('See how to set it up'), 'waiting' => $waiting];
     }
     if ($job && !intval($job['cron_job_enabled'])) {
-        return ['level' => 'warning', 'key' => 'job_off', 'title' => 'The Mail Queue job is switched off', 'text' => 'Cron is running, but this job isn\'t.' . $held,
-            'url' => 'cron.php', 'action' => 'Maintenance > Cron', 'waiting' => $waiting];
+        return ['level' => 'warning', 'key' => 'job_off', 'title' => __('The Mail Queue job is switched off'), 'text' => __('Cron is running, but this job isn\'t.') . $held,
+            'url' => 'cron.php', 'action' => __('Maintenance > Cron'), 'waiting' => $waiting];
     }
     if ($waiting) {
         $error = $job && $job['cron_job_last_error'] && $job['cron_job_last_error_at'] && strtotime($job['cron_job_last_error_at']) > time() - 3600
-            ? ' Its last error: ' . mb_strimwidth((string) $job['cron_job_last_error'], 0, 200, '...') : '';
-        return ['level' => 'warning', 'key' => 'slow', 'title' => 'Email is waiting longer than it should', 'text' => trim($held) . ' The Mail Queue job last ran ' . $ago($job['cron_job_last_run_at'] ?? null) . '.' . $error,
-            'url' => 'cron.php', 'action' => 'Maintenance > Cron', 'waiting' => $waiting];
+            ? ' ' . __('Its last error: %s', mb_strimwidth((string) $job['cron_job_last_error'], 0, 200, '...')) : '';
+        return ['level' => 'warning', 'key' => 'slow', 'title' => __('Email is waiting longer than it should'), 'text' => trim($held) . ' ' . __('The Mail Queue job last ran %s.', $ago($job['cron_job_last_run_at'] ?? null)) . $error,
+            'url' => 'cron.php', 'action' => __('Maintenance > Cron'), 'waiting' => $waiting];
     }
-    return ['level' => '', 'key' => 'ok', 'title' => '', 'text' => 'Sent by the Mail Queue job each minute - it last ran ' . $ago($job['cron_job_last_run_at'] ?? null) . '. A failed email is tried '
-        . (MAIL_QUEUE_TRIES - 1) . ' more times, ' . MAIL_QUEUE_RETRY_MINUTES . ' minutes apart. Email is kept ' . MAIL_QUEUE_KEEP_DAYS . ' days; a sent one without what it said.', 'url' => '', 'action' => '', 'waiting' => 0];
+    return ['level' => '', 'key' => 'ok', 'title' => '', 'text' => __('Sent by the Mail Queue job each minute - it last ran %1$s. A failed email is tried %2$d more times, %3$d minutes apart. Email is kept %4$d days; a sent one without what it said.',
+        $ago($job['cron_job_last_run_at'] ?? null), MAIL_QUEUE_TRIES - 1, MAIL_QUEUE_RETRY_MINUTES, MAIL_QUEUE_KEEP_DAYS), 'url' => '', 'action' => '', 'waiting' => 0];
 }
 
 /* Whether email_queue has email_error yet - not until the 3.3.7 update has run. */

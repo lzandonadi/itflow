@@ -12,9 +12,9 @@ defined('CONTRACT_PLACEHOLDERS') || die("Direct file access is not allowed");
 
 ?>
 <div class="mt-2 small" data-contract-placeholders>
-    <span class="text-secondary me-1">Fills in from the contract:</span>
+    <span class="text-secondary me-1"><?= __('Fills in from the contract:') ?></span>
     <?php foreach (CONTRACT_PLACEHOLDERS as $placeholder_word => $placeholder_about) { ?>
-        <button type="button" class="badge rounded-pill text-bg-light border font-monospace fw-normal mb-1" data-contract-placeholder="[<?= escapeHtml($placeholder_word) ?>]" title="<?= escapeHtml(ucfirst($placeholder_about)) ?>">[<?= escapeHtml($placeholder_word) ?>]</button>
+        <button type="button" class="badge rounded-pill text-bg-light border font-monospace fw-normal mb-1" data-contract-placeholder="[<?= escapeHtml($placeholder_word) ?>]" title="<?= escapeHtml(ucfirst(__($placeholder_about))) // i18n-dynamic - CONTRACT_PLACEHOLDERS ?>">[<?= escapeHtml($placeholder_word) ?>]</button>
     <?php } ?>
 </div>
 <script src="/js/contract_placeholders.js"></script>

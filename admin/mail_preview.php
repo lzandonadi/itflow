@@ -20,7 +20,7 @@ header('Cache-Control: no-store');
 $preview = emailPreview((string) ($_GET['email'] ?? ''));
 if ($preview === null) {
     http_response_code(404);
-    exit(json_encode(['error' => 'There is no such email']));
+    exit(json_encode(['error' => __('There is no such email')]));
 }
 
 $email = $preview['email'];
@@ -39,10 +39,10 @@ echo json_encode([
     'to_who' => $preview['to'],
     'when' => $preview['when'],
     'subject' => $email['subject'] ?? '',
-    'from' => $email ? ($email['from'] !== '' ? $person($email['from_name'], $email['from']) : 'No address yet - set it under From Addresses') : '',
+    'from' => $email ? ($email['from'] !== '' ? $person($email['from_name'], $email['from']) : __('No address yet - set it under From Addresses')) : '',
     'to' => $email ? $person($email['to_name'], $email['to']) : '',
     'also' => array_values(array_unique($others)),
     'calendar' => !empty($email['cal_str']),
     'html' => $email['html'] ?? '',
-    'error' => $email ? '' : ($preview['error'] !== '' ? 'It could not be made: ' . $preview['error'] : 'Nothing would be sent with the sample records.'),
+    'error' => $email ? '' : ($preview['error'] !== '' ? __('It could not be made: %s', $preview['error']) : __('Nothing would be sent with the sample records.')),
 ]);

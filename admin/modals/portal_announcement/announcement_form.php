@@ -17,36 +17,36 @@ $a_local = function ($value) {
 ?>
 
 <div class="mb-3">
-    <label class="form-label">Title <strong class="text-danger">*</strong></label>
+    <label class="form-label"><?= __('Title') ?> <strong class="text-danger">*</strong></label>
     <div class="input-group">
         <span class="input-group-text"><i class="fa fa-fw fa-bullhorn"></i></span>
-        <input type="text" class="form-control" name="title" maxlength="200" placeholder="Planned maintenance Saturday night" value="<?= escapeHtml($a['announcement_title'] ?? '') ?>" required autofocus>
+        <input type="text" class="form-control" name="title" maxlength="200" placeholder="<?= escapeHtml(__('Planned maintenance Saturday night')) ?>" value="<?= escapeHtml($a['announcement_title'] ?? '') ?>" required autofocus>
     </div>
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Message</label>
-    <textarea class="form-control" name="body" rows="5" maxlength="5000" placeholder="What is happening, when, and what they need to do - web addresses become links"><?= escapeHtml($a['announcement_body'] ?? '') ?></textarea>
+    <label class="form-label"><?= __('Message') ?></label>
+    <textarea class="form-control" name="body" rows="5" maxlength="5000" placeholder="<?= escapeHtml(__('What is happening, when, and what they need to do - web addresses become links')) ?>"><?= escapeHtml($a['announcement_body'] ?? '') ?></textarea>
 </div>
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Shown as</label>
+        <label class="form-label"><?= __('Shown as') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-flag"></i></span>
             <select class="form-select" name="tone">
                 <?php foreach (PORTAL_ANNOUNCEMENT_TONES as $key => $tone) { ?>
-                    <option value="<?= $key ?>"<?= $a_tone === $key ? ' selected' : '' ?>><?= escapeHtml($tone['label']) ?></option>
+                    <option value="<?= $key ?>"<?= $a_tone === $key ? ' selected' : '' ?>><?= escapeHtml(__($tone['label'])) /* i18n-dynamic */ ?></option>
                 <?php } ?>
             </select>
         </div>
     </div>
     <div class="col-md-6 mb-3">
-        <label class="form-label">For</label>
+        <label class="form-label"><?= __('For') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
             <select class="form-select select2" name="client_id">
-                <option value="0">Every client</option>
+                <option value="0"><?= __('Every client') ?></option>
                 <?php
                 $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients WHERE client_archived_at IS NULL OR client_id = $a_client ORDER BY client_name ASC");
                 while ($row = mysqli_fetch_assoc($sql_clients)) { ?>
@@ -59,19 +59,19 @@ $a_local = function ($value) {
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Show from</label>
+        <label class="form-label"><?= __('Show from') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar-plus"></i></span>
             <input type="datetime-local" class="form-control" name="starts_at" value="<?= escapeHtml($a_local($a['announcement_starts_at'] ?? '')) ?>">
         </div>
-        <small class="text-secondary">Empty is straight away</small>
+        <small class="text-secondary"><?= __('Empty is straight away') ?></small>
     </div>
     <div class="col-md-6 mb-3">
-        <label class="form-label">Until</label>
+        <label class="form-label"><?= __('Until') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar-times"></i></span>
             <input type="datetime-local" class="form-control" name="ends_at" value="<?= escapeHtml($a_local($a['announcement_ends_at'] ?? '')) ?>">
         </div>
-        <small class="text-secondary">Empty is until you archive it</small>
+        <small class="text-secondary"><?= __('Empty is until you archive it') ?></small>
     </div>
 </div>

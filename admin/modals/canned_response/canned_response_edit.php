@@ -11,13 +11,13 @@ $response = cannedResponseRow($_GET['id'] ?? 0);
 ob_start();
 
 if (!$response) { ?>
-    <div class="modal-body text-center text-secondary py-5">That canned response is gone - it may have been deleted.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That canned response is gone - it may have been deleted.') ?></div>
 <?php } else {
     $canned_response_id = intval($response['canned_response_id']);
     $response_category_ids = cannedResponseCategoryIds($canned_response_id); ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-comment-dots me-2"></i>Canned response: <strong><?= escapeHtml($response['canned_response_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-comment-dots me-2"></i><?= __('Canned response:') ?> <strong><?= escapeHtml($response['canned_response_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -27,13 +27,13 @@ if (!$response) { ?>
     <div class="modal-body">
         <?php if (intval($response['canned_response_user_id'])) {
             $owner_name = getFieldById('users', intval($response['canned_response_user_id']), 'user_name'); ?>
-            <div class="small text-body-secondary mb-3"><i class="fas fa-fw fa-user me-1"></i><?= $owner_name !== null && $owner_name !== '' ? escapeHtml($owner_name) . "'s own" : "A removed agent's own" ?> - offered to them alone. Share it with everyone from its menu in the list.</div>
+            <div class="small text-body-secondary mb-3"><i class="fas fa-fw fa-user me-1"></i><?= $owner_name !== null && $owner_name !== '' ? __("%s's own", escapeHtml($owner_name)) : __("A removed agent's own") ?> - <?= __('offered to them alone. Share it with everyone from its menu in the list.') ?></div>
         <?php } ?>
         <?php require __DIR__ . '/../../../includes/canned_response_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_canned_response" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_canned_response" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

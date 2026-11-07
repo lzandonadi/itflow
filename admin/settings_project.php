@@ -17,7 +17,7 @@ echo settingsPageStart('project');
     <div class="card itflow-settings-card">
         <div class="card-body">
 
-            <?= settingsSectionStart('numbering', 'Numbering', 'Each project gets the next number, after its prefix.') ?>
+            <?= settingsSectionStart('numbering', 'Numbering', __('Each project gets the next number, after its prefix.')) ?>
                 <?= settingsNumberingFields('project', $config_project_prefix, $config_project_next_number) ?>
             <?= settingsSectionEnd() ?>
 

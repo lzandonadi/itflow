@@ -26,7 +26,7 @@ if (isset($_GET['check_update'])) {
     enforceAdminPermission();
 
     if (!settingsColumnExists($mysqli, 'config_update_latest_commit')) {
-        flashAlert("Checking needs a schema change this install has not caught up with yet - run php scripts/update_cli.php from a shell once, and it will work from then on.", 'error');
+        flashAlert(__('Checking needs a schema change this install has not caught up with yet - run php scripts/update_cli.php from a shell once, and it will work from then on.'), 'error');
         redirect();
     }
 
@@ -34,7 +34,7 @@ if (isset($_GET['check_update'])) {
 
     logAudit("App", "Update", "$session_name asked cron to check for updates");
 
-    flashAlert("Checking for updates - cron will run the check within a minute.");
+    flashAlert(__('Checking for updates - cron will run the check within a minute.'));
 
     redirect();
 
@@ -50,7 +50,7 @@ if (isset($_GET['queue_update'])) {
     // close - and the column the queue is written to arrives with a migration. There is no
     // longer a button that applies migrations on their own, so the way out is the shell.
     if (!settingsColumnExists($mysqli, 'config_update_queued_at')) {
-        flashAlert("Queueing needs a schema change this install has not caught up with yet - run php scripts/update_cli.php from a shell once, and it will work from then on.", 'error');
+        flashAlert(__('Queueing needs a schema change this install has not caught up with yet - run php scripts/update_cli.php from a shell once, and it will work from then on.'), 'error');
         redirect();
     }
 
@@ -59,7 +59,7 @@ if (isset($_GET['queue_update'])) {
 
     logAudit("App", "Update", "$session_name queued an update to be applied by cron");
 
-    flashAlert("Update queued - cron will start it within a minute.");
+    flashAlert(__('Update queued - cron will start it within a minute.'));
 
     redirect();
 

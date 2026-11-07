@@ -53,12 +53,12 @@ foreach ($co_templates as $co_template_id => $co_template) {
             </li>
         <?php } ?>
     </ul>
-    <h2 class="h6 fw-semibold">Start another</h2>
+    <h2 class="h6 fw-semibold"><?= __('Start another') ?></h2>
 <?php } ?>
 
 <?php if (!$co_templates) { ?>
     <div class="alert alert-info small mb-0" data-co-no-templates>
-        <i class="fas fa-info-circle me-1"></i>There are no contract templates yet. Make one in <a href="/admin/contract_templates.php">Admin &gt; Contract Templates</a>, or write the contract on the client's <a href="/agent/contracts.php?client_id=<?= $client_id ?>">Contracts</a> and come back - this step then ticks itself off.
+        <i class="fas fa-info-circle me-1"></i><?= __("There are no contract templates yet. Make one in %1\$s, or write the contract on the client's %2\$s and come back - this step then ticks itself off.", '<a href="/admin/contract_templates.php">' . __('Admin &gt; Contract Templates') . '</a>', '<a href="/agent/contracts.php?client_id=' . $client_id . '">' . __('Contracts') . '</a>') ?>
     </div>
 <?php } else { ?>
     <form action="post.php" method="post" autocomplete="off" data-gs-form data-co-form="agreement">
@@ -70,27 +70,27 @@ foreach ($co_templates as $co_template_id => $co_template) {
                 foreach ($co_templates as $co_template_id => $co_template) {
                     $co_template_choices[$co_template_id] = $co_template['contract_template_name'] . ' - ' . contractTypeLabel($co_template['contract_template_type']) . ', ' . strtolower(contractTermLabel($co_template['contract_template_term_months']));
                 } ?>
-                <?= settingsSelect('template_id', $co_template_pick, $co_template_choices, ['id' => 'coTemplate', 'icon' => 'fa-file-contract', 'label' => 'Template', 'required' => true,
-                    'help' => 'Its rates, net terms, SLAs, support hours and terms - change them on the contract afterwards if this client\'s differ.']) ?>
+                <?= settingsSelect('template_id', $co_template_pick, $co_template_choices, ['id' => 'coTemplate', 'icon' => 'fa-file-contract', 'label' => __('Template'), 'required' => true,
+                    'help' => __('Its rates, net terms, SLAs, support hours and terms - change them on the contract afterwards if this client\'s differ.')]) ?>
             </div>
             <div class="col-sm-6">
-                <?= settingsInput('start', date('Y-m-d'), ['id' => 'coContractStart', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => 'From', 'required' => true, 'max' => '2999-12-31']) ?>
+                <?= settingsInput('start', date('Y-m-d'), ['id' => 'coContractStart', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => __('From'), 'required' => true, 'max' => '2999-12-31']) ?>
             </div>
             <div class="col-sm-6">
-                <?= settingsSelect('owner_id', (string) intval($session_user_id), ['0' => '- Nobody -'] + $co_agents, ['id' => 'coContractOwner', 'icon' => 'fa-user-tie', 'label' => 'Looked after by']) ?>
+                <?= settingsSelect('owner_id', (string) intval($session_user_id), ['0' => '- Nobody -'] + $co_agents, ['id' => 'coContractOwner', 'icon' => 'fa-user-tie', 'label' => __('Looked after by')]) ?>
             </div>
             <?php if ($co_sign_ready) { ?>
                 <div class="col-12">
                     <div class="itflow-gs-optional">
-                        <?= settingsSwitch('send', $co_signers ? '1' : '', ['id' => 'coContractSend', 'label' => 'Send it to them to sign', 'disabled' => !$co_signers, 'data' => ['gs-reveal' => 'coContractSendTo'],
-                            'help' => $co_signers ? 'A draft until you have countersigned it, then active from the day above.' : 'Nobody here has an email address yet - add them on People, or send it from the contract later.']) ?>
+                        <?= settingsSwitch('send', $co_signers ? '1' : '', ['id' => 'coContractSend', 'label' => __('Send it to them to sign'), 'disabled' => !$co_signers, 'data' => ['gs-reveal' => 'coContractSendTo'],
+                            'help' => $co_signers ? __('A draft until you have countersigned it, then active from the day above.') : __('Nobody here has an email address yet - add them on People, or send it from the contract later.')]) ?>
                         <?php if ($co_signers) { ?>
                             <div id="coContractSendTo" class="row g-3 mt-0">
                                 <div class="col-12">
-                                    <?= settingsSelect('signer_id', (string) array_key_first($co_signers), $co_signers, ['id' => 'coContractSigner', 'icon' => 'fa-signature', 'label' => 'To']) ?>
+                                    <?= settingsSelect('signer_id', (string) array_key_first($co_signers), $co_signers, ['id' => 'coContractSigner', 'icon' => 'fa-signature', 'label' => __('To')]) ?>
                                 </div>
                                 <div class="col-12">
-                                    <?= settingsTextarea('note', '', ['id' => 'coContractNote', 'label' => 'A note with it', 'rows' => 2, 'maxlength' => 2000, 'placeholder' => 'Looking forward to working with you.']) ?>
+                                    <?= settingsTextarea('note', '', ['id' => 'coContractNote', 'label' => __('A note with it'), 'rows' => 2, 'maxlength' => 2000, 'placeholder' => __('Looking forward to working with you.')]) ?>
                                 </div>
                             </div>
                         <?php } ?>
@@ -98,6 +98,6 @@ foreach ($co_templates as $co_template_id => $co_template) {
                 </div>
             <?php } ?>
         </div>
-        <button type="submit" name="client_onboarding_agreement" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-file-signature me-2"></i>Start the contract</button>
+        <button type="submit" name="client_onboarding_agreement" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-file-signature me-2"></i><?= __('Start the contract') ?></button>
     </form>
 <?php } ?>

@@ -94,32 +94,32 @@ uasort($clients, function ($a, $b) { return $b['opened'] <=> $a['opened'] ?: $b[
 $clients = array_values($clients);
 
 $columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'tickets.php');
     }],
-    'opened' => ['label' => 'Opened', 'type' => 'count', 'class' => 'fw-semibold'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'opened' => ['label' => __('Opened'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['opened'], $row['prev'], 'down') . '</span>';
     }],
-    'urgent' => ['label' => 'Urgent or high', 'type' => 'count', 'html' => function ($row) {
+    'urgent' => ['label' => __('Urgent or high'), 'type' => 'count', 'html' => function ($row) {
         return $row['urgent'] ? '<span class="text-danger-emphasis">' . $row['urgent'] . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'resolved' => ['label' => 'Resolved', 'type' => 'count'],
-    'open_now' => ['label' => 'Open now', 'type' => 'count', 'html' => function ($row) {
+    'resolved' => ['label' => __('Resolved'), 'type' => 'count'],
+    'open_now' => ['label' => __('Open now'), 'type' => 'count', 'html' => function ($row) {
         return $row['open_now'] ? '<a class="itflow-report-amount" href="/agent/tickets.php?client_id=' . $row['client_id'] . '">' . $row['open_now'] . '</a>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'seconds' => ['label' => 'Time logged', 'type' => 'hours'],
-    'response' => ['label' => 'First reply', 'type' => 'duration', 'title' => 'Typical (middle) time to the first reply'],
-    'resolve' => ['label' => 'To resolve', 'type' => 'duration', 'title' => 'Typical (middle) time to resolve'],
-    'sla' => ['label' => 'SLA response', 'type' => 'percent', 'html' => function ($row) {
+    'seconds' => ['label' => __('Time logged'), 'type' => 'hours'],
+    'response' => ['label' => __('First reply'), 'type' => 'duration', 'title' => __('Typical (middle) time to the first reply')],
+    'resolve' => ['label' => __('To resolve'), 'type' => 'duration', 'title' => __('Typical (middle) time to resolve')],
+    'sla' => ['label' => __('SLA response'), 'type' => 'percent', 'html' => function ($row) {
         return reportRateHtml($row['sla']);
     }],
-    'csat' => ['label' => 'Satisfaction', 'type' => 'percent', 'title' => 'Good ratings out of all good and bad', 'html' => function ($row) {
+    'csat' => ['label' => __('Satisfaction'), 'type' => 'percent', 'title' => __('Good ratings out of all good and bad'), 'html' => function ($row) {
         return $row['csat'] === null ? '<span class="itflow-report-zero">–</span>' : reportRateHtml($row['csat'], 90, 75) . ' <span class="small text-body-tertiary">' . ($row['good'] + $row['bad']) . '</span>';
     }],
 ];
 
-$totals = ['client' => 'Total'];
+$totals = ['client' => __('Total')];
 foreach (['opened', 'urgent', 'resolved', 'open_now', 'seconds'] as $key) {
     $totals[$key] = array_sum(array_column($clients, $key));
 }
@@ -151,14 +151,14 @@ $with_tickets = count(array_filter($clients, function ($c) { return $c['opened']
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Tickets opened', 'value' => reportCount($totals['opened']), 'sub' => reportCount($with_tickets) . ' <span class="text-body-tertiary">clients raised them</span>'],
-        ['label' => 'Average per client', 'value' => $with_tickets ? number_format($totals['opened'] / $with_tickets, 1) : '-', 'sub' => '<span class="text-body-tertiary">Of those who raised any</span>'],
-        ['label' => 'Busiest', 'value' => $busiest && $busiest['opened'] ? $busiest['client'] : '-', 'sub' => $busiest && $busiest['opened'] ? $busiest['opened'] . ' <span class="text-body-tertiary">tickets · ' . reportPercent(reportShare($busiest['opened'], $totals['opened'])) . ' of all</span>' : ''],
-        ['label' => 'Time logged', 'value' => reportHours($totals['seconds']) . ' h', 'sub' => $with_tickets ? reportHours($totals['seconds'] / $with_tickets) . ' h <span class="text-body-tertiary">per client</span>' : ''],
+        ['label' => __('Tickets opened'), 'value' => reportCount($totals['opened']), 'sub' => reportCount($with_tickets) . ' <span class="text-body-tertiary">' . __('clients raised them') . '</span>'],
+        ['label' => __('Average per client'), 'value' => $with_tickets ? number_format($totals['opened'] / $with_tickets, 1) : '-', 'sub' => '<span class="text-body-tertiary">' . __('Of those who raised any') . '</span>'],
+        ['label' => __('Busiest'), 'value' => $busiest && $busiest['opened'] ? $busiest['client'] : '-', 'sub' => $busiest && $busiest['opened'] ? $busiest['opened'] . ' <span class="text-body-tertiary">' . _n('ticket · %s of all', 'tickets · %s of all', $busiest['opened'], reportPercent(reportShare($busiest['opened'], $totals['opened']))) . '</span>' : ''],
+        ['label' => __('Time logged'), 'value' => reportHours($totals['seconds']) . ' h', 'sub' => $with_tickets ? reportHours($totals['seconds'] / $with_tickets) . ' h <span class="text-body-tertiary">' . __('per client') . '</span>' : ''],
     ]) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Clients raising the most', 'By priority') ?>
+        <?= reportSectionOpen(__('Clients raising the most'), __('By priority')) ?>
             <div class="card-body">
                 <?php
                 // Each client's tickets split by priority
@@ -173,17 +173,17 @@ $with_tickets = count(array_filter($clients, function ($c) { return $c['opened']
                 foreach (['Urgent' => 'dark', 'High' => 'danger', 'Medium' => 'warning', 'Low' => 'info'] as $priority => $tone) {
                     $series[] = ['label' => $priority, 'tone' => $tone, 'stack' => 'p', 'data' => array_map(function ($id) use ($split, $priority) { return $split[$priority][$id] ?? 0; }, $ids)];
                 }
-                echo reportChart(['type' => 'bar', 'horizontal' => true, 'stacked' => true, 'labels' => array_column($top, 'client'), 'series' => $series, 'format' => 'count'], '', 'Tickets opened per client, by priority');
+                echo reportChart(['type' => 'bar', 'horizontal' => true, 'stacked' => true, 'labels' => array_column($top, 'client'), 'series' => $series, 'format' => 'count'], '', __('Tickets opened per client, by priority'));
                 ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Busiest first', 'itflow-report-long') ?>
-        <?= reportTable($columns, $clients, ['empty' => 'No tickets in this period.', 'totals' => $totals, 'totals_html' => ['sla' => reportRateHtml($totals['sla']), 'csat' => $totals['csat'] === null ? '' : reportRateHtml($totals['csat'], 90, 75)]]) ?>
+    <?= reportSectionOpen(__('By client'), __('Busiest first'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $clients, ['empty' => __('No tickets in this period.'), 'totals' => $totals, 'totals_html' => ['sla' => reportRateHtml($totals['sla']), 'csat' => $totals['csat'] === null ? '' : reportRateHtml($totals['csat'], 90, 75)]]) ?>
         <div class="card-footer small text-body-secondary">
-            Opened counts tickets raised in the period; resolved counts those resolved in it, whenever raised. Times run on the clock and are the middle ticket's, so a few long ones do not skew them.
-            SLA response is the share of first-reply targets met. Satisfaction is from client ratings on tickets closed in the period.
+            <?= __("Opened counts tickets raised in the period; resolved counts those resolved in it, whenever raised. Times run on the clock and are the middle ticket's, so a few long ones do not skew them.") ?>
+            <?= __('SLA response is the share of first-reply targets met. Satisfaction is from client ratings on tickets closed in the period.') ?>
         </div>
     </div>
 

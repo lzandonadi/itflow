@@ -84,15 +84,15 @@ function billingCardParts($description) {
     $brands = [
         'visa' => ['Visa', 'fab fa-cc-visa'],
         'mastercard' => ['Mastercard', 'fab fa-cc-mastercard'],
-        'amex' => ['American Express', 'fab fa-cc-amex'],
-        'american express' => ['American Express', 'fab fa-cc-amex'],
+        'amex' => ['American Express', 'fab fa-cc-amex'], // i18n-ignore - card brand names
+        'american express' => ['American Express', 'fab fa-cc-amex'], // i18n-ignore - card brand names
         'discover' => ['Discover', 'fab fa-cc-discover'],
-        'diners' => ['Diners Club', 'fab fa-cc-diners-club'],
+        'diners' => ['Diners Club', 'fab fa-cc-diners-club'], // i18n-ignore - card brand names
         'jcb' => ['JCB', 'fab fa-cc-jcb'],
         'unionpay' => ['UnionPay', 'fas fa-credit-card'],
     ];
     if (!preg_match('/^(.+?)\s*-\s*(\d{4})\s*\|\s*Exp\s*(\d{1,2})\/(\d{2,4})$/i', $description, $m)) {
-        return ['brand' => '', 'last4' => '', 'exp' => '', 'expired' => false, 'icon' => 'fas fa-credit-card', 'label' => $description !== '' ? $description : 'Card'];
+        return ['brand' => '', 'last4' => '', 'exp' => '', 'expired' => false, 'icon' => 'fas fa-credit-card', 'label' => $description !== '' ? $description : __('Card')];
     }
     $key = strtolower(trim($m[1]));
     [$brand, $icon] = $brands[$key] ?? [ucwords($key), 'fas fa-credit-card'];
@@ -151,11 +151,11 @@ function billingSavedCards($client_id) {
 function billingPaySelection($client_id, array $invoice_ids, &$error = '') {
     $invoice_ids = array_values(array_unique(array_filter(array_map('intval', $invoice_ids))));
     if (!$invoice_ids) {
-        $error = 'Tick the invoices you want to pay';
+        $error = __('Tick the invoices you want to pay');
         return null;
     }
     if (count($invoice_ids) > BILLING_PAY_MAX_INVOICES) {
-        $error = 'Pay up to ' . BILLING_PAY_MAX_INVOICES . ' invoices at a time';
+        $error = __('Pay up to %d invoices at a time', BILLING_PAY_MAX_INVOICES);
         return null;
     }
     $open = [];
@@ -165,14 +165,14 @@ function billingPaySelection($client_id, array $invoice_ids, &$error = '') {
     $selection = ['invoices' => [], 'cents' => [], 'total' => 0.0, 'currency' => '', 'numbers' => []];
     foreach ($invoice_ids as $id) {
         if (!isset($open[$id])) {
-            $error = 'One of those invoices has been paid or changed since the page loaded - check the list and try again';
+            $error = __('One of those invoices has been paid or changed since the page loaded - check the list and try again');
             return null;
         }
         $row = $open[$id];
         $cents = (int) round((floatval($row['invoice_amount']) - floatval($row['paid'])) * 100);
         $currency = strtoupper((string) $row['invoice_currency_code']);
         if ($selection['currency'] !== '' && $currency !== $selection['currency']) {
-            $error = 'Those invoices are in different currencies - pay each currency on its own';
+            $error = __('Those invoices are in different currencies - pay each currency on its own');
             return null;
         }
         $selection['currency'] = $currency;
@@ -183,8 +183,7 @@ function billingPaySelection($client_id, array $invoice_ids, &$error = '') {
     }
     $selection['total'] = array_sum($selection['cents']) / 100;
     if (!billingOnlinePayAllowed($selection['total'])) {
-        $error = 'Card payments are limited to under ' . billingMoney(floatval(billingStripeProvider()['payment_provider_threshold'] ?? 0), $selection['currency'])
-            . ' at a time - pay fewer invoices at once, or pay another way';
+        $error = __('Card payments are limited to under %s at a time - pay fewer invoices at once, or pay another way', billingMoney(floatval(billingStripeProvider()['payment_provider_threshold'] ?? 0), $selection['currency']));
         return null;
     }
     return $selection;
@@ -256,10 +255,10 @@ function billingStripeChargeSaved(array $selection, $client_id, $saved_payment_i
     $card = $provider ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT saved_payment_provider_method, saved_payment_description FROM client_saved_payment_methods
         WHERE saved_payment_id = $saved_payment_id AND saved_payment_client_id = $client_id AND saved_payment_provider_id = " . intval($provider['payment_provider_id']) . " LIMIT 1")) : null;
     if (!$provider || !$card || $customer === '') {
-        return ['ok' => false, 'error' => 'That card is no longer saved - choose another'];
+        return ['ok' => false, 'error' => __('That card is no longer saved - choose another')];
     }
     if (billingCardParts($card['saved_payment_description'])['expired']) {
-        return ['ok' => false, 'error' => 'That card has expired - choose another or pay with a new card'];
+        return ['ok' => false, 'error' => __('That card has expired - choose another or pay with a new card')];
     }
     $params = billingStripeIntentParams($selection, $client_id, $by) + [
         'customer' => $customer,
@@ -273,14 +272,14 @@ function billingStripeChargeSaved(array $selection, $client_id, $saved_payment_i
         $code = (string) $e->getStripeCode();
         logApp("Stripe", "warning", "Saved card payment declined for client $client_id: " . $e->getMessage());
         return ['ok' => false, 'error' => $code === 'authentication_required'
-            ? 'Your bank wants to confirm this payment - choose A new card and enter the card details to approve it'
-            : 'Your card was declined: ' . rtrim($e->getMessage(), '.') . '. Try another card'];
+            ? __('Your bank wants to confirm this payment - choose A new card and enter the card details to approve it')
+            : __('Your card was declined: %s. Try another card', rtrim($e->getMessage(), '.'))];
     } catch (\Throwable $e) {
         logApp("Stripe", "error", "Saved card payment failed for client $client_id: " . $e->getMessage());
-        return ['ok' => false, 'error' => 'The payment could not be made just now - nothing was charged. Try again in a moment'];
+        return ['ok' => false, 'error' => __('The payment could not be made just now - nothing was charged. Try again in a moment')];
     }
     if ($pi->status !== 'succeeded') {
-        return ['ok' => false, 'error' => 'The payment did not go through - nothing was charged. Try another card'];
+        return ['ok' => false, 'error' => __('The payment did not go through - nothing was charged. Try another card')];
     }
     return ['ok' => true, 'pi' => $pi];
 }
@@ -341,25 +340,25 @@ function billingStripeBook($pi, $client_id, array $by = []) {
         return ['ok' => false, 'error' => $error, 'applied' => [], 'payment_id' => 0, 'already' => false];
     };
     if (!preg_match('/^pi_[A-Za-z0-9_]+$/', $pi_id)) {
-        return $fail('not a payment');
+        return $fail('not a payment'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     if (($pi['status'] ?? '') !== 'succeeded') {
         return $fail('not succeeded');
     }
     $received = intval($pi['amount_received'] ?? 0);
     if ($received <= 0 || $received !== intval($pi['amount'] ?? -1)) {
-        return $fail('amount not received in full');
+        return $fail('amount not received in full'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     $metadata = (array) ($pi['metadata'] ?? []);
     if (intval($metadata['itflow_client_id'] ?? 0) !== $client_id) {
-        return $fail('not this client');
+        return $fail('not this client'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
     $split = billingPaySplitParse($metadata['itflow_invoices'] ?? '');
     if (!$split && intval($metadata['itflow_invoice_id'] ?? 0)) {
         $split = [intval($metadata['itflow_invoice_id']) => $received];
     }
     if (!$split || array_sum($split) !== $received) {
-        return $fail('split does not add up');
+        return $fail('split does not add up'); // i18n-ignore - why a payment could not be recorded, for the app log
     }
 
     $currency = strtoupper(preg_replace('/[^A-Za-z]/', '', (string) ($pi['currency'] ?? '')));
@@ -367,7 +366,7 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     foreach ($split as $invoice_id => $cents) {
         $invoice = billingRow('invoice', $invoice_id, false);
         if (!$invoice || intval($invoice['client_id']) !== $client_id || strtoupper((string) $invoice['invoice_currency_code']) !== $currency || $cents <= 0) {
-            return $fail("invoice $invoice_id does not fit");
+            return $fail("invoice $invoice_id does not fit"); // i18n-ignore - why a payment could not be recorded, for the app log
         }
         $invoices[$invoice_id] = $invoice;
     }
@@ -397,7 +396,7 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     $name = trim((string) ($by['name'] ?? ''));
     $via = trim((string) ($by['via'] ?? ''));
     $many = count($invoices) > 1;
-    $dev = empty($pi['livemode']) ? ' (DEV MODE)' : '';
+    $dev = empty($pi['livemode']) ? ' (DEV MODE)' : ''; // i18n-ignore - the payment history stays English
     $applied = [];
     $first_payment_id = 0;
 
@@ -417,8 +416,9 @@ function billingStripeBook($pi, $client_id, array $by = []) {
 
         $state = invoiceState($invoice, invoicePaid($invoice_id));
         if (!in_array($status_before, invoiceOpenStatuses(), true) || $state['balance'] < 0) {
-            appNotify("Invoice Payment", escapeSql("Check $number for {$invoice['client_name']}: a card payment of $money went on it"
-                . ($state['balance'] < 0 ? ' and it is now overpaid by ' . billingMoney(-$state['balance'], $currency) : " while it was $status_before")),
+            appNotify("Invoice Payment", escapeSql($state['balance'] < 0 // i18n-ignore - the notification kind is a key
+                ? __('Check %1$s for %2$s: a card payment of %3$s went on it and it is now overpaid by %4$s', $number, $invoice['client_name'], $money, billingMoney(-$state['balance'], $currency))
+                : __('Check %1$s for %2$s: a card payment of %3$s went on it while it was %4$s', $number, $invoice['client_name'], $money, invoiceStatusLabel($status_before))),
                 "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
         }
         if ($status === 'Paid') {
@@ -433,14 +433,14 @@ function billingStripeBook($pi, $client_id, array $by = []) {
     $client_name = (string) $applied[0]['invoice']['client_name'];
     $who = $name !== '' ? " ($name" . ($via !== '' ? ", $via" : '') . ')' : '';
     if ($many) {
-        appNotify("Invoice Paid", escapeSql("$client_name paid " . count($applied) . ' invoices online - ' . billingMoney($total, $currency) . $who), "/agent/invoices.php?client_id=$client_id", $client_id);
+        appNotify("Invoice Paid", escapeSql(__('%1$s paid %2$d invoices online - %3$s', $client_name, count($applied), billingMoney($total, $currency)) . $who), "/agent/invoices.php?client_id=$client_id", $client_id); // i18n-ignore - the notification kind is a key
     } else {
         $number = billingNumber('invoice', $applied[0]['invoice']);
-        appNotify("Invoice Paid", escapeSql("Invoice $number has been paid by $client_name$who"), "/agent/invoice.php?invoice_id=" . intval($applied[0]['invoice']['invoice_id']), $client_id);
+        appNotify("Invoice Paid", escapeSql(__('Invoice %1$s has been paid by %2$s', $number, $client_name) . $who), "/agent/invoice.php?invoice_id=" . intval($applied[0]['invoice']['invoice_id']), $client_id); // i18n-ignore - the notification kind is a key
     }
 
     if (billingEmailReady()) {
-        billingPaymentReceiptSend($applied, ['date' => $date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => $by['how'] ?? 'Online card'], true);
+        billingPaymentReceiptSend($applied, ['date' => $date, 'method' => 'Card', 'reference' => "Stripe - $pi_id", 'how' => $by['how'] ?? 'Online card'], true); // i18n-ignore - the payment history stays English
     }
 
     return ['ok' => true, 'error' => '', 'applied' => $applied, 'payment_id' => $first_payment_id, 'already' => false];
@@ -525,7 +525,44 @@ function billingPaymentReceipt($payment_id, $client_id) {
 function billingPaymentMethodText($method, $reference = '') {
     $method = trim((string) $method);
     if (strcasecmp($method, 'Stripe') === 0 || stripos((string) $reference, 'Stripe - pi_') === 0) {
-        return 'Card';
+        return __('Card');
     }
-    return $method !== '' ? $method : 'Payment';
+    return $method !== '' ? $method : __('Payment');
+}
+
+/* ------------------------------------------------------------ Autopay */
+
+/**
+ * SQL for "this recurring invoice has an autopay that can charge": a recurring_payments row
+ * on a card its client saved, with the card's provider turned on - what the nightly job needs
+ * before it charges anything. A row without a card (made before 2.2.3) never charges, so it
+ * doesn't count. $recurring_column is the outer query's recurring invoice id, qualified when
+ * the outer query reads recurring_invoices itself.
+ */
+function billingAutopayUsableSql($recurring_column) {
+    return "EXISTS (SELECT 1 FROM recurring_payments
+        JOIN recurring_invoices AS autopay_recurring ON autopay_recurring.recurring_invoice_id = recurring_payment_recurring_invoice_id
+        JOIN client_saved_payment_methods ON saved_payment_id = recurring_payment_saved_payment_id AND saved_payment_client_id = autopay_recurring.recurring_invoice_client_id
+        JOIN payment_providers ON payment_provider_id = saved_payment_provider_id AND payment_provider_active = 1
+        WHERE recurring_payment_recurring_invoice_id = $recurring_column)";
+}
+
+/**
+ * An autopay that did not charge: nothing is paid and the invoice stays open. It goes in the
+ * invoice's history and the audit log, and the team is told - once a day per invoice and
+ * technician. $history starts "Autopay not charged" or "Stripe autopay failed" (the nightly
+ * job skips an invoice that already has one today, so the charge is tried once a day);
+ * $reason is for the audit log. Both in English, like the job's other history rows. Raw
+ * values - escaped here.
+ */
+function billingAutopayFailed($invoice_id, $client_id, $reference, $history, $reason) {
+    global $mysqli;
+
+    $invoice_id = intval($invoice_id);
+    $client_id = intval($client_id);
+    $history_sql = escapeSql($history);
+
+    mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Payment failed', history_description = '$history_sql', history_invoice_id = $invoice_id");
+    logAudit("Invoice", "Payment", "Failed auto Payment for invoice " . escapeSql($reference) . ": " . escapeSql($reason), $client_id, $invoice_id);
+    appNotifyOncePerDay("Invoice", escapeSql(__('Autopay did not charge invoice %s - it is still open. Its history says why.', $reference)), "/agent/invoice.php?invoice_id=$invoice_id", $client_id, $invoice_id);
 }

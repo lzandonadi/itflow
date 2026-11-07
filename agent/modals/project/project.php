@@ -35,11 +35,11 @@ ob_start();
         </div>
         <h5 class="modal-title fw-semibold text-break"><?= escapeHtml($project['project_name']) ?></h5>
         <div class="small text-body-secondary mt-1">
-            <?= $project_client_id ? escapeHtml($project['client_name']) : 'Internal - no client' ?>
+            <?= $project_client_id ? escapeHtml($project['client_name']) : __('Internal - no client') ?>
             <span class="mx-1">&middot;</span>started <?= timeAgo($project['project_start'] ?: $project['project_created_at']) ?>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -50,11 +50,11 @@ ob_start();
 
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-1">Progress</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-1"><?= __('Progress') ?></div>
             <?= projectProgressHtml($stats) ?>
         </div>
         <div class="col-sm-6">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-1">Time<?= floatval($project['project_budget_hours']) > 0 ? ' / budget' : '' ?></div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-1"><?= floatval($project['project_budget_hours']) > 0 ? __('Time / budget') : __('Time') ?></div>
             <?= projectTimeHtml($project, $stats) ?>
             <?php if ($stats['unbilled_seconds']) { ?>
                 <div class="small text-body-secondary mt-1"><?= projectHoursText($stats['unbilled_seconds']) ?> billable, not invoiced</div>
@@ -63,10 +63,10 @@ ob_start();
     </div>
 
     <dl class="itflow-asset-dl mb-3">
-        <dt>Manager</dt>
-        <dd><?= formatAssignee($project['project_manager'], $project['user_name'], $project['user_avatar'], false, 'No manager') ?></dd>
+        <dt><?= __('Manager') ?></dt>
+        <dd><?= formatAssignee($project['project_manager'], $project['user_name'], $project['user_avatar'], false, __('No manager')) ?></dd>
         <?php if (intval($project['project_contact_id']) && $project['contact_name'] !== null) { ?>
-            <dt>Contact</dt>
+            <dt><?= __('Contact') ?></dt>
             <dd>
                 <?= contactLink($project_client_id, $project['project_contact_id'], $project['contact_name'], $project['contact_photo'] ?? '') ?>
                 <?php if ($project['contact_email']) { ?>
@@ -75,38 +75,38 @@ ob_start();
             </dd>
         <?php } ?>
         <?php if ($project['project_start']) { ?>
-            <dt>Start</dt><dd><?= escapeHtml(date('D M j, Y', strtotime($project['project_start']))) ?></dd>
+            <dt><?= __('Start') ?></dt><dd><?= escapeHtml(formatDate($project['project_start'], 'date_weekday')) ?></dd>
         <?php } ?>
-        <dt>Due</dt><dd><?= $project['project_due'] ? escapeHtml(date('D M j, Y', strtotime($project['project_due']))) : '<span class="text-body-secondary">-</span>' ?></dd>
+        <dt><?= __('Due') ?></dt><dd><?= $project['project_due'] ? escapeHtml(formatDate($project['project_due'], 'date_weekday')) : '<span class="text-body-secondary">-</span>' ?></dd>
         <?php if ($project['project_completed_at']) { ?>
-            <dt>Completed</dt><dd><?= escapeHtml(date('D M j, Y', strtotime($project['project_completed_at']))) ?></dd>
+            <dt><?= __('Completed') ?></dt><dd><?= escapeHtml(formatDate($project['project_completed_at'], 'date_weekday')) ?></dd>
         <?php } ?>
     </dl>
 
     <?php if ($description !== '') { ?>
-        <h6 class="small text-body-secondary fw-semibold text-uppercase">Scope</h6>
+        <h6 class="small text-body-secondary fw-semibold text-uppercase"><?= __('Scope') ?></h6>
         <div class="border rounded p-2 mb-3 small itflow-project-scope"><?= nl2br(escapeHtml(mb_strlen($description) > 600 ? mb_substr($description, 0, 600) . '…' : $description)) ?></div>
     <?php } ?>
 
     <h6 class="small text-body-secondary fw-semibold text-uppercase">
-        Open tickets<?php if ($stats['open'] > count($open_tickets)) { ?> <span class="fw-normal text-lowercase">- <?= count($open_tickets) ?> of <?= $stats['open'] ?></span><?php } ?>
+        <?= __('Open tickets') ?><?php if ($stats['open'] > count($open_tickets)) { ?> <span class="fw-normal text-lowercase">- <?= __('%1$d of %2$d', count($open_tickets), $stats['open']) ?></span><?php } ?>
     </h6>
     <?php if ($open_tickets) { ?>
         <?= ticketTableHtml($open_tickets, ['compact' => true]) ?>
     <?php } else { ?>
-        <div class="small text-body-secondary"><?= $stats['tickets'] ? 'None - every ticket is resolved or closed.' : 'No tickets on it yet.' ?></div>
+        <div class="small text-body-secondary"><?= $stats['tickets'] ? __('None - every ticket is resolved or closed.') : __('No tickets on it yet.') ?></div>
     <?php } ?>
 
 </div>
 
 <div class="modal-footer">
     <?php if ($can_edit && $is_open) { ?>
-        <button type="button" class="btn btn-outline-secondary me-auto ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?<?= $project_client_id ? "client_id=$project_client_id&" : '' ?>project_id=<?= $project_id ?>"><i class="fas fa-plus me-2"></i>New ticket</button>
+        <button type="button" class="btn btn-outline-secondary me-auto ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_add.php?<?= $project_client_id ? "client_id=$project_client_id&" : '' ?>project_id=<?= $project_id ?>"><i class="fas fa-plus me-2"></i><?= __('New ticket') ?></button>
     <?php } ?>
     <?php if ($can_edit && !$project['project_archived_at']) { ?>
-        <button type="button" class="btn btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/project/project_edit.php?id=<?= $project_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/project/project_edit.php?id=<?= $project_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <a class="btn btn-primary text-bold" href="<?= $url ?>"><i class="fas fa-project-diagram me-2"></i>Open project</a>
+    <a class="btn btn-primary text-bold" href="<?= $url ?>"><i class="fas fa-project-diagram me-2"></i><?= __('Open project') ?></a>
 </div>
 
 <?php

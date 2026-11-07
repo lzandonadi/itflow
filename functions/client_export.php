@@ -31,21 +31,21 @@ const CLIENT_EXPORT_PASSWORD_MIN = 8;
  */
 function clientExportSections() {
     return [
-        'contacts' => ['label' => 'Contacts', 'icon' => 'fa-users', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
-        'locations' => ['label' => 'Locations', 'icon' => 'fa-map-marker-alt', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
-        'vendors' => ['label' => 'Vendors', 'icon' => 'fa-building', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
-        'networks' => ['label' => 'Networks and IP addresses', 'icon' => 'fa-network-wired', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'assets' => ['label' => 'Assets', 'icon' => 'fa-desktop', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'racks' => ['label' => 'Racks', 'icon' => 'fa-server', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'software' => ['label' => 'Licenses', 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'domains' => ['label' => 'Domains', 'icon' => 'fa-globe', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'certificates' => ['label' => 'Certificates', 'icon' => 'fa-lock', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'services' => ['label' => 'Services', 'icon' => 'fa-stream', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
-        'credentials' => ['label' => 'Credentials', 'icon' => 'fa-key', 'module' => 'module_credential', 'feature' => 'itdoc', 'pdf' => true, 'pdf_default' => false],
-        'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'module' => 'module_client', 'feature' => 'itdoc', 'pdf' => true],
-        'files' => ['label' => 'Files', 'icon' => 'fa-paperclip', 'module' => 'module_client', 'feature' => 'itdoc', 'pdf' => true],
-        'tickets' => ['label' => 'Tickets and projects', 'icon' => 'fa-life-ring', 'module' => 'module_support', 'feature' => 'ticketing', 'pdf' => false],
-        'billing' => ['label' => 'Invoices, quotes and payments', 'icon' => 'fa-file-invoice-dollar', 'module' => 'module_sales', 'feature' => 'accounting', 'pdf' => false],
+        'contacts' => ['label' => __('Contacts'), 'icon' => 'fa-users', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
+        'locations' => ['label' => __('Locations'), 'icon' => 'fa-map-marker-alt', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
+        'vendors' => ['label' => __('Vendors'), 'icon' => 'fa-building', 'module' => 'module_client', 'feature' => '', 'pdf' => true],
+        'networks' => ['label' => __('Networks and IP addresses'), 'icon' => 'fa-network-wired', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'assets' => ['label' => __('Assets'), 'icon' => 'fa-desktop', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'racks' => ['label' => __('Racks'), 'icon' => 'fa-server', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'software' => ['label' => __('Licenses'), 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'domains' => ['label' => __('Domains'), 'icon' => 'fa-globe', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'certificates' => ['label' => __('Certificates'), 'icon' => 'fa-lock', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'services' => ['label' => __('Services'), 'icon' => 'fa-stream', 'module' => 'module_support', 'feature' => 'itdoc', 'pdf' => true],
+        'credentials' => ['label' => __('Credentials'), 'icon' => 'fa-key', 'module' => 'module_credential', 'feature' => 'itdoc', 'pdf' => true, 'pdf_default' => false],
+        'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'module' => 'module_client', 'feature' => 'itdoc', 'pdf' => true],
+        'files' => ['label' => __('Files'), 'icon' => 'fa-paperclip', 'module' => 'module_client', 'feature' => 'itdoc', 'pdf' => true],
+        'tickets' => ['label' => __('Tickets and projects'), 'icon' => 'fa-life-ring', 'module' => 'module_support', 'feature' => 'ticketing', 'pdf' => false],
+        'billing' => ['label' => __('Invoices, quotes and payments'), 'icon' => 'fa-file-invoice-dollar', 'module' => 'module_sales', 'feature' => 'accounting', 'pdf' => false],
     ];
 }
 
@@ -94,14 +94,14 @@ function clientExportCheck($options, $post) {
         return '';
     }
     if (strlen($options['password']) < CLIENT_EXPORT_PASSWORD_MIN) {
-        return 'To include passwords, set a password of at least ' . CLIENT_EXPORT_PASSWORD_MIN . ' characters to lock the file with.';
+        return __('To include passwords, set a password of at least %d characters to lock the file with.', CLIENT_EXPORT_PASSWORD_MIN);
     }
     if ($options['password'] !== (string) ($post['password_confirm'] ?? '')) {
-        return 'The two passwords do not match.';
+        return __('The two passwords do not match.');
     }
     // Nothing can be decrypted without the agent's vault open in this session
     if (encryptCredentialEntry('probe') === false) {
-        return 'Your vault session has expired, so passwords cannot be read - sign out and back in, then export again.';
+        return __('Your vault session has expired, so passwords cannot be read - sign out and back in, then export again.');
     }
     return '';
 }
@@ -250,6 +250,7 @@ function clientExportFolderPath($tree, $folder_id) {
  */
 function clientExportDatasets() {
     $archived = ['created' => 'Created', 'archived' => 'Archived'];
+    // i18n-ignore-start - the CSV headings stay English; the README and PDF name the tables through clientExportDatasetLabel()
     return [
         'client' => ['section' => '', 'label' => 'Client', 'columns' => [
             'name' => 'Name', 'abbreviation' => 'Abbreviation', 'industry' => 'Industry', 'website' => 'Website', 'referral' => 'Referral', 'lead' => 'Lead',
@@ -402,6 +403,7 @@ function clientExportDatasets() {
             'amount' => 'Amount', 'type' => 'Type', 'note' => 'Note', 'created' => 'Created', 'expires' => 'Expires', 'invoice' => 'Used on invoice',
         ]],
     ];
+    // i18n-ignore-end
 }
 
 /** The datasets the options cover, in order. */
@@ -466,7 +468,7 @@ function clientExportRows($dataset, $client_id, $options) {
                     'tags' => clientExportTags('client_tags', 'client_id', [$client_id])[$client_id] ?? '',
                     'hourly_rate' => $terms ? sprintf('%.2f', $terms['rate']['rate']) : '', 'after_hours_rate' => $terms && $terms['after_hours'][0] > 0 ? sprintf('%.2f', $terms['after_hours'][0]) : '',
                     'net_terms' => $terms ? $terms['net_terms'][0] : '',
-                    'terms_from' => $terms ? (($terms['rate']['contract_name'] ?: ($terms['net_terms'][1] ?: $terms['after_hours'][1])) ?: 'The defaults') : '',
+                    'terms_from' => $terms ? (($terms['rate']['contract_name'] ?: ($terms['net_terms'][1] ?: $terms['after_hours'][1])) ?: 'The defaults') : '', // i18n-ignore - a CSV value, stays English
                     'currency' => $billing ? $row['client_currency_code'] : '', 'tax_id' => $billing ? $row['client_tax_id_number'] : '',
                     'notes' => $row['client_notes'], 'created' => clientExportDate($row['client_created_at']), 'archived' => clientExportDate($row['client_archived_at']),
                 ];
@@ -676,7 +678,7 @@ function clientExportRows($dataset, $client_id, $options) {
                 $rows[] = ['id' => intval($row['certificate_id']), 'name' => $row['certificate_name'], 'description' => $row['certificate_description'], 'host' => $row['certificate_domain'],
                     'names' => $row['certificate_names'], 'issued_by' => $row['certificate_issued_by'], 'issued' => clientExportDate($row['certificate_issued_at']),
                     'expires' => clientExportDate($row['certificate_expire']), 'fingerprint' => $row['certificate_fingerprint'],
-                    'check' => CERTIFICATE_CHECK_STATES[$row['certificate_check_status'] ?? '']['label'] ?? '', 'checked' => clientExportDate($row['certificate_checked_at']),
+                    'check' => CERTIFICATE_CHECK_STATES[$row['certificate_check_status'] ?? '']['label'] ?? '', '_check' => (string) ($row['certificate_check_status'] ?? ''), 'checked' => clientExportDate($row['certificate_checked_at']),
                     'domain' => $row['domain_name'] ?? '', 'notes' => $row['certificate_notes'], 'public_key' => $row['certificate_public_key'],
                     'created' => $row['certificate_created_at'], 'archived' => clientExportDate($row['certificate_archived_at'])];
             }
@@ -745,7 +747,7 @@ function clientExportRows($dataset, $client_id, $options) {
                     (SELECT SUM(TIME_TO_SEC(ticket_reply_time_worked)) FROM ticket_replies WHERE ticket_reply_ticket_id = tickets.ticket_id AND ticket_reply_archived_at IS NULL) AS seconds,
                     (SELECT CONCAT(invoice_prefix, invoice_number) FROM invoices WHERE invoice_id = ticket_invoice_id AND invoice_client_id = $client_id) AS invoice_ref
                 FROM tickets WHERE ticket_client_id = $client_id" . $live('ticket_archived_at') . " ORDER BY ticket_number DESC", function ($row) use (&$rows, $name, $met) {
-                $rows[] = ['id' => intval($row['ticket_id']), 'number' => ticketReference($row), 'subject' => $row['ticket_subject'], 'status' => $name('status', $row['ticket_status']),
+                $rows[] = ['id' => intval($row['ticket_id']), 'number' => ticketReference($row), 'subject' => $row['ticket_subject'], 'status' => $name('status', $row['ticket_status']), '_status_id' => intval($row['ticket_status']),
                     'priority' => $row['ticket_priority'], 'category' => $name('category', $row['ticket_category']), 'source' => $row['ticket_source'],
                     'contact' => $name('contact', $row['ticket_contact_id']), 'assigned_to' => $name('user', $row['ticket_assigned_to']), 'asset' => $name('asset', $row['ticket_asset_id']),
                     'location' => $name('location', $row['ticket_location_id']), 'project' => $name('project', $row['ticket_project_id']), 'vendor' => $name('vendor', $row['ticket_vendor_id']),
@@ -818,7 +820,7 @@ function clientExportRows($dataset, $client_id, $options) {
                 WHERE {$prefix}_client_id = $client_id" . $live("{$prefix}_archived_at") . " AND i.item_archived_at IS NULL ORDER BY {$prefix}_number DESC, i.item_order, i.item_id") as $row) {
                 $rows[] = [$parent => $row['parent_ref'], 'item' => $row['item_name'], 'description' => $row['item_description'], 'quantity' => floatval($row['item_quantity']),
                     'price' => round(floatval($row['item_price']), 2), 'subtotal' => round(floatval($row['item_subtotal']), 2), 'tax' => round(floatval($row['item_tax']), 2),
-                    'total' => round(floatval($row['item_total']), 2), 'billed' => quoteFrequencies()[quoteFrequency($row['item_frequency'] ?? '')]];
+                    'total' => round(floatval($row['item_total']), 2), 'billed' => i18nEnglish('quoteFrequencies')[quoteFrequency($row['item_frequency'] ?? '')]]; // CSV values stay English
             }
             break;
 
@@ -842,7 +844,7 @@ function clientExportRows($dataset, $client_id, $options) {
         case 'recurring_invoices':
             foreach ($fetch("SELECT * FROM recurring_invoices WHERE recurring_invoice_client_id = $client_id" . $live('recurring_invoice_archived_at') . " ORDER BY recurring_invoice_number") as $row) {
                 $rows[] = ['number' => $row['recurring_invoice_prefix'] . $row['recurring_invoice_number'], 'scope' => $row['recurring_invoice_scope'],
-                    'frequency' => recurringInvoiceFrequencies()[$row['recurring_invoice_frequency']] ?? ucfirst((string) $row['recurring_invoice_frequency']), 'active' => clientExportYes($row['recurring_invoice_status']),
+                    'frequency' => i18nEnglish('recurringInvoiceFrequencies')[$row['recurring_invoice_frequency']] ?? ucfirst((string) $row['recurring_invoice_frequency']), /* CSV values stay English */ 'active' => clientExportYes($row['recurring_invoice_status']),
                     'next_date' => clientExportDate($row['recurring_invoice_next_date']), 'last_sent' => clientExportDate($row['recurring_invoice_last_sent']),
                     'amount' => round(floatval($row['recurring_invoice_amount']), 2), 'currency' => $row['recurring_invoice_currency_code'],
                     'auto_send' => clientExportYes($row['recurring_invoice_auto_send']), 'category' => $name('category', $row['recurring_invoice_category_id']),
@@ -958,10 +960,114 @@ function clientExportCompany() {
     return $row ?: ['company_name' => '', 'company_phone' => '', 'company_phone_country_code' => '', 'company_email' => '', 'company_website' => '', 'company_logo' => '', 'company_country' => ''];
 }
 
-/** "Oct 16, 2026" for a stored date, or ''. */
+/** "Oct 16, 2026" for a stored date, in the interface language, or ''. */
 function clientExportShowDate($value) {
     $value = clientExportDate($value);
-    return $value === '' ? '' : date('M j, Y', strtotime($value));
+    return $value === '' ? '' : formatDate($value, 'date');
+}
+
+/** 'Yes' / '' as the PDF and the archive pages show a stored 'Yes'. */
+function clientExportShowYes($value) {
+    return $value === 'Yes' ? __('Yes') : '';
+}
+
+/** "3 contacts" and the like, for the PDF - $noun is the kind of record. */
+function clientExportCountText($n, $noun) {
+    $n = intval($n);
+    switch ($noun) {
+        case 'contact': return _n('%d contact', '%d contacts', $n);
+        case 'location': return _n('%d location', '%d locations', $n);
+        case 'vendor': return _n('%d vendor', '%d vendors', $n);
+        case 'network': return _n('%d network', '%d networks', $n);
+        case 'asset': return _n('%d asset', '%d assets', $n);
+        case 'device': return _n('%d device', '%d devices', $n);
+        case 'rack': return _n('%d rack', '%d racks', $n);
+        case 'license': return _n('%d license', '%d licenses', $n);
+        case 'domain': return _n('%d domain', '%d domains', $n);
+        case 'certificate': return _n('%d certificate', '%d certificates', $n);
+        case 'service': return _n('%d service', '%d services', $n);
+        case 'credential': return _n('%d credential', '%d credentials', $n);
+        case 'document': return _n('%d document', '%d documents', $n);
+        case 'file': return _n('%d file', '%d files', $n);
+    }
+    return (string) $n;
+}
+
+/** "a, b and c" in the interface language. */
+function clientExportList(array $items) {
+    $items = array_values(array_filter($items, 'strlen'));
+    if (count($items) < 2) {
+        return $items[0] ?? '';
+    }
+    $last = array_pop($items);
+    return __('%1$s and %2$s', implode(', ', $items), $last);
+}
+
+/**
+ * A table of the export as the README names it, in the interface language - the
+ * datasets keep their English label, as it describes the CSV and the JSON manifest.
+ */
+function clientExportDatasetLabel($key, $label = '') {
+    switch ($key) {
+        case 'client': return __('Client');
+        case 'client_notes': return __('Client notes');
+        case 'slas': return __('Service levels');
+        case 'contacts': return __('Contacts');
+        case 'contact_notes': return __('Contact notes');
+        case 'locations': return __('Locations');
+        case 'vendors': return __('Vendors');
+        case 'networks': return __('Networks');
+        case 'ip_addresses': return __('IP addresses');
+        case 'assets': return __('Assets');
+        case 'asset_interfaces': return __('Asset interfaces');
+        case 'asset_notes': return __('Asset notes');
+        case 'asset_fields': return __('Asset custom fields');
+        case 'racks': return __('Racks');
+        case 'rack_units': return __('Rack contents');
+        case 'licenses': return __('Licenses');
+        case 'license_seats': return __('License seats');
+        case 'license_keys': return __('License keys');
+        case 'domains': return __('Domains');
+        case 'certificates': return __('Certificates');
+        case 'services': return __('Services');
+        case 'credentials': return __('Credentials');
+        case 'documents': return __('Documents');
+        case 'files': return __('Files');
+        case 'links': return __('Links between records');
+        case 'tickets': return __('Tickets');
+        case 'ticket_replies': return __('Ticket replies');
+        case 'ticket_tasks': return __('Ticket tasks');
+        case 'recurring_tickets': return __('Recurring tickets');
+        case 'projects': return __('Projects');
+        case 'invoices': return __('Invoices');
+        case 'invoice_items': return __('Invoice items');
+        case 'payments': return __('Payments');
+        case 'quotes': return __('Quotes');
+        case 'quote_items': return __('Quote items');
+        case 'recurring_invoices': return __('Recurring invoices');
+        case 'recurring_invoice_items': return __('Recurring invoice items');
+        case 'credits': return __('Credits');
+    }
+    return (string) $label;
+}
+
+/** The PDF's name for a group of assets - the keys stay English, as they are compared. */
+function clientExportAssetFamilyLabel($family) {
+    switch ($family) {
+        case 'Servers and storage': return __('Servers and storage');
+        case 'Network equipment': return __('Network equipment');
+        case 'Power': return __('Power');
+        case 'Workstations': return __('Workstations');
+        case 'Phones and mobile devices': return __('Phones and mobile devices');
+        case 'Printers and other devices': return __('Printers and other devices');
+    }
+    return (string) $family;
+}
+
+/** A contact's roles ('Primary', 'Billing'...) as the PDF lists them. */
+function clientExportRoleLabels(array $roles) {
+    $labels = ['Primary' => __('Primary'), 'Billing' => __('Billing'), 'Technical' => __('Technical'), 'Important' => __('Important')];
+    return array_map(function ($role) use ($labels) { return $labels[$role] ?? $role; }, $roles);
 }
 
 /** Text for a PDF cell: escaped, line breaks kept. */
@@ -1037,7 +1143,7 @@ function clientExportPdfDocumentHtml($html, $document_id) {
         }
         $info = $data ? @getimagesizefromstring($data) : false;
         if (!$info || !in_array($info[2], [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF], true)) {
-            return $alt !== '' ? '<i>[' . $alt . ']</i>' : '<i>[image]</i>';
+            return $alt !== '' ? '<i>[' . $alt . ']</i>' : '<i>[' . __('image') . ']</i>';
         }
         $width = min(intval($info[0]), 640);
         return '<img src="@' . base64_encode($data) . '" width="' . $width . '" alt="' . $alt . '">';
@@ -1076,8 +1182,8 @@ function clientExportPdf($client_id, $options) {
     $pdf = new ClientExportPdf('P', 'mm', $format, true, 'UTF-8', false);
     $pdf->SetCreator('ITFlow');
     $pdf->SetAuthor($company['company_name']);
-    $pdf->SetTitle($client['name'] . ' - IT Documentation');
-    $pdf->SetSubject('IT Documentation');
+    $pdf->SetTitle(__('%s - IT Documentation', $client['name']));
+    $pdf->SetSubject(__('IT Documentation'));
     $pdf->SetMargins(16, 20, 16);
     $pdf->SetHeaderMargin(8);
     $pdf->SetFooterMargin(10);
@@ -1085,7 +1191,7 @@ function clientExportPdf($client_id, $options) {
     $pdf->setImageScale(1.6);
     $pdf->setFontSubsetting(true);
     $pdf->running_title = $client['name'];
-    $pdf->running_footer = trim($company['company_name'] . ' · Confidential · ' . date('M j, Y'), ' ·');
+    $pdf->running_footer = trim($company['company_name'] . ' · ' . __('Confidential') . ' · ' . formatDate(date('Y-m-d'), 'date'), ' ·');
     if ($options['secrets']) {
         // Readable and printable with the password, not editable
         $pdf->SetProtection(['modify', 'annot-forms', 'fill-forms', 'assemble'], $options['password'], bin2hex(random_bytes(16)), 3);
@@ -1124,8 +1230,8 @@ function clientExportPdf($client_id, $options) {
         }
         $pdf->Ln(1.5);
     };
-    $count = function ($n, $one, $many = null) {
-        return $n . ' ' . ($n === 1 ? $one : ($many ?? $one . 's'));
+    $count = function ($n, $noun) {
+        return clientExportCountText($n, $noun);
     };
 
     /*
@@ -1145,18 +1251,17 @@ function clientExportPdf($client_id, $options) {
     $pdf->SetY(86);
     $pdf->SetFont('dejavusans', '', 12);
     $pdf->SetTextColor(108, 117, 125);
-    $pdf->Cell($width, 7, 'IT Documentation', 0, 1, 'L');
+    $pdf->Cell($width, 7, __('IT Documentation'), 0, 1, 'L');
     $pdf->SetFont('dejavusans', 'B', 26);
     $pdf->SetTextColor(33, 37, 41);
     $pdf->MultiCell($width, 12, $client['name'], 0, 'L', false, 1);
     $pdf->Ln(2);
     $pdf->SetFont('dejavusans', '', 10);
     $pdf->SetTextColor(73, 80, 87);
-    $pdf->MultiCell($width, 5, 'Prepared ' . date('F j, Y') . ' by ' . stripslashes((string) $session_name) . ($company['company_name'] ? ', ' . $company['company_name'] : ''), 0, 'L', false, 1);
+    $pdf->MultiCell($width, 5, $company['company_name'] ? __('Prepared %1$s by %2$s, %3$s', formatDate(date('Y-m-d'), 'date_long'), stripslashes((string) $session_name), $company['company_name']) : __('Prepared %1$s by %2$s', formatDate(date('Y-m-d'), 'date_long'), stripslashes((string) $session_name)), 0, 'L', false, 1);
 
     $included = array_map(function ($key) use ($sections) { return lcfirst($sections[$key]['label']); }, $options['sections']);
-    $about = 'This document records ' . $client['name'] . "'s IT environment as documented on " . date('F j, Y') . ': the client details'
-        . ($included ? ', ' . implode(', ', array_slice($included, 0, -1)) . (count($included) > 1 ? ' and ' : '') . end($included) : '') . '.';
+    $about = __('This document records the IT environment of %1$s as documented on %2$s: %3$s.', $client['name'], formatDate(date('Y-m-d'), 'date_long'), clientExportList(array_merge([__('the client details')], $included)));
     $pdf->SetY(150);
     $pdf->SetFont('dejavusans', '', 9);
     $pdf->SetTextColor(73, 80, 87);
@@ -1165,8 +1270,8 @@ function clientExportPdf($client_id, $options) {
     $pdf->SetFont('dejavusans', 'B', 9);
     $pdf->SetTextColor($options['secrets'] ? 176 : 73, $options['secrets'] ? 42 : 80, $options['secrets'] ? 55 : 87);
     $pdf->MultiCell($width, 5, $options['secrets']
-        ? 'Confidential - this copy includes passwords. Keep it somewhere secure and destroy printed copies when they are no longer needed.'
-        : 'Confidential - store it securely and share it only with people who look after these systems.', 0, 'L', false, 1);
+        ? __('Confidential - this copy includes passwords. Keep it somewhere secure and destroy printed copies when they are no longer needed.')
+        : __('Confidential - store it securely and share it only with people who look after these systems.'), 0, 'L', false, 1);
 
     $contact_lines = array_filter([$company['company_name'], clientExportPhone($company['company_phone'], $company['company_phone_country_code']), $company['company_email'], $company['company_website']]);
     $pdf->SetY($pdf->getPageHeight() - 46);
@@ -1180,7 +1285,7 @@ function clientExportPdf($client_id, $options) {
     if (!$config_whitelabel_enabled) {
         $pdf->SetFont('dejavusans', '', 7);
         $pdf->SetTextColor(173, 181, 189);
-        $pdf->Cell($width, 4, 'Powered by ITFlow', 0, 1, 'R');
+        $pdf->Cell($width, 4, __('Powered by ITFlow'), 0, 1, 'R');
     }
 
     /*
@@ -1190,23 +1295,23 @@ function clientExportPdf($client_id, $options) {
     $contacts = $has('contacts') ? $data('contacts') : [];
     $locations = $has('locations') ? $data('locations') : [];
     $primary_location = $locations[0] ?? null;
-    $chapter('Overview');
+    $chapter(__('Overview'));
     $write(clientExportPdfFacts([
-        'Client' => '<b>' . $e($client['name']) . '</b>',
-        'Industry' => $e($client['industry'] ?? ''),
-        'Website' => $e($client['website'] ?? ''),
-        'Main address' => $primary_location ? $e(formatAddress($primary_location['address'], $primary_location['city'], $primary_location['state'], $primary_location['zip'], $primary_location['country'])) : '',
-        'Main phone' => $primary_location ? $e($primary_location['phone']) : '',
-        'Client since' => $e(clientExportShowDate($client['created'] ?? '')),
+        __('Client') => '<b>' . $e($client['name']) . '</b>',
+        __('Industry') => $e($client['industry'] ?? ''),
+        __('Website') => $e($client['website'] ?? ''),
+        __('Main address') => $primary_location ? $e(formatAddress($primary_location['address'], $primary_location['city'], $primary_location['state'], $primary_location['zip'], $primary_location['country'])) : '',
+        __('Main phone') => $primary_location ? $e($primary_location['phone']) : '',
+        __('Client since') => $e(clientExportShowDate($client['created'] ?? '')),
     ]));
 
     $key_contacts = array_values(array_filter($contacts, function ($c) {
         return $c['primary'] === 'Yes' || $c['billing'] === 'Yes' || $c['technical'] === 'Yes' || $c['important'] === 'Yes';
     }));
     if ($key_contacts) {
-        $chapter('Key contacts', '', 1);
-        $write(clientExportPdfTable(['Name' => 24, 'Role' => 16, 'Email' => 30, 'Phone' => 15, 'Mobile' => 15], array_map(function ($c) use ($e) {
-            $roles = array_keys(array_filter(['Primary' => $c['primary'] === 'Yes', 'Billing' => $c['billing'] === 'Yes', 'Technical' => $c['technical'] === 'Yes', 'Important' => $c['important'] === 'Yes']));
+        $chapter(__('Key contacts'), '', 1);
+        $write(clientExportPdfTable([__('Name') => 24, _x('Role', 'contact') => 16, __('Email') => 30, __('Phone') => 15, __('Mobile') => 15], array_map(function ($c) use ($e) {
+            $roles = clientExportRoleLabels(array_keys(array_filter(['Primary' => $c['primary'] === 'Yes', 'Billing' => $c['billing'] === 'Yes', 'Technical' => $c['technical'] === 'Yes', 'Important' => $c['important'] === 'Yes'])));
             return ['<b>' . $e($c['name']) . '</b>' . clientExportPdfSub($c['title']), $e(implode(', ', $roles)), $e($c['email']), $e($c['phone']), $e($c['mobile'])];
         }, $key_contacts)));
     }
@@ -1223,26 +1328,26 @@ function clientExportPdf($client_id, $options) {
         }
     }
     if ($glance) {
-        $chapter('In this document', '', 1);
-        $write(clientExportPdfTable(['Section' => 50, 'Records' => 50], $glance));
+        $chapter(__('In this document'), '', 1);
+        $write(clientExportPdfTable([__('Section') => 50, __('Records') => 50], $glance));
     }
 
     $slas = $data('slas');
     if ($slas) {
-        $chapter('Service levels', 'Targets run in business hours.', 1);
+        $chapter(__('Service levels'), __('Targets run in business hours.'), 1);
         $minutes = function ($m) {
             $m = intval($m);
             return $m >= 60 ? round($m / 60, 1) . ' h' : $m . ' min';
         };
-        $write(clientExportPdfTable(['Priority' => 20, 'SLA' => 40, 'First reply within' => 20, 'Resolved within' => 20], array_map(function ($s) use ($e, $minutes) {
-            return [$e($s['priority']), $e($s['sla']), $e($minutes($s['response_minutes'])), $e($minutes($s['resolution_minutes']))];
+        $write(clientExportPdfTable([__('Priority') => 20, 'SLA' => 40, __('First reply within') => 20, __('Resolved within') => 20], array_map(function ($s) use ($e, $minutes) {
+            return [$e(ticketPriorityLabel($s['priority'])), $e($s['sla']), $e($minutes($s['response_minutes'])), $e($minutes($s['resolution_minutes']))];
         }, $slas)));
     }
 
-    $support = array_filter(['Company' => $e($company['company_name']), 'Phone' => $e(clientExportPhone($company['company_phone'], $company['company_phone_country_code'])),
-        'Email' => $e($company['company_email']), 'Website' => $e($company['company_website'])]);
+    $support = array_filter([__('Company') => $e($company['company_name']), __('Phone') => $e(clientExportPhone($company['company_phone'], $company['company_phone_country_code'])),
+        __('Email') => $e($company['company_email']), __('Website') => $e($company['company_website'])]);
     if ($support) {
-        $chapter('Getting support', '', 1);
+        $chapter(__('Getting support'), '', 1);
         $write(clientExportPdfFacts($support));
     }
 
@@ -1250,9 +1355,9 @@ function clientExportPdf($client_id, $options) {
      * Contacts
      */
     if ($has('contacts') && $contacts) {
-        $chapter('Contacts', $count(count($contacts), 'contact'), 0, true);
-        $write(clientExportPdfTable(['Name' => 24, 'Email' => 25, 'Phone' => 17, 'Mobile' => 15, 'Location' => 19], array_map(function ($c) use ($e) {
-            $roles = implode(', ', array_keys(array_filter(['Primary' => $c['primary'] === 'Yes', 'Billing' => $c['billing'] === 'Yes', 'Technical' => $c['technical'] === 'Yes'])));
+        $chapter(__('Contacts'), $count(count($contacts), 'contact'), 0, true);
+        $write(clientExportPdfTable([__('Name') => 24, __('Email') => 25, __('Phone') => 17, __('Mobile') => 15, __('Location') => 19], array_map(function ($c) use ($e) {
+            $roles = implode(', ', clientExportRoleLabels(array_keys(array_filter(['Primary' => $c['primary'] === 'Yes', 'Billing' => $c['billing'] === 'Yes', 'Technical' => $c['technical'] === 'Yes']))));
             return ['<b>' . $e($c['name']) . '</b>' . clientExportPdfSub(trim($c['title'] . ($c['department'] ? ' · ' . $c['department'] : ''), ' ·')) . clientExportPdfSub($roles),
                 $e($c['email']), $e($c['phone']), $e($c['mobile']), $e($c['location'])];
         }, $contacts)));
@@ -1262,12 +1367,12 @@ function clientExportPdf($client_id, $options) {
      * Locations
      */
     if ($has('locations') && $locations) {
-        $chapter('Locations', $count(count($locations), 'location'), 0, true);
+        $chapter(__('Locations'), $count(count($locations), 'location'), 0, true);
         foreach ($locations as $location) {
-            $chapter($location['name'] . ($location['primary'] === 'Yes' ? ' (primary)' : ''), $location['description'], 1);
+            $chapter($location['primary'] === 'Yes' ? __('%s (primary)', $location['name']) : $location['name'], $location['description'], 1);
             $write(clientExportPdfFacts([
-                'Address' => $e(formatAddress($location['address'], $location['city'], $location['state'], $location['zip'], $location['country'])),
-                'Phone' => $e($location['phone']), 'Fax' => $e($location['fax']), 'Hours' => $e($location['hours']), 'Contact' => $e($location['contact']), 'Notes' => $e($location['notes']),
+                __('Address') => $e(formatAddress($location['address'], $location['city'], $location['state'], $location['zip'], $location['country'])),
+                __('Phone') => $e($location['phone']), __('Fax') => $e($location['fax']), __('Hours') => $e($location['hours']), __('Contact') => $e($location['contact']), __('Notes') => $e($location['notes']),
             ]));
         }
     }
@@ -1277,9 +1382,9 @@ function clientExportPdf($client_id, $options) {
      */
     $networks = $has('networks') ? $data('networks') : [];
     if ($networks) {
-        $chapter('Networks', $count(count($networks), 'network'), 0, true);
-        $write(clientExportPdfTable(['Network' => 22, 'Address' => 20, 'Gateway' => 14, 'DNS' => 16, 'DHCP range' => 16, 'Location' => 12], array_map(function ($n) use ($e) {
-            return ['<b>' . $e($n['name']) . '</b>' . clientExportPdfSub(trim($n['type'] . ($n['vlan'] !== '' ? ' · VLAN ' . $n['vlan'] : '') . ($n['provider'] ? ' · ' . $n['provider'] : ''), ' ·')),
+        $chapter(__('Networks'), $count(count($networks), 'network'), 0, true);
+        $write(clientExportPdfTable([__('Network') => 22, __('Address') => 20, __('Gateway') => 14, 'DNS' => 16, __('DHCP range') => 16, __('Location') => 12], array_map(function ($n) use ($e) {
+            return ['<b>' . $e($n['name']) . '</b>' . clientExportPdfSub(trim(($n['type'] !== '' ? networkTypeName($n['type']) : '') . ($n['vlan'] !== '' ? ' · VLAN ' . $n['vlan'] : '') . ($n['provider'] ? ' · ' . $n['provider'] : ''), ' ·')),
                 $e($n['network']) . clientExportPdfSub($n['subnet']), $e($n['gateway']), $e(trim($n['primary_dns'] . "\n" . $n['secondary_dns'])), $e($n['dhcp_range']), $e($n['location'])];
         }, $networks)));
         $addresses = [];
@@ -1288,9 +1393,10 @@ function clientExportPdf($client_id, $options) {
         }
         foreach ($networks as $network) {
             if (!empty($addresses[$network['name']])) {
-                $chapter($network['name'] . ' - addresses', '', 1);
-                $write(clientExportPdfTable(['Address' => 16, 'Type' => 13, 'Hostname' => 20, 'MAC address' => 19, 'Description' => 32], array_map(function ($ip) use ($e) {
-                    return [$e($ip['address']), $e(ucfirst((string) $ip['type'])), $e($ip['hostname']), $e($ip['mac']), $e($ip['description'])];
+                $chapter(__('%s - addresses', $network['name']), '', 1);
+                $ip_types = networkIpTypes();
+                $write(clientExportPdfTable([__('Address') => 16, __('Type') => 13, 'Hostname' => 20, __('MAC address') => 19, __('Description') => 32], array_map(function ($ip) use ($e, $ip_types) {
+                    return [$e($ip['address']), $e($ip_types[$ip['type']][3] ?? ucfirst((string) $ip['type'])), $e($ip['hostname']), $e($ip['mac']), $e($ip['description'])];
                 }, $addresses[$network['name']])));
             }
         }
@@ -1301,7 +1407,7 @@ function clientExportPdf($client_id, $options) {
      */
     $assets = $has('assets') ? $data('assets') : [];
     if ($assets) {
-        $chapter('Assets', $count(count($assets), 'asset') . ' in use', 0, true);
+        $chapter(__('Assets'), _n('%d asset in use', '%d assets in use', count($assets)), 0, true);
         // By the type's group (ASSET_TYPES, functions/asset_type.php)
         $families = [
             'Servers and storage' => assetTypesInGroup('server', 'virtual'),
@@ -1314,7 +1420,7 @@ function clientExportPdf($client_id, $options) {
         foreach ($families as $family => $types) {
             $placed[$family] = array_values(array_filter($assets, function ($a) use ($types) { return in_array($a['type'], $types, true); }));
         }
-        $placed['Printers and other devices'] = array_values(array_filter($assets, function ($a) use ($families) {
+        $placed['Printers and other devices'] = array_values(array_filter($assets, function ($a) use ($families) { // i18n-ignore - a key, shown through clientExportAssetFamilyLabel()
             return !in_array($a['type'], array_merge(...array_values($families)), true);
         }));
         $warranty = function ($date) {
@@ -1322,18 +1428,18 @@ function clientExportPdf($client_id, $options) {
                 return '';
             }
             $expired = $date < date('Y-m-d');
-            return '<span style="color:' . ($expired ? '#b02a37' : '#212529') . ';">' . ($expired ? 'Ended ' : '') . clientExportShowDate($date) . '</span>';
+            return '<span style="color:' . ($expired ? '#b02a37' : '#212529') . ';">' . ($expired ? __('Ended %s', clientExportShowDate($date)) : clientExportShowDate($date)) . '</span>';
         };
         foreach ($placed as $family => $list) {
             if (!$list) {
                 continue;
             }
-            $chapter($family, $count(count($list), 'device'), 1);
+            $chapter(clientExportAssetFamilyLabel($family), $count(count($list), 'device'), 1);
             $user_facing = in_array($family, ['Workstations', 'Phones and mobile devices', 'Printers and other devices'], true);
             $write(clientExportPdfTable(
-                ['Name' => 19, 'Make and model' => 19, 'Serial' => 14, ($family === 'Network equipment' ? 'Firmware' : 'OS') => 14, ($user_facing ? 'Used by' : 'IP address') => 13, 'Location' => 11, 'Warranty' => 10],
+                [__('Name') => 19, __('Make and model') => 19, __('Serial') => 14, ($family === 'Network equipment' ? __('Firmware') : __('OS')) => 14, ($user_facing ? __('Used by') : __('IP address')) => 13, __('Location') => 11, __('Warranty') => 10],
                 array_map(function ($a) use ($e, $warranty, $user_facing) {
-                    return ['<b>' . $e($a['name']) . '</b>' . clientExportPdfSub($a['type'] . ($a['status'] && $a['status'] !== 'Deployed' ? ' · ' . $a['status'] : '')),
+                    return ['<b>' . $e($a['name']) . '</b>' . clientExportPdfSub(assetTypeLabel($a['type']) . ($a['status'] && $a['status'] !== 'Deployed' ? ' · ' . $a['status'] : '')),
                         $e(trim($a['make'] . ' ' . $a['model'])), $e($a['serial']), $e($a['os']), $e($user_facing ? $a['used_by'] : $a['ip']),
                         $e($a['location']) . clientExportPdfSub($a['physical_location']), $warranty($a['warranty_expire'])];
                 }, $list)
@@ -1346,7 +1452,7 @@ function clientExportPdf($client_id, $options) {
      */
     $racks = $has('racks') ? $data('racks') : [];
     if ($racks) {
-        $chapter('Racks', $count(count($racks), 'rack'), 0, true);
+        $chapter(__('Racks'), $count(count($racks), 'rack'), 0, true);
         $units = [];
         foreach ($data('rack_units') as $unit) {
             $units[$unit['rack']][] = $unit;
@@ -1355,10 +1461,10 @@ function clientExportPdf($client_id, $options) {
             $chapter($rack['name'], trim(implode(' · ', array_filter([$rack['units'] ? $rack['units'] . 'U' : '', $rack['model'], $rack['location'], $rack['physical_location']]))), 1);
             $list = $units[$rack['name']] ?? [];
             usort($list, function ($a, $b) { return intval($b['from_unit']) <=> intval($a['from_unit']); });
-            $write($list ? clientExportPdfTable(['Units' => 12, 'Face' => 10, 'Device' => 38, 'Type' => 16, 'Power' => 10, 'Notes' => 14], array_map(function ($u) use ($e) {
+            $write($list ? clientExportPdfTable([__('Units') => 12, __('Face') => 10, __('Device') => 38, __('Type') => 16, __('Power') => 10, __('Notes') => 14], array_map(function ($u) use ($e) {
                 $span = intval($u['from_unit']) === intval($u['to_unit']) ? 'U' . $u['from_unit'] : 'U' . $u['from_unit'] . '-' . $u['to_unit'];
-                return [$e($span), $e($u['face']), '<b>' . $e($u['device']) . '</b>', $e($u['type']), $e($u['power_watts'] ? $u['power_watts'] . ' W' : ''), $e($u['notes'])];
-            }, $list)) : '<span style="color:#6c757d;">Nothing documented in this rack.</span>');
+                return [$e($span), $e(strtolower($u['face']) === 'rear' ? __('Rear') : __('Front')), '<b>' . $e($u['device']) . '</b>', $e(rackItemTypeLabel($u['type'])), $e($u['power_watts'] ? $u['power_watts'] . ' W' : ''), $e($u['notes'])];
+            }, $list)) : '<span style="color:#6c757d;">' . __('Nothing documented in this rack.') . '</span>');
         }
     }
 
@@ -1367,15 +1473,15 @@ function clientExportPdf($client_id, $options) {
      */
     $licenses = $has('software') ? $data('licenses') : [];
     if ($licenses) {
-        $chapter('Licenses', $count(count($licenses), 'license'), 0, true);
+        $chapter(__('Licenses'), $count(count($licenses), 'license'), 0, true);
         $keys = [];
         foreach ($data('license_keys') as $key) {
             $keys[$key['license']][] = $key['key'] . ($key['assigned_to'] !== '' ? ' (' . $key['assigned_to'] . ')' : '');
         }
-        $write(clientExportPdfTable(['License' => 26, 'Type' => 15, 'Keys' => 24, 'Seats' => 9, 'Renews' => 12, 'Vendor' => 14], array_map(function ($l) use ($e, $keys) {
-            $seats = $l['seats'] !== '' ? $l['seats_used'] . ' of ' . $l['seats'] : ($l['seats_used'] ? $l['seats_used'] . ' in use' : '');
+        $write(clientExportPdfTable([__('License') => 26, __('Type') => 15, __('Keys') => 24, __('Seats') => 9, __('Renews') => 12, __('Vendor') => 14], array_map(function ($l) use ($e, $keys) {
+            $seats = $l['seats'] !== '' ? __('%1$s of %2$s', $l['seats_used'], $l['seats']) : ($l['seats_used'] ? __('%d in use', $l['seats_used']) : '');
             $license_keys = array_filter(array_merge([$l['key']], $keys[$l['name']] ?? []), 'strlen');
-            return ['<b>' . $e(trim($l['name'] . ' ' . $l['version'])) . '</b>' . clientExportPdfSub($l['description']), $e($l['type']) . clientExportPdfSub($l['license_type']),
+            return ['<b>' . $e(trim($l['name'] . ' ' . $l['version'])) . '</b>' . clientExportPdfSub($l['description']), $e($l['type']) . clientExportPdfSub($l['license_type'] !== '' ? softwareLicenseTypeLabel($l['license_type']) : ''),
                 $license_keys ? '<span style="font-family:dejavusansmono;font-size:7pt;">' . $e(implode("\n", $license_keys)) . '</span>' : '', $e($seats),
                 $e(clientExportShowDate($l['expires'])), $e($l['vendor'])];
         }, $licenses)));
@@ -1384,8 +1490,8 @@ function clientExportPdf($client_id, $options) {
             $holders[$seat['license']][$seat['seat']][] = $seat['name'];
         }
         if ($holders) {
-            $chapter('Who has each license', '', 1);
-            $write(clientExportPdfTable(['License' => 26, 'Devices' => 37, 'Users' => 37], array_map(function ($license, $seats) use ($e) {
+            $chapter(__('Who has each license'), '', 1);
+            $write(clientExportPdfTable([__('License') => 26, __('Devices') => 37, __('Users') => 37], array_map(function ($license, $seats) use ($e) {
                 return ['<b>' . $e($license) . '</b>', $e(implode(', ', $seats['Device'] ?? [])), $e(implode(', ', $seats['User'] ?? []))];
             }, array_keys($holders), $holders)));
         }
@@ -1396,21 +1502,21 @@ function clientExportPdf($client_id, $options) {
      */
     $domains = $has('domains') ? $data('domains') : [];
     if ($domains) {
-        $chapter('Domains', $count(count($domains), 'domain'), 0, true);
-        $write(clientExportPdfTable(['Domain' => 22, 'Expires' => 14, 'Registrar' => 16, 'DNS host' => 16, 'Web host' => 16, 'Mail host' => 16], array_map(function ($d) use ($e) {
-            return ['<b>' . $e($d['name']) . '</b>' . clientExportPdfSub($d['description']), $e(clientExportShowDate($d['expires'])) . clientExportPdfSub($d['auto_renew'] === 'Yes' ? 'Auto-renews' : ''),
+        $chapter(__('Domains'), $count(count($domains), 'domain'), 0, true);
+        $write(clientExportPdfTable([__('Domain') => 22, __('Expires') => 14, __('Registrar') => 16, __('DNS host') => 16, __('Web host') => 16, __('Mail host') => 16], array_map(function ($d) use ($e) {
+            return ['<b>' . $e($d['name']) . '</b>' . clientExportPdfSub($d['description']), $e(clientExportShowDate($d['expires'])) . clientExportPdfSub($d['auto_renew'] === 'Yes' ? __('Auto-renews') : ''),
                 $e($d['registrar']), $e($d['dns_host']), $e($d['web_host']), $e($d['mail_host'])];
         }, $domains)));
-        $chapter('DNS', 'As last looked up.', 1);
-        $write(clientExportPdfTable(['Domain' => 22, 'Name servers' => 30, 'Mail servers' => 30, 'A record' => 18], array_map(function ($d) use ($e) {
+        $chapter('DNS', __('As last looked up.'), 1);
+        $write(clientExportPdfTable([__('Domain') => 22, __('Name servers') => 30, __('Mail servers') => 30, __('A record') => 18], array_map(function ($d) use ($e) {
             return ['<b>' . $e($d['name']) . '</b>', $e($d['name_servers']), $e($d['mail_servers']), $e($d['ip'])];
         }, $domains)));
     }
     $certificates = $has('certificates') ? $data('certificates') : [];
     if ($certificates) {
-        $chapter('Certificates', $count(count($certificates), 'certificate'), 0, !$domains);
-        $write(clientExportPdfTable(['Certificate' => 26, 'Host' => 22, 'Issued by' => 20, 'Expires' => 14, 'Last check' => 18], array_map(function ($c) use ($e) {
-            return ['<b>' . $e($c['name']) . '</b>', $e($c['host']), $e($c['issued_by']), $e(clientExportShowDate($c['expires'])), $e($c['check']) . clientExportPdfSub(clientExportShowDate($c['checked']))];
+        $chapter(__('Certificates'), $count(count($certificates), 'certificate'), 0, !$domains);
+        $write(clientExportPdfTable([__('Certificate') => 26, 'Host' => 22, __('Issued by') => 20, __('Expires') => 14, __('Last check') => 18], array_map(function ($c) use ($e) {
+            return ['<b>' . $e($c['name']) . '</b>', $e($c['host']), $e($c['issued_by']), $e(clientExportShowDate($c['expires'])), $e(($c['_check'] ?? '') !== '' ? certificateCheckStateLabel($c['_check']) : $c['check']) . clientExportPdfSub(clientExportShowDate($c['checked']))];
         }, $certificates)));
     }
 
@@ -1419,7 +1525,7 @@ function clientExportPdf($client_id, $options) {
      */
     $services = $has('services') ? $data('services') : [];
     if ($services) {
-        $chapter('Services', $count(count($services), 'service') . ', most important first', 0, true);
+        $chapter(__('Services'), _n('%d service, most important first', '%d services, most important first', count($services)), 0, true);
         $depends = [];
         foreach ($data('links') as $link) {
             if ($link['type'] === 'Service') {
@@ -1427,19 +1533,19 @@ function clientExportPdf($client_id, $options) {
             }
         }
         foreach ($services as $service) {
-            $chapter($service['name'], trim(implode(' · ', array_filter([$service['importance'] ? $service['importance'] . ' importance' : '', $service['category']]))), 1);
+            $chapter($service['name'], trim(implode(' · ', array_filter([$service['importance'] ? serviceImportanceText($service['importance']) : '', $service['category']]))), 1);
             $on = $depends[$service['name']] ?? [];
             $write(clientExportPdfFacts([
-                'What it is' => $e($service['description']),
-                'Runs on' => $e(implode(', ', $on['Asset'] ?? [])),
-                'Domains' => $e(implode(', ', $on['Domain'] ?? [])),
-                'Certificates' => $e(implode(', ', $on['Certificate'] ?? [])),
-                'Logins' => $e(implode(', ', $on['Credential'] ?? [])),
-                'Supported by' => $e(implode(', ', array_merge($on['Vendor'] ?? [], $on['Contact'] ?? []))),
-                'Documents' => $e(implode(', ', $on['Document'] ?? [])),
-                'Backup' => $e($service['backup']),
-                'Notes' => $e($service['notes']),
-                'Next review' => $e(clientExportShowDate($service['review_due'])),
+                __('What it is') => $e($service['description']),
+                __('Runs on') => $e(implode(', ', $on['Asset'] ?? [])),
+                __('Domains') => $e(implode(', ', $on['Domain'] ?? [])),
+                __('Certificates') => $e(implode(', ', $on['Certificate'] ?? [])),
+                __('Logins') => $e(implode(', ', $on['Credential'] ?? [])),
+                __('Supported by') => $e(implode(', ', array_merge($on['Vendor'] ?? [], $on['Contact'] ?? []))),
+                __('Documents') => $e(implode(', ', $on['Document'] ?? [])),
+                __('Backup') => $e($service['backup']),
+                __('Notes') => $e($service['notes']),
+                __('Next review') => $e(clientExportShowDate($service['review_due'])),
             ]));
         }
     }
@@ -1449,9 +1555,9 @@ function clientExportPdf($client_id, $options) {
      */
     $vendors = $has('vendors') ? $data('vendors') : [];
     if ($vendors) {
-        $chapter('Vendors', $count(count($vendors), 'vendor'), 0, true);
-        $write(clientExportPdfTable(['Vendor' => 22, 'Account' => 15, 'Support' => 22, 'Hours and SLA' => 18, 'Account manager' => 23], array_map(function ($v) use ($e) {
-            return ['<b>' . $e($v['name']) . '</b>' . clientExportPdfSub($v['description']), $e($v['account_number']) . clientExportPdfSub($v['code'] !== '' ? 'PIN ' . $v['code'] : ''),
+        $chapter(__('Vendors'), $count(count($vendors), 'vendor'), 0, true);
+        $write(clientExportPdfTable([__('Vendor') => 22, __('Account') => 15, __('Support') => 22, __('Hours and SLA') => 18, __('Account manager') => 23], array_map(function ($v) use ($e) {
+            return ['<b>' . $e($v['name']) . '</b>' . clientExportPdfSub($v['description']), $e($v['account_number']) . clientExportPdfSub($v['code'] !== '' ? __('PIN %s', $v['code']) : ''),
                 $e(trim($v['phone'] . "\n" . $v['email'] . "\n" . $v['website'])), $e(trim($v['hours'] . "\n" . $v['sla'])),
                 $e(trim($v['contact_name'] . "\n" . $v['contact_phone'] . "\n" . $v['contact_email']))];
         }, $vendors)));
@@ -1462,18 +1568,18 @@ function clientExportPdf($client_id, $options) {
      */
     $credentials = $has('credentials') ? $data('credentials') : [];
     if ($credentials) {
-        $chapter('Credentials', $count(count($credentials), 'credential') . ($options['secrets'] ? ' - with passwords' : ' - passwords are not included'), 0, true);
+        $chapter(__('Credentials'), $options['secrets'] ? _n('%d credential - with passwords', '%d credentials - with passwords', count($credentials)) : _n('%d credential - passwords are not included', '%d credentials - passwords are not included', count($credentials)), 0, true);
         $mono = function ($value) use ($e) {
             return $value === '' ? '' : '<span style="font-family:dejavusansmono;font-size:7.5pt;">' . $e($value) . '</span>';
         };
         if ($options['secrets']) {
-            $write(clientExportPdfTable(['Name' => 24, 'Username' => 20, 'Password' => 20, '2FA secret' => 14, 'Link' => 22], array_map(function ($c) use ($e, $mono) {
+            $write(clientExportPdfTable([__('Name') => 24, __('Username') => 20, __('Password') => 20, __('2FA secret') => 14, _x('Link', 'web address') => 22], array_map(function ($c) use ($e, $mono) {
                 return ['<b>' . $e($c['name']) . '</b>' . clientExportPdfSub($c['description']), $mono($c['username']), $mono($c['password']),
-                    $c['otp_secret'] !== '' ? $mono($c['otp_secret']) : $e($c['has_2fa'] === 'Yes' ? 'Yes' : ''), $e($c['uri'])];
+                    $c['otp_secret'] !== '' ? $mono($c['otp_secret']) : $e(clientExportShowYes($c['has_2fa'])), $e($c['uri'])];
             }, $credentials)));
         } else {
-            $write(clientExportPdfTable(['Name' => 30, 'Username' => 26, '2FA' => 8, 'Link' => 36], array_map(function ($c) use ($e, $mono) {
-                return ['<b>' . $e($c['name']) . '</b>' . clientExportPdfSub($c['description']), $mono($c['username']), $e($c['has_2fa'] === 'Yes' ? 'Yes' : ''), $e($c['uri'])];
+            $write(clientExportPdfTable([__('Name') => 30, __('Username') => 26, '2FA' => 8, _x('Link', 'web address') => 36], array_map(function ($c) use ($e, $mono) {
+                return ['<b>' . $e($c['name']) . '</b>' . clientExportPdfSub($c['description']), $mono($c['username']), $e(clientExportShowYes($c['has_2fa'])), $e($c['uri'])];
             }, $credentials)));
         }
     }
@@ -1483,8 +1589,8 @@ function clientExportPdf($client_id, $options) {
      */
     $files = $has('files') ? $data('files') : [];
     if ($files) {
-        $chapter('Files', $count(count($files), 'file') . ' on record. The files themselves are in the full export.', 0, true);
-        $write(clientExportPdfTable(['Name' => 36, 'Folder' => 26, 'Type' => 10, 'Size' => 12, 'Uploaded' => 16], array_map(function ($f) use ($e) {
+        $chapter(__('Files'), _n('%d file on record. The files themselves are in the full export.', '%d files on record. The files themselves are in the full export.', count($files)), 0, true);
+        $write(clientExportPdfTable([__('Name') => 36, __('Folder') => 26, __('Type') => 10, __('Size') => 12, __('Uploaded') => 16], array_map(function ($f) use ($e) {
             return ['<b>' . $e($f['name']) . '</b>' . clientExportPdfSub($f['description']), $e($f['folder']), $e($f['type']), $e(formatBytes($f['size'], 1)), $e(clientExportShowDate($f['created']))];
         }, $files)));
     }
@@ -1494,13 +1600,13 @@ function clientExportPdf($client_id, $options) {
      */
     $documents = $has('documents') ? $data('documents') : [];
     if ($documents) {
-        $chapter('Documents', $count(count($documents), 'document') . ', each on the pages that follow', 0, true);
-        $write(clientExportPdfTable(['Document' => 46, 'Folder' => 30, 'Updated' => 24], array_map(function ($d) use ($e) {
+        $chapter(__('Documents'), _n('%d document, on the pages that follow', '%d documents, each on the pages that follow', count($documents)), 0, true);
+        $write(clientExportPdfTable([__('Document') => 46, __('Folder') => 30, __('Updated') => 24], array_map(function ($d) use ($e) {
             return ['<b>' . $e($d['name']) . '</b>' . clientExportPdfSub($d['description']), $e($d['folder']), $e(clientExportShowDate($d['updated'] ?: $d['created']))];
         }, $documents)));
         foreach ($documents as $document) {
             $content = clientExportDocumentContent($document['id'], $client_id);
-            $chapter($document['name'], trim(implode(' · ', array_filter([$document['folder'], 'Updated ' . clientExportShowDate($document['updated'] ?: $document['created'])])), ' ·'), 1, true, 15);
+            $chapter($document['name'], trim(implode(' · ', array_filter([$document['folder'], __('Updated %s', clientExportShowDate($document['updated'] ?: $document['created']))])), ' ·'), 1, true, 15);
             if ($document['description'] !== '') {
                 $write('<p style="color:#495057;"><i>' . $e($document['description']) . '</i></p>');
             }
@@ -1511,7 +1617,7 @@ function clientExportPdf($client_id, $options) {
                 $pdf->commitTransaction();
             } catch (Exception $exception) {
                 $pdf = $pdf->rollbackTransaction();
-                $write('<p style="color:#6c757d;"><i>This document has formatting the PDF cannot show, so here is its text.</i></p>' . $e(clientExportText($content)));
+                $write('<p style="color:#6c757d;"><i>' . __('This document has formatting the PDF cannot show, so here is its text.') . '</i></p>' . $e(clientExportText($content)));
             }
         }
     }
@@ -1522,7 +1628,7 @@ function clientExportPdf($client_id, $options) {
     $pdf->addTOCPage();
     $pdf->SetFont('dejavusans', 'B', 15);
     $pdf->SetTextColor(33, 37, 41);
-    $pdf->Cell($width, 8, 'Contents', 0, 1, 'L');
+    $pdf->Cell($width, 8, __('Contents'), 0, 1, 'L');
     $pdf->SetDrawColor(13, 110, 253);
     $pdf->SetLineWidth(0.6);
     $pdf->Line($pdf->GetX(), $pdf->GetY(), $pdf->GetX() + 18, $pdf->GetY());
@@ -1533,7 +1639,7 @@ function clientExportPdf($client_id, $options) {
             . '<td width="10%" align="right"><span style="' . $style . '">#TOC_PAGE_NUMBER#</span></td></tr></table>';
     };
     $pdf->SetFont('dejavusans', '', 9);
-    $pdf->addHTMLTOC(2, 'Contents', [
+    $pdf->addHTMLTOC(2, __('Contents'), [
         $toc_line(false, 'font-weight:bold;font-size:9.5pt;color:#212529;'),
         $toc_line(true, 'font-size:8.5pt;color:#495057;'),
     ], true, 'B', [33, 37, 41]);
@@ -1564,7 +1670,7 @@ const CLIENT_EXPORT_STORED_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic',
 
 /** A web page of the export - a document, a ticket, the README - with its own styles, readable offline. */
 function clientExportHtmlPage($title, $body, $up = '') {
-    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+    return '<!DOCTYPE html><html lang="' . i18nHtmlLang() . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<title>' . escapeHtml($title) . '</title><style>'
         . 'html{background:#f6f7f9}body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#212529;background:#f6f7f9;margin:0;line-height:1.5;font-size:15px}'
         . 'main{max-width:960px;margin:0 auto;padding:32px 20px 64px}'
@@ -1579,7 +1685,7 @@ function clientExportHtmlPage($title, $body, $up = '') {
         . '.content img{max-width:100%;height:auto}.content table{width:auto}.content td,.content th{border:1px solid #dee2e6}'
         . 'nav.crumbs{font-size:13px;margin-bottom:14px}ul.plain{list-style:none;padding-left:0}ul.plain li{padding:3px 0}'
         . '.notice{background:#fff3cd;border:1px solid #ffe69c;border-radius:8px;padding:12px 16px;margin-bottom:18px}'
-        . '</style></head><body><main>' . ($up !== null ? '<nav class="crumbs"><a href="' . $up . 'README.html">&larr; Back to the export</a></nav>' : '')
+        . '</style></head><body><main>' . ($up !== null ? '<nav class="crumbs"><a href="' . $up . 'README.html">&larr; ' . __('Back to the export') . '</a></nav>' : '')
         . $body . '</main></body></html>';
 }
 
@@ -1625,7 +1731,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
     $client_id = intval($client_id);
     $client = clientExportRows('client', $client_id, $options)[0] ?? null;
     if (!$client) {
-        $error = 'That client no longer exists.';
+        $error = __('That client no longer exists.');
         return false;
     }
 
@@ -1634,7 +1740,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
     $zip_path = $tmp_dir . '/client-export-' . bin2hex(random_bytes(12)) . '.zip';
     $zip = new ZipArchive();
     if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        $error = 'The export could not be started - the server could not write to uploads/tmp.';
+        $error = __('The export could not be started - the server could not write to uploads/tmp.');
         return false;
     }
     // Whatever ends the request - an error, a time limit, a dropped download -
@@ -1717,8 +1823,10 @@ function clientExportArchive($client_id, $options, &$error = '') {
             $content = documentHtmlPurify(clientExportDocumentContent($document['id'], $client_id));
             $content = clientExportLocalImages($content, ['/uploads/documents/' . $document['id'] . '/' => __DIR__ . '/../uploads/documents/' . $document['id']],
                 'documents/_images/' . $document['id'], $up, $add_file);
-            $meta = array_filter([$document['folder'] !== '' ? 'Folder: ' . $document['folder'] : '', 'Updated ' . clientExportShowDate($document['updated'] ?: $document['created']),
-                $document['created_by'] !== '' ? 'by ' . $document['created_by'] : '', $document['archived'] !== '' ? 'Archived ' . clientExportShowDate($document['archived']) : '']);
+            $updated = clientExportShowDate($document['updated'] ?: $document['created']);
+            $meta = array_filter([$document['folder'] !== '' ? __('Folder: %s', $document['folder']) : '',
+                $document['created_by'] !== '' ? __('Updated %1$s by %2$s', $updated, $document['created_by']) : __('Updated %s', $updated),
+                $document['archived'] !== '' ? __('Archived %s', clientExportShowDate($document['archived'])) : '']);
             $add_string($path, clientExportHtmlPage($document['name'], '<div class="card"><h1>' . escapeHtml($document['name']) . '</h1>'
                 . '<div class="muted small">' . escapeHtml(implode(' · ', $meta)) . '</div>'
                 . ($document['description'] !== '' ? '<p><em>' . escapeHtml($document['description']) . '</em></p>' : '')
@@ -1735,7 +1843,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
         foreach ($rows['files'] as $i => $file) {
             $source = $client_file($file['_reference']);
             if (!$source) {
-                $missing[] = 'File "' . $file['name'] . '" is on record but not on the server';
+                $missing[] = __('File "%s" is on record but not on the server', $file['name']);
                 continue;
             }
             $folder = 'files' . ($file['folder'] !== '' ? '/' . implode('/', array_map('clientExportSafeName', explode('/', $file['folder']))) : '');
@@ -1766,7 +1874,7 @@ function clientExportArchive($client_id, $options, &$error = '') {
                 $dir = realpath(__DIR__ . '/../uploads/tickets/' . $ticket['id']);
                 $source = $dir ? realpath($dir . '/' . basename((string) $attachment['ticket_attachment_reference_name'])) : false;
                 if (!$source || strpos($source, $dir . DIRECTORY_SEPARATOR) !== 0) {
-                    $missing[] = 'Attachment "' . $attachment['ticket_attachment_name'] . '" on ' . $ticket['number'] . ' is on record but not on the server';
+                    $missing[] = __('Attachment "%1$s" on %2$s is on record but not on the server', $attachment['ticket_attachment_name'], $ticket['number']);
                     continue;
                 }
                 $target = clientExportUniquePath('tickets/attachments/' . clientExportSafeName($ticket['number']), clientExportSafeName($attachment['ticket_attachment_name']), $used);
@@ -1774,12 +1882,12 @@ function clientExportArchive($client_id, $options, &$error = '') {
                     $files_html .= '<li><a href="../' . escapeHtml($target) . '">' . escapeHtml($attachment['ticket_attachment_name']) . '</a></li>';
                 }
             }
-            $badges = '<span class="badge blue">' . escapeHtml($ticket['status']) . '</span><span class="badge">' . escapeHtml($ticket['priority']) . '</span>'
+            $badges = '<span class="badge blue">' . escapeHtml(ticketStatusLabel($ticket['_status_id'], $ticket['status'])) . '</span><span class="badge">' . escapeHtml(ticketPriorityLabel($ticket['priority'])) . '</span>'
                 . ($ticket['category'] !== '' ? '<span class="badge">' . escapeHtml($ticket['category']) . '</span>' : '');
-            $facts = array_filter(['Contact' => $ticket['contact'], 'Assigned to' => $ticket['assigned_to'], 'Asset' => $ticket['asset'], 'Location' => $ticket['location'],
-                'Project' => $ticket['project'], 'Vendor' => trim($ticket['vendor'] . ($ticket['vendor_ticket'] !== '' ? ' (case ' . $ticket['vendor_ticket'] . ')' : '')),
-                'Opened' => clientExportShowDate($ticket['created']), 'Resolved' => clientExportShowDate($ticket['resolved']), 'Closed' => clientExportShowDate($ticket['closed']),
-                'Time worked' => $ticket['time_worked'], 'Rating' => $ticket['feedback'], 'Invoice' => $ticket['_invoice']]);
+            $facts = array_filter([__('Contact') => $ticket['contact'], __('Assigned to') => $ticket['assigned_to'], __('Asset') => $ticket['asset'], __('Location') => $ticket['location'],
+                __('Project') => $ticket['project'], __('Vendor') => $ticket['vendor_ticket'] !== '' ? __('%1$s (case %2$s)', $ticket['vendor'], $ticket['vendor_ticket']) : $ticket['vendor'],
+                __('Opened') => clientExportShowDate($ticket['created']), __('Resolved') => clientExportShowDate($ticket['resolved']), __('Closed') => clientExportShowDate($ticket['closed']),
+                __('Time worked') => $ticket['time_worked'], __('Rating') => ['Good' => _x('Good', 'ticket rating'), 'Bad' => _x('Bad', 'ticket rating')][$ticket['feedback']] ?? $ticket['feedback'], __('Invoice') => $ticket['_invoice']]);
             $facts_html = '<table>';
             foreach ($facts as $label => $value) {
                 $facts_html .= '<tr><th style="width:160px">' . escapeHtml($label) . '</th><td>' . escapeHtml($value) . '</td></tr>';
@@ -1796,20 +1904,20 @@ function clientExportArchive($client_id, $options, &$error = '') {
                 $by = $type === 'Client' ? ($names['contact'][intval($reply['ticket_reply_by'])] ?? '') : ($names['user'][intval($reply['ticket_reply_by'])] ?? '');
                 $worked = clientExportHours(clientExportSeconds($reply['ticket_reply_time_worked']));
                 $class = $type === 'Client' ? 'client' : ($type === 'Internal' ? 'internal' : '');
-                $label = $type === 'Internal' ? 'Internal note' : ($type === 'Client' ? 'Client' : 'Reply');
-                $thread .= '<div class="reply ' . $class . '"><div class="small muted"><strong>' . escapeHtml($by ?: 'Unknown') . '</strong> · ' . escapeHtml($label)
-                    . ' · ' . escapeHtml(date('M j, Y g:i A', strtotime($reply['ticket_reply_created_at']))) . ($worked !== '' ? ' · ' . escapeHtml($worked) . ' worked' : '')
+                $label = $type === 'Internal' ? __('Internal note') : ($type === 'Client' ? __('Client') : __('Reply'));
+                $thread .= '<div class="reply ' . $class . '"><div class="small muted"><strong>' . escapeHtml($by ?: __('Unknown')) . '</strong> · ' . escapeHtml($label)
+                    . ' · ' . escapeHtml(formatDate($reply['ticket_reply_created_at'], 'datetime')) . ($worked !== '' ? ' · ' . escapeHtml(__('%s worked', $worked)) : '')
                     . '</div><div class="content">' . documentHtmlPurify($reply['ticket_reply']) . '</div></div>';
             }
             $add_string($path, clientExportHtmlPage($ticket['number'] . ' - ' . $ticket['subject'],
-                '<div class="card"><div class="muted small">' . escapeHtml($ticket['number']) . ($ticket['archived'] !== '' ? ' · Archived' : '') . '</div>'
+                '<div class="card"><div class="muted small">' . escapeHtml($ticket['number']) . ($ticket['archived'] !== '' ? ' · ' . __('Archived') : '') . '</div>'
                 . '<h1>' . escapeHtml($ticket['subject']) . '</h1><div>' . $badges . '</div></div>'
                 . '<div class="card">' . $facts_html . '</div>'
-                . '<div class="card"><h3 style="margin-top:0">Details</h3><div class="content">' . documentHtmlPurify($details) . '</div></div>'
-                . ($thread !== '' ? '<div class="card"><h3 style="margin-top:0">Conversation</h3>' . $thread . '</div>' : '')
-                . ($files_html !== '' ? '<div class="card"><h3 style="margin-top:0">Attachments</h3><ul>' . $files_html . '</ul></div>' : ''), '../'));
+                . '<div class="card"><h3 style="margin-top:0">' . __('Details') . '</h3><div class="content">' . documentHtmlPurify($details) . '</div></div>'
+                . ($thread !== '' ? '<div class="card"><h3 style="margin-top:0">' . __('Conversation') . '</h3>' . $thread . '</div>' : '')
+                . ($files_html !== '' ? '<div class="card"><h3 style="margin-top:0">' . __('Attachments') . '</h3><ul>' . $files_html . '</ul></div>' : ''), '../'));
             $rows['tickets'][$i]['path'] = $path;
-            $ticket_pages[] = ['number' => $ticket['number'], 'subject' => $ticket['subject'], 'status' => $ticket['status'], 'created' => $ticket['created'], 'path' => $path];
+            $ticket_pages[] = ['number' => $ticket['number'], 'subject' => $ticket['subject'], 'status' => ticketStatusLabel($ticket['_status_id'], $ticket['status']), 'created' => $ticket['created'], 'path' => $path];
         }
     }
 
@@ -1846,11 +1954,11 @@ function clientExportArchive($client_id, $options, &$error = '') {
     if ($options['with_pdf']) {
         $pdf_sections = array_values(array_intersect($options['sections'], array_keys(array_filter(clientExportSections(), function ($s) { return $s['pdf']; }))));
         try {
-            $pdf_name = clientExportFileName($client['name'], 'IT Documentation', 'pdf');
+            $pdf_name = clientExportFileName($client['name'], __('IT Documentation'), 'pdf');
             $add_string($pdf_name, clientExportPdf($client_id, ['kind' => 'pdf', 'sections' => $pdf_sections, 'archived' => false] + $options));
         } catch (Exception $exception) {
             $pdf_name = '';
-            $missing[] = 'The documentation PDF could not be made: ' . $exception->getMessage();
+            $missing[] = __('The documentation PDF could not be made: %s', $exception->getMessage());
         }
     }
 
@@ -1858,48 +1966,49 @@ function clientExportArchive($client_id, $options, &$error = '') {
      * The README - what is here, and links to all of it
      */
     $sections = clientExportSections();
-    $readme = '<div class="card"><div class="muted small">Client data export</div><h1>' . escapeHtml($client['name']) . '</h1>'
-        . '<div class="muted">Exported ' . escapeHtml(date('F j, Y g:i A')) . ' by ' . escapeHtml(stripslashes((string) $session_name)) . ' from ITFlow ' . escapeHtml(APP_VERSION) . '</div></div>';
+    $readme = '<div class="card"><div class="muted small">' . __('Client data export') . '</div><h1>' . escapeHtml($client['name']) . '</h1>'
+        . '<div class="muted">' . escapeHtml(__('Exported %1$s by %2$s from ITFlow %3$s', formatDate(date('Y-m-d H:i:s'), 'datetime'), stripslashes((string) $session_name), APP_VERSION)) . '</div></div>';
     if ($options['secrets']) {
-        $readme .= '<div class="notice"><strong>This export includes passwords and 2FA secrets.</strong> Keep it encrypted, share the password separately, and delete copies once they are no longer needed.</div>';
+        $readme .= '<div class="notice"><strong>' . __('This export includes passwords and 2FA secrets.') . '</strong> ' . __('Keep it encrypted, share the password separately, and delete copies once they are no longer needed.') . '</div>';
     }
-    $readme .= '<div class="card"><h2 style="margin-top:0">What is in this export</h2><ul>'
-        . ($pdf_name !== '' ? '<li><a href="' . escapeHtml(rawurlencode($pdf_name)) . '">' . escapeHtml($pdf_name) . '</a> - the IT documentation, ready to print or share</li>' : '')
-        . '<li><strong>data/csv</strong> - every record as a spreadsheet (opens in Excel, Numbers or LibreOffice)</li>'
-        . '<li><strong>data/json</strong> - the same records for importing into another system, described in data/export.json</li>'
-        . ($document_pages ? '<li><strong>documents</strong> - ' . count($document_pages) . ' documents as web pages, in their folders</li>' : '')
-        . (isset($rows['files']) ? '<li><strong>files</strong> - ' . count(array_filter(array_column($rows['files'], 'path'))) . ' files, in their folders</li>' : '')
-        . ($ticket_pages ? '<li><strong>tickets</strong> - ' . count($ticket_pages) . ' ticket conversations with their attachments</li>' : '')
-        . ($photos ? '<li><strong>photos</strong> - ' . $photos . ' photos of contacts, assets, locations and racks</li>' : '')
-        . '</ul><p class="small muted">Included: client details, ' . escapeHtml(implode(', ', array_map(function ($key) use ($sections) { return lcfirst($sections[$key]['label']); }, $options['sections'])))
-        . '. ' . ($options['archived'] ? 'Archived records are included and dated in their Archived column.' : 'Archived records are left out.')
-        . ($options['secrets'] ? '' : (in_array('credentials', $options['sections'], true) ? ' Passwords and 2FA secrets are not included.' : '')) . '</p></div>';
+    $file_count = isset($rows['files']) ? count(array_filter(array_column($rows['files'], 'path'))) : 0;
+    $readme .= '<div class="card"><h2 style="margin-top:0">' . __('What is in this export') . '</h2><ul>'
+        . ($pdf_name !== '' ? '<li><a href="' . escapeHtml(rawurlencode($pdf_name)) . '">' . escapeHtml($pdf_name) . '</a> - ' . __('the IT documentation, ready to print or share') . '</li>' : '')
+        . '<li><strong>data/csv</strong> - ' . __('every record as a spreadsheet (opens in Excel, Numbers or LibreOffice)') . '</li>'
+        . '<li><strong>data/json</strong> - ' . __('the same records for importing into another system, described in data/export.json') . '</li>'
+        . ($document_pages ? '<li><strong>documents</strong> - ' . _n('%d document as a web page, in its folder', '%d documents as web pages, in their folders', count($document_pages)) . '</li>' : '')
+        . (isset($rows['files']) ? '<li><strong>files</strong> - ' . _n('%d file, in its folder', '%d files, in their folders', $file_count) . '</li>' : '')
+        . ($ticket_pages ? '<li><strong>tickets</strong> - ' . _n('%d ticket conversation with its attachments', '%d ticket conversations with their attachments', count($ticket_pages)) . '</li>' : '')
+        . ($photos ? '<li><strong>photos</strong> - ' . _n('%d photo of contacts, assets, locations and racks', '%d photos of contacts, assets, locations and racks', $photos) . '</li>' : '')
+        . '</ul><p class="small muted">' . escapeHtml(__('Included: %s.', implode(', ', array_merge([__('client details')], array_map(function ($key) use ($sections) { return lcfirst($sections[$key]['label']); }, $options['sections'])))))
+        . ' ' . ($options['archived'] ? __('Archived records are included and dated in their Archived column.') : __('Archived records are left out.'))
+        . ($options['secrets'] ? '' : (in_array('credentials', $options['sections'], true) ? ' ' . __('Passwords and 2FA secrets are not included.') : '')) . '</p></div>';
 
-    $readme .= '<div class="card"><h2 style="margin-top:0">Records</h2><table><tr><th>Table</th><th class="num">Rows</th><th>Download</th></tr>';
-    foreach ($manifest_sets as $set) {
-        $readme .= '<tr><td>' . escapeHtml($set['label']) . '</td><td class="num">' . $set['rows'] . '</td><td><a href="' . $set['csv'] . '">CSV</a> · <a href="' . $set['json'] . '">JSON</a></td></tr>';
+    $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Records') . '</h2><table><tr><th>' . __('Table') . '</th><th class="num">' . __('Rows') . '</th><th>' . __('Download') . '</th></tr>';
+    foreach ($manifest_sets as $set_key => $set) {
+        $readme .= '<tr><td>' . escapeHtml(clientExportDatasetLabel($set_key, $set['label'])) . '</td><td class="num">' . $set['rows'] . '</td><td><a href="' . $set['csv'] . '">CSV</a> · <a href="' . $set['json'] . '">JSON</a></td></tr>'; // i18n-ignore - file formats
     }
     $readme .= '</table></div>';
 
     if ($document_pages) {
-        $readme .= '<div class="card"><h2 style="margin-top:0">Documents</h2><ul class="plain">';
+        $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Documents') . '</h2><ul class="plain">';
         foreach ($document_pages as $page) {
             $readme .= '<li><a href="' . escapeHtml(implode('/', array_map('rawurlencode', explode('/', $page['path'])))) . '">' . escapeHtml($page['name']) . '</a>'
                 . ($page['folder'] !== '' ? ' <span class="muted small">' . escapeHtml($page['folder']) . '</span>' : '')
-                . ($page['archived'] !== '' ? ' <span class="badge">Archived</span>' : '') . '</li>';
+                . ($page['archived'] !== '' ? ' <span class="badge">' . __('Archived') . '</span>' : '') . '</li>';
         }
         $readme .= '</ul></div>';
     }
     if (!empty($rows['files'])) {
-        $readme .= '<div class="card"><h2 style="margin-top:0">Files</h2><table><tr><th>File</th><th>Folder</th><th class="num">Size</th></tr>';
+        $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Files') . '</h2><table><tr><th>' . __('File') . '</th><th>' . __('Folder') . '</th><th class="num">' . __('Size') . '</th></tr>';
         foreach ($rows['files'] as $file) {
             $readme .= '<tr><td>' . ($file['path'] !== '' ? '<a href="' . escapeHtml(implode('/', array_map('rawurlencode', explode('/', $file['path'])))) . '">' . escapeHtml($file['name']) . '</a>'
-                : escapeHtml($file['name']) . ' <span class="badge red">Missing</span>') . '</td><td>' . escapeHtml($file['folder']) . '</td><td class="num">' . escapeHtml(formatBytes($file['size'], 1)) . '</td></tr>';
+                : escapeHtml($file['name']) . ' <span class="badge red">' . __('Missing') . '</span>') . '</td><td>' . escapeHtml($file['folder']) . '</td><td class="num">' . escapeHtml(formatBytes($file['size'], 1)) . '</td></tr>';
         }
         $readme .= '</table></div>';
     }
     if ($ticket_pages) {
-        $readme .= '<div class="card"><h2 style="margin-top:0">Tickets</h2><table><tr><th>Ticket</th><th>Subject</th><th>Status</th><th>Opened</th></tr>';
+        $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Tickets') . '</h2><table><tr><th>' . __('Ticket') . '</th><th>' . __('Subject') . '</th><th>' . __('Status') . '</th><th>' . __('Opened') . '</th></tr>';
         foreach ($ticket_pages as $page) {
             $readme .= '<tr><td><a href="' . escapeHtml(implode('/', array_map('rawurlencode', explode('/', $page['path'])))) . '">' . escapeHtml($page['number']) . '</a></td><td>'
                 . escapeHtml($page['subject']) . '</td><td>' . escapeHtml($page['status']) . '</td><td>' . escapeHtml(clientExportShowDate($page['created'])) . '</td></tr>';
@@ -1907,13 +2016,13 @@ function clientExportArchive($client_id, $options, &$error = '') {
         $readme .= '</table></div>';
     }
     if ($missing) {
-        $readme .= '<div class="card"><h2 style="margin-top:0">Not included</h2><ul>';
+        $readme .= '<div class="card"><h2 style="margin-top:0">' . __('Not included') . '</h2><ul>';
         foreach ($missing as $line) {
             $readme .= '<li>' . escapeHtml($line) . '</li>';
         }
         $readme .= '</ul></div>';
     }
-    $add_string('README.html', clientExportHtmlPage($client['name'] . ' - Client data export', $readme, null));
+    $add_string('README.html', clientExportHtmlPage(__('%s - Client data export', $client['name']), $readme, null));
 
     $add_string('data/export.json', json_encode([
         'exported_at' => date('c'),
@@ -1932,12 +2041,12 @@ function clientExportArchive($client_id, $options, &$error = '') {
     if ($failed) {
         $zip->close();
         @unlink($zip_path);
-        $error = "This server's zip library cannot encrypt archives (libzip 1.2 or newer is needed), so the export was not made. Export it without passwords instead.";
+        $error = __('This server\'s zip library cannot encrypt archives (libzip 1.2 or newer is needed), so the export was not made. Export it without passwords instead.');
         return false;
     }
     if (!$zip->close()) {
         @unlink($zip_path);
-        $error = 'The export could not be finished - the server may be out of disk space.';
+        $error = __('The export could not be finished - the server may be out of disk space.');
         return false;
     }
     return $zip_path;
@@ -2019,9 +2128,11 @@ function clientExportSendHeaders($filename, $type, $length) {
     header('Pragma: no-cache');
 }
 
-/** The sections of an export as words, for the audit log. */
+/** The sections of an export as words, for the audit log - in English, whatever the interface language. */
 function clientExportSummary($options) {
-    $sections = clientExportSections();
-    $labels = array_map(function ($key) use ($sections) { return lcfirst($sections[$key]['label']); }, $options['sections']);
-    return 'client details' . ($labels ? ', ' . implode(', ', $labels) : '');
+    return i18nEnglish(function () use ($options) {
+        $sections = clientExportSections();
+        $labels = array_map(function ($key) use ($sections) { return lcfirst($sections[$key]['label']); }, $options['sections']);
+        return 'client details' . ($labels ? ', ' . implode(', ', $labels) : '');
+    });
 }

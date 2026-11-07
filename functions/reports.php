@@ -47,159 +47,159 @@
 function reportCatalog() {
     return [
         'finance' => [
-            'label' => 'Finance',
+            'label' => __('Finance'),
             'reports' => [
                 'profit_loss' => [
-                    'title' => 'Profit & Loss', 'icon' => 'fa-balance-scale', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Income against spending by month or quarter, with the margin and last year beside it.',
+                    'title' => __('Profit & Loss'), 'icon' => 'fa-balance-scale', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Income against spending by month or quarter, with the margin and last year beside it.'),
                 ],
                 'income_summary' => [
-                    'title' => 'Income', 'icon' => 'fa-hand-holding-usd', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Money received by category and month - invoice payments and other revenue.',
+                    'title' => __('Income'), 'icon' => 'fa-hand-holding-usd', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Money received by category and month - invoice payments and other revenue.'),
                 ],
                 'expense_summary' => [
-                    'title' => 'Expenses', 'icon' => 'fa-shopping-cart', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Spending by category and month.',
+                    'title' => __('Expenses'), 'icon' => 'fa-shopping-cart', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Spending by category and month.'),
                 ],
                 'budget' => [
-                    'title' => 'Budget vs Actual', 'icon' => 'fa-bullseye', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Plan what you will spend each month by category, and see how the real spending compares.',
+                    'title' => __('Budget vs Actual'), 'icon' => 'fa-bullseye', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Plan what you will spend each month by category, and see how the real spending compares.'),
                 ],
                 'expense_by_vendor' => [
-                    'title' => 'Spend by Vendor', 'icon' => 'fa-building', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Who you pay the most - and the vendors paid 600 or more, for 1099 forms.',
+                    'title' => __('Spend by Vendor'), 'icon' => 'fa-building', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Who you pay the most - and the vendors paid 600 or more, for 1099 forms.'),
                 ],
                 'tax_summary' => [
-                    'title' => 'Tax Collected', 'icon' => 'fa-percent', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Tax on sales by part of each rate, invoiced or paid, with taxable, exempt and non-taxable sales and the tax paid on purchases, by month or quarter.',
+                    'title' => __('Tax Collected'), 'icon' => 'fa-percent', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Tax on sales by part of each rate, invoiced or paid, with taxable, exempt and non-taxable sales and the tax paid on purchases, by month or quarter.'),
                 ],
                 'mileage' => [
-                    'title' => 'Mileage', 'icon' => 'fa-route', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Distance driven by agent and client, with what it comes to at your mileage rate.',
+                    'title' => __('Mileage'), 'icon' => 'fa-route', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Distance driven by agent and client, with what it comes to at your mileage rate.'),
                 ],
             ],
         ],
         'billing' => [
-            'label' => 'Sales & Billing',
+            'label' => __('Sales & Billing'),
             'reports' => [
                 'outstanding_balances' => [
-                    'title' => 'Receivables Aging', 'icon' => 'fa-hourglass-half', 'module' => 'module_sales', 'feature' => ['accounting'],
-                    'description' => 'What each client owes, split by how late it is.',
+                    'title' => __('Receivables Aging'), 'icon' => 'fa-hourglass-half', 'module' => 'module_sales', 'feature' => ['accounting'],
+                    'description' => __('What each client owes, split by how late it is.'),
                 ],
                 'income_by_client' => [
-                    'title' => 'Income by Client', 'icon' => 'fa-users', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'What each client paid in the period, against the period before.',
+                    'title' => __('Income by Client'), 'icon' => 'fa-users', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('What each client paid in the period, against the period before.'),
                 ],
                 'client_profitability' => [
-                    'title' => 'Client Profitability', 'icon' => 'fa-chart-line', 'module' => 'module_financial', 'feature' => ['accounting'],
-                    'description' => 'Each client\'s income against the hours spent on them - your effective hourly rate.',
+                    'title' => __('Client Profitability'), 'icon' => 'fa-chart-line', 'module' => 'module_financial', 'feature' => ['accounting'],
+                    'description' => __('Each client\'s income against the hours spent on them - your effective hourly rate.'),
                 ],
                 'recurring_by_client' => [
-                    'title' => 'Recurring Revenue', 'icon' => 'fa-sync-alt', 'module' => 'module_sales', 'feature' => ['accounting'],
-                    'description' => 'Monthly and yearly recurring revenue by client and category.',
+                    'title' => __('Recurring Revenue'), 'icon' => 'fa-sync-alt', 'module' => 'module_sales', 'feature' => ['accounting'],
+                    'description' => __('Monthly and yearly recurring revenue by client and category.'),
                 ],
                 'quote_pipeline' => [
-                    'title' => 'Quotes Pipeline', 'icon' => 'fa-comment-dollar', 'module' => 'module_sales', 'feature' => ['accounting'],
-                    'description' => 'Open quotes, your win rate, and the value won and lost.',
+                    'title' => __('Quotes Pipeline'), 'icon' => 'fa-comment-dollar', 'module' => 'module_sales', 'feature' => ['accounting'],
+                    'description' => __('Open quotes, your win rate, and the value won and lost.'),
                 ],
                 'inventory' => [
-                    'title' => 'Inventory', 'icon' => 'fa-warehouse', 'module' => 'module_sales', 'feature' => ['accounting'],
-                    'description' => 'Stock on the shelf and what it is worth, what came in and went out at cost, and what to reorder.',
+                    'title' => __('Inventory'), 'icon' => 'fa-warehouse', 'module' => 'module_sales', 'feature' => ['accounting'],
+                    'description' => __('Stock on the shelf and what it is worth, what came in and went out at cost, and what to reorder.'),
                 ],
                 'tickets_unbilled' => [
-                    'title' => 'Unbilled Work', 'icon' => 'fa-receipt', 'module' => 'module_sales', 'feature' => ['accounting', 'ticketing'],
-                    'description' => 'Billable tickets that are done but not invoiced yet, with the time and value on them.',
+                    'title' => __('Unbilled Work'), 'icon' => 'fa-receipt', 'module' => 'module_sales', 'feature' => ['accounting', 'ticketing'],
+                    'description' => __('Billable tickets that are done but not invoiced yet, with the time and value on them.'),
                 ],
                 'client_ticket_time_detail' => [
-                    'title' => 'Time Detail by Client', 'icon' => 'fa-stopwatch', 'module' => 'module_sales', 'feature' => ['accounting', 'ticketing'],
-                    'description' => 'Every reply with time on it, by client and ticket, rounded up to your billing increment.',
+                    'title' => __('Time Detail by Client'), 'icon' => 'fa-stopwatch', 'module' => 'module_sales', 'feature' => ['accounting', 'ticketing'],
+                    'description' => __('Every reply with time on it, by client and ticket, rounded up to your billing increment.'),
                 ],
             ],
         ],
         'service' => [
-            'label' => 'Service Desk',
+            'label' => __('Service Desk'),
             'reports' => [
                 'ticket_summary' => [
-                    'title' => 'Ticket Overview', 'icon' => 'fa-life-ring', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Tickets opened and resolved, how fast, where they came from and when.',
+                    'title' => __('Ticket Overview'), 'icon' => 'fa-life-ring', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Tickets opened and resolved, how fast, where they came from and when.'),
                 ],
                 'ticket_aging' => [
-                    'title' => 'Open Ticket Aging', 'icon' => 'fa-hourglass-start', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Every open ticket by age, agent and client - the backlog, oldest first.',
+                    'title' => __('Open Ticket Aging'), 'icon' => 'fa-hourglass-start', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Every open ticket by age, agent and client - the backlog, oldest first.'),
                 ],
                 'ticket_by_client' => [
-                    'title' => 'Tickets by Client', 'icon' => 'fa-building', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Ticket volume, time worked and response times for each client.',
+                    'title' => __('Tickets by Client'), 'icon' => 'fa-building', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Ticket volume, time worked and response times for each client.'),
                 ],
                 'time_by_tech' => [
-                    'title' => 'Technician Performance', 'icon' => 'fa-user-clock', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Hours logged, billable share, utilization and tickets for each agent.',
+                    'title' => __('Technician Performance'), 'icon' => 'fa-user-clock', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Hours logged, billable share, utilization and tickets for each agent.'),
                 ],
                 'sla_summary' => [
-                    'title' => 'SLA Performance', 'icon' => 'fa-tachometer-alt', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Response and resolution targets met, by month, priority and agent.',
+                    'title' => __('SLA Performance'), 'icon' => 'fa-tachometer-alt', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Response and resolution targets met, by month, priority and agent.'),
                 ],
                 'sla_by_client' => [
-                    'title' => 'SLA by Client', 'icon' => 'fa-handshake', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'Response and resolution targets met for each client.',
+                    'title' => __('SLA by Client'), 'icon' => 'fa-handshake', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('Response and resolution targets met for each client.'),
                 ],
                 'satisfaction' => [
-                    'title' => 'Customer Satisfaction', 'icon' => 'fa-smile', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'How clients rated their closed tickets, by agent and client.',
+                    'title' => __('Customer Satisfaction'), 'icon' => 'fa-smile', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('How clients rated their closed tickets, by agent and client.'),
                 ],
                 'ticket_templates' => [
-                    'title' => 'Ticket Templates', 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'How often each template is used and how - by agents, from the client portal, on a schedule or by projects - with the time spent and how long its tickets take, and the ones not used.',
+                    'title' => __('Ticket Templates'), 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('How often each template is used and how - by agents, from the client portal, on a schedule or by projects - with the time spent and how long its tickets take, and the ones not used.'),
                 ],
                 'canned_responses' => [
-                    'title' => 'Canned Responses', 'icon' => 'fa-comment-dots', 'module' => 'module_support', 'feature' => ['ticketing'],
-                    'description' => 'How often each canned response goes into a reply, on how many tickets and by whom, which agents reach for them, and the ones not used.',
+                    'title' => __('Canned Responses'), 'icon' => 'fa-comment-dots', 'module' => 'module_support', 'feature' => ['ticketing'],
+                    'description' => __('How often each canned response goes into a reply, on how many tickets and by whom, which agents reach for them, and the ones not used.'),
                 ],
             ],
         ],
         'clients' => [
-            'label' => 'Clients & Documentation',
+            'label' => __('Clients & Documentation'),
             'reports' => [
                 'client_review' => [
-                    'title' => 'Client Review', 'icon' => 'fa-clipboard-list', 'module' => 'module_support', 'feature' => [],
-                    'description' => 'One client\'s quarter on a page - tickets, SLAs, assets, renewals and what to do next. Made to print for a business review.',
+                    'title' => __('Client Review'), 'icon' => 'fa-clipboard-list', 'module' => 'module_support', 'feature' => [],
+                    'description' => __('One client\'s quarter on a page - tickets, SLAs, assets, renewals and what to do next. Made to print for a business review.'),
                 ],
                 'renewals' => [
-                    'title' => 'Renewals & Expirations', 'icon' => 'fa-calendar-alt', 'module' => 'module_support', 'feature' => ['itdoc'],
-                    'description' => 'Domains, certificates, licenses and warranties coming up for renewal, or already lapsed.',
+                    'title' => __('Renewals & Expirations'), 'icon' => 'fa-calendar-alt', 'module' => 'module_support', 'feature' => ['itdoc'],
+                    'description' => __('Domains, certificates, licenses and warranties coming up for renewal, or already lapsed.'),
                 ],
                 'asset_lifecycle' => [
-                    'title' => 'Asset Lifecycle', 'icon' => 'fa-recycle', 'module' => 'module_support', 'feature' => ['itdoc'],
-                    'description' => 'How old the hardware is, its warranty and operating system support - and what is due for replacement.',
+                    'title' => __('Asset Lifecycle'), 'icon' => 'fa-recycle', 'module' => 'module_support', 'feature' => ['itdoc'],
+                    'description' => __('How old the hardware is, its warranty and operating system support - and what is due for replacement.'),
                 ],
                 'documentation_coverage' => [
-                    'title' => 'Documentation Coverage', 'icon' => 'fa-tasks', 'module' => 'module_support', 'feature' => ['itdoc'],
-                    'description' => 'What is documented for each client, and what is missing.',
+                    'title' => __('Documentation Coverage'), 'icon' => 'fa-tasks', 'module' => 'module_support', 'feature' => ['itdoc'],
+                    'description' => __('What is documented for each client, and what is missing.'),
                 ],
                 'document_templates' => [
-                    'title' => 'Document Templates', 'icon' => 'fa-file-alt', 'module' => 'module_support', 'feature' => ['itdoc'],
-                    'description' => 'How often each document template is used, how many of the clients that should have a document from one do, and the documents due a review - by template and by client.',
+                    'title' => __('Document Templates'), 'icon' => 'fa-file-alt', 'module' => 'module_support', 'feature' => ['itdoc'],
+                    'description' => __('How often each document template is used, how many of the clients that should have a document from one do, and the documents due a review - by template and by client.'),
                 ],
                 'license_templates' => [
-                    'title' => 'License Templates', 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => ['itdoc'],
-                    'description' => 'How much each license template is used, the seats on its licenses against the ones bought, how many of the clients that should have one do, and how many are billed - by template and by client.',
+                    'title' => __('License Templates'), 'icon' => 'fa-cube', 'module' => 'module_support', 'feature' => ['itdoc'],
+                    'description' => __('How much each license template is used, the seats on its licenses against the ones bought, how many of the clients that should have one do, and how many are billed - by template and by client.'),
                 ],
                 'vendor_templates' => [
-                    'title' => 'Vendor Templates', 'icon' => 'fa-building', 'module' => 'module_client', 'feature' => [],
-                    'description' => 'How many clients have a vendor from each template, how many of the clients that should have one do, which are out of step with their template, and the licenses, assets, cases and spend on their vendors - by template and by client.',
+                    'title' => __('Vendor Templates'), 'icon' => 'fa-building', 'module' => 'module_client', 'feature' => [],
+                    'description' => __('How many clients have a vendor from each template, how many of the clients that should have one do, which are out of step with their template, and the licenses, assets, cases and spend on their vendors - by template and by client.'),
                 ],
                 'credential_rotation' => [
-                    'title' => 'Credential Rotation', 'icon' => 'fa-key', 'module' => 'module_credential', 'feature' => ['itdoc'],
-                    'description' => 'Passwords that have not changed in a while, oldest first.',
+                    'title' => __('Credential Rotation'), 'icon' => 'fa-key', 'module' => 'module_credential', 'feature' => ['itdoc'],
+                    'description' => __('Passwords that have not changed in a while, oldest first.'),
                 ],
             ],
         ],
         'activity' => [
-            'label' => 'Activity',
+            'label' => __('Activity'),
             'reports' => [
                 'audit_activity' => [
-                    'title' => 'Audit Activity', 'icon' => 'fa-history', 'module' => 'module_client', 'feature' => [],
-                    'description' => 'What was done in ITFlow - changes, deletions, passwords looked at, exports and sign-ins - over time, out of hours, and by person, client and kind of record.',
+                    'title' => __('Audit Activity'), 'icon' => 'fa-history', 'module' => 'module_client', 'feature' => [],
+                    'description' => __('What was done in ITFlow - changes, deletions, passwords looked at, exports and sign-ins - over time, out of hours, and by person, client and kind of record.'),
                 ],
             ],
         ],
@@ -289,17 +289,22 @@ function reportEnforce($key) {
  */
 
 const REPORT_PERIODS = [
-    'this_month' => 'This month',
-    'last_month' => 'Last month',
-    'this_quarter' => 'This quarter',
-    'last_quarter' => 'Last quarter',
-    'this_year' => 'This year',
-    'last_year' => 'Last year',
+    'this_month' => 'This month', // i18n-ignore - shown through __(), date expressions and system names
+    'last_month' => 'Last month', // i18n-ignore - shown through __(), date expressions and system names
+    'this_quarter' => 'This quarter', // i18n-ignore - shown through __(), date expressions and system names
+    'last_quarter' => 'Last quarter', // i18n-ignore - shown through __(), date expressions and system names
+    'this_year' => 'This year', // i18n-ignore - shown through __(), date expressions and system names
+    'last_year' => 'Last year', // i18n-ignore - shown through __(), date expressions and system names
     'last_30' => 'Last 30 days',
     'last_90' => 'Last 90 days',
     'last_12' => 'Last 12 months',
-    'custom' => 'Custom dates',
+    'custom' => 'Custom dates', // i18n-ignore - shown through __(), date expressions and system names
 ];
+
+/** A preset period's name as shown - REPORT_PERIODS keeps the English. */
+function reportPeriodLabel($key) {
+    return isset(REPORT_PERIODS[$key]) ? __(REPORT_PERIODS[$key]) : substr((string) $key, 5); // i18n-dynamic - REPORT_PERIODS, entries in lang/pt_BR/reports.php
+}
 
 /** The URL parameters that pick this period again - for a link to another report over the same dates. */
 function reportPeriodQuery(array $period) {
@@ -343,28 +348,28 @@ function reportPeriod($default = 'this_year') {
             $end = $today;
             $prev_start = dashboardShiftMonths($start, -1);
             $prev_end = dashboardShiftMonths($today, -1);
-            $compare = 'the same days last month';
+            $compare = __('the same days last month');
             break;
         case 'last_month':
             $start = dashboardShiftMonths(date('Y-m-01'), -1);
             $end = $month_end($start);
             $prev_start = dashboardShiftMonths($start, -1);
             $prev_end = $month_end($prev_start);
-            $compare = 'the month before';
+            $compare = __('the month before');
             break;
         case 'this_quarter':
             $start = $quarter_start;
             $end = $today;
             $prev_start = dashboardShiftMonths($start, -3);
             $prev_end = dashboardShiftMonths($today, -3);
-            $compare = 'the same point last quarter';
+            $compare = __('the same point last quarter');
             break;
         case 'last_quarter':
             $start = dashboardShiftMonths($quarter_start, -3);
             $end = $month_end(dashboardShiftMonths($start, 2));
             $prev_start = dashboardShiftMonths($start, -3);
             $prev_end = $month_end(dashboardShiftMonths($prev_start, 2));
-            $compare = 'the quarter before';
+            $compare = __('the quarter before');
             break;
         case 'last_year':
             $start = ($year - 1) . '-01-01';
@@ -380,14 +385,14 @@ function reportPeriod($default = 'this_year') {
             $end = $today;
             $prev_start = date('Y-m-d', strtotime('-' . (2 * $days - 1) . ' days'));
             $prev_end = date('Y-m-d', strtotime("-$days days"));
-            $compare = "the $days days before";
+            $compare = __('the %d days before', $days);
             break;
         case 'last_12':
             $start = dashboardShiftMonths(date('Y-m-01'), -11);
             $end = $today;
             $prev_start = dashboardShiftMonths($start, -12);
             $prev_end = dashboardShiftMonths($today, -12);
-            $compare = 'the 12 months before';
+            $compare = __('the 12 months before');
             break;
         case 'custom':
             $start = reportDateParam('from', date('Y-m-01'));
@@ -398,7 +403,7 @@ function reportPeriod($default = 'this_year') {
             $span = intval((new DateTime($start))->diff(new DateTime($end))->days) + 1;
             $prev_end = date('Y-m-d', strtotime("$start -1 day"));
             $prev_start = date('Y-m-d', strtotime("$prev_end -" . ($span - 1) . ' days'));
-            $compare = 'the ' . $span . ' day' . ($span === 1 ? '' : 's') . ' before';
+            $compare = _n('the %d day before', 'the %d days before', $span);
             break;
         default:
             if (preg_match('/^year-(\d{4})$/', $key, $m)) {
@@ -416,14 +421,14 @@ function reportPeriod($default = 'this_year') {
             $end = $today;
             $prev_start = ($year - 1) . '-01-01';
             $prev_end = dashboardShiftMonths($today, -12);
-            $compare = 'the same point last year';
+            $compare = __('the same point last year');
     }
 
     $days = intval((new DateTime($start))->diff(new DateTime($end))->days) + 1;
 
     return [
         'key' => $key,
-        'label' => REPORT_PERIODS[$key] ?? substr($key, 5),
+        'label' => reportPeriodLabel($key),
         'start' => $start,
         'end' => $end,
         'prev_start' => $prev_start,
@@ -439,12 +444,12 @@ function reportRangeText($start, $end) {
     $s = strtotime($start);
     $e = strtotime($end);
     if ($start === $end) {
-        return date('M j, Y', $s);
+        return formatDate($s);
     }
     if (date('Y', $s) === date('Y', $e)) {
-        return date('M j', $s) . ' – ' . date('M j, Y', $e);
+        return formatDate($s, 'date_short') . ' – ' . formatDate($e);
     }
-    return date('M j, Y', $s) . ' – ' . date('M j, Y', $e);
+    return formatDate($s) . ' – ' . formatDate($e);
 }
 
 /** SQL: $column falls in the period (or the one before it, with $previous). Works on DATE and DATETIME columns. */
@@ -466,7 +471,7 @@ function reportBuckets($period) {
     if ($unit === 'week') {
         $cursor->modify('-' . (intval($cursor->format('N')) - 1) . ' days');
     } elseif ($unit === 'month') {
-        $cursor->modify('first day of this month');
+        $cursor->modify('first day of this month'); // i18n-ignore - shown through __(), date expressions and system names
     }
     $multi_year = substr($period['start'], 0, 4) !== substr($period['end'], 0, 4);
 
@@ -475,16 +480,17 @@ function reportBuckets($period) {
     for ($guard = 0; $cursor <= $end && $guard < 400; $guard++) {
         if ($unit === 'month') {
             $keys[] = $cursor->format('Y-m');
-            $labels[] = $cursor->format($multi_year ? 'M y' : 'M');
+            $labels[] = formatDate($cursor, $multi_year ? 'month_year_short' : 'month');
             $cursor->modify('+1 month');
         } else {
             $keys[] = $cursor->format('Y-m-d');
-            $labels[] = $cursor->format('M j');
+            $labels[] = formatDate($cursor, 'date_short');
             $cursor->modify($unit === 'week' ? '+7 days' : '+1 day');
         }
     }
 
-    return ['unit' => $unit, 'keys' => $keys, 'labels' => $labels];
+    $names = ['day' => [__('Day'), __('By day'), __('day')], 'week' => [__('Week'), __('By week'), __('week')], 'month' => [__('Month'), __('By month'), __('month')]][$unit];
+    return ['unit' => $unit, 'keys' => $keys, 'labels' => $labels, 'unit_title' => $names[0], 'by' => $names[1], 'unit_label' => $names[2]];
 }
 
 /** SQL for the bucket a date falls in - the same keys reportBuckets() lays out. */
@@ -679,12 +685,12 @@ function reportChange($current, $previous) {
  */
 function reportChangeHtml($current, $previous, $good = 'up', $compare = '') {
     $change = reportChange($current, $previous);
-    $against = $compare !== '' ? ' <span class="text-body-tertiary">vs ' . escapeHtml($compare) . '</span>' : '';
+    $against = $compare !== '' ? ' <span class="text-body-tertiary">' . escapeHtml(__('vs %s', $compare)) . '</span>' : '';
     if ($change === null) {
-        return '<span class="text-body-tertiary">Nothing before to compare</span>';
+        return '<span class="text-body-tertiary">' . __('Nothing before to compare') . '</span>';
     }
     if ($change === 0) {
-        return '<span class="text-body-secondary fw-semibold">No change</span>' . $against;
+        return '<span class="text-body-secondary fw-semibold">' . __('No change') . '</span>' . $against;
     }
     $better = $good === 'up' ? $change > 0 : $change < 0;
     return '<span class="fw-semibold ' . ($better ? 'text-success-emphasis' : 'text-danger-emphasis') . '">'
@@ -775,7 +781,8 @@ function reportLegendHtml(array $labels, array $values, array $colors, $format =
  * Turn rows into "top $n and the rest as Other" - for doughnuts and short
  * lists. Each row is ['label' => .., 'value' => .., 'color' => ..].
  */
-function reportTopN(array $rows, $n = 6, $other_label = 'Other') {
+function reportTopN(array $rows, $n = 6, $other_label = null) {
+    $other_label ??= __('Other');
     usort($rows, function ($a, $b) {
         return $b['value'] <=> $a['value'];
     });
@@ -844,7 +851,7 @@ function reportCellText(array $column, $value) {
         case 'duration':
             return reportDuration($value);
         case 'date':
-            return date('M j, Y', strtotime($value));
+            return formatDate($value);
     }
     return (string) $value;
 }
@@ -904,7 +911,7 @@ function reportTable(array $columns, array $rows, array $options = []) {
 
     if (!$rows) {
         $html .= '<tr><td colspan="' . count($columns) . '" class="text-center text-body-secondary py-4">'
-            . ($options['empty'] ?? 'Nothing to show for this period.') . '</td></tr>';
+            . ($options['empty'] ?? __('Nothing to show for this period.')) . '</td></tr>';
     }
 
     foreach ($rows as $row) {
@@ -934,8 +941,8 @@ function reportTable(array $columns, array $rows, array $options = []) {
         $html .= '</tr>';
     }
     if ($limit && $all > $limit) {
-        $html .= '<tr><td colspan="' . count($columns) . '" class="text-center small text-body-secondary py-2">Showing the first ' . reportCount($limit) . ' of ' . reportCount($all)
-            . ' - <a href="' . escapeHtml(reportUrl(['export' => 'csv'] + (!empty($options['export_table']) ? ['table' => $options['export_table']] : []))) . '">export them all</a></td></tr>';
+        $html .= '<tr><td colspan="' . count($columns) . '" class="text-center small text-body-secondary py-2">' . __('Showing the first %1$s of %2$s - %3$s', reportCount($limit), reportCount($all),
+            '<a href="' . escapeHtml(reportUrl(['export' => 'csv'] + (!empty($options['export_table']) ? ['table' => $options['export_table']] : []))) . '">' . __('export them all') . '</a>') . '</td></tr>';
     }
     $html .= '</tbody>';
 
@@ -945,7 +952,7 @@ function reportTable(array $columns, array $rows, array $options = []) {
         foreach ($columns as $key => $column) {
             $number = reportColumnIsNumber($column);
             if ($first) {
-                $html .= '<td>' . escapeHtml($options['totals'][$key] ?? 'Total') . '</td>';
+                $html .= '<td>' . escapeHtml($options['totals'][$key] ?? __('Total')) . '</td>';
                 $first = false;
                 continue;
             }
@@ -972,7 +979,7 @@ function reportExporting($table = null) {
 }
 
 /** Send rows as a CSV file and stop. Numbers go out bare; text is guarded against formulas. */
-function reportCsv($name, array $columns, array $rows, array $totals = null) {
+function reportCsv($name, array $columns, array $rows, ?array $totals = null) {
     global $session_name;
 
     $columns = array_filter($columns, function ($column) {
@@ -988,10 +995,10 @@ function reportCsv($name, array $columns, array $rows, array $totals = null) {
         $label = $column['label'];
         $type = $column['type'] ?? 'text';
         if (in_array($type, ['hours', 'duration'], true) && stripos($label, 'hour') === false) {
-            return "$label (hours)";
+            return __('%s (hours)', $label);
         }
         if ($type === 'percent' && strpos($label, '%') === false) {
-            return "$label %";
+            return __('%s %%', $label);
         }
         return $label;
     }, array_values($columns)), ',', '"', '\\');
@@ -1052,28 +1059,28 @@ function reportPeriodControl($period, array $options = []) {
 
     $html = '<div class="col-sm-6 col-lg-auto"><div class="input-group">'
         . '<span class="input-group-text"><i class="fas fa-fw fa-calendar-alt"></i></span>'
-        . '<select class="form-select" name="period" data-report-period aria-label="Period">';
+        . '<select class="form-select" name="period" data-report-period aria-label="' . escapeHtml(__('Period')) . '">';
     foreach ($allowed as $key) {
         if ($key === 'custom') {
             continue;
         }
-        $html .= '<option value="' . $key . '"' . ($period['key'] === $key ? ' selected' : '') . '>' . escapeHtml(REPORT_PERIODS[$key]) . '</option>';
+        $html .= '<option value="' . $key . '"' . ($period['key'] === $key ? ' selected' : '') . '>' . escapeHtml(reportPeriodLabel($key)) . '</option>';
     }
     foreach ($years as $year) {
         $html .= '<option value="year-' . intval($year) . '"' . ($period['key'] === "year-$year" ? ' selected' : '') . '>' . intval($year) . '</option>';
     }
     if (in_array('custom', $allowed, true)) {
-        $html .= '<option value="custom"' . ($custom ? ' selected' : '') . '>Custom dates</option>';
+        $html .= '<option value="custom"' . ($custom ? ' selected' : '') . '>' . __('Custom dates') . '</option>';
     }
     $html .= '</select></div></div>';
 
     if (in_array('custom', $allowed, true)) {
         $html .= '<div class="col-sm-6 col-lg-auto" data-report-custom' . ($custom ? '' : ' hidden') . '><div class="input-group">'
-            . '<span class="input-group-text">From</span>'
+            . '<span class="input-group-text">' . __('From') . '</span>'
             . '<input type="date" class="form-control" name="from" value="' . escapeHtml($period['start']) . '"' . ($custom ? '' : ' disabled') . '>'
-            . '<span class="input-group-text">to</span>'
+            . '<span class="input-group-text">' . __('to') . '</span>'
             . '<input type="date" class="form-control" name="to" value="' . escapeHtml($period['end']) . '"' . ($custom ? '' : ' disabled') . '>'
-            . '<button class="btn btn-primary" type="submit" title="Show these dates"><i class="fas fa-check"></i></button>'
+            . '<button class="btn btn-primary" type="submit" title="' . escapeHtml(__('Show these dates')) . '"><i class="fas fa-check"></i></button>'
             . '</div></div>';
     }
     return $html;
@@ -1083,7 +1090,7 @@ function reportPeriodControl($period, array $options = []) {
 function reportYearControl($year, array $years) {
     $html = '<div class="col-sm-6 col-lg-auto"><div class="input-group">'
         . '<span class="input-group-text"><i class="fas fa-fw fa-calendar-alt"></i></span>'
-        . '<select class="form-select" name="year" data-report-autosubmit aria-label="Year">';
+        . '<select class="form-select" name="year" data-report-autosubmit aria-label="' . escapeHtml(__('Year')) . '">';
     foreach ($years as $y) {
         $html .= '<option value="' . intval($y) . '"' . (intval($y) === intval($year) ? ' selected' : '') . '>' . intval($y) . '</option>';
     }
@@ -1091,14 +1098,15 @@ function reportYearControl($year, array $years) {
 }
 
 /** The client picker - every client this user may see, or one. */
-function reportClientControl($client_id, $all_label = 'All clients', $required = false) {
+function reportClientControl($client_id, $all_label = null, $required = false) {
+    $all_label ??= __('All clients');
     global $mysqli;
     $client_id = intval($client_id);
     $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
         WHERE (client_archived_at IS NULL OR client_id = $client_id) " . clientScopeSql('client_id') . "
         ORDER BY client_name ASC");
-    $html = '<div class="col-sm-6 col-lg-3"><select class="form-select select2" name="client_id" data-report-autosubmit aria-label="Client">'
-        . '<option value="">' . escapeHtml($required ? '- Pick a client -' : "- $all_label -") . '</option>';
+    $html = '<div class="col-sm-6 col-lg-3"><select class="form-select select2" name="client_id" data-report-autosubmit aria-label="' . escapeHtml(__('Client')) . '">'
+        . '<option value="">' . escapeHtml($required ? __('- Pick a client -') : "- $all_label -") . '</option>';
     while ($row = mysqli_fetch_assoc($sql)) {
         $id = intval($row['client_id']);
         $html .= '<option value="' . $id . '"' . ($id === $client_id ? ' selected' : '') . selectOptionClient($id, $row['client_name'], $row['client_abbreviation'] ?? '') . '>'
@@ -1108,13 +1116,14 @@ function reportClientControl($client_id, $all_label = 'All clients', $required =
 }
 
 /** The agent picker - active agents, and whoever is picked. */
-function reportAgentControl($user_id, $all_label = 'All agents') {
+function reportAgentControl($user_id, $all_label = null) {
+    $all_label ??= __('All agents');
     global $mysqli;
     $user_id = intval($user_id);
     $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users
         WHERE user_type = 1 AND ((user_archived_at IS NULL AND user_status = 1) OR user_id = $user_id)
         ORDER BY user_name ASC");
-    $html = '<div class="col-sm-6 col-lg-2"><select class="form-select select2" name="agent" data-report-autosubmit aria-label="Agent">'
+    $html = '<div class="col-sm-6 col-lg-2"><select class="form-select select2" name="agent" data-report-autosubmit aria-label="' . escapeHtml(__('Agent')) . '">'
         . '<option value="">- ' . escapeHtml($all_label) . ' -</option>';
     while ($row = mysqli_fetch_assoc($sql)) {
         $id = intval($row['user_id']);
@@ -1184,9 +1193,9 @@ function reportHeader($key, array $options = []) {
     $export = $options['export'] ?? true;
     $export_html = '';
     if ($export === true) {
-        $export_html = '<a class="btn btn-outline-light" href="' . escapeHtml(reportUrl(['export' => 'csv'])) . '"><i class="fas fa-fw fa-file-csv"></i><span class="d-none d-md-inline ms-2">Export</span></a>';
+        $export_html = '<a class="btn btn-outline-light" href="' . escapeHtml(reportUrl(['export' => 'csv'])) . '"><i class="fas fa-fw fa-file-csv"></i><span class="d-none d-md-inline ms-2">' . __('Export') . '</span></a>';
     } elseif (is_array($export) && $export) {
-        $export_html = '<div class="dropdown"><button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-fw fa-file-csv"></i><span class="d-none d-md-inline ms-2">Export</span></button><div class="dropdown-menu dropdown-menu-end">';
+        $export_html = '<div class="dropdown"><button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-fw fa-file-csv"></i><span class="d-none d-md-inline ms-2">' . __('Export') . '</span></button><div class="dropdown-menu dropdown-menu-end">';
         foreach ($export as $table => $label) {
             $export_html .= '<a class="dropdown-item" href="' . escapeHtml(reportUrl(['export' => 'csv', 'table' => $table])) . '"><i class="fas fa-fw fa-file-csv me-2"></i>' . escapeHtml($label) . '</a>';
         }
@@ -1201,7 +1210,7 @@ function reportHeader($key, array $options = []) {
         $controls .= reportYearControl($options['year'][0], $options['year'][1]);
     }
     if (array_key_exists('client', $options) && $options['client'] !== null) {
-        $controls .= reportClientControl($options['client'], 'All clients', !empty($options['client_required']));
+        $controls .= reportClientControl($options['client'], null, !empty($options['client_required']));
     }
     if (array_key_exists('agent', $options) && $options['agent'] !== null) {
         $controls .= reportAgentControl($options['agent']);
@@ -1218,7 +1227,7 @@ function reportHeader($key, array $options = []) {
             <div class="d-flex gap-2 d-print-none">
                 <?= $options['actions'] ?? '' ?>
                 <?= $export_html ?>
-                <button type="button" class="btn btn-primary" onclick="window.print();"><i class="fas fa-fw fa-print"></i><span class="d-none d-md-inline ms-2">Print</span></button>
+                <button type="button" class="btn btn-primary" onclick="window.print();"><i class="fas fa-fw fa-print"></i><span class="d-none d-md-inline ms-2"><?= __('Print') ?></span></button>
             </div>
         </div>
         <?php if ($controls !== '') { ?>
@@ -1239,7 +1248,7 @@ function reportHeader($key, array $options = []) {
         <div class="itflow-report-print-meta">
             <?= escapeHtml($session_company_name) ?>
             <?php if (!empty($options['print_meta'])) { ?> · <?= escapeHtml($options['print_meta']) ?><?php } ?>
-            · Printed <?= escapeHtml(date('M j, Y g:i A')) ?> by <?= escapeHtml(stripslashes($session_name)) ?>
+            · <?= escapeHtml(__('Printed %1$s by %2$s', formatDate('now', 'datetime'), stripslashes($session_name))) ?>
         </div>
     </div>
     <?php
@@ -1268,7 +1277,7 @@ function reportEmpty($text, $icon = 'fa-check-circle', $tone = 'success') {
 function reportClientLink($client_id, $client_name, $page = 'client_overview.php') {
     $client_id = intval($client_id);
     if (!$client_id) {
-        return '<span class="text-body-secondary">No client</span>';
+        return '<span class="text-body-secondary">' . __('No client') . '</span>';
     }
     return '<a class="text-body fw-semibold" href="/agent/' . $page . '?client_id=' . $client_id . '">' . escapeHtml($client_name) . '</a>';
 }
@@ -1277,7 +1286,7 @@ function reportClientLink($client_id, $client_name, $page = 'client_overview.php
 function reportClientCell($client_id, $client_name, $client_abbreviation = '', $page = 'client_overview.php') {
     $client_id = intval($client_id);
     if (!$client_id) {
-        return '<span class="text-body-secondary fst-italic">No client</span>';
+        return '<span class="text-body-secondary fst-italic">' . __('No client') . '</span>';
     }
     $tone = clientInitialsTone($client_id);
     $initials = escapeHtml(clientInitials((string) $client_abbreviation, (string) $client_name));
@@ -1297,14 +1306,14 @@ function reportTicketLink($row, $with_subject = true) {
 }
 
 /** An agent's avatar and name. */
-function reportAgentCell($user_id, $user_name, $user_avatar = '', $none = 'Unassigned') {
-    return formatAssignee($user_id, $user_name, $user_avatar, false, $none);
+function reportAgentCell($user_id, $user_name, $user_avatar = '', $none = null) {
+    return formatAssignee($user_id, $user_name, $user_avatar, false, $none ?? __('Unassigned'));
 }
 
 /** A ticket priority's coloured dot, as on the dashboard. */
 function reportPriorityDot($priority) {
     $colors = ['Urgent' => 'dark', 'High' => 'danger', 'Medium' => 'warning', 'Low' => 'info'];
-    return '<span class="itflow-dash-dot d-inline-block bg-' . ($colors[$priority] ?? 'secondary') . ' me-1" title="' . escapeHtml($priority) . ' priority"></span>';
+    return '<span class="itflow-dash-dot d-inline-block bg-' . ($colors[$priority] ?? 'secondary') . ' me-1" title="' . escapeHtml(__('%s priority', ticketPriorityLabel($priority))) . '"></span>';
 }
 
 /*
@@ -1390,7 +1399,7 @@ function reportCategoryRows($type, array &$grid) {
         }
     }
     if (isset($grid[0]) && abs($grid[0]['total']) > 0.004) {
-        $rows[0] = ['category_id' => 0, 'category_name' => 'No category', 'category_color' => '', 'category_archived_at' => null];
+        $rows[0] = ['category_id' => 0, 'category_name' => __('No category'), 'category_color' => '', 'category_archived_at' => null];
     }
     return $rows;
 }
@@ -1420,7 +1429,7 @@ function reportYearColumns($view) {
     }
     $columns = [];
     for ($m = 1; $m <= 12; $m++) {
-        $columns[$m] = [date('M', mktime(0, 0, 0, $m, 1)), $m, $m];
+        $columns[$m] = [formatDate(mktime(0, 0, 0, $m, 1), 'month'), $m, $m];
     }
     return $columns;
 }
@@ -1496,7 +1505,7 @@ function reportCategoryChartSeries(array $categories, array $grid, $months_shown
         for ($m = 1; $m <= 12; $m++) {
             $data[] = $m <= $months_shown ? round($other[$m], 2) : null;
         }
-        $series[] = ['label' => 'Other', 'data' => $data, 'tone' => 'faint', 'stack' => 'year'];
+        $series[] = ['label' => __('Other'), 'data' => $data, 'tone' => 'faint', 'stack' => 'year'];
     }
     return $series;
 }
@@ -1510,18 +1519,18 @@ function reportCategoryYearTable(array $categories, array $grid, $year, $list, $
     $columns = reportYearColumns('month');
     $totals = reportGridTotals($grid);
     $html = '<div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0 itflow-report-table itflow-report-grid" data-report-sort>'
-        . '<thead class="table-light"><tr><th data-sort="text">Category</th>';
+        . '<thead class="table-light"><tr><th data-sort="text">' . __('Category') . '</th>';
     foreach ($columns as [$label]) {
         $html .= '<th class="text-end" data-sort="num">' . $label . '</th>';
     }
-    $html .= '<th class="text-end" data-sort="num">' . intval($year) . '</th><th class="text-end" data-sort="num">Share</th></tr></thead><tbody>';
+    $html .= '<th class="text-end" data-sort="num">' . intval($year) . '</th><th class="text-end" data-sort="num">' . __('Share') . '</th></tr></thead><tbody>';
     if (!$categories) {
-        $html .= '<tr><td colspan="15" class="text-center text-body-secondary py-4">Nothing in ' . intval($year) . '.</td></tr>';
+        $html .= '<tr><td colspan="15" class="text-center text-body-secondary py-4">' . __('Nothing in %d.', $year) . '</td></tr>';
     }
     foreach ($categories as $cat => $category) {
         $row = reportGridRow($grid, $cat);
         $html .= '<tr><td data-value="' . escapeHtml(mb_strtolower($category['category_name'])) . '">' . escapeHtml($category['category_name'])
-            . (!empty($category['category_archived_at']) ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">Archived</span>' : '') . '</td>';
+            . (!empty($category['category_archived_at']) ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">' . __('Archived') . '</span>' : '') . '</td>';
         foreach ($columns as $i => [$label, $first, $last]) {
             [$dtf, $dtt] = reportColumnDates($year, $first, $last);
             $url = $cat || $uncategorised !== '' ? "/agent/$list?" . ($cat ? "category=$cat" : $uncategorised) . "&canned_date=custom&dtf=$dtf&dtt=$dtt" : '';
@@ -1543,7 +1552,7 @@ function reportCategoryYearTable(array $categories, array $grid, $year, $list, $
 
 /** The same grid as CSV rows: category, each month, the year. */
 function reportCategoryYearCsv(array $categories, array $grid, $year, $name, $total_label) {
-    $columns = ['name' => ['label' => 'Category']];
+    $columns = ['name' => ['label' => __('Category')]];
     foreach (reportYearColumns('month') as $i => [$label]) {
         $columns["m$i"] = ['label' => $label, 'type' => 'money'];
     }
@@ -1616,7 +1625,7 @@ function reportTicketCategories() {
 
 /** How long open tickets have been open - the buckets the aging report counts in, with the most days each takes. */
 const REPORT_AGE_BUCKETS = [
-    'day' => ['Under a day', 0],
+    'day' => ['Under a day', 0], // i18n-ignore - shown through __(), date expressions and system names
     '3' => ['1–3 days', 3],
     '7' => ['4–7 days', 7],
     '30' => ['8–30 days', 30],
@@ -1718,17 +1727,20 @@ function reportHeatmap(array $counts, $noun = 'ticket') {
     foreach ($counts as $hours) {
         $max = max($max, ...array_values($hours ?: [0]));
     }
-    $html = '<div class="table-responsive"><table class="itflow-report-heat" aria-label="When ' . $noun . 's came in, by weekday and hour"><thead><tr><th></th>';
+    $entries = $noun === 'entry';
+    $english = i18nLocale() === 'en_US';
+    $html = '<div class="table-responsive"><table class="itflow-report-heat" aria-label="' . escapeHtml($entries ? __('When entries came in, by weekday and hour') : __('When tickets came in, by weekday and hour')) . '"><thead><tr><th></th>';
     for ($h = 0; $h < 24; $h++) {
-        $html .= '<th scope="col">' . ($h % 3 === 0 ? date('ga', mktime($h, 0, 0)) : '') . '</th>';
+        $html .= '<th scope="col">' . ($h % 3 === 0 ? ($english ? date('ga', mktime($h, 0, 0)) : $h . 'h') : '') . '</th>';
     }
     $html .= '</tr></thead><tbody>';
     for ($d = 1; $d <= 7; $d++) {
-        $day = date('D', strtotime("Monday this week +" . ($d - 1) . " days"));
+        $day = escapeHtml(formatDate(strtotime("Monday this week +" . ($d - 1) . " days"), 'weekday_short'));
         $html .= '<tr><th scope="row">' . $day . '</th>';
         for ($h = 0; $h < 24; $h++) {
             $n = intval($counts[$d][$h] ?? 0);
-            $html .= '<td style="--heat: ' . round($n / $max, 3) . '" title="' . $day . ' ' . date('g A', mktime($h, 0, 0)) . ': ' . $n . ' ' . $noun . ($n === 1 ? '' : 's') . '"></td>';
+            $what = $entries ? _n('%d entry', '%d entries', $n) : _n('%d ticket', '%d tickets', $n);
+            $html .= '<td style="--heat: ' . round($n / $max, 3) . '" title="' . $day . ' ' . escapeHtml(formatDate(mktime($h, 0, 0), 'time')) . ': ' . $what . '"></td>';
         }
         $html .= '</tr>';
     }
@@ -1749,14 +1761,14 @@ const REPORT_ASSET_GONE = ['Lost', 'Stolen', 'Retired'];
  * as more versions reach the end.
  */
 const REPORT_OS_END_OF_LIFE = [
-    ['/\bwindows\s+(xp|vista)\b/i', 'Windows XP / Vista'],
+    ['/\bwindows\s+(xp|vista)\b/i', 'Windows XP / Vista'], // i18n-ignore - shown through __(), date expressions and system names
     ['/\bwindows\s+(7|8(\.1)?)\b/i', 'Windows 7 / 8'],
     ['/\bwindows\s+10\b(?!.*\bltsc\b)/i', 'Windows 10'],
-    ['/\bserver\s+(2000|2003|2008|2012)\b/i', 'Windows Server 2012 or older'],
+    ['/\bserver\s+(2000|2003|2008|2012)\b/i', 'Windows Server 2012 or older'], // i18n-ignore - shown through __(), date expressions and system names
     ['/\b(mac\s?os|os\s?x)\s*(x\s*)?(10\.\d+|11|12|13)\b/i', 'macOS 13 or older'],
     ['/\bcentos\b(?!\s*stream\s*(9|10))/i', 'CentOS'],
-    ['/\bubuntu\b\D*(1\d|20)\.\d\d\b/i', 'Ubuntu 20.04 or older'],
-    ['/\bdebian\b\D*\b([6-9]|1[01])\b/i', 'Debian 11 or older'],
+    ['/\bubuntu\b\D*(1\d|20)\.\d\d\b/i', 'Ubuntu 20.04 or older'], // i18n-ignore - shown through __(), date expressions and system names
+    ['/\bdebian\b\D*\b([6-9]|1[01])\b/i', 'Debian 11 or older'], // i18n-ignore - shown through __(), date expressions and system names
 ];
 
 /** The end-of-support name for an asset's OS ('Windows 10'), or '' while it is supported or unknown. */
@@ -1767,7 +1779,7 @@ function reportOsEndOfLife($os) {
     }
     foreach (REPORT_OS_END_OF_LIFE as [$pattern, $name]) {
         if (preg_match($pattern, $os)) {
-            return $name;
+            return __($name); // i18n-dynamic - REPORT_OS_END_OF_LIFE, entries in lang/pt_BR/reports.php
         }
     }
     return '';
@@ -1822,7 +1834,7 @@ function reportAssetCell($row) {
 
 /** "3.4 yrs" from days, or '' without. */
 function reportYears($days, $decimals = 1) {
-    return $days === null ? '' : number_format($days / 365.25, $decimals) . ' yrs';
+    return $days === null ? '' : __('%s yrs', number_format($days / 365.25, $decimals));
 }
 
 /** What comes up for renewal, and how each kind is shown. */
@@ -1871,7 +1883,7 @@ function reportRenewals($client_id, $ahead, array $kinds = []) {
             WHERE domain_archived_at IS NULL AND client_archived_at IS NULL AND " . $window('domain_expire') . reportClientSql('domain_client_id', $client_id));
         while ($row = mysqli_fetch_assoc($sql)) {
             $auto = intval($row['domain_auto_renew']) === 1;
-            $add('domain', $row['domain_id'], $row['domain_name'], ($auto ? 'Auto-renew' : 'Manual renewal') . ($row['vendor_name'] ? ' · ' . $row['vendor_name'] : ''),
+            $add('domain', $row['domain_id'], $row['domain_name'], ($auto ? __('Auto-renew') : __('Manual renewal')) . ($row['vendor_name'] ? ' · ' . $row['vendor_name'] : ''),
                 $row, $row['domain_expire'], $auto, '/agent/domains.php?client_id=' . intval($row['client_id']) . '&open=' . intval($row['domain_id']), domainTile('sm'));
         }
     }
@@ -1881,7 +1893,7 @@ function reportRenewals($client_id, $ahead, array $kinds = []) {
             WHERE certificate_archived_at IS NULL AND client_archived_at IS NULL AND " . $window('certificate_expire') . reportClientSql('certificate_client_id', $client_id));
         while ($row = mysqli_fetch_assoc($sql)) {
             $auto = certificateShortLived($row);
-            $add('certificate', $row['certificate_id'], $row['certificate_name'], ($auto ? 'Short-lived, renews itself' : 'Manual renewal') . ($row['certificate_issued_by'] ? ' · ' . $row['certificate_issued_by'] : ''),
+            $add('certificate', $row['certificate_id'], $row['certificate_name'], ($auto ? __('Short-lived, renews itself') : __('Manual renewal')) . ($row['certificate_issued_by'] ? ' · ' . $row['certificate_issued_by'] : ''),
                 $row, $row['certificate_expire'], $auto, '/agent/certificates.php?client_id=' . intval($row['client_id']) . '&open=' . intval($row['certificate_id']), certificateTile('sm'));
         }
     }
@@ -1922,9 +1934,9 @@ function reportDuePill($days, $auto = false) {
         $ago = -$days;
         $tone = 'danger';
         $icon = 'fa-calendar-times';
-        $text = 'Lapsed ' . ($ago === 1 ? 'yesterday' : "$ago days ago");
+        $text = $ago === 1 ? __('Lapsed yesterday') : __('Lapsed %d days ago', $ago);
     } else {
-        $text = $days === 0 ? 'Today' : ($days === 1 ? 'Tomorrow' : ($days <= 60 ? "In $days days" : 'In ' . round($days / 30.4) . ' months'));
+        $text = $days === 0 ? __('Today') : ($days === 1 ? __('Tomorrow') : ($days <= 60 ? __('In %d days', $days) : __('In %d months', round($days / 30.4))));
         $tone = $auto ? 'info' : ($days <= 7 ? 'danger' : ($days <= 30 ? 'warning' : 'secondary'));
         $icon = $auto ? 'fa-sync-alt' : ($days <= 30 ? 'fa-hourglass-half' : 'fa-calendar');
     }
@@ -1943,18 +1955,18 @@ const REPORT_COVERAGE_SHARE = 80;
 function reportCoverageChecks() {
     $share = REPORT_COVERAGE_SHARE;
     $checks = [
-        'primary_contact' => ['label' => 'Primary contact', 'page' => 'contacts.php'],
-        'billing_contact' => ['label' => 'Billing contact', 'page' => 'contacts.php'],
-        'primary_location' => ['label' => 'Primary location', 'page' => 'locations.php'],
-        'assets' => ['label' => 'Assets', 'page' => 'assets.php'],
-        'asset_locations' => ['label' => 'Assets placed', 'page' => 'assets.php', 'title' => "At least $share% of assets have a location"],
-        'device_owners' => ['label' => 'Device owners', 'page' => 'assets.php', 'title' => "At least $share% of laptops, desktops, phones and tablets have a contact"],
-        'networks' => ['label' => 'Networks', 'page' => 'networks.php'],
-        'credentials' => ['label' => 'Credentials', 'page' => 'credentials.php'],
-        'documents' => ['label' => 'Documents', 'page' => 'files.php'],
-        'domains' => ['label' => 'Domains', 'page' => 'domains.php'],
-        'services' => ['label' => 'Services', 'page' => 'services.php'],
-        'licenses' => ['label' => 'Licenses', 'page' => 'software.php'],
+        'primary_contact' => ['label' => __('Primary contact'), 'page' => 'contacts.php'],
+        'billing_contact' => ['label' => __('Billing contact'), 'page' => 'contacts.php'],
+        'primary_location' => ['label' => __('Primary location'), 'page' => 'locations.php'],
+        'assets' => ['label' => __('Assets'), 'page' => 'assets.php'],
+        'asset_locations' => ['label' => __('Assets placed'), 'page' => 'assets.php', 'title' => __('At least %d%% of assets have a location', $share)],
+        'device_owners' => ['label' => __('Device owners'), 'page' => 'assets.php', 'title' => __('At least %d%% of laptops, desktops, phones and tablets have a contact', $share)],
+        'networks' => ['label' => __('Networks'), 'page' => 'networks.php'],
+        'credentials' => ['label' => __('Credentials'), 'page' => 'credentials.php'],
+        'documents' => ['label' => __('Documents'), 'page' => 'files.php'],
+        'domains' => ['label' => __('Domains'), 'page' => 'domains.php'],
+        'services' => ['label' => __('Services'), 'page' => 'services.php'],
+        'licenses' => ['label' => __('Licenses'), 'page' => 'software.php'],
     ];
     if (reportPermission('module_credential') < 1) {
         unset($checks['credentials']);
@@ -2044,7 +2056,7 @@ function reportCoverage($client_id = 0) {
 function reportCoverageMissingHtml($client) {
     $checks = reportCoverageChecks();
     if (!$client['missing']) {
-        return '<span class="text-success-emphasis small"><i class="fas fa-check-circle me-1"></i>Nothing</span>';
+        return '<span class="text-success-emphasis small"><i class="fas fa-check-circle me-1"></i>' . __('Nothing') . '</span>';
     }
     $html = '<span class="d-inline-flex flex-wrap gap-1">';
     foreach ($client['missing'] as $key) {

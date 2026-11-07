@@ -51,7 +51,7 @@
 
     if (window.tinymce && document.querySelector('textarea.tinymce')) {
         var skin = editorSkin();
-        tinymce.init({
+        tinymce.init(Object.assign({
             selector: 'textarea.tinymce',
             browser_spellcheck: true,
             resize: true,
@@ -65,13 +65,13 @@
             skin: skin.skin,
             content_css: skin.content_css,
             content_style: skin.content_style,
-            toolbar: 'bold italic forecolor | bullist numlist | link table | removeformat',
+            toolbar: 'bold italic forecolor | bullist numlist | link table | removeformat', // i18n-ignore - editor settings
             mobile: {
                 menubar: false,
-                plugins: 'autosave lists autolink',
-                toolbar: 'bold italic bullist numlist'
+                plugins: 'autosave lists autolink', // i18n-ignore - editor settings
+                toolbar: 'bold italic bullist numlist' // i18n-ignore - editor settings
             },
-            plugins: 'link image lists table autoresize',
+            plugins: 'link image lists table autoresize', // i18n-ignore - editor settings
             setup: function (editor) {
                 // A required field the editor hides can't take the browser's
                 // own "fill this in" - so the form is checked here instead
@@ -106,7 +106,7 @@
                     }
                 });
             }
-        });
+        }, window.itflowI18n ? itflowI18n.tinyMce() : {}));
     }
 
     // ---------- Attachments ----------
@@ -240,9 +240,9 @@
             var over = limit > 0 && cents >= limit;
             var tooMany = max > 0 && count > max;
             text('[data-pay-total]', amount);
-            text('[data-pay-count]', count + (count === 1 ? ' invoice' : ' invoices'));
-            text('[data-pay-label]', !count ? 'Tick an invoice to pay' : (tooMany ? 'Pay up to ' + max + ' invoices at a time'
-                : (method && method.value === 'new' ? 'Continue to pay ' : 'Pay ') + amount));
+            text('[data-pay-count]', count === 1 ? __('%d invoice', count) : __('%d invoices', count));
+            text('[data-pay-label]', !count ? __('Tick an invoice to pay') : (tooMany ? __('Pay up to %d invoices at a time', max)
+                : (method && method.value === 'new' ? __('Continue to pay %s', amount) : __('Pay %s', amount))));
             var note = form.querySelector('[data-pay-limit-note]');
             if (note) {
                 note.hidden = !over;

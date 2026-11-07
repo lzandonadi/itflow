@@ -26,12 +26,12 @@ function recurringTicketFromPost($client_id, $current = null) {
 
     $subject = trim((string) ($_POST['subject'] ?? ''));
     if ($subject === '') {
-        flashAlert('A recurring ticket needs a subject.', 'error');
+        flashAlert(__('A recurring ticket needs a subject.'), 'error');
         redirect();
     }
     $frequency = recurringTicketFrequency($_POST['frequency'] ?? '');
     if (!$frequency) {
-        flashAlert('Pick how often it runs.', 'error');
+        flashAlert(__('Pick how often it runs.'), 'error');
         redirect();
     }
 
@@ -93,8 +93,8 @@ function recurringTicketNotifyAgent($user_id, array $subjects) {
         return;
     }
     $count = count($subjects);
-    $what = $count === 1 ? 'Recurring ticket ' . escapeSql($subjects[0]) . ' has' : "$count recurring tickets have";
-    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Recurring Ticket', notification = '$what been assigned to you by " . escapeSql($session_name) . "', notification_action = 'recurring_tickets.php?assigned_agent=$user_id', notification_user_id = $user_id");
+    $what = escapeSql($count === 1 ? __('Recurring ticket %1$s has been assigned to you by %2$s', $subjects[0], $session_name) : __('%1$d recurring tickets have been assigned to you by %2$s', $count, $session_name));
+    mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Recurring Ticket', notification = '$what', notification_action = 'recurring_tickets.php?assigned_agent=$user_id', notification_user_id = $user_id");
 
     recurringTicketMailAssigned($user_id, $subjects, stripslashes($session_name));
 }
@@ -107,14 +107,14 @@ if (isset($_POST['add_recurring_ticket'])) {
 
     $client_id = intval($_POST['client_id'] ?? 0);
     if (!$client_id || !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM clients WHERE client_id = $client_id"))) {
-        flashAlert('Pick the client it is for.', 'error');
+        flashAlert(__('Pick the client it is for.'), 'error');
         redirect();
     }
     enforceClientAccess();
 
     $start_date = recurringTicketDate($_POST['start_date'] ?? '');
     if (!$start_date || $start_date < date('Y-m-d')) {
-        flashAlert('Pick when it starts - today or later.', 'error');
+        flashAlert(__('Pick when it starts - today or later.'), 'error');
         redirect();
     }
 
@@ -140,7 +140,7 @@ if (isset($_POST['add_recurring_ticket'])) {
 
     logAudit("Recurring Ticket", "Create", "$session_name created recurring ticket {$f['subject']} - {$f['frequency']}", $client_id, $recurring_ticket_id);
 
-    flashAlert("Recurring ticket <strong>" . escapeHtml(trim($_POST['subject'])) . "</strong> created - first run " . escapeHtml(date('M j, Y', strtotime($start_date))));
+    flashAlert(__('Recurring ticket %1$s created - first run %2$s', '<strong>' . escapeHtml(trim($_POST['subject'])) . '</strong>', escapeHtml(formatDate($start_date, 'date'))));
 
     redirect();
 
@@ -157,7 +157,7 @@ if (isset($_POST['edit_recurring_ticket'])) {
     $next_run = recurringTicketDate($_POST['next_date'] ?? '');
     $current_next_run = substr((string) $row['recurring_ticket_next_run'], 0, 10);
     if (!$next_run || ($next_run < date('Y-m-d') && $next_run !== $current_next_run)) {
-        flashAlert('Pick when it runs next - today or later.', 'error');
+        flashAlert(__('Pick when it runs next - today or later.'), 'error');
         redirect();
     }
 
@@ -190,7 +190,7 @@ if (isset($_POST['edit_recurring_ticket'])) {
 
     logAudit("Recurring Ticket", "Edit", "$session_name edited recurring ticket {$f['subject']}", $client_id, $recurring_ticket_id);
 
-    flashAlert("Recurring ticket <strong>" . escapeHtml(trim($_POST['subject'])) . "</strong> updated");
+    flashAlert(__('Recurring ticket %s updated', '<strong>' . escapeHtml(trim($_POST['subject'])) . '</strong>'));
 
     redirect();
 
@@ -205,12 +205,12 @@ if (isset($_GET['force_recurring_ticket'])) {
 
     $ticket_id = recurringTicketRunNow($row, $session_name);
     if (!$ticket_id) {
-        flashAlert("The ticket could not be raised.", 'error');
+        flashAlert(__('The ticket could not be raised.'), 'error');
         redirect();
     }
 
     $ticket = ticketRow($ticket_id);
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($ticket)) . "</strong> raised from <strong>" . escapeHtml($row['recurring_ticket_subject']) . "</strong>");
+    flashAlert(__('Ticket %1$s raised from %2$s', '<strong>' . escapeHtml(ticketReference($ticket)) . '</strong>', '<strong>' . escapeHtml($row['recurring_ticket_subject']) . '</strong>'));
 
     redirect();
 
@@ -227,7 +227,7 @@ if (isset($_POST['bulk_force_recurring_tickets'])) {
         }
     }
 
-    flashAlert("Raised <strong>$count</strong> ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Raised <strong>%d</strong> ticket', 'Raised <strong>%d</strong> tickets', $count));
 
     redirect();
 
@@ -256,7 +256,8 @@ if (isset($_GET['pause_recurring_ticket']) || isset($_GET['resume_recurring_tick
 
     logAudit("Recurring Ticket", "Edit", "$session_name " . ($pause ? 'paused' : 'resumed') . " recurring ticket $subject", $client_id, $recurring_ticket_id);
 
-    flashAlert("Recurring ticket <strong>" . escapeHtml($row['recurring_ticket_subject']) . "</strong> " . ($pause ? 'paused' : 'resumed'));
+    $subject_html = '<strong>' . escapeHtml($row['recurring_ticket_subject']) . '</strong>';
+    flashAlert($pause ? __('Recurring ticket %s paused', $subject_html) : __('Recurring ticket %s resumed', $subject_html));
 
     redirect();
 
@@ -285,7 +286,7 @@ if (isset($_POST['bulk_pause_recurring_tickets']) || isset($_POST['bulk_resume_r
         $count++;
     }
 
-    flashAlert(($pause ? 'Paused' : 'Resumed') . " <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's'));
+    flashAlert($pause ? _n('Paused <strong>%d</strong> recurring ticket', 'Paused <strong>%d</strong> recurring tickets', $count) : _n('Resumed <strong>%d</strong> recurring ticket', 'Resumed <strong>%d</strong> recurring tickets', $count));
 
     redirect();
 
@@ -304,7 +305,7 @@ if (isset($_GET['delete_recurring_ticket'])) {
 
     logAudit("Recurring Ticket", "Delete", "$session_name deleted recurring ticket $subject", $client_id, $recurring_ticket_id);
 
-    flashAlert("Recurring ticket <strong>" . escapeHtml($row['recurring_ticket_subject']) . "</strong> deleted", 'error');
+    flashAlert(__('Recurring ticket %s deleted', '<strong>' . escapeHtml($row['recurring_ticket_subject']) . '</strong>'), 'error');
 
     redirect();
 
@@ -323,7 +324,7 @@ if (isset($_POST['bulk_delete_recurring_tickets'])) {
 
     logAudit("Recurring Ticket", "Bulk Delete", "$session_name deleted $count recurring ticket(s)");
 
-    flashAlert("Deleted <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> recurring ticket', 'Deleted <strong>%d</strong> recurring tickets', $count), 'error');
 
     redirect();
 
@@ -335,10 +336,10 @@ if (isset($_POST['bulk_assign_recurring_ticket'])) {
 
     $assign_to = ticketAgentId($_POST['assign_to'] ?? 0);
     if (intval($_POST['assign_to'] ?? 0) && !$assign_to) {
-        flashAlert('Pick an active agent.', 'error');
+        flashAlert(__('Pick an active agent.'), 'error');
         redirect();
     }
-    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No one';
+    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No one'; // i18n-ignore - the audit log
 
     $count = 0;
     $subjects = [];
@@ -354,7 +355,7 @@ if (isset($_POST['bulk_assign_recurring_ticket'])) {
 
     recurringTicketNotifyAgent($assign_to, $subjects);
 
-    flashAlert("Assigned <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's') . " to <strong>" . escapeHtml($agent_name) . "</strong>");
+    flashAlert(_n('Assigned <strong>%1$d</strong> recurring ticket to %2$s', 'Assigned <strong>%1$d</strong> recurring tickets to %2$s', $count, $count, '<strong>' . escapeHtml($assign_to ? $agent_name : __('No one')) . '</strong>'));
 
     redirect();
 
@@ -365,7 +366,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_priority'])) {
     validateCSRFToken();
 
     if (!in_array($_POST['bulk_priority'] ?? '', TICKET_PRIORITIES, true)) {
-        flashAlert('Pick a priority.', 'error');
+        flashAlert(__('Pick a priority.'), 'error');
         redirect();
     }
     $priority = $_POST['bulk_priority'];
@@ -378,7 +379,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_priority'])) {
         $count++;
     }
 
-    flashAlert("Priority set to <strong>$priority</strong> on <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Priority set to %1$s on <strong>%2$d</strong> recurring ticket', 'Priority set to %1$s on <strong>%2$d</strong> recurring tickets', $count, '<strong>' . escapeHtml(ticketPriorityLabel($priority)) . '</strong>', $count));
 
     redirect();
 
@@ -389,7 +390,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_category'])) {
     validateCSRFToken();
 
     $category_id = ticketCategoryId($_POST['bulk_category'] ?? 0);
-    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized';
+    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized'; // i18n-ignore - the audit log
 
     $count = 0;
     foreach (recurringTicketsForBulk(2) as $recurring_ticket_id => $row) {
@@ -399,7 +400,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_category'])) {
         $count++;
     }
 
-    flashAlert("Category set to <strong>" . escapeHtml($category_name) . "</strong> on <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Category set to %1$s on <strong>%2$d</strong> recurring ticket', 'Category set to %1$s on <strong>%2$d</strong> recurring tickets', $count, '<strong>' . escapeHtml($category_id ? $category_name : __('Not categorized')) . '</strong>', $count));
 
     redirect();
 
@@ -412,7 +413,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_billable'])) {
     enforceUserPermission('module_sales', 2);
 
     $billable = intval($_POST['billable'] ?? 0) ? 1 : 0;
-    $billable_wording = $billable ? 'Billable' : 'Not billable';
+    $billable_wording = $billable ? 'Billable' : 'Not billable'; // i18n-ignore - the audit log
 
     $count = 0;
     foreach (recurringTicketsForBulk(2) as $recurring_ticket_id => $row) {
@@ -422,7 +423,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_billable'])) {
         $count++;
     }
 
-    flashAlert("<strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's') . " marked <strong>$billable_wording</strong>");
+    flashAlert($billable ? _n('<strong>%d</strong> recurring ticket marked <strong>billable</strong>', '<strong>%d</strong> recurring tickets marked <strong>billable</strong>', $count) : _n('<strong>%d</strong> recurring ticket marked <strong>not billable</strong>', '<strong>%d</strong> recurring tickets marked <strong>not billable</strong>', $count));
 
     redirect();
 
@@ -434,7 +435,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_next_run_date'])) {
 
     $next_run = recurringTicketDate($_POST['next_run_date'] ?? '');
     if (!$next_run || $next_run < date('Y-m-d')) {
-        flashAlert('Pick when they run next - today or later.', 'error');
+        flashAlert(__('Pick when they run next - today or later.'), 'error');
         redirect();
     }
 
@@ -447,7 +448,7 @@ if (isset($_POST['bulk_edit_recurring_ticket_next_run_date'])) {
         $count++;
     }
 
-    flashAlert("Next run set to <strong>" . escapeHtml(date('M j, Y', strtotime($next_run))) . "</strong> on <strong>$count</strong> recurring ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Next run set to %1$s on <strong>%2$d</strong> recurring ticket', 'Next run set to %1$s on <strong>%2$d</strong> recurring tickets', $count, '<strong>' . escapeHtml(formatDate($next_run, 'date')) . '</strong>', $count));
 
     redirect();
 

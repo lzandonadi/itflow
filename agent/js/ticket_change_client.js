@@ -10,7 +10,7 @@ itflowReady(function () {
         if (!contactSelect) {
             return;
         }
-        contactSelect.innerHTML = '<option value="">Loading...</option>';
+        contactSelect.innerHTML = '<option value="">' + __('Loading...') + '</option>';
 
         const query = new URLSearchParams({
             get_client_contacts: 1,
@@ -55,7 +55,7 @@ itflowReady(function () {
             })
             .catch(function (error) {
                 console.error('AJAX Error:', error);
-                contactSelect.innerHTML = '<option value="">Failed to load contacts</option>';
+                contactSelect.innerHTML = '<option value="">' + __('Failed to load contacts') + '</option>';
             });
     }
 

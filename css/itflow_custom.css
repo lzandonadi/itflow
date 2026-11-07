@@ -6937,6 +6937,24 @@ a.itflow-billing-stat:hover {
     align-items: center;
     gap: .15rem;
 }
+/* Wide screens: the menu takes the room between the logo and the buttons on the
+   right and sits in the middle of it, rather than right up against the logo. Below
+   992px it is hidden (d-lg-flex) and the tab bar takes over. */
+@media (min-width: 992px) {
+    .itflow-portal-nav {
+        flex: 1 1 auto;
+        justify-content: center;
+        min-width: 0;
+    }
+}
+/* The header's buttons (New ticket) keep their label on one line: when the header is
+   tight, around 992px, the room comes out of the space around the menu instead. From
+   992 to 1199px the account shows only its initials (header.php), so a long contact
+   name cannot push the menu under the logo - the name is at the top of its menu. */
+.itflow-portal-header .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
 .itflow-portal-nav-link {
     display: inline-flex;
     align-items: center;

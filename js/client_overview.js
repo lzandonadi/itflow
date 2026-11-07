@@ -19,7 +19,7 @@
             }
             const value = notes.value;
             if (status) {
-                status.textContent = 'Saving...';
+                status.textContent = __('Saving...');
             }
             itflowPost('ajax.php', {
                 client_set_notes: 'TRUE',
@@ -29,11 +29,11 @@
             }, function () {
                 saved = value;
                 if (status) {
-                    status.textContent = 'Saved';
+                    status.textContent = __('Saved');
                 }
             }, function () {
                 if (status) {
-                    status.textContent = 'Not saved - try again';
+                    status.textContent = __('Not saved - try again');
                 }
             });
         });
@@ -69,8 +69,8 @@
         data: {
             labels: data.monthly.labels,
             datasets: [
-                { label: 'Invoiced', data: data.monthly.invoiced, backgroundColor: alpha(cssVar('--itflow-accent', '#0d6efd'), 0.75), borderRadius: 3, maxBarThickness: 22 },
-                { label: 'Paid', data: data.monthly.paid, backgroundColor: alpha(cssVar('--bs-success', '#198754'), 0.8), borderRadius: 3, maxBarThickness: 22 }
+                { label: __('Invoiced'), data: data.monthly.invoiced, backgroundColor: alpha(cssVar('--itflow-accent', '#0d6efd'), 0.75), borderRadius: 3, maxBarThickness: 22 },
+                { label: __('Paid'), data: data.monthly.paid, backgroundColor: alpha(cssVar('--bs-success', '#198754'), 0.8), borderRadius: 3, maxBarThickness: 22 }
             ]
         },
         options: {

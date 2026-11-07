@@ -28,15 +28,15 @@ $money = function ($amount) use ($currency) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Statement</h1>
-        <p><?= escapeHtml($session_client_name) ?> · as of <?= escapeHtml(date('M j, Y')) ?></p>
+        <h1><?= escapeHtml(__('Statement')) ?></h1>
+        <p><?= escapeHtml($session_client_name) ?> · <?= escapeHtml(__('as of %s', formatDate(date('Y-m-d'), 'date'))) ?></p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php if ($statement['invoices']) { ?>
-            <a class="btn btn-outline-secondary" href="post.php?export_statement_pdf=1<?= $with_paid ? '&paid=1' : '' ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-file-pdf me-2"></i>Download PDF</a>
+            <a class="btn btn-outline-secondary" href="post.php?export_statement_pdf=1<?= $with_paid ? '&paid=1' : '' ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-file-pdf me-2"></i><?= escapeHtml(__('Download PDF')) ?></a>
         <?php } ?>
         <?php if ($statement['total'] > 0 && $cards) { ?>
-            <a class="btn btn-primary" href="unpaid_invoices.php"><i class="fas fa-credit-card me-2"></i>Pay invoices</a>
+            <a class="btn btn-primary" href="unpaid_invoices.php"><i class="fas fa-credit-card me-2"></i><?= escapeHtml(__('Pay invoices')) ?></a>
         <?php } ?>
     </div>
 </div>
@@ -47,7 +47,7 @@ $money = function ($amount) use ($currency) {
             <span class="itflow-portal-stat-icon"><i class="fas fa-file-invoice-dollar"></i></span>
             <span>
                 <span class="itflow-portal-stat-value d-block"><?= $money($statement['total']) ?></span>
-                <span class="itflow-portal-stat-label">Total due</span>
+                <span class="itflow-portal-stat-label"><?= escapeHtml(__('Total due')) ?></span>
             </span>
         </div>
     </div>
@@ -56,15 +56,15 @@ $money = function ($amount) use ($currency) {
             <span class="itflow-portal-stat-icon"><i class="fas fa-exclamation-circle"></i></span>
             <span>
                 <span class="itflow-portal-stat-value d-block"><?= $money($statement['overdue']) ?></span>
-                <span class="itflow-portal-stat-label">Past due</span>
+                <span class="itflow-portal-stat-label"><?= escapeHtml(__('Past due')) ?></span>
             </span>
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="itflow-portal-aging" aria-label="How late">
+        <div class="itflow-portal-aging" aria-label="<?= escapeHtml(__('How late')) ?>">
             <?php foreach ($statement['aging'] as $bucket => $amount) { ?>
                 <div class="<?= $amount > 0 && $bucket !== 'Current' ? 'is-late' : '' ?>">
-                    <span><?= escapeHtml($bucket) ?></span>
+                    <span><?= escapeHtml(billingAgingLabel($bucket)) ?></span>
                     <strong class="itflow-money"><?= $money($amount) ?></strong>
                 </div>
             <?php } ?>
@@ -72,27 +72,27 @@ $money = function ($amount) use ($currency) {
     </div>
 </div>
 
-<nav class="itflow-portal-tabs" aria-label="Statement">
-    <a class="<?= !$with_paid ? 'active' : '' ?>" href="statement.php"><i class="fas fa-hourglass-half"></i>Open invoices</a>
-    <a class="<?= $with_paid ? 'active' : '' ?>" href="statement.php?view=year"><i class="fas fa-calendar-alt"></i>Last 12 months</a>
+<nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Statement')) ?>">
+    <a class="<?= !$with_paid ? 'active' : '' ?>" href="statement.php"><i class="fas fa-hourglass-half"></i><?= escapeHtml(__('Open invoices')) ?></a>
+    <a class="<?= $with_paid ? 'active' : '' ?>" href="statement.php?view=year"><i class="fas fa-calendar-alt"></i><?= escapeHtml(__('Last 12 months')) ?></a>
 </nav>
 
 <section class="itflow-portal-panel">
     <?php if (!$statement['invoices']) { ?>
         <?= $with_paid
-            ? emptyStateHtml(['title' => 'No invoices in the last 12 months', 'text' => '', 'icon' => 'fa-file-alt', 'filtered' => false])
-            : emptyStateHtml(['title' => 'Nothing outstanding', 'text' => 'You are all paid up - thank you.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+            ? emptyStateHtml(['title' => __('No invoices in the last 12 months'), 'text' => '', 'icon' => 'fa-file-alt', 'filtered' => false])
+            : emptyStateHtml(['title' => __('Nothing outstanding'), 'text' => __('You are all paid up - thank you.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
     <?php } else { ?>
         <div class="table-responsive">
             <table class="table align-middle mb-0 itflow-portal-table">
                 <thead>
                     <tr>
-                        <th>Invoice</th>
-                        <th class="d-none d-md-table-cell">Date</th>
-                        <th>Due</th>
-                        <th class="text-end d-none d-md-table-cell">Amount</th>
-                        <th class="text-end d-none d-md-table-cell">Paid</th>
-                        <th class="text-end">Balance</th>
+                        <th><?= escapeHtml(__('Invoice')) ?></th>
+                        <th class="d-none d-md-table-cell"><?= escapeHtml(__('Date')) ?></th>
+                        <th><?= escapeHtml(__('Due')) ?></th>
+                        <th class="text-end d-none d-md-table-cell"><?= escapeHtml(__('Amount')) ?></th>
+                        <th class="text-end d-none d-md-table-cell"><?= escapeHtml(__('Paid')) ?></th>
+                        <th class="text-end"><?= escapeHtml(__('Balance')) ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,21 +103,21 @@ $money = function ($amount) use ($currency) {
                                 <a class="fw-semibold" href="invoice.php?id=<?= intval($row['invoice_id']) ?>"><?= escapeHtml($row['invoice_prefix'] . $row['invoice_number']) ?></a>
                                 <?php if (trim((string) $row['invoice_scope']) !== '') { ?><div class="small text-body-secondary text-truncate"><?= escapeHtml($row['invoice_scope']) ?></div><?php } ?>
                             </td>
-                            <td class="text-nowrap d-none d-md-table-cell"><?= escapeHtml(date('M j, Y', strtotime($row['invoice_date']))) ?></td>
+                            <td class="text-nowrap d-none d-md-table-cell"><?= escapeHtml(formatDate($row['invoice_date'], 'date')) ?></td>
                             <td class="text-nowrap<?= $late ? ' text-danger-emphasis' : '' ?>">
-                                <?= escapeHtml(date('M j, Y', strtotime($row['invoice_due']))) ?>
-                                <?php if ($late) { ?><div class="small"><?= intval($row['days']) ?> <?= intval($row['days']) === 1 ? 'day' : 'days' ?> late</div><?php } ?>
+                                <?= escapeHtml(formatDate($row['invoice_due'], 'date')) ?>
+                                <?php if ($late) { ?><div class="small"><?= escapeHtml(_n('%d day late', '%d days late', intval($row['days']))) ?></div><?php } ?>
                             </td>
                             <td class="text-end itflow-money d-none d-md-table-cell"><?= $money($row['invoice_amount']) ?></td>
                             <td class="text-end itflow-money d-none d-md-table-cell"><?= $money($row['paid']) ?></td>
-                            <td class="text-end itflow-money fw-semibold"><?= $row['balance'] > 0 ? $money($row['balance']) : '<span class="text-success-emphasis">Paid</span>' ?></td>
+                            <td class="text-end itflow-money fw-semibold"><?= $row['balance'] > 0 ? $money($row['balance']) : '<span class="text-success-emphasis">' . escapeHtml(_x('Paid', 'invoice status')) . '</span>' ?></td>
                         </tr>
                     <?php } ?>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td class="d-none d-md-table-cell" colspan="3"></td>
-                        <th colspan="2" class="text-end">Total due</th>
+                        <th colspan="2" class="text-end"><?= escapeHtml(__('Total due')) ?></th>
                         <th class="text-end itflow-money"><?= $money($statement['total']) ?></th>
                     </tr>
                 </tfoot>

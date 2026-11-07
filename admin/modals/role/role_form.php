@@ -20,35 +20,35 @@ $r_admin_locked = ($role_admin_blocker ?? '') !== '';
 
 <div data-role-form>
     <div class="mb-3">
-        <label>Name <strong class="text-danger">*</strong></label>
+        <label><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-user-tag"></i></span>
-            <input type="text" class="form-control" name="name" maxlength="200" placeholder="Help Desk, Billing, Field Tech" value="<?= escapeHtml($r['role_name'] ?? '') ?>" required autofocus>
+            <input type="text" class="form-control" name="name" maxlength="200" placeholder="<?= escapeHtml(__('Help Desk, Billing, Field Tech')) ?>" value="<?= escapeHtml($r['role_name'] ?? '') ?>" required autofocus>
         </div>
     </div>
 
     <div class="mb-3">
-        <label>Description</label>
+        <label><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-            <input type="text" class="form-control" name="description" maxlength="200" placeholder="Who it is for" value="<?= escapeHtml($r['role_description'] ?? '') ?>">
+            <input type="text" class="form-control" name="description" maxlength="200" placeholder="<?= escapeHtml(__('Who it is for')) ?>" value="<?= escapeHtml($r['role_description'] ?? '') ?>">
         </div>
     </div>
 
     <div class="mb-3">
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" name="admin" value="1" id="roleAdmin" data-role-admin<?= $r_admin ? ' checked' : '' ?><?= $r_admin_locked ? ' disabled' : '' ?>>
-            <label class="form-check-label fw-semibold" for="roleAdmin"><i class="fas fa-fw fa-user-shield me-1"></i>Admin</label>
-            <div class="form-text mt-0">Every part of ITFlow, every client, and Admin - users, roles and settings.</div>
+            <label class="form-check-label fw-semibold" for="roleAdmin"><i class="fas fa-fw fa-user-shield me-1"></i><?= __('Admin') ?></label>
+            <div class="form-text mt-0"><?= __('Every part of ITFlow, every client, and Admin - users, roles and settings.') ?></div>
             <?php if ($r_admin_locked) { ?>
                 <input type="hidden" name="admin" value="1">
-                <div class="form-text mt-0 text-warning-emphasis"><i class="fas fa-fw fa-lock me-1"></i>It stays an admin role: <?= escapeHtml($role_admin_blocker) ?></div>
+                <div class="form-text mt-0 text-warning-emphasis"><i class="fas fa-fw fa-lock me-1"></i><?= escapeHtml(__('It stays an admin role: %s', $role_admin_blocker)) ?></div>
             <?php } ?>
         </div>
     </div>
 
     <div data-role-levels<?= $r_admin ? ' hidden' : '' ?>>
-        <label class="mb-2">What its agents can open</label>
+        <label class="mb-2"><?= __('What its agents can open') ?></label>
         <?php
         // Each client's pages need Clients - most of the rest is on them
         $r_by_name = [];
@@ -58,7 +58,7 @@ $r_admin_locked = ($role_admin_blocker ?? '') !== '';
         $r_needs_clients = empty($r_by_name['module_client'])
             && max($r_by_name['module_support'] ?? 0, $r_by_name['module_credential'] ?? 0, $r_by_name['module_sales'] ?? 0, $r_by_name['module_financial'] ?? 0) > 0;
         ?>
-        <div class="alert alert-warning small py-2" data-role-needs-clients<?= $r_needs_clients ? '' : ' hidden' ?>><i class="fas fa-fw fa-exclamation-triangle me-1"></i>Each client's pages need Clients at Read, and most of what is picked here is on them - with Clients at None, its agents are turned away from most of it.</div>
+        <div class="alert alert-warning small py-2" data-role-needs-clients<?= $r_needs_clients ? '' : ' hidden' ?>><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Each client\'s pages need Clients at Read, and most of what is picked here is on them - with Clients at None, its agents are turned away from most of it.') ?></div>
         <?php foreach (roleModules() as $module_id => $module) {
             $level = min(intval($r_levels[$module_id] ?? 0), $module['max']);
             $label = escapeHtml($module['label']); ?>
@@ -78,7 +78,7 @@ $r_admin_locked = ($role_admin_blocker ?? '') !== '';
                             }
                             $id = "roleLevel{$module_id}_$value"; ?>
                             <input class="btn-check" type="radio" name="levels[<?= $module_id ?>]" id="<?= $id ?>" value="<?= $value ?>" autocomplete="off"<?= $level === $value ? ' checked' : '' ?>>
-                            <label class="btn btn-outline-<?= ROLE_LEVEL_TONES[$value] ?>" for="<?= $id ?>"><?= $level_label ?></label>
+                            <label class="btn btn-outline-<?= ROLE_LEVEL_TONES[$value] ?>" for="<?= $id ?>"><?= escapeHtml(_x($level_label, 'role level')) /* i18n-dynamic - ROLE_LEVELS */ ?></label>
                         <?php } ?>
                     </div>
                 </div>
@@ -91,7 +91,7 @@ $r_admin_locked = ($role_admin_blocker ?? '') !== '';
             </div>
         <?php } ?>
     </div>
-    <div class="small text-secondary" data-role-admin-note<?= $r_admin ? '' : ' hidden' ?>><i class="fas fa-fw fa-info-circle me-1"></i>An admin role opens every part of ITFlow, so there are no levels to set. Its levels are kept, for if it stops being one.</div>
+    <div class="small text-secondary" data-role-admin-note<?= $r_admin ? '' : ' hidden' ?>><i class="fas fa-fw fa-info-circle me-1"></i><?= __('An admin role opens every part of ITFlow, so there are no levels to set. Its levels are kept, for if it stops being one.') ?></div>
 </div>
 
 <script src="/js/role_form.js"></script>

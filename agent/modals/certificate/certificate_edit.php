@@ -14,7 +14,7 @@ enforceUserPermission('module_support', 2);
 $certificate_id = intval($_GET['id'] ?? 0);
 $certificate = certificateRow($certificate_id);
 if (!$certificate) {
-    echo json_encode(['error' => 'That certificate no longer exists.']);
+    echo json_encode(['error' => __('That certificate no longer exists.')]);
     exit;
 }
 $client_id = intval($certificate['certificate_client_id']);
@@ -36,7 +36,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-lock me-2"></i>Editing certificate: <strong><?= $certificate_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-lock me-2"></i><?= __('Editing certificate:') ?> <strong><?= $certificate_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -48,8 +48,8 @@ ob_start();
         <?php require 'certificate_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_certificate" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_certificate" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

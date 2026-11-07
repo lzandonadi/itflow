@@ -13,7 +13,7 @@ require_once "../includes/check_login.php";
 // Require an attachment ID
 if (!isset($_GET['attachment_id'])) {
     http_response_code(400);
-    exit("Attachment ID required");
+    exit(__('Attachment ID required'));
 }
 
 $attachment_id = intval($_GET['attachment_id']);
@@ -41,7 +41,7 @@ $sql = mysqli_query($mysqli, "SELECT * FROM ticket_attachments
 
 if (mysqli_num_rows($sql) !== 1) {
     http_response_code(404);
-    exit("Attachment not found");
+    exit(__('Attachment not found'));
 }
 
 $row = mysqli_fetch_array($sql);
@@ -63,7 +63,7 @@ $file_path = realpath(__DIR__ . "/../uploads/tickets/$ticket_id/$attachment_refe
 // Path traversal guard - resolved path must stay inside uploads
 if ($file_path === false || $uploads_base === false || strpos($file_path, $uploads_base) !== 0) {
     http_response_code(404);
-    exit("Attachment not found");
+    exit(__('Attachment not found'));
 }
 
 // No MIME column on ticket_attachments - detect from file content.

@@ -87,30 +87,30 @@ $templates = array_values($templates);
 
 $admin = !empty($session_is_admin);
 $columns = [
-    'template' => ['label' => 'Template', 'html' => function ($row) use ($admin) {
+    'template' => ['label' => __('Template'), 'html' => function ($row) use ($admin) {
         $name = escapeHtml($row['template']);
         return ($admin ? '<a href="/admin/ticket_template.php?ticket_template_id=' . $row['id'] . '">' . $name . '</a>' : $name)
-            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">Archived</span>' : '')
-            . ($row['portal_form'] ? ' <i class="fas fa-door-open text-body-tertiary ms-1" title="Offered in the client portal"></i>' : '');
+            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">' . __('Archived') . '</span>' : '')
+            . ($row['portal_form'] ? ' <i class="fas fa-door-open text-body-tertiary ms-1" title="' . escapeHtml(__('Offered in the client portal')) . '"></i>' : '');
     }],
-    'raised' => ['label' => 'Raised', 'type' => 'count', 'class' => 'fw-semibold'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'raised' => ['label' => __('Raised'), 'type' => 'count', 'class' => 'fw-semibold'],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['raised'], $row['prev'], 'up') . '</span>';
     }],
-    'agent' => ['label' => 'By agents', 'type' => 'count'],
-    'portal' => ['label' => 'From the portal', 'type' => 'count'],
-    'recurring' => ['label' => 'Recurring', 'type' => 'count'],
-    'project' => ['label' => 'Projects', 'type' => 'count'],
-    'resolved' => ['label' => 'Resolved', 'type' => 'count'],
-    'open_now' => ['label' => 'Open now', 'type' => 'count'],
-    'resolve' => ['label' => 'To resolve', 'type' => 'duration', 'title' => 'Typical (middle) time to resolve'],
-    'seconds' => ['label' => 'Time logged', 'type' => 'hours'],
-    'last' => ['label' => 'Last used', 'type' => 'date', 'html' => function ($row) {
-        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">Never</span>';
+    'agent' => ['label' => __('By agents'), 'type' => 'count'],
+    'portal' => ['label' => __('From the portal'), 'type' => 'count'],
+    'recurring' => ['label' => __('Recurring'), 'type' => 'count'],
+    'project' => ['label' => __('Projects'), 'type' => 'count'],
+    'resolved' => ['label' => __('Resolved'), 'type' => 'count'],
+    'open_now' => ['label' => __('Open now'), 'type' => 'count'],
+    'resolve' => ['label' => __('To resolve'), 'type' => 'duration', 'title' => __('Typical (middle) time to resolve')],
+    'seconds' => ['label' => __('Time logged'), 'type' => 'hours'],
+    'last' => ['label' => __('Last used'), 'type' => 'date', 'html' => function ($row) {
+        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">' . __('Never') . '</span>';
     }],
 ];
 
-$totals = ['template' => 'Total'];
+$totals = ['template' => __('Total')];
 foreach (['raised', 'agent', 'portal', 'recurring', 'project', 'resolved', 'open_now', 'seconds'] as $key) {
     $totals[$key] = array_sum(array_column($templates, $key));
 }
@@ -142,31 +142,31 @@ $top = array_slice(array_filter($templates, function ($t) { return $t['raised'] 
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Raised from templates', 'value' => reportCount($totals['raised']), 'sub' => $all_raised ? reportPercent(reportShare($totals['raised'], $all_raised)) . ' <span class="text-body-tertiary">of all tickets raised</span>' : ''],
-        ['label' => 'From the client portal', 'value' => reportCount($totals['portal']), 'sub' => '<span class="text-body-tertiary">Asked for on its request forms</span>'],
-        ['label' => 'Templates used', 'value' => $used . ' of ' . count($current), 'sub' => $unused ? $unused . ' <span class="text-body-tertiary">not used in this period</span>' : '<span class="text-body-tertiary">Every one</span>'],
-        ['label' => 'Most used', 'value' => $top ? $top[0]['template'] : '-', 'sub' => $top ? $top[0]['raised'] . ' <span class="text-body-tertiary">tickets · ' . reportPercent(reportShare($top[0]['raised'], $totals['raised'])) . ' of them</span>' : ''],
+        ['label' => __('Raised from templates'), 'value' => reportCount($totals['raised']), 'sub' => $all_raised ? reportPercent(reportShare($totals['raised'], $all_raised)) . ' <span class="text-body-tertiary">' . __('of all tickets raised') . '</span>' : ''],
+        ['label' => __('From the client portal'), 'value' => reportCount($totals['portal']), 'sub' => '<span class="text-body-tertiary">' . __('Asked for on its request forms') . '</span>'],
+        ['label' => __('Templates used'), 'value' => __('%1$d of %2$d', $used, count($current)), 'sub' => $unused ? $unused . ' <span class="text-body-tertiary">' . __('not used in this period') . '</span>' : '<span class="text-body-tertiary">' . __('Every one') . '</span>'],
+        ['label' => __('Most used'), 'value' => $top ? $top[0]['template'] : '-', 'sub' => $top ? $top[0]['raised'] . ' <span class="text-body-tertiary">tickets · ' . reportPercent(reportShare($top[0]['raised'], $totals['raised'])) . ' of them</span>' : ''],
     ]) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Most used', 'How they were raised') ?>
+        <?= reportSectionOpen(__('Most used'), __('How they were raised')) ?>
             <div class="card-body">
                 <?php
                 $series = [];
-                foreach (['agent' => ['By agents', 'accent'], 'portal' => ['From the portal', 'success'], 'recurring' => ['Recurring', 'info'], 'project' => ['Projects', 'purple']] as $key => [$label, $tone]) {
+                foreach (['agent' => [__('By agents'), 'accent'], 'portal' => [__('From the portal'), 'success'], 'recurring' => ['Recurring', 'info'], 'project' => ['Projects', 'purple']] as $key => [$label, $tone]) {
                     $series[] = ['label' => $label, 'tone' => $tone, 'stack' => 'how', 'data' => array_column($top, $key)];
                 }
-                echo reportChart(['type' => 'bar', 'horizontal' => true, 'stacked' => true, 'labels' => array_column($top, 'template'), 'series' => $series, 'format' => 'count'], '', 'Tickets raised per template, by how');
+                echo reportChart(['type' => 'bar', 'horizontal' => true, 'stacked' => true, 'labels' => array_column($top, 'template'), 'series' => $series, 'format' => 'count'], '', __('Tickets raised per template, by how'));
                 ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By template', 'Most used first, then the ones not used', 'itflow-report-long') ?>
-        <?= reportTable($columns, $templates, ['empty' => 'There are no ticket templates yet.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By template'), __('Most used first, then the ones not used'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $templates, ['empty' => __('There are no ticket templates yet.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Raised counts tickets raised in the period from each template; resolved counts those resolved in it, whenever raised. To resolve is the middle ticket's time, so a few long ones do not skew it.
-            Time logged is the time on their replies in the period. Tickets remember their template from the update that brought ticket templates' setup in - older ones are not counted.
+            <?= __("Raised counts tickets raised in the period from each template; resolved counts those resolved in it, whenever raised. To resolve is the middle ticket's time, so a few long ones do not skew it.") ?>
+            <?= __('Time logged is the time on their replies in the period. Tickets remember their template from the update that brought ticket templates\' setup in - older ones are not counted.') ?>
         </div>
     </div>
 

@@ -93,15 +93,15 @@ function softwareTemplateFileNotes($value, $max = 20000) {
 function softwareTemplatesImportRead($contents, &$error = '') {
     $data = is_array($contents) ? $contents : json_decode((string) $contents, true);
     if (!is_array($data) || ($data['format'] ?? '') !== SOFTWARE_TEMPLATE_FILE_FORMAT || !isset($data['templates']) || !is_array($data['templates'])) {
-        $error = "That isn't a license templates file - export one from Admin > License Templates.";
+        $error = __("That isn't a license templates file - export one from Admin > License Templates.");
         return null;
     }
     if (intval($data['version'] ?? 0) > SOFTWARE_TEMPLATE_FILE_VERSION) {
-        $error = 'That file was made by a newer version of ITFlow - update this one first.';
+        $error = __('That file was made by a newer version of ITFlow - update this one first.');
         return null;
     }
     if (count($data['templates']) > 500) {
-        $error = 'That file holds more than 500 license templates - split it up.';
+        $error = __('That file holds more than 500 license templates - split it up.');
         return null;
     }
 
@@ -136,7 +136,7 @@ function softwareTemplatesImportRead($contents, &$error = '') {
         ];
     }
     if (!$templates) {
-        $error = 'There are no license templates in that file.';
+        $error = __('There are no license templates in that file.');
         return null;
     }
     return $templates;
@@ -246,15 +246,15 @@ function softwareTemplatesImport(array $templates, $existing = 'skip', $only_exi
 /* What an import did, in words - for its message. HTML. */
 function softwareTemplatesImportSummary(array $counts) {
     $parts = [];
-    foreach (['added' => 'added', 'replaced' => 'replaced', 'skipped' => 'already here, left as they were'] as $key => $word) {
+    foreach (['added' => _x('added', 'import count'), 'replaced' => _x('replaced', 'import count'), 'skipped' => __('already here, left as they were')] as $key => $word) {
         if ($counts[$key]) {
             $parts[] = '<strong>' . $counts[$key] . '</strong> ' . $word;
         }
     }
     $products = $counts['products'];
-    return ucfirst(implode(', ', $parts) ?: 'nothing brought in')
-        . ($counts['vendors'] ? '. Added <strong>' . $counts['vendors'] . '</strong> vendor template' . ($counts['vendors'] === 1 ? '' : 's') . ' they come from' : '')
-        . ($products ? '. Not sold as ' . escapeHtml(implode(', ', array_slice($products, 0, 5))) . (count($products) > 5 ? ' and ' . (count($products) - 5) . ' more' : '')
-            . ' - ' . (count($products) === 1 ? 'that product isn\'t' : 'those products aren\'t') . ' here, so pick what each is sold as on its page' : '')
+    return ucfirst(implode(', ', $parts) ?: __('nothing brought in'))
+        . ($counts['vendors'] ? _n('. Added <strong>%d</strong> vendor template they come from', '. Added <strong>%d</strong> vendor templates they come from', $counts['vendors']) : '')
+        . ($products ? __('. Not sold as %s', escapeHtml(implode(', ', array_slice($products, 0, 5)))) . (count($products) > 5 ? ' ' . __('and %d more', count($products) - 5) : '')
+            . ' - ' . (count($products) === 1 ? __("that product isn't here, so pick what each is sold as on its page") : __("those products aren't here, so pick what each is sold as on its page")) : '')
         . '.';
 }

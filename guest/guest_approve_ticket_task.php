@@ -11,7 +11,7 @@ $purifier_config->set('URI.AllowedSchemes', ['data' => true, 'src' => true, 'htt
 $purifier = new HTMLPurifier($purifier_config);
 
 if (!isset($_GET['task_approval_id'], $_GET['url_key'])) {
-    echo "<br><h2>Oops, something went wrong! Please raise a ticket if you believe this is an error.</h2>";
+    echo "<br><h2>" . __('Oops, something went wrong! Please raise a ticket if you believe this is an error.') . "</h2>";
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';
     exit();
 }
@@ -39,7 +39,7 @@ $url_key = escapeSql($_GET['url_key']);
 
 $task_row = mysqli_fetch_assoc(mysqli_query($mysqli,
     "SELECT approval_status, task_id, task_name, ticket_details,
-        ticket_number, ticket_prefix, ticket_priority, ticket_status_name, ticket_subject FROM task_approvals
+        ticket_number, ticket_prefix, ticket_priority, ticket_status, ticket_status_name, ticket_subject FROM task_approvals
         LEFT JOIN tasks ON approval_task_id = task_id
         LEFT JOIN tickets on task_ticket_id = ticket_id
         LEFT JOIN ticket_statuses ON ticket_status = ticket_status_id
@@ -49,7 +49,7 @@ $task_row = mysqli_fetch_assoc(mysqli_query($mysqli,
 
 if (!$task_row) {
     // Invalid
-    echo "<br><h2>Oops, something went wrong! Please raise a ticket if you believe this is an error.</h2>";
+    echo "<br><h2>" . __('Oops, something went wrong! Please raise a ticket if you believe this is an error.') . "</h2>";
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';
     exit();
 }
@@ -61,7 +61,8 @@ $approval_status = escapeHtml($task_row['approval_status']);
 
 $ticket_prefix = escapeHtml($task_row['ticket_prefix']);
 $ticket_number = intval($task_row['ticket_number']);
-$ticket_status = escapeHtml($task_row['ticket_status_name']);
+$page_title = escapeHtml(__('Task Approval'));
+$ticket_status = escapeHtml(ticketStatusLabel($task_row['ticket_status'], $task_row['ticket_status_name']));
 $ticket_priority = escapeHtml($task_row['ticket_priority']);
 $ticket_subject = escapeHtml($task_row['ticket_subject']);
 $ticket_details = $purifier->purify($task_row['ticket_details']);
@@ -88,19 +89,19 @@ $approve_link = "guest_post.php?approve_ticket_task=$task_id&approval_id=$approv
              supporting detail and follows underneath. */ ?>
     <div class="card mt-3 mb-3">
         <div class="card-header bg-dark text-center py-3">
-            <h4 class="mb-0"><i class="fas fa-fw fa-clipboard-check me-2"></i>Task Approval</h4>
+            <h4 class="mb-0"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Task Approval') ?></h4>
         </div>
 
         <div class="card-body text-center py-4">
 
             <?php if ($approval_status == 'pending') { ?>
-                <p class="text-muted mb-2">You have been asked to approve the following task</p>
+                <p class="text-muted mb-2"><?= __('You have been asked to approve the following task') ?></p>
             <?php } ?>
 
             <h4 class="mb-3"><?= ucfirst($task_name) ?></h4>
 
             <p class="text-muted mb-4">
-                Ticket <span class="text-bold"><?= $ticket_prefix, $ticket_number ?></span> &mdash; <?= $ticket_subject ?>
+                <?= __('Ticket %1$s &mdash; %2$s', '<span class="text-bold">' . $ticket_prefix . $ticket_number . '</span>', $ticket_subject) ?>
             </p>
 
             <?php if ($approval_status == 'pending') { ?>
@@ -109,14 +110,14 @@ $approve_link = "guest_post.php?approve_ticket_task=$task_id&approval_id=$approv
                          which is where a mailed approval link is usually opened */ ?>
                 <div class="d-grid gap-2 d-sm-block">
                     <a href="<?= $approve_link ?>" class="btn btn-success btn-lg confirm-link"
-                       data-confirm-title="Approve this task?"
+                       data-confirm-title="<?= escapeHtml(__('Approve this task?')) ?>"
                        data-confirm-text="<?= ucfirst($task_name) ?>"
-                       data-confirm-button="Yes, approve">
-                        <i class="fas fa-fw fa-check me-2"></i>Approve task
+                       data-confirm-button="<?= escapeHtml(__('Yes, approve')) ?>">
+                        <i class="fas fa-fw fa-check me-2"></i><?= __('Approve task') ?>
                     </a>
                 </div>
 
-                <small class="text-muted d-block mt-3">Not expecting this? Get in touch using the details below.</small>
+                <small class="text-muted d-block mt-3"><?= __('Not expecting this? Get in touch using the details below.') ?></small>
 
             <?php } elseif ($approval_status == 'approved') { ?>
 
@@ -124,13 +125,13 @@ $approve_link = "guest_post.php?approve_ticket_task=$task_id&approval_id=$approv
                          is the confirmation screen for every successful approval -
                          not just an already-done state */ ?>
                 <div class="alert alert-success d-inline-block mb-0">
-                    <i class="fas fa-fw fa-check-circle me-2"></i><span class="text-bold">Approved</span> &mdash; nothing further is needed.
+                    <i class="fas fa-fw fa-check-circle me-2"></i><?= __('%s &mdash; nothing further is needed.', '<span class="text-bold">' . __('Approved') . '</span>') ?>
                 </div>
 
             <?php } else { ?>
 
                 <div class="alert alert-danger d-inline-block mb-0">
-                    <i class="fas fa-fw fa-times-circle me-2"></i><span class="text-bold">Declined</span> &mdash; this task was not approved.
+                    <i class="fas fa-fw fa-times-circle me-2"></i><?= __('%s &mdash; this task was not approved.', '<span class="text-bold">' . __('Declined') . '</span>') ?>
                 </div>
 
             <?php } ?>
@@ -140,10 +141,10 @@ $approve_link = "guest_post.php?approve_ticket_task=$task_id&approval_id=$approv
 
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title mt-2">Ticket details</h5>
+            <h5 class="card-title mt-2"><?= __('Ticket details') ?></h5>
             <div class="card-tools">
                 <span class="p-2 badge rounded-pill text-bg-secondary"><?= $ticket_status ?></span>
-                <span class="p-2 badge rounded-pill text-bg-<?= $ticket_priority_color ?>"><?= $ticket_priority ?></span>
+                <span class="p-2 badge rounded-pill text-bg-<?= $ticket_priority_color ?>"><?= escapeHtml(ticketPriorityLabel($task_row['ticket_priority'])) ?></span>
             </div>
         </div>
 

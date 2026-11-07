@@ -29,7 +29,7 @@ $license = softwareRow($software_id);
 
 if (!$license || ($client_url && intval($license['software_client_id']) !== intval($client_id))) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
 
 } else {
 
@@ -42,7 +42,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
     $software_version = escapeHtml($license['software_version']);
     $software_type = escapeHtml($license['software_type']);
     $software_description = escapeHtml($license['software_description']);
-    $software_license_type = escapeHtml($license['software_license_type']);
+    $software_license_type = escapeHtml(softwareLicenseTypeLabel($license['software_license_type']));
     $software_key = $license['software_key'];
     $software_purchase_reference = escapeHtml($license['software_purchase_reference']);
     $software_purchase = escapeHtml($license['software_purchase']);
@@ -78,26 +78,26 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
     $history = auditLogHistory('Software', $software_id);
 
     $license_tabs = [
-        'seats' => ['label' => 'Seats', 'icon' => 'fa-users', 'count' => $seats['used']],
-        'keys' => ['label' => 'Keys', 'icon' => 'fa-key', 'count' => count($keys) + ($software_key ? 1 : 0)],
-        'credentials' => ['label' => 'Credentials', 'icon' => 'fa-key', 'count' => count($credentials)],
-        'documents' => ['label' => 'Documents', 'icon' => 'fa-file-alt', 'count' => count($documents)],
-        'files' => ['label' => 'Files', 'icon' => 'fa-paperclip', 'count' => count($files)],
-        'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+        'seats' => ['label' => __('Seats'), 'icon' => 'fa-users', 'count' => $seats['used']],
+        'keys' => ['label' => __('Keys'), 'icon' => 'fa-key', 'count' => count($keys) + ($software_key ? 1 : 0)],
+        'credentials' => ['label' => __('Credentials'), 'icon' => 'fa-key', 'count' => count($credentials)],
+        'documents' => ['label' => __('Documents'), 'icon' => 'fa-file-alt', 'count' => count($documents)],
+        'files' => ['label' => __('Files'), 'icon' => 'fa-paperclip', 'count' => count($files)],
+        'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
     ];
     if (!$can_credentials) {
         unset($license_tabs['credentials']);
     }
 
     // A renewal ticket, filled in with what the person doing it needs
-    $renewal_subject = 'Renew ' . $license['software_name'] . ($renewal ? ' - ' . strtolower($renewal['text']) : '');
+    $renewal_subject = $renewal ? __('Renew %1$s - %2$s', $license['software_name'], mb_strtolower($renewal['text'])) : __('Renew %s', $license['software_name']);
     // Plain text, one fact a line - the ticket form escapes it
     $renewal_details = implode("\n", array_filter([
-        'Renew ' . trim($license['software_name'] . ' ' . $license['software_version']) . ' for ' . $license['client_name'] . '.',
-        $renewal ? 'Renewal date: ' . $renewal['date'] : '',
-        $seats['state'] !== 'unlimited' ? 'Seats: ' . $seats['used'] . ' in use of ' . $seats['total'] : 'Seats in use: ' . $seats['used'],
-        $license['vendor_name'] ? 'Vendor: ' . $license['vendor_name'] . ($license['vendor_account_number'] ? ' (account ' . $license['vendor_account_number'] . ')' : '') : '',
-        $license['software_purchase_reference'] ? 'Last order: ' . $license['software_purchase_reference'] : '',
+        __('Renew %1$s for %2$s.', trim($license['software_name'] . ' ' . $license['software_version']), $license['client_name']),
+        $renewal ? __('Renewal date: %s', formatDate($renewal['date'], 'date')) : '',
+        $seats['state'] !== 'unlimited' ? __('Seats: %1$d in use of %2$d', $seats['used'], $seats['total']) : __('Seats in use: %d', $seats['used']),
+        $license['vendor_name'] ? ($license['vendor_account_number'] ? __('Vendor: %1$s (account %2$s)', $license['vendor_name'], $license['vendor_account_number']) : __('Vendor: %s', $license['vendor_name'])) : '',
+        $license['software_purchase_reference'] ? __('Last order: %s', $license['software_purchase_reference']) : '',
     ]));
     $renewal_ticket_url = 'modals/ticket/ticket_add.php?' . http_build_query(['client_id' => $client_id, 'subject' => $renewal_subject, 'details' => $renewal_details]);
 
@@ -113,7 +113,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
             <a href="client_overview.php?client_id=<?= $client_id ?>"><?= $client_name ?></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="software.php?client_id=<?= $client_id ?>">Licenses</a>
+            <a href="software.php?client_id=<?= $client_id ?>"><?= __('Licenses') ?></a>
         </li>
         <li class="breadcrumb-item active"><?= $software_name ?></li>
     </ol>
@@ -127,8 +127,8 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                 <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                     <span><?= $software_name ?></span>
                     <?php if ($software_version) { ?><span class="text-body-secondary fw-normal"><?= $software_version ?></span><?php } ?>
-                    <?php if ($software_favorite) { ?><i class="fas fa-star text-warning fs-6" title="Favorite"></i><?php } ?>
-                    <?php if ($software_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                    <?php if ($software_favorite) { ?><i class="fas fa-star text-warning fs-6" title="<?= escapeHtml(__('Favorite')) ?>"></i><?php } ?>
+                    <?php if ($software_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                     <span class="fs-6"><?= softwareRenewalPill($renewal, true) ?></span>
                     <?php if ($seats['state'] === 'over') { ?>
                         <span class="fs-6"><span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal"><i class="fas fa-exclamation-triangle me-1"></i><?= $seats['over'] ?> over seats</span></span>
@@ -148,65 +148,65 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
             <div class="d-flex flex-wrap gap-2 d-print-none">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-outline-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/software/software_renew.php?id=<?= $software_id ?>">
-                        <i class="fas fa-redo-alt me-2"></i>Renew
+                        <i class="fas fa-redo-alt me-2"></i><?= __('Renew') ?>
                     </button>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i>New</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-2"></i><?= __('New') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= escapeHtml($renewal_ticket_url) ?>">
-                                <i class="fa fa-fw fa-life-ring text-secondary me-2"></i>Renewal Ticket
+                                <i class="fa fa-fw fa-life-ring text-secondary me-2"></i><?= __('Renewal Ticket') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/software/software_key_add.php?software_id=<?= $software_id ?>">
-                                <i class="fa fa-fw fa-key text-secondary me-2"></i>Keys
+                                <i class="fa fa-fw fa-key text-secondary me-2"></i><?= __('Keys') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&software_id=<?= $software_id ?>">
-                                <i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document
+                                <i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?>
                             </a>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&software_id=<?= $software_id ?>">
-                                <i class="fa fa-fw fa-upload text-secondary me-2"></i>Upload File(s)
+                                <i class="fa fa-fw fa-upload text-secondary me-2"></i><?= __('Upload File(s)') ?>
                             </a>
                         </div>
                     </div>
                     <div class="dropdown">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i>Link</button>
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>asset"><i class="fa fa-fw fa-desktop text-secondary me-2"></i>Device</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i>User</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>asset"><i class="fa fa-fw fa-desktop text-secondary me-2"></i><?= __('Device') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>contact"><i class="fa fa-fw fa-user text-secondary me-2"></i><?= __('User') ?></a>
                             <?php if ($can_link_credentials) { ?>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>credential"><i class="fa fa-fw fa-lock text-secondary me-2"></i>Credential</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>credential"><i class="fa fa-fw fa-lock text-secondary me-2"></i><?= __('Credential') ?></a>
                             <?php } ?>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-file-alt text-secondary me-2"></i>Document</a>
-                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>file"><i class="fa fa-fw fa-paperclip text-secondary me-2"></i>File</a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>document"><i class="fa fa-fw fa-file-alt text-secondary me-2"></i><?= __('Document') ?></a>
+                            <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $link_url ?>file"><i class="fa fa-fw fa-paperclip text-secondary me-2"></i><?= __('File') ?></a>
                         </div>
                     </div>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/software/software_edit.php?id=<?= $software_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                 <?php } ?>
                 <?php if ($can_restore) { ?>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($software_archived_at) { ?>
                                 <a class="dropdown-item" href="post.php?restore_software=<?= $software_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                 </a>
                                 <?php if ($can_delete) { ?>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_software=<?= $software_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                         data-confirm-text="<?= $software_name ?> goes for good, with its seats and keys.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             <?php } else { ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/software/software_seats.php?id=<?= $software_id ?>">
-                                    <i class="fas fa-fw fa-users text-secondary me-2"></i>Seats
+                                    <i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Seats') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_software=<?= $software_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                    data-confirm-text="It drops off every device and user until it is restored.">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    data-confirm-text="<?= escapeHtml(__('It drops off every device and user until it is restored.')) ?>">
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -223,44 +223,44 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-cube text-secondary me-2"></i>License</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-cube text-secondary me-2"></i><?= __('License') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-asset-dl mb-0">
-                        <dt>Seats</dt>
+                        <dt><?= __('Seats') ?></dt>
                         <dd><?= softwareSeatBar($seats) ?></dd>
                         <?php if ($software_license_type) { ?>
-                            <dt>Type</dt>
+                            <dt><?= __('Type') ?></dt>
                             <dd><i class="fas fa-fw <?= softwareLicenseTypeIcon($license['software_license_type']) ?> text-secondary me-1"></i><?= $software_license_type ?></dd>
                         <?php } ?>
-                        <dt>Key</dt>
+                        <dt><?= __('Key') ?></dt>
                         <dd>
                             <?php if ($software_key) { ?>
                                 <?= softwareKeyHtml($software_key) ?>
                             <?php } elseif ($keys) { ?>
-                                <a href="#keys" data-license-tab-link="keys"><?= count($keys) ?> individual key<?= count($keys) === 1 ? '' : 's' ?></a>
+                                <a href="#keys" data-license-tab-link="keys"><?= _n('%d individual key', '%d individual keys', count($keys)) ?></a>
                             <?php } else { ?>
-                                <span class="text-body-secondary">None recorded</span>
+                                <span class="text-body-secondary"><?= __('None recorded') ?></span>
                             <?php } ?>
                         </dd>
-                        <dt>Renews</dt>
+                        <dt><?= __('Renews') ?></dt>
                         <dd>
                             <?php if ($renewal) { ?>
                                 <?= escapeHtml($renewal['date']) ?>
                                 <div class="small text-<?= $renewal['tone'] === 'success' ? 'body-secondary' : $renewal['tone'] . '-emphasis' ?>"><?= escapeHtml($renewal['text']) ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">No date</span>
+                                <span class="text-body-secondary"><?= __('No date') ?></span>
                             <?php } ?>
                         </dd>
                         <?php if ($software_purchase) { ?>
-                            <dt>Purchased</dt>
-                            <dd><?= $software_purchase ?><?php if ($software_purchase_age) { ?><div class="small text-body-secondary"><?= $software_purchase_age ?> ago</div><?php } ?></dd>
+                            <dt><?= __('Purchased') ?></dt>
+                            <dd><?= $software_purchase ?><?php if ($software_purchase_age) { ?><div class="small text-body-secondary"><?= escapeHtml(__('%s ago', $software_purchase_age)) ?></div><?php } ?></dd>
                         <?php } ?>
                         <?php if ($software_purchase_reference) { ?>
-                            <dt>Order ref</dt>
-                            <dd><?= $software_purchase_reference ?><button type="button" class="itflow-copy clipboardjs" title="Copy reference" data-clipboard-text="<?= $software_purchase_reference ?>"><i class="far fa-copy"></i></button></dd>
+                            <dt><?= __('Order ref') ?></dt>
+                            <dd><?= $software_purchase_reference ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy reference')) ?>" data-clipboard-text="<?= $software_purchase_reference ?>"><i class="far fa-copy"></i></button></dd>
                         <?php } ?>
-                        <dt>Added</dt><dd title="<?= $software_created_at ?>"><?= timeAgo($software_created_at) ?></dd>
+                        <dt><?= __('Added') ?></dt><dd title="<?= $software_created_at ?>"><?= timeAgo($software_created_at) ?></dd>
                     </dl>
                 </div>
             </div>
@@ -273,36 +273,36 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                 $vendor_pin = vendorSecretHtml($license['vendor_code']); ?>
                 <div class="card mb-3">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-building text-secondary me-2"></i>Vendor</h3>
+                        <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-building text-secondary me-2"></i><?= __('Vendor') ?></h3>
                         <span class="small"><?= vendorLink($vendor_id, $license['vendor_name'], ['page' => true, 'client_id' => $client_id]) ?></span>
                     </div>
                     <div class="card-body">
                         <dl class="itflow-asset-dl mb-0">
                             <?php if ($vendor_account) { ?>
-                                <dt>Account</dt>
-                                <dd><span class="font-monospace"><?= $vendor_account ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy account number" data-clipboard-text="<?= $vendor_account ?>"><i class="far fa-copy"></i></button></dd>
+                                <dt><?= __('Account') ?></dt>
+                                <dd><span class="font-monospace"><?= $vendor_account ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy account number')) ?>" data-clipboard-text="<?= $vendor_account ?>"><i class="far fa-copy"></i></button></dd>
                             <?php } ?>
                             <?php if ($vendor_pin) { ?>
-                                <dt>PIN</dt><dd><?= $vendor_pin ?></dd>
+                                <dt><?= __('PIN') ?></dt><dd><?= $vendor_pin ?></dd>
                             <?php } ?>
                             <?php if ($vendor_phone) { ?>
-                                <dt>Phone</dt><dd><?= $vendor_phone ?></dd>
+                                <dt><?= __('Phone') ?></dt><dd><?= $vendor_phone ?></dd>
                             <?php } ?>
                             <?php if ($vendor_email) { ?>
-                                <dt>Email</dt>
-                                <dd><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></dd>
+                                <dt><?= __('Email') ?></dt>
+                                <dd><a href="mailto:<?= $vendor_email ?>"><?= $vendor_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $vendor_email ?>"><i class="far fa-copy"></i></button></dd>
                             <?php } ?>
                             <?php if ($vendor_website) { ?>
-                                <dt>Website</dt><dd><a href="<?= escapeHtml(vendorWebsiteUrl($license['vendor_website'])) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($license['vendor_website'])) ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
+                                <dt><?= __('Website') ?></dt><dd><a href="<?= escapeHtml(vendorWebsiteUrl($license['vendor_website'])) ?>" target="_blank" rel="noopener"><?= escapeHtml(vendorWebsiteLabel($license['vendor_website'])) ?><i class="fas fa-external-link-alt ms-1 small"></i></a></dd>
                             <?php } ?>
                             <?php if ($license['vendor_hours']) { ?>
-                                <dt>Hours</dt><dd><?= escapeHtml($license['vendor_hours']) ?></dd>
+                                <dt><?= __('Hours') ?></dt><dd><?= escapeHtml($license['vendor_hours']) ?></dd>
                             <?php } ?>
                             <?php if ($license['vendor_sla']) { ?>
-                                <dt>SLA</dt><dd><?= escapeHtml($license['vendor_sla']) ?></dd>
+                                <dt><?= __('SLA') ?></dt><dd><?= escapeHtml($license['vendor_sla']) ?></dd>
                             <?php } ?>
                             <?php if (!$vendor_account && !$vendor_phone && !$vendor_email && !$vendor_website && !$license['vendor_hours'] && !$license['vendor_sla']) { ?>
-                                <dt>Contact</dt><dd class="text-body-secondary">Nothing recorded on the vendor yet</dd>
+                                <dt><?= __('Contact') ?></dt><dd class="text-body-secondary"><?= __('Nothing recorded on the vendor yet') ?></dd>
                             <?php } ?>
                         </dl>
                     </div>
@@ -311,9 +311,9 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i>Notes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i><?= __('Notes') ?></h3>
                 </div>
-                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-license-notes" rows="6" placeholder="Admin portal, how it is billed, who to call to renew - saves when you click away"
+                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-license-notes" rows="6" placeholder="<?= escapeHtml(__('Admin portal, how it is billed, who to call to renew - saves when you click away')) ?>"
                     data-software-id="<?= $software_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token']) ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $software_notes ?></textarea>
             </div>
 
@@ -343,17 +343,17 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                 <?php if ($seats['state'] === 'unlimited') { ?>
                                     <?= $seats['used'] ?> in use - no seat limit.
                                 <?php } else { ?>
-                                    <?= $seats['used'] ?> of <?= $seats['total'] ?> seats in use<?= $seats['over'] ? ' - <span class="text-danger-emphasis fw-semibold">' . $seats['over'] . ' over</span>' : ($seats['free'] ? ', ' . $seats['free'] . ' free' : '') ?>.
+                                    <?= $seats['over'] ? __('%1$d of %2$d seats in use - %3$s.', $seats['used'], $seats['total'], '<span class="text-danger-emphasis fw-semibold">' . __('%d over', $seats['over']) . '</span>') : ($seats['free'] ? __('%1$d of %2$d seats in use, %3$d free.', $seats['used'], $seats['total'], $seats['free']) : __('%1$d of %2$d seats in use.', $seats['used'], $seats['total'])) ?>
                                 <?php } ?>
                             </span>
                             <?php if ($can_edit) { ?>
                                 <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/software/software_seats.php?id=<?= $software_id ?>">
-                                    <i class="fas fa-users me-2"></i>Manage Seats
+                                    <i class="fas fa-users me-2"></i><?= __('Manage Seats') ?>
                                 </button>
                             <?php } ?>
                         </div>
                         <?php if ($holders['assets']) { ?>
-                            <div class="itflow-license-section"><i class="fas fa-fw fa-desktop me-1"></i>Devices <span class="badge rounded-pill ms-1"><?= count($holders['assets']) ?></span></div>
+                            <div class="itflow-license-section"><i class="fas fa-fw fa-desktop me-1"></i><?= __('Devices') ?> <span class="badge rounded-pill ms-1"><?= count($holders['assets']) ?></span></div>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <tbody>
@@ -365,7 +365,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                                     <span class="itflow-asset-icon itflow-asset-icon-sm itflow-asset-tone-<?= assetTypeTone($holder['asset_type']) ?>" aria-hidden="true"><i class="fas fa-fw fa-<?= getAssetIcon($holder['asset_type']) ?>"></i></span>
                                                     <div class="min-w-0">
                                                         <a class="fw-semibold ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= $holder_id ?>"><?= escapeHtml($holder['asset_name']) ?></a>
-                                                        <div class="small text-body-secondary text-truncate"><?= escapeHtml(implode(' · ', array_filter([$holder['asset_type'], trim($holder['asset_make'] . ' ' . $holder['asset_model'])]))) ?></div>
+                                                        <div class="small text-body-secondary text-truncate"><?= escapeHtml(implode(' · ', array_filter([assetTypeLabel($holder['asset_type']), trim($holder['asset_make'] . ' ' . $holder['asset_model'])]))) ?></div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -373,7 +373,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                                 <?php if ($holder['asset_contact_name']) { ?>
                                                     <?= contactLink($client_id, $holder['asset_contact_id'], $holder['asset_contact_name'], $holder['asset_contact_photo']) ?>
                                                 <?php } else { ?>
-                                                    <span class="text-body-secondary small">Nobody assigned</span>
+                                                    <span class="text-body-secondary small"><?= __('Nobody assigned') ?></span>
                                                 <?php } ?>
                                             </td>
                                             <td class="itflow-license-key-cell">
@@ -381,12 +381,12 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                                     <div><?= softwareKeyHtml($held_key) ?></div>
                                                 <?php } ?>
                                                 <?php if (!$holder['held_keys'] && $software_key) { ?>
-                                                    <span class="small text-body-secondary" title="No key of its own - the license key">License key</span>
+                                                    <span class="small text-body-secondary" title="<?= escapeHtml(__('No key of its own - the license key')) ?>"><?= __('License key') ?></span>
                                                 <?php } ?>
                                             </td>
                                             <td class="text-end">
                                                 <?php if ($can_edit) { ?>
-                                                    <a href="<?= $unlink_url('asset', $holder_id) ?>" class="btn btn-sm btn-light confirm-link" title="Take off this license" data-confirm-text="Frees the seat, and any key it had."><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= $unlink_url('asset', $holder_id) ?>" class="btn btn-sm btn-light confirm-link" title="<?= escapeHtml(__('Take off this license')) ?>" data-confirm-text="<?= escapeHtml(__('Frees the seat, and any key it had.')) ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -396,7 +396,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                             </div>
                         <?php } ?>
                         <?php if ($holders['contacts']) { ?>
-                            <div class="itflow-license-section"><i class="fas fa-fw fa-user me-1"></i>Users <span class="badge rounded-pill ms-1"><?= count($holders['contacts']) ?></span></div>
+                            <div class="itflow-license-section"><i class="fas fa-fw fa-user me-1"></i><?= __('Users') ?> <span class="badge rounded-pill ms-1"><?= count($holders['contacts']) ?></span></div>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <tbody>
@@ -408,7 +408,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                                 <?= contactLink($holder['contact_client_id'], $holder_id, $holder['contact_name'], $holder['contact_photo'], ['size' => 'sm', 'class' => 'fw-semibold']) ?>
                                                 <?php if ($holder['contact_title'] || $holder_email) { ?>
                                                     <div class="small text-body-secondary itflow-license-holder-sub text-truncate">
-                                                        <?= escapeHtml($holder['contact_title']) ?><?= $holder['contact_title'] && $holder_email ? ' &middot; ' : '' ?><?php if ($holder_email) { ?><a class="text-reset" href="mailto:<?= $holder_email ?>"><?= $holder_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $holder_email ?>"><i class="far fa-copy"></i></button><?php } ?>
+                                                        <?= escapeHtml($holder['contact_title']) ?><?= $holder['contact_title'] && $holder_email ? ' &middot; ' : '' ?><?php if ($holder_email) { ?><a class="text-reset" href="mailto:<?= $holder_email ?>"><?= $holder_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $holder_email ?>"><i class="far fa-copy"></i></button><?php } ?>
                                                     </div>
                                                 <?php } ?>
                                             </td>
@@ -419,7 +419,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                             </td>
                                             <td class="text-end">
                                                 <?php if ($can_edit) { ?>
-                                                    <a href="<?= $unlink_url('contact', $holder_id) ?>" class="btn btn-sm btn-light confirm-link" title="Take off this license" data-confirm-text="Frees the seat, and any key they had."><i class="fas fa-fw fa-unlink"></i></a>
+                                                    <a href="<?= $unlink_url('contact', $holder_id) ?>" class="btn btn-sm btn-light confirm-link" title="<?= escapeHtml(__('Take off this license')) ?>" data-confirm-text="<?= escapeHtml(__('Frees the seat, and any key they had.')) ?>"><i class="fas fa-fw fa-unlink"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -430,9 +430,9 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                         <?php } ?>
                         <?php if (!$holders['assets'] && !$holders['contacts']) { ?>
                             <div class="itflow-asset-empty">
-                                <div>Nothing and nobody on this license yet.</div>
+                                <div><?= __('Nothing and nobody on this license yet.') ?></div>
                                 <?php if ($can_edit) { ?>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mt-3 ajax-modal" data-modal-url="modals/software/software_seats.php?id=<?= $software_id ?>"><i class="fas fa-users me-2"></i>Add devices and users</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-3 ajax-modal" data-modal-url="modals/software/software_seats.php?id=<?= $software_id ?>"><i class="fas fa-users me-2"></i><?= __('Add devices and users') ?></button>
                                 <?php } ?>
                             </div>
                         <?php } ?>
@@ -443,29 +443,29 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                         <div class="itflow-asset-pane-bar">
                             <span class="text-body-secondary small">
                                 <?php if ($keys) { ?>
-                                    <?= count($keys) ?> individual key<?= count($keys) === 1 ? '' : 's' ?><?= $keys_free ? ", $keys_free not handed out" : ', all handed out' ?>. A key shows on the page of whoever has it.
+                                    <?= $keys_free ? _n('%1$d individual key, %2$d not handed out. A key shows on the page of whoever has it.', '%1$d individual keys, %2$d not handed out. A key shows on the page of whoever has it.', count($keys), count($keys), $keys_free) : _n('%d individual key, all handed out. A key shows on the page of whoever has it.', '%d individual keys, all handed out. A key shows on the page of whoever has it.', count($keys)) ?>
                                 <?php } else { ?>
-                                    A key per device or user, for licenses sold that way. Each shows on the page of whoever has it.
+                                    <?= __('A key per device or user, for licenses sold that way. Each shows on the page of whoever has it.') ?>
                                 <?php } ?>
                             </span>
                             <?php if ($can_edit) { ?>
                                 <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/software/software_key_add.php?software_id=<?= $software_id ?>">
-                                    <i class="fas fa-plus me-2"></i>Add Keys
+                                    <i class="fas fa-plus me-2"></i><?= __('Add Keys') ?>
                                 </button>
                             <?php } ?>
                         </div>
                         <?php if ($software_key) { ?>
                             <div class="d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom itflow-license-main-key">
-                                <span class="badge rounded-pill text-bg-primary fw-normal">License key</span>
+                                <span class="badge rounded-pill text-bg-primary fw-normal"><?= __('License key') ?></span>
                                 <?= softwareKeyHtml($software_key, 'itflow-copy-always') ?>
-                                <span class="small text-body-secondary ms-auto">Covers every seat - change it with Edit</span>
+                                <span class="small text-body-secondary ms-auto"><?= __('Covers every seat - change it with Edit') ?></span>
                             </div>
                         <?php } ?>
                         <?php if ($keys) { ?>
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="text-nowrap table-light">
-                                    <tr><th>Key</th><th>Handed to</th><th></th></tr>
+                                    <tr><th><?= __('Key') ?></th><th><?= __('Handed to') ?></th><th></th></tr>
                                     </thead>
                                     <tbody>
                                     <?php foreach ($keys as $key) { ?>
@@ -482,14 +482,14 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                                         <?= contactLink($key_contact['contact_client_id'], $key_contact['contact_id'], $key_contact['contact_name'], $key_contact['contact_photo'], ['archived' => !empty($key_contact['contact_archived_at'])]) ?>
                                                     <?php } ?>
                                                     <?php if (!$key['assets'] && !$key['contacts']) { ?>
-                                                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle fw-normal">Free</span>
+                                                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle fw-normal"><?= __('Free') ?></span>
                                                     <?php } ?>
                                                 </div>
                                             </td>
                                             <td class="text-end text-nowrap">
                                                 <?php if ($can_edit) { ?>
-                                                    <button type="button" class="btn btn-sm btn-light ajax-modal" title="Hand out or change" data-modal-url="modals/software/software_key_edit.php?id=<?= $key['id'] ?>"><i class="fas fa-fw fa-user-tag"></i></button>
-                                                    <a href="post.php?delete_software_key=<?= $key['id'] ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="btn btn-sm btn-light text-danger confirm-link" title="Delete key" data-confirm-text="The key is removed from the license and from whoever has it."><i class="fas fa-fw fa-trash"></i></a>
+                                                    <button type="button" class="btn btn-sm btn-light ajax-modal" title="<?= escapeHtml(__('Hand out or change')) ?>" data-modal-url="modals/software/software_key_edit.php?id=<?= $key['id'] ?>"><i class="fas fa-fw fa-user-tag"></i></button>
+                                                    <a href="post.php?delete_software_key=<?= $key['id'] ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="btn btn-sm btn-light text-danger confirm-link" title="<?= escapeHtml(__('Delete key')) ?>" data-confirm-text="<?= escapeHtml(__('The key is removed from the license and from whoever has it.')) ?>"><i class="fas fa-fw fa-trash"></i></a>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -498,7 +498,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                 </table>
                             </div>
                         <?php } elseif (!$software_key) { ?>
-                            <div class="itflow-asset-empty">No keys recorded.</div>
+                            <div class="itflow-asset-empty"><?= __('No keys recorded.') ?></div>
                         <?php } ?>
                     </div>
 
@@ -506,10 +506,10 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                     <!-- Credentials: the vendor portal, the admin console -->
                     <div class="tab-pane fade" id="license-pane-credentials" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Logins that go with it - the vendor portal, the admin console. Passwords are fetched only when you ask.</span>
+                            <span class="text-body-secondary small"><?= __('Logins that go with it - the vendor portal, the admin console. Passwords are fetched only when you ask.') ?></span>
                             <?php if ($can_link_credentials) { ?>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url ?>credential">
-                                    <i class="fas fa-link me-2"></i>Link
+                                    <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                 </button>
                             <?php } ?>
                         </div>
@@ -521,29 +521,29 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                 },
                             ]) ?>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No credentials linked.</div>
+                            <div class="itflow-asset-empty"><?= __('No credentials linked.') ?></div>
                         <?php } ?>
                     </div>
                     <?php } ?>
 
                     <!-- Documents and files -->
-                    <?php foreach (['documents' => ['document', $documents, 'Setup guides, the renewal process, what is included.', 'No documents linked.'],
-                                    'files' => ['file', $files, 'Invoices, license certificates, installers, exports.', 'No files linked.']] as $pane => [$to, $linked, $hint, $empty]) { ?>
+                    <?php foreach (['documents' => ['document', $documents, __('Setup guides, the renewal process, what is included.'), __('No documents linked.')],
+                                    'files' => ['file', $files, __('Invoices, license certificates, installers, exports.'), __('No files linked.')]] as $pane => [$to, $linked, $hint, $empty]) { ?>
                         <div class="tab-pane fade" id="license-pane-<?= $pane ?>" role="tabpanel">
                             <div class="itflow-asset-pane-bar">
                                 <span class="text-body-secondary small"><?= $hint ?></span>
                                 <?php if ($can_edit) { ?>
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn btn-sm btn-outline-secondary ajax-modal" data-modal-url="<?= $link_url . $to ?>">
-                                            <i class="fas fa-link me-2"></i>Link
+                                            <i class="fas fa-link me-2"></i><?= __('Link') ?>
                                         </button>
                                         <?php if ($to === 'document') { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-size="xl" data-modal-url="modals/document/document_add.php?client_id=<?= $client_id ?>&software_id=<?= $software_id ?>">
-                                                <i class="fas fa-plus me-2"></i>New Document
+                                                <i class="fas fa-plus me-2"></i><?= __('New Document') ?>
                                             </button>
                                         <?php } else { ?>
                                             <button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="modals/file/file_upload.php?client_id=<?= $client_id ?>&software_id=<?= $software_id ?>">
-                                                <i class="fas fa-upload me-2"></i>Upload
+                                                <i class="fas fa-upload me-2"></i><?= __('Upload') ?>
                                             </button>
                                         <?php } ?>
                                     </div>
@@ -555,7 +555,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                                         <li class="itflow-link-row">
                                             <?= linkRowHtml($to, $linked_row, $client_id) ?>
                                             <?php if ($can_edit) { ?>
-                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="Unlink <?= $to ?>"><i class="fas fa-unlink"></i></a>
+                                                <a class="itflow-link-remove" href="<?= $unlink_url($to, $linked_row['id']) ?>" title="<?= __('Unlink') ?>"><i class="fas fa-unlink"></i></a>
                                             <?php } ?>
                                         </li>
                                     <?php } ?>
@@ -569,7 +569,7 @@ if (!$license || ($client_url && intval($license['software_client_id']) !== intv
                     <!-- History, from the audit log -->
                     <div class="tab-pane fade" id="license-pane-history" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Renewals, seat and key changes, edits - newest first.</span>
+                            <span class="text-body-secondary small"><?= __('Renewals, seat and key changes, edits - newest first.') ?></span>
                         </div>
                         <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                     </div>

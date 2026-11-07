@@ -13,7 +13,7 @@ $payment_id = intval($_GET['id'] ?? 0);
 $payment = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT payments.*, invoice_id FROM payments LEFT JOIN invoices ON invoice_id = payment_invoice_id WHERE payment_id = $payment_id LIMIT 1"));
 $invoice = $payment ? billingRow('invoice', intval($payment['payment_invoice_id'])) : null;
 if (!$payment || !$invoice) {
-    exit(json_encode(['error' => 'That payment no longer exists.']));
+    exit(json_encode(['error' => __('That payment no longer exists.')]));
 }
 $client_id = intval($invoice['client_id']);
 enforceClientAccess();
@@ -37,7 +37,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-credit-card me-2"></i>Edit Payment <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $invoice)) ?> &middot; <?= escapeHtml($invoice['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-credit-card me-2"></i><?= __('Edit Payment') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $invoice)) ?> &middot; <?= escapeHtml($invoice['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -48,8 +48,8 @@ ob_start();
         <?php require __DIR__ . '/payment_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_payment" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_payment" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

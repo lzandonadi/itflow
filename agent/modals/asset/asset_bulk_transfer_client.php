@@ -17,7 +17,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-exchange-alt me-2"></i>Transfer <strong><?= $count ?></strong> asset<?= $count === 1 ? '' : 's' ?> to Client</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-exchange-alt me-2"></i><?= _n('Transfer %s asset to Client', 'Transfer %s assets to Client', $count, '<strong>' . $count . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -28,11 +28,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Client <strong class="text-danger">*</strong></label>
+            <label><?= __('Client') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
                 <select class="form-select select2" name="bulk_client_id">
-                    <option value="">- Select Client -</option>
+                    <option value=""><?= __('- Select Client -') ?></option>
                     <?php
                         $clients_sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE client_archived_at IS NULL $client_select_query " . clientScopeSql('client_id') . " ORDER BY client_name ASC");
 
@@ -49,14 +49,14 @@ ob_start();
         </div>
 
         <div class="alert alert-dark" role="alert">
-            <i>The current asset will be archived and content copied to a new asset.</i>
+            <i><?= __('The current asset will be archived and content copied to a new asset.') ?></i>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_transfer_client_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Transfer to Client</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_transfer_client_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Transfer to Client') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

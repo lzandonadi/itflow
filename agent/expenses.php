@@ -111,14 +111,14 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $dtf === $stats['month_start'] && $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($date_url($stats['month_start'], date('Y-m-t'), ['show' => ''])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i>This month</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i><?= __('This month') ?></div>
             <div class="itflow-billing-stat-value"><?= $stat_money($stats['month']) ?></div>
             <div class="itflow-billing-stat-note">
                 <?php if ($month_change !== null) { ?>
                     <span class="<?= $month_change > 0 ? 'text-danger-emphasis' : 'text-success-emphasis' ?>"><i class="fas fa-arrow-<?= $month_change > 0 ? 'up' : 'down' ?> me-1"></i><?= abs($month_change) ?>%</span>
-                    on the same days of <?= date('F', strtotime($stats['last_start'])) ?>
+                    <?= __('on the same days of %s', formatDate($stats['last_start'], 'month_long')) ?>
                 <?php } else { ?>
-                    <?= $stat_money($stats['last_month']) ?> in <?= date('F', strtotime($stats['last_start'])) ?>
+                    <?= __('%1$s in %2$s', $stat_money($stats['last_month']), formatDate($stats['last_start'], 'month_long')) ?>
                 <?php } ?>
             </div>
         </a>
@@ -132,41 +132,41 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat" href="recurring_expenses.php">
-            <div class="itflow-billing-stat-label"><i class="fas fa-redo-alt me-1"></i>Recurring</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-redo-alt me-1"></i><?= __('Recurring') ?></div>
             <div class="itflow-billing-stat-value"><?= $stat_money($stats['recurring_monthly']) ?></div>
-            <div class="itflow-billing-stat-note">a month from <?= $stats['recurring_count'] ?> running &middot; <?= $stat_money($stats['recurring_monthly'] * 12) ?> a year</div>
+            <div class="itflow-billing-stat-note"><?= _n('a month from %1$d running &middot; %2$s a year', 'a month from %1$d running &middot; %2$s a year', $stats['recurring_count'], $stats['recurring_count'], $stat_money($stats['recurring_monthly'] * 12)) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $show === 'no_receipt' ? 'active' : '' ?>" href="<?= escapeHtml($date_url($stats['since_90'], date('Y-m-d'), ['show' => 'no_receipt'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-paperclip me-1"></i>No receipt, 90 days</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-paperclip me-1"></i><?= __('No receipt, 90 days') ?></div>
             <div class="itflow-billing-stat-value <?= $stats['no_receipt'] ? 'text-warning-emphasis' : '' ?>"><?= $stats['no_receipt'] ?></div>
-            <div class="itflow-billing-stat-note"><?= $stats['no_receipt'] ? $stat_money($stats['no_receipt_amount']) . ' without one' : 'Every one has its receipt' ?></div>
+            <div class="itflow-billing-stat-note"><?= $stats['no_receipt'] ? __('%s without one', $stat_money($stats['no_receipt_amount'])) : __('Every one has its receipt') ?></div>
         </a>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-shopping-cart me-2"></i>Expenses</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-shopping-cart me-2"></i><?= __('Expenses') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_add.php<?= $vendor_filter ? "?vendor_id=$vendor_filter" : '' ?>"><i class="fas fa-plus me-2"></i>New Expense</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_add.php<?= $vendor_filter ? "?vendor_id=$vendor_filter" : '' ?>"><i class="fas fa-plus me-2"></i><?= __('New Expense') ?></button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <?php if ($can_edit) { ?>
-                        <a class="dropdown-item" href="expense_import.php"><i class="fa fa-fw fa-file-import text-secondary me-2"></i>Import Statement</a>
+                        <a class="dropdown-item" href="expense_import.php"><i class="fa fa-fw fa-file-import text-secondary me-2"></i><?= __('Import Statement') ?></a>
                         <div class="dropdown-divider"></div>
                     <?php } ?>
                     <a class="dropdown-item ajax-modal" href="#"
                         data-modal-url="<?= buildExportModalUrl('modals/expense/expense_export.php', ['account', 'vendor', 'category', 'client', 'method', 'paid_by', 'recurring_expense_id', 'show', 'q'], ['dtf' => $dtf, 'dtt' => $dtt]) ?>">
-                        <i class="fa fa-fw fa-download text-secondary me-2"></i>Export
+                        <i class="fa fa-fw fa-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
-                    <a class="dropdown-item" href="recurring_expenses.php"><i class="fa fa-fw fa-redo-alt text-secondary me-2"></i>Recurring Expenses</a>
+                    <a class="dropdown-item" href="recurring_expenses.php"><i class="fa fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Recurring Expenses') ?></a>
                     <?php if (reportCanOpen('expense_summary')) { ?>
-                        <a class="dropdown-item" href="reports/expense_summary.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i>Expenses Report</a>
+                        <a class="dropdown-item" href="reports/expense_summary.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Expenses Report') ?></a>
                     <?php } ?>
                 </div>
             </div>
@@ -185,20 +185,20 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
             <div class="row g-2 align-items-center">
                 <div class="col-lg-3 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search expenses" title="Vendor, description, reference, amount, client, category">
-                        <button class="btn btn-outline-secondary <?= $more_filters ? 'active' : '' ?>" title="More filters" type="button" data-bs-toggle="collapse" data-bs-target="#expenseMoreFilters"><i class="fas fa-filter"></i></button>
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search expenses')) ?>" title="<?= escapeHtml(__('Vendor, description, reference, amount, client, category')) ?>">
+                        <button class="btn btn-outline-secondary <?= $more_filters ? 'active' : '' ?>" title="<?= escapeHtml(__('More filters')) ?>" type="button" data-bs-toggle="collapse" data-bs-target="#expenseMoreFilters"><i class="fas fa-filter"></i></button>
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="Date paid" aria-label="Date paid">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('Date paid')) ?>" aria-label="<?= escapeHtml(__('Date paid')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
                 </div>
                 <div class="col-lg-2 col-md-4">
-                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="Vendor">
-                        <option value="">- Any vendor -</option>
+                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Vendor')) ?>">
+                        <option value=""><?= __('- Any vendor -') ?></option>
                         <?php
                         $sql_filter = mysqli_query($mysqli, "SELECT vendor_id, vendor_name, vendor_description FROM vendors
                             WHERE vendor_client_id = 0 AND EXISTS (SELECT 1 FROM expenses WHERE expense_vendor_id = vendor_id) ORDER BY vendor_name ASC");
@@ -209,16 +209,16 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-4">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Category">
-                        <option value="">- Any category -</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Category')) ?>">
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?= categoryFilterOptionsHtml('Expense', $category_filter, "SELECT DISTINCT expense_category_id FROM expenses WHERE expense_vendor_id > 0") ?>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-4">
                     <div class="d-flex gap-2">
                         <div class="flex-grow-1 min-w-0">
-                            <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="Client">
-                                <option value="">- Any client -</option>
+                            <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Client')) ?>">
+                                <option value=""><?= __('- Any client -') ?></option>
                                 <?php
                                 $sql_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                                     WHERE EXISTS (SELECT 1 FROM expenses WHERE expense_client_id = client_id) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
@@ -231,18 +231,18 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                         <?php if ($can_edit) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-xxl-inline ms-1">Bulk</span> (<span id="selectedCount">0</span>)
+                                    <i class="fas fa-fw fa-layer-group"></i><span class="d-none d-xxl-inline ms-1"><?= __('Bulk') ?></span> (<span id="selectedCount">0</span>)
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=category" data-bulk="true"><i class="fas fa-fw fa-list text-secondary me-2"></i>Set Category</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=account" data-bulk="true"><i class="fas fa-fw fa-piggy-bank text-secondary me-2"></i>Set Account</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=method" data-bulk="true"><i class="fas fa-fw fa-credit-card text-secondary me-2"></i>Set Payment Method</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=client" data-bulk="true"><i class="fas fa-fw fa-user text-secondary me-2"></i>Set Client</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=billable" data-bulk="true"><i class="fas fa-fw fa-file-invoice-dollar text-secondary me-2"></i>Set Billable</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_reimburse.php" data-bulk="true"><i class="fas fa-fw fa-hand-holding-usd text-secondary me-2"></i>Reimburse</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=category" data-bulk="true"><i class="fas fa-fw fa-list text-secondary me-2"></i><?= __('Set Category') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=account" data-bulk="true"><i class="fas fa-fw fa-piggy-bank text-secondary me-2"></i><?= __('Set Account') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=method" data-bulk="true"><i class="fas fa-fw fa-credit-card text-secondary me-2"></i><?= __('Set Payment Method') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=client" data-bulk="true"><i class="fas fa-fw fa-user text-secondary me-2"></i><?= __('Set Client') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_edit.php?field=billable" data-bulk="true"><i class="fas fa-fw fa-file-invoice-dollar text-secondary me-2"></i><?= __('Set Billable') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_reimburse.php" data-bulk="true"><i class="fas fa-fw fa-hand-holding-usd text-secondary me-2"></i><?= __('Reimburse') ?></a>
                                     <?php if ($can_delete) { ?>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-danger text-bold ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_delete.php" data-bulk="true"><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                                        <a class="dropdown-item text-danger text-bold ajax-modal" href="#" data-modal-url="modals/expense/expense_bulk_delete.php" data-bulk="true"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -255,8 +255,8 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     <div class="col-lg-3 col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
-                            <select class="form-select select2" name="account" onchange="this.form.submit()" aria-label="Paid from">
-                                <option value="">- Any account -</option>
+                            <select class="form-select select2" name="account" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Paid from')) ?>">
+                                <option value=""><?= __('- Any account -') ?></option>
                                 <?php
                                 $sql_filter = mysqli_query($mysqli, "SELECT account_id, account_name FROM accounts WHERE EXISTS (SELECT 1 FROM expenses WHERE expense_account_id = account_id AND expense_vendor_id > 0) ORDER BY account_name ASC");
                                 while ($row = mysqli_fetch_assoc($sql_filter)) {
@@ -269,8 +269,8 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     <div class="col-lg-3 col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
-                            <select class="form-select select2" name="method" onchange="this.form.submit()" aria-label="Paid by">
-                                <option value="">- Any payment method -</option>
+                            <select class="form-select select2" name="method" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Paid by')) ?>">
+                                <option value=""><?= __('- Any payment method -') ?></option>
                                 <?php
                                 $sql_filter = mysqli_query($mysqli, "SELECT DISTINCT expense_payment_method FROM expenses WHERE expense_vendor_id > 0 AND COALESCE(expense_payment_method, '') <> '' ORDER BY expense_payment_method ASC");
                                 while ($row = mysqli_fetch_row($sql_filter)) { ?>
@@ -294,14 +294,14 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
         </nav>
         <?php if ($recurring_filter) { ?>
             <div class="small text-body-secondary mt-2">
-                <i class="fas fa-filter me-1"></i>Recorded by <?= $recurring_filter_row ? '<a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense.php?id=' . $recurring_filter . '">' . escapeHtml(recurringExpenseLabel($recurring_filter_row)) . '</a>' : 'a recurring expense' ?>
-                <a class="ms-2" href="<?= escapeHtml($filter_url(['recurring_expense_id' => ''])) ?>">Clear</a>
+                <i class="fas fa-filter me-1"></i><?= __('Recorded by') ?> <?= $recurring_filter_row ? '<a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense.php?id=' . $recurring_filter . '">' . escapeHtml(recurringExpenseLabel($recurring_filter_row)) . '</a>' : __('a recurring expense') ?>
+                <a class="ms-2" href="<?= escapeHtml($filter_url(['recurring_expense_id' => ''])) ?>"><?= __('Clear') ?></a>
             </div>
         <?php } ?>
         <?php if ($paid_by_filter) { ?>
             <div class="small text-body-secondary mt-2">
-                <i class="fas fa-filter me-1"></i>Paid personally by <?= escapeHtml((string) getFieldById('users', $paid_by_filter, 'user_name')) ?>
-                <a class="ms-2" href="<?= escapeHtml($filter_url(['paid_by' => ''])) ?>">Clear</a>
+                <i class="fas fa-filter me-1"></i><?= __('Paid personally by %s', escapeHtml((string) getFieldById('users', $paid_by_filter, 'user_name'))) ?>
+                <a class="ms-2" href="<?= escapeHtml($filter_url(['paid_by' => ''])) ?>"><?= __('Clear') ?></a>
             </div>
         <?php } ?>
     </div>
@@ -312,10 +312,10 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
             <?php foreach ($owed as $owed_id => $agent) { ?>
                 <div class="list-group-item d-flex flex-wrap align-items-center gap-2 bg-warning-subtle">
                     <i class="fas fa-hand-holding-usd text-warning-emphasis"></i>
-                    <span class="flex-grow-1"><strong><?= escapeHtml($agent['user_name']) ?></strong> is owed <strong class="itflow-money"><?= $stat_money($agent['total']) ?></strong>
-                        <span class="text-body-secondary">for <?= $agent['count'] ?> expense<?= $agent['count'] === 1 ? '' : 's' ?><?= $agent['oldest'] > 1 ? ', the oldest ' . $agent['oldest'] . ' days ago' : ($agent['oldest'] === 1 ? ', the oldest yesterday' : ' from today') ?></span></span>
+                    <span class="flex-grow-1"><strong><?= escapeHtml($agent['user_name']) ?></strong> <?= __('is owed') ?> <strong class="itflow-money"><?= $stat_money($agent['total']) ?></strong>
+                        <span class="text-body-secondary"><?= escapeHtml($agent['oldest'] > 1 ? _n('for %1$d expense, the oldest %2$d days ago', 'for %1$d expenses, the oldest %2$d days ago', $agent['count'], $agent['count'], $agent['oldest']) : ($agent['oldest'] === 1 ? _n('for %d expense, the oldest yesterday', 'for %d expenses, the oldest yesterday', $agent['count']) : _n('for %d expense from today', 'for %d expenses from today', $agent['count']))) ?></span></span>
                     <?php if ($can_edit) { ?>
-                        <button type="button" class="btn btn-sm btn-success ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_reimburse.php?user_id=<?= $owed_id ?>"><i class="fas fa-hand-holding-usd me-1"></i>Reimburse</button>
+                        <button type="button" class="btn btn-sm btn-success ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_reimburse.php?user_id=<?= $owed_id ?>"><i class="fas fa-hand-holding-usd me-1"></i><?= __('Reimburse') ?></button>
                     <?php } ?>
                 </div>
             <?php } ?>
@@ -329,16 +329,16 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                 <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                 <?php } ?>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=expense_date&order=<?= $disp ?>">Date <?php if ($sort == 'expense_date') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>">Vendor <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=category_name&order=<?= $disp ?>">Category <?php if ($sort == 'category_name') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">Client <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=account_name&order=<?= $disp ?>">Paid from <?php if ($sort == 'account_name') { echo $order_icon; } ?></a></th>
-                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=expense_amount&order=<?= $disp ?>">Amount <?php if ($sort == 'expense_amount') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=expense_date&order=<?= $disp ?>"><?= __('Date') ?> <?php if ($sort == 'expense_date') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>"><?= __('Vendor') ?> <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=category_name&order=<?= $disp ?>"><?= __('Category') ?> <?php if ($sort == 'category_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>"><?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=account_name&order=<?= $disp ?>"><?= __('Paid from') ?> <?php if ($sort == 'account_name') { echo $order_icon; } ?></a></th>
+                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=expense_amount&order=<?= $disp ?>"><?= __('Amount') ?> <?php if ($sort == 'expense_amount') { echo $order_icon; } ?></a></th>
                 <th></th>
             </tr>
             </thead>
@@ -353,17 +353,17 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="expense_ids[]" value="<?= $expense_id ?>" aria-label="Select this expense">
+                                <input class="form-check-input bulk-select" type="checkbox" name="expense_ids[]" value="<?= $expense_id ?>" aria-label="<?= escapeHtml(__('Select this expense')) ?>">
                             </div>
                         </td>
                     <?php } ?>
                     <td class="text-nowrap">
                         <a class="fw-semibold ajax-modal" href="#" <?= $row_open ?>><?= escapeHtml($row['expense_date']) ?></a>
                         <?php if ($row['expense_receipt']) { ?>
-                            <a class="text-success ms-1" href="expense_receipt.php?expense_id=<?= $expense_id ?>&amp;action=view" target="_blank" title="Open the receipt"><i class="fas fa-paperclip"></i></a>
+                            <a class="text-success ms-1" href="expense_receipt.php?expense_id=<?= $expense_id ?>&amp;action=view" target="_blank" title="<?= escapeHtml(__('Open the receipt')) ?>"><i class="fas fa-paperclip"></i></a>
                         <?php } ?>
                         <?php if (intval($row['expense_recurring_expense_id'])) { ?>
-                            <a class="text-body-secondary small ms-1 ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense.php?id=<?= intval($row['expense_recurring_expense_id']) ?>" title="Recorded by a recurring expense"><i class="fas fa-redo-alt"></i></a>
+                            <a class="text-body-secondary small ms-1 ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/recurring_expense/recurring_expense.php?id=<?= intval($row['expense_recurring_expense_id']) ?>" title="<?= escapeHtml(__('Recorded by a recurring expense')) ?>"><i class="fas fa-redo-alt"></i></a>
                         <?php } ?>
                     </td>
                     <td class="itflow-expense-vendor">
@@ -378,9 +378,9 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                             <div class="text-truncate" style="max-width: 10rem;"><a class="text-reset" href="<?= escapeHtml($filter_url(['client' => intval($row['expense_client_id'])])) ?>" title="<?= escapeHtml((string) $row['client_name']) ?> - their expenses"><?= escapeHtml($row['client_name']) ?></a></div>
                             <?php if ($row['expense_invoice_id']) {
                                 $row_invoice = $row['invoice_number'] !== null ? $row['invoice_prefix'] . $row['invoice_number'] : 'an invoice'; ?>
-                                <div class="small"><?php if ($can_sales && $row['invoice_number'] !== null) { ?><a class="text-success-emphasis" href="invoice.php?invoice_id=<?= intval($row['expense_invoice_id']) ?>" title="Billed on to them"><i class="fas fa-check-circle me-1"></i>Billed <?= escapeHtml($row_invoice) ?></a><?php } else { ?><span class="text-success-emphasis"><i class="fas fa-check-circle me-1"></i>Billed <?= escapeHtml($row_invoice) ?></span><?php } ?></div>
+                                <div class="small"><?php if ($can_sales && $row['invoice_number'] !== null) { ?><a class="text-success-emphasis" href="invoice.php?invoice_id=<?= intval($row['expense_invoice_id']) ?>" title="<?= escapeHtml(__('Billed on to them')) ?>"><i class="fas fa-check-circle me-1"></i><?= escapeHtml(__('Billed %s', $row_invoice)) ?></a><?php } else { ?><span class="text-success-emphasis"><i class="fas fa-check-circle me-1"></i><?= escapeHtml(__('Billed %s', $row_invoice)) ?></span><?php } ?></div>
                             <?php } elseif (intval($row['expense_billable']) && $row_amount > 0) { ?>
-                                <div class="small"><?php if ($can_sales) { ?><a class="text-warning-emphasis" href="unbilled_time.php?client_id=<?= intval($row['expense_client_id']) ?>" title="Billable at <?= escapeHtml(rtrim(rtrim(number_format(floatval($row['expense_markup']), 2, '.', ''), '0'), '.')) ?>% markup - bill it from Unbilled Time"><i class="fas fa-file-invoice-dollar me-1"></i>To bill</a><?php } else { ?><span class="text-warning-emphasis"><i class="fas fa-file-invoice-dollar me-1"></i>To bill</span><?php } ?></div>
+                                <div class="small"><?php if ($can_sales) { ?><a class="text-warning-emphasis" href="unbilled_time.php?client_id=<?= intval($row['expense_client_id']) ?>" title="<?= __('Billable at %s%% markup - bill it from Unbilled Time', escapeHtml(rtrim(rtrim(number_format(floatval($row['expense_markup']), 2, '.', ''), '0'), '.'))) ?>"><i class="fas fa-file-invoice-dollar me-1"></i><?= __('To bill') ?></a><?php } else { ?><span class="text-warning-emphasis"><i class="fas fa-file-invoice-dollar me-1"></i><?= __('To bill') ?></span><?php } ?></div>
                             <?php } ?>
                         <?php } else { ?>
                             <span class="text-body-secondary">-</span>
@@ -388,11 +388,11 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     </td>
                     <td class="text-nowrap">
                         <?php if (intval($row['expense_paid_by'])) { ?>
-                            <a class="text-reset" href="<?= escapeHtml($filter_url(['paid_by' => intval($row['expense_paid_by'])])) ?>" title="Paid personally - their expenses"><i class="fas fa-hand-holding-usd text-body-secondary me-1"></i><?= escapeHtml($row['paid_by_name'] ?: 'An agent') ?></a>
+                            <a class="text-reset" href="<?= escapeHtml($filter_url(['paid_by' => intval($row['expense_paid_by'])])) ?>" title="<?= escapeHtml(__('Paid personally - their expenses')) ?>"><i class="fas fa-hand-holding-usd text-body-secondary me-1"></i><?= escapeHtml($row['paid_by_name'] ?: __('An agent')) ?></a>
                             <?php if ($row['expense_reimbursement_id']) { ?>
-                                <div class="small"><a class="text-success-emphasis ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_reimbursement.php?id=<?= intval($row['expense_reimbursement_id']) ?>"><i class="fas fa-check-circle me-1"></i>Paid back</a></div>
+                                <div class="small"><a class="text-success-emphasis ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_reimbursement.php?id=<?= intval($row['expense_reimbursement_id']) ?>"><i class="fas fa-check-circle me-1"></i><?= __('Paid back') ?></a></div>
                             <?php } elseif ($row_amount > 0) { ?>
-                                <div class="small text-warning-emphasis">To reimburse</div>
+                                <div class="small text-warning-emphasis"><?= __('To reimburse') ?></div>
                             <?php } ?>
                         <?php } else { ?>
                             <?= escapeHtml($row['account_name'] ?: '-') ?>
@@ -401,30 +401,30 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                     </td>
                     <td class="text-end itflow-money text-nowrap">
                         <span class="fw-semibold <?= $row_amount < 0 ? 'text-success-emphasis' : '' ?>"><?= escapeHtml(billingMoney($row_amount, $row_currency)) ?></span>
-                        <?php if ($row_amount < 0) { ?><div class="small text-body-secondary">Refund</div><?php } ?>
+                        <?php if ($row_amount < 0) { ?><div class="small text-body-secondary"><?= __('Refund') ?></div><?php } ?>
                         <?php if (floatval($row['expense_tax_amount']) != 0) { ?><div class="small text-body-secondary">incl. <?= escapeHtml(billingMoney(abs(floatval($row['expense_tax_amount'])), $row_currency)) ?> tax</div><?php } ?>
                     </td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
+                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
                                 <?php if ($row['expense_receipt']) { ?>
-                                    <a class="dropdown-item" href="expense_receipt.php?expense_id=<?= $expense_id ?>"><i class="fas fa-fw fa-download text-secondary me-2"></i>Download Receipt</a>
+                                    <a class="dropdown-item" href="expense_receipt.php?expense_id=<?= $expense_id ?>"><i class="fas fa-fw fa-download text-secondary me-2"></i><?= __('Download Receipt') ?></a>
                                 <?php } ?>
                                 <?php if ($can_edit) { ?>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_edit.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_copy.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_edit.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_copy.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?></a>
                                     <?php if ($row_amount > 0) { ?>
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_refund.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-undo-alt text-secondary me-2"></i>Refund</a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense_refund.php?id=<?= $expense_id ?>"><i class="fas fa-fw fa-undo-alt text-secondary me-2"></i><?= __('Refund') ?></a>
                                     <?php } ?>
                                 <?php } ?>
                                 <?php if ($can_delete) { ?>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_expense=<?= $expense_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                        data-confirm-text="<?= escapeHtml(expenseLabel($row)) ?> goes for good<?= $row['expense_receipt'] ? ', with its receipt' : '' ?>.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        data-confirm-text="<?= escapeHtml($row['expense_receipt'] ? __('%s goes for good, with its receipt.', expenseLabel($row)) : __('%s goes for good.', expenseLabel($row))) ?>">
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -437,7 +437,7 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
                 <tfoot>
                 <tr class="table-light">
                     <td colspan="<?= $can_edit ? 6 : 5 ?>" class="text-body-secondary small">
-                        <?= intval($num_rows[0]) ?> expense<?= intval($num_rows[0]) === 1 ? '' : 's' ?><?= $any_filter ? ' match' . (intval($num_rows[0]) === 1 ? 'es' : '') : '' ?><?= $num_rows[0] > count($expenses) ? ' - the total is for all of them, not just this page' : '' ?>
+                        <?= $any_filter ? _n('%d expense matches', '%d expenses match', intval($num_rows[0])) : _n('%d expense', '%d expenses', intval($num_rows[0])) ?><?= $num_rows[0] > count($expenses) ? __(' - the total is for all of them, not just this page') : '' ?>
                     </td>
                     <td class="text-end itflow-money fw-semibold text-nowrap"><?= $stat_money($listed_total) ?></td>
                     <td></td>
@@ -448,15 +448,15 @@ $month_change = $stats['last_to_date'] > 0 ? round(($stats['month'] - $stats['la
     </div>
     <?php
     $empty_state = [
-        'thing' => 'expenses',
+        'thing' => __('expenses'),
         'icon' => 'fa-shopping-cart',
         'filtered' => $q || $vendor_filter || $category_filter || $account_filter || $client_filter || $method_filter !== '' || $recurring_filter || $paid_by_filter || $dtf !== '1970-01-01',
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['no_receipt', 'to_bill', 'to_reimburse']),
-        'text' => 'What the business spends - enter them as they come, or bring in a bank or card statement.',
+        'text' => __('What the business spends - enter them as they come, or bring in a bank or card statement.'),
         'actions' => $can_edit ? [
-            ['label' => 'New Expense', 'modal' => 'modals/expense/expense_add.php' . ($vendor_filter ? "?vendor_id=$vendor_filter" : ''), 'size' => 'lg'],
-            ['label' => 'Import Statement', 'href' => 'expense_import.php', 'icon' => 'fa-file-import'],
+            ['label' => __('New Expense'), 'modal' => 'modals/expense/expense_add.php' . ($vendor_filter ? "?vendor_id=$vendor_filter" : ''), 'size' => 'lg'],
+            ['label' => __('Import Statement'), 'href' => 'expense_import.php', 'icon' => 'fa-file-import'],
         ] : [],
     ];
     require_once "../includes/filter_footer.php";

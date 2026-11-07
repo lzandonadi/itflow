@@ -45,23 +45,23 @@ $pay_token = bin2hex(random_bytes(16));
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Pay invoices</h1>
-        <p>Tick what to pay - it goes through as one card payment.</p>
+        <h1><?= escapeHtml(__('Pay invoices')) ?></h1>
+        <p><?= escapeHtml(__('Tick what to pay - it goes through as one card payment.')) ?></p>
     </div>
 </div>
 
 <?php if (!$provider) { ?>
 
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => 'Card payments are not set up', 'text' => 'To pay, use the payment details on each invoice.', 'icon' => 'fa-credit-card', 'filtered' => false,
-            'actions' => [['label' => 'Invoices to pay', 'href' => 'invoices.php?tab=open', 'icon' => 'fa-file-invoice-dollar']]]) ?>
+        <?= emptyStateHtml(['title' => __('Card payments are not set up'), 'text' => __('To pay, use the payment details on each invoice.'), 'icon' => 'fa-credit-card', 'filtered' => false,
+            'actions' => [['label' => __('Invoices to pay'), 'href' => 'invoices.php?tab=open', 'icon' => 'fa-file-invoice-dollar']]]) ?>
     </section>
 
 <?php } elseif (!$open) { ?>
 
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => 'Nothing to pay', 'text' => 'You are all paid up - thank you.', 'icon' => 'fa-check', 'filtered' => false,
-            'actions' => [['label' => 'Your payments', 'href' => 'payments.php', 'icon' => 'fa-receipt']]]) ?>
+        <?= emptyStateHtml(['title' => __('Nothing to pay'), 'text' => __('You are all paid up - thank you.'), 'icon' => 'fa-check', 'filtered' => false,
+            'actions' => [['label' => __('Your payments'), 'href' => 'payments.php', 'icon' => 'fa-receipt']]]) ?>
     </section>
 
 <?php } else { ?>
@@ -75,10 +75,10 @@ $pay_token = bin2hex(random_bytes(16));
             <div class="col-lg-8">
                 <section class="itflow-portal-panel">
                     <div class="itflow-portal-panel-head">
-                        <h2><i class="fas fa-file-invoice-dollar"></i>Still to pay</h2>
+                        <h2><i class="fas fa-file-invoice-dollar"></i><?= escapeHtml(__('Still to pay')) ?></h2>
                         <div class="form-check mb-0 small">
                             <input class="form-check-input" type="checkbox" id="payAll" data-pay-all<?= count($ticked) === count($open) ? ' checked' : '' ?>>
-                            <label class="form-check-label" for="payAll">All</label>
+                            <label class="form-check-label" for="payAll"><?= escapeHtml(__('All')) ?></label>
                         </div>
                     </div>
                     <ul class="itflow-portal-list">
@@ -91,9 +91,9 @@ $pay_token = bin2hex(random_bytes(16));
                                     <span class="itflow-portal-ticket-main">
                                         <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml($row['invoice_prefix'] . $row['invoice_number']) ?><?php if (trim((string) $row['invoice_scope']) !== '') { ?><span class="fw-normal text-body-secondary"> · <?= escapeHtml($row['invoice_scope']) ?></span><?php } ?></span>
                                         <span class="itflow-portal-ticket-meta">
-                                            <span>Due <?= escapeHtml(date('M j, Y', strtotime($row['invoice_due']))) ?></span>
-                                            <?php if ($state['paid'] > 0) { ?><span><?= escapeHtml(billingMoney($state['paid'], $row['invoice_currency_code'])) ?> of <?= escapeHtml(billingMoney($row['invoice_amount'], $row['invoice_currency_code'])) ?> paid</span><?php } ?>
-                                            <a href="invoice.php?id=<?= $id ?>">View</a>
+                                            <span><?= escapeHtml(_x('Due %s', 'invoice due', formatDate($row['invoice_due'], 'date'))) ?></span>
+                                            <?php if ($state['paid'] > 0) { ?><span><?= escapeHtml(__('%1$s of %2$s paid', billingMoney($state['paid'], $row['invoice_currency_code']), billingMoney($row['invoice_amount'], $row['invoice_currency_code']))) ?></span><?php } ?>
+                                            <a href="invoice.php?id=<?= $id ?>"><?= escapeHtml(__('View')) ?></a>
                                         </span>
                                     </span>
                                     <span class="itflow-portal-ticket-side">
@@ -110,8 +110,8 @@ $pay_token = bin2hex(random_bytes(16));
             <div class="col-lg-4">
                 <section class="itflow-portal-panel itflow-portal-paybox">
                     <div class="itflow-portal-panel-head">
-                        <h2><i class="fas fa-credit-card"></i>Pay with</h2>
-                        <a href="saved_payment_methods.php">Your cards</a>
+                        <h2><i class="fas fa-credit-card"></i><?= escapeHtml(__('Pay with')) ?></h2>
+                        <a href="saved_payment_methods.php"><?= escapeHtml(__('Your cards')) ?></a>
                     </div>
                     <div class="itflow-portal-panel-body">
                         <div class="itflow-portal-methods">
@@ -122,7 +122,7 @@ $pay_token = bin2hex(random_bytes(16));
                                     <i class="<?= escapeHtml($card['card']['icon']) ?> fa-fw fa-lg"></i>
                                     <span class="min-w-0">
                                         <span class="d-block text-truncate"><?= escapeHtml($card['card']['label']) ?></span>
-                                        <small class="<?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>"><?= $card['card']['exp'] !== '' ? ($expired ? 'Expired ' : 'Expires ') . escapeHtml($card['card']['exp']) : 'Saved card' ?></small>
+                                        <small class="<?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>"><?= escapeHtml($card['card']['exp'] !== '' ? ($expired ? _x('Expired %s', 'card', $card['card']['exp']) : __('Expires %s', $card['card']['exp'])) : __('Saved card')) ?></small>
                                     </span>
                                 </label>
                             <?php } ?>
@@ -130,24 +130,24 @@ $pay_token = bin2hex(random_bytes(16));
                                 <input class="form-check-input" type="radio" name="method" value="new"<?= $usable ? '' : ' checked' ?>>
                                 <i class="fas fa-plus-circle fa-fw fa-lg text-body-secondary"></i>
                                 <span>
-                                    <span class="d-block">A new card</span>
-                                    <small class="text-body-secondary">Enter the card on the next page</small>
+                                    <span class="d-block"><?= escapeHtml(__('A new card')) ?></span>
+                                    <small class="text-body-secondary"><?= escapeHtml(__('Enter the card on the next page')) ?></small>
                                 </span>
                             </label>
                         </div>
                     </div>
                     <div class="itflow-portal-paybar">
                         <div class="d-flex justify-content-between align-items-baseline mb-2">
-                            <span class="text-body-secondary" data-pay-count><?= count($ticked) ?> <?= count($ticked) === 1 ? 'invoice' : 'invoices' ?></span>
+                            <span class="text-body-secondary" data-pay-count><?= escapeHtml(_n('%d invoice', '%d invoices', count($ticked))) ?></span>
                             <span class="itflow-portal-big-amount itflow-money" data-pay-total><?= escapeHtml(billingMoney($total_cents / 100, $currency)) ?></span>
                         </div>
                         <div class="alert alert-warning small py-2" data-pay-limit-note<?= $limit_cents > 0 && $total_cents >= $limit_cents ? '' : ' hidden' ?>>
-                            Card payments are limited to under <?= escapeHtml(billingMoney($limit_cents / 100, $currency)) ?> at a time - untick some invoices, or pay another way.
+                            <?= escapeHtml(__('Card payments are limited to under %s at a time - untick some invoices, or pay another way.', billingMoney($limit_cents / 100, $currency))) ?>
                         </div>
                         <button type="submit" class="btn btn-success btn-lg w-100" name="portal_pay" data-pay-button<?= !$ticked ? ' disabled' : '' ?>>
-                            <i class="fas fa-lock me-2"></i><span data-pay-label><?= $usable ? 'Pay ' : 'Continue to pay ' ?><?= escapeHtml(billingMoney($total_cents / 100, $currency)) ?></span>
+                            <i class="fas fa-lock me-2"></i><span data-pay-label><?= escapeHtml($usable ? __('Pay %s', billingMoney($total_cents / 100, $currency)) : __('Continue to pay %s', billingMoney($total_cents / 100, $currency))) ?></span>
                         </button>
-                        <p class="small text-body-secondary text-center mt-2 mb-0">Paid securely through Stripe - your card details never reach us.</p>
+                        <p class="small text-body-secondary text-center mt-2 mb-0"><?= escapeHtml(__('Paid securely through Stripe - your card details never reach us.')) ?></p>
                     </div>
                 </section>
             </div>

@@ -33,7 +33,7 @@ function domainsState($expiry) {
         return null;
     }
     if ($expiry['state'] === 'expired') {
-        return ['label' => 'Expired', 'icon' => 'fa-calendar-times', 'class' => 'itflow-portal-state-late'];
+        return ['label' => __('Expired'), 'icon' => 'fa-calendar-times', 'class' => 'itflow-portal-state-late'];
     }
     $auto = !empty($expiry['auto']) || !empty($expiry['short_lived']);
     if ($expiry['state'] === 'soon') {
@@ -45,20 +45,20 @@ function domainsState($expiry) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Domains &amp; certificates</h1>
-        <p>Your domain names and the certificates that keep your sites secure</p>
+        <h1><?= __('Domains &amp; certificates') ?></h1>
+        <p><?= __('Your domain names and the certificates that keep your sites secure') ?></p>
     </div>
 </div>
 
-<nav class="itflow-portal-tabs" aria-label="Domains and certificates">
-    <a class="<?= $tab === 'domains' ? 'active' : '' ?>" href="domains.php"><i class="fas fa-globe"></i>Domains <span class="badge rounded-pill"><?= $counts['domains'] ?></span></a>
-    <a class="<?= $tab === 'certificates' ? 'active' : '' ?>" href="domains.php?tab=certificates"><i class="fas fa-lock"></i>Certificates <span class="badge rounded-pill"><?= $counts['certificates'] ?></span></a>
+<nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Domains and certificates')) ?>">
+    <a class="<?= $tab === 'domains' ? 'active' : '' ?>" href="domains.php"><i class="fas fa-globe"></i><?= __('Domains') ?> <span class="badge rounded-pill"><?= $counts['domains'] ?></span></a>
+    <a class="<?= $tab === 'certificates' ? 'active' : '' ?>" href="domains.php?tab=certificates"><i class="fas fa-lock"></i><?= __('Certificates') ?> <span class="badge rounded-pill"><?= $counts['certificates'] ?></span></a>
 </nav>
 
 <section class="itflow-portal-panel">
     <?php if ($tab === 'domains') { ?>
         <?php if (!$counts['domains']) { ?>
-            <?= emptyStateHtml(['title' => 'No domains yet', 'text' => 'The domain names we look after for you show here.', 'icon' => 'fa-globe', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No domains yet'), 'text' => __('The domain names we look after for you show here.'), 'icon' => 'fa-globe', 'filtered' => false]) ?>
         <?php } else { ?>
             <ul class="itflow-portal-list">
                 <?php while ($row = mysqli_fetch_assoc($domains)) {
@@ -84,7 +84,7 @@ function domainsState($expiry) {
         <?php } ?>
     <?php } else { ?>
         <?php if (!$counts['certificates']) { ?>
-            <?= emptyStateHtml(['title' => 'No certificates yet', 'text' => 'The web certificates we watch for you show here.', 'icon' => 'fa-lock', 'filtered' => false]) ?>
+            <?= emptyStateHtml(['title' => __('No certificates yet'), 'text' => __('The web certificates we watch for you show here.'), 'icon' => 'fa-lock', 'filtered' => false]) ?>
         <?php } else { ?>
             <ul class="itflow-portal-list">
                 <?php while ($row = mysqli_fetch_assoc($certificates)) {
@@ -95,7 +95,7 @@ function domainsState($expiry) {
                             <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml($row['certificate_name']) ?></span>
                             <span class="itflow-portal-ticket-meta">
                                 <?php if (trim((string) $row['certificate_domain']) !== '') { ?><span><i class="fas fa-globe me-1"></i><?= escapeHtml($row['certificate_domain']) ?></span><?php } ?>
-                                <?php if (trim((string) $row['certificate_issued_by']) !== '') { ?><span>Issued by <?= escapeHtml($row['certificate_issued_by']) ?></span><?php } ?>
+                                <?php if (trim((string) $row['certificate_issued_by']) !== '') { ?><span><?= __('Issued by %s', escapeHtml($row['certificate_issued_by'])) ?></span><?php } ?>
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">

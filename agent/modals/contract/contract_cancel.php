@@ -18,7 +18,7 @@ if ($contract) {
 ob_start();
 
 if (!$contract || $contract['contract_status'] !== 'Active') { ?>
-    <div class="modal-body text-center text-secondary py-5"><?= $contract ? 'Only an active contract can be cancelled.' : 'That contract is gone - it may have been deleted.' ?></div>
+    <div class="modal-body text-center text-secondary py-5"><?= $contract ? __('Only an active contract can be cancelled.') : __('That contract is gone - it may have been deleted.') ?></div>
 <?php } else {
     $notice = contractNoticeDate($contract);
     $last_day = date('Y-m-d');
@@ -27,7 +27,7 @@ if (!$contract || $contract['contract_status'] !== 'Active') { ?>
     } ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-ban me-2"></i>Cancel <strong><?= escapeHtml($contract['contract_name']) ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-ban me-2"></i><?= __('Cancel <strong>%s</strong>', escapeHtml($contract['contract_name'])) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -36,27 +36,27 @@ if (!$contract || $contract['contract_status'] !== 'Active') { ?>
     <div class="modal-body">
         <?php if ($notice !== '') { ?>
             <p class="small <?= $notice >= date('Y-m-d') ? 'text-secondary' : 'text-warning-emphasis' ?>">
-                <i class="fas fa-fw fa-bell me-1"></i><?= intval($contract['contract_notice_days']) ?> days notice - <?= $notice >= date('Y-m-d') ? 'given by ' . escapeHtml(date('M j, Y', strtotime($notice))) . ', it ends on ' . escapeHtml(date('M j, Y', strtotime($contract['contract_end_date']))) . '.' : 'the notice date, ' . escapeHtml(date('M j, Y', strtotime($notice))) . ', has passed.' ?>
+                <i class="fas fa-fw fa-bell me-1"></i><?= escapeHtml($notice >= date('Y-m-d') ? __('%1$d days notice - given by %2$s, it ends on %3$s.', intval($contract['contract_notice_days']), formatDate($notice, 'date'), formatDate($contract['contract_end_date'], 'date')) : __('%1$d days notice - the notice date, %2$s, has passed.', intval($contract['contract_notice_days']), formatDate($notice, 'date'))) ?>
             </p>
         <?php } ?>
         <div class="mb-3">
-            <label class="form-label">Last day in force</label>
+            <label class="form-label"><?= __('Last day in force') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar-times"></i></span>
                 <input type="date" class="form-control" name="last_day" value="<?= escapeHtml($last_day) ?>" required>
             </div>
         </div>
         <div class="mb-1">
-            <label class="form-label">Why</label>
+            <label class="form-label"><?= __('Why') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-comment"></i></span>
-                <input type="text" class="form-control" name="reason" maxlength="255" placeholder="Moving to another provider, bought out, closing down">
+                <input type="text" class="form-control" name="reason" maxlength="255" placeholder="<?= escapeHtml(__('Moving to another provider, bought out, closing down')) ?>">
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="cancel_contract" class="btn btn-danger text-bold"><i class="fas fa-ban me-2"></i>Cancel contract</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Keep it</button>
+        <button type="submit" name="cancel_contract" class="btn btn-danger text-bold"><i class="fas fa-ban me-2"></i><?= __('Cancel contract') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Keep it') ?></button>
     </div>
 </form>
 

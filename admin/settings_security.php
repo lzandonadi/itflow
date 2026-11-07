@@ -25,32 +25,32 @@ echo settingsPageStart('security');
     <div class="card itflow-settings-card">
         <div class="card-body">
 
-            <?= settingsSectionStart('sign-in', 'The sign-in page', 'Agents and client contacts sign in on the same page. A login key keeps the agents\' way in out of sight - without the key in its address, the page is for client contacts only.') ?>
-                <?= settingsTextarea('config_login_message', $config_login_message, ['rows' => 3, 'maxlength' => 65000, 'placeholder' => 'Authorised users only',
-                    'help' => 'Shown above the sign-in form - plain text, each new line kept.']) ?>
-                <?= settingsSwitch('config_login_key_required', $config_login_key_required, ['help' => 'Agents sign in only from the address with the key in it.']) ?>
+            <?= settingsSectionStart('sign-in', __('The sign-in page'), __('Agents and client contacts sign in on the same page. A login key keeps the agents\' way in out of sight - without the key in its address, the page is for client contacts only.')) ?>
+                <?= settingsTextarea('config_login_message', $config_login_message, ['rows' => 3, 'maxlength' => 65000, 'placeholder' => __('Authorised users only'),
+                    'help' => __('Shown above the sign-in form - plain text, each new line kept.')]) ?>
+                <?= settingsSwitch('config_login_key_required', $config_login_key_required, ['help' => __('Agents sign in only from the address with the key in it.')]) ?>
                 <div data-settings-depends-on="config_login_key_required">
                     <?= settingsInput('config_login_key_secret', $config_login_key_secret, ['icon' => 'fa-key', 'maxlength' => 99, 'pattern' => '\w{3,99}',
-                        'title' => '3 to 99 letters, numbers and underscores', 'placeholder' => 'MYSECRET', 'autocomplete' => 'off',
-                        'help' => '3 to 99 letters, numbers and underscores - easy for your agents to remember.']) ?>
-                    <div class="itflow-settings-note mt-2 text-break" data-login-url>Agents sign in at <span class="font-monospace"><?= escapeHtml($login_url) ?><span data-login-url-key><?= escapeHtml($login_key_shown) ?></span></span></div>
+                        'title' => __('3 to 99 letters, numbers and underscores'), 'placeholder' => 'MYSECRET', 'autocomplete' => 'off',
+                        'help' => __('3 to 99 letters, numbers and underscores - easy for your agents to remember.')]) ?>
+                    <div class="itflow-settings-note mt-2 text-break" data-login-url><?= __('Agents sign in at') ?> <span class="font-monospace"><?= escapeHtml($login_url) ?><span data-login-url-key><?= escapeHtml($login_key_shown) ?></span></span></div>
                 </div>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSectionStart('two-step', 'Two-step sign-in', 'An agent giving their code can have the browser remembered, and isn\'t asked for one in it again until this runs out.') ?>
+            <?= settingsSectionStart('two-step', __('Two-step sign-in'), __('An agent giving their code can have the browser remembered, and isn\'t asked for one in it again until this runs out.')) ?>
                 <?= settingsInput('config_login_remember_me_expire', intval($config_login_remember_me_expire), ['icon' => 'fa-clock', 'type' => 'number', 'min' => 1, 'max' => 365, 'required' => true,
-                    'suffix' => 'days', 'help' => 'Each agent can see and forget their remembered browsers in their own Security settings.']) ?>
+                    'suffix' => __('days'), 'help' => __('Each agent can see and forget their remembered browsers in their own Security settings.')]) ?>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSectionStart('failed', 'Failed sign-ins', 'Counted over ' . SIGN_IN_WINDOW_MINUTES . ' minutes, from one address or against one account. An address is turned away after ' . SIGN_IN_LOCKOUT . ', whatever is set here.') ?>
+            <?= settingsSectionStart('failed', __('Failed sign-ins'), __('Counted over %1$d minutes, from one address or against one account. An address is turned away after %2$s, whatever is set here.', SIGN_IN_WINDOW_MINUTES, SIGN_IN_LOCKOUT)) ?>
                 <?= settingsSelect('config_login_alert_failures', intval($config_login_alert_failures), signInAlertOptions(), ['icon' => 'fa-bell',
-                    'help' => 'Each admin gets a notification and an email.']) ?>
+                    'help' => __('Each admin gets a notification and an email.')]) ?>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSectionStart('shares', 'Shared links', 'When an agent shares a login, note, document or file with someone outside ITFlow.') ?>
+            <?= settingsSectionStart('shares', __('Shared links'), __('When an agent shares a login, note, document or file with someone outside ITFlow.')) ?>
                 <?= settingsSelect('config_share_max_hours', intval($config_share_max_hours), shareMaxOptions(), ['icon' => 'fa-hourglass-half',
-                    'help' => 'The longest an agent can pick - a link stops working then, or sooner.']) ?>
-                <?= settingsSwitch('config_share_require_protection', $config_share_require_protection, ['help' => 'A shared password or secure note opens only with a passphrase the agent gives, or a code emailed to the person it is for.']) ?>
+                    'help' => __('The longest an agent can pick - a link stops working then, or sooner.')]) ?>
+                <?= settingsSwitch('config_share_require_protection', $config_share_require_protection, ['help' => __('A shared password or secure note opens only with a passphrase the agent gives, or a code emailed to the person it is for.')]) ?>
             <?= settingsSectionEnd() ?>
 
             <?= settingsSaveBar('edit_security_settings') ?>

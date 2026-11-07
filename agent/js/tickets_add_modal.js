@@ -287,7 +287,7 @@
                 const contacts = response.contacts || [];
 
                 // Contacts dropdown
-                const contactSelectDropdown = resetDropdown("contactSelect", '- No One -', '0');
+                const contactSelectDropdown = resetDropdown("contactSelect", __('- No One -'), '0');
 
                 // Watchers is a tags field - any address can be typed in, these are just the handy ones
                 const watchersDropdown = resetDropdown("watchersSelect", null, null);
@@ -493,7 +493,7 @@
                 const projects = response.projects || [];
 
                 // Projects dropdown
-                const projectSelectDropdown = resetDropdown("projectSelect", '- Select Project -', '0');
+                const projectSelectDropdown = resetDropdown("projectSelect", __('- Select Project -'), '0');
 
                 // Populate dropdown - the client's own, then our internal ones
                 projects.forEach(project => {

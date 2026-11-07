@@ -37,4 +37,4 @@ foreach (['invoice', 'quote'] as $type) {
 }
 
 http_response_code(404);
-exit('That document is not available.');
+exit(escapeHtml(__('That document is not available.')));

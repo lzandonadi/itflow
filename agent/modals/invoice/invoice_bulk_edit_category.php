@@ -15,7 +15,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-tag me-2"></i>Set Category <span class="fw-normal text-white-50 ms-1"><?= $count ?> invoice<?= $count === 1 ? '' : 's' ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-tag me-2"></i><?= __('Set Category') ?> <span class="fw-normal text-white-50 ms-1"><?= _n('%d invoice', '%d invoices', $count) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -23,20 +23,20 @@ ob_start();
     <?php foreach ($invoice_ids as $invoice_id) { ?><input type="hidden" name="invoice_ids[]" value="<?= $invoice_id ?>"><?php } ?>
 
     <div class="modal-body">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
             <select class="form-select select2" name="bulk_category_id" required>
-                <option value="">- Pick a category -</option>
+                <option value=""><?= __('- Pick a category -') ?></option>
                 <?= categoryOptionsHtml('Income') ?>
             </select>
             <?= categoryAddButtonHtml('Income', 'btn btn-secondary') ?>
         </div>
-        <div class="form-text">Reports group income by it.</div>
+        <div class="form-text"><?= __('Reports group income by it.') ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_invoice_category" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Set Category</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_invoice_category" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Set Category') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

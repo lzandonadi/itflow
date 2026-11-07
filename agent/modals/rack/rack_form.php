@@ -11,10 +11,10 @@ isset($mysqli) || die("Direct file access is not allowed");
 
 <ul class="nav nav-pills nav-justified mb-3">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#rackFormDetails">Details</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#rackFormDetails"><?= __('Details') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#rackFormPhotos">Photos &amp; Notes</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#rackFormPhotos"><?= __('Photos &amp; Notes') ?></a>
     </li>
 </ul>
 
@@ -25,19 +25,19 @@ isset($mysqli) || die("Direct file access is not allowed");
         <div class="row g-3">
 
             <div class="col-md-7">
-                <label class="form-label">Name <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-server"></i></span>
-                    <input type="text" class="form-control" name="name" placeholder="MDF-RACK-01" maxlength="200" value="<?= $rack_name ?>" required autofocus>
+                    <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('MDF-RACK-01')) ?>" maxlength="200" value="<?= $rack_name ?>" required autofocus>
                 </div>
             </div>
 
             <div class="col-md-5">
-                <label class="form-label">Type <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Type') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-server"></i></span>
                     <select class="form-select select2" name="type" required>
-                        <option value="">- Type -</option>
+                        <option value=""><?= __('- Type -') ?></option>
                         <?php // Rack types from Admin > Categories - one the rack has that is archived or isn't a type any more stays an option, or the required select would change it on every edit ?>
                         <?= categoryOptionsHtml('rack_type', html_entity_decode($rack_type, ENT_QUOTES, 'UTF-8')) ?>
                     </select>
@@ -46,50 +46,50 @@ isset($mysqli) || die("Direct file access is not allowed");
             </div>
 
             <div class="col-md-4">
-                <label class="form-label">Height <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Height') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-arrows-alt-v"></i></span>
                     <input type="number" class="form-control" name="units" placeholder="42" min="<?= max(1, $rack_highest_used_unit) ?>" max="70" value="<?= $rack_units ?: '' ?>" required>
                     <span class="input-group-text">U</span>
                 </div>
                 <?php if ($rack_highest_used_unit > 0) { ?>
-                    <div class="form-text">In use up to U<?= $rack_highest_used_unit ?></div>
+                    <div class="form-text"><?= __('In use up to U%d', $rack_highest_used_unit) ?></div>
                 <?php } ?>
             </div>
 
             <div class="col-md-8">
-                <label class="form-label">Unit numbering</label>
+                <label class="form-label"><?= __('Unit numbering') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-sort-numeric-down"></i></span>
                     <select class="form-select" name="units_descending">
-                        <option value="0" <?php if (!$rack_units_descending) { echo "selected"; } ?>>U1 at the bottom (standard)</option>
-                        <option value="1" <?php if ($rack_units_descending) { echo "selected"; } ?>>U1 at the top</option>
+                        <option value="0" <?php if (!$rack_units_descending) { echo "selected"; } ?>><?= __('U1 at the bottom (standard)') ?></option>
+                        <option value="1" <?php if ($rack_units_descending) { echo "selected"; } ?>><?= __('U1 at the top') ?></option>
                     </select>
                 </div>
             </div>
 
             <div class="col-md-7">
-                <label class="form-label">Model</label>
+                <label class="form-label"><?= __('Model') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                    <input type="text" class="form-control" name="model" placeholder="APC NetShelter SX 42U" maxlength="200" value="<?= $rack_model ?>">
+                    <input type="text" class="form-control" name="model" placeholder="<?= escapeHtml(__('APC NetShelter SX 42U')) ?>" maxlength="200" value="<?= $rack_model ?>">
                 </div>
             </div>
 
             <div class="col-md-5">
-                <label class="form-label">Depth</label>
+                <label class="form-label"><?= __('Depth') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-ruler"></i></span>
-                    <input type="text" class="form-control" name="depth" placeholder="1070 mm" maxlength="50" value="<?= $rack_depth ?>">
+                    <input type="text" class="form-control" name="depth" placeholder="<?= escapeHtml(__('1070 mm')) ?>" maxlength="50" value="<?= $rack_depth ?>">
                 </div>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Location</label>
+                <label class="form-label"><?= __('Location') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>
                     <select class="form-select select2" name="location">
-                        <option value="">- Location -</option>
+                        <option value=""><?= __('- Location -') ?></option>
                         <?php
                         $sql = mysqli_query($mysqli, "SELECT location_id, location_name FROM locations WHERE location_archived_at IS NULL AND location_client_id = $client_id ORDER BY location_name ASC");
                         while ($row = mysqli_fetch_assoc($sql)) {
@@ -103,28 +103,28 @@ isset($mysqli) || die("Direct file access is not allowed");
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Where in the building</label>
+                <label class="form-label"><?= __('Where in the building') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-door-closed"></i></span>
-                    <input type="text" class="form-control" name="physical_location" placeholder="2nd floor, comms closet B" maxlength="200" value="<?= $rack_physical_location ?>">
+                    <input type="text" class="form-control" name="physical_location" placeholder="<?= escapeHtml(__('2nd floor, comms closet B')) ?>" maxlength="200" value="<?= $rack_physical_location ?>">
                 </div>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Power budget</label>
+                <label class="form-label"><?= __('Power budget') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-bolt"></i></span>
                     <input type="number" class="form-control" name="power_capacity" placeholder="1440" min="0" max="1000000" value="<?= $rack_power_capacity ?: '' ?>">
                     <span class="input-group-text">W</span>
                 </div>
-                <div class="form-text">What the circuit or UPS feeding this rack can supply. Leave empty to skip power tracking.</div>
+                <div class="form-text"><?= __('What the circuit or UPS feeding this rack can supply. Leave empty to skip power tracking.') ?></div>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Description</label>
+                <label class="form-label"><?= __('Description') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-                    <input type="text" class="form-control" name="description" placeholder="Main comms rack" maxlength="500" value="<?= $rack_description ?>">
+                    <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('Main comms rack')) ?>" maxlength="500" value="<?= $rack_description ?>">
                 </div>
             </div>
 
@@ -147,15 +147,15 @@ isset($mysqli) || die("Direct file access is not allowed");
                     <?php if ($photo_current) { ?>
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" name="<?= $photo_remove_field ?>" value="1" id="rackForm_<?= $photo_remove_field ?>">
-                            <label class="form-check-label" for="rackForm_<?= $photo_remove_field ?>">Remove this photo</label>
+                            <label class="form-check-label" for="rackForm_<?= $photo_remove_field ?>"><?= __('Remove this photo') ?></label>
                         </div>
                     <?php } ?>
                 </div>
             <?php } ?>
         </div>
 
-        <label class="form-label">Notes</label>
-        <textarea class="form-control" rows="6" placeholder="Keys, access, who to call at the site, power circuit numbers..." name="notes"><?= $rack_notes ?></textarea>
+        <label class="form-label"><?= __('Notes') ?></label>
+        <textarea class="form-control" rows="6" placeholder="<?= escapeHtml(__('Keys, access, who to call at the site, power circuit numbers...')) ?>" name="notes"><?= $rack_notes ?></textarea>
 
     </div>
 

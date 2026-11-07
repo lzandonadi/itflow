@@ -19,11 +19,11 @@
 
     // What the preview says under itself, by menu
     const NOTES = {
-        1: 'In the agent menu, under Tools',
-        2: 'In the top bar - its name shows on hover',
-        3: 'In the client portal\'s menu',
-        4: 'In the admin menu',
-        5: 'In the reports menu'
+        1: __('In the agent menu, under Tools'),
+        2: __('In the top bar - its name shows on hover'),
+        3: __('In the client portal\'s menu'),
+        4: __('In the admin menu'),
+        5: __('In the reports menu')
     };
 
     // Whether Font Awesome draws an icon by this name
@@ -37,7 +37,7 @@
     function uriProblem(value) {
         const match = /^([a-z][a-z0-9+.-]*):/i.exec(value);
         if (match && SCHEMES.indexOf(match[1].toLowerCase()) === -1) {
-            return 'A link can\'t start with "' + match[1] + ':" - use a web address (https://...), a page of ITFlow (/agent/...), mailto: or tel:.';
+            return __('A link can\'t start with "%s:" - use a web address (https://...), a page of ITFlow (/agent/...), mailto: or tel:.', match[1]);
         }
         return '';
     }
@@ -81,10 +81,10 @@
         function draw() {
             const where = location.value;
             preview.dataset.location = where;
-            previewName.textContent = name.value.trim() || 'New link';
+            previewName.textContent = name.value.trim() || __('New link');
             previewIcon.className = 'fas fa-fw fa-' + (icon.value || 'external-link-alt');
             previewTab.hidden = !newTab.checked;
-            item.title = (where === '2' ? (name.value.trim() || 'New link') + (description.value.trim() ? ' - ' : '') : '') + description.value.trim();
+            item.title = (where === '2' ? (name.value.trim() || __('New link')) + (description.value.trim() ? ' - ' : '') : '') + description.value.trim();
             previewNote.textContent = NOTES[where] || '';
             const option = location.options[location.selectedIndex];
             locationAbout.textContent = option ? option.dataset.about : '';
@@ -125,7 +125,7 @@
             if (usable) {
                 custom.dataset.icon = term;
                 custom.querySelector('i').className = 'fas fa-fw fa-' + term + ' me-1';
-                custom.querySelector('span').textContent = 'Use ' + term;
+                custom.querySelector('span').textContent = __('Use %s', term);
                 custom.classList.toggle('active', icon.value === term);
             }
             none.hidden = shown > 0 || usable;

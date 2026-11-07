@@ -49,7 +49,7 @@ if (isset($_POST['edit_invoice_settings'])) {
     // Late fees - a percent of what is owed
     $late_fee = billingNumberInput(str_replace('%', '', (string) $in['config_invoice_late_fee_percent']));
     if ($late_fee === null || $late_fee < 0 || $late_fee > 100) {
-        $errors['config_invoice_late_fee_percent'] = 'A percent, from 0 to 100.';
+        $errors['config_invoice_late_fee_percent'] = __('A percent, from 0 to 100.');
     }
     $after['config_invoice_late_fee_percent'] = $late_fee;
 
@@ -81,7 +81,7 @@ if (isset($_POST['edit_invoice_settings'])) {
     // Billable expenses - the markup they start with, a percent
     $markup = billingNumberInput(str_replace('%', '', (string) $in['config_expense_markup']));
     if ($markup === null || $markup < 0 || $markup > 1000) {
-        $errors['config_expense_markup'] = 'The markup is a percent, from 0 to 1000.';
+        $errors['config_expense_markup'] = __('The markup is a percent, from 0 to 1000.');
     }
     $after['config_expense_markup'] = $markup;
 
@@ -90,16 +90,16 @@ if (isset($_POST['edit_invoice_settings'])) {
     foreach (['config_mileage_rate', 'config_trip_bill_rate'] as $rate) {
         $after[$rate] = tripRateInput($in[$rate]);
         if ($after[$rate] === null) {
-            $errors[$rate] = 'The rates are amounts, such as 0.70.';
+            $errors[$rate] = __('The rates are amounts, such as 0.70.');
         }
     }
     $after['config_trip_charge'] = billingNumberInput($in['config_trip_charge']);
     if ($after['config_trip_charge'] === null || $after['config_trip_charge'] < 0 || $after['config_trip_charge'] >= 1000000) {
-        $errors['config_trip_charge'] = 'An amount, such as 45.00.';
+        $errors['config_trip_charge'] = __('An amount, such as 45.00.');
     }
     $included = billingNumberInput($in['config_trip_included']);
     if ($included === null || $included < 0 || $included >= 100000) {
-        $errors['config_trip_included'] = 'A distance, such as 20.';
+        $errors['config_trip_included'] = __('A distance, such as 20.');
     }
     $after['config_trip_included'] = $included === null ? null : round($included, 1);
     $category_id = intval($in['config_mileage_category_id']);

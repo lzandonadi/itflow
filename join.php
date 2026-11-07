@@ -49,7 +49,7 @@ $session_user_id = 0;
 $company = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT company_name, company_logo FROM companies WHERE company_id = 1"));
 $company_name = (string) ($company['company_name'] ?? '');
 $app = userMailAppName();
-$where = $company_name !== '' ? "$company_name on $app" : $app;
+$where = $company_name !== '' ? __('%1$s on %2$s', $company_name, $app) : $app;
 
 $invite_id = intval($_POST['invite'] ?? ($_GET['invite'] ?? 0));
 $token = $_POST['token'] ?? ($_GET['token'] ?? '');
@@ -74,8 +74,8 @@ if ($invite && $link['state'] === 'pending' && $_SERVER['REQUEST_METHOD'] === 'P
     ], $error);
     if ($user_id) {
         $first = strtok(trim(preg_replace('/\s+/', ' ', strip_tags($in_name))), ' ');
-        $_SESSION['login_message'] = "Welcome, $first - your account is ready. Sign in with " . $invite['invite_email'] . ' and your new password.'
-            . (intval($invite['invite_force_mfa']) ? ' Have your authenticator app ready - you set up multi-factor authentication as you sign in.' : '');
+        $_SESSION['login_message'] = __('Welcome, %1$s - your account is ready. Sign in with %2$s and your new password.', $first, $invite['invite_email'])
+            . (intval($invite['invite_force_mfa']) ? ' ' . __('Have your authenticator app ready - you set up multi-factor authentication as you sign in.') : '');
         $_SESSION['login_message_type'] = 'success';
         header("Location: $sign_in");
         exit();
@@ -86,18 +86,18 @@ if ($invite && $link['state'] === 'pending' && $_SERVER['REQUEST_METHOD'] === 'P
 }
 
 $by = $invite ? userInviteBy($invite) : '';
-$ask = $by !== '' ? "Ask $by to send it again." : 'Ask your administrator to send it again.';
+$ask = $by !== '' ? __('Ask %s to send it again.', $by) : __('Ask your administrator to send it again.');
 $notes = [
-    'gone' => ["That link doesn't work", 'It may have been copied only in part - or a newer invite replaced it, so use the link in the latest one.'],
-    'expired' => ['That invite has run out', 'Invites work for ' . USER_INVITE_LINK_DAYS . " days. $ask"],
-    'accepted' => ["You've joined already", 'Sign in with ' . ($invite['invite_email'] ?? 'your email address') . ' and the password you chose.'],
-    'cancelled' => ['That invite was cancelled', $by !== '' ? "Ask $by about it." : 'Ask your administrator about it.'],
+    'gone' => [__("That link doesn't work"), __('It may have been copied only in part - or a newer invite replaced it, so use the link in the latest one.')],
+    'expired' => [__('That invite has run out'), _n('Invites work for %d day.', 'Invites work for %d days.', USER_INVITE_LINK_DAYS) . " $ask"],
+    'accepted' => [__("You've joined already"), isset($invite['invite_email']) ? __('Sign in with %s and the password you chose.', $invite['invite_email']) : __('Sign in with your email address and the password you chose.')],
+    'cancelled' => [__('That invite was cancelled'), $by !== '' ? __('Ask %s about it.', $by) : __('Ask your administrator about it.')],
 ];
 $state = $link['state'];
-$title = $state === 'pending' ? "Join $where" : $notes[$state][0];
+$title = $state === 'pending' ? __('Join %s', $where) : $notes[$state][0];
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
     <title><?= escapeHtml($company_name !== '' ? $company_name : $app) ?> | <?= escapeHtml($title) ?></title>
@@ -109,13 +109,14 @@ $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
     <?php } ?>
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
+<script src="/js/i18n.js"></script>
 </head>
 <body class="hold-transition login-page">
 
 <div class="login-box itflow-join-box">
     <div class="login-logo">
         <?php if (!empty($company['company_logo'])) { ?>
-            <img alt="<?= escapeHtml($company_name) ?> logo" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
+            <img alt="<?= escapeHtml(__('%s logo', $company_name)) ?>" height="110" width="380" class="img-fluid" src="/uploads/settings/<?= escapeHtml($company['company_logo']) ?>">
         <?php } else { ?>
             <span class="fw-semibold"><?= escapeHtml($company_name !== '' ? $company_name : $app) ?></span>
         <?php } ?>
@@ -128,8 +129,21 @@ $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
 
                 <h1 class="h5 mb-1" data-join="agent"><?= escapeHtml($title) ?></h1>
                 <p class="text-body-secondary small mb-3">
-                    <?= $by !== '' ? escapeHtml($by) . ' invited' : 'You are invited as' ?> <strong><?= escapeHtml($invite['invite_email']) ?></strong> to join <?= escapeHtml($where) ?><?php if ((string) $invite['role_name'] !== '') { ?>, as <strong><?= escapeHtml($invite['role_name']) ?></strong><?php } ?>.
-                    Choose your password and you're ready to sign in.
+                    <?php
+                    $join_args = [escapeHtml($invite['invite_email']), escapeHtml($where)];
+                    if ((string) $invite['role_name'] !== '') {
+                        $join_args[] = escapeHtml($invite['role_name']);
+                        echo $by !== ''
+                            ? __('%1$s invited <strong>%2$s</strong> to join %3$s, as <strong>%4$s</strong>.', escapeHtml($by), ...$join_args)
+                            : __('You are invited as <strong>%1$s</strong> to join %2$s, as <strong>%3$s</strong>.', ...$join_args);
+                    } else {
+                        echo $by !== ''
+                            ? __('%1$s invited <strong>%2$s</strong> to join %3$s.', escapeHtml($by), ...$join_args)
+                            : __('You are invited as <strong>%1$s</strong> to join %2$s.', ...$join_args);
+                    }
+                    ?>
+
+                    <?= __("Choose your password and you're ready to sign in.") ?>
                 </p>
 
                 <?php if ($error !== '') { ?>
@@ -142,31 +156,31 @@ $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
                     <input type="hidden" name="agent_join" value="1">
                     <input type="text" class="d-none" name="username" value="<?= escapeHtml($invite['invite_email']) ?>" autocomplete="username" aria-hidden="true" tabindex="-1">
 
-                    <label class="form-label small mb-1" for="joinName">Your name <strong class="text-danger">*</strong> <span class="text-body-secondary">- as it shows on tickets</span></label>
+                    <label class="form-label small mb-1" for="joinName"><?= __('Your name') ?> <strong class="text-danger">*</strong> <span class="text-body-secondary"><?= __('- as it shows on tickets') ?></span></label>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
                         <input type="text" class="form-control" id="joinName" name="name" value="<?= escapeHtml($in_name) ?>" maxlength="200" autocomplete="name" required<?= trim($in_name) === '' ? ' autofocus' : '' ?>>
                     </div>
 
-                    <label class="form-label small mb-1" for="joinPassword">Choose a password <span class="text-body-secondary">- at least <?= USER_PASSWORD_MIN ?> characters</span></label>
+                    <label class="form-label small mb-1" for="joinPassword"><?= __('Choose a password') ?> <span class="text-body-secondary"><?= __('- at least %d characters', USER_PASSWORD_MIN) ?></span></label>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-lock"></i></span>
                         <input type="password" class="form-control" id="joinPassword" name="new_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" required<?= trim($in_name) !== '' ? ' autofocus' : '' ?>>
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><i class="fas fa-fw fa-check-double"></i></span>
-                        <input type="password" class="form-control" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" placeholder="The same again" aria-label="The password again" required>
+                        <input type="password" class="form-control" name="confirm_password" minlength="<?= USER_PASSWORD_MIN ?>" autocomplete="new-password" placeholder="<?= escapeHtml(__('The same again')) ?>" aria-label="<?= escapeHtml(__('The password again')) ?>" required>
                     </div>
-                    <p class="small text-body-secondary mb-3"><i class="fas fa-fw fa-key me-1"></i>It also unlocks the credential vault for you, so keep it to yourself.</p>
+                    <p class="small text-body-secondary mb-3"><i class="fas fa-fw fa-key me-1"></i><?= __('It also unlocks the credential vault for you, so keep it to yourself.') ?></p>
 
                     <?php if (intval($invite['invite_force_mfa'])) { ?>
                         <div class="alert alert-info small d-flex gap-2" data-join-mfa>
                             <i class="fas fa-mobile-alt mt-1"></i>
-                            <div>Multi-factor authentication is required: have an authenticator app on your phone ready - you set it up as you sign in.</div>
+                            <div><?= __('Multi-factor authentication is required: have an authenticator app on your phone ready - you set it up as you sign in.') ?></div>
                         </div>
                     <?php } ?>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fas fa-check me-2"></i>Join</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fas fa-check me-2"></i><?= __('Join') ?></button>
                 </form>
 
             <?php } else { ?>
@@ -174,12 +188,12 @@ $title = $state === 'pending' ? "Join $where" : $notes[$state][0];
                 <h1 class="h5 mb-1" data-join-state="<?= escapeHtml($state) ?>"><?= escapeHtml($title) ?></h1>
                 <p class="text-body-secondary small mb-3"><?= escapeHtml($notes[$state][1]) ?></p>
                 <?php if ($state === 'accepted') { ?>
-                    <a class="btn btn-primary w-100 mb-3" href="<?= escapeHtml($sign_in) ?>"><i class="fas fa-sign-in-alt me-2"></i>Sign in</a>
+                    <a class="btn btn-primary w-100 mb-3" href="<?= escapeHtml($sign_in) ?>"><i class="fas fa-sign-in-alt me-2"></i><?= __('Sign in') ?></a>
                 <?php } ?>
 
             <?php } ?>
 
-            <a href="<?= escapeHtml($sign_in) ?>"><i class="fas fa-arrow-left me-1"></i>Back to sign in</a>
+            <a href="<?= escapeHtml($sign_in) ?>"><i class="fas fa-arrow-left me-1"></i><?= __('Back to sign in') ?></a>
 
         </div>
     </div>

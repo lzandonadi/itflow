@@ -20,7 +20,7 @@ if (isset($_POST['save_budget'])) {
 
     $year = budgetYear($_POST['year'] ?? 0);
     if (!$year) {
-        flashAlert('That is not a year a budget can be set for.', 'error');
+        flashAlert(__('That is not a year a budget can be set for.'), 'error');
         redirect('/agent/reports/budget.php');
     }
 
@@ -77,7 +77,7 @@ if (isset($_POST['save_budget'])) {
         logAudit("Budget", "Edit", "$session_name updated the $year budget ($changed change" . ($changed === 1 ? '' : 's') . ")");
     }
 
-    flashAlert($changed ? "The $year budget is saved" : "Nothing changed in the $year budget", $changed ? 'success' : 'info');
+    flashAlert($changed ? __('The %s budget is saved', $year) : __('Nothing changed in the %s budget', $year), $changed ? 'success' : 'info');
 
     redirect("/agent/reports/budget.php?year=$year");
 
@@ -90,14 +90,14 @@ if (isset($_POST['copy_budget'])) {
 
     $year = budgetYear($_POST['year'] ?? 0);
     if (!$year) {
-        flashAlert('That is not a year a budget can be set for.', 'error');
+        flashAlert(__('That is not a year a budget can be set for.'), 'error');
         redirect('/agent/reports/budget.php');
     }
     $from_year = $year - 1;
 
     $count = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM budget WHERE budget_year = $from_year"))[0]);
     if (!$count) {
-        flashAlert("There is no $from_year budget to copy.", 'error');
+        flashAlert(__('There is no %s budget to copy.', $from_year), 'error');
         redirect("/agent/reports/budget.php?year=$year&view=edit");
     }
 

@@ -36,9 +36,9 @@ $gs_use_standard = settingsChecked('standard_slas', true);
 <form action="post.php" method="post" autocomplete="off" data-gs-form>
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-    <h2 class="h6 fw-semibold">Business hours</h2>
-    <p class="small text-body-secondary">Response times count only these - an urgent ticket on Friday evening is due Monday morning. Holidays are added in Admin &gt; SLAs.</p>
-    <?= settingsField('business_days', 'Days', '<div class="d-flex flex-wrap gap-2" role="group" aria-label="Business days" data-gs-days>' . implode('', array_map(function ($day) use ($gs_day_names, $gs_days) {
+    <h2 class="h6 fw-semibold"><?= __('Business hours') ?></h2>
+    <p class="small text-body-secondary"><?= __('Response times count only these - an urgent ticket on Friday evening is due Monday morning. Holidays are added in Admin &gt; SLAs.') ?></p>
+    <?= settingsField('business_days', __('Days'), '<div class="d-flex flex-wrap gap-2" role="group" aria-label="' . escapeHtml(__('Business days')) . '" data-gs-days>' . implode('', array_map(function ($day) use ($gs_day_names, $gs_days) {
         return '<input type="checkbox" class="btn-check" name="business_days[]" value="' . $day . '" id="gsDay' . $day . '" autocomplete="off"' . (in_array($day, $gs_days, true) ? ' checked' : '') . '>'
             . '<label class="btn btn-outline-primary btn-sm itflow-gs-day" for="gsDay' . $day . '">' . $gs_day_names[$day] . '</label>';
     }, array_keys($gs_day_names))) . '</div>', '', 'gsDay1') ?>
@@ -51,16 +51,16 @@ $gs_use_standard = settingsChecked('standard_slas', true);
         </div>
     </div>
 
-    <h2 class="h6 fw-semibold">Response times</h2>
+    <h2 class="h6 fw-semibold"><?= __('Response times') ?></h2>
     <?php if ($gs_slas) { ?>
-        <p class="small text-body-secondary">The response times a ticket gets unless its client has their own - in Admin &gt; SLAs.</p>
+        <p class="small text-body-secondary"><?= __('The response times a ticket gets unless its client has their own - in Admin &gt; SLAs.') ?></p>
     <?php } else { ?>
-        <p class="small text-body-secondary">How soon a ticket is answered, by its priority - a client can have their own. Change them, add a time to put a ticket right by, or add more, in Admin &gt; SLAs.</p>
+        <p class="small text-body-secondary"><?= __('How soon a ticket is answered, by its priority - a client can have their own. Change them, add a time to put a ticket right by, or add more, in Admin &gt; SLAs.') ?></p>
     <?php } ?>
     <div class="table-responsive mb-3">
         <table class="table table-sm align-middle mb-0 itflow-gs-slas" data-gs-slas>
             <thead>
-                <tr><th scope="col">Priority</th><th scope="col">Answered within</th><?= $gs_show_resolution ? '<th scope="col">Put right within</th>' : '' ?></tr>
+                <tr><th scope="col"><?= __('Priority') ?></th><th scope="col"><?= __('Answered within') ?></th><?= $gs_show_resolution ? __('<th scope="col">Put right within</th>') : '' ?></tr>
             </thead>
             <tbody>
                 <?php foreach (array_keys(GETTING_STARTED_SLAS) as $gs_priority) {
@@ -71,7 +71,7 @@ $gs_use_standard = settingsChecked('standard_slas', true);
                         <th scope="row" class="fw-normal"><?= $gs_priority ?><?= isset($gs_slas[$gs_priority]) ? ' <span class="small text-body-secondary">- ' . escapeHtml($gs_slas[$gs_priority]['sla_name']) . '</span>' : '' ?></th>
                         <td><?= escapeHtml(formatSlaMinutes($gs_response)) ?></td>
                         <?php if ($gs_show_resolution) { ?>
-                            <td><?= $gs_resolution > 0 ? escapeHtml(formatSlaMinutes($gs_resolution)) : '<span class="text-body-secondary">No set time</span>' ?></td>
+                            <td><?= $gs_resolution > 0 ? escapeHtml(formatSlaMinutes($gs_resolution)) : __('<span class="text-body-secondary">No set time</span>') ?></td>
                         <?php } ?>
                     </tr>
                 <?php } ?>
@@ -79,19 +79,19 @@ $gs_use_standard = settingsChecked('standard_slas', true);
         </table>
     </div>
     <?php if (count($gs_slas) < count(GETTING_STARTED_SLAS)) { ?>
-        <div class="mb-4"><?= settingsSwitch('standard_slas', $gs_use_standard, ['id' => 'gsStandardSlas', 'label' => $gs_slas ? 'Use these for the priorities that have none' : 'Use these',
-            'help' => 'Open tickets get them too.']) ?></div>
+        <div class="mb-4"><?= settingsSwitch('standard_slas', $gs_use_standard, ['id' => 'gsStandardSlas', 'label' => $gs_slas ? __('Use these for the priorities that have none') : __('Use these'),
+            'help' => __('Open tickets get them too.')]) ?></div>
     <?php } ?>
 
-    <h2 class="h6 fw-semibold<?= count($gs_slas) < count(GETTING_STARTED_SLAS) ? '' : ' mt-4' ?>">Ticket numbers</h2>
+    <h2 class="h6 fw-semibold<?= count($gs_slas) < count(GETTING_STARTED_SLAS) ? '' : ' mt-4' ?>"><?= __('Ticket numbers') ?></h2>
     <div class="mb-4"><?= settingsNumberingFields('ticket', (string) ($gs_support['config_ticket_prefix'] ?? ''), intval($gs_support['config_ticket_next_number'] ?? 1)) ?></div>
 
-    <h2 class="h6 fw-semibold">Client portal</h2>
+    <h2 class="h6 fw-semibold"><?= __('Client portal') ?></h2>
     <div class="mb-4">
         <input type="hidden" name="config_client_portal_enable" value="0">
-        <?= settingsSwitch('config_client_portal_enable', intval($gs_support['config_client_portal_enable'] ?? 1) === 1, ['id' => 'gsPortal', 'label' => 'Clients can sign in to raise and follow tickets',
-            'help' => 'And to pay invoices, see quotes and documents - what each contact sees is set on the contact. Invite them from their client\'s Contacts.']) ?>
+        <?= settingsSwitch('config_client_portal_enable', intval($gs_support['config_client_portal_enable'] ?? 1) === 1, ['id' => 'gsPortal', 'label' => __('Clients can sign in to raise and follow tickets'),
+            'help' => __('And to pay invoices, see quotes and documents - what each contact sees is set on the contact. Invite them from their client\'s Contacts.')]) ?>
     </div>
 
-    <button type="submit" name="getting_started_support" value="1" class="btn btn-primary" data-gs-save>Save and continue<i class="fas fa-arrow-right ms-2"></i></button>
+    <button type="submit" name="getting_started_support" value="1" class="btn btn-primary" data-gs-save><?= __('Save and continue') ?><i class="fas fa-arrow-right ms-2"></i></button>
 </form>

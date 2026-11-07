@@ -32,7 +32,7 @@ $form_discount = floatval($form_value('discount_amount', '0'));
 // Net terms for a new invoice's due date - a contract in force's, else the
 // default (0 is On Receipt), as the invoice is saved with
 $form_default_terms = billingDefaults()['net_terms'];
-[$form_terms, $form_terms_from] = $form_client_id ? contractNetTermsWhose($form_client_id, date('Y-m-d')) : [$form_default_terms, 'the default'];
+[$form_terms, $form_terms_from] = $form_client_id ? contractNetTermsWhose($form_client_id, date('Y-m-d')) : [$form_default_terms, __('the default')];
 $form_contract_terms = contractNetTermsToday();
 // Before the 3.5.0 update a client still has net terms of its own, which apply without a contract's
 $form_legacy_terms = !billingAfterHoursReady();
@@ -46,24 +46,24 @@ if (!$form_edit && !$form_client_id) {
 }
 
 $form_scope_placeholder = [
-    'invoice' => 'Managed services - October, onsite visit 12 March, new laptop for Sam',
-    'quote' => 'Firewall replacement, Microsoft 365 migration, new starter kit',
-    'recurring' => 'Monthly managed services, backup and hosting',
+    'invoice' => __('Managed services - October, onsite visit 12 March, new laptop for Sam'),
+    'quote' => __('Firewall replacement, Microsoft 365 migration, new starter kit'),
+    'recurring' => __('Monthly managed services, backup and hosting'),
 ][$form_type];
 
 ?>
-<div class="row g-3" id="<?= $form_id ?>" data-billing-form="<?= $form_type ?>" data-terms="<?= $form_terms ?>" data-terms-from="<?= escapeHtml($form_terms_from) ?>">
+<div class="row g-3" id="<?= $form_id ?>" data-billing-form="<?= $form_type ?>" data-terms="<?= $form_terms ?>" data-terms-from="<?= escapeHtml($form_terms_from) ?>" data-terms-days="<?= escapeHtml(__('%d days from the invoice date')) ?>" data-terms-receipt="<?= escapeHtml(__('Due on receipt')) ?>" data-terms-line="<?= escapeHtml(__('%1$s - %2$s terms.')) ?>" data-terms-default="<?= escapeHtml(__('the default')) ?>">
 
     <?php if (!$form_edit && !$form_client_id) { ?>
         <div class="col-12">
-            <label class="form-label">Client <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
                 <select class="form-select select2" name="client_id" required data-billing-client>
-                    <option value="">- Select a client -</option>
+                    <option value=""><?= __('- Select a client -') ?></option>
                     <?php foreach ($form_clients as $form_client) { ?>
                         <?php $form_option_terms = isset($form_contract_terms[intval($form_client['client_id'])]) ? [$form_contract_terms[intval($form_client['client_id'])][0], contractPossessive($form_contract_terms[intval($form_client['client_id'])][1])]
-                            : ($form_legacy_terms && $form_client['client_net_terms'] !== null ? [intval($form_client['client_net_terms']), "the client's"] : [$form_default_terms, 'the default']); ?>
+                            : ($form_legacy_terms && $form_client['client_net_terms'] !== null ? [intval($form_client['client_net_terms']), __("the client's")] : [$form_default_terms, __('the default')]); ?>
                         <option value="<?= intval($form_client['client_id']) ?>" data-terms="<?= $form_option_terms[0] ?>" data-terms-from="<?= escapeHtml($form_option_terms[1]) ?>"<?= selectOptionClient($form_client['client_id'], $form_client['client_name'], $form_client['client_abbreviation'] ?? '') ?>><?= escapeHtml($form_client['client_name']) ?></option>
                     <?php } ?>
                 </select>
@@ -74,25 +74,25 @@ $form_scope_placeholder = [
     <?php } ?>
 
     <div class="col-12">
-        <label class="form-label">Scope</label>
+        <label class="form-label"><?= __('Scope') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-comment"></i></span>
             <input type="text" class="form-control" name="scope" maxlength="255" placeholder="<?= escapeHtml($form_scope_placeholder) ?>" value="<?= escapeHtml($form_value('scope')) ?>" <?= $form_edit ? '' : 'autofocus' ?>>
         </div>
         <div class="form-text">
-            What it is for, in a few words - shown on it and in lists.
+            <?= __('What it is for, in a few words - shown on it and in lists.') ?>
             <?php if ($form_type === 'recurring') { ?>
-                Put <code>{month}</code>, <code>{quarter}</code>, <code>{year}</code> or <code>{period}</code> in it - here, in the notes or on a line - and each invoice says the period it covers: "Managed services - {month}" reads "Managed services - November 2026".
+                <?= __('Put %1$s, %2$s, %3$s or %4$s in it - here, in the notes or on a line - and each invoice says the period it covers: "Managed services - {month}" reads "Managed services - November 2026".', '<code>{month}</code>', '<code>{quarter}</code>', '<code>{year}</code>', '<code>{period}</code>') ?>
             <?php } ?>
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
             <select class="form-select select2" name="category" required>
-                <option value="">- Category -</option>
+                <option value=""><?= __('- Category -') ?></option>
                 <?= categoryOptionsHtml('Income', $form_category_id, ['since' => $form_edit ? $form_value('created_at') : null]) ?>
             </select>
             <?= categoryAddButtonHtml('Income', 'btn btn-secondary') ?>
@@ -101,14 +101,14 @@ $form_scope_placeholder = [
 
     <?php if ($form_type === 'invoice') { ?>
         <div class="col-sm-6">
-            <label class="form-label">Invoice date <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Invoice date') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_value('date', date('Y-m-d'))) ?>" required data-billing-date>
             </div>
         </div>
         <div class="col-sm-6">
-            <label class="form-label">Due <?= $form_edit ? '<strong class="text-danger">*</strong>' : '' ?></label>
+            <label class="form-label"><?= __('Due') ?> <?= $form_edit ? '<strong class="text-danger">*</strong>' : '' ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar-check"></i></span>
                 <?php if ($form_edit) { ?>
@@ -118,54 +118,54 @@ $form_scope_placeholder = [
                 <?php } ?>
             </div>
             <?php if (!$form_edit) { ?>
-                <div class="form-text" data-billing-terms-note><?= $form_terms ? "$form_terms days from the invoice date" : 'Due on receipt' ?> - <?= escapeHtml($form_terms_from) ?> terms.</div>
+                <div class="form-text" data-billing-terms-note><?= escapeHtml(__('%1$s - %2$s terms.', $form_terms ? __('%d days from the invoice date', $form_terms) : __('Due on receipt'), $form_terms_from)) ?></div>
             <?php } ?>
         </div>
     <?php } elseif ($form_type === 'quote') { ?>
         <div class="col-sm-6">
-            <label class="form-label">Quote date <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Quote date') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_value('date', date('Y-m-d'))) ?>" required data-billing-date>
             </div>
         </div>
         <div class="col-sm-6">
-            <label class="form-label">Valid until <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Valid until') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-hourglass-half"></i></span>
                 <input type="date" class="form-control" name="expire" max="2999-12-31" value="<?= escapeHtml($form_value('expire', date('Y-m-d', strtotime('+30 days')))) ?>" required data-billing-expire>
             </div>
             <div class="form-text">
                 <?php foreach ([15, 30, 60, 90] as $days) { ?>
-                    <a href="#" class="me-2" data-billing-expire-days="<?= $days ?>"><?= $days ?> days</a>
+                    <a href="#" class="me-2" data-billing-expire-days="<?= $days ?>"><?= _n('%d day', '%d days', $days) ?></a>
                 <?php } ?>
             </div>
         </div>
     <?php } else { ?>
         <div class="col-sm-6">
-            <label class="form-label">Billed <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= _x('Billed', 'how often') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-sync-alt"></i></span>
                 <select class="form-select" name="frequency" required>
                     <?php foreach (recurringInvoiceFrequencies() as $frequency => $label) { ?>
-                        <option value="<?= $frequency ?>" <?= $form_value('frequency', 'month') === $frequency ? 'selected' : '' ?>><?= $label ?></option>
+                        <option value="<?= $frequency ?>" <?= $form_value('frequency', 'month') === $frequency ? 'selected' : '' ?>><?= escapeHtml($label) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
         <div class="col-sm-6">
-            <label class="form-label"><?= $form_edit ? 'Next invoice' : 'First invoice' ?> <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= $form_edit ? __('Next invoice') : __('First invoice') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-calendar-day"></i></span>
                 <input type="date" class="form-control" name="<?= $form_edit ? 'next_date' : 'start_date' ?>" max="2999-12-31"
                     value="<?= escapeHtml($form_edit ? $form_value('next_date') : date('Y-m-01', strtotime('first day of next month'))) ?>" required>
             </div>
-            <div class="form-text">Made on this date, then every period after.</div>
+            <div class="form-text"><?= __('Made on this date, then every period after.') ?></div>
         </div>
     <?php } ?>
 
     <div class="col-sm-6">
-        <label class="form-label">Discount</label>
+        <label class="form-label"><?= __('Discount') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-tags"></i></span>
             <input type="text" class="form-control text-end" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]{0,2}"
@@ -173,29 +173,29 @@ $form_scope_placeholder = [
                 placeholder="0.00" value="<?= $form_discount != 0 ? number_format($form_discount, 2, '.', '') : '' ?>">
             <span class="input-group-text"><?= escapeHtml($form_currency) ?></span>
         </div>
-        <div class="form-text">Taken off the total, after the lines.</div>
+        <div class="form-text"><?= __('Taken off the total, after the lines.') ?></div>
     </div>
 
     <?php if ($form_type === 'recurring') { ?>
         <div class="col-sm-6">
-            <label class="form-label">When it is made</label>
+            <label class="form-label"><?= __('When it is made') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-paper-plane"></i></span>
                 <select class="form-select" name="auto_send">
-                    <option value="1" <?= $form_value('auto_send', '1') === '1' ? 'selected' : '' ?>>Send it automatically</option>
-                    <option value="0" <?= $form_value('auto_send', '1') === '0' ? 'selected' : '' ?>>Leave a draft to check</option>
+                    <option value="1" <?= $form_value('auto_send', '1') === '1' ? 'selected' : '' ?>><?= __('Send it automatically') ?></option>
+                    <option value="0" <?= $form_value('auto_send', '1') === '0' ? 'selected' : '' ?>><?= __('Leave a draft to check') ?></option>
                 </select>
             </div>
             <?php if (empty($config_recurring_auto_send_invoice)) { ?>
-                <div class="form-text text-warning-emphasis">Emailing the invoices recurring invoices make is off in Settings &gt; Notifications - they are made as drafts.</div>
+                <div class="form-text text-warning-emphasis"><?= __('Emailing the invoices recurring invoices make is off in Settings &gt; Notifications - they are made as drafts.') ?></div>
             <?php } ?>
         </div>
         <?php if ($form_edit) { ?>
             <div class="col-12">
                 <div class="form-check form-switch">
                     <input type="hidden" name="status" value="0">
-                    <input class="form-check-input" type="checkbox" role="switch" name="status" value="1" id="<?= $form_id ?>Active" <?= intval($form_value('status', '1')) ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="<?= $form_id ?>Active">Active - invoices are made on schedule</label>
+                    <input class="form-check-input" type="checkbox" role="switch" name="status" value="1" id="<?= $form_id ?>Active" <?php /* i18n-ignore */ ?><?= intval($form_value('status', '1')) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="<?= $form_id ?>Active"><?= __('Active - invoices are made on schedule') ?></label>
                 </div>
             </div>
         <?php } ?>
@@ -236,7 +236,8 @@ $form_scope_placeholder = [
             if (note) {
                 var picked = client && client.options[client.selectedIndex];
                 var from = picked && picked.value ? picked.getAttribute('data-terms-from') : root.getAttribute('data-terms-from');
-                note.textContent = (terms() ? terms() + ' days from the invoice date' : 'Due on receipt') + ' - ' + (from || 'the default') + ' terms.';
+                var when = terms() ? root.getAttribute('data-terms-days').replace('%d', terms()) : root.getAttribute('data-terms-receipt');
+                note.textContent = root.getAttribute('data-terms-line').replace('%1$s', when).replace('%2$s', from || root.getAttribute('data-terms-default'));
             }
         }
     }

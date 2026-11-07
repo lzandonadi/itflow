@@ -89,18 +89,18 @@ $pill_url = function ($show) {
     return '?' . http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'provider' => $_GET['provider'] ?? '', 'client' => $_GET['client'] ?? '', 'show' => $show]));
 };
 $csrf = $_SESSION['csrf_token'];
-$page_title = 'Saved Cards';
+$page_title = __('Saved Cards');
 
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="payment_providers.php">Payment Providers</a></li>
-    <li class="breadcrumb-item active">Saved Cards</li>
+    <li class="breadcrumb-item"><a href="payment_providers.php"><?= __('Payment Providers') ?></a></li>
+    <li class="breadcrumb-item active"><?= __('Saved Cards') ?></li>
 </ol>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-wallet me-2"></i>Saved Cards</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-wallet me-2"></i><?= __('Saved Cards') ?></h3>
     </div>
     <div class="card-header py-3">
         <form autocomplete="off">
@@ -108,14 +108,14 @@ $page_title = 'Saved Cards';
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search saved cards..." title="Client, card, provider, or the provider's customer or payment method ID">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search saved cards...')) ?>" title="<?= escapeHtml(__('Client, card, provider, or the provider\'s customer or payment method ID')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <?php if ($provider_count > 1 || $provider_filter) { ?>
                     <div class="col-md-3 col-lg-2">
-                        <select class="form-select" name="provider" onchange="this.form.submit()" aria-label="Provider">
-                            <option value="">All providers</option>
+                        <select class="form-select" name="provider" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Provider')) ?>">
+                            <option value=""><?= __('All providers') ?></option>
                             <?php while ($provider = mysqli_fetch_assoc($providers)) { ?>
                                 <option value="<?= intval($provider['payment_provider_id']) ?>" <?= intval($provider['payment_provider_id']) === $provider_filter ? 'selected' : '' ?>><?= escapeHtml($provider['payment_provider_name']) ?></option>
                             <?php } ?>
@@ -123,8 +123,8 @@ $page_title = 'Saved Cards';
                     </div>
                 <?php } ?>
                 <div class="col-md-3 col-lg-3">
-                    <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="Client">
-                        <option value="">All clients</option>
+                    <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Client')) ?>">
+                        <option value=""><?= __('All clients') ?></option>
                         <?php while ($client = mysqli_fetch_assoc($clients)) { ?>
                             <option value="<?= intval($client['client_id']) ?>" <?= intval($client['client_id']) === $client_filter ? 'selected' : '' ?>><?= escapeHtml($client['client_name']) ?></option>
                         <?php } ?>
@@ -133,20 +133,20 @@ $page_title = 'Saved Cards';
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-2">
-            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-wallet me-1"></i>All <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show === 'autopay' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('autopay')) ?>" title="Cards recurring invoices pay with"><i class="fas fa-fw fa-sync-alt me-1"></i>On autopay <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
-            <a class="nav-link <?= $show === 'expired' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('expired')) ?>" title="<?= intval($counts[3]) ? intval($counts[3]) . ' still on autopay - it will be declined' : 'Cards that have run out' ?>"><i class="fas fa-fw fa-calendar-times me-1"></i>Expired <span class="badge rounded-pill ms-1 <?= $show !== 'expired' && intval($counts[3]) ? 'text-bg-danger' : '' ?>"><?= intval($counts[2]) ?></span></a>
+            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-wallet me-1"></i><?= __('All') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show === 'autopay' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('autopay')) ?>" title="<?= escapeHtml(__('Cards recurring invoices pay with')) ?>"><i class="fas fa-fw fa-sync-alt me-1"></i><?= __('On autopay') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show === 'expired' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('expired')) ?>" title="<?= intval($counts[3]) ? escapeHtml(__('%d still on autopay - it will be declined', intval($counts[3]))) : __('Cards that have run out') ?>"><i class="fas fa-fw fa-calendar-times me-1"></i><?= __('Expired') ?> <span class="badge rounded-pill ms-1 <?= $show !== 'expired' && intval($counts[3]) ? 'text-bg-danger' : '' ?>"><?= intval($counts[2]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('client_name', 'Client') ?></th>
-                <th><?= $sort_link('saved_payment_description', 'Card') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('expires', 'Expires') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('autopay', 'Autopay') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('saved_payment_created_at', 'Saved') ?></th>
+                <th class="ps-3"><?= $sort_link('client_name', __('Client')) ?></th>
+                <th><?= $sort_link('saved_payment_description', __('Card')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('expires', __('Expires')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('autopay', __('Autopay')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('saved_payment_created_at', __('Saved')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -159,33 +159,33 @@ $page_title = 'Saved Cards';
                 $uses = $autopay[$saved_id] ?? [];
                 $client_id = intval($row['saved_payment_client_id']);
                 $label = $card['label'] . ($card['exp'] !== '' ? ' (exp ' . $card['exp'] . ')' : '');
-                $confirm = 'It is taken off ' . ($row['payment_provider_name'] ?: 'its provider') . ' too.';
+                $confirm = $row['payment_provider_name'] ? __('It is taken off %s too.', $row['payment_provider_name']) : __('It is taken off its provider too.');
                 if ($uses) {
-                    $confirm .= ' Autopay on ' . implode(', ', array_column($uses, 'reference')) . ' stops - each says so in its history.';
+                    $confirm .= ' ' . __('Autopay on %s stops - each says so in its history.', implode(', ', array_column($uses, 'reference')));
                 }
                 ?>
                 <tr data-saved-payment-id="<?= $saved_id ?>">
                     <td class="ps-3">
                         <?php if ($row['client_name'] !== null) { ?>
                             <a class="fw-semibold text-body" href="/agent/client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($row['client_name']) ?></a>
-                            <?php if ($row['client_archived_at']) { ?><span class="badge text-bg-secondary ms-1">Archived</span><?php } ?>
+                            <?php if ($row['client_archived_at']) { ?><span class="badge text-bg-secondary ms-1"><?= __('Archived') ?></span><?php } ?>
                         <?php } else { ?>
-                            <span class="text-body-secondary">Client #<?= $client_id ?></span>
+                            <span class="text-body-secondary"><?= __('Client #%d', $client_id) ?></span>
                         <?php } ?>
                         <?php if (trim((string) $row['payment_provider_client']) !== '') { ?>
-                            <div class="small text-body-secondary font-monospace" title="Its customer at <?= escapeHtml($row['payment_provider_name']) ?>"><?= escapeHtml($row['payment_provider_client']) ?></div>
+                            <div class="small text-body-secondary font-monospace" title="<?= __('Its customer at %s', escapeHtml($row['payment_provider_name'])) ?>"><?= escapeHtml($row['payment_provider_client']) ?></div>
                         <?php } ?>
                     </td>
                     <td>
                         <div class="text-nowrap"><i class="<?= escapeHtml($card['icon']) ?> fa-fw fa-lg text-secondary me-1"></i><span class="fw-semibold"><?= escapeHtml($card['label']) ?></span></div>
                         <div class="small text-body-secondary">
-                            <?= escapeHtml($row['payment_provider_name'] ?? '') ?><?= intval($row['payment_provider_active'] ?? 0) ? '' : ' <span class="badge text-bg-secondary">Off</span>' ?>
-                            <span class="font-monospace ms-1" title="Its payment method at the provider"><?= escapeHtml($row['saved_payment_provider_method']) ?></span>
+                            <?= escapeHtml($row['payment_provider_name'] ?? '') ?><?= intval($row['payment_provider_active'] ?? 0) ? '' : ' <span class="badge text-bg-secondary">' . __('Off') . '</span>' ?>
+                            <span class="font-monospace ms-1" title="<?= escapeHtml(__('Its payment method at the provider')) ?>"><?= escapeHtml($row['saved_payment_provider_method']) ?></span>
                         </div>
                         <!-- On smaller screens when it runs out comes along under it -->
-                        <?php if ($card['exp'] !== '') { ?><div class="d-md-none small <?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>">Exp <?= escapeHtml($card['exp']) ?><?= $expired ? ' - expired' : '' ?></div><?php } ?>
+                        <?php if ($card['exp'] !== '') { ?><div class="d-md-none small <?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>"><?= __('Exp %s', escapeHtml($card['exp'])) ?><?= $expired ? __(' - expired') : '' ?></div><?php } ?>
                         <?php if ($uses) { ?>
-                            <div class="d-lg-none small <?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>"><i class="fas fa-fw fa-redo-alt me-1"></i>Autopay on <?= escapeHtml(implode(', ', array_column($uses, 'reference'))) ?><?= $expired ? ' - it will be declined' : '' ?></div>
+                            <div class="d-lg-none small <?= $expired ? 'text-danger-emphasis' : 'text-body-secondary' ?>"><i class="fas fa-fw fa-redo-alt me-1"></i><?= __('Autopay on %s', escapeHtml(implode(', ', array_column($uses, 'reference')))) ?><?= $expired ? __(' - it will be declined') : '' ?></div>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap" data-card-expires="<?= $expired ? 'expired' : ($expiring ? 'soon' : 'ok') ?>">
@@ -194,24 +194,24 @@ $page_title = 'Saved Cards';
                         <?php } else { ?>
                             <?= escapeHtml($card['exp']) ?>
                             <?php if ($expired) { ?>
-                                <span class="badge text-bg-danger ms-1">Expired</span>
+                                <span class="badge text-bg-danger ms-1"><?= __('Expired') ?></span>
                             <?php } elseif ($expiring) { ?>
-                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1">Soon</span>
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1"><?= __('Soon') ?></span>
                             <?php } ?>
                         <?php } ?>
                     </td>
                     <td class="d-none d-lg-table-cell small" data-card-autopay="<?= count($uses) ?>">
                         <?php if (!$uses) { ?>
-                            <span class="text-body-secondary">None</span>
+                            <span class="text-body-secondary"><?= __('None') ?></span>
                         <?php } ?>
                         <?php foreach ($uses as $use) { ?>
                             <div class="text-nowrap">
                                 <a class="text-reset" href="/agent/recurring_invoice.php?recurring_invoice_id=<?= $use['id'] ?>"><i class="fas fa-fw fa-redo-alt text-secondary me-1"></i><?= escapeHtml($use['reference']) ?></a>
                                 <span class="text-body-secondary">· <?= escapeHtml(billingMoney($use['amount'], $use['currency'])) ?> <?= escapeHtml($use['frequency']) ?></span>
                                 <?php if (!$use['active']) { ?>
-                                    <span class="badge text-bg-secondary ms-1">Not running</span>
+                                    <span class="badge text-bg-secondary ms-1"><?= __('Not running') ?></span>
                                 <?php } elseif ($expired) { ?>
-                                    <div class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i>Next on <?= escapeHtml(date('M j', strtotime($use['next']))) ?> - it will be declined</div>
+                                    <div class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Next on %s - it will be declined', escapeHtml(formatDate($use['next'], 'date_short'))) ?></div>
                                 <?php } else { ?>
                                     <span class="text-body-secondary">· next <?= escapeHtml(date('M j', strtotime($use['next']))) ?></span>
                                 <?php } ?>
@@ -221,16 +221,16 @@ $page_title = 'Saved Cards';
                     <td class="d-none d-lg-table-cell small text-body-secondary text-nowrap" title="<?= escapeHtml($row['saved_payment_created_at']) ?>"><?= escapeHtml(date('M j, Y', strtotime($row['saved_payment_created_at']))) ?></td>
                     <td class="text-end pe-3">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="?<?= escapeHtml(http_build_query(['client' => $client_id])) ?>">
-                                    <i class="fas fa-fw fa-filter text-secondary me-2"></i>This client's cards
+                                    <i class="fas fa-fw fa-filter text-secondary me-2"></i><?= __('This client\'s cards') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_saved_payment=<?= $saved_id ?>&csrf_token=<?= $csrf ?>"
                                     data-confirm-title="<?= escapeHtml('Remove ' . $label . ($row['client_name'] !== null ? ' from ' . $row['client_name'] : '') . '?') ?>"
-                                    data-confirm-text="<?= escapeHtml($confirm) ?>" data-confirm-button="Remove">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Remove
+                                    data-confirm-text="<?= escapeHtml($confirm) ?>" data-confirm-button="<?= escapeHtml(__('Remove')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Remove') ?>
                                 </a>
                             </div>
                         </div>
@@ -242,9 +242,9 @@ $page_title = 'Saved Cards';
     </div>
     <?php
     $empty_state = [
-        'thing' => 'saved cards',
+        'thing' => __('saved cards'),
         'icon' => 'fa-wallet',
-        'text' => 'The cards clients save to pay by - in the client portal, or added for them - show here, with the recurring invoices that autopay with each.',
+        'text' => __('The cards clients save to pay by - in the client portal, or added for them - show here, with the recurring invoices that autopay with each.'),
         'filtered' => $q !== '' || $provider_filter || $client_filter || $show !== '',
     ];
     ?>

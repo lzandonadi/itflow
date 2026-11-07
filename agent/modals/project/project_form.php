@@ -18,12 +18,12 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
 
 <?php if ($is_new && !$form_client_id && !isset($form['fixed_client'])) { ?>
     <div class="mb-3">
-        <label class="form-label">Client <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
             <select class="form-select select2" name="client_id" id="projectClientSelect" required>
-            <option value="">- Pick a client -</option>
-            <option value="0" data-icon="fas fa-building" data-description="Our own work - no client">Internal</option>
+            <option value=""><?= __('- Pick a client -') ?></option>
+            <option value="0" data-icon="fas fa-building" data-description="Our own work - no client"><?= __('Internal') ?></option>
             <?php
             $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE client_archived_at IS NULL " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
             while ($row = mysqli_fetch_assoc($sql)) { ?>
@@ -37,10 +37,10 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
 <?php } ?>
 
 <div class="mb-3">
-    <label class="form-label">Name <strong class="text-danger">*</strong></label>
+    <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
     <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-project-diagram"></i></span>
-        <input type="text" class="form-control" name="name" placeholder="Onboarding, server refresh, office move..." maxlength="255" value="<?= escapeHtml($form['project_name'] ?? '') ?>" required autofocus>
+        <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Onboarding, server refresh, office move...')) ?>" maxlength="255" value="<?= escapeHtml($form['project_name'] ?? '') ?>" required autofocus>
     </div>
 </div>
 
@@ -55,11 +55,11 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
         GROUP BY project_templates.project_template_id ORDER BY project_template_name ASC");
     if (mysqli_num_rows($sql_templates)) { ?>
         <div class="mb-3">
-            <label class="form-label">Template</label>
+            <label class="form-label"><?= __('Template') ?></label>
             <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-cubes"></i></span>
             <select class="form-select select2" name="project_template_id" id="projectTemplateSelect">
-                <option value="0">None - start empty</option>
+                <option value="0"><?= __('None - start empty') ?></option>
                 <?php while ($row = mysqli_fetch_assoc($sql_templates)) {
                     $ticket_count = intval($row['ticket_count']);
                     $task_count = intval($row['task_count']); ?>
@@ -70,7 +70,7 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
             </div>
             <div class="form-check mt-2" id="projectAssignToManager" hidden>
                 <input class="form-check-input" type="checkbox" name="assign_to_manager" value="1" id="assignToManager" checked>
-                <label class="form-check-label small" for="assignToManager">Assign the template's tickets to the manager</label>
+                <label class="form-check-label small" for="assignToManager"><?= __('Assign the template\'s tickets to the manager') ?></label>
             </div>
         </div>
     <?php }
@@ -78,11 +78,11 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
 
 <div class="row g-3 mb-3">
     <div class="col-md-6">
-        <label class="form-label">Manager</label>
+        <label class="form-label"><?= __('Manager') ?></label>
         <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-user-tie"></i></span>
         <select class="form-select select2" name="project_manager">
-            <option value="0" data-icon="fas fa-user-slash">No manager</option>
+            <option value="0" data-icon="fas fa-user-slash"><?= __('No manager') ?></option>
             <?php
             $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users
                 WHERE user_type = 1 AND ((user_status = 1 AND user_archived_at IS NULL) OR user_id = $form_manager_id)
@@ -95,11 +95,11 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
         </div>
     </div>
     <div class="col-md-6" id="projectContactField" <?= $form_client_id || ($is_new && !isset($form['fixed_client'])) ? '' : 'hidden' ?>>
-        <label class="form-label">Client contact</label>
+        <label class="form-label"><?= __('Client contact') ?></label>
         <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-address-card"></i></span>
         <select class="form-select select2" name="contact_id" id="projectContactSelect" data-selected="<?= $form_contact_id ?>">
-            <option value="0">Nobody</option>
+            <option value="0"><?= __('Nobody') ?></option>
             <?php if ($form_client_id) {
                 $sql = mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_title, contact_photo, contact_primary, contact_technical FROM contacts
                     WHERE contact_client_id = $form_client_id AND (contact_archived_at IS NULL OR contact_id = $form_contact_id)
@@ -111,36 +111,36 @@ $form_manager_id = intval($form['project_manager'] ?? 0);
             } ?>
         </select>
         </div>
-        <div class="form-text">Who signs it off at the client - tickets from a template go to them.</div>
+        <div class="form-text"><?= __('Who signs it off at the client - tickets from a template go to them.') ?></div>
     </div>
 </div>
 
 <div class="row g-3 mb-3">
     <div class="col-md-4">
-        <label class="form-label">Start</label>
+        <label class="form-label"><?= __('Start') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-play"></i></span>
             <input type="date" class="form-control" name="start" id="projectStart" value="<?= escapeHtml($form['project_start'] ?? '') ?>">
         </div>
     </div>
     <div class="col-md-4">
-        <label class="form-label">Due</label>
+        <label class="form-label"><?= __('Due') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-flag-checkered"></i></span>
             <input type="date" class="form-control" name="due_date" id="projectDue" value="<?= escapeHtml($form['project_due'] ?? '') ?>" min="<?= escapeHtml($form['project_start'] ?? '') ?>">
         </div>
     </div>
     <div class="col-md-4">
-        <label class="form-label">Budget</label>
+        <label class="form-label"><?= __('Budget') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-hourglass-half"></i></span>
-            <input type="number" class="form-control" name="budget_hours" min="0" max="999999" step="0.25" inputmode="decimal" placeholder="None" value="<?= floatval($form['project_budget_hours'] ?? 0) > 0 ? escapeHtml(rtrim(rtrim((string) $form['project_budget_hours'], '0'), '.')) : '' ?>">
-            <span class="input-group-text">hours</span>
+            <input type="number" class="form-control" name="budget_hours" min="0" max="999999" step="0.25" inputmode="decimal" placeholder="<?= escapeHtml(__('None')) ?>" value="<?= floatval($form['project_budget_hours'] ?? 0) > 0 ? escapeHtml(rtrim(rtrim((string) $form['project_budget_hours'], '0'), '.')) : '' ?>">
+            <span class="input-group-text"><?= __('hours') ?></span>
         </div>
     </div>
 </div>
 
 <div class="mb-0">
-    <label class="form-label">Scope</label>
-    <textarea class="form-control" name="description" rows="5" placeholder="What is in and out of the work, and what &quot;done&quot; looks like"><?= escapeHtml($form['project_description'] ?? '') ?></textarea>
+    <label class="form-label"><?= __('Scope') ?></label>
+    <textarea class="form-control" name="description" rows="5" placeholder="<?= escapeHtml(__('What is in and out of the work, and what "done" looks like')) ?>"><?= escapeHtml($form['project_description'] ?? '') ?></textarea>
 </div>

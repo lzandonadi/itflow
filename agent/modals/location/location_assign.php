@@ -12,7 +12,7 @@ require_once '../../../includes/modal_header.php';
 $location_id = intval($_GET['id'] ?? 0);
 $location = locationRow($location_id);
 if (!$location) {
-    echo json_encode(['error' => 'That location no longer exists.']);
+    echo json_encode(['error' => __('That location no longer exists.')]);
     exit;
 }
 $client_id = intval($location['location_client_id']);
@@ -23,7 +23,7 @@ $kinds = array_filter(LOCATION_KINDS, function ($k) {
     return lookupUserPermission($k['module']) >= 2;
 });
 if (!$kinds) {
-    echo json_encode(['error' => 'You do not have permission to move things to a location.']);
+    echo json_encode(['error' => __('You do not have permission to move things to a location.')]);
     exit;
 }
 $kind = isset($kinds[$_GET['kind'] ?? '']) ? $_GET['kind'] : array_key_first($kinds);
@@ -58,7 +58,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-dolly me-2"></i>Move to <strong><?= $location_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-dolly me-2"></i><?= __('Move to %s', "<strong>$location_name</strong>") ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-location-assign-form>
@@ -72,7 +72,7 @@ ob_start();
             <nav class="nav nav-pills itflow-asset-pills itflow-link-types mb-3" role="tablist">
                 <?php foreach ($kinds as $kind_key => $k) { ?>
                     <button type="button" class="nav-link <?= $kind_key === $kind ? 'active' : '' ?>" data-bs-toggle="pill" data-bs-target="#locationAssign-<?= $kind_key ?>" data-assign-type="<?= $kind_key ?>" role="tab">
-                        <i class="fas fa-fw <?= $k['icon'] ?> me-1"></i><?= $k['plural'] ?>
+                        <i class="fas fa-fw <?= $k['icon'] ?> me-1"></i><?= locationKindText($kind_key, 'plural') ?>
                     </button>
                 <?php } ?>
             </nav>
@@ -83,12 +83,12 @@ ob_start();
                 $candidates = locationAssignCandidates($kind_key, $client_id, $location_id); ?>
                 <div class="tab-pane fade <?= $kind_key === $kind ? 'show active' : '' ?>" id="locationAssign-<?= $kind_key ?>" role="tabpanel">
                     <?php if ($candidates) { ?>
-                        <label class="form-label">Which <?= strtolower($k['plural']) ?>?</label>
+                        <label class="form-label"><?= locationKindText($kind_key, 'which') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-fw <?= $k['icon'] ?>"></i></span>
-                            <select class="form-select select2" name="ids[]" multiple data-placeholder="Pick one or more <?= strtolower($k['plural']) ?>" <?= $kind_key === $kind ? '' : 'disabled' ?> data-assign-select="<?= $kind_key ?>">
+                            <select class="form-select select2" name="ids[]" multiple data-placeholder="<?= escapeHtml(locationKindText($kind_key, 'pick')) ?>" <?= $kind_key === $kind ? '' : 'disabled' ?> data-assign-select="<?= $kind_key ?>">
                                 <?php foreach ($candidates as $row) {
-                                    $where = $row['current_location'] ? 'At ' . $row['current_location'] : 'No location';
+                                    $where = $row['current_location'] ? __('At %s', $row['current_location']) : __('No location');
                                     $description = implode(' · ', array_filter([$row['detail'], $where]));
                                     if ($kind_key === 'contact') {
                                         $data = selectOptionContact($row['contact_client_id'], $row['name'], $row['contact_photo'], $description, $row['id']);
@@ -101,11 +101,11 @@ ob_start();
                                 <?php } ?>
                             </select>
                         </div>
-                        <div class="form-text"><?= count($candidates) ?> <?= count($candidates) === 1 ? $k['label'] : strtolower($k['plural']) ?> somewhere else or at no location.</div>
+                        <div class="form-text"><?= locationKindText($kind_key, 'elsewhere', count($candidates)) ?></div>
                     <?php } else { ?>
                         <div class="itflow-asset-empty py-4">
                             <i class="fas <?= $k['icon'] ?> fa-2x mb-2"></i>
-                            <div>Every <?= $k['label'] ?> this client has is already here.</div>
+                            <div><?= locationKindText($kind_key, 'all_here') ?></div>
                         </div>
                     <?php } ?>
                 </div>
@@ -114,8 +114,8 @@ ob_start();
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="set_location_records" class="btn btn-primary text-bold"><i class="fas fa-dolly me-2"></i>Move here</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="set_location_records" class="btn btn-primary text-bold"><i class="fas fa-dolly me-2"></i><?= __('Move here') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

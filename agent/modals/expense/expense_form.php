@@ -108,11 +108,11 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
     <?php } ?>
 
     <div class="col-md-7">
-        <label class="form-label">Vendor <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Vendor') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
             <select class="form-select select2" name="vendor" required data-expense-vendor <?= $form_refund ? 'disabled' : '' ?>>
-                <option value="">- Who it was paid to -</option>
+                <option value=""><?= __('- Who it was paid to -') ?></option>
                 <?php foreach ($form_vendors as $vendor_id => $vendor) { ?>
                     <option value="<?= $vendor_id ?>" <?= $form_vendor === $vendor_id ? 'selected' : '' ?><?= selectOptionVendor($vendor['vendor_name'], $vendor['vendor_archived_at'] ? 'Archived' : (string) $vendor['vendor_description']) ?>><?= escapeHtml($vendor['vendor_name']) ?></option>
                 <?php } ?>
@@ -120,14 +120,14 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
             <?php if ($form_refund) { ?>
                 <input type="hidden" name="vendor" value="<?= $form_vendor ?>">
             <?php } else { ?>
-                <a class="btn btn-outline-secondary" title="Add a vendor - opens Vendors in a new tab" href="vendors.php" target="_blank"><i class="fas fa-fw fa-plus"></i></a>
+                <a class="btn btn-outline-secondary" title="<?= escapeHtml(__('Add a vendor - opens Vendors in a new tab')) ?>" href="vendors.php" target="_blank"><i class="fas fa-fw fa-plus"></i></a>
             <?php } ?>
         </div>
-        <div class="form-text" data-expense-filled hidden>Filled in from the last expense with them.</div>
+        <div class="form-text" data-expense-filled hidden><?= __('Filled in from the last expense with them.') ?></div>
     </div>
 
     <div class="col-md-5">
-        <label class="form-label"><?= $form_refund ? 'Amount back' : 'Amount' ?> <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= $form_refund ? __('Amount back') : 'Amount' ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
             <input type="text" class="form-control text-end fw-semibold" inputmode="decimal" pattern="-?[0-9,]*\.?[0-9]{0,2}" name="amount" placeholder="0.00" required
@@ -135,18 +135,18 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
             <span class="input-group-text"><?= escapeHtml($form_currency) ?></span>
         </div>
         <?php if ($form_refund) { ?>
-            <div class="form-text">Saved as money back - a negative expense.</div>
+            <div class="form-text"><?= __('Saved as money back - a negative expense.') ?></div>
         <?php } elseif ($form_edit && floatval($form_row['expense_amount']) < 0) { ?>
-            <div class="form-text">Negative - money back from the vendor.</div>
+            <div class="form-text"><?= __('Negative - money back from the vendor.') ?></div>
         <?php } ?>
     </div>
 
     <div class="col-md-7">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
             <select class="form-select select2" name="category" required data-expense-category>
-                <option value="">- What it was for -</option>
+                <option value=""><?= __('- What it was for -') ?></option>
                 <?= categoryOptionsHtml('Expense', $form_category) ?>
             </select>
             <?= categoryAddButtonHtml('Expense') ?>
@@ -154,7 +154,7 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Date <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Date') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
             <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= escapeHtml($form_date) ?>" required <?= $form_lock ? 'readonly' : '' ?>>
@@ -171,17 +171,17 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
     ?>
 
     <div class="col-md-7">
-        <label class="form-label">Paid from <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Paid from') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
             <select class="form-select select2" name="account" required data-expense-account <?= $form_reimbursed || $form_lock ? 'disabled' : '' ?>>
-                <option value="">- Which account -</option>
+                <option value=""><?= __('- Which account -') ?></option>
                 <?php foreach ($form_accounts as $account_id => $account) { ?>
                     <option value="<?= $account_id ?>" <?= !$form_paid_by && $form_account === $account_id ? 'selected' : '' ?> data-icon="fas fa-piggy-bank"
                         data-description="<?= escapeHtml(billingMoney($account['balance'], $account['account_currency_code'])) ?><?= $account['account_archived_at'] ? ' - archived' : '' ?>"><?= escapeHtml($account['account_name']) ?></option>
                 <?php } ?>
                 <?php if (!$form_refund) { ?>
-                    <option value="personal" <?= $form_paid_by ? 'selected' : '' ?> data-icon="fas fa-hand-holding-usd" data-description="An agent paid it - to pay them back">Paid personally</option>
+                    <option value="personal" <?= $form_paid_by ? 'selected' : '' ?> data-icon="fas fa-hand-holding-usd" data-description="An agent paid it - to pay them back"><?= __('Paid personally') ?></option>
                 <?php } ?>
             </select>
             <?php if ($form_reimbursed) { ?>
@@ -193,11 +193,11 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Paid by</label>
+        <label class="form-label"><?= __('Paid by') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
             <select class="form-select select2" name="payment_method" data-expense-method>
-                <option value="">- How it was paid -</option>
+                <option value=""><?= __('- How it was paid -') ?></option>
                 <?php foreach ($form_methods as $method) { ?>
                     <option value="<?= escapeHtml($method) ?>" <?= $form_method === $method ? 'selected' : '' ?>><?= escapeHtml($method) ?></option>
                 <?php } ?>
@@ -207,11 +207,11 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
 
     <?php if (!$form_refund) { ?>
         <div class="col-md-7" data-expense-payer <?= $form_paid_by ? '' : 'hidden' ?>>
-            <label class="form-label">Paid personally by <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Paid personally by') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-hand-holding-usd"></i></span>
                 <select class="form-select select2" name="paid_by" data-expense-paid-by <?= $form_reimbursed ? 'disabled' : '' ?>>
-                    <option value="">- Who paid it -</option>
+                    <option value=""><?= __('- Who paid it -') ?></option>
                     <?php foreach ($form_payers as $payer_id => $payer_name) { ?>
                         <option value="<?= $payer_id ?>" <?= ($form_paid_by ?: intval($session_user_id)) === $payer_id ? 'selected' : '' ?>><?= escapeHtml($payer_name) ?><?= $payer_id === intval($session_user_id) ? ' (me)' : '' ?></option>
                     <?php } ?>
@@ -222,9 +222,9 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
             </div>
             <div class="form-text">
                 <?php if ($form_reimbursed) { ?>
-                    Paid back on <?= escapeHtml(date('M j, Y', strtotime($form_row['reimbursement_date']))) ?> from <?= escapeHtml($form_row['reimbursed_account_name'] ?: 'an account') ?> - undo that reimbursement to change who paid it.
+                    <?= escapeHtml(__('Paid back on %1$s from %2$s - undo that reimbursement to change who paid it.', formatDate($form_row['reimbursement_date'], 'date'), $form_row['reimbursed_account_name'] ?: __('an account'))) ?>
                 <?php } else { ?>
-                    It counts as spent on its date, and comes out of an account when they are paid back - from To reimburse on the expenses list.
+                    <?= __('It counts as spent on its date, and comes out of an account when they are paid back - from To reimburse on the expenses list.') ?>
                 <?php } ?>
             </div>
         </div>
@@ -232,11 +232,11 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
     <?php } ?>
 
     <div class="col-md-7">
-        <label class="form-label">Client</label>
+        <label class="form-label"><?= __('Client') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
             <select class="form-select select2" name="client_id" data-expense-client <?= $form_billed ? 'disabled' : '' ?>>
-                <option value="0">- Not for a client -</option>
+                <option value="0"><?= __('- Not for a client -') ?></option>
                 <?php foreach ($form_clients as $client) { ?>
                     <option value="<?= intval($client['client_id']) ?>" <?= $form_client === intval($client['client_id']) ? 'selected' : '' ?><?= selectOptionClient($client['client_id'], $client['client_name'], $client['client_abbreviation'] ?? '') ?>><?= escapeHtml($client['client_name']) ?></option>
                 <?php } ?>
@@ -245,14 +245,14 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
                 <input type="hidden" name="client_id" value="<?= $form_client ?>">
             <?php } ?>
         </div>
-        <div class="form-text">A direct cost of theirs - it counts against them in Client Profitability.</div>
+        <div class="form-text"><?= __('A direct cost of theirs - it counts against them in Client Profitability.') ?></div>
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Reference</label>
+        <label class="form-label"><?= __('Reference') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-            <input type="text" class="form-control" name="reference" maxlength="200" placeholder="Their invoice or order number" value="<?= escapeHtml($form_reference) ?>">
+            <input type="text" class="form-control" name="reference" maxlength="200" placeholder="<?= escapeHtml(__('Their invoice or order number')) ?>" value="<?= escapeHtml($form_reference) ?>">
         </div>
     </div>
 
@@ -262,44 +262,44 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
                 <?php if ($form_billed) { ?>
                     <i class="fas fa-check-circle text-success"></i>
                     <div class="flex-grow-1 small">
-                        Billed on <a href="invoice.php?invoice_id=<?= intval($form_row['expense_invoice_id']) ?>"><?= escapeHtml($form_row['invoice_prefix'] . $form_row['invoice_number']) ?></a><?= $form_row['billed_subtotal'] !== null ? ' at ' . escapeHtml(billingMoney($form_row['billed_subtotal'], $form_row['expense_currency_code'])) : '' ?>.
-                        <span class="text-body-secondary">Changing the amount here doesn't change the invoice - take it off the invoice to bill it again.</span>
+                        <?= __('Billed on') ?> <a href="invoice.php?invoice_id=<?= intval($form_row['expense_invoice_id']) ?>"><?= escapeHtml($form_row['invoice_prefix'] . $form_row['invoice_number']) ?></a><?= $form_row['billed_subtotal'] !== null ? ' at ' . escapeHtml(billingMoney($form_row['billed_subtotal'], $form_row['expense_currency_code'])) : '' ?>.
+                        <span class="text-body-secondary"><?= __('Changing the amount here doesn\'t change the invoice - take it off the invoice to bill it again.') ?></span>
                     </div>
                     <input type="hidden" name="billable" value="1">
                     <input type="hidden" name="markup" value="<?= number_format($form_markup, 2, '.', '') ?>">
                 <?php } else { ?>
                     <div class="form-check form-switch mb-0">
-                        <input class="form-check-input" type="checkbox" role="switch" name="billable" value="1" id="<?= $form_id ?>Billable" <?= $form_billable ? 'checked' : '' ?> data-expense-billable>
-                        <label class="form-check-label" for="<?= $form_id ?>Billable">Bill it on to them</label>
+                        <input class="form-check-input" type="checkbox" role="switch" name="billable" value="1" id="<?= $form_id ?>Billable" <?= $form_billable ? 'checked' : '' ?> data-expense-billable><?php /* i18n-ignore - an id */ ?>
+                        <label class="form-check-label" for="<?= $form_id ?>Billable"><?= __('Bill it on to them') ?></label>
                     </div>
                     <div class="input-group input-group-sm" style="max-width: 11rem;" data-expense-billable-only>
                         <span class="input-group-text"><i class="fa fa-fw fa-percent"></i></span>
-                        <input type="text" class="form-control text-end" name="markup" inputmode="decimal" value="<?= rtrim(rtrim(number_format($form_markup, 2, '.', ''), '0'), '.') ?>" aria-label="Markup" data-expense-markup>
-                        <span class="input-group-text">markup</span>
+                        <input type="text" class="form-control text-end" name="markup" inputmode="decimal" value="<?= rtrim(rtrim(number_format($form_markup, 2, '.', ''), '0'), '.') ?>" aria-label="<?= escapeHtml(__('Markup')) ?>" data-expense-markup>
+                        <span class="input-group-text"><?= __('markup') ?></span>
                     </div>
-                    <div class="small text-body-secondary" data-expense-billable-only>Bills <strong data-expense-bills></strong> - it waits in Unbilled Time and on their invoices until it goes on one.</div>
+                    <div class="small text-body-secondary" data-expense-billable-only><?= __('Bills') ?> <strong data-expense-bills></strong> <?= __('- it waits in Unbilled Time and on their invoices until it goes on one.') ?></div>
                 <?php } ?>
             </div>
         </div>
     <?php } ?>
 
     <div class="col-12">
-        <label class="form-label">Description</label>
+        <label class="form-label"><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="3" name="description" placeholder="What it was - 24 port switch for Ravenwood, October M365 licensing"><?= escapeHtml($form_description) ?></textarea>
+            <textarea class="form-control" rows="3" name="description" placeholder="<?= escapeHtml(__('What it was - 24 port switch for Ravenwood, October M365 licensing')) ?>"><?= escapeHtml($form_description) ?></textarea>
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">Receipt</label>
+        <label class="form-label"><?= __('Receipt') ?></label>
         <?php if ($form_receipt) { ?>
             <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded border" data-expense-receipt-current>
                 <i class="fas fa-fw fa-<?= expenseReceiptKind($form_receipt) === 'pdf' ? 'file-pdf text-danger' : 'file-image text-primary' ?>"></i>
                 <a class="text-truncate flex-grow-1" href="expense_receipt.php?expense_id=<?= intval($form_row['expense_id']) ?>&amp;action=view" target="_blank"><?= escapeHtml(expenseReceiptName($form_row)) ?></a>
                 <div class="form-check form-switch mb-0 text-nowrap">
                     <input class="form-check-input" type="checkbox" role="switch" name="receipt_remove" value="1" id="<?= $form_id ?>Remove" data-expense-receipt-remove>
-                    <label class="form-check-label small" for="<?= $form_id ?>Remove">Remove</label>
+                    <label class="form-check-label small" for="<?= $form_id ?>Remove"><?= __('Remove') ?></label>
                 </div>
             </div>
         <?php } ?>
@@ -307,7 +307,7 @@ $form_markup = $form_row && !$form_refund ? floatval($form_row['expense_markup']
             <span class="input-group-text"><i class="fa fa-fw fa-paperclip"></i></span>
             <input type="file" class="form-control" name="file" accept="image/*,application/pdf" data-expense-receipt-file>
         </div>
-        <div class="form-text"><?= $form_receipt ? 'Choose a file to replace it. ' : '' ?>A photo or a PDF - on a phone, take the picture right here.</div>
+        <div class="form-text"><?= $form_receipt ? __('Choose a file to replace it.') . ' ' : '' ?><?= __('A photo or a PDF - on a phone, take the picture right here.') ?></div>
     </div>
 
 </div>

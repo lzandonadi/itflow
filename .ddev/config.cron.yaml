@@ -1,0 +1,12 @@
+# Runs the ITFlow cron dispatcher every minute inside the web container,
+# as in production (see CLAUDE.md > Cron).
+webimage_extra_packages: [cron]
+
+web_extra_daemons:
+  - name: "cron"
+    command: "sudo /usr/sbin/cron -f"
+    directory: /var/www/html
+
+hooks:
+  post-start:
+    - exec: "echo '* * * * * php /var/www/html/cron/cron.php >/dev/null' | crontab -"

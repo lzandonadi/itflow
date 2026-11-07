@@ -33,7 +33,7 @@ if (isset(starterContentPacks()[$pack]) && in_array($pack, starterPreviewPacks()
 
 if (!$row) {
     http_response_code(404);
-    echo json_encode(['error' => 'There is no such starter content.']);
+    echo json_encode(['error' => __('There is no such starter content.')]);
     exit;
 }
 

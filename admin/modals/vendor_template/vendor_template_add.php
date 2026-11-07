@@ -37,7 +37,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-building me-2"></i>New Vendor Template</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-building me-2"></i><?= __('New Vendor Template') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="/admin/post.php" method="post" autocomplete="off">
@@ -47,14 +47,14 @@ ob_start();
         <?php if ($from_vendor) { ?>
             <input type="hidden" name="from_vendor" value="<?= intval($from_vendor['vendor_id']) ?>">
             <div class="alert alert-info small py-2" data-from-vendor>
-                <i class="fas fa-fw fa-info-circle me-1"></i>Starting from <strong><?= escapeHtml($from_vendor['vendor_name']) ?></strong><?= $from_vendor['client_name'] !== null ? ' for ' . escapeHtml($from_vendor['client_name']) : '' ?> - its account number, PIN and account manager stay its own. It is linked to the new template.
+                <i class="fas fa-fw fa-info-circle me-1"></i><?= __('Starting from') ?> <strong><?= escapeHtml($from_vendor['vendor_name']) ?></strong><?= $from_vendor['client_name'] !== null ? ' for ' . escapeHtml($from_vendor['client_name']) : '' ?> - its account number, PIN and account manager stay its own. It is linked to the new template.
             </div>
         <?php } ?>
         <?php require __DIR__ . '/vendor_template_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_vendor_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create Vendor Template</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_vendor_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create Vendor Template') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

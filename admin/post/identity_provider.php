@@ -22,9 +22,9 @@ if (isset($_POST['edit_identity_provider'])) {
 
     $errors = [];
     if ($client_id !== '' && !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $client_id)) {
-        $errors['config_azure_client_id'] = 'The Application (client) ID - 32 letters and numbers in five groups, as e721e3b6-01d6-50e8-7f22-c84d951a52e7.';
+        $errors['config_azure_client_id'] = __('The Application (client) ID - 32 letters and numbers in five groups, as e721e3b6-01d6-50e8-7f22-c84d951a52e7.');
     } elseif ($client_id !== '' && $after['config_azure_client_secret'] === '') {
-        $errors['config_azure_client_secret'] = 'And a secret for it, from Certificates & secrets.';
+        $errors['config_azure_client_secret'] = __('And a secret for it, from Certificates & secrets.');
     }
     if ($errors) {
         settingsRefuse('identity', $errors);

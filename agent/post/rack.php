@@ -24,7 +24,7 @@ if (isset($_POST['add_rack']) || isset($_POST['edit_rack'])) {
         $sql = mysqli_query($mysqli, "SELECT rack_client_id, rack_photo, rack_photo_rear FROM racks WHERE rack_id = $rack_id");
         $rack_row = mysqli_fetch_assoc($sql);
         if (!$rack_row) {
-            flashAlert("That rack no longer exists", 'error');
+            flashAlert(__('That rack no longer exists'), 'error');
             redirect();
         }
         $client_id = intval($rack_row['rack_client_id']);
@@ -51,12 +51,12 @@ if (isset($_POST['add_rack']) || isset($_POST['edit_rack'])) {
     $notes = escapeSql($_POST['notes'] ?? '');
 
     if ($name === '') {
-        flashAlert("A rack needs a name", 'error');
+        flashAlert(__('A rack needs a name'), 'error');
         redirect();
     }
 
     if ($units < 1 || $units > 70) {
-        flashAlert("A rack is between 1 and 70 units tall", 'error');
+        flashAlert(__('A rack is between 1 and 70 units tall'), 'error');
         redirect();
     }
 
@@ -73,7 +73,7 @@ if (isset($_POST['add_rack']) || isset($_POST['edit_rack'])) {
             ORDER BY unit_end_number DESC LIMIT 1");
         if ($row = mysqli_fetch_assoc($sql)) {
             $blocking_name = rackUnitName($row['asset_name'], $row['unit_device'], $row['unit_type']);
-            flashAlert("Can't shrink the rack to {$units}U - <strong>" . strip_tags($blocking_name) . "</strong> is mounted up to U" . intval($row['unit_end_number']) . ". Move or remove it first.", 'error');
+            flashAlert(__('Can\'t shrink the rack to %1$sU - <strong>%2$s</strong> is mounted up to U%3$s. Move or remove it first.', $units, strip_tags($blocking_name), intval($row['unit_end_number'])), 'error');
             redirect();
         }
 
@@ -99,12 +99,12 @@ if (isset($_POST['add_rack']) || isset($_POST['edit_rack'])) {
 
     if ($is_edit) {
         logAudit("Rack", "Edit", "$session_name edited rack $name", $client_id, $rack_id);
-        flashAlert("Rack <strong>$name_display</strong> saved");
+        flashAlert(__('Rack <strong>%s</strong> saved', $name_display));
         redirect();
     }
 
     logAudit("Rack", "Create", "$session_name created rack $name", $client_id, $rack_id);
-    flashAlert("Rack <strong>$name_display</strong> created - now add what's in it");
+    flashAlert(__('Rack <strong>%s</strong> created - now add what\'s in it', $name_display));
     redirect("rack.php?client_id=$client_id&rack_id=$rack_id");
 
 }
@@ -121,7 +121,7 @@ if (isset($_GET['archive_rack']) || isset($_GET['restore_rack'])) {
     $sql = mysqli_query($mysqli, "SELECT rack_name, rack_client_id FROM racks WHERE rack_id = $rack_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert("That rack no longer exists", 'error');
+        flashAlert(__('That rack no longer exists'), 'error');
         redirect();
     }
     $rack_name = escapeSql($row['rack_name']);
@@ -134,11 +134,11 @@ if (isset($_GET['archive_rack']) || isset($_GET['restore_rack'])) {
     if ($is_archive) {
         mysqli_query($mysqli, "UPDATE racks SET rack_archived_at = NOW() WHERE rack_id = $rack_id");
         logAudit("Rack", "Archive", "$session_name archived rack $rack_name", $client_id, $rack_id);
-        flashAlert("Rack <strong>$rack_name_display</strong> archived", 'error');
+        flashAlert(__('Rack <strong>%s</strong> archived', $rack_name_display), 'error');
     } else {
         mysqli_query($mysqli, "UPDATE racks SET rack_archived_at = NULL WHERE rack_id = $rack_id");
         logAudit("Rack", "Restore", "$session_name restored rack $rack_name", $client_id, $rack_id);
-        flashAlert("Rack <strong>$rack_name_display</strong> restored");
+        flashAlert(__('Rack <strong>%s</strong> restored', $rack_name_display));
     }
 
     redirect();
@@ -156,7 +156,7 @@ if (isset($_GET['delete_rack'])) {
     $sql = mysqli_query($mysqli, "SELECT rack_name, rack_client_id, rack_photo, rack_photo_rear FROM racks WHERE rack_id = $rack_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert("That rack no longer exists", 'error');
+        flashAlert(__('That rack no longer exists'), 'error');
         redirect();
     }
     $rack_name = escapeSql($row['rack_name']);
@@ -173,7 +173,7 @@ if (isset($_GET['delete_rack'])) {
 
     logAudit("Rack", "Delete", "$session_name deleted rack $rack_name", $client_id);
 
-    flashAlert("Rack <strong>$rack_name_display</strong> deleted", 'error');
+    flashAlert(__('Rack <strong>%s</strong> deleted', $rack_name_display), 'error');
 
     // The rack page this may have come from is gone - land on the list
     redirect("racks.php?client_id=$client_id");
@@ -195,7 +195,7 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
         $sql = mysqli_query($mysqli, "SELECT unit_rack_id FROM rack_units WHERE unit_id = $unit_id");
         $unit_row = mysqli_fetch_assoc($sql);
         if (!$unit_row) {
-            flashAlert("That item is no longer in the rack", 'error');
+            flashAlert(__('That item is no longer in the rack'), 'error');
             redirect();
         }
         $rack_id = intval($unit_row['unit_rack_id']);
@@ -207,7 +207,7 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
     $sql = mysqli_query($mysqli, "SELECT rack_name, rack_client_id, rack_units FROM racks WHERE rack_id = $rack_id");
     $rack_row = mysqli_fetch_assoc($sql);
     if (!$rack_row) {
-        flashAlert("That rack no longer exists", 'error');
+        flashAlert(__('That rack no longer exists'), 'error');
         redirect();
     }
     $rack_name = escapeSql($rack_row['rack_name']);
@@ -230,7 +230,7 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
     $notes = escapeSql($_POST['notes'] ?? '');
 
     if ($start < 1 || $end > $rack_units) {
-        flashAlert("That doesn't fit - this rack runs from U1 to U$rack_units", 'error');
+        flashAlert(__('That doesn\'t fit - this rack runs from U1 to U%s', $rack_units), 'error');
         redirect();
     }
 
@@ -240,7 +240,7 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
         $sql = mysqli_query($mysqli, "SELECT asset_name FROM assets WHERE asset_id = $asset_id AND asset_client_id = $client_id");
         $asset_row = mysqli_fetch_assoc($sql);
         if (!$asset_row) {
-            flashAlert("That asset doesn't belong to this client", 'error');
+            flashAlert(__('That asset doesn\'t belong to this client'), 'error');
             redirect();
         }
         $asset_name = $asset_row['asset_name'];
@@ -249,17 +249,17 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
             LEFT JOIN racks ON rack_id = unit_rack_id
             WHERE unit_asset_id = $asset_id AND unit_id != $unit_id LIMIT 1");
         if ($row = mysqli_fetch_assoc($sql)) {
-            flashAlert("<strong>" . strip_tags($asset_name) . "</strong> is already racked in " . strip_tags($row['rack_name']) . " at " . html_entity_decode(rackPositionLabel($row['unit_start_number'], $row['unit_end_number'])), 'error');
+            flashAlert(__('<strong>%1$s</strong> is already racked in %2$s at %3$s', strip_tags($asset_name), strip_tags($row['rack_name']), html_entity_decode(rackPositionLabel($row['unit_start_number'], $row['unit_end_number']))), 'error');
             redirect();
         }
     } elseif ($label === '') {
-        flashAlert("Pick an asset or give the item a name", 'error');
+        flashAlert(__('Pick an asset or give the item a name'), 'error');
         redirect();
     }
 
     $conflict = rackUnitConflict($rack_id, $start, $end, $face, $full_depth, $unit_id);
     if ($conflict) {
-        flashAlert(html_entity_decode(rackPositionLabel($start, $end)) . " on the $face is taken by <strong>" . strip_tags($conflict['name']) . "</strong> (" . html_entity_decode(rackPositionLabel($conflict['start'], $conflict['end'])) . ")", 'error');
+        flashAlert(__('%1$s on the %2$s is taken by <strong>%3$s</strong> (%4$s)', html_entity_decode(rackPositionLabel($start, $end)), $face, strip_tags($conflict['name']), html_entity_decode(rackPositionLabel($conflict['start'], $conflict['end']))), 'error');
         redirect();
     }
 
@@ -279,11 +279,11 @@ if (isset($_POST['add_rack_unit']) || isset($_POST['edit_rack_unit'])) {
     if ($is_edit) {
         mysqli_query($mysqli, "UPDATE rack_units SET $set WHERE unit_id = $unit_id");
         logAudit("Rack", "Edit", "$session_name updated $item_name_sql at $position ($face) in rack $rack_name", $client_id, $rack_id);
-        flashAlert("<strong>$item_name_display</strong> saved at $position");
+        flashAlert(__('<strong>%1$s</strong> saved at %2$s', $item_name_display, $position));
     } else {
         mysqli_query($mysqli, "INSERT INTO rack_units SET $set, unit_rack_id = $rack_id");
         logAudit("Rack", "Edit", "$session_name added $item_name_sql at $position ($face) to rack $rack_name", $client_id, $rack_id);
-        flashAlert("<strong>$item_name_display</strong> added at $position");
+        flashAlert(__('<strong>%1$s</strong> added at %2$s', $item_name_display, $position));
     }
 
     redirect();
@@ -304,7 +304,7 @@ if (isset($_GET['remove_rack_unit'])) {
         WHERE unit_id = $unit_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
-        flashAlert("That item is no longer in the rack", 'error');
+        flashAlert(__('That item is no longer in the rack'), 'error');
         redirect();
     }
     $rack_name = escapeSql($row['rack_name']);
@@ -318,7 +318,7 @@ if (isset($_GET['remove_rack_unit'])) {
 
     logAudit("Rack", "Edit", "$session_name removed " . escapeSql($item_name) . " from rack $rack_name", $client_id, $rack_id);
 
-    flashAlert("<strong>" . strip_tags($item_name) . "</strong> removed from the rack", 'error');
+    flashAlert(__('<strong>%s</strong> removed from the rack', strip_tags($item_name)), 'error');
 
     redirect();
 

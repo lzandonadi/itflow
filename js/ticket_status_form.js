@@ -43,7 +43,7 @@
         const swatches = form.querySelectorAll('[data-ticket-status-swatch]');
 
         function draw() {
-            badge.textContent = name.value.trim() || 'New status';
+            badge.textContent = name.value.trim() || __('New status');
             badge.style.setProperty('--itflow-status-bg', color.value);
             badge.style.setProperty('--itflow-status-text', textColor(color.value));
         }

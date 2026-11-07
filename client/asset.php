@@ -13,7 +13,7 @@ header("Content-Security-Policy: default-src 'self'");
 require_once "includes/inc_all.php";
 
 $can_it = $config_module_enable_itdoc && contactCan('itdoc');
-$back = $can_it ? ['assets.php', 'Devices'] : ['index.php', 'Home'];
+$back = $can_it ? ['assets.php', __('Devices')] : ['index.php', __('Home')];
 
 $asset_id = intval($_GET['id'] ?? 0);
 $asset = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_description, asset_type, asset_make, asset_model, asset_serial, asset_os,
@@ -26,7 +26,7 @@ $asset = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_id, asset_name, 
 if (!$asset) { ?>
     <a class="itflow-portal-back" href="<?= $back[0] ?>"><i class="fas fa-chevron-left"></i><?= $back[1] ?></a>
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => "That device isn't here", 'text' => 'It may have been retired, or it is not one you can see.', 'icon' => 'fa-desktop', 'filtered' => false,
+        <?= emptyStateHtml(['title' => __('That device isn\'t here'), 'text' => __('It may have been retired, or it is not one you can see.'), 'icon' => 'fa-desktop', 'filtered' => false,
             'actions' => [['label' => $back[1], 'href' => $back[0], 'icon' => 'fa-arrow-left']]]) ?>
     </section>
     <?php
@@ -47,15 +47,15 @@ $tickets = mysqli_query($mysqli, "SELECT " . portalTicketColumnsSql() . " FROM t
     ORDER BY COALESCE(tickets.ticket_updated_at, tickets.ticket_created_at) DESC LIMIT 10");
 
 $facts = array_filter([
-    'Kind' => escapeHtml($asset['asset_type']),
-    'Make and model' => escapeHtml($what),
-    'Serial number' => $asset['asset_serial'] !== '' && $asset['asset_serial'] !== null ? '<span class="font-monospace">' . escapeHtml($asset['asset_serial']) . '</span>' : '',
-    'Operating system' => escapeHtml($asset['asset_os']),
-    'Used by' => !empty($asset['contact_name']) ? escapeHtml($asset['contact_name']) . (intval($asset['asset_contact_id']) === $session_contact_id ? ' (you)' : '') : '',
-    'Location' => escapeHtml($asset['location_name'] ?? ''),
-    'Purchased' => !empty($asset['asset_purchase_date']) ? escapeHtml(date('M j, Y', strtotime($asset['asset_purchase_date']))) . (assetAge($asset['asset_purchase_date']) !== '' ? ' <span class="text-body-secondary">(' . escapeHtml(assetAge($asset['asset_purchase_date'])) . ')</span>' : '') : '',
-    'Warranty' => $warranty ? portalStateBadge(['label' => $warranty['text'], 'icon' => 'fa-shield-alt', 'class' => ['danger' => 'itflow-portal-state-late', 'warning' => 'itflow-portal-state-you', 'success' => 'itflow-portal-state-resolved'][$warranty['tone']]]) : '',
-    'Status' => escapeHtml($asset['asset_status']),
+    __('Kind') => escapeHtml(assetTypeLabel($asset['asset_type'])),
+    __('Make and model') => escapeHtml($what),
+    __('Serial number') => $asset['asset_serial'] !== '' && $asset['asset_serial'] !== null ? '<span class="font-monospace">' . escapeHtml($asset['asset_serial']) . '</span>' : '',
+    __('Operating system') => escapeHtml($asset['asset_os']),
+    __('Used by') => !empty($asset['contact_name']) ? escapeHtml($asset['contact_name']) . (intval($asset['asset_contact_id']) === $session_contact_id ? ' ' . __('(you)') : '') : '',
+    __('Location') => escapeHtml($asset['location_name'] ?? ''),
+    __('Purchased') => !empty($asset['asset_purchase_date']) ? escapeHtml(formatDate($asset['asset_purchase_date'], 'date')) . (assetAge($asset['asset_purchase_date']) !== '' ? ' <span class="text-body-secondary">(' . escapeHtml(assetAge($asset['asset_purchase_date'])) . ')</span>' : '') : '',
+    __('Warranty') => $warranty ? portalStateBadge(['label' => $warranty['text'], 'icon' => 'fa-shield-alt', 'class' => ['danger' => 'itflow-portal-state-late', 'warning' => 'itflow-portal-state-you', 'success' => 'itflow-portal-state-resolved'][$warranty['tone']]]) : '',
+    __('Status') => escapeHtml($asset['asset_status']),
 ], function ($value) {
     return trim((string) $value) !== '';
 });
@@ -68,14 +68,14 @@ $facts = array_filter([
         <?= portalTile('fa-' . getAssetIcon($asset['asset_type']), 'lg') ?>
         <div class="min-w-0">
             <h1 class="text-truncate"><?= escapeHtml($asset['asset_name']) ?></h1>
-            <p><?= escapeHtml(implode(' · ', array_filter([$asset['asset_type'], $what]))) ?></p>
+            <p><?= escapeHtml(implode(' · ', array_filter([assetTypeLabel($asset['asset_type']), $what]))) ?></p>
         </div>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php if ($link) { ?>
-            <a class="btn btn-outline-secondary" href="<?= $link ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-2"></i>Open</a>
+            <a class="btn btn-outline-secondary" href="<?= $link ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-2"></i><?= __('Open') ?></a>
         <?php } ?>
-        <a class="btn btn-primary" href="ticket_add.php?asset=<?= $asset_id ?>"><i class="fas fa-life-ring me-2"></i>Report a problem</a>
+        <a class="btn btn-primary" href="ticket_add.php?asset=<?= $asset_id ?>"><i class="fas fa-life-ring me-2"></i><?= __('Report a problem') ?></a>
     </div>
 </div>
 
@@ -83,7 +83,7 @@ $facts = array_filter([
     <div class="col-lg-7">
         <section class="itflow-portal-panel">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-info-circle"></i>Details</h2>
+                <h2><i class="fas fa-info-circle"></i><?= __('Details') ?></h2>
             </div>
             <div class="itflow-portal-panel-body">
                 <?php if (trim((string) $asset['asset_description']) !== '') { ?>
@@ -101,10 +101,10 @@ $facts = array_filter([
     <div class="col-lg-5">
         <section class="itflow-portal-panel mb-4">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-life-ring"></i>Open tickets about it</h2>
+                <h2><i class="fas fa-life-ring"></i><?= __('Open tickets about it') ?></h2>
             </div>
             <?php if (!mysqli_num_rows($tickets)) { ?>
-                <?= emptyStateHtml(['title' => 'Nothing open', 'text' => 'Something wrong with it? Report a problem and we will pick it up.', 'icon' => 'fa-check', 'filtered' => false]) ?>
+                <?= emptyStateHtml(['title' => __('Nothing open'), 'text' => __('Something wrong with it? Report a problem and we will pick it up.'), 'icon' => 'fa-check', 'filtered' => false]) ?>
             <?php } else { ?>
                 <ul class="itflow-portal-list">
                     <?php while ($row = mysqli_fetch_assoc($tickets)) { ?>
@@ -125,8 +125,8 @@ $facts = array_filter([
         <?php if ($licenses) { ?>
             <section class="itflow-portal-panel">
                 <div class="itflow-portal-panel-head">
-                    <h2><i class="fas fa-cube"></i>Licenses on it</h2>
-                    <a href="licenses.php">All licenses</a>
+                    <h2><i class="fas fa-cube"></i><?= __('Licenses on it') ?></h2>
+                    <a href="licenses.php"><?= __('All licenses') ?></a>
                 </div>
                 <ul class="itflow-portal-list">
                     <?php foreach ($licenses as $license) {

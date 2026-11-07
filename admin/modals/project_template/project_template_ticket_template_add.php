@@ -10,7 +10,7 @@ require_once '../../includes/modal_header.php';
 $project_template_id = intval($_GET['project_template_id'] ?? 0);
 $name = getFieldById('project_templates', $project_template_id, 'project_template_name');
 if ($name === null || $name === '') {
-    echo json_encode(['error' => 'That project template no longer exists.']);
+    echo json_encode(['error' => __('That project template no longer exists.')]);
     exit;
 }
 
@@ -26,7 +26,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-life-ring me-2"></i>Add ticket templates <small class="ms-1 opacity-75"><?= escapeHtml($name) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-life-ring me-2"></i><?= __('Add ticket templates') ?> <small class="ms-1 opacity-75"><?= escapeHtml($name) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -35,23 +35,23 @@ ob_start();
 
     <div class="modal-body">
         <?php if (mysqli_num_rows($sql)) { ?>
-            <label class="form-label">Ticket templates <strong class="text-danger">*</strong></label>
-            <select class="form-select select2" name="ticket_template_ids[]" multiple required data-placeholder="Pick ticket templates...">
+            <label class="form-label"><?= __('Ticket templates') ?> <strong class="text-danger">*</strong></label>
+            <select class="form-select select2" name="ticket_template_ids[]" multiple required data-placeholder="<?= escapeHtml(__('Pick ticket templates...')) ?>">
                 <?php while ($row = mysqli_fetch_assoc($sql)) {
                     $task_count = intval($row['task_count']); ?>
                     <option value="<?= intval($row['ticket_template_id']) ?>" data-icon="fas fa-life-ring"
-                        data-description="<?= escapeHtml(trim(($task_count ? "$task_count task" . ($task_count === 1 ? '' : 's') : 'No tasks') . ($row['ticket_template_subject'] ? ' - ' . $row['ticket_template_subject'] : ''))) ?>"><?= escapeHtml($row['ticket_template_name']) ?></option>
+                        data-description="<?= escapeHtml(trim(($task_count ? "$task_count task" . ($task_count === 1 ? '' : 's') : __('No tasks')) . ($row['ticket_template_subject'] ? ' - ' . $row['ticket_template_subject'] : ''))) ?>"><?= escapeHtml($row['ticket_template_name']) ?></option>
                 <?php } ?>
             </select>
-            <div class="form-text">They go at the end, in the order picked - drag them about on the template afterwards.</div>
+            <div class="form-text"><?= __('They go at the end, in the order picked - drag them about on the template afterwards.') ?></div>
         <?php } else { ?>
-            <div class="text-body-secondary">Every ticket template is in it already. Make more under <a href="ticket_templates.php">Ticket Templates</a>.</div>
+            <div class="text-body-secondary"><?= __('Every ticket template is in it already. Make more under') ?> <a href="ticket_templates.php"><?= __('Ticket Templates') ?></a>.</div>
         <?php } ?>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="add_ticket_template_to_project_template" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Add</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_ticket_template_to_project_template" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Add') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

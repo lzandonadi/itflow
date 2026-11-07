@@ -23,11 +23,11 @@ $existing_tasks = $existing_tasks ?? [];
 <input type="hidden" name="tasks_submitted" value="1">
 
 <div class="mb-3">
-    <label>Tasks</label>
+    <label><?= __('Tasks') ?></label>
 
     <div class="row g-2 mb-1 text-muted small">
-        <div class="col-7">Task</div>
-        <div class="col-3">Estimate (mins)</div>
+        <div class="col-7"><?= __('Task') ?></div>
+        <div class="col-3"><?= __('Estimate (mins)') ?></div>
         <div class="col-2"></div>
     </div>
 
@@ -35,19 +35,19 @@ $existing_tasks = $existing_tasks ?? [];
         <?php foreach ($existing_tasks as $existing_task) { ?>
         <div class="row g-2 mb-2 ticket-task-row">
             <div class="col-7">
-                <input type="text" class="form-control" name="tasks[]" placeholder="Task name" maxlength="255" value="<?= escapeHtml($existing_task['name']) ?>">
+                <input type="text" class="form-control" name="tasks[]" placeholder="<?= escapeHtml(__('Task name')) ?>" maxlength="255" value="<?= escapeHtml($existing_task['name']) ?>">
             </div>
             <div class="col-3">
-                <input type="number" class="form-control" name="task_estimates[]" placeholder="Mins" min="0" value="<?= intval($existing_task['estimate']) ?: '' ?>">
+                <input type="number" class="form-control" name="task_estimates[]" placeholder="<?= escapeHtml(__('Mins')) ?>" min="0" value="<?= intval($existing_task['estimate']) ?: '' ?>">
             </div>
             <div class="col-2">
-                <button type="button" class="btn btn-secondary w-100 ticket-task-remove" title="Remove task"><i class="fa fa-fw fa-trash"></i></button>
+                <button type="button" class="btn btn-secondary w-100 ticket-task-remove" title="<?= escapeHtml(__('Remove task')) ?>"><i class="fa fa-fw fa-trash"></i></button>
             </div>
         </div>
         <?php } ?>
     </div>
 
-    <button type="button" class="btn btn-secondary" id="ticketTaskAdd"><i class="fas fa-plus me-2"></i>Add Task</button>
+    <button type="button" class="btn btn-secondary" id="ticketTaskAdd"><i class="fas fa-plus me-2"></i><?= __('Add Task') ?></button>
 
-    <small class="form-text text-muted">Leave the estimate blank if you don't track one. Blank task names are ignored.</small>
+    <small class="form-text text-muted"><?= __('Leave the estimate blank if you don\'t track one. Blank task names are ignored.') ?></small>
 </div>

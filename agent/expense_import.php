@@ -42,13 +42,13 @@ $money = function ($amount) use ($currency) {
     return escapeHtml(billingMoney($amount, $currency));
 };
 
-$steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review'];
+$steps = ['upload' => __('Statement'), 'columns' => __('Columns'), 'review' => __('Review')];
 
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="expenses.php">Expenses</a></li>
-    <li class="breadcrumb-item active">Import Statement</li>
+    <li class="breadcrumb-item"><a href="expenses.php"><?= __('Expenses') ?></a></li>
+    <li class="breadcrumb-item active"><?= __('Import Statement') ?></li>
 </ol>
 
 <!-- Where it is up to -->
@@ -62,8 +62,8 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
     <?php } ?>
     <?php if ($import) { ?>
         <span class="ms-auto small text-body-secondary text-truncate">
-            <i class="fas fa-file-csv me-1"></i><?= escapeHtml($import['file_name']) ?> &middot; <?= escapeHtml($account['account_name'] ?? 'an account since deleted') ?>
-            <a class="ms-2 confirm-link" href="post.php?expense_import_discard&amp;csrf_token=<?= $csrf ?>" data-confirm-text="The statement you started is dropped - nothing from it has been imported.">Start over</a>
+            <i class="fas fa-file-csv me-1"></i><?= escapeHtml($import['file_name']) ?> &middot; <?= escapeHtml($account['account_name'] ?? __('an account since deleted')) ?>
+            <a class="ms-2 confirm-link" href="post.php?expense_import_discard&amp;csrf_token=<?= $csrf ?>" data-confirm-text="<?= escapeHtml(__('The statement you started is dropped - nothing from it has been imported.')) ?>"><?= __('Start over') ?></a>
         </span>
     <?php } ?>
 </div>
@@ -73,8 +73,8 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
     <?php if ($import) { ?>
         <div class="alert alert-info d-flex flex-wrap align-items-center gap-2">
             <i class="fas fa-file-csv"></i>
-            <span class="me-auto"><?= escapeHtml($import['file_name']) ?> is part way through - nothing from it is imported yet.</span>
-            <a class="btn btn-sm btn-primary" href="expense_import.php?step=<?= $import['map'] ? 'review' : 'columns' ?>">Carry on with it</a>
+            <span class="me-auto"><?= escapeHtml(__('%s is part way through - nothing from it is imported yet.', $import['file_name'])) ?></span>
+            <a class="btn btn-sm btn-primary" href="expense_import.php?step=<?= $import['map'] ? 'review' : 'columns' ?>"><?= __('Carry on with it') ?></a>
         </div>
     <?php } ?>
 
@@ -82,18 +82,18 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-header bg-dark py-2">
-                    <h3 class="card-title mt-2"><i class="fas fa-fw fa-file-import me-2"></i>Import Statement</h3>
+                    <h3 class="card-title mt-2"><i class="fas fa-fw fa-file-import me-2"></i><?= __('Import Statement') ?></h3>
                 </div>
                 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-7">
-                                <label class="form-label">It is the statement of <strong class="text-danger">*</strong></label>
+                                <label class="form-label"><?= __('It is the statement of') ?> <strong class="text-danger">*</strong></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
                                     <select class="form-select select2" name="account" required>
-                                        <option value="">- Which account or card -</option>
+                                        <option value=""><?= __('- Which account or card -') ?></option>
                                         <?php foreach ($accounts as $account_id => $row) { ?>
                                             <option value="<?= $account_id ?>" <?= $account_id === intval($config_default_expense_account) ? 'selected' : '' ?> data-icon="fas fa-piggy-bank"
                                                 data-description="<?= escapeHtml(billingMoney($row['balance'], $row['account_currency_code'])) ?>"><?= escapeHtml($row['account_name']) ?></option>
@@ -102,11 +102,11 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <label class="form-label">Paid by</label>
+                                <label class="form-label"><?= __('Paid by') ?></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
                                     <select class="form-select select2" name="payment_method">
-                                        <option value="">- How they were paid -</option>
+                                        <option value=""><?= __('- How they were paid -') ?></option>
                                         <?php foreach ($methods as $method) { ?>
                                             <option value="<?= escapeHtml($method) ?>" <?= $method === (string) $config_default_expense_payment_method ? 'selected' : '' ?>><?= escapeHtml($method) ?></option>
                                         <?php } ?>
@@ -114,18 +114,18 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
                                 </div>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Statement <strong class="text-danger">*</strong></label>
+                                <label class="form-label"><?= __('Statement') ?> <strong class="text-danger">*</strong></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-fw fa-file-csv"></i></span>
                                     <input type="file" class="form-control" name="file" accept=".csv,.txt,.tsv,text/csv" required>
                                 </div>
-                                <div class="form-text">The CSV your bank or card's website exports - often under Download, Export or Activity. Up to <?= EXPENSE_IMPORT_MAX_LINES ?> lines.</div>
+                                <div class="form-text"><?= escapeHtml(__("The CSV your bank or card's website exports - often under Download, Export or Activity. Up to %d lines.", EXPENSE_IMPORT_MAX_LINES)) ?></div>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <button type="submit" name="expense_import_upload" class="btn btn-primary text-bold"><i class="fas fa-upload me-2"></i>Read Statement</button>
-                        <a class="btn btn-light ms-1" href="expenses.php"><i class="fas fa-times me-2"></i>Cancel</a>
+                        <button type="submit" name="expense_import_upload" class="btn btn-primary text-bold"><i class="fas fa-upload me-2"></i><?= __('Read Statement') ?></button>
+                        <a class="btn btn-light ms-1" href="expenses.php"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></a>
                     </div>
                 </form>
             </div>
@@ -133,18 +133,18 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-body small">
-                    <h3 class="h6 fw-semibold"><i class="fas fa-fw fa-info-circle text-secondary me-1"></i>How it goes</h3>
+                    <h3 class="h6 fw-semibold"><i class="fas fa-fw fa-info-circle text-secondary me-1"></i><?= __('How it goes') ?></h3>
                     <ul class="ps-3 mb-3">
-                        <li>The columns are worked out for you - check them once, and the next statement from the same account goes straight to the review.</li>
-                        <li>Each line is matched to a vendor: what you picked for that merchant last time, or one of your vendors whose name is in it. A new vendor can be made from the line's text.</li>
-                        <li>Lines brought in before, and ones with the same amount as an expense entered by hand within <?= EXPENSE_IMPORT_DUPLICATE_DAYS ?> days, are left out unless you tick them.</li>
-                        <li>Payments to the card and other money in are left out unless you tick them - then they come in as money back.</li>
-                        <li>Nothing is imported until you press Import on the review.</li>
+                        <li><?= __('The columns are worked out for you - check them once, and the next statement from the same account goes straight to the review.') ?></li>
+                        <li><?= __('Each line is matched to a vendor: what you picked for that merchant last time, or one of your vendors whose name is in it. A new vendor can be made from the line\'s text.') ?></li>
+                        <li><?= escapeHtml(__('Lines brought in before, and ones with the same amount as an expense entered by hand within %d days, are left out unless you tick them.', EXPENSE_IMPORT_DUPLICATE_DAYS)) ?></li>
+                        <li><?= __('Payments to the card and other money in are left out unless you tick them - then they come in as money back.') ?></li>
+                        <li><?= __('Nothing is imported until you press Import on the review.') ?></li>
                     </ul>
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-body-secondary"><i class="fas fa-magic me-1"></i><?= $rules_count ?> merchant<?= $rules_count === 1 ? '' : 's' ?> remembered</span>
                         <?php if ($rules_count) { ?>
-                            <a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_import_rules.php">See them</a>
+                            <a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense_import_rules.php"><?= __('See them') ?></a>
                         <?php } ?>
                     </div>
                 </div>
@@ -190,11 +190,11 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
         $client_options .= '<option value="' . $client_id . '">' . escapeHtml($client_name) . '</option>';
     }
     $states = [
-        'new' => ['label' => 'New', 'tone' => 'primary'],
-        'imported' => ['label' => 'Imported before', 'tone' => 'secondary'],
-        'entered' => ['label' => 'Entered already?', 'tone' => 'warning'],
-        'money_in' => ['label' => 'Money in', 'tone' => 'success'],
-        'problem' => ['label' => "Can't read", 'tone' => 'danger'],
+        'new' => ['label' => _x('New', 'statement line'), 'tone' => 'primary'],
+        'imported' => ['label' => __('Imported before'), 'tone' => 'secondary'],
+        'entered' => ['label' => __('Entered already?'), 'tone' => 'warning'],
+        'money_in' => ['label' => __('Money in'), 'tone' => 'success'],
+        'problem' => ['label' => __('Can\'t read'), 'tone' => 'danger'],
     ];
     ?>
 
@@ -202,30 +202,30 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
     <div class="row g-3 mb-3">
         <div class="col-6 col-xl-3">
             <div class="itflow-billing-stat">
-                <div class="itflow-billing-stat-label"><i class="fas fa-receipt me-1"></i>New charges</div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-receipt me-1"></i><?= __('New charges') ?></div>
                 <div class="itflow-billing-stat-value"><?= $count['new'] ?></div>
                 <div class="itflow-billing-stat-note"><?= $count['matched'] ?> matched to a vendor</div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="itflow-billing-stat">
-                <div class="itflow-billing-stat-label"><i class="fas fa-check-double me-1"></i>Already in</div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-check-double me-1"></i><?= __('Already in') ?></div>
                 <div class="itflow-billing-stat-value"><?= $count['imported'] + $count['entered'] ?></div>
-                <div class="itflow-billing-stat-note"><?= $count['imported'] ?> imported before &middot; <?= $count['entered'] ?> look entered</div>
+                <div class="itflow-billing-stat-note"><?= escapeHtml(__('%d imported before', $count['imported'])) ?> &middot; <?= escapeHtml(__('%d look entered', $count['entered'])) ?></div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="itflow-billing-stat">
-                <div class="itflow-billing-stat-label"><i class="fas fa-arrow-down me-1"></i>Money in</div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-arrow-down me-1"></i><?= __('Money in') ?></div>
                 <div class="itflow-billing-stat-value"><?= $count['money_in'] ?></div>
-                <div class="itflow-billing-stat-note">Payments and refunds - left out<?php if ($count['money_in']) { ?> &middot; <a href="post.php?income_import_from_statement&amp;csrf_token=<?= $csrf ?>">Bring them in as income</a><?php } ?></div>
+                <div class="itflow-billing-stat-note"><?= __('Payments and refunds - left out') ?><?php if ($count['money_in']) { ?> &middot; <a href="post.php?income_import_from_statement&amp;csrf_token=<?= $csrf ?>"><?= __('Bring them in as income') ?></a><?php } ?></div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="itflow-billing-stat">
-                <div class="itflow-billing-stat-label"><i class="fas fa-columns me-1"></i>Columns</div>
-                <div class="itflow-billing-stat-value fs-6 fw-normal mt-2"><?= $import['remembered'] ? 'As last time' : 'As you set them' ?></div>
-                <div class="itflow-billing-stat-note"><a href="expense_import.php?step=columns">Change them</a><?= $count['problem'] ? ' &middot; <span class="text-danger-emphasis">' . $count['problem'] . " can't be read</span>" : '' ?></div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-columns me-1"></i><?= __('Columns') ?></div>
+                <div class="itflow-billing-stat-value fs-6 fw-normal mt-2"><?= $import['remembered'] ? __('As last time') : __('As you set them') ?></div>
+                <div class="itflow-billing-stat-note"><a href="expense_import.php?step=columns"><?= __('Change them') ?></a><?= $count['problem'] ? ' &middot; <span class="text-danger-emphasis">' . $count['problem'] . " can't be read</span>" : '' ?></div>
             </div>
         </div>
     </div>
@@ -236,26 +236,26 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
 
         <div class="card">
             <div class="card-header py-2 d-flex flex-wrap align-items-center gap-2">
-                <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-tasks text-secondary me-2"></i>The lines</h3>
+                <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-tasks text-secondary me-2"></i><?= __('The lines') ?></h3>
                 <div class="input-group input-group-sm" style="width: auto;">
                     <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
-                    <select class="form-select" data-import-bulk-category aria-label="Category for the ticked lines">
-                        <option value="">- Category for the ticked -</option>
+                    <select class="form-select" data-import-bulk-category aria-label="<?= escapeHtml(__('Category for the ticked lines')) ?>">
+                        <option value=""><?= __('- Category for the ticked -') ?></option>
                         <?= $category_options ?>
                     </select>
                 </div>
                 <div class="input-group input-group-sm" style="width: auto;">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
-                    <select class="form-select" data-import-bulk-client aria-label="Client for the ticked lines">
-                        <option value="">- Client for the ticked -</option>
-                        <option value="0">Not for a client</option>
+                    <select class="form-select" data-import-bulk-client aria-label="<?= escapeHtml(__('Client for the ticked lines')) ?>">
+                        <option value=""><?= __('- Client for the ticked -') ?></option>
+                        <option value="0"><?= __('Not for a client') ?></option>
                         <?= $client_options ?>
                     </select>
                 </div>
                 <?php if ($count['money_in'] || $count['imported'] || $count['entered']) { ?>
                     <div class="form-check form-switch mb-0 ms-2">
                         <input class="form-check-input" type="checkbox" role="switch" id="importShowAll" data-import-show-all>
-                        <label class="form-check-label small" for="importShowAll">Show money in and lines already in</label>
+                        <label class="form-check-label small" for="importShowAll"><?= __('Show money in and lines already in') ?></label>
                     </div>
                 <?php } ?>
             </div>
@@ -264,14 +264,14 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
                     <thead class="table-light text-nowrap">
                     <tr>
                         <th class="checkbox-column border-end">
-                            <div class="form-check"><input class="form-check-input" type="checkbox" data-import-all title="Tick or untick them all" aria-label="All"></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" data-import-all title="<?= escapeHtml(__('Tick or untick them all')) ?>" aria-label="<?= escapeHtml(__('All')) ?>"></div>
                         </th>
-                        <th>Date</th>
-                        <th>On the statement</th>
-                        <th class="text-end">Amount</th>
-                        <th>Vendor</th>
-                        <th>Category</th>
-                        <th>Client</th>
+                        <th><?= __('Date') ?></th>
+                        <th><?= __('On the statement') ?></th>
+                        <th class="text-end"><?= __('Amount') ?></th>
+                        <th><?= __('Vendor') ?></th>
+                        <th><?= __('Category') ?></th>
+                        <th><?= __('Client') ?></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -285,7 +285,7 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
                             <?= in_array($state, ['new'], true) ? '' : 'data-import-extra' ?> class="<?= $take ? '' : 'itflow-unbilled-off' ?>">
                             <td class="checkbox-column border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" data-import-take <?= $take ? 'checked' : '' ?> <?= $fixed ? 'disabled' : '' ?> aria-label="Import this line">
+                                    <input class="form-check-input" type="checkbox" data-import-take <?= $take ? 'checked' : '' ?> <?= $fixed ? 'disabled' : '' ?> aria-label="<?= escapeHtml(__('Import this line')) ?>">
                                 </div>
                             </td>
                             <td class="text-nowrap small"><?= $line['date'] ? escapeHtml($line['date']) : '<span class="text-danger-emphasis">?</span>' ?></td>
@@ -294,45 +294,45 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
                                 <div class="small">
                                     <span class="badge rounded-pill bg-<?= $states[$state]['tone'] ?>-subtle text-<?= $states[$state]['tone'] ?>-emphasis fw-normal"><?= $states[$state]['label'] ?></span>
                                     <?php if ($state === 'imported') { ?>
-                                        <a class="ajax-modal small" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($line['imported']) ?>">Open it</a>
+                                        <a class="ajax-modal small" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($line['imported']) ?>"><?= __('Open it') ?></a>
                                     <?php } elseif ($state === 'entered') { ?>
                                         <a class="ajax-modal small" href="#" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=<?= intval($line['entered']) ?>"><?= escapeHtml($line['entered_label']) ?></a>
                                     <?php } elseif ($state === 'problem') { ?>
                                         <span class="small text-danger-emphasis"><?= escapeHtml($line['problem']) ?></span>
                                     <?php } elseif ($line['matched'] === 'rule') { ?>
-                                        <span class="small text-body-secondary" title="Picked for this merchant before"><i class="fas fa-magic me-1"></i>as last time</span>
+                                        <span class="small text-body-secondary" title="<?= escapeHtml(__('Picked for this merchant before')) ?>"><i class="fas fa-magic me-1"></i><?= __('as last time') ?></span>
                                     <?php } elseif ($line['matched'] === 'name') { ?>
-                                        <span class="small text-body-secondary" title="The vendor's name is in the line"><i class="fas fa-link me-1"></i>by name</span>
+                                        <span class="small text-body-secondary" title="<?= escapeHtml(__('The vendor\'s name is in the line')) ?>"><i class="fas fa-link me-1"></i><?= __('by name') ?></span>
                                     <?php } ?>
                                     <?php if ($line['reference'] !== '') { ?><span class="small text-body-secondary ms-1">#<?= escapeHtml($line['reference']) ?></span><?php } ?>
                                 </div>
                             </td>
                             <td class="text-end text-nowrap itflow-money fw-semibold <?= $line['amount'] !== null && $line['amount'] < 0 ? 'text-success-emphasis' : '' ?>"><?= $line['amount'] === null ? '-' : $money($line['amount']) ?></td>
                             <?php if ($fixed) { ?>
-                                <td colspan="3" class="small text-body-secondary"><?= $state === 'imported' ? 'Brought in from a statement before - not imported again.' : 'Not imported - fix the columns if every line says this.' ?></td>
+                                <td colspan="3" class="small text-body-secondary"><?= $state === 'imported' ? __('Brought in from a statement before - not imported again.') : __('Not imported - fix the columns if every line says this.') ?></td>
                             <?php } else { ?>
                                 <td class="itflow-import-pick">
-                                    <select class="form-select form-select-sm" data-import-vendor data-value="<?= escapeHtml($vendor_value) ?>" aria-label="Vendor">
-                                        <option value="">- Vendor -</option>
+                                    <select class="form-select form-select-sm" data-import-vendor data-value="<?= escapeHtml($vendor_value) ?>" aria-label="<?= escapeHtml(__('Vendor')) ?>">
+                                        <option value=""><?= __('- Vendor -') ?></option>
                                         <option value="new">+ New vendor</option>
                                         <?= $vendor_options ?>
                                     </select>
-                                    <input type="text" class="form-control form-control-sm mt-1" maxlength="200" value="<?= escapeHtml($line['new_vendor']) ?>" data-import-new-vendor aria-label="New vendor name" placeholder="New vendor's name">
+                                    <input type="text" class="form-control form-control-sm mt-1" maxlength="200" value="<?= escapeHtml($line['new_vendor']) ?>" data-import-new-vendor aria-label="<?= escapeHtml(__('New vendor name')) ?>" placeholder="<?= escapeHtml(__('New vendor\'s name')) ?>">
                                 </td>
                                 <td class="itflow-import-pick">
-                                    <select class="form-select form-select-sm" data-import-category data-value="<?= intval($line['category_id']) ?: '' ?>" aria-label="Category">
-                                        <option value="">- Category -</option>
+                                    <select class="form-select form-select-sm" data-import-category data-value="<?= intval($line['category_id']) ?: '' ?>" aria-label="<?= escapeHtml(__('Category')) ?>">
+                                        <option value=""><?= __('- Category -') ?></option>
                                         <?= $category_options ?>
                                     </select>
                                 </td>
                                 <td class="itflow-import-pick">
-                                    <select class="form-select form-select-sm" data-import-client data-value="<?= intval($line['client_id']) ?>" aria-label="Client">
+                                    <select class="form-select form-select-sm" data-import-client data-value="<?= intval($line['client_id']) ?>" aria-label="<?= escapeHtml(__('Client')) ?>">
                                         <option value="0">-</option>
                                         <?= $client_options ?>
                                     </select>
                                     <div class="form-check form-switch small mt-1 mb-0" data-import-billable-box>
                                         <input class="form-check-input" type="checkbox" role="switch" id="importBillable<?= $n ?>" data-import-billable <?= $line['billable'] ? 'checked' : '' ?>>
-                                        <label class="form-check-label" for="importBillable<?= $n ?>">Bill on</label>
+                                        <label class="form-check-label" for="importBillable<?= $n ?>"><?= __('Bill on') ?></label>
                                     </div>
                                 </td>
                             <?php } ?>
@@ -343,8 +343,8 @@ $steps = ['upload' => 'Statement', 'columns' => 'Columns', 'review' => 'Review']
             </div>
             <div class="card-footer d-flex flex-wrap align-items-center gap-2 itflow-import-footer">
                 <span class="me-auto small text-body-secondary" data-import-summary></span>
-                <a class="btn btn-light" href="expense_import.php?step=columns"><i class="fas fa-arrow-left me-2"></i>Columns</a>
-                <button type="submit" name="expense_import_save" value="1" class="btn btn-primary text-bold" data-import-submit><i class="fas fa-file-import me-2"></i><span data-import-submit-label>Import</span></button>
+                <a class="btn btn-light" href="expense_import.php?step=columns"><i class="fas fa-arrow-left me-2"></i><?= __('Columns') ?></a>
+                <button type="submit" name="expense_import_save" value="1" class="btn btn-primary text-bold" data-import-submit><i class="fas fa-file-import me-2"></i><span data-import-submit-label><?= __('Import') ?></span></button>
             </div>
         </div>
     </form>

@@ -138,7 +138,7 @@ function itflowAutocomplete(input, options) {
         if (all.length > items.length) {
             var more = document.createElement('div');
             more.className = 'itflow-ac-more small text-muted px-3 py-2 border-top';
-            more.textContent = 'Showing ' + items.length + ' of ' + all.length + ' - keep typing to narrow';
+            more.textContent = __('Showing %1$s of %2$s - keep typing to narrow', items.length, all.length);
             menu.appendChild(more);
         }
         menu.classList.add('show');

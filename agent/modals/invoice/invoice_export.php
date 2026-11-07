@@ -29,7 +29,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Invoices</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Invoices') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -44,41 +44,41 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label>Search</label>
+            <label><?= __('Search') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Number, scope, client, amount">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= __('Number, scope, client, amount') ?>">
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-file-invoice-dollar"></i></span>
                 <select class="form-select select2" name="status">
-                    <option value="">- All Statuses -</option>
-                    <option <?php if ($status_filter === 'Draft') { echo "selected"; } ?> value="Draft">Draft</option>
-                    <option <?php if ($status_filter === 'Unpaid') { echo "selected"; } ?> value="Unpaid">Unpaid</option>
-                    <option <?php if ($status_filter === 'Overdue') { echo "selected"; } ?> value="Overdue">Overdue</option>
-                    <option <?php if ($status_filter === 'Paid') { echo "selected"; } ?> value="Paid">Paid</option>
-                    <option <?php if ($status_filter === 'Cancelled') { echo "selected"; } ?> value="Cancelled">Cancelled or non-billable</option>
+                    <option value=""><?= __('- All Statuses -') ?></option>
+                    <option <?php if ($status_filter === 'Draft') { echo "selected"; } ?> value="Draft"><?= _x('Draft', 'invoices filter') ?></option>
+                    <option <?php if ($status_filter === 'Unpaid') { echo "selected"; } ?> value="Unpaid"><?= _x('Unpaid', 'invoices filter') ?></option>
+                    <option <?php if ($status_filter === 'Overdue') { echo "selected"; } ?> value="Overdue"><?= _x('Overdue', 'invoices filter') ?></option>
+                    <option <?php if ($status_filter === 'Paid') { echo "selected"; } ?> value="Paid"><?= _x('Paid', 'invoices filter') ?></option>
+                    <option <?php if ($status_filter === 'Cancelled') { echo "selected"; } ?> value="Cancelled"><?= __('Cancelled or non-billable') ?></option>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Category</label>
+            <label><?= __('Category') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
                 <select class="form-select select2" name="category">
-                    <option value="">- All Categories -</option>
+                    <option value=""><?= __('- All Categories -') ?></option>
                     <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT DISTINCT invoice_category_id FROM invoices") ?>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Issued From</label>
+            <label><?= __('Issued From') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
@@ -86,7 +86,7 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Issued To</label>
+            <label><?= __('Issued To') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

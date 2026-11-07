@@ -23,7 +23,7 @@ if (isset($_GET['enable_cron']) || isset($_GET['disable_cron'])) {
 
     logAudit("Cron", "Edit", "$session_name " . ($enabled ? 'enabled' : 'disabled') . " the master cron switch");
 
-    flashAlert("Cron " . ($enabled ? 'enabled' : 'disabled') . ".", $enabled ? 'success' : 'error');
+    flashAlert($enabled ? __('Cron enabled.') : __('Cron disabled.'), $enabled ? 'success' : 'error');
 
     redirect();
 
@@ -41,7 +41,7 @@ if (isset($_POST['edit_cron_job'])) {
     $registry = cronJobRegistryByName();
 
     if (!$row || !isset($registry[$row['cron_job_name']])) {
-        flashAlert("That cron job is not part of this version of ITFlow.", 'error');
+        flashAlert(__('That cron job is not part of this version of ITFlow.'), 'error');
         redirect();
     }
 
@@ -64,7 +64,7 @@ if (isset($_POST['edit_cron_job'])) {
     if ($schedule === 'Daily') {
         $submitted = trim($_POST['daily_at']);
         if (!preg_match('/^([01][0-9]|2[0-3]):[0-5][0-9]$/', $submitted)) {
-            flashAlert("Enter the daily run time as a 24-hour time, for example 03:00.", 'error');
+            flashAlert(__('Enter the daily run time as a 24-hour time, for example 03:00.'), 'error');
             redirect();
         }
         $daily_at = "'" . escapeSql($submitted) . ":00'";
@@ -79,7 +79,7 @@ if (isset($_POST['edit_cron_job'])) {
 
     logAudit("Cron", "Edit", "$session_name edited the schedule for cron job $cron_job_name", 0, $cron_job_id);
 
-    flashAlert("Cron job schedule updated.");
+    flashAlert(__('Cron job schedule updated.'));
 
     redirect();
 
@@ -97,12 +97,12 @@ if (isset($_GET['run_cron_job'])) {
     $registry = cronJobRegistryByName();
 
     if (!$row || !isset($registry[$row['cron_job_name']])) {
-        flashAlert("That cron job is not part of this version of ITFlow.", 'error');
+        flashAlert(__('That cron job is not part of this version of ITFlow.'), 'error');
         redirect();
     }
 
     $cron_job_name = escapeSql($row['cron_job_name']);
-    $cron_job_label = $registry[$row['cron_job_name']]['label'];
+    $cron_job_label = __($registry[$row['cron_job_name']]['label']); // i18n-dynamic - includes/cron_jobs.php
 
     // The job is not run here. These scripts are written for the command line and some of
     // them take minutes, so the request is left for the dispatcher to pick up on its next
@@ -111,7 +111,7 @@ if (isset($_GET['run_cron_job'])) {
 
     logAudit("Cron", "Run", "$session_name requested an immediate run of cron job $cron_job_name", 0, $cron_job_id);
 
-    flashAlert("$cron_job_label is queued and will start within a minute.");
+    flashAlert(__('%s is queued and will start within a minute.', $cron_job_label));
 
     redirect();
 
@@ -136,7 +136,7 @@ if (isset($_GET['enable_cron_job']) || isset($_GET['disable_cron_job'])) {
 
     logAudit("Cron", "Edit", "$session_name " . ($enabled ? 'enabled' : 'disabled') . " cron job $cron_job_name", 0, $cron_job_id);
 
-    flashAlert("Cron job " . ($enabled ? 'enabled' : 'disabled') . ".", $enabled ? 'success' : 'error');
+    flashAlert($enabled ? __('Cron job enabled.') : __('Cron job disabled.'), $enabled ? 'success' : 'error');
 
     redirect();
 
@@ -150,7 +150,7 @@ if (isset($_GET['clear_cron_error'])) {
 
     mysqli_query($mysqli, "UPDATE cron_jobs SET cron_job_last_error = NULL, cron_job_last_error_at = NULL WHERE cron_job_id = $cron_job_id");
 
-    flashAlert("Error cleared.");
+    flashAlert(__('Error cleared.'));
 
     redirect();
 

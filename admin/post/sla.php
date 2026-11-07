@@ -16,7 +16,7 @@ if (isset($_POST['add_sla'])) {
 
     logAudit("SLA", "Create", "$session_name created SLA $name");
 
-    flashAlert("SLA <strong>$name</strong> created");
+    flashAlert(__('SLA <strong>%s</strong> created', $name));
 
     redirect();
 
@@ -45,7 +45,7 @@ if (isset($_POST['edit_sla'])) {
 
     logAudit("SLA", "Edit", "$session_name edited SLA $name");
 
-    flashAlert("SLA <strong>$name</strong> updated - targets recalculated on $restamped open ticket(s)");
+    flashAlert(__('SLA <strong>%1$s</strong> updated - targets recalculated on %2$s open ticket(s)', $name, $restamped));
 
     redirect();
 
@@ -64,7 +64,7 @@ if (isset($_GET['archive_sla'])) {
 
     logAudit("SLA", "Archive", "$session_name archived SLA ID $sla_id");
 
-    flashAlert("SLA archived");
+    flashAlert(__('SLA archived'));
 
     redirect();
 
@@ -80,7 +80,7 @@ if (isset($_GET['unarchive_sla'])) {
 
     logAudit("SLA", "Restore", "$session_name restored SLA ID $sla_id");
 
-    flashAlert("SLA restored");
+    flashAlert(__('SLA restored'));
 
     redirect();
 
@@ -117,7 +117,7 @@ if (isset($_POST['edit_sla_settings'])) {
 
     logAudit("Settings", "Edit", "$session_name edited SLA / business hours settings");
 
-    flashAlert("SLA settings updated - targets recalculated on $restamped open ticket(s)");
+    flashAlert(__('SLA settings updated - targets recalculated on %s open ticket(s)', $restamped));
 
     redirect();
 
@@ -135,13 +135,13 @@ if (isset($_POST['add_holiday'])) {
     $parsed_date = DateTime::createFromFormat('Y-m-d', $holiday_date_input);
 
     if (!$parsed_date || $parsed_date->format('Y-m-d') !== $holiday_date_input) {
-        flashAlert("Enter a valid date for the closure day.", 'error');
+        flashAlert(__('Enter a valid date for the closure day.'), 'error');
         redirect();
     }
 
     $holiday_name_input = trim($_POST['holiday_name'] ?? '');
     if ($holiday_name_input === '') {
-        flashAlert("Enter a name for the closure day.", 'error');
+        flashAlert(__('Enter a name for the closure day.'), 'error');
         redirect();
     }
 
@@ -157,7 +157,7 @@ if (isset($_POST['add_holiday'])) {
 
     logAudit("Settings", "Create", "$session_name added SLA closure day $holiday_date - $holiday_name");
 
-    flashAlert("Closure day added - targets recalculated on $restamped open ticket(s)");
+    flashAlert(__('Closure day added - targets recalculated on %s open ticket(s)', $restamped));
 
     redirect();
 
@@ -171,7 +171,7 @@ if (isset($_POST['delete_holiday'])) {
 
     $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT holiday_date, holiday_name FROM business_holidays WHERE holiday_id = $holiday_id LIMIT 1"));
     if (!$row) {
-        flashAlert("Closure day not found.", 'error');
+        flashAlert(__('Closure day not found.'), 'error');
         redirect();
     }
     $holiday_date = escapeSql($row['holiday_date']);
@@ -184,7 +184,7 @@ if (isset($_POST['delete_holiday'])) {
 
     logAudit("Settings", "Delete", "$session_name removed SLA closure day $holiday_date - $holiday_name");
 
-    flashAlert("Closure day removed - targets recalculated on $restamped open ticket(s)");
+    flashAlert(__('Closure day removed - targets recalculated on %s open ticket(s)', $restamped));
 
     redirect();
 
@@ -197,7 +197,7 @@ if (isset($_POST['generate_holidays'])) {
     $holiday_year = intval($_POST['holiday_year']);
 
     if ($holiday_year < 2000 || $holiday_year > 2100) {
-        flashAlert("Enter a year between 2000 and 2100.", 'error');
+        flashAlert(__('Enter a year between 2000 and 2100.'), 'error');
         redirect();
     }
 
@@ -216,7 +216,7 @@ if (isset($_POST['generate_holidays'])) {
 
     logAudit("Settings", "Create", "$session_name generated $added US federal holiday closure day(s) for $holiday_year");
 
-    flashAlert("Added $added US federal holiday(s) for $holiday_year - targets recalculated on $restamped open ticket(s)");
+    flashAlert(__('Added %1$s US federal holiday(s) for %2$s - targets recalculated on %3$s open ticket(s)', $added, $holiday_year, $restamped));
 
     redirect();
 
@@ -249,7 +249,7 @@ if (isset($_POST['save_sla_assignments'])) {
 
     logAudit("SLA", "Edit", "$session_name updated default SLA assignments");
 
-    flashAlert("Default SLA assignments saved - $restamped open ticket(s) re-evaluated");
+    flashAlert(__('Default SLA assignments saved - %s open ticket(s) re-evaluated', $restamped));
 
     redirect();
 

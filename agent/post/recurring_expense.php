@@ -26,7 +26,7 @@ if (isset($_POST['create_recurring_expense'])) {
 
     logAudit("Recurring Expense", "Create", "$session_name set up the recurring expense " . escapeSql($label), intval($row['recurring_expense_client_id']), $recurring_expense_id);
 
-    flashAlert("Recurring expense <strong>" . escapeHtml($label) . "</strong> set up - the first one is recorded on " . escapeHtml(date('M j, Y', strtotime($row['recurring_expense_next_date']))));
+    flashAlert(__('Recurring expense %1$s set up - the first one is recorded on %2$s', '<strong>' . escapeHtml($label) . '</strong>', escapeHtml(formatDate($row['recurring_expense_next_date'], 'date'))));
 
     redirect();
 
@@ -51,19 +51,19 @@ if (isset($_POST['edit_recurring_expense'])) {
 
     $changes = [];
     if (floatval($before['recurring_expense_amount']) != floatval($row['recurring_expense_amount'])) {
-        $changes[] = 'amount from ' . billingMoney($before['recurring_expense_amount'], $before['recurring_expense_currency_code']) . ' to ' . billingMoney($row['recurring_expense_amount'], $row['recurring_expense_currency_code']);
+        $changes[] = 'amount from ' . billingMoney($before['recurring_expense_amount'], $before['recurring_expense_currency_code']) . ' to ' . billingMoney($row['recurring_expense_amount'], $row['recurring_expense_currency_code']);  // i18n-ignore - the audit log
     }
     if ($before['recurring_expense_next_date'] !== $row['recurring_expense_next_date']) {
-        $changes[] = "next date from {$before['recurring_expense_next_date']} to {$row['recurring_expense_next_date']}";
+        $changes[] = "next date from {$before['recurring_expense_next_date']} to {$row['recurring_expense_next_date']}";  // i18n-ignore - the audit log
     }
     logAudit("Recurring Expense", "Edit", "$session_name edited the recurring expense " . escapeSql($label) . ($changes ? ' - ' . escapeSql(implode(', ', $changes)) : ''), intval($row['recurring_expense_client_id']), $recurring_expense_id);
 
     if ($state === 'ended' && recurringExpenseState($before) !== 'ended') {
-        flashAlert("Recurring expense <strong>" . escapeHtml($label) . "</strong> saved - its end date is before the next one, so it has ended", 'warning');
+        flashAlert(__('Recurring expense %s saved - its end date is before the next one, so it has ended', '<strong>' . escapeHtml($label) . '</strong>'), 'warning');
     } elseif ($state === 'active' && recurringExpenseState($before) === 'ended') {
-        flashAlert("Recurring expense <strong>" . escapeHtml($label) . "</strong> saved and running again - the next one is on " . escapeHtml(date('M j, Y', strtotime($row['recurring_expense_next_date']))));
+        flashAlert(__('Recurring expense %1$s saved and running again - the next one is on %2$s', '<strong>' . escapeHtml($label) . '</strong>', escapeHtml(formatDate($row['recurring_expense_next_date'], 'date'))));
     } else {
-        flashAlert("Recurring expense <strong>" . escapeHtml($label) . "</strong> saved");
+        flashAlert(__('Recurring expense %s saved', '<strong>' . escapeHtml($label) . '</strong>'));
     }
 
     redirect();
@@ -79,7 +79,7 @@ if (isset($_GET['recurring_expense_set_status'])) {
 
     $row = recurringExpenseRow(intval($_GET['recurring_expense_set_status']));
     if (!$row) {
-        flashAlert('That recurring expense no longer exists', 'error');
+        flashAlert(__('That recurring expense no longer exists'), 'error');
         redirect();
     }
     $recurring_expense_id = intval($row['recurring_expense_id']);
@@ -87,7 +87,7 @@ if (isset($_GET['recurring_expense_set_status'])) {
     $label = recurringExpenseLabel($row);
 
     if ($status === 1 && recurringExpenseEnded($row)) {
-        flashAlert("<strong>" . escapeHtml($label) . "</strong> ended on " . escapeHtml($row['recurring_expense_end_date']) . " - change its end date in Edit to run it again", 'error');
+        flashAlert(__('%1$s ended on %2$s - change its end date in Edit to run it again', '<strong>' . escapeHtml($label) . '</strong>', escapeHtml($row['recurring_expense_end_date'])), 'error');
         redirect();
     }
 
@@ -96,9 +96,9 @@ if (isset($_GET['recurring_expense_set_status'])) {
     logAudit("Recurring Expense", $status ? "Resume" : "Pause", "$session_name " . ($status ? 'resumed' : 'paused') . " the recurring expense " . escapeSql($label), intval($row['recurring_expense_client_id']), $recurring_expense_id);
 
     if ($status && $row['recurring_expense_next_date'] < date('Y-m-d', strtotime('-' . RECURRING_EXPENSE_GRACE_DAYS . ' days'))) {
-        flashAlert("<strong>" . escapeHtml($label) . "</strong> resumed - its next date has passed, so record the missed runs or move it on", 'warning');
+        flashAlert(__('%s resumed - its next date has passed, so record the missed runs or move it on', "<strong>" . escapeHtml($label) . "</strong>"), 'warning');
     } else {
-        flashAlert("<strong>" . escapeHtml($label) . "</strong> " . ($status ? 'resumed' : 'paused'));
+        flashAlert($status ? __('%s resumed', "<strong>" . escapeHtml($label) . "</strong>") : __('%s paused', "<strong>" . escapeHtml($label) . "</strong>"));
     }
 
     redirect();
@@ -114,25 +114,26 @@ if (isset($_GET['recurring_expense_record'])) {
 
     $row = recurringExpenseRow(intval($_GET['recurring_expense_record']));
     if (!$row) {
-        flashAlert('That recurring expense no longer exists', 'error');
+        flashAlert(__('That recurring expense no longer exists'), 'error');
         redirect();
     }
     if (recurringExpenseEnded($row)) {
-        flashAlert("<strong>" . escapeHtml(recurringExpenseLabel($row)) . "</strong> has ended - there is nothing more to record", 'error');
+        flashAlert(__('%s has ended - there is nothing more to record', '<strong>' . escapeHtml(recurringExpenseLabel($row)) . '</strong>'), 'error');
         redirect();
     }
     $run = isset($_GET['run']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['run']) ? $_GET['run'] : $row['recurring_expense_next_date'];
 
     $expense_id = recurringExpenseRecord(intval($row['recurring_expense_id']), intval($session_user_id), $run, stripslashes($session_name));
     if (!$expense_id) {
-        flashAlert("That run of <strong>" . escapeHtml(recurringExpenseLabel($row)) . "</strong> is already recorded", 'warning');
+        flashAlert(__('That run of %s is already recorded', '<strong>' . escapeHtml(recurringExpenseLabel($row)) . '</strong>'), 'warning');
         redirect();
     }
     $after = recurringExpenseRow(intval($row['recurring_expense_id']), false);
 
-    flashAlert("Recorded <strong>" . escapeHtml(expenseLabel(expenseRow($expense_id, false))) . "</strong>" . (recurringExpenseEnded($after)
-        ? ' - that was the last one, it has ended'
-        : ' - the next one is on ' . escapeHtml(date('M j, Y', strtotime($after['recurring_expense_next_date'])))));
+    $strong = '<strong>' . escapeHtml(expenseLabel(expenseRow($expense_id, false))) . '</strong>';
+    flashAlert(recurringExpenseEnded($after)
+        ? __('Recorded %s - that was the last one, it has ended', $strong)
+        : __('Recorded %1$s - the next one is on %2$s', $strong, escapeHtml(formatDate($after['recurring_expense_next_date'], 'date'))));
 
     redirect();
 
@@ -147,7 +148,7 @@ if (isset($_GET['recurring_expense_catch_up'])) {
 
     $row = recurringExpenseRow(intval($_GET['recurring_expense_catch_up']));
     if (!$row) {
-        flashAlert('That recurring expense no longer exists', 'error');
+        flashAlert(__('That recurring expense no longer exists'), 'error');
         redirect();
     }
     $recurring_expense_id = intval($row['recurring_expense_id']);
@@ -160,7 +161,7 @@ if (isset($_GET['recurring_expense_catch_up'])) {
 
     logAudit("Recurring Expense", "Move On", "$session_name moved the recurring expense " . escapeSql(recurringExpenseLabel($row)) . " on from $from to $next without recording the missed runs", intval($row['recurring_expense_client_id']), $recurring_expense_id);
 
-    flashAlert("<strong>" . escapeHtml(recurringExpenseLabel($row)) . "</strong> moved on to " . escapeHtml(date('M j, Y', strtotime($next))) . ($ends ? ' - past its end date, so it has ended' : ''));
+    flashAlert($ends ? __('%1$s moved on to %2$s - past its end date, so it has ended', '<strong>' . escapeHtml(recurringExpenseLabel($row)) . '</strong>', escapeHtml(formatDate($next, 'date'))) : __('%1$s moved on to %2$s', '<strong>' . escapeHtml(recurringExpenseLabel($row)) . '</strong>', escapeHtml(formatDate($next, 'date'))));
 
     redirect();
 
@@ -180,7 +181,7 @@ if (isset($_GET['delete_recurring_expense'])) {
 
     logAudit("Recurring Expense", "Delete", "$session_name deleted the recurring expense " . escapeSql(recurringExpenseLabel($row)), intval($row['recurring_expense_client_id']));
 
-    flashAlert("Recurring expense <strong>" . escapeHtml(recurringExpenseLabel($row)) . "</strong> deleted - the expenses it recorded stay", 'error');
+    flashAlert(__('Recurring expense %s deleted - the expenses it recorded stay', '<strong>' . escapeHtml(recurringExpenseLabel($row)) . '</strong>'), 'error');
 
     redirect();
 

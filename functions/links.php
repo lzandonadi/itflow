@@ -288,6 +288,202 @@ function linkRemoveAll($type, $id) {
     }
 }
 
+/**
+ * What the link picker and the Linked card say about one kind of record, as
+ * whole sentences in the interface language - LINK_ENTITIES keeps the English
+ * names for the database side. $key: which, pick, free ($n), free_linked ($n,
+ * $n, $linked), every, none, link, unlink, linked_one ($name, $to),
+ * linked_many ($n, $count_html, $to), unlinked ($name, $from).
+ */
+function linkEntityText($type, $key, ...$args) {
+    switch ($type) {
+        case 'asset':
+            switch ($key) {
+                case 'which': return __('Which assets?', ...$args);
+                case 'pick': return __('Pick one or more assets', ...$args);
+                case 'free': return _n('%d asset not linked yet.', '%d assets not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d asset not linked yet, %2$d already linked.', '%1$d assets not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every asset this client has is already linked.', ...$args);
+                case 'none': return __('This client has no assets to link.', ...$args);
+                case 'link': return __('Link asset', ...$args);
+                case 'unlink': return __('Unlink asset', ...$args);
+                case 'linked_one': return __('Asset %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s asset to %2$s', 'Linked %1$s assets to %2$s', ...$args);
+                case 'unlinked': return __('Asset %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'contact':
+            switch ($key) {
+                case 'which': return __('Which contacts?', ...$args);
+                case 'pick': return __('Pick one or more contacts', ...$args);
+                case 'free': return _n('%d contact not linked yet.', '%d contacts not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d contact not linked yet, %2$d already linked.', '%1$d contacts not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every contact this client has is already linked.', ...$args);
+                case 'none': return __('This client has no contacts to link.', ...$args);
+                case 'link': return __('Link contact', ...$args);
+                case 'unlink': return __('Unlink contact', ...$args);
+                case 'linked_one': return __('Contact %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s contact to %2$s', 'Linked %1$s contacts to %2$s', ...$args);
+                case 'unlinked': return __('Contact %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'document':
+            switch ($key) {
+                case 'which': return __('Which documents?', ...$args);
+                case 'pick': return __('Pick one or more documents', ...$args);
+                case 'free': return _n('%d document not linked yet.', '%d documents not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d document not linked yet, %2$d already linked.', '%1$d documents not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every document this client has is already linked.', ...$args);
+                case 'none': return __('This client has no documents to link.', ...$args);
+                case 'link': return __('Link document', ...$args);
+                case 'unlink': return __('Unlink document', ...$args);
+                case 'linked_one': return __('Document %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s document to %2$s', 'Linked %1$s documents to %2$s', ...$args);
+                case 'unlinked': return __('Document %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'file':
+            switch ($key) {
+                case 'which': return __('Which files?', ...$args);
+                case 'pick': return __('Pick one or more files', ...$args);
+                case 'free': return _n('%d file not linked yet.', '%d files not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d file not linked yet, %2$d already linked.', '%1$d files not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every file this client has is already linked.', ...$args);
+                case 'none': return __('This client has no files to link.', ...$args);
+                case 'link': return __('Link file', ...$args);
+                case 'unlink': return __('Unlink file', ...$args);
+                case 'linked_one': return __('File %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s file to %2$s', 'Linked %1$s files to %2$s', ...$args);
+                case 'unlinked': return __('File %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'software':
+            switch ($key) {
+                case 'which': return __('Which licenses?', ...$args);
+                case 'pick': return __('Pick one or more licenses', ...$args);
+                case 'free': return _n('%d license not linked yet.', '%d licenses not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d license not linked yet, %2$d already linked.', '%1$d licenses not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every license this client has is already linked.', ...$args);
+                case 'none': return __('This client has no licenses to link.', ...$args);
+                case 'link': return __('Link license', ...$args);
+                case 'unlink': return __('Unlink license', ...$args);
+                case 'linked_one': return __('License %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s license to %2$s', 'Linked %1$s licenses to %2$s', ...$args);
+                case 'unlinked': return __('License %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'location':
+            switch ($key) {
+                case 'which': return __('Which locations?', ...$args);
+                case 'pick': return __('Pick one or more locations', ...$args);
+                case 'free': return _n('%d location not linked yet.', '%d locations not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d location not linked yet, %2$d already linked.', '%1$d locations not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every location this client has is already linked.', ...$args);
+                case 'none': return __('This client has no locations to link.', ...$args);
+                case 'link': return __('Link location', ...$args);
+                case 'unlink': return __('Unlink location', ...$args);
+                case 'linked_one': return __('Location %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s location to %2$s', 'Linked %1$s locations to %2$s', ...$args);
+                case 'unlinked': return __('Location %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'credential':
+            switch ($key) {
+                case 'which': return __('Which credentials?', ...$args);
+                case 'pick': return __('Pick one or more credentials', ...$args);
+                case 'free': return _n('%d credential not linked yet.', '%d credentials not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d credential not linked yet, %2$d already linked.', '%1$d credentials not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every credential this client has is already linked.', ...$args);
+                case 'none': return __('This client has no credentials to link.', ...$args);
+                case 'link': return __('Link credential', ...$args);
+                case 'unlink': return __('Unlink credential', ...$args);
+                case 'linked_one': return __('Credential %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s credential to %2$s', 'Linked %1$s credentials to %2$s', ...$args);
+                case 'unlinked': return __('Credential %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'vendor':
+            switch ($key) {
+                case 'which': return __('Which vendors?', ...$args);
+                case 'pick': return __('Pick one or more vendors', ...$args);
+                case 'free': return _n('%d vendor not linked yet.', '%d vendors not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d vendor not linked yet, %2$d already linked.', '%1$d vendors not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every vendor this client has is already linked.', ...$args);
+                case 'none': return __('This client has no vendors to link.', ...$args);
+                case 'link': return __('Link vendor', ...$args);
+                case 'unlink': return __('Unlink vendor', ...$args);
+                case 'linked_one': return __('Vendor %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s vendor to %2$s', 'Linked %1$s vendors to %2$s', ...$args);
+                case 'unlinked': return __('Vendor %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'service':
+            switch ($key) {
+                case 'which': return __('Which services?', ...$args);
+                case 'pick': return __('Pick one or more services', ...$args);
+                case 'free': return _n('%d service not linked yet.', '%d services not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d service not linked yet, %2$d already linked.', '%1$d services not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every service this client has is already linked.', ...$args);
+                case 'none': return __('This client has no services to link.', ...$args);
+                case 'link': return __('Link service', ...$args);
+                case 'unlink': return __('Unlink service', ...$args);
+                case 'linked_one': return __('Service %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s service to %2$s', 'Linked %1$s services to %2$s', ...$args);
+                case 'unlinked': return __('Service %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'domain':
+            switch ($key) {
+                case 'which': return __('Which domains?', ...$args);
+                case 'pick': return __('Pick one or more domains', ...$args);
+                case 'free': return _n('%d domain not linked yet.', '%d domains not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d domain not linked yet, %2$d already linked.', '%1$d domains not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every domain this client has is already linked.', ...$args);
+                case 'none': return __('This client has no domains to link.', ...$args);
+                case 'link': return __('Link domain', ...$args);
+                case 'unlink': return __('Unlink domain', ...$args);
+                case 'linked_one': return __('Domain %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s domain to %2$s', 'Linked %1$s domains to %2$s', ...$args);
+                case 'unlinked': return __('Domain %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+        case 'certificate':
+            switch ($key) {
+                case 'which': return __('Which certificates?', ...$args);
+                case 'pick': return __('Pick one or more certificates', ...$args);
+                case 'free': return _n('%d certificate not linked yet.', '%d certificates not linked yet.', ...$args);
+                case 'free_linked': return _n('%1$d certificate not linked yet, %2$d already linked.', '%1$d certificates not linked yet, %2$d already linked.', ...$args);
+                case 'every': return __('Every certificate this client has is already linked.', ...$args);
+                case 'none': return __('This client has no certificates to link.', ...$args);
+                case 'link': return __('Link certificate', ...$args);
+                case 'unlink': return __('Unlink certificate', ...$args);
+                case 'linked_one': return __('Certificate %1$s linked to %2$s', ...$args);
+                case 'linked_many': return _n('Linked %1$s certificate to %2$s', 'Linked %1$s certificates to %2$s', ...$args);
+                case 'unlinked': return __('Certificate %1$s unlinked from %2$s', ...$args);
+            }
+            break;
+    }
+    return '';
+}
+
+/** The heading for one kind of record - "Assets", "Licenses" - in the interface language. */
+function linkEntityPlural($type) {
+    switch ($type) {
+        case 'asset': return __('Assets');
+        case 'contact': return __('Contacts');
+        case 'document': return __('Documents');
+        case 'file': return __('Files');
+        case 'software': return __('Licenses');
+        case 'location': return __('Locations');
+        case 'credential': return __('Credentials');
+        case 'vendor': return __('Vendors');
+        case 'service': return __('Services');
+        case 'domain': return __('Domains');
+        case 'certificate': return __('Certificates');
+    }
+    return escapeHtml(LINK_ENTITIES[$type]['plural'] ?? $type);
+}
+
 /** A candidate as an option in a picker (itflow_select.js) - its icon or avatar, and a line under it. Rows as linkCandidates() gives them. */
 function linkOptionData($to, $row, $client_id) {
     switch ($to) {
@@ -297,20 +493,20 @@ function linkOptionData($to, $row, $client_id) {
             return selectOptionContact($row['contact_client_id'], $row['name'], $row['contact_photo'], $row['contact_title'], $row['id']);
         case 'file':
             $info = fileTypeInfo($row['file_ext']);
-            return selectOptionData(['icon' => 'fas fa-' . $info['icon'], 'description' => ($row['folder_name'] ?: 'Top level') . ' · ' . formatBytes(intval($row['file_size'])), 'keywords' => $row['file_description']]);
+            return selectOptionData(['icon' => 'fas fa-' . $info['icon'], 'description' => ($row['folder_name'] ?: __('Top level')) . ' · ' . formatBytes(intval($row['file_size'])), 'keywords' => $row['file_description']]);
         case 'document':
-            return selectOptionData(['icon' => 'fas fa-file-alt', 'description' => $row['document_description'] ?: 'Updated ' . timeAgo($row['document_updated_at'] ?: $row['document_created_at'])]);
+            return selectOptionData(['icon' => 'fas fa-file-alt', 'description' => $row['document_description'] ?: __('Updated %s', timeAgo($row['document_updated_at'] ?: $row['document_created_at']))]);
         case 'software':
             // How many seats are left, so a full license is seen before it is picked
             $seats = softwareSeats($row['seats_used'], $row['software_seats']);
             $seat_text = $seats['state'] === 'unlimited' ? '' : ($seats['state'] === 'over' || $seats['state'] === 'full'
-                ? 'Full - ' . $seats['used'] . ' of ' . $seats['total'] . ' seats'
-                : $seats['free'] . ' of ' . $seats['total'] . ' seats free');
-            return selectOptionData(['icon' => 'fas ' . softwareTypeStyle($row['software_type'])['icon'], 'description' => implode(' · ', array_filter([$row['software_license_type'], $seat_text, $row['software_version']]))]);
+                ? __('Full - %1$d of %2$d seats', $seats['used'], $seats['total'])
+                : __('%1$d of %2$d seats free', $seats['free'], $seats['total']));
+            return selectOptionData(['icon' => 'fas ' . softwareTypeStyle($row['software_type'])['icon'], 'description' => implode(' · ', array_filter([softwareLicenseTypeLabel($row['software_license_type']), $seat_text, $row['software_version']]))]);
         case 'credential':
             return selectOptionCredential(['credential_name' => $row['name'], 'credential_description' => $row['credential_description'], 'credential_uri' => $row['credential_uri']], $row['credential_description'] ?: $row['credential_uri']);
         case 'location':
-            return selectOptionData(['icon' => 'fas fa-' . (intval($row['location_primary']) ? 'building' : 'map-marker-alt'), 'description' => implode(' · ', array_filter([intval($row['location_primary']) ? 'Primary' : '', locationAddressText($row)]))]);
+            return selectOptionData(['icon' => 'fas fa-' . (intval($row['location_primary']) ? 'building' : 'map-marker-alt'), 'description' => implode(' · ', array_filter([intval($row['location_primary']) ? __('Primary') : '', locationAddressText($row)]))]);
         case 'vendor':
             return selectOptionVendor($row['name'], $row['vendor_description']);
         case 'service':
@@ -351,7 +547,7 @@ function linkRowHtml($to, $row, $client_id) {
         case 'document':
             $lead = documentTile('sm');
             $link = "<a class=\"text-truncate\" href=\"document.php?client_id=" . intval($client_id) . "&amp;document_id=$id\">$name</a>";
-            $detail = 'Updated ' . timeAgo($row['document_updated_at'] ?: $row['document_created_at']);
+            $detail = __('Updated %s', timeAgo($row['document_updated_at'] ?: $row['document_created_at']));
             break;
         case 'software':
             $lead = softwareTile($row['software_type'], 'sm');
@@ -359,8 +555,8 @@ function linkRowHtml($to, $row, $client_id) {
             $seats = softwareSeats($row['seats_used'] ?? 0, $row['software_seats'] ?? 0);
             $renewal = softwareRenewal($row['software_expire'] ?? '');
             $detail = implode(' · ', array_filter([
-                $row['software_license_type'] ?? '',
-                $seats['state'] === 'unlimited' ? '' : $seats['used'] . ' / ' . $seats['total'] . ' seats',
+                softwareLicenseTypeLabel($row['software_license_type'] ?? ''),
+                $seats['state'] === 'unlimited' ? '' : __('%1$d / %2$d seats', $seats['used'], $seats['total']),
                 $renewal && $renewal['state'] !== 'active' ? $renewal['text'] : '',
             ]));
             break;
@@ -368,7 +564,7 @@ function linkRowHtml($to, $row, $client_id) {
             $credential = ['credential_name' => $row['name'], 'credential_description' => $row['credential_description'] ?? '', 'credential_uri' => $row['credential_uri'] ?? '', 'credential_username' => $row['credential_username'] ?? ''];
             $lead = credentialTile($credential, 'sm');
             $link = "<a class=\"ajax-modal text-truncate\" href=\"#\" data-modal-url=\"modals/credential/credential.php?id=$id\">$name</a>"
-                . (intval($row['credential_favorite'] ?? 0) ? '<i class="fas fa-star text-warning small ms-1 align-self-center" title="Starred"></i>' : '');
+                . (intval($row['credential_favorite'] ?? 0) ? '<i class="fas fa-star text-warning small ms-1 align-self-center" title="' . escapeHtml(__('Starred')) . '"></i>' : '');
             $detail = $row['credential_description'] ?: $row['credential_uri'];
             // The login itself - username to copy, the password and 2FA code on asking
             $username = credentialUsername($credential);
@@ -390,7 +586,7 @@ function linkRowHtml($to, $row, $client_id) {
         case 'service':
             $lead = serviceTile($row['service_category'] ?? '', 'sm');
             $link = '<a class="text-truncate" href="' . escapeHtml(serviceUrl($id, $row['service_client_id'] ?? $client_id)) . "\">$name</a>";
-            $detail = implode(' · ', array_filter([$row['service_category'] ?? '', ($row['service_importance'] ?? '') ? $row['service_importance'] . ' importance' : '']));
+            $detail = implode(' · ', array_filter([$row['service_category'] ?? '', ($row['service_importance'] ?? '') ? __('%s importance', $row['service_importance']) : '']));
             break;
         case 'domain':
             $lead = domainTile('sm');
@@ -432,25 +628,25 @@ function linkGroupsHtml($from, $id, $client_id, $archived = false) {
         $link_url = "modals/link/link.php?from=$from&amp;id=$id&amp;to=$to";
         if (!$rows) {
             if ($can_edit) {
-                $empty[] = "<a class=\"ajax-modal btn btn-xs btn-outline-secondary\" href=\"#\" data-modal-url=\"$link_url\"><i class=\"fas {$entity['icon']} me-1\"></i>{$entity['plural']}</a>";
+                $empty[] = "<a class=\"ajax-modal btn btn-xs btn-outline-secondary\" href=\"#\" data-modal-url=\"$link_url\"><i class=\"fas {$entity['icon']} me-1\"></i>" . linkEntityPlural($to) . '</a>';
             }
             continue;
         }
         $items = '';
         foreach ($rows as $row) {
             $unlink = $can_edit
-                ? '<a class="itflow-link-remove confirm-link" href="post.php?unlink_item&amp;from=' . $from . '&amp;id=' . $id . '&amp;to=' . $to . '&amp;other=' . intval($row['id']) . '&amp;csrf_token=' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" title="Unlink ' . $entity['label'] . '"><i class="fas fa-unlink"></i></a>'
+                ? '<a class="itflow-link-remove confirm-link" href="post.php?unlink_item&amp;from=' . $from . '&amp;id=' . $id . '&amp;to=' . $to . '&amp;other=' . intval($row['id']) . '&amp;csrf_token=' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" title="' . escapeHtml(linkEntityText($to, 'unlink')) . '"><i class="fas fa-unlink"></i></a>'
                 : '';
             $items .= '<li class="itflow-link-row">' . linkRowHtml($to, $row, $client_id) . $unlink . '</li>';
         }
-        $add = $can_edit ? "<a class=\"ajax-modal ms-auto small\" href=\"#\" data-modal-url=\"$link_url\" title=\"Link {$entity['label']}\"><i class=\"fas fa-plus me-1\"></i>Link</a>" : '';
-        $groups .= "<div class=\"itflow-link-group\"><div class=\"itflow-link-group-head\"><i class=\"fas fa-fw {$entity['icon']} me-1\"></i>{$entity['plural']}<span class=\"badge rounded-pill ms-1\">" . count($rows) . "</span>$add</div><ul class=\"list-unstyled mb-0\">$items</ul></div>";
+        $add = $can_edit ? "<a class=\"ajax-modal ms-auto small\" href=\"#\" data-modal-url=\"$link_url\" title=\"" . escapeHtml(linkEntityText($to, 'link')) . '"><i class="fas fa-plus me-1"></i>' . __('Link') . '</a>' : '';
+        $groups .= "<div class=\"itflow-link-group\"><div class=\"itflow-link-group-head\"><i class=\"fas fa-fw {$entity['icon']} me-1\"></i>" . linkEntityPlural($to) . "<span class=\"badge rounded-pill ms-1\">" . count($rows) . "</span>$add</div><ul class=\"list-unstyled mb-0\">$items</ul></div>";
     }
     if ($empty) {
-        $groups .= '<div class="itflow-link-empty"><span class="small text-body-secondary me-1">Link</span>' . implode(' ', $empty) . '</div>';
+        $groups .= '<div class="itflow-link-empty"><span class="small text-body-secondary me-1">' . __('Link') . '</span>' . implode(' ', $empty) . '</div>';
     }
     if ($groups === '') {
-        $groups = '<div class="small text-body-secondary">Nothing linked.</div>';
+        $groups = '<div class="small text-body-secondary">' . __('Nothing linked.') . '</div>';
     }
     return "<div class=\"itflow-links\">$groups</div>";
 }

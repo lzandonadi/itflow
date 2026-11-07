@@ -1,4 +1,5 @@
-/*
+/* i18n-ignore-file - the setup wizard runs before a language is chosen and stays English
+ *
  * The setup wizard (setup/index.php, setup/steps/) - what its forms do in the
  * browser before they are sent. The server checks everything again
  * (setup/setup_forms.php); this says so sooner, beside the field.

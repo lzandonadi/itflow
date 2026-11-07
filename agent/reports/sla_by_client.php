@@ -64,28 +64,28 @@ $clients = array_values($clients);
 $agent_link = $agent_id ? "&assigned=$agent_id" : '';
 
 $columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'tickets.php');
     }],
-    'tickets' => ['label' => 'Tickets', 'type' => 'count'],
+    'tickets' => ['label' => __('Tickets'), 'type' => 'count'],
     // The late counts sit beside their share on screen; the export keeps them apart
-    'response_missed' => ['label' => 'Replied late', 'type' => 'count', 'screen' => false],
-    'response_percent' => ['label' => 'Response', 'type' => 'percent', 'title' => 'First replies in time, of those judged', 'html' => function ($row) {
+    'response_missed' => ['label' => __('Replied late'), 'type' => 'count', 'screen' => false],
+    'response_percent' => ['label' => __('Response'), 'type' => 'percent', 'title' => __('First replies in time, of those judged'), 'html' => function ($row) {
         return reportRateHtml($row['response_percent']) . reportLateHtml($row['response_missed']);
     }],
-    'resolution_missed' => ['label' => 'Resolved late', 'type' => 'count', 'screen' => false],
-    'resolution_percent' => ['label' => 'Resolution', 'type' => 'percent', 'title' => 'Resolved in time, of those judged', 'html' => function ($row) {
+    'resolution_missed' => ['label' => __('Resolved late'), 'type' => 'count', 'screen' => false],
+    'resolution_percent' => ['label' => __('Resolution'), 'type' => 'percent', 'title' => __('Resolved in time, of those judged'), 'html' => function ($row) {
         return reportRateHtml($row['resolution_percent']) . reportLateHtml($row['resolution_missed']);
     }],
-    'response' => ['label' => 'First reply', 'type' => 'duration', 'title' => 'Typical (middle) time to the first reply, on the clock'],
-    'resolve_clock' => ['label' => 'Clock to resolve', 'type' => 'duration', 'title' => 'Average business time with the SLA clock running, to resolve'],
-    'breached_open' => ['label' => 'Breached now', 'type' => 'count', 'csv_label' => 'Breached and still open', 'title' => 'Open tickets that have missed a target, whenever they were raised', 'html' => function ($row) use ($agent_link) {
+    'response' => ['label' => __('First reply'), 'type' => 'duration', 'title' => __('Typical (middle) time to the first reply, on the clock')],
+    'resolve_clock' => ['label' => __('Clock to resolve'), 'type' => 'duration', 'title' => __('Average business time with the SLA clock running, to resolve')],
+    'breached_open' => ['label' => __('Breached now'), 'type' => 'count', 'csv_label' => __('Breached and still open'), 'title' => __('Open tickets that have missed a target, whenever they were raised'), 'html' => function ($row) use ($agent_link) {
         return $row['breached_open'] ? '<a class="text-danger-emphasis fw-semibold" href="/agent/tickets.php?client_id=' . $row['client_id'] . '&sla=breached' . $agent_link . '">' . $row['breached_open'] . '</a>' : '<span class="itflow-report-zero">–</span>';
     }],
 ];
 
 $overall = reportSlaCompliance($filter);
-$totals = ['client' => 'Total', 'tickets' => $overall['tickets'], 'response_missed' => $overall['response_missed'], 'response_percent' => $overall['response_percent'],
+$totals = ['client' => __('Total'), 'tickets' => $overall['tickets'], 'response_missed' => $overall['response_missed'], 'response_percent' => $overall['response_percent'],
     'resolution_missed' => $overall['resolution_missed'], 'resolution_percent' => $overall['resolution_percent'],
     'breached_open' => array_sum(array_column($clients, 'breached_open'))];
 
@@ -109,37 +109,36 @@ $chart_rows = array_slice($clients, 0, 15);
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Clients with SLA tickets', 'value' => reportCount(count($clients)), 'sub' => reportCount($overall['tickets']) . ' <span class="text-body-tertiary">tickets</span>'],
-        ['label' => 'First reply in time', 'value_html' => reportRateHtml($overall['response_percent']), 'sub' => '<span class="text-body-tertiary">Across all clients</span>'],
-        ['label' => 'Resolved in time', 'value_html' => reportRateHtml($overall['resolution_percent']), 'sub' => '<span class="text-body-tertiary">Across all clients</span>'],
-        ['label' => 'Clients under 80%', 'value' => reportCount(count($below)), 'tone' => $below ? 'danger' : 'success', 'sub' => '<span class="text-body-tertiary">On response or resolution</span>'],
+        ['label' => __('Clients with SLA tickets'), 'value' => reportCount(count($clients)), 'sub' => reportCount($overall['tickets']) . ' <span class="text-body-tertiary">' . __('tickets') . '</span>'],
+        ['label' => __('First reply in time'), 'value_html' => reportRateHtml($overall['response_percent']), 'sub' => '<span class="text-body-tertiary">' . __('Across all clients') . '</span>'],
+        ['label' => __('Resolved in time'), 'value_html' => reportRateHtml($overall['resolution_percent']), 'sub' => '<span class="text-body-tertiary">' . __('Across all clients') . '</span>'],
+        ['label' => __('Clients under 80%'), 'value' => reportCount(count($below)), 'tone' => $below ? 'danger' : 'success', 'sub' => '<span class="text-body-tertiary">' . __('On response or resolution') . '</span>'],
     ]) ?>
 
     <?php if ($chart_rows) { ?>
-        <?= reportSectionOpen('Targets met', 'Worst first') ?>
+        <?= reportSectionOpen(__('Targets met'), __('Worst first')) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
                     'labels' => array_column($chart_rows, 'client'),
                     'series' => [
-                        ['label' => 'First reply in time', 'data' => array_column($chart_rows, 'response_percent'), 'tone' => 'accent'],
-                        ['label' => 'Resolved in time', 'data' => array_column($chart_rows, 'resolution_percent'), 'tone' => 'success'],
+                        ['label' => __('First reply in time'), 'data' => array_column($chart_rows, 'response_percent'), 'tone' => 'accent'],
+                        ['label' => __('Resolved in time'), 'data' => array_column($chart_rows, 'resolution_percent'), 'tone' => 'success'],
                     ],
                     'format' => 'percent',
                     'max' => 100,
-                ], '', 'The share of SLA targets met for each client') ?>
+                ], '', __('The share of SLA targets met for each client')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Worst first') ?>
-        <?= reportTable($columns, $clients, ['empty' => reportEmpty('No ticket raised in this period carried an SLA.', 'fa-stopwatch', 'secondary'), 'totals' => $totals,
+    <?= reportSectionOpen(__('By client'), __('Worst first')) ?>
+        <?= reportTable($columns, $clients, ['empty' => reportEmpty(__('No ticket raised in this period carried an SLA.'), 'fa-stopwatch', 'secondary'), 'totals' => $totals,
             'totals_html' => ['response_percent' => reportRateHtml($overall['response_percent']) . reportLateHtml($overall['response_missed']),
                 'resolution_percent' => reportRateHtml($overall['resolution_percent']) . reportLateHtml($overall['resolution_missed'])]]) ?>
         <div class="card-footer small text-body-secondary">
-            Tickets raised in the period that carry an SLA. Percentages count only targets already judged. The first reply runs on the clock;
-            the SLA clock to resolve counts business hours with the clock running, so time paused (On Hold) is left out.
+            <?= __('Tickets raised in the period that carry an SLA. Percentages count only targets already judged. The first reply runs on the clock; the SLA clock to resolve counts business hours with the clock running, so time paused (On Hold) is left out.') ?>
         </div>
     </div>
 

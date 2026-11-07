@@ -60,11 +60,11 @@
         // The two passwords have to match before anything is sent
         if (passwords.length === 2) {
             passwords[1].addEventListener('input', function () {
-                passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : 'The passwords do not match');
+                passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : __('The passwords do not match'));
             });
             passwords[0].addEventListener('input', function () {
                 if (passwords[1].value !== '') {
-                    passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : 'The passwords do not match');
+                    passwords[1].setCustomValidity(passwords[1].value === passwords[0].value ? '' : __('The passwords do not match'));
                 }
             });
         }
@@ -74,7 +74,7 @@
             form.querySelector('input[name="download_token"]').value = token;
             const label = submit.innerHTML;
             submit.disabled = true;
-            submit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Preparing...';
+            submit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + __('Preparing...');
 
             // A disabled button is left out of the post - carry its name across
             let marker = form.querySelector('input[data-client-export-trigger]');

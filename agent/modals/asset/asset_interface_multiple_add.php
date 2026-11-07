@@ -28,7 +28,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-ethernet me-2"></i>Add ports to <strong><?= escapeHtml($asset['asset_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-ethernet me-2"></i><?= __('Add ports to') ?> <strong><?= escapeHtml($asset['asset_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -39,28 +39,28 @@ ob_start();
     <div class="modal-body">
         <div class="row g-3">
             <div class="col-md-5">
-                <label class="form-label">Name before the number</label>
+                <label class="form-label"><?= __('Name before the number') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-font"></i></span>
-                    <input type="text" class="form-control font-monospace" name="name_prefix" maxlength="190" placeholder="Gi1/0/, eth, Port " value="<?= escapeHtml($prefix) ?>" data-series="prefix">
+                    <input type="text" class="form-control font-monospace" name="name_prefix" maxlength="190" placeholder="<?= escapeHtml(__('Gi1/0/, eth, Port ')) ?>" value="<?= escapeHtml($prefix) ?>" data-series="prefix">
                 </div>
             </div>
             <div class="col-md-3 col-6">
-                <label class="form-label">First number</label>
+                <label class="form-label"><?= __('First number') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
                     <input type="number" class="form-control" name="interface_start" min="0" value="<?= $start ?>" required data-series="start">
                 </div>
             </div>
             <div class="col-md-4 col-6">
-                <label class="form-label">How many</label>
+                <label class="form-label"><?= __('How many') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-ethernet"></i></span>
                     <input type="number" class="form-control" name="interfaces" min="1" max="128" value="<?= $count ?>" required data-series="count">
                 </div>
             </div>
             <div class="col-md-5">
-                <label class="form-label">Numbers</label>
+                <label class="form-label"><?= __('Numbers') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-sort-numeric-down"></i></span>
                     <select class="form-select" name="pad" data-series="pad">
@@ -71,22 +71,22 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-7">
-                <label class="form-label">Type</label>
+                <label class="form-label"><?= __('Type') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-plug"></i></span>
                     <select class="form-select select2" name="type">
-                        <option value="">- No type -</option>
-                        <?= categoryOptionsHtml('network_interface', isset($types['Ethernet']) ? 'Ethernet' : null) ?>
+                        <option value=""><?= __('- No type -') ?></option>
+                        <?= categoryOptionsHtml('network_interface', isset($types['Ethernet']) ? __('Ethernet') : null) ?>
                     </select>
                     <?= categoryAddButtonHtml('network_interface', 'btn btn-secondary') ?>
                 </div>
             </div>
             <div class="col-md-7">
-                <label class="form-label">Network</label>
+                <label class="form-label"><?= __('Network') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-network-wired"></i></span>
                     <select class="form-select select2" name="network_id">
-                        <option value="0">- No network -</option>
+                        <option value="0"><?= __('- No network -') ?></option>
                         <?php foreach ($networks as $network) { ?>
                             <option value="<?= intval($network['network_id']) ?>"<?= selectOptionNetwork($network) ?>><?= escapeHtml($network['network_name']) ?></option>
                         <?php } ?>
@@ -94,25 +94,25 @@ ob_start();
                 </div>
             </div>
             <div class="col-md-5">
-                <label class="form-label">VLANs</label>
+                <label class="form-label"><?= __('VLANs') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                     <input type="text" class="form-control" name="vlans" maxlength="200" placeholder="e.g. 10">
                 </div>
             </div>
             <div class="col-12">
-                <label class="form-label">Notes</label>
+                <label class="form-label"><?= __('Notes') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-pen"></i></span>
-                    <input type="text" class="form-control" name="notes" placeholder="On every one of them">
+                    <input type="text" class="form-control" name="notes" placeholder="<?= escapeHtml(__('On every one of them')) ?>">
                 </div>
             </div>
         </div>
         <div class="small mt-3 p-2 rounded bg-body-tertiary" data-series="preview"></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_asset_multiple_interfaces" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Add</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_asset_multiple_interfaces" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Add') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -140,14 +140,14 @@ ob_start();
             var box = field('preview');
             box.innerHTML = '';
             if (!list.length) {
-                box.textContent = 'Nothing to add.';
+                box.textContent = <?= json_encode(__('Nothing to add.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
                 return;
             }
             var shown = list.length > 6 ? list.slice(0, 3).concat(['...'], list.slice(-2)) : list;
             var skipped = list.filter(function (name) { return existing.indexOf(name.toLowerCase()) !== -1; }).length;
             var head = document.createElement('div');
             head.className = 'fw-semibold mb-1';
-            head.textContent = (list.length - skipped) + ' new port' + (list.length - skipped === 1 ? '' : 's') + (skipped ? ' - ' + skipped + ' already there, skipped' : '');
+            head.textContent = ((list.length - skipped) === 1 ? <?= json_encode(_n('%s new port', '%s new ports', 1, '%s'), JSON_HEX_TAG | JSON_HEX_AMP) ?> : <?= json_encode(_n('%s new port', '%s new ports', 2, '%s'), JSON_HEX_TAG | JSON_HEX_AMP) ?>).replace('%s', list.length - skipped) + (skipped ? ' - ' + <?= json_encode(__('%d already there, skipped'), JSON_HEX_TAG | JSON_HEX_AMP) ?>.replace('%d', skipped) : '');
             var line = document.createElement('div');
             line.className = 'font-monospace';
             shown.forEach(function (name, i) {

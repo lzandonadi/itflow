@@ -19,7 +19,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/check_login.php';
 
 if (!clientOnboardingReady()) {
-    flashAlert('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update', 'error');
+    flashAlert(__('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update'), 'error');
     redirect('/agent/clients.php');
 }
 enforceUserPermission('module_client', 2);
@@ -29,12 +29,12 @@ $co_client = null;
 if ($client_id) {
     $co_client = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT * FROM clients WHERE client_id = $client_id LIMIT 1"));
     if (!$co_client) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect('/agent/clients.php');
     }
     enforceClientAccess($client_id);
     if ($co_client['client_archived_at']) {
-        flashAlert('An archived client isn\'t onboarded - restore it first.', 'error');
+        flashAlert(__('An archived client isn\'t onboarded - restore it first.'), 'error');
         redirect("/agent/client_overview.php?client_id=$client_id");
     }
     $co_row = clientOnboardingRow($client_id) ?? clientOnboardingStart($client_id);
@@ -76,20 +76,20 @@ if (!empty($_SESSION['alert_message'])) {
 
 $co_company = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT company_name, company_logo FROM companies WHERE company_id = 1")) ?: [];
 $co_name = $co_client ? (string) $co_client['client_name'] : '';
-$co_title = $co_step === 'done' ? 'Where it stands' : $co_info['title'];
+$co_title = $co_step === 'done' ? __('Where it stands') : $co_info['title'];
 $co_leave = $client_id ? "/agent/client_overview.php?client_id=$client_id" : '/agent/clients.php';
 define('FROM_CLIENT_ONBOARDING', true);
 
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= $user_config_theme_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="<?= $user_config_theme_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="<?= $user_config_theme_dark ? 'dark' : 'light' ?>">
     <meta name="robots" content="noindex">
-    <title><?= escapeHtml($co_title) ?> - <?= escapeHtml($co_name !== '' ? "Onboarding $co_name" : 'Onboard a client') ?> - <?= escapeHtml($co_company['company_name'] ?? 'ITFlow') ?></title>
+    <title><?= escapeHtml($co_title) ?> - <?= escapeHtml($co_name !== '' ? "Onboarding $co_name" : __('Onboard a client')) ?> - <?= escapeHtml($co_company['company_name'] ?? 'ITFlow') ?></title>
     <?php if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico')) { ?>
         <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
     <?php } ?>
@@ -98,6 +98,7 @@ define('FROM_CLIENT_ONBOARDING', true);
     <link rel="stylesheet" href="/libs/sweetalert2/css/sweetalert2.min.css">
     <link rel="stylesheet" href="/libs/intl-tel-input/css/intlTelInput.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
+<script src="/js/i18n.js"></script>
 </head>
 
 <body class="itflow-setup itflow-gs itflow-co bg-body-tertiary" data-itflow-phone-country="<?= escapeHtml($country_iso2_array[$session_company_country] ?? '') ?>">
@@ -107,23 +108,23 @@ define('FROM_CLIENT_ONBOARDING', true);
     <header class="itflow-gs-top">
         <a href="<?= $client_id ? clientOnboardingUrl($client_id) : $co_leave ?>" class="itflow-gs-brand text-reset text-decoration-none min-w-0">
             <span class="itflow-gs-card-icon flex-shrink-0 align-self-center" aria-hidden="true"><i class="fas fa-route"></i></span>
-            <span class="text-truncate" data-co-name><?= escapeHtml($co_name !== '' ? $co_name : 'A new client') ?></span>
-            <span class="itflow-setup-brand-sub">Onboarding</span>
+            <span class="text-truncate" data-co-name><?= escapeHtml($co_name !== '' ? $co_name : __('A new client')) ?></span>
+            <span class="itflow-setup-brand-sub"><?= __('Onboarding') ?></span>
         </a>
         <a href="<?= escapeHtml($co_leave) ?>" class="btn btn-sm btn-outline-secondary flex-shrink-0" data-co-later
-            title="<?= $client_id ? 'Their overview shows what is left, to carry on from' : 'Back to the clients' ?>"><?= $client_id && !$co_progress['finished'] ? 'Do it later' : ($client_id ? 'Go to the client' : 'Cancel') ?><i class="fas fa-arrow-right ms-2"></i></a>
+            title="<?= $client_id ? __('Their overview shows what is left, to carry on from') : __('Back to the clients') ?>"><?= $client_id && !$co_progress['finished'] ? __('Do it later') : ($client_id ? __('Go to the client') : __('Cancel')) ?><i class="fas fa-arrow-right ms-2"></i></a>
     </header>
 
     <!-- The steps, and where each stands -->
-    <nav class="itflow-setup-steps" aria-label="Onboarding steps">
+    <nav class="itflow-setup-steps" aria-label="<?= escapeHtml(__('Onboarding steps')) ?>">
         <ol class="list-unstyled d-none d-md-flex">
             <?php foreach ($co_keys_all as $key) {
-                $step = $co_steps[$key] ?? (CLIENT_ONBOARDING_STEPS[$key] + ['done' => false, 'skipped' => false]);
+                $step = $co_steps[$key] ?? (clientOnboardingStepInfo($key) + ['done' => false, 'skipped' => false]);
                 $state = $key === $co_step ? 'current' : ($step['done'] ? 'done' : ($step['skipped'] ? 'skipped' : 'todo'));
                 $marker = $step['done'] ? '<i class="fas fa-check"></i>' : ($step['skipped'] ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-fw ' . $step['icon'] . '"></i>'); ?>
                 <li class="itflow-setup-step is-<?= $state ?><?= $step['done'] ? ' has-done' : '' ?>" data-co-step="<?= $key ?>" data-co-state="<?= $step['done'] ? 'done' : ($step['skipped'] ? 'skipped' : 'todo') ?>"<?= $state === 'current' ? ' aria-current="step"' : '' ?>>
                     <?php if ($client_id) { ?>
-                        <a href="<?= clientOnboardingUrl($client_id, $key) ?>" title="<?= escapeHtml($step['title'] . ' - ' . ($step['done'] ? 'done' : ($step['skipped'] ? 'skipped for now' : 'to do'))) ?>">
+                        <a href="<?= clientOnboardingUrl($client_id, $key) ?>" title="<?= escapeHtml($step['done'] ? __('%s - done', $step['title']) : ($step['skipped'] ? __('%s - skipped for now', $step['title']) : __('%s - to do', $step['title']))) ?>">
                             <span class="itflow-setup-step-marker"><?= $marker ?></span><span class="itflow-setup-step-label"><?= escapeHtml($step['label']) ?></span>
                         </a>
                     <?php } else { ?>
@@ -135,9 +136,9 @@ define('FROM_CLIENT_ONBOARDING', true);
         <div class="d-md-none">
             <div class="d-flex justify-content-between small mb-1">
                 <span class="fw-semibold"><?= escapeHtml($co_title) ?></span>
-                <span class="text-body-secondary"><?= $client_id ? $co_progress['done'] : 0 ?> of <?= $co_total ?> done</span>
+                <span class="text-body-secondary"><?= __('%1$d of %2$d done', $client_id ? $co_progress['done'] : 0, $co_total) ?></span>
             </div>
-            <div class="progress itflow-gs-progress" role="progressbar" aria-label="How far onboarding has got" aria-valuenow="<?= $client_id ? $co_progress['done'] : 0 ?>" aria-valuemin="0" aria-valuemax="<?= $co_total ?>">
+            <div class="progress itflow-gs-progress" role="progressbar" aria-label="<?= escapeHtml(__('How far onboarding has got')) ?>" aria-valuenow="<?= $client_id ? $co_progress['done'] : 0 ?>" aria-valuemin="0" aria-valuemax="<?= $co_total ?>">
                 <div class="progress-bar" style="width: <?= $client_id && $co_total ? round($co_progress['done'] * 100 / $co_total) : 0 ?>%"></div>
             </div>
         </div>
@@ -157,9 +158,9 @@ define('FROM_CLIENT_ONBOARDING', true);
                     <div class="d-flex flex-wrap align-items-start gap-2 mb-1">
                         <h1 class="h4 fw-semibold mb-0 me-auto"><i class="fas fa-fw <?= $co_info['icon'] ?> text-body-secondary me-2"></i><?= escapeHtml($co_info['title']) ?></h1>
                         <?php if ($co_info['done']) { ?>
-                            <span class="badge rounded-pill text-bg-success" data-co-done><i class="fas fa-check me-1"></i>Done</span>
+                            <span class="badge rounded-pill text-bg-success" data-co-done><i class="fas fa-check me-1"></i><?= __('Done') ?></span>
                         <?php } elseif ($co_info['skipped']) { ?>
-                            <span class="badge rounded-pill text-bg-secondary" data-co-skipped>Skipped for now</span>
+                            <span class="badge rounded-pill text-bg-secondary" data-co-skipped><?= __('Skipped for now') ?></span>
                         <?php } ?>
                     </div>
                     <p class="text-body-secondary mb-4"><?= escapeHtml($co_info['about']) ?></p>
@@ -168,16 +169,16 @@ define('FROM_CLIENT_ONBOARDING', true);
                 <?php if ($client_id) { ?>
                     <div class="card-footer d-flex flex-wrap align-items-center gap-2 py-3 px-4">
                         <?php if ($co_prev !== '') { ?>
-                            <a href="<?= clientOnboardingUrl($client_id, $co_prev) ?>" class="btn btn-link text-decoration-none ps-0"><i class="fas fa-arrow-left me-2"></i>Back</a>
+                            <a href="<?= clientOnboardingUrl($client_id, $co_prev) ?>" class="btn btn-link text-decoration-none ps-0"><i class="fas fa-arrow-left me-2"></i><?= __('Back') ?></a>
                         <?php } ?>
-                        <span class="me-auto small text-body-secondary"><?= $co_progress['done'] ?> of <?= $co_progress['total'] ?> done</span>
+                        <span class="me-auto small text-body-secondary"><?= __('%1$d of %2$d done', $co_progress['done'], $co_progress['total']) ?></span>
                         <?php if ($co_info['done'] || $co_info['skipped']) { ?>
-                            <a href="<?= clientOnboardingUrl($client_id, $co_next) ?>" class="btn btn-outline-primary" data-co-continue><?= $co_next === 'done' ? 'Finish' : 'Next: ' . escapeHtml($co_steps[$co_next]['title']) ?><i class="fas fa-arrow-right ms-2"></i></a>
+                            <a href="<?= clientOnboardingUrl($client_id, $co_next) ?>" class="btn btn-outline-primary" data-co-continue><?= $co_next === 'done' ? __('Finish') : 'Next: ' . escapeHtml($co_steps[$co_next]['title']) ?><i class="fas fa-arrow-right ms-2"></i></a>
                         <?php } elseif ($co_step !== 'company') { ?>
                             <form action="post.php" method="post" class="m-0">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                 <input type="hidden" name="client_id" value="<?= $client_id ?>">
-                                <button type="submit" name="client_onboarding_skip" value="<?= escapeHtml($co_step) ?>" class="btn btn-outline-secondary" data-co-skip>Skip for now</button>
+                                <button type="submit" name="client_onboarding_skip" value="<?= escapeHtml($co_step) ?>" class="btn btn-outline-secondary" data-co-skip><?= __('Skip for now') ?></button>
                             </form>
                         <?php } ?>
                     </div>
@@ -191,7 +192,7 @@ define('FROM_CLIENT_ONBOARDING', true);
     </main>
 
     <footer class="itflow-setup-footer">
-        <?= $client_id ? 'Carry on any time from ' . escapeHtml(contractPossessive($co_name)) . ' overview.' : 'Saving the company makes the client - the rest can wait.' ?>
+        <?= $client_id ? __("Carry on any time from the client's overview.") : __('Saving the company makes the client - the rest can wait.') ?>
     </footer>
 
 </div>

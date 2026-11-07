@@ -13,7 +13,7 @@ $sql = mysqli_query($mysqli, "SELECT task_completed_at, task_completion_estimate
 
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    echo json_encode(['error' => 'That task no longer exists.']);
+    echo json_encode(['error' => __('That task no longer exists.')]);
     exit;
 }
 $task_name = escapeHtml($row['task_name']);
@@ -38,7 +38,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-tasks me-2"></i>Edit task</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-tasks me-2"></i><?= __('Edit task') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -48,15 +48,15 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Task <strong class="text-danger">*</strong></label>
+            <label><?= __('Task') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="What needs doing" maxlength="255" value="<?= $task_name ?>" required autofocus>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('What needs doing')) ?>" maxlength="255" value="<?= $task_name ?>" required autofocus>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Time estimate <span class="text-secondary">(minutes)</span></label>
+            <label><?= __('Time estimate <span class="text-secondary">(minutes)</span>') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-clock"></i></span>
                 <input type="number" class="form-control" name="completion_estimate" placeholder="e.g. 30" value="<?= $task_completion_estimate ?>">
@@ -66,13 +66,13 @@ ob_start();
         <?php if (mysqli_num_rows($sql_task_approvals) > 0) { ?>
             <hr>
             <div class="mb-3">
-                <b>Approvals</b>
+                <b><?= __('Approvals') ?></b>
 
                 <table class="table table-sm table-bordered" style="margin-top:10px;">
                     <thead>
                     <tr>
-                        <th>Who can approve</th>
-                        <th>Status</th>
+                        <th><?= __('Who can approve') ?></th>
+                        <th><?= __('Status') ?></th>
                         <th></th>
                     </tr>
                     </thead>
@@ -88,26 +88,26 @@ ob_start();
 
                         // In words - the raw scope/type pair ("Internal", "Any") meant nothing on screen
                         if ($approval_scope == 'internal' && $approval_type == 'specific') {
-                            $approval_who = $approval_user_name ?: 'A specific technician';
+                            $approval_who = $approval_user_name ?: __('A specific technician');
                         } elseif ($approval_scope == 'internal') {
-                            $approval_who = 'Any other technician';
+                            $approval_who = __('Any other technician');
                         } elseif ($approval_type == 'technical') {
-                            $approval_who = "The client's technical contacts";
+                            $approval_who = __("The client's technical contacts");
                         } elseif ($approval_type == 'billing') {
-                            $approval_who = "The client's billing contacts";
+                            $approval_who = __("The client's billing contacts");
                         } else {
-                            $approval_who = 'The ticket contact';
+                            $approval_who = __('The ticket contact');
                         }
                         ?>
                         <tr>
                             <td><?= $approval_who ?></td>
-                            <td><?= ucfirst($approval_status) ?></td>
+                            <td><?= escapeHtml(['pending' => __('Pending'), 'approved' => __('Approved')][$approval_status] ?? ucfirst($approval_status)) ?></td>
                             <td>
                                 <?php if ($approval_status !== 'approved') { ?>
                                     <a class="text-danger"
-                                       onclick="return confirm('Delete this approval request?');"
+                                       onclick="return confirm(<?= escapeHtml(json_encode(__('Delete this approval request?'))) ?>);"
                                        href="post.php?delete_ticket_task_approver=<?= $approval_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-times"></i>Remove
+                                        <i class="fas fa-fw fa-times"></i><?= __('Remove') ?>
                                     </a>
                                     <!-- confirm-link won't work -->
                                 <?php } ?>
@@ -123,8 +123,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket_task" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_ticket_task" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

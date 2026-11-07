@@ -100,11 +100,11 @@ if (!empty($_GET['expire_days'])) {
 
 // Extra columns, picked from the filter bar
 $extra_column_options = [
-    'Mac_Address' => 'MAC address',
-    'Purchase_Date' => 'Purchase date',
-    'Install_Date' => 'Install date',
-    'Warranty_Expire' => 'Warranty',
-    'Details' => 'Details',
+    'Mac_Address' => __('MAC address'),
+    'Purchase_Date' => __('Purchase date'),
+    'Install_Date' => __('Install date'),
+    'Warranty_Expire' => __('Warranty'),
+    'Details' => __('Details'),
 ];
 $extra_columns = array_values(array_intersect(array_keys($extra_column_options), (array) ($_GET['show_column'] ?? [])));
 $show_mac = in_array('Mac_Address', $extra_columns, true);
@@ -196,25 +196,25 @@ if ($assets) {
     }
 }
 
-$search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets';
+$search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : __('assets');
 
 ?>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-desktop me-2"></i>Assets</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-desktop me-2"></i><?= __('Assets') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit) { ?>
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_add.php?<?= $client_url ?>&type=<?= $type_filter ?>">
-                    <i class="fas fa-plus me-2"></i>New <?= $type_filter ? $asset_type_tabs[$type_filter]['new'] : 'Asset' ?>
+                    <i class="fas fa-plus me-2"></i><?= $type_filter ? $asset_type_tabs[$type_filter]['new'] : __('New Asset') ?>
                 </button>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
                 <div class="dropdown-menu">
                     <?php if ($client_url) { ?>
                     <a class="dropdown-item text-dark ajax-modal" href="#"
                         data-modal-url="modals/asset/asset_import.php?<?= $client_url ?>">
-                        <i class="fa fa-fw fa-upload me-2"></i>Import
+                        <i class="fa fa-fw fa-upload me-2"></i><?= __('Import') ?>
                     </a>
                     <?php } ?>
                     <?php if ($num_rows[0] > 0) { ?>
@@ -223,7 +223,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         <?php } ?>
                         <a class="dropdown-item text-dark ajax-modal" href="#"
                             data-modal-url="<?= buildExportModalUrl('modals/asset/asset_export.php', ['client_id', 'type', 'client', 'location', 'status', 'tags', 'expire_days', 'archived', 'q']) ?>">
-                            <i class="fa fa-fw fa-download me-2"></i>Export
+                            <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                         </a>
                     <?php } ?>
                 </div>
@@ -237,7 +237,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
         <div class="card-header py-2 itflow-asset-tabs">
             <nav class="nav nav-pills flex-nowrap overflow-auto">
                 <a class="nav-link text-nowrap <?= $type_filter === '' ? 'active' : '' ?>" href="?<?= $url_query_strings_sort ?>&type=">
-                    All <span class="badge rounded-pill ms-1"><?= $tab_counts[''] ?></span>
+                    <?= __('All') ?> <span class="badge rounded-pill ms-1"><?= $tab_counts[''] ?></span>
                 </a>
                 <?php foreach ($asset_type_tabs as $tab_key => $tab) {
                     if (!$tab_counts[$tab_key] && $type_filter !== $tab_key) {
@@ -261,14 +261,14 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
             <div class="row g-2 align-items-center">
                 <div class="col-xl-3 col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= strtolower($search_noun) ?>, IPs, serials...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search %s, IPs, serials...', mb_strtolower($search_noun))) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <?php if ($client_url) { ?>
                 <div class="col-xl col-lg-4 col-md-6">
                     <select class="form-select select2" name="location" onchange="this.form.submit()">
-                        <option value="">- All Locations -</option>
+                        <option value=""><?= __('- All Locations -') ?></option>
                         <?php
                         $sql_locations_filter = mysqli_query($mysqli, "
                             SELECT DISTINCT location_id, location_name
@@ -288,7 +288,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                 <?php } else { ?>
                 <div class="col-xl col-lg-4 col-md-6">
                     <select class="form-select select2" name="client" onchange="this.form.submit()">
-                        <option value="" <?php if ($client == "") { echo "selected"; } ?>>- All Clients -</option>
+                        <option value="" <?php if ($client == "") { echo "selected"; } ?>><?= __('- All Clients -') ?></option>
                         <?php
                         $sql_clients_filter = mysqli_query($mysqli, "
                             SELECT DISTINCT client_id, client_name, client_abbreviation
@@ -309,7 +309,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                 <?php } ?>
                 <div class="col-xl col-lg-4 col-md-6">
                     <select class="form-select select2" name="status" onchange="this.form.submit()">
-                        <option value="">- Status -</option>
+                        <option value=""><?= __('- Status -') ?></option>
                         <?= categoryFilterOptionsHtml('asset_status', $status_filter, "SELECT DISTINCT asset_status FROM assets
                             LEFT JOIN clients ON client_id = asset_client_id
                             WHERE $archive_query AND asset_status IS NOT NULL AND asset_status <> ''
@@ -317,7 +317,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                     </select>
                 </div>
                 <div class="col-xl col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="- Tags -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('- Tags -')) ?>" multiple>
                         <?php
                         // Tags in use on assets in this scope, plus any already picked
                         $sql_tags_filter = mysqli_query($mysqli, "
@@ -340,15 +340,15 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                 </div>
                 <div class="col-xl col-lg-3 col-md-6">
                     <select class="form-select select2" name="expire_days" onchange="this.form.submit()">
-                        <option value="" <?php if ($expire_days == "") { echo "selected"; } ?>>- Warranty -</option>
-                        <option value="expired" <?php if ($expire_days === "expired") { echo "selected"; } ?>>Expired</option>
+                        <option value="" <?php if ($expire_days == "") { echo "selected"; } ?>><?= __('- Warranty -') ?></option>
+                        <option value="expired" <?php if ($expire_days === "expired") { echo "selected"; } ?>><?= __('Expired') ?></option>
                         <?php foreach ([7, 30, 45, 60, 90] as $expire_option) { ?>
-                            <option value="<?= $expire_option ?>" <?php if ($expire_days === $expire_option) { echo "selected"; } ?>>Expiring in <?= $expire_option ?> days</option>
+                            <option value="<?= $expire_option ?>" <?php if ($expire_days === $expire_option) { echo "selected"; } ?>><?= __('Expiring in %d days', $expire_option) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="col-xl col-lg-3 col-md-6">
-                    <select onchange="this.form.submit()" class="form-select select2" name="show_column[]" data-placeholder="- More columns -" multiple>
+                    <select onchange="this.form.submit()" class="form-select select2" name="show_column[]" data-placeholder="<?= escapeHtml(__('- More columns -')) ?>" multiple>
                         <?php foreach ($extra_column_options as $column_key => $column_label) { ?>
                             <option value="<?= $column_key ?>" <?php if (in_array($column_key, $extra_columns, true)) { echo 'selected'; } ?>><?= $column_label ?></option>
                         <?php } ?>
@@ -357,78 +357,78 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                 <div class="col-xl-auto col-lg-3 col-md-12">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="?<?= $client_url ?>archived=<?= $archived ? 0 : 1 ?>"
-                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active assets' : 'Show archived assets' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2">Archived</span>
+                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Back to active assets') : __('Show archived assets') ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { // every bulk action changes them ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount"></span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount"></span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <button class="dropdown-item"
                                     type="submit" form="bulkActions" name="bulk_favorite_assets">
-                                    <i class="fas fa-fw fa-star text-warning me-2"></i>Favorite
+                                    <i class="fas fa-fw fa-star text-warning me-2"></i><?= __('Favorite') ?>
                                 </button>
                                 <button class="dropdown-item"
                                     type="submit" form="bulkActions" name="bulk_unfavorite_assets">
-                                    <i class="far fa-fw fa-star me-2"></i>Unfavorite
+                                    <i class="far fa-fw fa-star me-2"></i><?= __('Unfavorite') ?>
                                 </button>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($client_url) { ?>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_assign_contact.php?<?= $client_url ?>"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-user me-2"></i>Assign Contact
+                                    <i class="fas fa-fw fa-user me-2"></i><?= __('Assign Contact') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_assign_location.php?<?= $client_url ?>"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-map-marker-alt me-2"></i>Assign Location
+                                    <i class="fas fa-fw fa-map-marker-alt me-2"></i><?= __('Assign Location') ?>
                                 </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_assign_physical_location.php"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-door-closed me-2"></i>Set Physical Location
+                                    <i class="fas fa-fw fa-door-closed me-2"></i><?= __('Set Physical Location') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_edit_status.php"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-info-circle me-2"></i>Set Status
+                                    <i class="fas fa-fw fa-info-circle me-2"></i><?= __('Set Status') ?>
                                 </a>
                                 <a class="dropdown-item" href="#" data-tag-picker data-tag-entity="asset" data-tag-bulk data-csrf="<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-tags me-2"></i>Tags
+                                    <i class="fas fa-fw fa-tags me-2"></i><?= __('Tags') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_add_ticket.php"
                                     data-modal-size="lg"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-life-ring me-2"></i>Create Tickets
+                                    <i class="fas fa-fw fa-life-ring me-2"></i><?= __('Create Tickets') ?>
                                 </a>
                                 <a class="dropdown-item ajax-modal" href="#"
                                     data-modal-url="modals/asset/asset_bulk_transfer_client.php?<?= $client_url ?>"
                                     data-bulk="true">
-                                    <i class="fas fa-fw fa-arrow-right me-2"></i>Transfer to Client
+                                    <i class="fas fa-fw fa-arrow-right me-2"></i><?= __('Transfer to Client') ?>
                                 </a>
                                 <?php if ($archived) { ?>
                                     <div class="dropdown-divider"></div>
                                     <button class="dropdown-item text-info"
                                         type="submit" form="bulkActions" name="bulk_restore_assets">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                     <button class="dropdown-item text-danger text-bold"
                                         type="submit" form="bulkActions" name="bulk_delete_assets">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </button>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <div class="dropdown-divider"></div>
                                     <button class="dropdown-item text-danger confirm-link"
                                         type="submit" form="bulkActions" name="bulk_archive_assets">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -450,84 +450,84 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                     <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_name&order=<?= $disp ?>">
-                            Name <?php if ($sort == 'asset_name') { echo $order_icon; } ?>
+                            <?= __('Name') ?> <?php if ($sort == 'asset_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_type&order=<?= $disp ?>">
-                            Type / OS <?php if ($sort == 'asset_type') { echo $order_icon; } ?>
+                            <?= __('Type / OS') ?> <?php if ($sort == 'asset_type') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php if ($show_model) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_make&order=<?= $disp ?>">
-                                Model / Serial <?php if ($sort == 'asset_make') { echo $order_icon; } ?>
+                                <?= __('Model / Serial') ?> <?php if ($sort == 'asset_make') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=interface_ip&order=<?= $disp ?>">
-                            IP <?php if ($sort == 'interface_ip') { echo $order_icon; } ?>
+                            <?= __('IP') ?> <?php if ($sort == 'interface_ip') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php if ($show_mac) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=interface_mac&order=<?= $disp ?>">
-                                MAC <?php if ($sort == 'interface_mac') { echo $order_icon; } ?>
+                                <?= __('MAC') ?> <?php if ($sort == 'interface_mac') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <?php if ($show_purchase) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_purchase_date&order=<?= $disp ?>">
-                                Purchased <?php if ($sort == 'asset_purchase_date') { echo $order_icon; } ?>
+                                <?= __('Purchased') ?> <?php if ($sort == 'asset_purchase_date') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <?php if ($show_details) { ?>
-                        <th>Details</th>
+                        <th><?= __('Details') ?></th>
                     <?php } ?>
                     <?php if ($show_install) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_install_date&order=<?= $disp ?>">
-                                Installed <?php if ($sort == 'asset_install_date') { echo $order_icon; } ?>
+                                <?= __('Installed') ?> <?php if ($sort == 'asset_install_date') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <?php if ($show_warranty) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_warranty_expire&order=<?= $disp ?>">
-                                Warranty <?php if ($sort == 'asset_warranty_expire') { echo $order_icon; } ?>
+                                <?= __('Warranty') ?> <?php if ($sort == 'asset_warranty_expire') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <?php if ($show_contact) { ?>
                         <th>
                             <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=contact_name&order=<?= $disp ?>">
-                                Assigned To <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
+                                <?= __('Assigned To') ?> <?php if ($sort == 'contact_name') { echo $order_icon; } ?>
                             </a>
                         </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=location_name&order=<?= $disp ?>">
-                            Location <?php if ($sort == 'location_name') { echo $order_icon; } ?>
+                            <?= __('Location') ?> <?php if ($sort == 'location_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=asset_status&order=<?= $disp ?>">
-                            Status <?php if ($sort == 'asset_status') { echo $order_icon; } ?>
+                            <?= __('Status') ?> <?php if ($sort == 'asset_status') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php if (!$client_url) { ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                            Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                            <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php } ?>
@@ -578,7 +578,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="asset_ids[]" value="<?= $asset_id ?>" aria-label="Select <?= $asset_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="asset_ids[]" value="<?= $asset_id ?>" aria-label="<?= __('Select %s', $asset_name) ?>">
                             </div>
                         </td>
                         <?php } ?>
@@ -588,8 +588,8 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                                 <span class="itflow-asset-icon itflow-asset-tone-<?= $asset_tone ?>" aria-hidden="true"><i class="fas fa-fw fa-<?= $device_icon ?>"></i></span>
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body stretched-link" href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>"><?= $asset_name ?></a>
-                                    <?php if ($asset_favorite) { ?><i class="fas fa-star text-warning ms-1" title="Favorite"></i><?php } ?>
-                                    <?php if ($asset_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($asset_favorite) { ?><i class="fas fa-star text-warning ms-1" title="<?= escapeHtml(__('Favorite')) ?>"></i><?php } ?>
+                                    <?php if ($asset_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($asset_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $asset_description ?>"><?= $asset_description ?></div>
                                     <?php } ?>
@@ -601,7 +601,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         </td>
 
                         <td>
-                            <div><?= $asset_type ?></div>
+                            <div><?= assetTypeLabel($asset_type) ?></div>
                             <?php if ($asset_os) { ?>
                                 <div class="small text-body-secondary text-nowrap"><i class="<?= $asset_os_icon ?> fa-fw me-1"></i><?= $asset_os ?></div>
                             <?php } ?>
@@ -612,17 +612,17 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                                 <div><?= $asset_make_model ?: '<span class="text-body-secondary">-</span>' ?></div>
                                 <?php if ($asset_serial) { ?>
                                     <div class="small text-body-secondary text-nowrap">
-                                        <span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy serial" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button>
+                                        <span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy serial')) ?>" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button>
                                     </div>
                                 <?php } ?>
                                 <?php if ($asset_warranty && $asset_warranty['tone'] !== 'success' && !$show_warranty) { ?>
-                                    <span class="badge rounded-pill bg-<?= $asset_warranty['tone'] ?>-subtle text-<?= $asset_warranty['tone'] ?>-emphasis border border-<?= $asset_warranty['tone'] ?>-subtle fw-normal mt-1" title="Warranty <?= escapeHtml($asset_warranty['date']) ?>">
-                                        <i class="fas fa-shield-alt me-1"></i>Warranty <?= strtolower($asset_warranty['short']) ?>
+                                    <span class="badge rounded-pill bg-<?= $asset_warranty['tone'] ?>-subtle text-<?= $asset_warranty['tone'] ?>-emphasis border border-<?= $asset_warranty['tone'] ?>-subtle fw-normal mt-1" title="<?= escapeHtml(__('Warranty %s', formatDate($asset_warranty['date'], 'date'))) ?>">
+                                        <i class="fas fa-shield-alt me-1"></i><?= escapeHtml(mb_strtolower($asset_warranty['badge'])) ?>
                                     </span>
                                 <?php } ?>
                                 <?php if ($asset_battery && $asset_battery['tone'] !== 'success') { ?>
-                                    <span class="badge rounded-pill bg-<?= $asset_battery['tone'] ?>-subtle text-<?= $asset_battery['tone'] ?>-emphasis border border-<?= $asset_battery['tone'] ?>-subtle fw-normal mt-1" title="Replace battery by <?= escapeHtml($asset_battery['date']) ?>" data-asset-battery>
-                                        <i class="fas fa-battery-quarter me-1"></i>Battery <?= strtolower(escapeHtml($asset_battery['short'])) ?>
+                                    <span class="badge rounded-pill bg-<?= $asset_battery['tone'] ?>-subtle text-<?= $asset_battery['tone'] ?>-emphasis border border-<?= $asset_battery['tone'] ?>-subtle fw-normal mt-1" title="<?= escapeHtml(__('Replace battery by %s', formatDate($asset_battery['date'], 'date'))) ?>" data-asset-battery>
+                                        <i class="fas fa-battery-quarter me-1"></i><?= escapeHtml(__('Battery %s', mb_strtolower($asset_battery['short']))) ?>
                                     </span>
                                 <?php } ?>
                             </td>
@@ -630,7 +630,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
 
                         <td class="text-nowrap">
                             <?php if ($asset_ip) { ?>
-                                <span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?>
+                                <span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?>
                             <?php } else { ?>
                                 <span class="text-body-secondary">-</span>
                             <?php } ?>
@@ -650,7 +650,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         <?php if ($show_mac) { ?>
                             <td class="text-nowrap">
                                 <?php if ($asset_mac) { ?>
-                                    <span class="font-monospace"><?= $asset_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy MAC" data-clipboard-text="<?= $asset_mac ?>"><i class="far fa-copy"></i></button>
+                                    <span class="font-monospace"><?= $asset_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy MAC')) ?>" data-clipboard-text="<?= $asset_mac ?>"><i class="far fa-copy"></i></button>
                                 <?php } else { ?>
                                     <span class="text-body-secondary">-</span>
                                 <?php } ?>
@@ -659,7 +659,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         <?php if ($show_purchase) { ?>
                             <td class="text-nowrap">
                                 <?= $asset_purchase_date ?: '<span class="text-body-secondary">-</span>' ?>
-                                <?php if ($asset_purchase_date) { ?><div class="small text-body-secondary"><?= assetAge($row['asset_purchase_date']) ?> old</div><?php } ?>
+                                <?php if ($asset_purchase_date) { ?><div class="small text-body-secondary"><?= escapeHtml(__('%s old', assetAge($row['asset_purchase_date']))) ?></div><?php } ?>
                             </td>
                         <?php } ?>
                         <?php if ($show_details) { ?>
@@ -680,7 +680,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                             <td class="text-nowrap">
                                 <?php if ($asset_warranty) { ?>
                                     <?= escapeHtml($asset_warranty['date']) ?>
-                                    <div class="small text-<?= $asset_warranty['tone'] ?>-emphasis"><?= $asset_warranty['tone'] === 'success' ? 'Covered for ' . escapeHtml(str_replace('in ', '', timeAgo($asset_warranty['date']))) : escapeHtml($asset_warranty['text']) ?></div>
+                                    <div class="small text-<?= $asset_warranty['tone'] ?>-emphasis"><?= $asset_warranty['tone'] === 'success' ? escapeHtml(__('Covered for %s', str_replace(__('in') . ' ', '', timeAgo($asset_warranty['date'])))) : escapeHtml($asset_warranty['text']) ?></div>
                                 <?php } else { ?>
                                     <span class="text-body-secondary">-</span>
                                 <?php } ?>
@@ -709,7 +709,7 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                                 <div class="small text-body-secondary <?= $can_edit ? 'mt-1' : '' ?>"><?= $asset_physical_location ?></div>
                             <?php } ?>
                             <?php if ($asset_rack) { ?>
-                                <a class="small text-nowrap d-inline-block <?= $can_edit && !$asset_physical_location ? 'mt-1' : '' ?>" href="rack.php?client_id=<?= $client_id ?>&rack_id=<?= intval($asset_rack['rack_id']) ?>" title="Racked">
+                                <a class="small text-nowrap d-inline-block <?= $can_edit && !$asset_physical_location ? 'mt-1' : '' ?>" href="rack.php?client_id=<?= $client_id ?>&rack_id=<?= intval($asset_rack['rack_id']) ?>" title="<?= escapeHtml(__('Racked')) ?>">
                                     <i class="fas fa-server me-1"></i><?= escapeHtml($asset_rack['rack_name']) ?> &middot; <?= rackPositionLabel($asset_rack['unit_start_number'], $asset_rack['unit_end_number']) ?>
                                 </a>
                             <?php } ?>
@@ -727,27 +727,27 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
                         <td class="text-end">
                             <?php if ($can_edit) { ?>
                                 <div class="dropdown dropstart">
-                                    <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                    <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_edit.php?id=<?= $asset_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset_copy.php?id=<?= $asset_id ?>">
-                                            <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                            <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($asset_archived_at) { ?>
                                             <a class="dropdown-item" href="post.php?restore_asset=<?= $asset_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                             </a>
                                             <?php if ($can_delete) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_asset=<?= $asset_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_asset=<?= $asset_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     </div>
@@ -764,13 +764,13 @@ $search_noun = $type_filter ? $asset_type_tabs[$type_filter]['label'] : 'assets'
     </form>
     <?php
     $empty_state = [
-        'thing' => $type_filter ? strtolower($asset_type_tabs[$type_filter]['label']) : 'assets',
+        'thing' => $type_filter ? mb_strtolower($asset_type_tabs[$type_filter]['label']) : __('assets'),
         'icon' => $type_filter ? $asset_type_tabs[$type_filter]['icon'] : 'fa-desktop',
         'views' => ['type'],
-        'text' => $type_filter ? '' : 'Their computers, servers, network gear and phones - what each is, where it is and who uses it.',
+        'text' => $type_filter ? '' : __('Their computers, servers, network gear and phones - what each is, where it is and who uses it.'),
         'actions' => $can_edit ? array_merge(
-            [['label' => 'New ' . ($type_filter ? rtrim($asset_type_tabs[$type_filter]['label'], 's') : 'Asset'), 'modal' => "modals/asset/asset_add.php?$client_url&type=$type_filter", 'size' => 'lg']],
-            $client_url ? [['label' => 'Import', 'modal' => "modals/asset/asset_import.php?$client_url", 'icon' => 'fa-upload']] : []
+            [['label' => $type_filter ? $asset_type_tabs[$type_filter]['new'] : __('New Asset'), 'modal' => "modals/asset/asset_add.php?$client_url&type=$type_filter", 'size' => 'lg']],
+            $client_url ? [['label' => __('Import'), 'modal' => "modals/asset/asset_import.php?$client_url", 'icon' => 'fa-upload']] : []
         ) : [],
     ];
     ?>

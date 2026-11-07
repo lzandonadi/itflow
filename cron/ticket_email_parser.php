@@ -97,7 +97,8 @@ function addTicket($contact_id, $contact_name, $contact_email, $client_id, $date
     // Convert newlines to <br>
     $message = nl2br($message);
     // Wrap final formatted message
-    $message = "<i>Email from: <b>$contact_name</b> &lt;$contact_email&gt; at $date:-</i> <br><br><div style='line-height:1.5;'>$message</div>";
+    // In the interface language; ticketEmailExcerpt() knows the line by its closing ":-</i>"
+    $message = "<i>" . __('Email from: %1$s at %2$s', "<b>$contact_name</b> &lt;$contact_email&gt;", formatDate($date, 'datetime')) . ":-</i> <br><br><div style='line-height:1.5;'>$message</div>";
 
     $ticket_prefix_esc = mysqli_real_escape_string($mysqli, $config_ticket_prefix);
     $message_esc = mysqli_real_escape_string($mysqli, $message);
@@ -160,7 +161,7 @@ function addTicket($contact_id, $contact_name, $contact_email, $client_id, $date
     // The sender is told it is a ticket now - unless they asked for replies only (Your account in the client portal)
     $contact_wants = !$contact_id || ticketContactWantsEmail(getFieldById('contacts', intval($contact_id), 'contact_ticket_emails'), 'created');
     if ($config_ticket_client_general_notifications == 1 && !preg_match($bad_pattern, $contact_email) && $contact_wants && ($new = ticketRow($id))) {
-        ticketMailCreated($id, 'Ticket created -', [], false, 'email', [['email' => stripslashes($contact_email), 'name' => stripslashes($contact_name)]]);
+        ticketMailCreated($id, __('Ticket created -'), [], false, 'email', [['email' => stripslashes($contact_email), 'name' => stripslashes($contact_name)]]);
     }
 
     // The new-ticket address (Admin > Ticket), when there is one
@@ -181,15 +182,16 @@ function addReply($from_email, $date, $subject, $ticket_number, $message, $attac
     // $message contains the raw HTML body from IMAP
 
     // 1) Remove the reply separator and everything below it (HTML-aware)
-    // This matches: <i ...>##- Please type your reply above this line -##</i> and EVERYTHING after it
+    // This matches: <i ...>##- Please type your reply above this line -##</i> and EVERYTHING after it - the line in any
+    // language ITFlow speaks (emailReplyMarkerPattern()), as the email being answered may have gone out in another
     $message = preg_replace(
-        '/<i[^>]*>##-\s*Please\s+type\s+your\s+reply\s+above\s+this\s+line\s*-##<\/i>.*$/is',
+        '/<i[^>]*>' . emailReplyMarkerPattern() . '<\/i>.*$/is',
         '',
         $message
     );
     // A reply sent as plain text has the line without its <i>, often quoted ("> ") - cut there too, or the
     // email it quotes, earlier messages and all, lands on the ticket
-    $message = preg_replace('/(?:&gt;\s*)*##-\s*Please\s+type\s+your\s+reply\s+above\s+this\s+line\s*-##.*$/is', '', $message);
+    $message = preg_replace('/(?:&gt;\s*)*' . emailReplyMarkerPattern() . '.*$/is', '', $message);
 
     // 2) Clean up the remaining message
 
@@ -210,7 +212,7 @@ function addReply($from_email, $date, $subject, $ticket_number, $message, $attac
     $message = nl2br($message);
 
     // 3) Final wrapper
-    $message = "<i>Email from: $from_email at $date:-</i><br><br><div style='line-height:1.5;'>$message</div>";
+    $message = "<i>" . __('Email from: %1$s at %2$s', $from_email, formatDate($date, 'datetime')) . ":-</i><br><br><div style='line-height:1.5;'>$message</div>";
 
     $ticket_number_esc = intval($ticket_number);
     $message_esc = mysqli_real_escape_string($mysqli, $message);
@@ -238,7 +240,8 @@ function addReply($from_email, $date, $subject, $ticket_number, $message, $attac
             $config_ticket_prefix_esc = mysqli_real_escape_string($mysqli, $config_ticket_prefix);
             $ticket_number_esc2 = mysqli_real_escape_string($mysqli, $ticket_number);
 
-            appNotify("Ticket", "Email parser: $from_email attempted to re-open ticket $config_ticket_prefix_esc$ticket_number_esc2 (ID $ticket_id) - check inbox manually to see email", "/agent/ticket.php?ticket_id=$ticket_id$client_uri", $client_id);
+            // The values come escaped for SQL - the template is escaped, then filled
+            appNotify("Ticket", vsprintf(escapeSql(__('Email parser: %1$s attempted to re-open ticket %2$s (ID %3$d) - check inbox manually to see email')), [$from_email, "$config_ticket_prefix_esc$ticket_number_esc2", $ticket_id]), "/agent/ticket.php?ticket_id=$ticket_id$client_uri", $client_id);
 
             // They are told it didn't reach anyone, and how to raise a new one
             ticketMailClosedReply($ticket_id, stripslashes($from_email));
@@ -253,7 +256,7 @@ function addReply($from_email, $date, $subject, $ticket_number, $message, $attac
             } else {
                 $ticket_reply_type = 'Internal';
                 $ticket_reply_contact = '0';
-                $message = "<b>WARNING: Contact email mismatch</b><br>$message";
+                $message = "<b>" . __('WARNING: Contact email mismatch') . "</b><br>$message";
                 $message_esc = mysqli_real_escape_string($mysqli, $message);
             }
         }
@@ -607,7 +610,7 @@ foreach ($messages as $message) {
         $from_domain = escapeSql(end($from_domain));
 
         // Subject
-        $subject = escapeSql((string)$message->subject() ?: 'No Subject');
+        $subject = escapeSql((string)$message->subject() ?: __('No Subject'));
 
         // Skip vacation/out-of-office auto-responders to prevent mail loops (RFC 3834)
         // Some* NDRs use "auto-generated" and are still handled by the NDR logic below
@@ -618,7 +621,7 @@ foreach ($messages as $message) {
             logApp("Cron-Email-Parser", "info", "Email parser skipped auto-responder from $from_email ($subject)");
                 appNotify(
                     "Mail",
-                    "Email parser: Skipped auto-responder message from $from_email. Subject: $subject",
+                    vsprintf(escapeSql(__('Email parser: Skipped auto-responder message from %1$s. Subject: %2$s')), [$from_email, $subject]),
                     "",
                     0
                 );
@@ -846,14 +849,14 @@ foreach ($messages as $message) {
                 }
 
                 // Fallbacks
-                $failed_recipient = $failed_recipient ?: 'unknown recipient';
-                $diagnostic_code  = $diagnostic_code ?: 'unknown diagnostic code';
-                $status_code      = $status_code ?: 'unknown status code';
+                $failed_recipient = $failed_recipient ?: escapeSql(__('unknown recipient'));
+                $diagnostic_code  = $diagnostic_code ?: escapeSql(__('unknown diagnostic code'));
+                $status_code      = $status_code ?: escapeSql(__('unknown status code'));
                 $original_subject = $original_subject ?: $subject;
 
                 appNotify(
                     "Ticket",
-                    "Email parser: NDR - Message to $failed_recipient bounced. Subject: $original_subject Diagnostics: $status_code / $diagnostic_code - check ITFlow folder manually to see email",
+                    vsprintf(escapeSql(__('Email parser: NDR - Message to %1$s bounced. Subject: %2$s Diagnostics: %3$s / %4$s - check ITFlow folder manually to see email')), [$failed_recipient, $original_subject, $status_code, $diagnostic_code]),
                     "",
                     0
                 );
@@ -864,10 +867,10 @@ foreach ($messages as $message) {
                     $ticket_number = intval($ticket_number_matches[1]);
 
                     // Craft a clean bounce message
-                    $reply_body = "Email delivery failed.\n".
-                        "Recipient: $failed_recipient\n".
-                        "Status: $status_code\n".
-                        "Diagnostic: $diagnostic_code\n";
+                    $reply_body = __('Email delivery failed.') . "\n"
+                        . __('Recipient: %s', $failed_recipient) . "\n"
+                        . __('Status: %s', $status_code) . "\n"
+                        . __('Diagnostic: %s', $diagnostic_code) . "\n";
 
                     // No attachments
                     addReply(

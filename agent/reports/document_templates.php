@@ -139,55 +139,55 @@ usort($by_client, function ($a, $b) {
 });
 
 $columns = [
-    'template' => ['label' => 'Template', 'html' => function ($row) use ($admin) {
+    'template' => ['label' => __('Template'), 'html' => function ($row) use ($admin) {
         $name = escapeHtml($row['template']);
         return ($admin ? '<a href="/admin/document_template.php?document_template_id=' . $row['id'] . '">' . $name . '</a>' : $name)
-            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">Archived</span>' : '');
+            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">' . __('Archived') . '</span>' : '');
     }],
-    'scope' => ['label' => 'Required of', 'html' => function ($row) {
+    'scope' => ['label' => __('Required of'), 'html' => function ($row) {
         return $row['scope'] !== '' ? '<span class="small">' . escapeHtml($row['scope']) . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'made' => ['label' => 'Made', 'type' => 'count', 'class' => 'fw-semibold', 'title' => 'Documents made from it in the period'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'made' => ['label' => __('Made'), 'type' => 'count', 'class' => 'fw-semibold', 'title' => __('Documents made from it in the period')],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['made'], $row['prev'], 'up') . '</span>';
     }],
-    'documents' => ['label' => 'Documents', 'type' => 'count', 'title' => 'Current documents from it'],
-    'clients' => ['label' => 'Clients', 'type' => 'count', 'title' => 'Clients with one'],
-    'should' => ['label' => 'Should have one', 'type' => 'count', 'screen' => false],
-    'have' => ['label' => 'Have one', 'type' => 'count', 'screen' => false],
-    'coverage' => ['label' => 'Coverage', 'type' => 'percent', 'title' => 'Of the clients that should have one, how many do', 'html' => function ($row) {
+    'documents' => ['label' => __('Documents'), 'type' => 'count', 'title' => __('Current documents from it')],
+    'clients' => ['label' => __('Clients'), 'type' => 'count', 'title' => __('Clients with one')],
+    'should' => ['label' => __('Should have one'), 'type' => 'count', 'screen' => false],
+    'have' => ['label' => __('Have one'), 'type' => 'count', 'screen' => false],
+    'coverage' => ['label' => __('Coverage'), 'type' => 'percent', 'title' => __('Of the clients that should have one, how many do'), 'html' => function ($row) {
         if ($row['coverage'] === null) {
             return '<span class="itflow-report-zero">–</span>';
         }
         $tone = $row['coverage'] >= 100 ? 'success' : ($row['coverage'] >= 75 ? 'warning' : 'danger');
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="progress itflow-report-meter" style="width: 4rem" role="presentation">'
             . '<div class="progress-bar bg-' . $tone . '" style="width: ' . round($row['coverage']) . '%"></div></div>'
-            . '<span class="small text-nowrap" title="' . $row['have'] . ' of ' . $row['should'] . ' clients">' . $row['have'] . ' of ' . $row['should'] . '</span></div>';
+            . '<span class="small text-nowrap" title="' . escapeHtml(_n('%1$d of %2$d client', '%1$d of %2$d clients', $row['should'], $row['have'], $row['should'])) . '">' . __('%1$d of %2$d', $row['have'], $row['should']) . '</span></div>';
     }],
-    'due' => ['label' => 'Due a review', 'type' => 'count', 'html' => function ($row) {
+    'due' => ['label' => __('Due a review'), 'type' => 'count', 'html' => function ($row) {
         return $row['due'] ? '<span class="fw-semibold text-warning-emphasis">' . $row['due'] . '</span>' : ($row['review_months'] ? '<span class="itflow-report-zero">0</span>' : '<span class="itflow-report-zero">–</span>');
     }],
-    'last' => ['label' => 'Last made', 'type' => 'date', 'html' => function ($row) {
-        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">Never</span>';
+    'last' => ['label' => __('Last made'), 'type' => 'date', 'html' => function ($row) {
+        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">' . __('Never') . '</span>';
     }],
 ];
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'files.php');
     }],
-    'should' => ['label' => 'Should have', 'type' => 'count'],
-    'have' => ['label' => 'Have', 'type' => 'count'],
-    'missing' => ['label' => 'Missing', 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
+    'should' => ['label' => __('Should have'), 'type' => 'count'],
+    'have' => ['label' => __('Have'), 'type' => 'count'],
+    'missing' => ['label' => __('Missing'), 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
         return implode(', ', $row['missing']);
     }, 'html' => function ($row) {
-        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>None</span>' : '');
+        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>' . __('None') . '</span>' : '');
     }],
-    'documents' => ['label' => 'Documents', 'type' => 'count', 'title' => 'Current documents from a template'],
-    'due' => ['label' => 'Due a review', 'type' => 'count', 'html' => function ($row) {
+    'documents' => ['label' => __('Documents'), 'type' => 'count', 'title' => __('Current documents from a template')],
+    'due' => ['label' => __('Due a review'), 'type' => 'count', 'html' => function ($row) {
         return $row['due'] ? '<a class="fw-semibold text-warning-emphasis" href="/agent/files.php?client_id=' . $row['client_id'] . '&amp;type=due">' . $row['due'] . '</a>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'last' => ['label' => 'Last made', 'type' => 'date', 'html' => function ($row) {
-        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">Never</span>';
+    'last' => ['label' => __('Last made'), 'type' => 'date', 'html' => function ($row) {
+        return $row['last'] ? '<span class="small" title="' . escapeHtml($row['last']) . '">' . timeAgo($row['last']) . '</span>' : '<span class="itflow-report-zero">' . __('Never') . '</span>';
     }],
 ];
 
@@ -195,8 +195,8 @@ $made_total = array_sum(array_column($templates, 'made'));
 $previous = array_sum(array_column($templates, 'prev'));
 $should_total = array_sum(array_map('intval', array_column($templates, 'should')));
 $have_total = array_sum(array_map('intval', array_column($templates, 'have')));
-$totals = ['template' => 'Total', 'made' => $made_total, 'documents' => array_sum(array_column($templates, 'documents')), 'should' => $should_total, 'have' => $have_total, 'due' => count($due)];
-$client_totals = ['client' => 'Total', 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
+$totals = ['template' => __('Total'), 'made' => $made_total, 'documents' => array_sum(array_column($templates, 'documents')), 'should' => $should_total, 'have' => $have_total, 'due' => count($due)];
+$client_totals = ['client' => __('Total'), 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
     'documents' => array_sum(array_column($by_client, 'documents')), 'due' => array_sum(array_column($by_client, 'due'))];
 
 if (reportExporting('clients')) {
@@ -224,38 +224,38 @@ $oldest = $due ? reset($due) : null;
         'years' => reportPastYears("SELECT DISTINCT YEAR(document_created_at) AS y FROM documents WHERE document_template_id > 0"),
         'client' => $client_id,
         'agent' => $agent_id,
-        'export' => ['' => 'By template', 'clients' => 'By client'],
+        'export' => ['' => __('By template'), 'clients' => __('By client')],
         'print_meta' => $client_id ? reportClientName($client_id) : '',
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Documents made', 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', 'the period before') : ''],
-        ['label' => 'Templates used', 'value' => $used . ' of ' . count($live), 'sub' => count($live) - $used ? (count($live) - $used) . ' <span class="text-body-tertiary">not used in this period</span>' : '<span class="text-body-tertiary">Every one</span>'],
-        ['label' => 'Have what they should', 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
-            'sub' => $should_total ? $fully . ' of ' . $with_required . ' <span class="text-body-tertiary">client' . ($with_required === 1 ? '' : 's') . ' have every one</span>' : '<span class="text-body-tertiary">No template is required of anyone</span>'],
-        ['label' => 'Due a review', 'value' => reportCount(count($due)), 'tone' => $due ? 'warning' : '',
-            'sub' => $oldest ? '<span class="text-body-tertiary">the oldest last looked at</span> ' . timeAgo($oldest['reviewed_at']) : ''],
+        ['label' => __('Documents made'), 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', __('the period before')) : ''],
+        ['label' => __('Templates used'), 'value' => __('%1$d of %2$d', $used, count($live)), 'sub' => count($live) - $used ? (count($live) - $used) . ' <span class="text-body-tertiary">' . __('not used in this period') . '</span>' : '<span class="text-body-tertiary">' . __('Every one') . '</span>'],
+        ['label' => __('Have what they should'), 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
+            'sub' => $should_total ? __('%1$d of %2$d', $fully, $with_required) . ' <span class="text-body-tertiary">' . _n('client has every one', 'clients have every one', $with_required) . '</span>' : '<span class="text-body-tertiary">' . __('No template is required of anyone') . '</span>'],
+        ['label' => __('Due a review'), 'value' => reportCount(count($due)), 'tone' => $due ? 'warning' : '',
+            'sub' => $oldest ? '<span class="text-body-tertiary">' . __('the oldest last looked at') . '</span> ' . timeAgo($oldest['reviewed_at']) : ''],
     ]) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Most used', escapeHtml($period['range'])) ?>
+        <?= reportSectionOpen(__('Most used'), escapeHtml($period['range'])) ?>
             <div class="card-body">
                 <?= reportChart(['type' => 'bar', 'horizontal' => true, 'labels' => array_column($top, 'template'),
-                    'series' => [['label' => 'Documents made', 'tone' => 'accent', 'data' => array_column($top, 'made')]], 'format' => 'count'], '', 'Documents made from each') ?>
+                    'series' => [['label' => __('Documents made'), 'tone' => 'accent', 'data' => array_column($top, 'made')]], 'format' => 'count'], '', __('Documents made from each')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By template', 'Most used first, then the ones not used', 'itflow-report-long') ?>
-        <?= reportTable($columns, $templates, ['empty' => 'There are no document templates yet.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By template'), __('Most used first, then the ones not used'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $templates, ['empty' => __('There are no document templates yet.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Made counts the documents made from each in the period<?= $agent_id ? ' by the agent picked' : '' ?>; documents and clients count the current ones. Coverage is how many of the clients a template is required of
-            have a current document from it, and due a review is the documents its review period has passed for - both as they are now. Use is counted from the update that brought document templates' record of use in.
+            <?= $agent_id ? __('Made counts the documents made from each in the period by the agent picked; documents and clients count the current ones.') : __('Made counts the documents made from each in the period; documents and clients count the current ones.') ?>
+            <?= __('Coverage is how many of the clients a template is required of have a current document from it, and due a review is the documents its review period has passed for - both as they are now. Use is counted from the update that brought document templates\' record of use in.') ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('By client', 'Most missing first') ?>
-        <?= reportTable($client_columns, $by_client, ['empty' => 'No client has a document from a template, or one it should have.', 'totals' => $client_totals]) ?>
+    <?= reportSectionOpen(__('By client'), __('Most missing first')) ?>
+        <?= reportTable($client_columns, $by_client, ['empty' => __('No client has a document from a template, or one it should have.'), 'totals' => $client_totals]) ?>
     </div>
 
 </div>

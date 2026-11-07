@@ -31,6 +31,22 @@ const SOFTWARE_LICENSE_TYPES = [
     'Open Source' => 'fa-code-branch',
 ];
 
+/** A license type as people read it - one from the list in the interface language, a typed one as it is. */
+function softwareLicenseTypeLabel($license_type) {
+    $license_type = (string) $license_type;
+    return [
+        'Subscription' => _x('Subscription', 'license type'),
+        'Device' => _x('Device', 'license type'),
+        'User' => _x('User', 'license type'),
+        'Site' => _x('Site', 'license type'),
+        'Concurrent' => _x('Concurrent', 'license type'),
+        'Perpetual' => _x('Perpetual', 'license type'),
+        'Trial' => _x('Trial', 'license type'),
+        'Usage-based' => _x('Usage-based', 'license type'),
+        'Open Source' => _x('Open Source', 'license type'),
+    ][html_entity_decode($license_type, ENT_QUOTES, 'UTF-8')] ?? $license_type;
+}
+
 /** The icon for a license type, typed or from the list. */
 function softwareLicenseTypeIcon($license_type) {
     $license_type = html_entity_decode((string) $license_type, ENT_QUOTES, 'UTF-8');
@@ -115,14 +131,14 @@ function softwareRenewal($expire, $soon_days = 30) {
 
     if ($days < 0) {
         $ago = -$days;
-        $text = $ago === 1 ? 'Expired yesterday' : ($ago < 60 ? "Expired $ago days ago" : 'Expired ' . timeAgo($ymd));
-        return ['state' => 'expired', 'tone' => 'danger', 'short' => 'Expired', 'text' => $text, 'days' => $days, 'date' => $ymd];
+        $text = $ago === 1 ? __('Expired yesterday') : ($ago < 60 ? _n('Expired %d day ago', 'Expired %d days ago', $ago) : __('Expired %s', timeAgo($ymd)));
+        return ['state' => 'expired', 'tone' => 'danger', 'short' => __('Expired'), 'text' => $text, 'days' => $days, 'date' => $ymd];
     }
     if ($days <= $soon_days) {
-        $text = $days === 0 ? 'Renews today' : ($days === 1 ? 'Renews tomorrow' : "Renews in $days days");
+        $text = $days === 0 ? __('Renews today') : ($days === 1 ? __('Renews tomorrow') : _n('Renews in %d day', 'Renews in %d days', $days));
         return ['state' => 'soon', 'tone' => $days <= 7 ? 'danger' : 'warning', 'short' => $text, 'text' => $text, 'days' => $days, 'date' => $ymd];
     }
-    return ['state' => 'active', 'tone' => 'success', 'short' => 'Active', 'text' => 'Renews ' . timeAgo($ymd), 'days' => $days, 'date' => $ymd];
+    return ['state' => 'active', 'tone' => 'success', 'short' => __('Active'), 'text' => __('Renews %s', timeAgo($ymd)), 'days' => $days, 'date' => $ymd];
 }
 
 /** A renewal as a soft pill - expired red, soon amber, otherwise green. */
@@ -145,19 +161,19 @@ function softwareSeats($used, $total) {
     $total = intval($total);
     if ($total <= 0) {
         return ['used' => $used, 'total' => 0, 'free' => null, 'over' => 0, 'pct' => 0, 'state' => 'unlimited', 'tone' => 'secondary',
-            'text' => $used === 1 ? '1 in use' : "$used in use", 'title' => "$used in use, no seat limit"];
+            'text' => __('%d in use', $used), 'title' => __('%d in use, no seat limit', $used)];
     }
     $over = max(0, $used - $total);
     $free = max(0, $total - $used);
     $state = $over ? 'over' : ($free === 0 ? 'full' : ($used === 0 ? 'unused' : 'ok'));
-    $text = ['over' => "$over over", 'full' => 'All in use', 'unused' => 'None in use', 'ok' => "$free free"][$state];
+    $text = ['over' => __('%d over', $over), 'full' => __('All in use'), 'unused' => __('None in use'), 'ok' => __('%d free', $free)][$state];
     return [
         'used' => $used, 'total' => $total, 'free' => $free, 'over' => $over,
         'pct' => min(100, (int) round($used / $total * 100)),
         'state' => $state,
         'tone' => ['over' => 'danger', 'full' => 'warning', 'unused' => 'secondary', 'ok' => 'primary'][$state],
         'text' => $text,
-        'title' => "$used of $total seats in use" . ($over ? " - $over over" : ''),
+        'title' => $over ? __('%1$d of %2$d seats in use - %3$d over', $used, $total, $over) : __('%1$d of %2$d seats in use', $used, $total),
     ];
 }
 
@@ -165,12 +181,12 @@ function softwareSeats($used, $total) {
 function softwareSeatBar($seats, $show_text = true) {
     $text = $show_text ? '<div class="small text-' . ($seats['state'] === 'over' ? 'danger-emphasis fw-semibold' : 'body-secondary') . '">' . escapeHtml($seats['text']) . '</div>' : '';
     if ($seats['state'] === 'unlimited') {
-        return '<div class="itflow-seats" title="' . escapeHtml($seats['title']) . '"><span class="fw-semibold">' . $seats['used'] . '</span> <span class="small text-body-secondary">in use</span>'
-            . ($show_text ? '<div class="small text-body-secondary">No seat limit</div>' : '') . '</div>';
+        return '<div class="itflow-seats" title="' . escapeHtml($seats['title']) . '"><span class="fw-semibold">' . $seats['used'] . '</span> <span class="small text-body-secondary">' . __('in use') . '</span>'
+            . ($show_text ? '<div class="small text-body-secondary">' . __('No seat limit') . '</div>' : '') . '</div>';
     }
     return '<div class="itflow-seats" title="' . escapeHtml($seats['title']) . '">'
         . '<div class="d-flex align-items-baseline gap-1"><span class="fw-semibold' . ($seats['state'] === 'over' ? ' text-danger-emphasis' : '') . '">' . $seats['used'] . '</span><span class="text-body-secondary">/ ' . $seats['total'] . '</span></div>'
-        . '<div class="progress itflow-seats-bar" role="progressbar" aria-label="Seats in use" aria-valuenow="' . $seats['used'] . '" aria-valuemin="0" aria-valuemax="' . $seats['total'] . '">'
+        . '<div class="progress itflow-seats-bar" role="progressbar" aria-label="' . escapeHtml(__('Seats in use')) . '" aria-valuenow="' . $seats['used'] . '" aria-valuemin="0" aria-valuemax="' . $seats['total'] . '">'
         . '<div class="progress-bar bg-' . $seats['tone'] . '" style="width: ' . $seats['pct'] . '%"></div></div>'
         . $text . '</div>';
 }
@@ -188,13 +204,13 @@ function softwareSeatsUsedSql($software_column = 'software.software_id') {
 function softwareStatusFilters() {
     $used = softwareSeatsUsedSql('software.software_id');
     return [
-        'renewing' => ['label' => 'Renewing soon', 'icon' => 'fa-hourglass-half', 'title' => 'Renewing in the next 30 days',
+        'renewing' => ['label' => __('Renewing soon'), 'icon' => 'fa-hourglass-half', 'title' => __('Renewing in the next 30 days'),
             'sql' => "software_expire IS NOT NULL AND software_expire BETWEEN CURDATE() AND CURDATE() + INTERVAL 30 DAY"],
-        'expired' => ['label' => 'Expired', 'icon' => 'fa-calendar-times', 'title' => 'Past their renewal date',
+        'expired' => ['label' => __('Expired'), 'icon' => 'fa-calendar-times', 'title' => __('Past their renewal date'),
             'sql' => "software_expire IS NOT NULL AND software_expire != '0000-00-00' AND software_expire < CURDATE()"],
-        'over' => ['label' => 'Over seats', 'icon' => 'fa-exclamation-triangle', 'title' => 'More devices and users than seats bought',
+        'over' => ['label' => __('Over seats'), 'icon' => 'fa-exclamation-triangle', 'title' => __('More devices and users than seats bought'),
             'sql' => "software_seats > 0 AND $used > software_seats"],
-        'unused' => ['label' => 'No seats assigned', 'icon' => 'fa-user-slash', 'title' => 'Nobody and nothing on them yet',
+        'unused' => ['label' => __('No seats assigned'), 'icon' => 'fa-user-slash', 'title' => __('Nobody and nothing on them yet'),
             'sql' => "$used = 0"],
     ];
 }
@@ -206,7 +222,7 @@ function softwareKeyHtml($key, $class = '') {
         return '';
     }
     return '<span class="d-inline-flex align-items-center mw-100 ' . $class . '"><span class="font-monospace text-truncate itflow-license-key" title="' . $key . '">' . $key . '</span>'
-        . '<button type="button" class="itflow-copy clipboardjs" title="Copy key" data-clipboard-text="' . $key . '"><i class="far fa-copy"></i></button></span>';
+        . '<button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy key')) . '" data-clipboard-text="' . $key . '"><i class="far fa-copy"></i></button></span>';
 }
 
 /** One license by id with its client, vendor and seats in use - raw, or null. */
@@ -342,24 +358,24 @@ function softwareHeldBy($kind, $holder_id) {
 function softwareHeldTable($rows, $kind, $holder_id, $can_edit) {
     $holder_id = intval($holder_id);
     $html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="text-nowrap table-light"><tr>'
-        . '<th>License</th><th>Seats</th><th>Renews</th><th>Key</th><th></th></tr></thead><tbody>';
+        . '<th>' . __('License') . '</th><th>' . __('Seats') . '</th><th>' . __('Renews') . '</th><th>' . __('Key') . '</th><th></th></tr></thead><tbody>';
     foreach ($rows as $row) {
         $software_id = intval($row['software_id']);
         $renewal = softwareRenewal($row['software_expire']);
-        $sub = implode(' · ', array_filter([$row['software_license_type'], $row['software_version']]));
+        $sub = implode(' · ', array_filter([softwareLicenseTypeLabel($row['software_license_type']), $row['software_version']]));
         $keys = $row['held_keys'];
         $key_html = '';
         foreach ($keys as $key) {
             $key_html .= '<div>' . softwareKeyHtml($key) . '</div>';
         }
         if (!$keys && $row['software_key']) {
-            $key_html = softwareKeyHtml($row['software_key']) . '<div class="small text-body-secondary">License key</div>';
+            $key_html = softwareKeyHtml($row['software_key']) . '<div class="small text-body-secondary">' . __('License key') . '</div>';
         }
         $renew_html = $renewal
             ? escapeHtml($renewal['date']) . '<div class="small text-' . ($renewal['tone'] === 'success' ? 'body-secondary' : $renewal['tone'] . '-emphasis') . '">' . escapeHtml($renewal['text']) . '</div>'
             : '<span class="text-body-secondary">-</span>';
         $unlink = $can_edit
-            ? '<a href="post.php?unlink_item&amp;from=' . $kind . '&amp;id=' . $holder_id . '&amp;to=software&amp;other=' . $software_id . '&amp;csrf_token=' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" class="btn btn-sm btn-light confirm-link" title="Take off this license" data-confirm-text="Frees the seat, and any key it had."><i class="fas fa-fw fa-unlink"></i></a>'
+            ? '<a href="post.php?unlink_item&amp;from=' . $kind . '&amp;id=' . $holder_id . '&amp;to=software&amp;other=' . $software_id . '&amp;csrf_token=' . escapeHtml($_SESSION['csrf_token'] ?? '') . '" class="btn btn-sm btn-light confirm-link" title="' . escapeHtml(__('Take off this license')) . '" data-confirm-text="' . escapeHtml(__('Frees the seat, and any key it had.')) . '"><i class="fas fa-fw fa-unlink"></i></a>'
             : '';
         $html .= '<tr>'
             . '<td><div class="d-flex align-items-center gap-2">' . softwareTile($row['software_type'], 'sm') . '<div class="min-w-0">'
@@ -382,8 +398,8 @@ function softwareHeldList($rows) {
         $seats = softwareSeats($row['seats_used'], $row['software_seats']);
         $renewal = softwareRenewal($row['software_expire']);
         $detail = implode(' · ', array_filter([
-            $row['software_license_type'],
-            $seats['state'] === 'unlimited' ? '' : $seats['used'] . ' / ' . $seats['total'] . ' seats',
+            softwareLicenseTypeLabel($row['software_license_type']),
+            $seats['state'] === 'unlimited' ? '' : __('%1$d / %2$d seats', $seats['used'], $seats['total']),
             $renewal ? $renewal['text'] : '',
         ]));
         $key = $row['held_keys'][0] ?? $row['software_key'];
@@ -494,7 +510,7 @@ function softwareSeatWarning($software_id) {
         return '';
     }
     // Raw name - flash messages are escaped when shown (alertMessageHtml)
-    return ' - <strong>' . $row['software_name'] . '</strong> is now over its seats, ' . $seats['used'] . ' of ' . $seats['total'] . ' in use';
+    return ' - ' . __('%1$s is now over its seats, %2$d of %3$d in use', '<strong>' . $row['software_name'] . '</strong>', $seats['used'], $seats['total']);
 }
 
 /** Add keys to a license, one per line of $text - blank lines and keys it already has are skipped. Returns how many were added. */
@@ -587,6 +603,18 @@ function softwareRenewalExtended($expire, $term) {
         $base = $today;
     }
     return $base->add(new DateInterval($intervals[$term]))->format('Y-m-d');
+}
+
+/** A renewal term (SOFTWARE_RENEWAL_TERMS) in the interface language. */
+function softwareRenewalTermLabel($term) {
+    return [
+        '1m' => __('1 month'),
+        '3m' => __('3 months'),
+        '6m' => __('6 months'),
+        '1y' => __('1 year'),
+        '2y' => __('2 years'),
+        '3y' => __('3 years'),
+    ][$term] ?? (SOFTWARE_RENEWAL_TERMS[$term] ?? (string) $term);
 }
 
 /** The renewal terms the Renew modal offers. */

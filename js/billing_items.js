@@ -74,7 +74,7 @@ function itflowBillingLineForm(root, options) {
         var q = itflowBillingNumber(qty && qty.value !== '' ? qty.value : '1');
         var p = itflowBillingNumber(price ? price.value : '');
         if (isNaN(q) || isNaN(p)) {
-            preview.textContent = price && price.value !== '' ? 'Not a number' : '';
+            preview.textContent = price && price.value !== '' ? __('Not a number') : '';
             return;
         }
         var option = tax && tax.options[tax.selectedIndex];
@@ -127,10 +127,10 @@ function itflowBillingLineForm(root, options) {
                     "<div class='fw-semibold'>" + esc(item.label) + "</div>" +
                     (item.description ? "<div class='small text-body-secondary text-truncate'>" + esc(item.description) + "</div>" : "") +
                     "<div class='small mt-1'>" +
-                        "<span class='badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal me-1'>" + (isService ? 'Service' : 'Product') + "</span>" +
-                        (item.tax_percent != null ? "<span class='badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal me-1'>Tax " + esc(parseFloat(item.tax_percent)) + "%</span>" : "") +
+                        "<span class='badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal me-1'>" + (isService ? __('Service') : __('Product')) + "</span>" +
+                        (item.tax_percent != null ? "<span class='badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal me-1'>" + esc(__('Tax %s%%', parseFloat(item.tax_percent))) + "</span>" : "") +
                         (billed ? "<span class='badge rounded-pill bg-info-subtle text-info-emphasis fw-normal me-1'><i class='fas fa-redo-alt me-1'></i>" + esc(billed) + "</span>" : "") +
-                        (tracked ? "<span class='badge rounded-pill fw-normal " + (stock > 0 ? "bg-success-subtle text-success-emphasis" : "bg-danger-subtle text-danger-emphasis") + "'>" + esc(stock) + " in stock</span>" : "") +
+                        (tracked ? "<span class='badge rounded-pill fw-normal " + (stock > 0 ? "bg-success-subtle text-success-emphasis" : "bg-danger-subtle text-danger-emphasis") + "'>" + esc(__('%s in stock', stock)) + "</span>" : "") +
                     "</div>" +
                 "</div>" +
                 "<div class='fw-semibold text-nowrap'>" + esc(item.price != null && item.price !== '' ? itflowBillingMoney(Number(item.price), opts.currency, opts.locale) : '') + "</div>" +
@@ -278,11 +278,11 @@ function itflowBillingItems(options) {
                     csrf_token: opts.csrf
                 }, function () {
                     if (typeof itflowToast === 'function') {
-                        itflowToast('Order saved', 'success');
+                        itflowToast(__('Order saved'), 'success');
                     }
                 }, function () {
                     if (typeof itflowToast === 'function') {
-                        itflowToast("The new order didn't save - reloading", 'error');
+                        itflowToast(__("The new order didn't save - reloading"), 'error');
                     }
                     setTimeout(function () { window.location.reload(); }, 1200);
                 });
@@ -349,15 +349,16 @@ function itflowBillingSeatForm(form, recurringInvoiceId) {
                     preview.innerHTML = '';
                     var strong = document.createElement('strong');
                     strong.textContent = data.count;
-                    preview.append('Counts ', strong, ' now - ' + data.label);
+                    var parts = __('Counts %1$s now - %2$s', '\u0000', data.label).split('\u0000');
+                    preview.append(parts[0], strong, parts[1] || '');
                     if (Number(data.quantity) !== Number(data.count)) {
-                        preview.append(' - billed at the minimum, ' + data.quantity);
+                        preview.append(__(' - billed at the minimum, %s', data.quantity));
                     }
                 }
             })
             .catch(function () {
                 if (preview) {
-                    preview.textContent = "Couldn't count them just now - it is counted again when saved.";
+                    preview.textContent = __("Couldn't count them just now - it is counted again when saved.");
                 }
             });
     }

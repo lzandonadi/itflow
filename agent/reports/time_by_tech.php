@@ -97,13 +97,13 @@ $agents = array_values(array_filter($agents, function ($a) {
 usort($agents, function ($a, $b) { return $b['seconds'] <=> $a['seconds'] ?: strcasecmp($a['agent'], $b['agent']); });
 
 $columns = [
-    'agent' => ['label' => 'Agent', 'html' => function ($row) {
-        return reportAgentCell($row['user_id'], $row['agent'], $row['avatar']) . ($row['active'] ? '' : ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">Inactive</span>');
+    'agent' => ['label' => __('Agent'), 'html' => function ($row) {
+        return reportAgentCell($row['user_id'], $row['agent'], $row['avatar']) . ($row['active'] ? '' : ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">' . __('Inactive') . '</span>');
     }],
-    'seconds' => ['label' => 'Hours logged', 'type' => 'hours', 'class' => 'fw-semibold'],
-    'billable' => ['label' => 'Billable', 'type' => 'hours', 'title' => 'Time on billable tickets'],
-    'billable_share' => ['label' => 'Billable share', 'type' => 'percent', 'class' => 'text-body-secondary'],
-    'utilization' => ['label' => 'Utilization', 'type' => 'percent', 'title' => 'Hours logged against the hours available in the period', 'html' => function ($row) {
+    'seconds' => ['label' => __('Hours logged'), 'type' => 'hours', 'class' => 'fw-semibold'],
+    'billable' => ['label' => __('Billable'), 'type' => 'hours', 'title' => __('Time on billable tickets')],
+    'billable_share' => ['label' => __('Billable share'), 'type' => 'percent', 'class' => 'text-body-secondary'],
+    'utilization' => ['label' => __('Utilization'), 'type' => 'percent', 'title' => __('Hours logged against the hours available in the period'), 'html' => function ($row) {
         if ($row['utilization'] === null) {
             return '<span class="itflow-report-zero">–</span>';
         }
@@ -112,15 +112,15 @@ $columns = [
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="itflow-report-meter d-none d-lg-flex" style="width: 5rem"><span class="' . $tone . '" style="width: ' . min(100, round($share, 1)) . '%"></span></div>'
             . '<span class="small">' . reportPercent(round($share)) . '</span></div>';
     }],
-    'replies' => ['label' => 'Replies sent', 'type' => 'count', 'title' => 'Replies the client can see'],
-    'tickets_touched' => ['label' => 'Tickets worked', 'type' => 'count', 'title' => 'Tickets they replied on or logged time to'],
-    'resolved' => ['label' => 'Resolved', 'type' => 'count', 'title' => 'Tickets assigned to them, resolved in the period'],
-    'open_now' => ['label' => 'Open now', 'type' => 'count', 'html' => function ($row) {
+    'replies' => ['label' => __('Replies sent'), 'type' => 'count', 'title' => __('Replies the client can see')],
+    'tickets_touched' => ['label' => __('Tickets worked'), 'type' => 'count', 'title' => __('Tickets they replied on or logged time to')],
+    'resolved' => ['label' => __('Resolved'), 'type' => 'count', 'title' => __('Tickets assigned to them, resolved in the period')],
+    'open_now' => ['label' => __('Open now'), 'type' => 'count', 'html' => function ($row) {
         return $row['open_now'] ? '<a class="itflow-report-amount" href="/agent/tickets.php?assigned=' . $row['user_id'] . '">' . $row['open_now'] . '</a>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'response' => ['label' => 'First reply', 'type' => 'duration', 'title' => 'Typical (middle) time to the first reply on tickets assigned to them'],
-    'sla' => ['label' => 'SLA response', 'type' => 'percent', 'html' => function ($row) { return reportRateHtml($row['sla']); }],
-    'csat' => ['label' => 'Satisfaction', 'type' => 'percent', 'html' => function ($row) {
+    'response' => ['label' => __('First reply'), 'type' => 'duration', 'title' => __('Typical (middle) time to the first reply on tickets assigned to them')],
+    'sla' => ['label' => __('SLA response'), 'type' => 'percent', 'html' => function ($row) { return reportRateHtml($row['sla']); }],
+    'csat' => ['label' => __('Satisfaction'), 'type' => 'percent', 'html' => function ($row) {
         return $row['csat'] === null ? '<span class="itflow-report-zero">–</span>' : reportRateHtml($row['csat'], 90, 75) . ' <span class="small text-body-tertiary">' . ($row['good'] + $row['bad']) . '</span>';
     }],
 ];
@@ -128,7 +128,7 @@ $columns = [
 $total_seconds = array_sum(array_column($agents, 'seconds'));
 $total_billable = array_sum(array_column($agents, 'billable'));
 $active_count = count(array_filter($agents, function ($a) { return $a['active']; }));
-$totals = ['agent' => 'Total', 'seconds' => $total_seconds, 'billable' => $total_billable, 'billable_share' => reportShare($total_billable, $total_seconds),
+$totals = ['agent' => __('Total'), 'seconds' => $total_seconds, 'billable' => $total_billable, 'billable_share' => reportShare($total_billable, $total_seconds),
     'utilization' => $capacity > 0 && $active_count ? reportShare($total_seconds, $capacity * $active_count) : null,
     'replies' => array_sum(array_column($agents, 'replies')), 'resolved' => array_sum(array_column($agents, 'resolved')), 'open_now' => array_sum(array_column($agents, 'open_now'))];
 
@@ -151,10 +151,10 @@ foreach (array_slice($agents, 0, 8) as $i => $agent) {
 
 require_once "includes/inc_report_layout.php";
 
-$hours_control = '<div class="col-sm-6 col-lg-auto"><div class="input-group" title="Hours an agent works in a day - from the business hours in Admin > SLA unless you enter another">'
+$hours_control = '<div class="col-sm-6 col-lg-auto"><div class="input-group" title="' . escapeHtml(__('Hours an agent works in a day - from the business hours in Admin > SLA unless you enter another')) . '">'
     . '<span class="input-group-text"><i class="fas fa-fw fa-business-time"></i></span>'
-    . '<input type="text" inputmode="decimal" class="form-control" style="max-width: 6rem" name="hours" value="' . escapeHtml(rtrim(rtrim(number_format($workday, 2, '.', ''), '0'), '.')) . '" aria-label="Hours in a working day" data-report-autosubmit>'
-    . '<span class="input-group-text">h a day</span></div></div>';
+    . '<input type="text" inputmode="decimal" class="form-control" style="max-width: 6rem" name="hours" value="' . escapeHtml(rtrim(rtrim(number_format($workday, 2, '.', ''), '0'), '.')) . '" aria-label="' . escapeHtml(__('Hours in a working day')) . '" data-report-autosubmit>'
+    . '<span class="input-group-text">' . __('h a day') . '</span></div></div>';
 $with_time = array_values(array_filter($agents, function ($a) { return $a['seconds'] > 0; }));
 
 ?>
@@ -169,17 +169,17 @@ $with_time = array_values(array_filter($agents, function ($a) { return $a['secon
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Hours logged', 'value' => reportHours($total_seconds) . ' h', 'sub' => '<span class="text-body-tertiary">By ' . count($with_time) . ' agent' . (count($with_time) === 1 ? '' : 's') . '</span>'],
-        ['label' => 'Billable', 'value' => reportPercent(reportShare($total_billable, $total_seconds)), 'sub' => escapeHtml(reportHours($total_billable)) . ' h <span class="text-body-tertiary">on billable tickets</span>'],
-        ['label' => 'Utilization', 'value' => reportPercent($totals['utilization'] === null ? null : round($totals['utilization'])),
-            'sub' => '<span class="text-body-tertiary">Of ' . $working_days . ' working day' . ($working_days === 1 ? '' : 's') . ' × ' . escapeHtml(rtrim(rtrim(number_format($workday, 2), '0'), '.')) . ' h each</span>'],
-        ['label' => 'Resolved', 'value' => reportCount($totals['resolved']), 'sub' => reportCount($totals['open_now']) . ' <span class="text-body-tertiary">open now' . ($unassigned_open ? ', ' . $unassigned_open . ' unassigned' : '') . '</span>'],
+        ['label' => __('Hours logged'), 'value' => reportHours($total_seconds) . ' h', 'sub' => '<span class="text-body-tertiary">' . _n('By %d agent', 'By %d agents', count($with_time)) . '</span>'],
+        ['label' => __('Billable'), 'value' => reportPercent(reportShare($total_billable, $total_seconds)), 'sub' => escapeHtml(reportHours($total_billable)) . ' h <span class="text-body-tertiary">' . __('on billable tickets') . '</span>'],
+        ['label' => __('Utilization'), 'value' => reportPercent($totals['utilization'] === null ? null : round($totals['utilization'])),
+            'sub' => '<span class="text-body-tertiary">' . _n('Of %1$d working day × %2$s h each', 'Of %1$d working days × %2$s h each', $working_days, $working_days, escapeHtml(rtrim(rtrim(number_format($workday, 2), '0'), '.'))) . '</span>'],
+        ['label' => __('Resolved'), 'value' => reportCount($totals['resolved']), 'sub' => reportCount($totals['open_now']) . ' <span class="text-body-tertiary">' . ($unassigned_open ? __('open now, %d unassigned', $unassigned_open) : __('open now')) . '</span>'],
     ]) ?>
 
     <?php if ($with_time) { ?>
         <div class="row g-3">
             <div class="col-xl-5">
-                <?= reportSectionOpen('Hours logged', 'Billable and not', 'h-100 mb-0') ?>
+                <?= reportSectionOpen(__('Hours logged'), __('Billable and not'), 'h-100 mb-0') ?>
                     <div class="card-body">
                         <?= reportChart([
                             'type' => 'bar',
@@ -187,30 +187,29 @@ $with_time = array_values(array_filter($agents, function ($a) { return $a['secon
                             'stacked' => true,
                             'labels' => array_column($with_time, 'agent'),
                             'series' => [
-                                ['label' => 'Billable', 'data' => array_map(function ($a) { return round($a['billable'] / 3600, 1); }, $with_time), 'tone' => 'accent', 'stack' => 'h'],
-                                ['label' => 'Not billable', 'data' => array_map(function ($a) { return round(($a['seconds'] - $a['billable']) / 3600, 1); }, $with_time), 'tone' => 'faint', 'stack' => 'h'],
+                                ['label' => __('Billable'), 'data' => array_map(function ($a) { return round($a['billable'] / 3600, 1); }, $with_time), 'tone' => 'accent', 'stack' => 'h'],
+                                ['label' => __('Not billable'), 'data' => array_map(function ($a) { return round(($a['seconds'] - $a['billable']) / 3600, 1); }, $with_time), 'tone' => 'faint', 'stack' => 'h'],
                             ],
                             'format' => 'hours',
-                        ], '', 'Hours logged per agent, billable and not') ?>
+                        ], '', __('Hours logged per agent, billable and not')) ?>
                     </div>
                 </div>
             </div>
             <div class="col-xl-7">
-                <?= reportSectionOpen('Hours over the period', 'By ' . $buckets['unit'], 'h-100 mb-0') ?>
+                <?= reportSectionOpen(__('Hours over the period'), $buckets['by'], 'h-100 mb-0') ?>
                     <div class="card-body">
-                        <?= reportChart(['type' => 'line', 'labels' => $buckets['labels'], 'series' => $weekly, 'format' => 'hours', 'legend' => true], '', 'Hours logged by each agent over the period') ?>
+                        <?= reportChart(['type' => 'line', 'labels' => $buckets['labels'], 'series' => $weekly, 'format' => 'hours', 'legend' => true], '', __('Hours logged by each agent over the period')) ?>
                     </div>
                 </div>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By agent', 'Most hours first') ?>
-        <?= reportTable($columns, $agents, ['empty' => 'No agents.', 'totals' => $totals, 'totals_html' => ['utilization' => $totals['utilization'] === null ? '' : reportPercent(round($totals['utilization']))]]) ?>
+    <?= reportSectionOpen(__('By agent'), __('Most hours first')) ?>
+        <?= reportTable($columns, $agents, ['empty' => __('No agents.'), 'totals' => $totals, 'totals_html' => ['utilization' => $totals['utilization'] === null ? '' : reportPercent(round($totals['utilization']))]]) ?>
         <div class="card-footer small text-body-secondary">
-            Hours come from time logged on ticket replies in the period. Utilization compares them with the working days in the period
-            (the business days in Admin > SLA, less closure days) at <?= escapeHtml(rtrim(rtrim(number_format($workday, 2), '0'), '.')) ?> hours a day - it is a guide, not a timesheet.
-            Resolved, SLA and first reply go by who the ticket is assigned to.
+            <?= __('Hours come from time logged on ticket replies in the period. Utilization compares them with the working days in the period (the business days in Admin > SLA, less closure days) at %s hours a day - it is a guide, not a timesheet.', escapeHtml(rtrim(rtrim(number_format($workday, 2), '0'), '.'))) ?>
+            <?= __('Resolved, SLA and first reply go by who the ticket is assigned to.') ?>
         </div>
     </div>
 

@@ -33,7 +33,7 @@ $sql = mysqli_query($mysqli, "SELECT asset_archived_at, asset_client_id, asset_c
 
 $asset_row = mysqli_fetch_assoc($sql);
 if (!$asset_row) {
-    echo json_encode(['error' => 'That asset no longer exists.']);
+    echo json_encode(['error' => __('That asset no longer exists.')]);
     exit;
 }
 
@@ -144,15 +144,15 @@ while ($row = mysqli_fetch_assoc($sql_note_type_icons)) {
 
 // Only the tabs with something in them - same order as the asset page
 $quick_tabs = array_filter([
-    'interfaces' => ['label' => 'Interfaces', 'count' => $interface_count],
-    'credentials' => ['label' => 'Credentials', 'count' => $credential_count],
-    'tickets' => ['label' => 'Tickets', 'count' => $ticket_count, 'badge' => $ticket_open_count],
-    'recurring' => ['label' => 'Recurring', 'count' => $recurring_ticket_count],
-    'licenses' => ['label' => 'Licenses', 'count' => $software_count],
-    'services' => ['label' => 'Services', 'count' => $service_count],
-    'documents' => ['label' => 'Documents', 'count' => $document_count],
-    'files' => ['label' => 'Files', 'count' => $file_count],
-    'notes' => ['label' => 'Notes', 'count' => $note_count],
+    'interfaces' => ['label' => __('Interfaces'), 'count' => $interface_count],
+    'credentials' => ['label' => __('Credentials'), 'count' => $credential_count],
+    'tickets' => ['label' => __('Tickets'), 'count' => $ticket_count, 'badge' => $ticket_open_count],
+    'recurring' => ['label' => __('Recurring'), 'count' => $recurring_ticket_count],
+    'licenses' => ['label' => __('Licenses'), 'count' => $software_count],
+    'services' => ['label' => __('Services'), 'count' => $service_count],
+    'documents' => ['label' => __('Documents'), 'count' => $document_count],
+    'files' => ['label' => __('Files'), 'count' => $file_count],
+    'notes' => ['label' => __('Notes'), 'count' => $note_count],
 ], function ($tab) {
     return $tab['count'] > 0;
 });
@@ -180,8 +180,8 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $asset_name ?></span>
-                <?php if ($asset_favorite) { ?><i class="fas fa-star text-warning fs-6" title="Favorite"></i><?php } ?>
-                <?php if ($asset_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if ($asset_favorite) { ?><i class="fas fa-star text-warning fs-6" title="<?= escapeHtml(__('Favorite')) ?>"></i><?php } ?>
+                <?php if ($asset_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                 <span class="fs-6">
                     <?php if ($can_edit) { ?>
                         <?= quickPick('asset_status', $asset_id, (string) $asset_row['asset_status'], assetQuickHtml('asset_status', $asset_row), 'list', 0, $client_id) ?>
@@ -191,13 +191,13 @@ ob_start();
                 </span>
             </h5>
             <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
-                <span><?= $asset_type ?></span>
+                <span><?= assetTypeLabel($asset_type) ?></span>
                 <?php if ($asset_make_model) { ?><span><?= $asset_make_model ?></span><?php } ?>
                 <?php if ($asset_os) { ?><span><i class="<?= $asset_os_icon ?> fa-fw me-1"></i><?= $asset_os ?></span><?php } ?>
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -226,27 +226,27 @@ ob_start();
             <?php if ($has_left) { ?>
                 <div class="col-sm-6">
                     <?php if ($asset_ip) { ?>
-                        <div class="itflow-glance-item" title="IP address">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('IP address')) ?>">
                             <i class="fas fa-fw fa-globe"></i>
-                            <span><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?></span>
+                            <span><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?></span>
                         </div>
                     <?php } ?>
                     <?php if ($asset_mac) { ?>
-                        <div class="itflow-glance-item" title="MAC address">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('MAC address')) ?>">
                             <i class="fas fa-fw fa-ethernet"></i>
-                            <span><span class="font-monospace"><?= $asset_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy MAC" data-clipboard-text="<?= $asset_mac ?>"><i class="far fa-copy"></i></button></span>
+                            <span><span class="font-monospace"><?= $asset_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy MAC')) ?>" data-clipboard-text="<?= $asset_mac ?>"><i class="far fa-copy"></i></button></span>
                         </div>
                     <?php } ?>
                     <?php if ($asset_serial) { ?>
-                        <div class="itflow-glance-item" title="Serial number">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('Serial number')) ?>">
                             <i class="fas fa-fw fa-barcode"></i>
-                            <span><span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy serial" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button></span>
+                            <span><span class="font-monospace"><?= $asset_serial ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy serial')) ?>" data-clipboard-text="<?= $asset_serial ?>"><i class="far fa-copy"></i></button></span>
                         </div>
                     <?php } ?>
                     <?php if ($asset_warranty) { ?>
-                        <div class="itflow-glance-item" title="Warranty <?= escapeHtml($asset_warranty['date']) ?>">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('Warranty %s', formatDate($asset_warranty['date'], 'date'))) ?>">
                             <i class="fas fa-fw fa-shield-alt"></i>
-                            <span class="text-<?= $asset_warranty['tone'] ?>-emphasis">Warranty <?= strtolower(escapeHtml($asset_warranty['text'])) ?></span>
+                            <span class="text-<?= $asset_warranty['tone'] ?>-emphasis"><?= escapeHtml(__('Warranty %s', lcfirst($asset_warranty['text']))) ?></span>
                         </div>
                     <?php } ?>
                     <?php foreach ($asset_spec_rows as $spec_key => $spec_row) { ?>
@@ -264,7 +264,7 @@ ob_start();
             <?php if ($has_right) { ?>
                 <div class="col-sm-6">
                     <?php if ($can_edit || $asset_row['location_name']) { ?>
-                        <div class="itflow-glance-item" title="Location">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('Location')) ?>">
                             <i class="fas fa-fw fa-map-marker-alt"></i>
                             <div class="flex-grow-1 min-w-0">
                                 <?php if ($can_edit) { ?>
@@ -277,7 +277,7 @@ ob_start();
                         </div>
                     <?php } ?>
                     <?php if ($asset_has_contact && ($can_edit || $asset_row['contact_name'])) { ?>
-                        <div class="itflow-glance-item" title="Assigned to">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('Assigned to')) ?>">
                             <i class="fas fa-fw fa-user"></i>
                             <div class="flex-grow-1 min-w-0">
                                 <?php if ($can_edit) { ?>
@@ -289,7 +289,7 @@ ob_start();
                         </div>
                     <?php } ?>
                     <?php if ($asset_rack) { ?>
-                        <div class="itflow-glance-item" title="Rack">
+                        <div class="itflow-glance-item" title="<?= escapeHtml(__('Rack')) ?>">
                             <i class="fas fa-fw fa-server"></i>
                             <span><a href="rack.php?client_id=<?= $client_id ?>&rack_id=<?= intval($asset_rack['rack_id']) ?>"><?= escapeHtml($asset_rack['rack_name']) ?></a> <span class="text-body-secondary">&middot; <?= rackPositionLabel($asset_rack['unit_start_number'], $asset_rack['unit_end_number']) ?>, <?= $asset_rack['unit_face'] === 'rear' ? 'rear' : 'front' ?></span></span>
                         </div>
@@ -300,7 +300,7 @@ ob_start();
     <?php } ?>
 
     <?php if ($can_edit || $asset_notes) { ?>
-        <textarea class="form-control form-control-sm mt-3 itflow-asset-quicknote" rows="2" placeholder="Quick notes - saves when you click away" aria-label="Quick notes"
+        <textarea class="form-control form-control-sm mt-3 itflow-asset-quicknote" rows="2" placeholder="<?= escapeHtml(__('Quick notes - saves when you click away')) ?>" aria-label="<?= escapeHtml(__('Quick notes')) ?>"
             data-asset-id="<?= $asset_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token'] ?? '') ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $asset_notes ?></textarea>
     <?php } ?>
 
@@ -312,7 +312,7 @@ ob_start();
                     <li class="nav-item" role="presentation">
                         <button class="nav-link text-nowrap <?= $tab_key === $first_tab ? 'active' : '' ?>" data-bs-toggle="pill" data-bs-target="#asset-quick-<?= $asset_id ?>-<?= $tab_key ?>" data-asset-quick-tab="<?= $tab_key ?>" type="button" role="tab">
                             <?= $tab['label'] ?> <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
-                            <?php if (!empty($tab['badge'])) { ?><span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span><?php } ?>
+                            <?php if (!empty($tab['badge'])) { ?><span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= intval($tab['badge']) ?> open</span><?php } ?>
                         </button>
                     </li>
                 <?php } ?>
@@ -324,7 +324,7 @@ ob_start();
                     <div class="tab-pane fade <?= $first_tab === 'interfaces' ? 'show active' : '' ?>" id="asset-quick-<?= $asset_id ?>-interfaces" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-sm table-hover align-middle mb-0">
-                                <thead class="text-nowrap"><tr><th>Port</th><th>IP</th><th>MAC</th><th>Connected to</th></tr></thead>
+                                <thead class="text-nowrap"><tr><th><?= __('Port') ?></th><th><?= __('IP') ?></th><th><?= __('MAC') ?></th><th><?= __('Connected to') ?></th></tr></thead>
                                 <tbody>
                                 <?php while ($row = mysqli_fetch_assoc($sql_related_interfaces)) {
                                     $interface_ip = escapeHtml($row['interface_ip']);
@@ -333,10 +333,10 @@ ob_start();
                                     <tr>
                                         <td class="text-nowrap">
                                             <?= escapeHtml($row['interface_name']) ?>
-                                            <?php if (intval($row['interface_primary'])) { ?><span class="badge rounded-pill text-bg-primary fw-normal ms-1">Primary</span><?php } ?>
+                                            <?php if (intval($row['interface_primary'])) { ?><span class="badge rounded-pill text-bg-primary fw-normal ms-1"><?= __('Primary') ?></span><?php } ?>
                                         </td>
-                                        <td class="text-nowrap"><?php if ($interface_ip) { ?><span class="font-monospace"><?= $interface_ip ?></span><?php if ($interface_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $interface_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
-                                        <td class="text-nowrap"><?php if ($interface_mac) { ?><span class="font-monospace"><?= $interface_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy MAC" data-clipboard-text="<?= $interface_mac ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
+                                        <td class="text-nowrap"><?php if ($interface_ip) { ?><span class="font-monospace"><?= $interface_ip ?></span><?php if ($interface_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $interface_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
+                                        <td class="text-nowrap"><?php if ($interface_mac) { ?><span class="font-monospace"><?= $interface_mac ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy MAC')) ?>" data-clipboard-text="<?= $interface_mac ?>"><i class="far fa-copy"></i></button><?php } else { ?><span class="text-body-secondary">-</span><?php } ?></td>
                                         <td>
                                             <?php if ($connected_asset_id) { ?>
                                                 <a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= $connected_asset_id ?>"><i class="fas fa-fw fa-<?= getAssetIcon($row['connected_asset_type']) ?> me-1"></i><?= escapeHtml($row['connected_asset_name']) ?></a>
@@ -363,7 +363,7 @@ ob_start();
                     <div class="tab-pane fade <?= $first_tab === 'tickets' ? 'show active' : '' ?>" id="asset-quick-<?= $asset_id ?>-tickets" role="tabpanel">
                         <?= ticketTableHtml($related_tickets, ['compact' => true]) ?>
                         <?php if ($ticket_count > count($related_tickets)) { ?>
-                            <div class="small mt-2"><a href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>#tickets">All <?= $ticket_count ?> tickets on the asset page<i class="fas fa-arrow-right ms-1"></i></a></div>
+                            <div class="small mt-2"><a href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>#tickets"><?= __('All %d tickets on the asset page', $ticket_count) ?><i class="fas fa-arrow-right ms-1"></i></a></div>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -441,11 +441,11 @@ ob_start();
 </div>
 
 <div class="modal-footer">
-    <a href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i>Open asset</a>
+    <a href="asset.php?client_id=<?= $client_id ?>&asset_id=<?= $asset_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i><?= __('Open asset') ?></a>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_edit.php?id=<?= $asset_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/asset/asset_edit.php?id=<?= $asset_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <script>

@@ -116,7 +116,7 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $dtf === $stats['month_start'] && $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($date_url($stats['month_start'], date('Y-m-t'), ['show' => ''])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i>This month</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-calendar-alt me-1"></i><?= __('This month') ?></div>
             <div class="itflow-billing-stat-value"><?= escapeHtml(tripMilesText($stats['month_miles'])) ?></div>
             <div class="itflow-billing-stat-note">
                 <?= intval($stats['month_trips']) ?> trip<?= intval($stats['month_trips']) === 1 ? '' : 's' ?>
@@ -135,29 +135,29 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $show === 'mine' && $dtf === $stats['month_start'] ? 'active' : '' ?>" href="<?= escapeHtml($date_url($stats['month_start'], date('Y-m-t'), ['show' => 'mine'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-user me-1"></i>Yours this month</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-user me-1"></i><?= __('Yours this month') ?></div>
             <div class="itflow-billing-stat-value"><?= escapeHtml(tripMilesText($stats['my_month_miles'])) ?></div>
-            <div class="itflow-billing-stat-note"><?= intval($stats['my_month_trips']) ?> trip<?= intval($stats['my_month_trips']) === 1 ? '' : 's' ?> you drove</div>
+            <div class="itflow-billing-stat-note"><?= escapeHtml(_n('%d trip you drove', '%d trips you drove', intval($stats['my_month_trips']))) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <?php if ($pay_back) { ?>
             <a class="itflow-billing-stat <?= $show === 'to_pay' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['show' => 'to_pay', 'canned_date' => '', 'dtf' => '', 'dtt' => ''])) ?>">
-                <div class="itflow-billing-stat-label"><i class="fas fa-hand-holding-usd me-1"></i><?= $sees_all ? 'To pay back' : 'Owed to you' ?></div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-hand-holding-usd me-1"></i><?= $sees_all ? __('To pay back') : __('Owed to you') ?></div>
                 <div class="itflow-billing-stat-value <?= $owed_total['count'] ? 'text-warning-emphasis' : '' ?>"><?= $stat_money($owed_total['value']) ?></div>
                 <div class="itflow-billing-stat-note">
                     <?php if ($owed_total['count']) { ?>
-                        <?= escapeHtml(tripMilesText($owed_total['miles'])) ?> in their own vehicle<?= $sees_all ? ' &middot; ' . $owed_total['agents'] . ' agent' . ($owed_total['agents'] === 1 ? '' : 's') : '' ?>
+                        <?= escapeHtml(__('%s in their own vehicle', tripMilesText($owed_total['miles']))) ?><?= $sees_all ? ' &middot; ' . escapeHtml(_n('%d agent', '%d agents', $owed_total['agents'])) : '' ?>
                     <?php } else { ?>
-                        Nothing waiting &middot; <?= escapeHtml(tripRateText($rules['rate'])) ?>
+                        <?= __('Nothing waiting') ?> &middot; <?= escapeHtml(tripRateText($rules['rate'])) ?>
                     <?php } ?>
                 </div>
             </a>
         <?php } else { ?>
             <a class="itflow-billing-stat <?= $show === 'client' && $dtf === $stats['year_start'] ? 'active' : '' ?>" href="<?= escapeHtml($date_url($stats['year_start'], date('Y-12-31'), ['show' => 'client'])) ?>">
-                <div class="itflow-billing-stat-label"><i class="fas fa-building me-1"></i>For clients this year</div>
+                <div class="itflow-billing-stat-label"><i class="fas fa-building me-1"></i><?= __('For clients this year') ?></div>
                 <div class="itflow-billing-stat-value"><?= escapeHtml(tripMilesText($stats['year_client_miles'])) ?></div>
-                <div class="itflow-billing-stat-note"><?= $stats['year_miles'] > 0 ? round($stats['year_client_miles'] / $stats['year_miles'] * 100) . '% of the driving' : 'No driving yet this year' ?></div>
+                <div class="itflow-billing-stat-note"><?= $stats['year_miles'] > 0 ? __('%s%% of the driving', round($stats['year_client_miles'] / $stats['year_miles'] * 100)) : __('No driving yet this year') ?></div>
             </a>
         <?php } ?>
     </div>
@@ -165,25 +165,25 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-route me-2"></i>Trips<?= $sees_all ? '' : ' <span class="fw-normal text-white-50 small ms-1">yours</span>' ?></h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-route me-2"></i><?= __('Trips') ?><?= $sees_all ? '' : ' <span class="fw-normal text-white-50 small ms-1">' . escapeHtml(__('yours')) . '</span>' ?></h3>
         <div class="card-tools">
             <div class="btn-group">
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus me-2"></i>New Trip</button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus me-2"></i><?= __('New Trip') ?></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#"
                         data-modal-url="<?= buildExportModalUrl('modals/trip/trip_export.php', ['client_id', 'client', 'driver', 'location_id', 'ticket_id', 'show', 'q'], ['dtf' => $dtf, 'dtt' => $dtt]) ?>">
-                        <i class="fa fa-fw fa-download text-secondary me-2"></i>Export
+                        <i class="fa fa-fw fa-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <?php if ($pay_back && $can_manage) { ?>
-                        <a class="dropdown-item" href="<?= escapeHtml($filter_url(['show' => 'to_pay'])) ?>"><i class="fa fa-fw fa-hand-holding-usd text-secondary me-2"></i>Pay Mileage</a>
+                        <a class="dropdown-item" href="<?= escapeHtml($filter_url(['show' => 'to_pay'])) ?>"><i class="fa fa-fw fa-hand-holding-usd text-secondary me-2"></i><?= __('Pay Mileage') ?></a>
                     <?php } ?>
                     <?php if (reportCanOpen('mileage')) { ?>
-                        <a class="dropdown-item" href="reports/mileage.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i>Mileage Report</a>
+                        <a class="dropdown-item" href="reports/mileage.php"><i class="fa fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Mileage Report') ?></a>
                     <?php } ?>
                     <?php if ($session_is_admin) { ?>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/admin/settings_invoice.php#mileage"><i class="fa fa-fw fa-cog text-secondary me-2"></i>Mileage Rates</a>
+                        <a class="dropdown-item" href="/admin/settings_invoice.php#mileage"><i class="fa fa-fw fa-cog text-secondary me-2"></i><?= __('Mileage Rates') ?></a>
                     <?php } ?>
                 </div>
             </div>
@@ -204,12 +204,12 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search trips" title="Purpose, from, to, client, site, driver, ticket">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search trips')) ?>" title="<?= escapeHtml(__('Purpose, from, to, client, site, driver, ticket')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="Date of the trip" aria-label="Date of the trip">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('Date of the trip')) ?>" aria-label="<?= escapeHtml(__('Date of the trip')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
@@ -217,8 +217,8 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                 <div class="col-lg-<?= $client_page ? 6 : 3 ?> col-md-6">
                     <div class="d-flex gap-2">
                         <div class="flex-grow-1 min-w-0">
-                            <select class="form-select select2" name="driver" onchange="this.form.submit()" aria-label="Driver">
-                                <option value="">- Any driver -</option>
+                            <select class="form-select select2" name="driver" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Driver')) ?>">
+                                <option value=""><?= __('- Any driver -') ?></option>
                                 <?php
                                 $sql_filter = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE EXISTS (SELECT 1 FROM trips WHERE trip_user_id = user_id) ORDER BY user_name ASC");
                                 while ($row = mysqli_fetch_assoc($sql_filter)) {
@@ -236,8 +236,8 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                     <div class="col-lg-3 col-md-6">
                         <div class="d-flex gap-2">
                             <div class="flex-grow-1 min-w-0">
-                                <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="Client">
-                                    <option value="">- Any client -</option>
+                                <select class="form-select select2" name="client" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Client')) ?>">
+                                    <option value=""><?= __('- Any client -') ?></option>
                                     <?php
                                     $sql_filter = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients
                                         WHERE EXISTS (SELECT 1 FROM trips WHERE trip_client_id = client_id) " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
@@ -267,18 +267,18 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
         </nav>
         <?php if ($location_filter || $ticket_filter || $expense_filter || $invoice_filter) {
             if ($location_filter) {
-                $filter_text = 'To the site ' . escapeHtml((string) getFieldById('locations', $location_filter, 'location_name'));
+                $filter_text = escapeHtml(__('To the site %s', (string) getFieldById('locations', $location_filter, 'location_name')));
             } elseif ($ticket_filter) {
-                $filter_text = 'For the ticket ' . escapeHtml((string) getFieldById('tickets', $ticket_filter, 'ticket_subject'));
+                $filter_text = escapeHtml(__('For the ticket %s', (string) getFieldById('tickets', $ticket_filter, 'ticket_subject')));
             } elseif ($expense_filter) {
-                $filter_text = 'Paid back for on the <a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=' . $expense_filter . '">mileage expense</a>';
+                $filter_text = __('Paid back for on the %s', '<a href="#" class="ajax-modal" data-modal-size="lg" data-modal-url="modals/expense/expense.php?id=' . $expense_filter . '">' . escapeHtml(__('mileage expense')) . '</a>');
             } else {
                 $invoice_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT invoice_prefix, invoice_number FROM invoices WHERE invoice_id = $invoice_filter"));
-                $filter_text = 'Billed on <a href="invoice.php?invoice_id=' . $invoice_filter . '">' . escapeHtml($invoice_row ? $invoice_row['invoice_prefix'] . $invoice_row['invoice_number'] : 'an invoice since deleted') . '</a>';
+                $filter_text = __('Billed on %s', '<a href="invoice.php?invoice_id=' . $invoice_filter . '">' . escapeHtml($invoice_row ? $invoice_row['invoice_prefix'] . $invoice_row['invoice_number'] : __('an invoice since deleted')) . '</a>');
             } ?>
             <div class="small text-body-secondary mt-2">
                 <i class="fas fa-filter me-1"></i><?= $filter_text ?>
-                <a class="ms-2" href="<?= escapeHtml($filter_url(['location_id' => '', 'ticket_id' => '', 'expense_id' => '', 'invoice_id' => ''])) ?>">Clear</a>
+                <a class="ms-2" href="<?= escapeHtml($filter_url(['location_id' => '', 'ticket_id' => '', 'expense_id' => '', 'invoice_id' => ''])) ?>"><?= __('Clear') ?></a>
             </div>
         <?php } ?>
     </div>
@@ -289,10 +289,10 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
             <?php foreach ($owed as $owed_id => $owed_driver) { ?>
                 <div class="list-group-item d-flex flex-wrap align-items-center gap-2 bg-warning-subtle">
                     <i class="fas fa-car-side text-warning-emphasis"></i>
-                    <span class="flex-grow-1"><strong><?= escapeHtml($owed_driver['user_name']) ?></strong> is owed <strong class="itflow-money"><?= $stat_money($owed_driver['value']) ?></strong>
-                        <span class="text-body-secondary">for <?= $owed_driver['count'] ?> trip<?= $owed_driver['count'] === 1 ? '' : 's' ?>, <?= escapeHtml(tripMilesText($owed_driver['miles'])) ?> at <?= escapeHtml(tripRateText($rules['rate'])) ?><?= $owed_driver['oldest'] > 1 ? ', the oldest ' . $owed_driver['oldest'] . ' days ago' : '' ?></span></span>
+                    <span class="flex-grow-1"><strong><?= escapeHtml($owed_driver['user_name']) ?></strong> <?= __('is owed') ?> <strong class="itflow-money"><?= $stat_money($owed_driver['value']) ?></strong>
+                        <span class="text-body-secondary"><?= escapeHtml($owed_driver['oldest'] > 1 ? _n('for %1$d trip, %2$s at %3$s, the oldest %4$d days ago', 'for %1$d trips, %2$s at %3$s, the oldest %4$d days ago', $owed_driver['count'], $owed_driver['count'], tripMilesText($owed_driver['miles']), tripRateText($rules['rate']), $owed_driver['oldest']) : _n('for %1$d trip, %2$s at %3$s', 'for %1$d trips, %2$s at %3$s', $owed_driver['count'], $owed_driver['count'], tripMilesText($owed_driver['miles']), tripRateText($rules['rate']))) ?></span></span>
                     <?php if ($can_manage) { ?>
-                        <button type="button" class="btn btn-sm btn-success ajax-modal" data-modal-size="lg" data-modal-url="modals/trip/trip_claim.php?user_id=<?= $owed_id ?>"><i class="fas fa-hand-holding-usd me-1"></i>Pay Mileage</button>
+                        <button type="button" class="btn btn-sm btn-success ajax-modal" data-modal-size="lg" data-modal-url="modals/trip/trip_claim.php?user_id=<?= $owed_id ?>"><i class="fas fa-hand-holding-usd me-1"></i><?= __('Pay Mileage') ?></button>
                     <?php } ?>
                 </div>
             <?php } ?>
@@ -306,18 +306,18 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                 <?php if ($can_manage) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                 <?php } ?>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=trip_date&order=<?= $disp ?>">Date <?php if ($sort == 'trip_date') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=trip_destination&order=<?= $disp ?>">Trip <?php if ($sort == 'trip_destination') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=trip_date&order=<?= $disp ?>"><?= __('Date') ?> <?php if ($sort == 'trip_date') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=trip_destination&order=<?= $disp ?>"><?= __('Trip') ?> <?php if ($sort == 'trip_destination') { echo $order_icon; } ?></a></th>
                 <?php if (!$client_page) { ?>
-                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">Client <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
+                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>"><?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
                 <?php } else { ?>
-                    <th>Site</th>
+                    <th><?= __('Site') ?></th>
                 <?php } ?>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=user_name&order=<?= $disp ?>">Driver <?php if ($sort == 'user_name') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=user_name&order=<?= $disp ?>"><?= __('Driver') ?> <?php if ($sort == 'user_name') { echo $order_icon; } ?></a></th>
                 <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=trip_miles&order=<?= $disp ?>"><?= ucfirst(tripUnit()) ?> <?php if ($sort == 'trip_miles') { echo $order_icon; } ?></a></th>
                 <th></th>
             </tr>
@@ -331,7 +331,7 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                     <?php if ($can_manage) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="trip_ids[]" value="<?= $trip_id ?>" aria-label="Select this trip">
+                                <input class="form-check-input bulk-select" type="checkbox" name="trip_ids[]" value="<?= $trip_id ?>" aria-label="<?= escapeHtml(__('Select this trip')) ?>">
                             </div>
                         </td>
                     <?php } ?>
@@ -351,31 +351,31 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                     <?php if (!$client_page) { ?>
                         <td>
                             <?php if (intval($row['trip_client_id'])) { ?>
-                                <div class="text-truncate" style="max-width: 12rem;"><a class="text-reset" href="<?= escapeHtml($filter_url(['client' => intval($row['trip_client_id'])])) ?>" title="<?= escapeHtml((string) $row['client_name']) ?> - their trips"><?= escapeHtml($row['client_name']) ?></a></div>
+                                <div class="text-truncate" style="max-width: 12rem;"><a class="text-reset" href="<?= escapeHtml($filter_url(['client' => intval($row['trip_client_id'])])) ?>" title="<?= escapeHtml(__('%s - their trips', (string) $row['client_name'])) ?>"><?= escapeHtml($row['client_name']) ?></a></div>
                                 <?php if ($row['location_name'] !== null) { ?><div class="small text-body-secondary text-truncate" style="max-width: 12rem;"><i class="fas fa-map-marker-alt me-1"></i><?= escapeHtml($row['location_name']) ?></div><?php } ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary small">Our own</span>
+                                <span class="text-body-secondary small"><?= __('Our own') ?></span>
                             <?php } ?>
                         </td>
                     <?php } else { ?>
                         <td class="small"><?= $row['location_name'] !== null ? '<a class="text-reset" href="' . escapeHtml($filter_url(['location_id' => intval($row['trip_location_id'])])) . '"><i class="fas fa-map-marker-alt text-body-secondary me-1"></i>' . escapeHtml($row['location_name']) . '</a>' : '<span class="text-body-secondary">-</span>' ?></td>
                     <?php } ?>
-                    <td class="text-nowrap"><?= formatAssignee($row['trip_user_id'], $row['driver_name'] ?? '', $row['driver_avatar'] ?? '', false, 'No driver') ?></td>
+                    <td class="text-nowrap"><?= formatAssignee($row['trip_user_id'], $row['driver_name'] ?? '', $row['driver_avatar'] ?? '', false, __('No driver')) ?></td>
                     <td class="text-end text-nowrap">
                         <span class="fw-semibold"><?= number_format(floatval($row['trip_miles']), 1) ?></span>
-                        <?php if (intval($row['round_trip'])) { ?><i class="fas fa-sync-alt text-body-tertiary small ms-1" title="Round trip - <?= escapeHtml(tripMilesText(tripOneWay($row))) ?> each way"></i><?php } ?>
+                        <?php if (intval($row['round_trip'])) { ?><i class="fas fa-sync-alt text-body-tertiary small ms-1" title="<?= escapeHtml(__('Round trip - %s each way', tripMilesText(tripOneWay($row)))) ?>"></i><?php } ?>
                         <?php
                         // The money, as marks - their own vehicle and paid back, billable and billed
                         $marks = [];
                         if (intval($row['trip_own_vehicle'])) {
                             $marks[] = intval($row['trip_expense_id'])
-                                ? '<i class="fas fa-car-side text-success-emphasis" title="Their own vehicle - paid back for"></i>'
-                                : '<i class="fas fa-car-side text-warning-emphasis" title="Their own vehicle - to pay back' . ($pay_back ? ' ' . escapeHtml(billingMoney(round(floatval($row['trip_miles']) * $rules['rate'], 2))) : '') . '"></i>';
+                                ? '<i class="fas fa-car-side text-success-emphasis" title="' . escapeHtml(__('Their own vehicle - paid back for')) . '"></i>'
+                                : '<i class="fas fa-car-side text-warning-emphasis" title="' . escapeHtml($pay_back ? __('Their own vehicle - to pay back %s', billingMoney(round(floatval($row['trip_miles']) * $rules['rate'], 2))) : __('Their own vehicle - to pay back')) . '"></i>';
                         }
                         if ($row['invoice_number'] !== null) {
-                            $marks[] = '<a href="invoice.php?invoice_id=' . intval($row['trip_invoice_id']) . '" class="text-success-emphasis" title="Billed on ' . escapeHtml($row['invoice_prefix'] . $row['invoice_number']) . '"><i class="fas fa-file-invoice-dollar"></i></a>';
+                            $marks[] = '<a href="invoice.php?invoice_id=' . intval($row['trip_invoice_id']) . '" class="text-success-emphasis" title="' . escapeHtml(__('Billed on %s', $row['invoice_prefix'] . $row['invoice_number'])) . '"><i class="fas fa-file-invoice-dollar"></i></a>';
                         } elseif (intval($row['trip_billable']) && intval($row['trip_client_id'])) {
-                            $marks[] = '<i class="fas fa-file-invoice-dollar text-info-emphasis" title="To bill ' . escapeHtml(billingMoney(tripBillPrice($row))) . '"></i>';
+                            $marks[] = '<i class="fas fa-file-invoice-dollar text-info-emphasis" title="' . escapeHtml(__('To bill %s', billingMoney(tripBillPrice($row)))) . '"></i>';
                         }
                         if ($marks) { ?>
                             <div class="small d-flex justify-content-end gap-2 mt-1"><?= implode('', $marks) ?></div>
@@ -383,24 +383,24 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                     </td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
-                                <a class="dropdown-item" href="<?= escapeHtml(tripMapUrl($row)) ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-map-marked-alt text-secondary me-2"></i>Directions<i class="fas fa-external-link-alt small text-secondary ms-2"></i></a>
+                                <a class="dropdown-item ajax-modal" href="#" <?= $row_open ?>><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
+                                <a class="dropdown-item" href="<?= escapeHtml(tripMapUrl($row)) ?>" target="_blank" rel="noopener"><i class="fas fa-fw fa-map-marked-alt text-secondary me-2"></i><?= __('Directions') ?><i class="fas fa-external-link-alt small text-secondary ms-2"></i></a>
                                 <div class="dropdown-divider"></div>
                                 <?php if (tripCanEdit($row)) { ?>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_edit.php?id=<?= $trip_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_edit.php?id=<?= $trip_id ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
                                 <?php } ?>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_copy.php?id=<?= $trip_id ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy</a>
-                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_copy.php?id=<?= $trip_id ?>&amp;return=1"><i class="fas fa-fw fa-undo-alt text-secondary me-2"></i>Return Trip</a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_copy.php?id=<?= $trip_id ?>"><i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?></a>
+                                <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_copy.php?id=<?= $trip_id ?>&amp;return=1"><i class="fas fa-fw fa-undo-alt text-secondary me-2"></i><?= __('Return Trip') ?></a>
                                 <?php if ($pay_back && $can_manage && intval($row['trip_own_vehicle']) && !intval($row['trip_expense_id'])) { ?>
-                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_claim.php?trip_ids[]=<?= $trip_id ?>"><i class="fas fa-fw fa-hand-holding-usd text-secondary me-2"></i>Pay Mileage</a>
+                                    <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/trip/trip_claim.php?trip_ids[]=<?= $trip_id ?>"><i class="fas fa-fw fa-hand-holding-usd text-secondary me-2"></i><?= __('Pay Mileage') ?></a>
                                 <?php } ?>
                                 <?php if (tripCanDelete($row) && !intval($row['trip_expense_id']) && $row['invoice_number'] === null) { ?>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_trip=<?= $trip_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                        data-confirm-text="<?= escapeHtml(tripLabel($row)) ?> goes for good.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        data-confirm-text="<?= escapeHtml(__('%s goes for good.', tripLabel($row))) ?>">
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -413,7 +413,7 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
                 <tfoot>
                 <tr class="table-light">
                     <td colspan="<?= $can_manage ? 5 : 4 ?>" class="text-body-secondary small">
-                        <?= intval($num_rows[0]) ?> trip<?= intval($num_rows[0]) === 1 ? '' : 's' ?><?= $any_filter ? ' match' . (intval($num_rows[0]) === 1 ? 'es' : '') : '' ?><?= $num_rows[0] > count($trips) ? ' - the total is for all of them, not just this page' : '' ?>
+                        <?= escapeHtml($any_filter ? _n('%d trip matches', '%d trips match', intval($num_rows[0])) : _n('%d trip', '%d trips', intval($num_rows[0]))) ?><?= $num_rows[0] > count($trips) ? escapeHtml(_x(' - the total is for all of them, not just this page', 'trips')) : '' ?>
                     </td>
                     <td class="text-end fw-semibold text-nowrap"><?= escapeHtml(tripMilesText($listed_miles)) ?></td>
                     <td></td>
@@ -424,13 +424,13 @@ $add_url = 'modals/trip/trip_add.php' . ($client_page ? "?client_id=$client_id" 
     </div>
     <?php
     $empty_state = [
-        'thing' => 'trips',
+        'thing' => __('trips'),
         'icon' => 'fa-route',
         'filtered' => $q || $driver_filter || ($client_filter && !$client_page) || $location_filter || $ticket_filter || $expense_filter || $invoice_filter || $dtf !== '1970-01-01',
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['to_pay', 'to_bill']),
-        'text' => 'Log the drive out to a client from their ticket - Log a trip, in its menu - or with New Trip here.',
-        'actions' => [['label' => 'New Trip', 'modal' => $add_url, 'size' => 'lg']],
+        'text' => __('Log the drive out to a client from their ticket - Log a trip, in its menu - or with New Trip here.'),
+        'actions' => [['label' => __('New Trip'), 'modal' => $add_url, 'size' => 'lg']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

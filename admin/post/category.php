@@ -9,7 +9,11 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 
 // "asset status" - what a category is, for the audit log and messages
 $category_kind_word = function ($row) {
-    return categoryKind($row['category_type'] ?? '')['one'] ?? 'category';
+    return categoryKind($row['category_type'] ?? '')['one'] ?? __('category');
+};
+// The same in English, for the audit log
+$category_kind_en = function ($row) use ($category_kind_word) {
+    return i18nEnglish(fn () => $category_kind_word($row));
 };
 
 // Admin > Categories on a kind, to go back to after making one
@@ -38,7 +42,7 @@ if (isset($_POST['add_category'])) {
     $category_id = categoryCreate($fields);
     $kind = $category_kind_word(['category_type' => $fields['type']]);
 
-    logAudit("Category", "Create", "$session_name created $kind " . escapeSql($fields['name']), 0, $category_id);
+    logAudit("Category", "Create", "$session_name created " . $category_kind_en(['category_type' => $fields['type']]) . " " . escapeSql($fields['name']), 0, $category_id);
 
     if ($inline) {
         $row = categoryRow($category_id);
@@ -52,7 +56,7 @@ if (isset($_POST['add_category'])) {
         exit;
     }
 
-    flashAlert(ucfirst($kind) . " <strong>" . escapeHtml($fields['name']) . "</strong> created");
+    flashAlert(__('%1$s <strong>%2$s</strong> created', ucfirst($kind), escapeHtml($fields['name'])));
 
     // Back to its kind in Admin > Categories, or to the page the window was opened on
     redirect(str_contains($_SERVER['HTTP_REFERER'] ?? '', '/admin/categories.php') ? $category_page($fields['type']) : null);
@@ -65,7 +69,7 @@ if (isset($_POST['edit_category'])) {
 
     $row = categoryRow(intval($_POST['category_id'] ?? 0));
     if (!$row) {
-        flashAlert("That category is gone - it may have been merged into another, or deleted", 'error');
+        flashAlert(__('That category is gone - it may have been merged into another, or deleted'), 'error');
         redirect();
     }
 
@@ -79,9 +83,9 @@ if (isset($_POST['edit_category'])) {
     $kind = $category_kind_word($row);
     $was = $row['category_name'] !== $fields['name'] ? " (was " . escapeSql($row['category_name']) . ")" : '';
 
-    logAudit("Category", "Edit", "$session_name edited $kind " . escapeSql($fields['name']) . $was . ($renamed ? " - renamed on $renamed " . ($renamed === 1 ? 'record' : 'records') : ''), 0, intval($row['category_id']));
+    logAudit("Category", "Edit", "$session_name edited " . $category_kind_en($row) . " " . escapeSql($fields['name']) . $was . ($renamed ? " - renamed on $renamed " . ($renamed === 1 ? 'record' : 'records') : ''), 0, intval($row['category_id']));
 
-    flashAlert(ucfirst($kind) . " <strong>" . escapeHtml($fields['name']) . "</strong> saved" . ($renamed ? " - and renamed on the " . number_format($renamed) . ' ' . ($renamed === 1 ? 'record' : 'records') . " that had it" : ''));
+    flashAlert($renamed ? _n('%1$s <strong>%2$s</strong> saved - and renamed on the %3$s record that had it', '%1$s <strong>%2$s</strong> saved - and renamed on the %3$s records that had it', $renamed, ucfirst($kind), escapeHtml($fields['name']), number_format($renamed)) : __('%1$s <strong>%2$s</strong> saved', ucfirst($kind), escapeHtml($fields['name'])));
 
     redirect();
 
@@ -95,9 +99,8 @@ if (isset($_GET['archive_category'])) {
     if ($row && !$row['category_archived_at']) {
         categoryArchive($row['category_id']);
         $used = categoryUsageFor($row['category_id']);
-        logAudit("Category", "Archive", "$session_name archived " . $category_kind_word($row) . " " . escapeSql($row['category_name']), 0, intval($row['category_id']));
-        flashAlert(ucfirst($category_kind_word($row)) . " <strong>" . escapeHtml($row['category_name']) . "</strong> archived - "
-            . ($used['all'] ? "it stays on the " . escapeHtml(categoryUsageText($row, $used)) . " that have it, but isn't offered for new ones" : "it isn't offered for new ones"));
+        logAudit("Category", "Archive", "$session_name archived " . $category_kind_en($row) . " " . escapeSql($row['category_name']), 0, intval($row['category_id']));
+        flashAlert($used['all'] ? __('%1$s <strong>%2$s</strong> archived - it stays on the %3$s that have it, but isn\'t offered for new ones', ucfirst($category_kind_word($row)), escapeHtml($row['category_name']), escapeHtml(categoryUsageText($row, $used))) : __('%1$s <strong>%2$s</strong> archived - it isn\'t offered for new ones', ucfirst($category_kind_word($row)), escapeHtml($row['category_name'])));
     }
 
     redirect();
@@ -111,8 +114,8 @@ if (isset($_GET['restore_category'])) {
     $row = categoryRow(intval($_GET['restore_category']));
     if ($row && $row['category_archived_at']) {
         categoryRestore($row['category_id']);
-        logAudit("Category", "Restore", "$session_name restored " . $category_kind_word($row) . " " . escapeSql($row['category_name']), 0, intval($row['category_id']));
-        flashAlert(ucfirst($category_kind_word($row)) . " <strong>" . escapeHtml($row['category_name']) . "</strong> restored");
+        logAudit("Category", "Restore", "$session_name restored " . $category_kind_en($row) . " " . escapeSql($row['category_name']), 0, intval($row['category_id']));
+        flashAlert(__('%1$s <strong>%2$s</strong> restored', ucfirst($category_kind_word($row)), escapeHtml($row['category_name'])));
     }
 
     redirect();
@@ -134,9 +137,9 @@ if (isset($_GET['delete_category'])) {
         redirect();
     }
 
-    logAudit("Category", "Delete", "$session_name deleted " . $category_kind_word($row) . " " . escapeSql($row['category_name']));
+    logAudit("Category", "Delete", "$session_name deleted " . $category_kind_en($row) . " " . escapeSql($row['category_name']));
 
-    flashAlert(ucfirst($category_kind_word($row)) . " <strong>" . escapeHtml($row['category_name']) . "</strong> deleted", 'error');
+    flashAlert(__('%1$s <strong>%2$s</strong> deleted', ucfirst($category_kind_word($row)), escapeHtml($row['category_name'])), 'error');
 
     redirect();
 
@@ -148,7 +151,7 @@ if (isset($_POST['merge_categories'])) {
 
     $into = categoryRow(intval($_POST['into_category_id'] ?? 0));
     if (!$into) {
-        flashAlert("Pick the category to keep", 'error');
+        flashAlert(__('Pick the category to keep'), 'error');
         redirect();
     }
     $into_id = intval($into['category_id']);
@@ -162,21 +165,23 @@ if (isset($_POST['merge_categories'])) {
         }
     }
     if (!$from) {
-        flashAlert("Pick another " . escapeHtml($category_kind_word($into)) . " to merge into " . escapeHtml($into['category_name']), 'error');
+        flashAlert(__('Pick another %1$s to merge into %2$s', escapeHtml($category_kind_word($into)), escapeHtml($into['category_name'])), 'error');
         redirect();
     }
 
     $moved = categoryMerge(array_keys($from), $into_id);
     $kind = $category_kind_word($into);
-    $records = $moved ? number_format($moved) . ($moved === 1 ? ' record' : ' records') : '';
+    $records = $moved ? number_format($moved) . ($moved === 1 ? ' record' : ' records') : ''; // i18n-ignore - the audit log
 
-    logAudit("Category", "Merge", "$session_name merged " . (count($from) === 1 ? $kind : categoryKind($into['category_type'])['many']) . " " . escapeSql(implode(', ', $from)) . " into " . escapeSql($into['category_name'])
+    logAudit("Category", "Merge", "$session_name merged " . i18nEnglish(fn () => count($from) === 1 ? $category_kind_word($into) : categoryKind($into['category_type'])['many']) . " " . escapeSql(implode(', ', $from)) . " into " . escapeSql($into['category_name'])
         . ($moved ? " - $records" : ''), 0, $into_id);
 
-    flashAlert("Merged " . implode(', ', array_map(function ($name) {
+    $merged_names = implode(', ', array_map(function ($name) {
         return '<strong>' . escapeHtml($name) . '</strong>';
-    }, $from)) . " into <strong>" . escapeHtml($into['category_name']) . "</strong>"
-        . ($moved ? " - the $records that had " . (count($from) === 1 ? 'it' : 'them') . " have it now" : ''));
+    }, $from));
+    $records_shown = _n('%s record', '%s records', $moved, number_format($moved));
+    flashAlert(__('Merged %1$s into %2$s', $merged_names, '<strong>' . escapeHtml($into['category_name']) . '</strong>')
+        . ($moved ? (count($from) === 1 ? __(' - the %s that had it have it now', $records_shown) : __(' - the %s that had them have it now', $records_shown)) : ''));
 
     redirect();
 
@@ -198,7 +203,7 @@ if (isset($_GET['move_category'])) {
         if ($at !== false && isset($ids[$to])) {
             [$ids[$at], $ids[$to]] = [$ids[$to], $ids[$at]];
             categoryReorder($row['category_type'], $ids);
-            logAudit("Category", "Edit", "$session_name moved " . $category_kind_word($row) . " " . escapeSql($row['category_name']) . (($_GET['direction'] ?? '') === 'up' ? ' up' : ' down'), 0, intval($row['category_id']));
+            logAudit("Category", "Edit", "$session_name moved " . $category_kind_en($row) . " " . escapeSql($row['category_name']) . (($_GET['direction'] ?? '') === 'up' ? ' up' : ' down'), 0, intval($row['category_id']));
         }
     }
 
@@ -211,13 +216,13 @@ if (isset($_POST['reorder_categories'])) {
     // Dragged into order on Admin > Categories - answers with JSON, as the page saves it in the background
     header('Content-Type: application/json');
     if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => 'The page is out of date - reload it']);
+        echo json_encode(['ok' => false, 'error' => __('The page is out of date - reload it')]);
         exit;
     }
 
     $config = categoryKind($_POST['category'] ?? '');
     if (!$config || !$config['ordered']) {
-        echo json_encode(['ok' => false, 'error' => 'Those categories keep no order']);
+        echo json_encode(['ok' => false, 'error' => __('Those categories keep no order')]);
         exit;
     }
 
@@ -231,7 +236,7 @@ if (isset($_POST['reorder_categories'])) {
     $new_order = array_values(array_diff($current, $ids));
     array_splice($new_order, min(max(0, intval($_POST['offset'] ?? 0)), count($new_order)), 0, $ids);
     if (categoryReorder($config['kind'], $new_order)) {
-        logAudit("Category", "Edit", "$session_name reordered the " . $config['many']);
+        logAudit("Category", "Edit", "$session_name reordered the " . i18nEnglish(fn () => categoryKind($config['kind'])['many']));
     }
 
     echo json_encode(['ok' => true]);
@@ -255,11 +260,11 @@ if (isset($_POST['bulk_archive_categories']) || isset($_POST['bulk_restore_categ
         } else {
             categoryRestore($category_id);
         }
-        logAudit("Category", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived ' : 'restored ') . $category_kind_word($row) . " " . escapeSql($row['category_name']), 0, $category_id);
+        logAudit("Category", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived ' : 'restored ') . $category_kind_en($row) . " " . escapeSql($row['category_name']), 0, $category_id);
         $count++;
     }
 
-    flashAlert(($archive ? "Archived " : "Restored ") . $count . ($count === 1 ? " category" : " categories") . ($archive && $count ? " - they stay on their records, but aren't offered for new ones" : ''));
+    flashAlert($archive ? ($count ? _n('Archived %d category - it stays on its records, but isn\'t offered for new ones', 'Archived %d categories - they stay on their records, but aren\'t offered for new ones', $count) : __('Archived 0 categories')) : _n('Restored %d category', 'Restored %d categories', $count));
 
     redirect();
 
@@ -283,12 +288,12 @@ if (isset($_POST['bulk_delete_categories'])) {
             }
             continue;
         }
-        logAudit("Category", "Delete", "$session_name deleted " . $category_kind_word($row) . " " . escapeSql($row['category_name']));
+        logAudit("Category", "Delete", "$session_name deleted " . $category_kind_en($row) . " " . escapeSql($row['category_name']));
         $deleted++;
     }
 
-    flashAlert("Deleted $deleted " . ($deleted === 1 ? 'category' : 'categories')
-        . ($kept ? ". Kept " . implode(', ', $kept) . " - " . (count($kept) === 1 ? 'it is' : 'they are') . " in use, so merge " . (count($kept) === 1 ? 'it' : 'them') . " into another, or archive " . (count($kept) === 1 ? 'it' : 'them') : ''), $kept ? 'warning' : 'error');
+    flashAlert(_n('Deleted %d category', 'Deleted %d categories', $deleted)
+        . ($kept ? (count($kept) === 1 ? __('. Kept %s - it is in use, so merge it into another, or archive it', implode(', ', $kept)) : __('. Kept %s - they are in use, so merge them into another, or archive them', implode(', ', $kept))) : ''), $kept ? 'warning' : 'error');
 
     redirect();
 

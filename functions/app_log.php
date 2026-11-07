@@ -14,10 +14,10 @@
 /** The levels, worst first - each with its label, the word for one, icon and tone. */
 function appLogLevels() {
     return [
-        'error' => ['label' => 'Errors', 'one' => 'Error', 'icon' => 'fa-times-circle', 'tone' => 'danger', 'title' => 'Something failed'],
-        'warning' => ['label' => 'Warnings', 'one' => 'Warning', 'icon' => 'fa-exclamation-triangle', 'tone' => 'warning', 'title' => 'Something to look at, that carried on'],
-        'info' => ['label' => 'Info', 'one' => 'Info', 'icon' => 'fa-info-circle', 'tone' => 'info', 'title' => 'What was done - a cron run, mail sent'],
-        'debug' => ['label' => 'Debug', 'one' => 'Debug', 'icon' => 'fa-bug', 'tone' => 'secondary', 'title' => 'Detail for tracking a problem down'],
+        'error' => ['label' => __('Errors'), 'one' => __('Error'), 'icon' => 'fa-times-circle', 'tone' => 'danger', 'title' => __('Something failed')],
+        'warning' => ['label' => __('Warnings'), 'one' => __('Warning'), 'icon' => 'fa-exclamation-triangle', 'tone' => 'warning', 'title' => __('Something to look at, that carried on')],
+        'info' => ['label' => _x('Info', 'app log level'), 'one' => _x('Info', 'app log level'), 'icon' => 'fa-info-circle', 'tone' => 'info', 'title' => __('What was done - a cron run, mail sent')],
+        'debug' => ['label' => _x('Debug', 'app log level'), 'one' => _x('Debug', 'app log level'), 'icon' => 'fa-bug', 'tone' => 'secondary', 'title' => __('Detail for tracking a problem down')],
     ];
 }
 
@@ -58,7 +58,7 @@ function appLogCategoryIcon($category) {
  * the SQL on app_logs that picks them.
  */
 function appLogViews() {
-    $views = ['' => ['label' => 'All', 'icon' => 'fa-list', 'title' => 'Everything', 'where' => '', 'tone' => '']];
+    $views = ['' => ['label' => __('All'), 'icon' => 'fa-list', 'title' => __('Everything'), 'where' => '', 'tone' => '']];
     foreach (appLogLevels() as $level => $style) {
         $views[$level] = ['label' => $style['label'], 'icon' => $style['icon'], 'title' => $style['title'], 'where' => "app_log_type = '$level'", 'tone' => $style['tone']];
     }
@@ -113,17 +113,27 @@ function appLogFiltersSql(array $src, &$summary = []) {
 
 /** The filters' summary (appLogFiltersSql()) in a phrase - "Errors from Stripe matching "card", 2026-10-01 to 2026-10-19". */
 function appLogFiltersText(array $summary) {
-    $text = isset($summary['Showing']) ? $summary['Showing'] : 'Entries';
+    $text = isset($summary['Showing']) ? $summary['Showing'] : __('Entries');
     if (isset($summary['Category'])) {
-        $text .= ' from ' . $summary['Category'];
+        $text = __('%1$s from %2$s', $text, $summary['Category']);
     }
     if (isset($summary['Search'])) {
-        $text .= ' matching "' . $summary['Search'] . '"';
+        $text = __('%1$s matching "%2$s"', $text, $summary['Search']);
     }
     if (isset($summary['Dated'])) {
         $text .= ', ' . $summary['Dated'];
     }
     return $text;
+}
+
+/** The filters' summary (appLogFiltersSql()) with its labels in the interface language, for an export. */
+function appLogFiltersShown(array $summary) {
+    $labels = ['Search' => __('Search'), 'Category' => __('Category'), 'Showing' => __('Showing'), 'Dated' => __('Dated')];
+    $shown = [];
+    foreach ($summary as $key => $value) {
+        $shown[$labels[$key] ?? $key] = $value;
+    }
+    return $shown;
 }
 
 /** Is this a real Y-m-d date? */

@@ -199,23 +199,23 @@ function itflowIncomeImport(options) {
             if (!part(row, 'payer').value) {
                 applies.textContent = '';
             } else if (!parts.length && !picked(row).length) {
-                applies.textContent = (invoices[part(row, 'payer').value] || []).length ? 'Tick the invoices it pays' : 'Nothing of theirs is owed - bring it in as other income';
+                applies.textContent = (invoices[part(row, 'payer').value] || []).length ? __('Tick the invoices it pays') : __('Nothing of theirs is owed - bring it in as other income');
             } else {
-                applies.textContent = (parts.length ? 'Pays ' + parts.join(', ') : '') + (remaining > 0 ? (parts.length ? ' - ' : '') + money(remaining / 100) + ' more than they owe' : '');
+                applies.textContent = (parts.length ? __('Pays %s', parts.join(', ')) : '') + (remaining > 0 ? (parts.length ? ' - ' : '') + __('%s more than they owe', money(remaining / 100)) : '');
             }
         });
         var said = [];
         if (kinds.payment) {
-            said.push(kinds.payment + ' payment' + (kinds.payment === 1 ? '' : 's'));
+            said.push(kinds.payment === 1 ? __('%d payment', kinds.payment) : __('%d payments', kinds.payment));
         }
         if (kinds.income) {
-            said.push(kinds.income + ' other income');
+            said.push(__('%d other income', kinds.income));
         }
         if (kinds.transfer) {
-            said.push(kinds.transfer + ' transfer' + (kinds.transfer === 1 ? '' : 's'));
+            said.push(kinds.transfer === 1 ? __('%d transfer', kinds.transfer) : __('%d transfers', kinds.transfer));
         }
-        summary.textContent = count ? count + ' deposit' + (count === 1 ? '' : 's') + ' · ' + money(Math.round(total * 100) / 100) + ' - ' + said.join(', ') : 'Tick the deposits to import';
-        submitLabel.textContent = count ? 'Import ' + count : 'Import';
+        summary.textContent = count ? (count === 1 ? __('%d deposit', count) : __('%d deposits', count)) + ' · ' + money(Math.round(total * 100) / 100) + ' - ' + said.join(', ') : __('Tick the deposits to import');
+        submitLabel.textContent = count ? __('Import %d', count) : __('Import');
         submit.disabled = count === 0;
         if (all) {
             var shown = rows.filter(function (row) { return !row.hidden && !take(row).disabled; });
@@ -357,7 +357,7 @@ function itflowIncomeImport(options) {
             var applies = part(wrong[0], 'applies');
             if (!picked(wrong[0]).length) {
                 applies.className = 'small mt-1 text-danger-emphasis';
-                applies.textContent = 'Tick the invoices it pays';
+                applies.textContent = __('Tick the invoices it pays');
             }
             return;
         }

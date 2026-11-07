@@ -26,13 +26,13 @@ $can_delete = lookupUserPermission('module_sales') >= 3 && !empty($config_destru
 
 // Tabs
 $views = [
-    'all' => ['label' => 'All', 'icon' => 'fa-th-list', 'sql' => ''],
-    'service' => ['label' => 'Services', 'icon' => 'fa-wrench', 'sql' => "AND product_type = 'service'"],
-    'product' => ['label' => 'Products', 'icon' => 'fa-box-open', 'sql' => "AND product_type = 'product'"],
-    'hardware' => ['label' => 'Hardware', 'icon' => 'fa-laptop', 'sql' => "AND " . productHardwareSql(), 'title' => 'Becomes a client asset when it is sold'],
-    'recurring' => ['label' => 'Recurring', 'icon' => 'fa-redo-alt', 'sql' => "AND product_frequency IS NOT NULL", 'title' => 'Billed each month, quarter or year by default'],
-    'stocked' => ['label' => 'Stocked', 'icon' => 'fa-warehouse', 'sql' => "AND product_track_stock = 1", 'title' => 'Stock tracked'],
-    'reorder' => ['label' => 'Reorder', 'icon' => 'fa-shopping-basket', 'sql' => "AND " . productReorderSql(), 'title' => 'Stock at or under its reorder level, or out'],
+    'all' => ['label' => __('All'), 'icon' => 'fa-th-list', 'sql' => ''],
+    'service' => ['label' => __('Services'), 'icon' => 'fa-wrench', 'sql' => "AND product_type = 'service'"],
+    'product' => ['label' => __('Products'), 'icon' => 'fa-box-open', 'sql' => "AND product_type = 'product'"],
+    'hardware' => ['label' => __('Hardware'), 'icon' => 'fa-laptop', 'sql' => "AND " . productHardwareSql(), 'title' => __('Becomes a client asset when it is sold')],
+    'recurring' => ['label' => __('Recurring'), 'icon' => 'fa-redo-alt', 'sql' => "AND product_frequency IS NOT NULL", 'title' => __('Billed each month, quarter or year by default')],
+    'stocked' => ['label' => __('Stocked'), 'icon' => 'fa-warehouse', 'sql' => "AND product_track_stock = 1", 'title' => __('Stock tracked')],
+    'reorder' => ['label' => __('Reorder'), 'icon' => 'fa-shopping-basket', 'sql' => "AND " . productReorderSql(), 'title' => __('Stock at or under its reorder level, or out')],
 ];
 $view = (string) ($_GET['type'] ?? 'all');
 if (!isset($views[$view])) {
@@ -128,53 +128,53 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $view === 'all' ? '' : '' ?>" href="<?= escapeHtml($filter_url(['type' => 'all'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-th-list me-1"></i>Catalog</div>
-            <div class="itflow-billing-stat-value"><?= intval($counts['service']) ?> <span class="fs-6 fw-normal text-body-secondary">services</span> &middot; <?= intval($counts['product']) ?> <span class="fs-6 fw-normal text-body-secondary">products</span></div>
-            <div class="itflow-billing-stat-note"><?= intval($counts['recurring']) ?> billed each month, quarter or year</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-th-list me-1"></i><?= __('Catalog') ?></div>
+            <div class="itflow-billing-stat-value"><?= _n('%d <span class="fs-6 fw-normal text-body-secondary">service</span>', '%d <span class="fs-6 fw-normal text-body-secondary">services</span>', intval($counts['service'])) ?> &middot; <?= _n('%d <span class="fs-6 fw-normal text-body-secondary">product</span>', '%d <span class="fs-6 fw-normal text-body-secondary">products</span>', intval($counts['product'])) ?></div>
+            <div class="itflow-billing-stat-note"><?= _n('%d billed each month, quarter or year', '%d billed each month, quarter or year', intval($counts['recurring'])) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <a class="itflow-billing-stat" href="recurring_invoices.php" title="What lines from the catalog bring in a month on active recurring invoices - a quarterly one counts a third, a yearly one a twelfth">
-            <div class="itflow-billing-stat-label"><i class="fas fa-redo-alt me-1"></i>On recurring</div>
-            <div class="itflow-billing-stat-value text-success-emphasis"><?= $money($recurring_stat['monthly']) ?><span class="fs-6 fw-normal text-body-secondary ms-1">/mo</span></div>
-            <div class="itflow-billing-stat-note"><?= intval($recurring_stat['products']) ?> item<?= intval($recurring_stat['products']) === 1 ? '' : 's' ?> across <?= intval($recurring_stat['clients']) ?> client<?= intval($recurring_stat['clients']) === 1 ? '' : 's' ?></div>
+        <a class="itflow-billing-stat" href="recurring_invoices.php" title="<?= escapeHtml(__('What lines from the catalog bring in a month on active recurring invoices - a quarterly one counts a third, a yearly one a twelfth')) ?>">
+            <div class="itflow-billing-stat-label"><i class="fas fa-redo-alt me-1"></i><?= __('On recurring') ?></div>
+            <div class="itflow-billing-stat-value text-success-emphasis"><?= $money($recurring_stat['monthly']) ?><span class="fs-6 fw-normal text-body-secondary ms-1"><?= __('/mo') ?></span></div>
+            <div class="itflow-billing-stat-note"><?= _n('%d item', '%d items', intval($recurring_stat['products'])) ?> <?= _n('across %d client', 'across %d clients', intval($recurring_stat['clients'])) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="itflow-billing-stat" title="Lines from the catalog on invoices dated in the last 90 days - not drafts, cancelled or non-billable - before tax">
-            <div class="itflow-billing-stat-label"><i class="fas fa-chart-line me-1"></i>Sold, 90 days</div>
+        <div class="itflow-billing-stat" title="<?= escapeHtml(__('Lines from the catalog on invoices dated in the last 90 days - not drafts, cancelled or non-billable - before tax')) ?>">
+            <div class="itflow-billing-stat-label"><i class="fas fa-chart-line me-1"></i><?= __('Sold, 90 days') ?></div>
             <div class="itflow-billing-stat-value"><?= $money($sold_stat['amount']) ?></div>
             <div class="itflow-billing-stat-note text-truncate">
                 <?php if ($top_seller) { ?>
-                    Top: <a class="text-reset" href="product.php?product_id=<?= intval($top_seller['product_id']) ?>"><?= escapeHtml($top_seller['product_name']) ?></a>
+                    <?= __('Top:') ?> <a class="text-reset" href="product.php?product_id=<?= intval($top_seller['product_id']) ?>"><?= escapeHtml($top_seller['product_name']) ?></a>
                 <?php } else { ?>
-                    On <?= intval($sold_stat['invoices']) ?> invoices
+                    <?= _n('On %d invoice', 'On %d invoices', intval($sold_stat['invoices'])) ?>
                 <?php } ?>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <a class="itflow-billing-stat <?= in_array($view, ['stocked', 'reorder'], true) ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['type' => $reorder_count ? 'reorder' : 'stocked'])) ?>" title="What is on the shelf, at each product's cost">
-            <div class="itflow-billing-stat-label"><i class="fas fa-warehouse me-1"></i>On the shelf</div>
+        <a class="itflow-billing-stat <?= in_array($view, ['stocked', 'reorder'], true) ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['type' => $reorder_count ? 'reorder' : 'stocked'])) ?>" title="<?= escapeHtml(__('What is on the shelf, at each product\'s cost')) ?>">
+            <div class="itflow-billing-stat-label"><i class="fas fa-warehouse me-1"></i><?= __('On the shelf') ?></div>
             <?php if ($tracked_count && floatval($stock_stat['value']) <= 0) { ?>
-                <div class="itflow-billing-stat-value"><?= escapeHtml(billingQuantity($stock_stat['units'])) ?> <span class="fs-6 fw-normal text-body-secondary">unit<?= floatval($stock_stat['units']) == 1 ? '' : 's' ?></span></div>
+                <div class="itflow-billing-stat-value"><?= escapeHtml(billingQuantity($stock_stat['units'])) ?> <span class="fs-6 fw-normal text-body-secondary"><?= floatval($stock_stat['units']) == 1 ? __('unit') : __('units') ?></span></div>
                 <div class="itflow-billing-stat-note">
-                    On <?= $tracked_count ?> product<?= $tracked_count === 1 ? '' : 's' ?> - add a cost to value them
+                    <?= _n('On %d product - add a cost to value them', 'On %d products - add a cost to value them', $tracked_count) ?>
                     <?php if ($reorder_count) { ?>
-                        &middot; <span class="text-warning-emphasis"><?= $reorder_count ?> to reorder</span>
+                        &middot; <span class="text-warning-emphasis"><?= _n('%d to reorder', '%d to reorder', $reorder_count) ?></span>
                     <?php } ?>
                 </div>
             <?php } elseif ($tracked_count) { ?>
                 <div class="itflow-billing-stat-value"><?= $money($stock_stat['value']) ?></div>
                 <div class="itflow-billing-stat-note">
-                    <?= escapeHtml(billingQuantity($stock_stat['units'])) ?> unit<?= floatval($stock_stat['units']) == 1 ? '' : 's' ?> on <?= $tracked_count ?> product<?= $tracked_count === 1 ? '' : 's' ?>
+                    <?= floatval($stock_stat['units']) == 1 ? __('%s unit', escapeHtml(billingQuantity($stock_stat['units']))) : __('%s units', escapeHtml(billingQuantity($stock_stat['units']))) ?> <?= _n('on %d product', 'on %d products', $tracked_count) ?>
                     <?php if ($reorder_count) { ?>
-                        &middot; <span class="text-warning-emphasis"><?= $reorder_count ?> to reorder</span>
+                        &middot; <span class="text-warning-emphasis"><?= _n('%d to reorder', '%d to reorder', $reorder_count) ?></span>
                     <?php } ?>
                 </div>
             <?php } else { ?>
                 <div class="itflow-billing-stat-value text-body-secondary">-</div>
-                <div class="itflow-billing-stat-note">No product tracks its stock</div>
+                <div class="itflow-billing-stat-note"><?= __('No product tracks its stock') ?></div>
             <?php } ?>
         </a>
     </div>
@@ -185,47 +185,47 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
     <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-3">
         <i class="fas fa-tags"></i>
         <div class="flex-grow-1">
-            <strong><?= intval($reprice['lines']) ?> line<?= $reprice['lines'] == 1 ? ' is' : 's are' ?> at an old price</strong>
-            on recurring invoices, drafts or quotes, from <?= intval($reprice['products']) ?> product<?= $reprice['products'] == 1 ? '' : 's' ?><?= $reprice['monthly'] != 0 ? ' - worth ' . $money(abs($reprice['monthly'])) . ($reprice['monthly'] > 0 ? ' more' : ' less') . ' a month' : '' ?>.
+            <strong><?= _n('%d line is at an old price', '%d lines are at an old price', intval($reprice['lines'])) ?></strong>
+            <?= _n('on recurring invoices, drafts or quotes, from %d product', 'on recurring invoices, drafts or quotes, from %d products', intval($reprice['products'])) ?><?= $reprice['monthly'] != 0 ? ' - ' . ($reprice['monthly'] > 0 ? __('worth %s more a month', $money(abs($reprice['monthly']))) : __('worth %s less a month', $money(abs($reprice['monthly'])))) : '' ?>.
         </div>
-        <a class="btn btn-sm btn-warning" href="products_reprice.php"><i class="fas fa-tags me-1"></i>Update Prices</a>
+        <a class="btn btn-sm btn-warning" href="products_reprice.php"><i class="fas fa-tags me-1"></i><?= __('Update Prices') ?></a>
     </div>
 <?php } ?>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-box-open me-2"></i>Products and Services</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-box-open me-2"></i><?= __('Products and Services') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/product/product_add.php?type=<?= $add_type ?>">
-                        <i class="fas fa-plus me-2"></i>New
+                        <i class="fas fa-plus me-2"></i><?= __('New') ?>
                     </button>
                 <?php } ?>
                 <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <?php if ($can_edit) { ?>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/product/product_add.php?type=service">
-                            <i class="fas fa-fw fa-wrench text-secondary me-2"></i>New Service
+                            <i class="fas fa-fw fa-wrench text-secondary me-2"></i><?= __('New Service') ?>
                         </a>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/product/product_add.php?type=product">
-                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i>New Product
+                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('New Product') ?>
                         </a>
                         <?php if ($tracked_count) { ?>
                             <a class="dropdown-item" href="products_count.php">
-                                <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Count Stock
+                                <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Count Stock') ?>
                             </a>
                         <?php } ?>
                         <a class="dropdown-item" href="products_reprice.php">
-                            <i class="fas fa-fw fa-tags text-secondary me-2"></i>Update Prices<?php if ($reprice['lines']) { ?><span class="badge rounded-pill text-bg-warning ms-2" title="Lines at an old price"><?= intval($reprice['lines']) ?></span><?php } ?>
+                            <i class="fas fa-fw fa-tags text-secondary me-2"></i><?= __('Update Prices') ?><?php if ($reprice['lines']) { ?><span class="badge rounded-pill text-bg-warning ms-2" title="<?= escapeHtml(__('Lines at an old price')) ?>"><?= intval($reprice['lines']) ?></span><?php } ?>
                         </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/product/product_import.php">
-                            <i class="fas fa-fw fa-upload text-secondary me-2"></i>Import
+                            <i class="fas fa-fw fa-upload text-secondary me-2"></i><?= __('Import') ?>
                         </a>
                     <?php } ?>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= buildExportModalUrl('modals/product/product_export.php', ['category', 'vendor', 'archived', 'q'], ['type' => $view === 'all' ? '' : $view]) ?>">
-                        <i class="fas fa-fw fa-download text-secondary me-2"></i>Export
+                        <i class="fas fa-fw fa-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                 </div>
             </div>
@@ -239,19 +239,19 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
             <div class="row g-2 align-items-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search name, code, part number, vendor...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search name, code, part number, vendor...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Category">
-                        <option value="">- All Categories -</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Category')) ?>">
+                        <option value=""><?= __('- All Categories -') ?></option>
                         <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT DISTINCT product_category_id FROM products WHERE product_$archive_query") ?>
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="Vendor">
-                        <option value="">- All Vendors -</option>
+                    <select class="form-select select2" name="vendor" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Vendor')) ?>">
+                        <option value=""><?= __('- All Vendors -') ?></option>
                         <?php
                         $sql_vendors_filter = mysqli_query($mysqli, "SELECT vendor_id, vendor_name FROM vendors
                             WHERE EXISTS (SELECT 1 FROM products WHERE product_vendor_id = vendor_id AND product_$archive_query) ORDER BY vendor_name ASC");
@@ -263,8 +263,8 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <div class="d-flex justify-content-lg-end gap-2">
-                        <a href="<?= escapeHtml($filter_url(['archived' => $archived ? '' : 1])) ?>" class="btn btn-<?= $archived ? 'primary' : 'outline-secondary' ?>" title="<?= $archived ? 'Showing archived - show current' : 'Show archived' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none d-xl-inline ms-2">Archived</span>
+                        <a href="<?= escapeHtml($filter_url(['archived' => $archived ? '' : 1])) ?>" class="btn btn-<?= $archived ? 'primary' : 'outline-secondary' ?>" title="<?= escapeHtml($archived ? __('Showing archived - show current') : __('Show archived')) ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none d-xl-inline ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { ?>
                             <div class="dropdown" id="bulkActionButton" hidden>
@@ -273,21 +273,21 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/product/product_bulk_edit_category.php" data-bulk="true">
-                                        <i class="fas fa-fw fa-list me-2"></i>Set Category
+                                        <i class="fas fa-fw fa-list me-2"></i><?= __('Set Category') ?>
                                     </a>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($archived) { ?>
                                         <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_restore_products">
-                                            <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                            <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                         </button>
                                         <?php if ($can_delete) { ?>
                                             <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_products">
-                                                <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                             </button>
                                         <?php } ?>
                                     <?php } else { ?>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_products">
-                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                         </button>
                                     <?php } ?>
                                 </div>
@@ -318,16 +318,16 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                     <?php if ($can_edit) { ?>
                         <th class="checkbox-column border-end">
                             <div class="form-check">
-                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                                <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                             </div>
                         </th>
                     <?php } ?>
-                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_name&order=<?= $disp ?>">Item <?php if ($sort == 'product_name') { echo $order_icon; } ?></a></th>
-                    <th class="d-none d-md-table-cell"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_frequency&order=<?= $disp ?>">Billed <?php if ($sort == 'product_frequency') { echo $order_icon; } ?></a></th>
-                    <th class="d-none d-lg-table-cell text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_stock&order=<?= $disp ?>">Stock <?php if ($sort == 'product_stock') { echo $order_icon; } ?></a></th>
-                    <th class="d-none d-xl-table-cell"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>">Vendor <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
-                    <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_price&order=<?= $disp ?>">Price <?php if ($sort == 'product_price') { echo $order_icon; } ?></a></th>
-                    <th class="d-none d-sm-table-cell text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=margin&order=<?= $disp ?>" title="Price less cost, as a share of the price">Margin <?php if ($sort == 'margin') { echo $order_icon; } ?></a></th>
+                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_name&order=<?= $disp ?>"><?= __('Item') ?> <?php if ($sort == 'product_name') { echo $order_icon; } ?></a></th>
+                    <th class="d-none d-md-table-cell"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_frequency&order=<?= $disp ?>"><?= _x('Billed', 'product frequency') ?> <?php if ($sort == 'product_frequency') { echo $order_icon; } ?></a></th>
+                    <th class="d-none d-lg-table-cell text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_stock&order=<?= $disp ?>"><?= __('Stock') ?> <?php if ($sort == 'product_stock') { echo $order_icon; } ?></a></th>
+                    <th class="d-none d-xl-table-cell"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=vendor_name&order=<?= $disp ?>"><?= __('Vendor') ?> <?php if ($sort == 'vendor_name') { echo $order_icon; } ?></a></th>
+                    <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=product_price&order=<?= $disp ?>"><?= __('Price') ?> <?php if ($sort == 'product_price') { echo $order_icon; } ?></a></th>
+                    <th class="d-none d-sm-table-cell text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=margin&order=<?= $disp ?>" title="<?= escapeHtml(__('Price less cost, as a share of the price')) ?>"><?= __('Margin') ?> <?php if ($sort == 'margin') { echo $order_icon; } ?></a></th>
                     <th></th>
                 </tr>
                 </thead>
@@ -344,13 +344,13 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                     $row_currency = (string) $row['product_currency_code'];
                     $row_url = "product.php?product_id=$product_id";
                     $row_meta = array_filter([$row['product_code'] ? '<span class="font-monospace">' . escapeHtml($row['product_code']) . '</span>' : '', escapeHtml((string) $row['category_name']),
-                        $row_type === 'product' && $row['product_asset_type'] ? '<span title="Becomes a client asset when it is sold"><i class="fas fa-fw ' . escapeHtml(productAssetTypes()[$row['product_asset_type']] ?? 'fa-tag') . ' me-1"></i>' . escapeHtml($row['product_asset_type']) . '</span>' : '']);
+                        $row_type === 'product' && $row['product_asset_type'] ? '<span title="' . escapeHtml(__('Becomes a client asset when it is sold')) . '"><i class="fas fa-fw ' . escapeHtml(productAssetTypes()[$row['product_asset_type']] ?? 'fa-tag') . ' me-1"></i>' . escapeHtml(assetTypeLabel($row['product_asset_type'])) . '</span>' : '']);
                     ?>
                     <tr>
                         <?php if ($can_edit) { ?>
                             <td class="checkbox-column bg-light border-end">
                                 <div class="form-check">
-                                    <input class="form-check-input bulk-select" type="checkbox" name="product_ids[]" value="<?= $product_id ?>" aria-label="Select <?= escapeHtml($row['product_name']) ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="product_ids[]" value="<?= $product_id ?>" aria-label="<?= escapeHtml(__('Select %s', $row['product_name'])) ?>">
                                 </div>
                             </td>
                         <?php } ?>
@@ -359,7 +359,7 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                                 <?= productTile($row_type, 'sm') ?>
                                 <div class="min-w-0">
                                     <a class="fw-semibold" href="<?= $row_url ?>"><?= escapeHtml($row['product_name']) ?></a>
-                                    <?php if ($row['product_archived_at']) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($row['product_archived_at']) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <div class="small text-body-secondary text-truncate" style="max-width: 28rem;"><?= implode(' &middot; ', $row_meta) ?: '&nbsp;' ?></div>
                                 </div>
                             </div>
@@ -368,20 +368,20 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                             <?php if ($row['product_frequency']) { ?>
                                 <i class="fas fa-fw fa-redo-alt text-info-emphasis me-1 small"></i><?= escapeHtml(productBilledText($row['product_frequency'], $row['product_seat_source'])) ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary">One time</span>
+                                <span class="text-body-secondary"><?= _x('One time', 'billing frequency') ?></span>
                             <?php } ?>
                         </td>
                         <td class="d-none d-lg-table-cell text-end text-nowrap">
                             <?php if ($row_tracked) { ?>
                                 <span class="badge rounded-pill fw-normal <?= $row_stock <= 0 ? 'bg-danger-subtle text-danger-emphasis' : ($row_reorder ? 'bg-warning-subtle text-warning-emphasis' : 'bg-success-subtle text-success-emphasis') ?>"
-                                    title="<?= $row_level > 0 ? 'Reorder at ' . escapeHtml(billingQuantity($row_level)) : 'Reorder when it is out' ?>"><?= escapeHtml(billingQuantity($row_stock)) ?> in stock</span>
+                                    title="<?= $row_level > 0 ? escapeHtml(__('Reorder at %s', billingQuantity($row_level))) : escapeHtml(__('Reorder when it is out')) ?>"><?= escapeHtml(__('%s in stock', billingQuantity($row_stock))) ?></span>
                                 <?php if ($row_reorder) { ?>
-                                    <div class="small text-warning-emphasis">Reorder<?= floatval($row['product_reorder_qty']) > 0 ? ' ' . escapeHtml(billingQuantity($row['product_reorder_qty'])) : '' ?></div>
+                                    <div class="small text-warning-emphasis"><?= floatval($row['product_reorder_qty']) > 0 ? escapeHtml(__('Reorder %s', billingQuantity($row['product_reorder_qty']))) : __('Reorder') ?></div>
                                 <?php } elseif ($row['product_location']) { ?>
                                     <div class="small text-body-secondary"><?= escapeHtml($row['product_location']) ?></div>
                                 <?php } ?>
                             <?php } elseif ($row_type === 'product') { ?>
-                                <span class="small text-body-secondary" title="Stock isn't tracked - it is ordered for each job">As needed</span>
+                                <span class="small text-body-secondary" title="<?= escapeHtml(__('Stock isn\'t tracked - it is ordered for each job')) ?>"><?= __('As needed') ?></span>
                             <?php } else { ?>
                                 <span class="text-body-secondary">-</span>
                             <?php } ?>
@@ -396,46 +396,46 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                         </td>
                         <td class="text-end itflow-money">
                             <span class="fw-semibold"><?= $money($row['product_price'], $row_currency) ?></span>
-                            <?php if (floatval($row['product_cost']) > 0) { ?><div class="small text-body-secondary">cost <?= $money($row['product_cost'], $row_currency) ?></div><?php } ?>
+                            <?php if (floatval($row['product_cost']) > 0) { ?><div class="small text-body-secondary"><?= __('cost %s', $money($row['product_cost'], $row_currency)) ?></div><?php } ?>
                         </td>
                         <td class="d-none d-sm-table-cell text-end"><?= productMarginPill($row_margin) ?: '<span class="text-body-secondary">-</span>' ?></td>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-link text-body-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-sm btn-link text-body-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-fw fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
+                                    <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
                                     <?php if ($can_edit) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/product/product_edit.php?id=<?= $product_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <?php if ($row_tracked && !$row['product_archived_at']) { ?>
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/product/product_stock.php?id=<?= $product_id ?>&mode=receive">
-                                                <i class="fas fa-fw fa-dolly text-secondary me-2"></i>Receive
+                                                <i class="fas fa-fw fa-dolly text-secondary me-2"></i><?= __('Receive') ?>
                                             </a>
                                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/product/product_stock.php?id=<?= $product_id ?>&mode=count">
-                                                <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Count
+                                                <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Count') ?>
                                             </a>
                                         <?php } ?>
                                         <a class="dropdown-item" href="post.php?copy_product=<?= $product_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                            <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($row['product_archived_at']) { ?>
                                             <a class="dropdown-item" href="post.php?restore_product=<?= $product_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                             </a>
                                             <?php if ($can_delete) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_product=<?= $product_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                    data-confirm-text="<?= escapeHtml($row['product_name']) ?> goes for good, with its stock. Lines it is on keep their text and amounts.">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    data-confirm-text="<?= escapeHtml(__('%s goes for good, with its stock. Lines it is on keep their text and amounts.', $row['product_name'])) ?>">
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_product=<?= $product_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                                data-confirm-text="<?= escapeHtml($row['product_name']) ?> stops being offered on new lines. Lines it is already on stay.">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                data-confirm-text="<?= escapeHtml(__('%s stops being offered on new lines. Lines it is already on stay.', $row['product_name'])) ?>">
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     <?php } ?>
@@ -449,17 +449,17 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
                         <td colspan="8" class="text-center text-body-secondary py-5">
                             <?php if (!$catalog_count) { ?>
                                 <i class="fas fa-box-open fa-2x mb-3 opacity-50"></i>
-                                <div class="fw-semibold">Nothing in the catalog yet</div>
-                                <div class="small mb-3">Add the services and products you sell, and pick them as lines on invoices, quotes and recurring invoices.</div>
+                                <div class="fw-semibold"><?= __('Nothing in the catalog yet') ?></div>
+                                <div class="small mb-3"><?= __('Add the services and products you sell, and pick them as lines on invoices, quotes and recurring invoices.') ?></div>
                                 <?php if ($can_edit) { ?>
-                                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/product/product_add.php?type=service"><i class="fas fa-plus me-2"></i>New Service</button>
-                                    <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/product/product_import.php"><i class="fas fa-upload me-2"></i>Import</button>
+                                    <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/product/product_add.php?type=service"><i class="fas fa-plus me-2"></i><?= __('New Service') ?></button>
+                                    <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/product/product_import.php"><i class="fas fa-upload me-2"></i><?= __('Import') ?></button>
                                     <?php if ($session_is_admin ?? false) { ?>
-                                        <div class="small mt-3">Or load a starter catalog from <a href="../admin/starter_content.php">Starter Content</a>.</div>
+                                        <div class="small mt-3"><?= __('Or load a starter catalog from <a href="%s">Starter Content</a>.', '../admin/starter_content.php') ?></div>
                                     <?php } ?>
                                 <?php } ?>
                             <?php } else { ?>
-                                Nothing here<?= $q !== '' || $category_filter || $vendor_filter ? ' that matches' : '' ?>.
+                                <?= $q !== '' || $category_filter || $vendor_filter ? __('Nothing here that matches.') : __('Nothing here.') ?>
                             <?php } ?>
                         </td>
                     </tr>
@@ -470,14 +470,14 @@ $add_type = in_array($view, ['product', 'hardware', 'stocked', 'reorder'], true)
     </form>
     <?php
     $empty_state = [
-        'thing' => 'products and services',
+        'thing' => __('products and services'),
         'icon' => 'fa-box-open',
         'views' => ['type'],
         'view' => emptyStatePill($views, $view, 'all', ['reorder']),
-        'text' => 'What you sell - your services and the products you resell - with their prices, ready to add to an invoice.',
+        'text' => __('What you sell - your services and the products you resell - with their prices, ready to add to an invoice.'),
         'actions' => $can_edit ? [
-            ['label' => 'New Service', 'modal' => 'modals/product/product_add.php?type=service', 'size' => 'lg', 'icon' => 'fa-wrench'],
-            ['label' => 'New Product', 'modal' => 'modals/product/product_add.php?type=product', 'size' => 'lg', 'icon' => 'fa-box-open'],
+            ['label' => __('New Service'), 'modal' => 'modals/product/product_add.php?type=service', 'size' => 'lg', 'icon' => 'fa-wrench'],
+            ['label' => __('New Product'), 'modal' => 'modals/product/product_add.php?type=product', 'size' => 'lg', 'icon' => 'fa-box-open'],
         ] : [],
     ];
     ?>

@@ -17,39 +17,39 @@
  */
 
 const LOG_FORWARD_PROTOCOLS = ['udp' => 'UDP', 'tcp' => 'TCP', 'tls' => 'TLS'];
-const LOG_FORWARD_FORMATS = ['json' => 'JSON', 'cef' => 'CEF', 'plain' => 'Plain text'];
+const LOG_FORWARD_FORMATS = ['json' => 'JSON', 'cef' => 'CEF', 'plain' => 'Plain text']; // i18n-ignore - shared with the app log
 const LOG_FORWARD_TIMEOUT = 2;      // seconds to connect, or to write
 const LOG_FORWARD_BACKOFF = 60;     // seconds nothing is sent after a failure
 const LOG_FORWARD_BATCH = 50;       // entries queued before they are sent anyway, for a long cron run
 const LOG_FORWARD_FACILITY = 16;    // local0
-const LOG_FORWARD_CATEGORY = 'Log Forwarding';
+const LOG_FORWARD_CATEGORY = 'Log Forwarding'; // i18n-ignore - shared with the app log
 
 /** Which app log entries go out - the level and the ones above it, '' for none. */
 function logForwardAppLevels() {
     return [
-        '' => 'None',
-        'error' => 'Errors',
-        'warning' => 'Warnings and errors',
-        'info' => 'Info, warnings and errors',
-        'debug' => 'Everything, debug too',
+        '' => __('None'),
+        'error' => __('Errors'),
+        'warning' => __('Warnings and errors'),
+        'info' => __('Info, warnings and errors'),
+        'debug' => __('Everything, debug too'),
     ];
 }
 
 /** What each protocol is, in a line. */
 function logForwardProtocolHelp() {
     return [
-        'udp' => 'Fast, and nothing waits for the server - but nothing says whether it got there.',
-        'tcp' => 'Each entry arrives, in order, one a line.',
-        'tls' => 'TCP, encrypted - for a server outside your network.',
+        'udp' => __('Fast, and nothing waits for the server - but nothing says whether it got there.'),
+        'tcp' => __('Each entry arrives, in order, one a line.'),
+        'tls' => __('TCP, encrypted - for a server outside your network.'),
     ];
 }
 
 /** What each format is, in a line. */
 function logForwardFormatHelp() {
     return [
-        'json' => 'One JSON object an entry - Graylog, Splunk, Elastic, Wazuh and most others read it as it is.',
-        'cef' => 'Common Event Format - for Microsoft Sentinel, QRadar, ArcSight and other SIEMs that take it.',
-        'plain' => 'A line of text an entry, as a person would read it.',
+        'json' => __('One JSON object an entry - Graylog, Splunk, Elastic, Wazuh and most others read it as it is.'),
+        'cef' => __('Common Event Format - for Microsoft Sentinel, QRadar, ArcSight and other SIEMs that take it.'),
+        'plain' => __('A line of text an entry, as a person would read it.'),
     ];
 }
 
@@ -277,7 +277,7 @@ function logForwardSend(array $settings, array $lines, &$error = '', $keep = tru
             stream_set_timeout($socket, 0, 300000);
             $read = @fread($socket, 1);
             if ($read === false && empty(stream_get_meta_data($socket)['timed_out'])) {
-                $error = 'the server said nothing is listening on that port';
+                $error = 'the server said nothing is listening on that port'; // i18n-ignore - shared with the app log
                 @fclose($socket);
                 $socket = null;
                 return false;
@@ -334,7 +334,7 @@ function logForwardWrite($socket, $data, &$error) {
         $sent = @fwrite($socket, substr($data, $written));
         if ($sent === false || $sent === 0) {
             $meta = stream_get_meta_data($socket);
-            $error = !empty($meta['timed_out']) ? 'the server stopped taking them' : logForwardReason([error_get_last()['message'] ?? '', 'the connection was closed']);
+            $error = !empty($meta['timed_out']) ? 'the server stopped taking them' : logForwardReason([error_get_last()['message'] ?? '', 'the connection was closed']); // i18n-ignore - shared with the app log
             return false;
         }
         $written += $sent;
@@ -351,28 +351,28 @@ function logForwardReason($messages) {
         $message = trim(preg_replace('/^.*?(stream_socket_client|fwrite|fread)\(\):\s*/', '', (string) $message));
         return trim(preg_replace('/^Unable to connect to \S+ \((.*)\)$/', '$1', $message));
     }, (array) $messages), function ($message) {
-        return $message !== '' && strcasecmp($message, 'Unknown error') !== 0;
+        return $message !== '' && strcasecmp($message, 'Unknown error') !== 0; // i18n-ignore - shared with the app log
     }));
     $all = implode(' ', $messages);
     if (stripos($all, 'certificate verify failed') !== false) {
-        return "the server's certificate couldn't be checked - it isn't from an authority this server trusts, has run out, or is for another name";
+        return "the server's certificate couldn't be checked - it isn't from an authority this server trusts, has run out, or is for another name"; // i18n-ignore - shared with the app log
     }
     if (stripos($all, 'did not match expected CN') !== false || stripos($all, 'peer certificate CN') !== false) {
-        return "the server's certificate is for another name";
+        return "the server's certificate is for another name"; // i18n-ignore - shared with the app log
     }
     if (stripos($all, 'getaddrinfo') !== false || stripos($all, 'php_network_getaddresses') !== false) {
-        return "that server's name couldn't be found";
+        return "that server's name couldn't be found"; // i18n-ignore - shared with the app log
     }
     if (stripos($all, 'Connection refused') !== false) {
-        return 'the server refused the connection - nothing is listening on that port';
+        return 'the server refused the connection - nothing is listening on that port'; // i18n-ignore - shared with the app log
     }
     if (stripos($all, 'timed out') !== false) {
-        return 'the server did not answer in ' . LOG_FORWARD_TIMEOUT . ' seconds';
+        return 'the server did not answer in ' . LOG_FORWARD_TIMEOUT . ' seconds'; // i18n-ignore - shared with the app log
     }
     if (stripos($all, 'crypto') !== false || stripos($all, 'SSL') !== false) {
-        return "it couldn't start TLS with the server - " . ($messages[0] ?? 'it may not take TLS on that port');
+        return "it couldn't start TLS with the server - " . ($messages[0] ?? 'it may not take TLS on that port'); // i18n-ignore - shared with the app log
     }
-    return $messages[0] ?? 'it could not be reached';
+    return $messages[0] ?? 'it could not be reached'; // i18n-ignore - shared with the app log
 }
 
 /** The file that says when sending last failed, so the minute after is skipped. */
@@ -390,7 +390,7 @@ function logForwardBackingOff(array $settings) {
 /** Sending failed - wait a minute before trying again, and say so in the app log. */
 function logForwardFailed(array $settings, $count, $error) {
     @touch(logForwardBackoffFile($settings));
-    $what = $count === 1 ? '1 log entry' : "$count log entries";
+    $what = $count === 1 ? '1 log entry' : "$count log entries"; // i18n-ignore - shared with the app log
     logApp(LOG_FORWARD_CATEGORY, 'error', "Couldn't send $what to " . logForwardTarget($settings) . " - $error. Nothing more is sent for a minute; the entries are still here.");
 }
 
@@ -571,7 +571,7 @@ function logForwardAppMessage(array $row, $format) {
  */
 function logForwardTest(array $settings, $by = '') {
     $now = date('Y-m-d H:i:s');
-    $text = 'Test message from ITFlow' . ($by !== '' ? " - sent by $by" : '') . ' from Admin > Settings > Logs';
+    $text = 'Test message from ITFlow' . ($by !== '' ? " - sent by $by" : '') . ' from Admin > Settings > Logs'; // i18n-ignore - shared with the app log
     if ($settings['format'] === 'cef') {
         $message = logForwardCefStart('test', 'Test message', 6) . logForwardCefExtensions(['rt' => time() * 1000, 'msg' => $text, 'dvchost' => logForwardHostname()]);
     } elseif ($settings['format'] === 'plain') {

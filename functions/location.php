@@ -26,6 +26,52 @@ const LOCATION_KINDS = [
     'rack' => ['table' => 'racks', 'id' => 'rack_id', 'name' => 'rack_name', 'location' => 'rack_location_id', 'client' => 'rack_client_id', 'archived' => 'rack_archived_at', 'module' => 'module_support', 'label' => 'rack', 'plural' => 'Racks', 'icon' => 'fa-server'],
 ];
 
+/**
+ * What the screens say about one of LOCATION_KINDS, in the interface language -
+ * whole phrases, as the words around a kind change with it in other languages.
+ * $what: plural, which, pick, elsewhere ($n of them), all_here, moved_one
+ * ($args: name, location), moved ($args: count, location), gone ($args: name,
+ * location). The audit log keeps LOCATION_KINDS' English.
+ */
+function locationKindText($kind, $what, ...$args) {
+    $n = intval($args[0] ?? 0);
+    switch ("$kind.$what") {
+        case 'contact.plural': return __('Contacts');
+        case 'asset.plural': return __('Assets');
+        case 'network.plural': return __('Networks');
+        case 'rack.plural': return __('Racks');
+        case 'contact.which': return __('Which contacts?');
+        case 'asset.which': return __('Which assets?');
+        case 'network.which': return __('Which networks?');
+        case 'rack.which': return __('Which racks?');
+        case 'contact.pick': return __('Pick one or more contacts');
+        case 'asset.pick': return __('Pick one or more assets');
+        case 'network.pick': return __('Pick one or more networks');
+        case 'rack.pick': return __('Pick one or more racks');
+        case 'contact.elsewhere': return _n('%d contact somewhere else or at no location.', '%d contacts somewhere else or at no location.', $n);
+        case 'asset.elsewhere': return _n('%d asset somewhere else or at no location.', '%d assets somewhere else or at no location.', $n);
+        case 'network.elsewhere': return _n('%d network somewhere else or at no location.', '%d networks somewhere else or at no location.', $n);
+        case 'rack.elsewhere': return _n('%d rack somewhere else or at no location.', '%d racks somewhere else or at no location.', $n);
+        case 'contact.all_here': return __('Every contact this client has is already here.');
+        case 'asset.all_here': return __('Every asset this client has is already here.');
+        case 'network.all_here': return __('Every network this client has is already here.');
+        case 'rack.all_here': return __('Every rack this client has is already here.');
+        case 'contact.moved_one': return __('Contact %1$s moved to %2$s', ...$args);
+        case 'asset.moved_one': return __('Asset %1$s moved to %2$s', ...$args);
+        case 'network.moved_one': return __('Network %1$s moved to %2$s', ...$args);
+        case 'rack.moved_one': return __('Rack %1$s moved to %2$s', ...$args);
+        case 'contact.moved': return __('Moved %1$s contacts to %2$s', ...$args);
+        case 'asset.moved': return __('Moved %1$s assets to %2$s', ...$args);
+        case 'network.moved': return __('Moved %1$s networks to %2$s', ...$args);
+        case 'rack.moved': return __('Moved %1$s racks to %2$s', ...$args);
+        case 'contact.gone': return __('Contact %1$s is no longer at %2$s', ...$args);
+        case 'asset.gone': return __('Asset %1$s is no longer at %2$s', ...$args);
+        case 'network.gone': return __('Network %1$s is no longer at %2$s', ...$args);
+        case 'rack.gone': return __('Rack %1$s is no longer at %2$s', ...$args);
+    }
+    return '';
+}
+
 /** The address on one line - "1140 Ridge Avenue, Pittsburgh, PA 15212". Raw in, raw out. */
 function locationAddressText($row, $with_country = false) {
     return formatAddress($row['location_address'] ?? '', $row['location_city'] ?? '', $row['location_state'] ?? '', $row['location_zip'] ?? '', $with_country ? ($row['location_country'] ?? '') : '', ', ');

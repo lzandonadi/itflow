@@ -33,7 +33,7 @@ $ticket = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT tickets.*, client_nam
     LEFT JOIN slas ON sla_id = ticket_sla_id
     WHERE ticket_id = $ticket_id LIMIT 1"));
 if (!$ticket) {
-    echo json_encode(['error' => 'That ticket no longer exists.']);
+    echo json_encode(['error' => __('That ticket no longer exists.')]);
     exit;
 }
 $client_id = intval($ticket['ticket_client_id']);
@@ -58,7 +58,7 @@ $sla = ticketSlaState($ticket);
 $due = ticketDueState($ticket);
 $also_open = $is_open ? ticketAlsoOpen($ticket['ticket_contact_id'], $ticket['ticket_asset_id'], $ticket_id, 5) : [];
 $also_open_shares = array_values(array_unique(array_merge([], ...array_column($also_open, 'shares'))));
-$also_open_shares = count($also_open_shares) > 1 ? 'contact or asset' : ($also_open_shares[0] ?? 'contact');
+$also_open_title = count($also_open_shares) > 1 ? __('Also open for the same contact or asset') : (($also_open_shares[0] ?? 'contact') === 'asset' ? __('Also open for the same asset') : __('Also open for the same contact'));
 $tasks = ticketTaskCounts([$ticket_id])[$ticket_id] ?? null;
 
 $replies = [];
@@ -81,8 +81,8 @@ if ($tasks && $tasks[0] < $tasks[1]) {
     }
 }
 
-$move_text = ['us' => ['fa-reply text-primary', 'Needs a reply from us'], 'client' => ['fa-hourglass-half', 'With the client - we replied last'],
-    'parked' => ['fa-pause', 'Parked - the SLA clock is paused in this status']][$move] ?? null;
+$move_text = ['us' => ['fa-reply text-primary', __('Needs a reply from us')], 'client' => ['fa-hourglass-half', __('With the client - we replied last')],
+    'parked' => ['fa-pause', __('Parked - the SLA clock is paused in this status')]][$move] ?? null;
 $phones = [];
 if (!empty($ticket['contact_phone'])) {
     $phones[] = formatPhoneNumber($ticket['contact_phone'], $ticket['contact_phone_country_code']) . ($ticket['contact_extension'] ? ' x' . $ticket['contact_extension'] : '');
@@ -104,12 +104,12 @@ ob_start();
         </div>
         <h5 class="modal-title fw-semibold text-break"><?= escapeHtml($ticket['ticket_subject']) ?></h5>
         <div class="small text-body-secondary mt-1">
-            <?= $client_id ? escapeHtml($ticket['client_name']) : 'Internal - no client' ?>
+            <?= $client_id ? escapeHtml($ticket['client_name']) : __('Internal - no client') ?>
             <span class="mx-1">&middot;</span>opened <?= timeAgo($ticket['ticket_created_at']) ?>
             <?= ticketSourceIcon($ticket['ticket_source']) ?>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body itflow-ticket-glance">
@@ -126,25 +126,25 @@ ob_start();
             <?= ticketDuePill($due) ?>
             <?= ticketSlaPill($sla) ?>
             <?php if ($sla['key'] !== 'none' && !empty($sla['due']) && $is_open) { ?>
-                <span class="small text-body-secondary"><?= escapeHtml($sla['what']) ?> <?= escapeHtml(date('M j, g:i A', strtotime($sla['due']))) ?><?= $ticket['sla_name'] !== null ? ' &middot; ' . escapeHtml($ticket['sla_name']) : '' ?></span>
+                <span class="small text-body-secondary"><?= escapeHtml($sla['what']) ?> <?= escapeHtml(formatDate($sla['due'], 'datetime_short')) ?><?= $ticket['sla_name'] !== null ? ' &middot; ' . escapeHtml($ticket['sla_name']) : '' ?></span>
             <?php } ?>
         </div>
     <?php } ?>
 
     <dl class="itflow-asset-dl mb-3">
-        <dt>Contact</dt>
+        <dt><?= __('Contact') ?></dt>
         <dd>
             <?php if (intval($ticket['ticket_contact_id']) && $ticket['contact_name'] !== null) { ?>
                 <?= contactLink($client_id, $ticket['ticket_contact_id'], $ticket['contact_name'], $ticket['contact_photo'] ?? '') ?>
                 <?php if ($ticket['contact_title']) { ?><span class="text-body-secondary small ms-1"><?= escapeHtml($ticket['contact_title']) ?></span><?php } ?>
                 <?php if ($ticket['contact_email']) { ?>
                     <div class="small">
-                        <a href="mailto:<?= escapeHtml($ticket['contact_email']) ?>"><?= escapeHtml($ticket['contact_email']) ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= escapeHtml($ticket['contact_email']) ?>"><i class="far fa-copy"></i></button>
+                        <a href="mailto:<?= escapeHtml($ticket['contact_email']) ?>"><?= escapeHtml($ticket['contact_email']) ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= escapeHtml($ticket['contact_email']) ?>"><i class="far fa-copy"></i></button>
                     </div>
                 <?php } ?>
                 <?php foreach ($phones as $phone) { ?>
                     <div class="small">
-                        <a href="tel:<?= escapeHtml(preg_replace('/[^0-9+]/', '', $phone)) ?>"><?= escapeHtml($phone) ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy number" data-clipboard-text="<?= escapeHtml($phone) ?>"><i class="far fa-copy"></i></button>
+                        <a href="tel:<?= escapeHtml(preg_replace('/[^0-9+]/', '', $phone)) ?>"><?= escapeHtml($phone) ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy number')) ?>" data-clipboard-text="<?= escapeHtml($phone) ?>"><i class="far fa-copy"></i></button>
                     </div>
                 <?php } ?>
             <?php } else { ?>
@@ -152,46 +152,46 @@ ob_start();
             <?php } ?>
         </dd>
 
-        <dt>Assigned</dt>
+        <dt><?= __('Assigned') ?></dt>
         <dd><?= formatAssignee($ticket['ticket_assigned_to'], $ticket['user_name'], $ticket['user_avatar'], $is_open) ?></dd>
 
         <?php if (intval($ticket['ticket_asset_id']) && $ticket['asset_name'] !== null) { ?>
-            <dt>Asset</dt>
+            <dt><?= __('Asset') ?></dt>
             <dd><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= intval($ticket['ticket_asset_id']) ?>"><i class="fas fa-desktop text-body-secondary me-1"></i><?= escapeHtml($ticket['asset_name']) ?></a></dd>
         <?php } ?>
 
         <?php if (intval($ticket['ticket_location_id']) && $ticket['location_name'] !== null) { ?>
-            <dt>Site</dt>
+            <dt><?= __('Site') ?></dt>
             <dd><a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=<?= intval($ticket['ticket_location_id']) ?>"><i class="fas fa-map-marker-alt text-body-secondary me-1"></i><?= escapeHtml($ticket['location_name']) ?></a></dd>
         <?php } ?>
 
         <?php if ($ticket['category_name'] !== null && $ticket['category_name'] !== '') { ?>
-            <dt>Category</dt>
+            <dt><?= __('Category') ?></dt>
             <dd><?= categoryMarkHtml($ticket['category_color'], $ticket['category_icon'] ?? '', '<i class="fas fa-circle itflow-ticket-dot"%s aria-hidden="true"></i>') ?><?= escapeHtml($ticket['category_name']) ?></dd>
         <?php } ?>
 
         <?php if (!empty($ticket['ticket_schedule'])) { ?>
-            <dt>Scheduled</dt>
-            <dd><i class="fas fa-<?= intval($ticket['ticket_onsite']) ? 'truck' : 'calendar-check' ?> text-body-secondary me-1"></i><?= escapeHtml(date('D M j, g:i A', strtotime($ticket['ticket_schedule']))) ?><?= intval($ticket['ticket_onsite']) ? ' <span class="text-body-secondary">on site</span>' : '' ?></dd>
+            <dt><?= __('Scheduled') ?></dt>
+            <dd><i class="fas fa-<?= intval($ticket['ticket_onsite']) ? 'truck' : 'calendar-check' ?> text-body-secondary me-1"></i><?= escapeHtml(formatDate($ticket['ticket_schedule'], 'datetime_weekday')) ?><?= intval($ticket['ticket_onsite']) ? ' <span class="text-body-secondary">' . __('on site') . '</span>' : '' ?></dd>
         <?php } ?>
 
         <?php if (intval($ticket['ticket_project_id']) && $ticket['project_name'] !== null) { ?>
-            <dt>Project</dt>
+            <dt><?= __('Project') ?></dt>
             <dd><a href="<?= escapeHtml(projectUrl($ticket['ticket_project_id'], $ticket['project_client_id'])) ?>"><?= escapeHtml($ticket['project_name']) ?></a> <span class="text-body-secondary small"><?= escapeHtml($ticket['project_prefix'] . intval($ticket['project_number'])) ?></span></dd>
         <?php } ?>
 
         <?php if (intval($ticket['ticket_vendor_id']) && $ticket['vendor_name'] !== null) { ?>
-            <dt>Vendor</dt>
+            <dt><?= __('Vendor') ?></dt>
             <dd>
                 <?= vendorLink($ticket['ticket_vendor_id'], $ticket['vendor_name']) ?>
                 <?php if (!empty($ticket['ticket_vendor_ticket_number'])) { ?>
-                    <span class="small text-body-secondary ms-1">their ref <span class="font-monospace"><?= escapeHtml($ticket['ticket_vendor_ticket_number']) ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy their reference" data-clipboard-text="<?= escapeHtml($ticket['ticket_vendor_ticket_number']) ?>"><i class="far fa-copy"></i></button></span>
+                    <span class="small text-body-secondary ms-1">their ref <span class="font-monospace"><?= escapeHtml($ticket['ticket_vendor_ticket_number']) ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy their reference')) ?>" data-clipboard-text="<?= escapeHtml($ticket['ticket_vendor_ticket_number']) ?>"><i class="far fa-copy"></i></button></span>
                 <?php } ?>
             </dd>
         <?php } ?>
 
         <?php if ($tasks) { ?>
-            <dt>Tasks</dt>
+            <dt><?= __('Tasks') ?></dt>
             <dd>
                 <?= ticketTasksHtml($tasks) ?>
                 <?php if ($open_tasks) { ?>
@@ -207,20 +207,20 @@ ob_start();
 
     <?php if ($also_open) { ?>
         <div class="alert alert-warning py-2 small">
-            <div class="fw-semibold mb-1"><i class="fas fa-layer-group me-1"></i>Also open for the same <?= $also_open_shares ?></div>
+            <div class="fw-semibold mb-1"><i class="fas fa-layer-group me-1"></i><?= $also_open_title ?></div>
             <?php foreach ($also_open as $other) { ?>
                 <div class="text-truncate"><?= ticketLink($other) ?></div>
             <?php } ?>
         </div>
     <?php } ?>
 
-    <h6 class="small text-body-secondary fw-semibold text-uppercase">What it is about</h6>
-    <div class="itflow-ticket-glance-text border rounded p-2 mb-3"><?= $purifier->purify($ticket['ticket_details']) ?: '<span class="text-body-secondary">No details.</span>' ?></div>
+    <h6 class="small text-body-secondary fw-semibold text-uppercase"><?= __('What it is about') ?></h6>
+    <div class="itflow-ticket-glance-text border rounded p-2 mb-3"><?= $purifier->purify($ticket['ticket_details']) ?: '<span class="text-body-secondary">' . __('No details.') . '</span>' ?></div>
 
     <?php if ($replies) { ?>
         <h6 class="small text-body-secondary fw-semibold text-uppercase">
-            Latest replies
-            <?php if ($reply_count > count($replies)) { ?><span class="fw-normal text-lowercase">- <?= count($replies) ?> of <?= $reply_count ?></span><?php } ?>
+            <?= __('Latest replies') ?>
+            <?php if ($reply_count > count($replies)) { ?><span class="fw-normal text-lowercase">- <?= __('%1$d of %2$d', count($replies), $reply_count) ?></span><?php } ?>
         </h6>
         <?php foreach ($replies as $reply) {
             $type = $reply['ticket_reply_type'];
@@ -228,7 +228,7 @@ ob_start();
             ?>
             <div class="border rounded p-2 mb-2 <?= $type === 'Internal' ? 'bg-body-tertiary' : '' ?>">
                 <div class="small d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <span class="badge rounded-pill <?= ['Client' => 'text-bg-warning', 'Public' => 'text-bg-primary', 'Internal' => 'text-bg-secondary'][$type] ?? 'text-bg-secondary' ?>"><?= ['Client' => 'Client', 'Public' => 'Public', 'Internal' => 'Internal note'][$type] ?? escapeHtml($type) ?></span>
+                    <span class="badge rounded-pill <?= ['Client' => 'text-bg-warning', 'Public' => 'text-bg-primary', 'Internal' => 'text-bg-secondary'][$type] ?? 'text-bg-secondary' ?>"><?= ['Client' => __('Client'), 'Public' => _x('Public', 'ticket reply'), 'Internal' => __('Internal note')][$type] ?? escapeHtml($type) ?></span>
                     <span class="fw-semibold"><?= escapeHtml($who ?? '') ?></span>
                     <span class="text-body-secondary ms-auto" title="<?= escapeHtml($reply['ticket_reply_created_at']) ?>"><?= timeAgo($reply['ticket_reply_created_at']) ?></span>
                 </div>
@@ -236,19 +236,19 @@ ob_start();
             </div>
         <?php } ?>
     <?php } else { ?>
-        <div class="small text-body-secondary"><i class="far fa-clock me-1"></i>No replies yet.</div>
+        <div class="small text-body-secondary"><i class="far fa-clock me-1"></i><?= __('No replies yet.') ?></div>
     <?php } ?>
 
 </div>
 
 <div class="modal-footer">
     <?php if ($can_edit && !$mine) { ?>
-        <a class="btn btn-outline-secondary me-auto" href="post.php?assign_ticket_to_me=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-hand-paper me-2"></i>Assign to me</a>
+        <a class="btn btn-outline-secondary me-auto" href="post.php?assign_ticket_to_me=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-hand-paper me-2"></i><?= __('Assign to me') ?></a>
     <?php } ?>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_edit.php?id=<?= $ticket_id ?>"><i class="fas fa-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/ticket/ticket_edit.php?id=<?= $ticket_id ?>"><i class="fas fa-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <a class="btn btn-primary text-bold" href="<?= $url ?>"><i class="fas fa-life-ring me-2"></i>Open ticket</a>
+    <a class="btn btn-primary text-bold" href="<?= $url ?>"><i class="fas fa-life-ring me-2"></i><?= __('Open ticket') ?></a>
 </div>
 
 <?php

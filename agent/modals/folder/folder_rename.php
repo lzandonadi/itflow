@@ -14,7 +14,7 @@ $folder_id = intval($_GET['id'] ?? 0);
 
 $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT folder_client_id, folder_name, parent_folder FROM folders WHERE folder_id = $folder_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That folder no longer exists.']);
+    echo json_encode(['error' => __('That folder no longer exists.')]);
     exit;
 }
 $client_id = intval($row['folder_client_id']);
@@ -36,28 +36,28 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
-                <input type="text" class="form-control" name="folder_name" placeholder="Folder name" maxlength="200" value="<?= $folder_name ?>" required autofocus>
+                <input type="text" class="form-control" name="folder_name" placeholder="<?= escapeHtml(__('Folder name')) ?>" maxlength="200" value="<?= $folder_name ?>" required autofocus>
             </div>
         </div>
 
         <div class="mb-2">
-            <label class="form-label">Inside</label>
+            <label class="form-label"><?= __('Inside') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-sitemap"></i></span>
                 <select class="form-select select2" name="parent_folder">
                     <?= folderOptionsHtml($client_id, intval($row['parent_folder']), $folder_id) ?>
                 </select>
             </div>
-            <div class="form-text">Moving it takes everything inside along with it.</div>
+            <div class="form-text"><?= __('Moving it takes everything inside along with it.') ?></div>
         </div>
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="rename_folder" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="rename_folder" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -67,7 +67,7 @@ if ($client && $ticketing) {
     $t['categories'] = [];
     $sql = mysqli_query($mysqli, "SELECT ticket_category AS cat, COUNT(ticket_id) AS n FROM tickets WHERE $filter AND $opened_in GROUP BY ticket_category ORDER BY n DESC");
     while ($row = mysqli_fetch_assoc($sql)) {
-        $t['categories'][] = ['label' => $names[intval($row['cat'])] ?? 'No category', 'value' => intval($row['n'])];
+        $t['categories'][] = ['label' => $names[intval($row['cat'])] ?? __('No category'), 'value' => intval($row['n'])];
     }
 
     // Who raised them, and the devices that keep coming back
@@ -144,13 +144,13 @@ if ($client && $itdoc) {
         // What to plan for: unsupported, old, or a warranty about to end
         $reasons = [];
         if ($asset['os_eol'] !== '') {
-            $reasons[] = ['danger', $asset['os_eol'] . ' - no longer supported'];
+            $reasons[] = ['danger', __('%s - no longer supported', $asset['os_eol'])];
         }
         if ($old) {
-            $reasons[] = ['danger', reportYears($asset['age_days']) . ' old'];
+            $reasons[] = ['danger', __('%s old', reportYears($asset['age_days']))];
         }
         if ($ending) {
-            $reasons[] = ['warning', 'Warranty ends ' . ($asset['warranty']['days'] === 0 ? 'today' : 'in ' . $asset['warranty']['days'] . ' days')];
+            $reasons[] = ['warning', $asset['warranty']['days'] === 0 ? __('Warranty ends today') : __('Warranty ends in %d days', $asset['warranty']['days'])];
         }
         if ($reasons) {
             $asset['reasons'] = $reasons;
@@ -218,66 +218,64 @@ if ($client) {
     };
     if ($hw && $hw['os']) {
         $names = implode(', ', array_keys($hw['os_names']));
-        $advice[] = ['danger', 'fa-shield-alt', '<strong>' . $plural($hw['os'], 'device runs', 'devices run') . ' an operating system past its end of support</strong> (' . escapeHtml($names) . ').
-            They no longer get security fixes - plan the upgrades or replacements.', '/agent/reports/asset_lifecycle.php?client_id=' . $client_id];
+        $advice[] = ['danger', 'fa-shield-alt', _n('<strong>%1$s device runs an operating system past its end of support</strong> (%2$s). They no longer get security fixes - plan the upgrades or replacements.', '<strong>%1$s devices run an operating system past its end of support</strong> (%2$s). They no longer get security fixes - plan the upgrades or replacements.', $hw['os'], reportCount($hw['os']), escapeHtml($names)), '/agent/reports/asset_lifecycle.php?client_id=' . $client_id];
     }
     if ($money && $money['overdue'] > 0.004) {
-        $advice[] = ['danger', 'fa-file-invoice-dollar', '<strong>' . reportMoney($money['overdue']) . ' is past due</strong> of a ' . reportMoney($money['balance']) . ' balance.', '/agent/reports/outstanding_balances.php?client_id=' . $client_id];
+        $advice[] = ['danger', 'fa-file-invoice-dollar', __('<strong>%1$s is past due</strong> of a %2$s balance.', reportMoney($money['overdue']), reportMoney($money['balance'])), '/agent/reports/outstanding_balances.php?client_id=' . $client_id];
     }
     if ($t && $t['sla']['response_percent'] !== null && $t['sla']['response_percent'] < 90) {
-        $advice[] = ['warning', 'fa-stopwatch', '<strong>First replies met the SLA ' . reportPercent($t['sla']['response_percent']) . ' of the time.</strong> Look at when the late ones came in and who picked them up.',
+        $advice[] = ['warning', 'fa-stopwatch', __('<strong>First replies met the SLA %s of the time.</strong> Look at when the late ones came in and who picked them up.', reportPercent($t['sla']['response_percent'])),
             '/agent/reports/sla_summary.php?client_id=' . $client_id . '&' . http_build_query(reportPeriodQuery($period))];
     }
     if ($t && $t['bad']) {
-        $advice[] = ['warning', 'fa-frown', '<strong>' . $plural($t['bad'], 'ticket was', 'tickets were') . ' rated bad.</strong> Go through ' . ($t['bad'] === 1 ? 'it' : 'them') . ' together and agree what changes.',
+        $advice[] = ['warning', 'fa-frown', _n('<strong>%s ticket was rated bad.</strong> Go through it together and agree what changes.', '<strong>%s tickets were rated bad.</strong> Go through them together and agree what changes.', $t['bad'], reportCount($t['bad'])),
             '/agent/reports/satisfaction.php?client_id=' . $client_id . '&' . http_build_query(reportPeriodQuery($period))];
     }
     if ($t && $t['opened'] >= 5 && $t['opened_prev'] && $t['opened'] > $t['opened_prev'] * 1.25) {
-        $advice[] = ['warning', 'fa-chart-line', '<strong>Tickets were up ' . reportChange($t['opened'], $t['opened_prev']) . '%</strong> on ' . escapeHtml($period['compare']) . ' (' . reportCount($t['opened']) . ' against ' . reportCount($t['opened_prev']) . ').', ''];
+        $advice[] = ['warning', 'fa-chart-line', __('<strong>Tickets were up %1$s%%</strong> on %2$s (%3$s against %4$s).', reportChange($t['opened'], $t['opened_prev']), escapeHtml($period['compare']), reportCount($t['opened']), reportCount($t['opened_prev'])), ''];
     }
-    if ($t && $t['opened'] >= 5 && $t['categories'] && $t['categories'][0]['label'] !== 'No category' && $t['categories'][0]['value'] / $t['opened'] >= 0.3) {
+    if ($t && $t['opened'] >= 5 && $t['categories'] && $t['categories'][0]['label'] !== __('No category') && $t['categories'][0]['value'] / $t['opened'] >= 0.3) {
         $top = $t['categories'][0];
-        $advice[] = ['info', 'fa-tags', '<strong>' . escapeHtml($top['label']) . ' was ' . reportPercent(reportShare($top['value'], $t['opened'], 0)) . ' of tickets</strong> (' . reportCount($top['value']) . ').
-            Fixing the cause, or some training, could cut that down.', ''];
+        $advice[] = ['info', 'fa-tags', __('<strong>%1$s was %2$s of tickets</strong> (%3$s). Fixing the cause, or some training, could cut that down.', escapeHtml($top['label']), reportPercent(reportShare($top['value'], $t['opened'], 0)), reportCount($top['value'])), ''];
     }
     if ($t && $t['assets'] && intval($t['assets'][0]['n']) >= 3) {
         $asset = $t['assets'][0];
-        $advice[] = ['info', 'fa-redo', '<strong>' . escapeHtml($asset['asset_name']) . ' was on ' . reportCount(intval($asset['n'])) . ' tickets.</strong> Worth repairing properly or replacing.',
+        $advice[] = ['info', 'fa-redo', __('<strong>%1$s was on %2$s tickets.</strong> Worth repairing properly or replacing.', escapeHtml($asset['asset_name']), reportCount(intval($asset['n']))),
             '/agent/asset.php?client_id=' . $client_id . '&asset_id=' . intval($asset['asset_id'])];
     }
     if ($hw && $hw['old']) {
-        $advice[] = ['warning', 'fa-recycle', '<strong>' . $plural($hw['old'], 'device is', 'devices are') . ' over ' . REVIEW_OLD_YEARS . ' years old.</strong> Budget for replacing ' . ($hw['old'] === 1 ? 'it' : 'them') . ' over the coming year.',
+        $advice[] = ['warning', 'fa-recycle', _n('<strong>%1$s device is over %2$d years old.</strong> Budget for replacing it over the coming year.', '<strong>%1$s devices are over %2$d years old.</strong> Budget for replacing them over the coming year.', $hw['old'], reportCount($hw['old']), REVIEW_OLD_YEARS),
             '/agent/reports/asset_lifecycle.php?client_id=' . $client_id];
     }
     $manual_due = array_filter($renewals, function ($r) { return !$r['auto'] && $r['kind'] !== 'warranty'; });
     if ($manual_due) {
         $lapsed = count(array_filter($manual_due, function ($r) { return $r['days'] < 0; }));
-        $advice[] = [$lapsed ? 'danger' : 'warning', 'fa-calendar-alt', '<strong>' . $plural(count($manual_due), 'domain, certificate or license needs', 'domains, certificates or licenses need') . ' renewing</strong>'
-            . ($lapsed ? ', ' . reportCount($lapsed) . ' already lapsed' : ' in the next 90 days') . '.', '/agent/reports/renewals.php?client_id=' . $client_id . '&manual=1'];
+        $advice[] = [$lapsed ? 'danger' : 'warning', 'fa-calendar-alt', ($lapsed ? _n('<strong>%1$s domain, certificate or license needs renewing</strong>, %2$s already lapsed.', '<strong>%1$s domains, certificates or licenses need renewing</strong>, %2$s already lapsed.', count($manual_due), reportCount(count($manual_due)), reportCount($lapsed))
+                : _n('<strong>%s domain, certificate or license needs renewing</strong> in the next 90 days.', '<strong>%s domains, certificates or licenses need renewing</strong> in the next 90 days.', count($manual_due), reportCount(count($manual_due)))), '/agent/reports/renewals.php?client_id=' . $client_id . '&manual=1'];
     }
     if ($hw && $hw['ending']) {
-        $advice[] = ['info', 'fa-shield-alt', '<strong>' . $plural($hw['ending'], 'warranty ends', 'warranties end') . ' in the next 90 days.</strong> Extend the ones on kit that matters.',
+        $advice[] = ['info', 'fa-shield-alt', _n('<strong>%s warranty ends in the next 90 days.</strong> Extend the ones on kit that matters.', '<strong>%s warranties end in the next 90 days.</strong> Extend the ones on kit that matters.', $hw['ending'], reportCount($hw['ending'])),
             '/agent/reports/renewals.php?client_id=' . $client_id . '&kind=warranty'];
     }
     if ($t && $t['open_old']) {
-        $advice[] = ['warning', 'fa-hourglass-half', '<strong>' . $plural($t['open_old'], 'ticket has', 'tickets have') . ' been open over 30 days.</strong> Close them out or agree a plan.',
+        $advice[] = ['warning', 'fa-hourglass-half', _n('<strong>%s ticket has been open over 30 days.</strong> Close them out or agree a plan.', '<strong>%s tickets have been open over 30 days.</strong> Close them out or agree a plan.', $t['open_old'], reportCount($t['open_old'])),
             '/agent/reports/ticket_aging.php?client_id=' . $client_id];
     }
     if ($services) {
-        $advice[] = ['info', 'fa-stream', '<strong>' . $plural(count($services), 'service needs', 'services need') . ' a look</strong> - a review due, or something it depends on expiring or out of action.',
+        $advice[] = ['info', 'fa-stream', _n('<strong>%s service needs a look</strong> - a review due, or something it depends on expiring or out of action.', '<strong>%s services need a look</strong> - a review due, or something it depends on expiring or out of action.', count($services), reportCount(count($services))),
             '/agent/services.php?client_id=' . $client_id];
     }
     if ($credentials && intval($credentials['stale'])) {
-        $advice[] = ['info', 'fa-key', '<strong>' . $plural(intval($credentials['stale']), 'password has', 'passwords have') . ' not changed in over a year.</strong>',
+        $advice[] = ['info', 'fa-key', _n('<strong>%s password has not changed in over a year.</strong>', '<strong>%s passwords have not changed in over a year.</strong>', intval($credentials['stale']), reportCount(intval($credentials['stale']))),
             '/agent/reports/credential_rotation.php?client_id=' . $client_id . '&days=365'];
     }
     if ($coverage && $coverage['missing']) {
         $checks = reportCoverageChecks();
-        $advice[] = ['info', 'fa-tasks', '<strong>Documentation is missing:</strong> ' . escapeHtml(implode(', ', array_map(function ($k) use ($checks) { return strtolower($checks[$k]['label']); }, $coverage['missing']))) . '.',
+        $advice[] = ['info', 'fa-tasks', __('<strong>Documentation is missing:</strong> %s.', escapeHtml(implode(', ', array_map(function ($k) use ($checks) { return mb_strtolower($checks[$k]['label']); }, $coverage['missing'])))),
             '/agent/reports/documentation_coverage.php?gaps=1'];
     }
     if ($money && $money['unbilled']) {
-        $advice[] = ['info', 'fa-file-invoice', '<strong>' . $plural($money['unbilled'], 'billable ticket is', 'billable tickets are') . ' done but not invoiced yet.</strong>', '/agent/reports/tickets_unbilled.php?client_id=' . $client_id];
+        $advice[] = ['info', 'fa-file-invoice', _n('<strong>%s billable ticket is done but not invoiced yet.</strong>', '<strong>%s billable tickets are done but not invoiced yet.</strong>', $money['unbilled'], reportCount($money['unbilled'])), '/agent/reports/tickets_unbilled.php?client_id=' . $client_id];
     }
 }
 
@@ -297,17 +295,17 @@ if ($t && reportExporting()) {
         $rows[] = $row;
     }
     reportCsv($client['client_name'] . ' Tickets ' . $period['start'] . ' to ' . $period['end'], [
-        'ticket' => ['label' => 'Ticket', 'csv' => function ($row) { return ticketReference($row); }],
-        'ticket_subject' => ['label' => 'Subject'],
-        'category' => ['label' => 'Category'],
-        'ticket_priority' => ['label' => 'Priority'],
-        'ticket_status_name' => ['label' => 'Status'],
-        'contact_name' => ['label' => 'Contact'],
-        'user_name' => ['label' => 'Assigned to'],
-        'ticket_created_at' => ['label' => 'Opened'],
-        'response' => ['label' => 'Hours to first reply', 'type' => 'hours'],
-        'ticket_resolved_at' => ['label' => 'Resolved'],
-        'seconds' => ['label' => 'Hours logged', 'type' => 'hours'],
+        'ticket' => ['label' => __('Ticket'), 'csv' => function ($row) { return ticketReference($row); }],
+        'ticket_subject' => ['label' => __('Subject')],
+        'category' => ['label' => __('Category')],
+        'ticket_priority' => ['label' => __('Priority')],
+        'ticket_status_name' => ['label' => __('Status')],
+        'contact_name' => ['label' => __('Contact')],
+        'user_name' => ['label' => __('Assigned to')],
+        'ticket_created_at' => ['label' => __('Opened')],
+        'response' => ['label' => __('Hours to first reply'), 'type' => 'hours'],
+        'ticket_resolved_at' => ['label' => __('Resolved')],
+        'seconds' => ['label' => __('Hours logged'), 'type' => 'hours'],
     ], $rows);
 }
 
@@ -317,7 +315,7 @@ $header = [
     'period' => $period,
     'client' => $client_id,
     'client_required' => true,
-    'export' => $t ? ['tickets' => 'Tickets in the period'] : false,
+    'export' => $t ? ['tickets' => __('Tickets in the period')] : false,
     'print_meta' => $client ? $client['client_name'] : '',
 ];
 
@@ -330,7 +328,7 @@ $header = [
     <?php if (!$client) { ?>
 
         <div class="card"><div class="card-body">
-            <?= reportEmpty('Pick a client above to build their review.', 'fa-clipboard-list', 'secondary') ?>
+            <?= reportEmpty(__('Pick a client above to build their review.'), 'fa-clipboard-list', 'secondary') ?>
         </div></div>
 
     <?php } else { ?>
@@ -342,30 +340,30 @@ $header = [
                 <span class="itflow-client-avatar bg-<?= $tone ?>-subtle text-<?= $tone ?>-emphasis"><?= escapeHtml(clientInitials((string) $client['client_abbreviation'], $client['client_name'])) ?></span>
                 <div class="me-auto">
                     <h2 class="h4 mb-0"><a class="text-body text-decoration-none" href="/agent/client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($client['client_name']) ?></a></h2>
-                    <div class="text-body-secondary">Business review · <?= escapeHtml($period['range']) ?></div>
+                    <div class="text-body-secondary"><?= __('Business review · %s', escapeHtml($period['range'])) ?></div>
                 </div>
                 <dl class="row small mb-0 g-2 text-body-secondary">
                     <?php if ($primary) { ?>
-                        <dt class="col-auto fw-normal">Contact</dt>
+                        <dt class="col-auto fw-normal"><?= __('Contact') ?></dt>
                         <dd class="col-auto mb-0 text-body"><?= escapeHtml($primary['contact_name']) ?><?= $primary['contact_title'] ? ', ' . escapeHtml($primary['contact_title']) : '' ?></dd>
                     <?php } ?>
-                    <dt class="col-auto fw-normal">Client since</dt>
-                    <dd class="col-auto mb-0 text-body"><?= escapeHtml(date('M Y', strtotime($client['client_created_at']))) ?></dd>
+                    <dt class="col-auto fw-normal"><?= __('Client since') ?></dt>
+                    <dd class="col-auto mb-0 text-body"><?= escapeHtml(formatDate($client['client_created_at'], 'month_year')) ?></dd>
                 </dl>
             </div>
         </div>
 
-        <?= reportSectionOpen('Recommendations', $advice ? reportCount(count($advice)) . ' to talk through' : '') ?>
+        <?= reportSectionOpen(__('Recommendations'), $advice ? __('%s to talk through', reportCount(count($advice))) : '') ?>
             <div class="card-body">
                 <?php if (!$advice) { ?>
-                    <p class="mb-0 text-success-emphasis"><i class="fas fa-check-circle me-2"></i>Nothing stands out - a quiet, healthy period.</p>
+                    <p class="mb-0 text-success-emphasis"><i class="fas fa-check-circle me-2"></i><?= __('Nothing stands out - a quiet, healthy period.') ?></p>
                 <?php } else { ?>
                     <ul class="itflow-report-advice">
                         <?php foreach ($advice as [$tone, $icon, $text, $link]) { ?>
                             <li>
                                 <i class="fas fa-fw <?= $icon ?> text-<?= $tone ?>"></i>
                                 <div class="flex-grow-1"><?= $text ?></div>
-                                <?php if ($link) { ?><a class="small text-nowrap d-print-none" href="<?= escapeHtml($link) ?>">Details<i class="fas fa-angle-right ms-1"></i></a><?php } ?>
+                                <?php if ($link) { ?><a class="small text-nowrap d-print-none" href="<?= escapeHtml($link) ?>"><?= __('Details') ?><i class="fas fa-angle-right ms-1"></i></a><?php } ?>
                             </li>
                         <?php } ?>
                     </ul>
@@ -374,43 +372,43 @@ $header = [
         </div>
 
         <?php if ($t) { ?>
-            <h2 class="itflow-report-group-title mt-4 mb-2">Service desk</h2>
+            <h2 class="itflow-report-group-title mt-4 mb-2"><?= __('Service desk') ?></h2>
             <?= reportStats([
-                ['label' => 'Tickets raised', 'value' => reportCount($t['opened']), 'url' => '/agent/tickets.php?client_id=' . $client_id . '&show=all',
+                ['label' => __('Tickets raised'), 'value' => reportCount($t['opened']), 'url' => '/agent/tickets.php?client_id=' . $client_id . '&show=all',
                     'sub' => reportChangeHtml($t['opened'], $t['opened_prev'], 'down', $period['compare'])],
-                ['label' => 'Resolved', 'value' => reportCount($t['resolved']), 'sub' => reportCount($t['open_now']) . ' <span class="text-body-tertiary">open now</span>'],
-                ['label' => 'Typical first reply', 'value' => $t['response'] === null ? '-' : reportDuration($t['response']),
-                    'sub' => $t['resolve'] === null ? '' : 'Resolved in <span class="text-body">' . reportDuration($t['resolve']) . '</span>'],
-                ['label' => 'SLA met', 'value_html' => $t['sla']['response_percent'] === null ? '<span class="text-body-tertiary">-</span>' : reportRateHtml($t['sla']['response_percent']),
-                    'sub' => $t['sla']['resolution_percent'] === null ? '<span class="text-body-tertiary">No SLA tickets</span>' : 'Resolution <span class="text-body">' . reportPercent($t['sla']['resolution_percent']) . '</span>'],
-                ['label' => 'Satisfaction', 'value_html' => $t['satisfaction'] === null ? '<span class="text-body-tertiary">-</span>' : reportRateHtml($t['satisfaction']),
-                    'sub' => ($t['good'] + $t['bad']) ? reportCount($t['good'] + $t['bad']) . ' <span class="text-body-tertiary">ratings</span>' : '<span class="text-body-tertiary">No ratings</span>'],
-                ['label' => 'Time spent', 'value' => reportHours($t['seconds']) . ' h', 'sub' => '<span class="text-body-tertiary">Logged on their tickets</span>'],
+                ['label' => __('Resolved'), 'value' => reportCount($t['resolved']), 'sub' => reportCount($t['open_now']) . ' <span class="text-body-tertiary">' . __('open now') . '</span>'],
+                ['label' => __('Typical first reply'), 'value' => $t['response'] === null ? '-' : reportDuration($t['response']),
+                    'sub' => $t['resolve'] === null ? '' : __('Resolved in %s', '<span class="text-body">' . reportDuration($t['resolve']) . '</span>')],
+                ['label' => __('SLA met'), 'value_html' => $t['sla']['response_percent'] === null ? '<span class="text-body-tertiary">-</span>' : reportRateHtml($t['sla']['response_percent']),
+                    'sub' => $t['sla']['resolution_percent'] === null ? '<span class="text-body-tertiary">' . __('No SLA tickets') . '</span>' : __('Resolution %s', '<span class="text-body">' . reportPercent($t['sla']['resolution_percent']) . '</span>')],
+                ['label' => __('Satisfaction'), 'value_html' => $t['satisfaction'] === null ? '<span class="text-body-tertiary">-</span>' : reportRateHtml($t['satisfaction']),
+                    'sub' => ($t['good'] + $t['bad']) ? reportCount($t['good'] + $t['bad']) . ' <span class="text-body-tertiary">' . __('ratings') . '</span>' : '<span class="text-body-tertiary">' . __('No ratings') . '</span>'],
+                ['label' => __('Time spent'), 'value' => reportHours($t['seconds']) . ' h', 'sub' => '<span class="text-body-tertiary">' . __('Logged on their tickets') . '</span>'],
             ]) ?>
         <?php } ?>
 
         <?php if ($t && $t['opened'] + $t['resolved'] > 0) { ?>
             <div class="row g-3">
                 <div class="col-lg-7">
-                    <?= reportSectionOpen('Tickets over the period', '', 'h-100') ?>
+                    <?= reportSectionOpen(__('Tickets over the period'), '', 'h-100') ?>
                         <div class="card-body">
                             <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => [
-                                ['label' => 'Raised', 'data' => $t['opened_series'], 'tone' => 'accent'],
-                                ['label' => 'Resolved', 'data' => $t['resolved_series'], 'tone' => 'success'],
-                            ], 'format' => 'count'], '', 'Tickets raised and resolved over the period') ?>
+                                ['label' => __('Raised'), 'data' => $t['opened_series'], 'tone' => 'accent'],
+                                ['label' => __('Resolved'), 'data' => $t['resolved_series'], 'tone' => 'success'],
+                            ], 'format' => 'count'], '', __('Tickets raised and resolved over the period')) ?>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-5">
-                    <?= reportSectionOpen('What they were about', '', 'h-100') ?>
+                    <?= reportSectionOpen(__('What they were about'), '', 'h-100') ?>
                         <div class="card-body">
                             <?php $cats = reportTopN($t['categories'], 6); ?>
                             <?php if ($cats) { ?>
                                 <?= reportChart(['type' => 'bar', 'horizontal' => true, 'labels' => array_column($cats, 'label'),
-                                    'series' => [['label' => 'Tickets', 'data' => array_column($cats, 'value'), 'tones' => array_map(function ($i, $c) { return $c['color'] ?? reportPalette($i); }, array_keys($cats), $cats)]],
-                                    'format' => 'count', 'legend' => false], '', 'Tickets raised by category') ?>
+                                    'series' => [['label' => __('Tickets'), 'data' => array_column($cats, 'value'), 'tones' => array_map(function ($i, $c) { return $c['color'] ?? reportPalette($i); }, array_keys($cats), $cats)]],
+                                    'format' => 'count', 'legend' => false], '', __('Tickets raised by category')) ?>
                             <?php } else { ?>
-                                <?= reportEmpty('No tickets raised.', 'fa-tags', 'secondary') ?>
+                                <?= reportEmpty(__('No tickets raised.'), 'fa-tags', 'secondary') ?>
                             <?php } ?>
                         </div>
                     </div>
@@ -419,41 +417,41 @@ $header = [
 
             <div class="row g-3">
                 <div class="col-lg-6">
-                    <?= reportSectionOpen('Who raised the most', '', 'h-100') ?>
+                    <?= reportSectionOpen(__('Who raised the most'), '', 'h-100') ?>
                         <?= reportTable([
-                            'contact_name' => ['label' => 'Contact', 'html' => function ($row) use ($client_id) {
+                            'contact_name' => ['label' => __('Contact'), 'html' => function ($row) use ($client_id) {
                                 return '<a class="fw-semibold text-body" href="/agent/contact.php?client_id=' . $client_id . '&contact_id=' . intval($row['contact_id']) . '">' . escapeHtml($row['contact_name']) . '</a>'
                                     . ($row['contact_title'] ? '<div class="small text-body-secondary">' . escapeHtml($row['contact_title']) . '</div>' : '');
                             }],
-                            'n' => ['label' => 'Tickets', 'type' => 'count'],
-                        ], $t['contacts'], ['sortable' => false, 'empty' => 'No tickets had a contact.']) ?>
+                            'n' => ['label' => __('Tickets'), 'type' => 'count'],
+                        ], $t['contacts'], ['sortable' => false, 'empty' => __('No tickets had a contact.')]) ?>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <?= reportSectionOpen('Devices with the most tickets', '', 'h-100') ?>
+                    <?= reportSectionOpen(__('Devices with the most tickets'), '', 'h-100') ?>
                         <?= reportTable([
-                            'asset_name' => ['label' => 'Device', 'html' => function ($row) { return reportAssetCell($row); }],
-                            'model' => ['label' => 'Make and model', 'html' => function ($row) {
+                            'asset_name' => ['label' => __('Device'), 'html' => function ($row) { return reportAssetCell($row); }],
+                            'model' => ['label' => __('Make and model'), 'html' => function ($row) {
                                 return '<span class="small text-body-secondary">' . escapeHtml(trim($row['asset_make'] . ' ' . $row['asset_model'])) . '</span>';
                             }],
-                            'n' => ['label' => 'Tickets', 'type' => 'count'],
-                        ], $t['assets'], ['sortable' => false, 'empty' => 'No tickets were linked to a device.']) ?>
+                            'n' => ['label' => __('Tickets'), 'type' => 'count'],
+                        ], $t['assets'], ['sortable' => false, 'empty' => __('No tickets were linked to a device.')]) ?>
                     </div>
                 </div>
             </div>
 
             <?php if ($t['urgent']) { ?>
-                <?= reportSectionOpen('Urgent and high priority', reportCount(count($t['urgent'])) . ' raised in the period') ?>
+                <?= reportSectionOpen(__('Urgent and high priority'), __('%s raised in the period', reportCount(count($t['urgent'])))) ?>
                     <?= reportTable([
-                        'ticket' => ['label' => 'Ticket', 'class' => 'itflow-report-text', 'html' => function ($row) {
+                        'ticket' => ['label' => __('Ticket'), 'class' => 'itflow-report-text', 'html' => function ($row) {
                             return reportPriorityDot($row['ticket_priority']) . reportTicketLink($row);
                         }],
-                        'ticket_status_name' => ['label' => 'Status', 'html' => function ($row) {
+                        'ticket_status_name' => ['label' => __('Status'), 'html' => function ($row) {
                             return ticketStatusHtml($row['ticket_status_name'], $row['ticket_status_color'], 'detail');
                         }],
-                        'ticket_created_at' => ['label' => 'Raised', 'type' => 'date'],
-                        'took' => ['label' => 'Resolved in', 'type' => 'duration', 'html' => function ($row) {
-                            return $row['ticket_resolved_at'] ? reportDuration($row['took']) : '<span class="text-body-secondary small">Open ' . reportDuration($row['took']) . '</span>';
+                        'ticket_created_at' => ['label' => __('Raised'), 'type' => 'date'],
+                        'took' => ['label' => __('Resolved in'), 'type' => 'duration', 'html' => function ($row) {
+                            return $row['ticket_resolved_at'] ? reportDuration($row['took']) : '<span class="text-body-secondary small">' . __('Open %s', reportDuration($row['took'])) . '</span>';
                         }],
                     ], $t['urgent'], ['sortable' => false, 'limit' => 15]) ?>
                 </div>
@@ -461,19 +459,19 @@ $header = [
         <?php } ?>
 
         <?php if ($projects) { ?>
-            <?= reportSectionOpen('Projects', 'Open, and completed since the period began') ?>
+            <?= reportSectionOpen('Projects', __('Open, and completed since the period began')) ?>
                 <?= reportTable([
-                    'project_name' => ['label' => 'Project', 'class' => 'itflow-report-text', 'html' => function ($row) {
+                    'project_name' => ['label' => __('Project'), 'class' => 'itflow-report-text', 'html' => function ($row) {
                         return '<a class="fw-semibold text-body" href="/agent/' . projectUrl($row['project_id'], $row['project_client_id']) . '">' . escapeHtml($row['project_name']) . '</a>'
                             . '<div class="small text-body-secondary">' . escapeHtml(projectReference($row)) . '</div>';
                     }],
-                    'state' => ['label' => 'Status', 'html' => function ($row) {
+                    'state' => ['label' => __('Status'), 'html' => function ($row) {
                         return '<span class="d-inline-flex flex-wrap gap-1">' . projectStatePill($row) . (projectIsOpen($row) ? projectDuePill($row) : '') . '</span>';
                     }],
-                    'progress' => ['label' => 'Progress', 'html' => function ($row) use ($project_stats) {
+                    'progress' => ['label' => __('Progress'), 'html' => function ($row) use ($project_stats) {
                         return projectProgressHtml($project_stats[intval($row['project_id'])], true);
                     }],
-                    'time' => ['label' => 'Time', 'html' => function ($row) use ($project_stats) {
+                    'time' => ['label' => __('Time'), 'html' => function ($row) use ($project_stats) {
                         return projectTimeHtml($row, $project_stats[intval($row['project_id'])]);
                     }],
                 ], array_values($projects), ['sortable' => false]) ?>
@@ -481,29 +479,29 @@ $header = [
         <?php } ?>
 
         <?php if ($hw) { ?>
-            <h2 class="itflow-report-group-title mt-4 mb-2">Hardware and documentation</h2>
+            <h2 class="itflow-report-group-title mt-4 mb-2"><?= __('Hardware and documentation') ?></h2>
             <?= reportStats([
-                ['label' => 'Devices in use', 'value' => reportCount($hw['assets']), 'url' => '/agent/assets.php?client_id=' . $client_id,
+                ['label' => __('Devices in use'), 'value' => reportCount($hw['assets']), 'url' => '/agent/assets.php?client_id=' . $client_id,
                     'sub' => implode(' · ', array_map(function ($type, $n) { return escapeHtml($type) . ' <span class="text-body">' . reportCount($n) . '</span>'; },
                         array_slice(array_keys($hw['types']), 0, 3), array_slice(array_values($hw['types']), 0, 3)))],
-                ['label' => 'Average age', 'value' => $hw['average'] === null ? '-' : reportYears($hw['average'])],
-                ['label' => 'Over ' . REVIEW_OLD_YEARS . ' years old', 'value' => reportCount($hw['old']), 'tone' => $hw['old'] ? 'danger' : 'success'],
-                ['label' => 'Out of warranty', 'value' => reportCount($hw['expired']), 'tone' => $hw['expired'] ? 'warning' : '',
-                    'sub' => reportCount($hw['ending']) . ' <span class="text-body-tertiary">more within 90 days</span>'],
-                ['label' => 'Unsupported OS', 'value' => reportCount($hw['os']), 'tone' => $hw['os'] ? 'danger' : 'success'],
+                ['label' => __('Average age'), 'value' => $hw['average'] === null ? '-' : reportYears($hw['average'])],
+                ['label' => __('Over %d years old', REVIEW_OLD_YEARS), 'value' => reportCount($hw['old']), 'tone' => $hw['old'] ? 'danger' : 'success'],
+                ['label' => __('Out of warranty'), 'value' => reportCount($hw['expired']), 'tone' => $hw['expired'] ? 'warning' : '',
+                    'sub' => reportCount($hw['ending']) . ' <span class="text-body-tertiary">' . __('more within 90 days') . '</span>'],
+                ['label' => __('Unsupported OS'), 'value' => reportCount($hw['os']), 'tone' => $hw['os'] ? 'danger' : 'success'],
             ]) ?>
 
             <?php if ($hw['plan']) { ?>
-                <?= reportSectionOpen('Hardware to plan for', 'Unsupported, over ' . REVIEW_OLD_YEARS . ' years old, or the warranty ending soon') ?>
+                <?= reportSectionOpen(__('Hardware to plan for'), __('Unsupported, over %d years old, or the warranty ending soon', REVIEW_OLD_YEARS)) ?>
                     <?= reportTable([
-                        'asset_name' => ['label' => 'Device', 'html' => function ($row) { return reportAssetCell($row); }],
-                        'model' => ['label' => 'Make and model', 'html' => function ($row) {
+                        'asset_name' => ['label' => __('Device'), 'html' => function ($row) { return reportAssetCell($row); }],
+                        'model' => ['label' => __('Make and model'), 'html' => function ($row) {
                             return '<span class="text-nowrap">' . escapeHtml(trim($row['asset_make'] . ' ' . $row['asset_model'])) . '</span>';
                         }],
-                        'contact_name' => ['label' => 'Used by', 'html' => function ($row) {
+                        'contact_name' => ['label' => __('Used by'), 'html' => function ($row) {
                             return $row['contact_name'] ? escapeHtml($row['contact_name']) : '<span class="text-body-tertiary">-</span>';
                         }],
-                        'reasons' => ['label' => 'Why', 'html' => function ($row) {
+                        'reasons' => ['label' => __('Why'), 'html' => function ($row) {
                             $html = '<span class="d-inline-flex flex-wrap gap-1">';
                             foreach ($row['reasons'] as [$tone, $text]) {
                                 $html .= '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal">' . escapeHtml($text) . '</span>';
@@ -516,64 +514,64 @@ $header = [
         <?php } ?>
 
         <?php if ($itdoc && $renewals) { ?>
-            <?= reportSectionOpen('Renewals', 'Due in the next 90 days, or lapsed lately') ?>
+            <?= reportSectionOpen('Renewals', __('Due in the next 90 days, or lapsed lately')) ?>
                 <?= reportTable([
-                    'days' => ['label' => 'Due', 'html' => function ($row) { return reportDuePill($row['days'], $row['auto']); }],
-                    'name' => ['label' => 'What', 'class' => 'itflow-report-text', 'html' => function ($row) {
+                    'days' => ['label' => __('Due'), 'html' => function ($row) { return reportDuePill($row['days'], $row['auto']); }],
+                    'name' => ['label' => __('What'), 'class' => 'itflow-report-text', 'html' => function ($row) {
                         return '<div class="d-flex align-items-center gap-2">' . $row['tile'] . '<div class="min-w-0"><a class="fw-semibold text-body" href="' . escapeHtml($row['url']) . '">' . escapeHtml($row['name']) . '</a>'
                             . ($row['detail'] !== '' ? '<div class="small text-body-secondary">' . escapeHtml($row['detail']) . '</div>' : '') . '</div></div>';
                     }],
-                    'kind' => ['label' => 'Type', 'html' => function ($row) { return REPORT_RENEWAL_KINDS[$row['kind']]['one']; }],
-                    'date' => ['label' => 'Date', 'type' => 'date'],
+                    'kind' => ['label' => __('Type'), 'html' => function ($row) { return __(REPORT_RENEWAL_KINDS[$row['kind']]['one']); }], // i18n-dynamic - REPORT_RENEWAL_KINDS
+                    'date' => ['label' => __('Date'), 'type' => 'date'],
                 ], $renewals, ['sortable' => false, 'limit' => 20]) ?>
             </div>
         <?php } ?>
 
         <?php if ($services) { ?>
-            <?= reportSectionOpen('Services needing a look', reportCount(count($services)) . ' of ' . reportCount($service_count)) ?>
+            <?= reportSectionOpen(__('Services needing a look'), __('%1$s of %2$s', reportCount(count($services)), reportCount($service_count))) ?>
                 <?= reportTable([
-                    'service_name' => ['label' => 'Service', 'html' => function ($row) {
+                    'service_name' => ['label' => __('Service'), 'html' => function ($row) {
                         return '<span class="d-inline-flex align-items-center gap-2">' . serviceTile($row['service_category'], 'sm')
                             . '<a class="fw-semibold text-body" href="/agent/service.php?client_id=' . intval($row['service_client_id']) . '&service_id=' . intval($row['service_id']) . '">' . escapeHtml($row['service_name']) . '</a></span>';
                     }],
-                    'service_importance' => ['label' => 'Importance'],
-                    'review' => ['label' => 'Review', 'html' => function ($row) { return serviceReviewPill($row['review']); }],
-                    'attention' => ['label' => 'Depends on', 'html' => function ($row) {
-                        return intval($row['attention']) ? '<span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i>Something expiring or out of action</span>' : '<span class="text-body-tertiary small">All fine</span>';
+                    'service_importance' => ['label' => __('Importance')],
+                    'review' => ['label' => __('Review'), 'html' => function ($row) { return serviceReviewPill($row['review']); }],
+                    'attention' => ['label' => __('Depends on'), 'html' => function ($row) {
+                        return intval($row['attention']) ? '<span class="text-danger-emphasis small"><i class="fas fa-exclamation-triangle me-1"></i>' . __('Something expiring or out of action') . '</span>' : '<span class="text-body-tertiary small">' . __('All fine') . '</span>';
                     }],
                 ], $services, ['sortable' => false]) ?>
             </div>
         <?php } ?>
 
         <?php if ($coverage) { ?>
-            <?= reportSectionOpen('Documentation', reportPercent($coverage['score']) . ' covered - ' . $coverage['passed'] . ' of ' . $coverage['applies'] . ' checks') ?>
+            <?= reportSectionOpen(__('Documentation'), __('%1$s covered - %2$d of %3$d checks', reportPercent($coverage['score']), $coverage['passed'], $coverage['applies'])) ?>
                 <div class="card-body d-flex flex-wrap align-items-center gap-3">
                     <?php $tone = $coverage['score'] >= 90 ? 'success' : ($coverage['score'] >= 70 ? 'warning' : 'danger'); ?>
                     <div class="progress itflow-report-meter" style="width: 10rem" role="presentation"><div class="progress-bar bg-<?= $tone ?>" style="width: <?= round($coverage['score']) ?>%"></div></div>
                     <?php if ($coverage['missing']) { ?>
-                        <span class="small text-body-secondary">Missing</span>
+                        <span class="small text-body-secondary"><?= __('Missing') ?></span>
                         <?= reportCoverageMissingHtml($coverage) ?>
                     <?php } else { ?>
-                        <span class="small text-success-emphasis"><i class="fas fa-check-circle me-1"></i>Everything we check is documented</span>
+                        <span class="small text-success-emphasis"><i class="fas fa-check-circle me-1"></i><?= __('Everything we check is documented') ?></span>
                     <?php } ?>
                 </div>
             </div>
         <?php } ?>
 
         <?php if ($money) { ?>
-            <h2 class="itflow-report-group-title mt-4 mb-2">Billing</h2>
+            <h2 class="itflow-report-group-title mt-4 mb-2"><?= __('Billing') ?></h2>
             <?= reportStats([
-                ['label' => 'Invoiced', 'value' => reportMoney($money['invoiced']), 'sub' => '<span class="text-body-tertiary">In the period</span>', 'url' => '/agent/invoices.php?client_id=' . $client_id],
-                ['label' => 'Paid', 'value' => reportMoney($money['paid']), 'sub' => '<span class="text-body-tertiary">In the period</span>'],
-                ['label' => 'Balance owing', 'value' => reportMoney($money['balance']), 'tone' => $money['overdue'] > 0.004 ? 'danger' : '',
-                    'sub' => $money['overdue'] > 0.004 ? reportMoney($money['overdue']) . ' <span class="text-body-tertiary">past due</span>' : '<span class="text-body-tertiary">Nothing past due</span>'],
-                ['label' => 'Monthly recurring', 'value' => reportMoney($money['mrr']), 'sub' => reportMoney($money['mrr'] * 12) . ' <span class="text-body-tertiary">a year</span>'],
+                ['label' => __('Invoiced'), 'value' => reportMoney($money['invoiced']), 'sub' => '<span class="text-body-tertiary">' . __('In the period') . '</span>', 'url' => '/agent/invoices.php?client_id=' . $client_id],
+                ['label' => __('Paid'), 'value' => reportMoney($money['paid']), 'sub' => '<span class="text-body-tertiary">' . __('In the period') . '</span>'],
+                ['label' => __('Balance owing'), 'value' => reportMoney($money['balance']), 'tone' => $money['overdue'] > 0.004 ? 'danger' : '',
+                    'sub' => $money['overdue'] > 0.004 ? reportMoney($money['overdue']) . ' <span class="text-body-tertiary">' . __('past due') . '</span>' : '<span class="text-body-tertiary">' . __('Nothing past due') . '</span>'],
+                ['label' => __('Monthly recurring'), 'value' => reportMoney($money['mrr']), 'sub' => reportMoney($money['mrr'] * 12) . ' <span class="text-body-tertiary">' . __('a year') . '</span>'],
             ]) ?>
         <?php } ?>
 
         <p class="small text-body-secondary">
-            Times run on the clock from when a ticket was raised; "typical" is the middle ticket, so a few long ones do not skew it. The SLA counts business hours.
-            Hardware age runs from the purchase date, else the install date.
+            <?= __('Times run on the clock from when a ticket was raised; "typical" is the middle ticket, so a few long ones do not skew it. The SLA counts business hours.') ?>
+            <?= __('Hardware age runs from the purchase date, else the install date.') ?>
         </p>
 
     <?php } ?>

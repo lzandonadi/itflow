@@ -99,7 +99,7 @@ function itflowReconcile(opts) {
             cleared.textContent = balance(clearedCents);
         }
         if (ticked) {
-            ticked.textContent = (inCount + outCount) + ' ticked - ' + money(inCents) + ' in, ' + money(outCents) + ' out';
+            ticked.textContent = __('%1$d ticked - %2$s in, %3$s out', inCount + outCount, money(inCents), money(outCents));
         }
         differences.forEach(function (difference) {
             difference.textContent = money(differenceCents);
@@ -111,8 +111,8 @@ function itflowReconcile(opts) {
         }
         if (differenceNote) {
             differenceNote.textContent = differenceCents === 0
-                ? 'It balances - Finish it'
-                : (differenceCents > 0 ? 'What is ticked comes to less than the statement' : 'What is ticked comes to more than the statement');
+                ? __('It balances - Finish it')
+                : (differenceCents > 0 ? __('What is ticked comes to less than the statement') : __('What is ticked comes to more than the statement'));
         }
         finishes.forEach(function (finish) {
             finish.disabled = differenceCents !== 0 || pending > 0;
@@ -133,7 +133,7 @@ function itflowReconcile(opts) {
             });
             pending--;
             redraw();
-            itflowToast(message || 'That tick was not saved - try again.', 'error');
+            itflowToast(message || __('That tick was not saved - try again.'), 'error');
         };
         itflowPost('ajax.php', {
             reconcile_tick: 1,

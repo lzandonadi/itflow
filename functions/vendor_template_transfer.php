@@ -93,15 +93,15 @@ function vendorTemplateFileValue($field, $value, $max) {
 function vendorTemplatesImportRead($contents, &$error = '') {
     $data = is_array($contents) ? $contents : json_decode((string) $contents, true);
     if (!is_array($data) || ($data['format'] ?? '') !== VENDOR_TEMPLATE_FILE_FORMAT || !isset($data['templates']) || !is_array($data['templates'])) {
-        $error = "That isn't a vendor templates file - export one from Admin > Vendor Templates.";
+        $error = __("That isn't a vendor templates file - export one from Admin > Vendor Templates.");
         return null;
     }
     if (intval($data['version'] ?? 0) > VENDOR_TEMPLATE_FILE_VERSION) {
-        $error = 'That file was made by a newer version of ITFlow - update this one first.';
+        $error = __('That file was made by a newer version of ITFlow - update this one first.');
         return null;
     }
     if (count($data['templates']) > 1000) {
-        $error = 'That file holds more than 1000 vendor templates - split it up.';
+        $error = __('That file holds more than 1000 vendor templates - split it up.');
         return null;
     }
 
@@ -130,7 +130,7 @@ function vendorTemplatesImportRead($contents, &$error = '') {
         $templates[] = $template;
     }
     if (!$templates) {
-        $error = 'There are no vendor templates in that file.';
+        $error = __('There are no vendor templates in that file.');
         return null;
     }
     return $templates;
@@ -216,13 +216,13 @@ function vendorTemplatesImportFollowedCount(array $counts) {
 /* What an import did, in words - for its message. HTML. */
 function vendorTemplatesImportSummary(array $counts) {
     $parts = [];
-    foreach (['added' => 'added', 'replaced' => 'replaced', 'skipped' => 'already here, left as they were'] as $key => $word) {
+    foreach (['added' => _x('added', 'import count'), 'replaced' => _x('replaced', 'import count'), 'skipped' => __('already here, left as they were')] as $key => $word) {
         if ($counts[$key]) {
             $parts[] = '<strong>' . $counts[$key] . '</strong> ' . $word;
         }
     }
     $followed = vendorTemplatesImportFollowedCount($counts);
-    return ucfirst(implode(', ', $parts) ?: 'nothing brought in')
-        . ($followed ? '. <strong>' . $followed . '</strong> vendor' . ($followed === 1 ? '' : 's') . ' made from them changed with them' : '')
+    return ucfirst(implode(', ', $parts) ?: __('nothing brought in'))
+        . ($followed ? _n('. <strong>%d</strong> vendor made from them changed with them', '. <strong>%d</strong> vendors made from them changed with them', $followed) : '')
         . '.';
 }

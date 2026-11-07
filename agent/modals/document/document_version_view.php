@@ -18,7 +18,7 @@ $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT document_version_id, doc
     LEFT JOIN users ON document_version_created_by = user_id
     WHERE document_version_id = $document_version_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That version no longer exists.']);
+    echo json_encode(['error' => __('That version no longer exists.')]);
     exit;
 }
 $client_id = intval($row['document_client_id']);
@@ -37,34 +37,34 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title fw-semibold text-break"><?= escapeHtml($row['document_version_name']) ?></h5>
             <div class="small text-body-secondary mt-1">
-                Version of <?= date('M j, Y g:ia', strtotime($row['document_version_created_at'])) ?><?= $row['user_name'] ? ' by ' . escapeHtml($row['user_name']) : '' ?>
+                <?= $row['user_name'] ? __('Version of %1$s by %2$s', formatDate($row['document_version_created_at'], 'datetime'), escapeHtml($row['user_name'])) : __('Version of %s', formatDate($row['document_version_created_at'], 'datetime')) ?>
                 <?php if ($row['document_version_description']) { ?> &middot; <?= escapeHtml($row['document_version_description']) ?><?php } ?>
             </div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
-    <div class="prettyContent itflow-document-quick-content"><?= documentHtmlPurify($row['document_version_content']) ?: '<p class="text-body-secondary mb-0">This version was empty.</p>' ?></div>
+    <div class="prettyContent itflow-document-quick-content"><?= documentHtmlPurify($row['document_version_content']) ?: '<p class="text-body-secondary mb-0">' . __('This version was empty.') . '</p>' ?></div>
 </div>
 
 <div class="modal-footer">
     <?php if ($can_delete) { ?>
-        <a class="btn btn-outline-danger confirm-link me-auto" href="post.php?delete_document_version=<?= $document_version_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="This version is removed from the history for good.">
-            <i class="fas fa-trash me-2"></i>Delete version
+        <a class="btn btn-outline-danger confirm-link me-auto" href="post.php?delete_document_version=<?= $document_version_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" data-confirm-text="<?= escapeHtml(__('This version is removed from the history for good.')) ?>">
+            <i class="fas fa-trash me-2"></i><?= __('Delete version') ?>
         </a>
     <?php } ?>
     <?php if ($can_edit) { ?>
         <form action="post.php" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
             <input type="hidden" name="document_version_id" value="<?= $document_version_id ?>">
-            <button type="submit" name="restore_document_version" class="btn btn-primary text-bold confirm-link" data-confirm-title="Put this version back?" data-confirm-text="What the document says now is kept in its history." data-confirm-button="Restore">
-                <i class="fas fa-undo me-2"></i>Restore this version
+            <button type="submit" name="restore_document_version" class="btn btn-primary text-bold confirm-link" data-confirm-title="<?= escapeHtml(__('Put this version back?')) ?>" data-confirm-text="<?= escapeHtml(__('What the document says now is kept in its history.')) ?>" data-confirm-button="<?= escapeHtml(__('Restore')) ?>">
+                <i class="fas fa-undo me-2"></i><?= __('Restore this version') ?>
             </button>
         </form>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <script src="../js/pretty_content.js"></script>
