@@ -7,11 +7,11 @@ Define quem pode abrir e alterar o quê na área do técnico e na administraçã
 ## ADDED Requirements
 
 ### Requirement: Níveis de permissão por módulo
-O sistema SHALL controlar o acesso do técnico por papel, com um nível por módulo: nenhum, leitura, modificação (adicionar, editar, arquivar e o trabalho do dia a dia) ou completo (inclui excluir). Os módulos são clientes, suporte, vendas, financeiro, credenciais e relatórios.
+O sistema SHALL controlar o acesso do técnico por papel, com um nível por módulo: nenhum, leitura, modificação (adicionar, editar, arquivar e o trabalho do dia a dia) ou completo (inclui excluir). Os módulos são clientes, suporte, vendas, financeiro, credenciais, relatórios e IA. Um papel sem nível em um módulo não abre esse módulo. Os níveis valem para todas as formas de acesso: telas, janelas, chamadas internas da interface e API.
 
 #### Scenario: Técnico só com leitura em vendas
 - **WHEN** um técnico cujo papel tem leitura em vendas tenta editar um orçamento
-- **THEN** a ação é recusada com a mensagem de permissão negada e nada é gravado
+- **THEN** a ação é recusada com uma mensagem que diz que o papel só pode ver vendas, e nada é gravado
 
 #### Scenario: Exclusão exige nível completo
 - **WHEN** um técnico com nível de modificação em suporte tenta excluir um chamado
@@ -26,14 +26,22 @@ O sistema SHALL dar ao papel de administrador acesso a todos os módulos, a todo
 
 #### Scenario: Técnico comum envia formulário de administração
 - **WHEN** um técnico sem papel de administrador envia diretamente uma requisição de alteração de configuração
-- **THEN** nenhum handler de administração é executado e a configuração não muda
+- **THEN** nenhum handler de administração é executado, a configuração não muda e a requisição fica registrada no app log como não tratada
 
 ### Requirement: Restrição de técnicos a clientes
-O sistema SHALL permitir restringir um técnico a um subconjunto de clientes. Um técnico restrito não SHALL ver nem alterar registros de clientes fora do seu conjunto, em listas, buscas, exportações, na API ou abrindo um registro pelo ID na URL.
+O sistema SHALL permitir restringir um técnico a clientes por duas listas: uma de clientes liberados (quando existe, o técnico só acessa os clientes dela) e uma de clientes bloqueados (que o técnico nunca acessa, mesmo que também estejam liberados). Um técnico sem nenhuma das listas acessa todos os clientes. Administradores não são restringidos. Um técnico restrito não SHALL ver nem alterar registros de clientes fora do seu conjunto, em listas, buscas, exportações, na API ou abrindo um registro pelo ID na URL.
 
 #### Scenario: ID de outro cliente na URL
 - **WHEN** um técnico restrito ao cliente A abre a URL de um ativo do cliente B
-- **THEN** o acesso é negado
+- **THEN** o acesso é negado, ele volta para a lista de clientes e a tentativa fica registrada no audit log
+
+#### Scenario: Cliente bloqueado e liberado ao mesmo tempo
+- **WHEN** um cliente está nas duas listas de um técnico
+- **THEN** o técnico não acessa esse cliente
+
+#### Scenario: Chave de API de um técnico restrito
+- **WHEN** uma chave de API pertencente a um técnico restrito ao cliente A lista ativos
+- **THEN** a resposta traz apenas ativos do cliente A e de nenhum cliente, mesmo que a chamada peça outro cliente pelo filtro
 
 #### Scenario: Lista de despesas
 - **WHEN** um técnico restrito ao cliente A abre a lista de despesas
@@ -51,7 +59,7 @@ O sistema SHALL recusar toda ação que altera estado, seja por formulário ou p
 
 #### Scenario: Formulário vindo de outro site
 - **WHEN** uma página externa envia um POST de exclusão para o ITFlow usando a sessão do técnico, sem o token
-- **THEN** a ação é recusada e nada é alterado
+- **THEN** a resposta é 403 com a explicação de que o token não foi verificado, e nada é alterado
 
 ### Requirement: Ações de alteração deixam rastro
 O sistema SHALL registrar no audit log as alterações de estado feitas por técnicos e administradores, com o tipo, a ação, a descrição, o cliente e o registro afetado.

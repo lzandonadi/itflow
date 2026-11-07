@@ -4,11 +4,11 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 
 ## 1. Preparação
 
-- [ ] 1.1 Concluir o setup do ambiente DDEV e carregar dados de exemplo (clientes, contatos, chamados, faturas, contrato) para reproduzir os cenários; verificar logando como admin e como técnico restrito a um cliente
+- [x] 1.1 Concluir o setup do ambiente DDEV e carregar dados de exemplo (clientes, contatos, chamados, faturas, contrato) para reproduzir os cenários; verificar logando como admin e como técnico restrito a um cliente
 
 ## 2. Plataforma e segurança
 
-- [ ] 2.1 Verificar e completar `access-control`: níveis por módulo, gate do admin, `clientScopeSql`/`enforceClientAccess`, CSRF, audit; reproduzir no navegador "ID de outro cliente na URL" e "técnico só com leitura"
+- [x] 2.1 Verificar e completar `access-control`: níveis por módulo, gate do admin, `clientScopeSql`/`enforceClientAccess`, CSRF, audit; reproduzir no navegador "ID de outro cliente na URL" e "técnico só com leitura"
 - [ ] 2.2 Verificar e completar `client-portal-access`: perfis de contato, "View as contact", MFA do portal; reproduzir com um contato só técnico abrindo faturas
 - [ ] 2.3 Verificar e completar `scheduled-jobs`: registro, reivindicação, bloqueio, Run Now, interruptor geral, `interval_safe`; verificar com `ddev exec php cron/cron.php` e com o interruptor desligado
 - [ ] 2.4 Verificar e completar `backups`: criptografia, pendente via cron, validações da restauração, retenção; verificar gerando um backup com `ddev exec php cron/backup.php` e restaurando com `scripts/restore_cli.php` em um snapshot (`ddev snapshot`)
