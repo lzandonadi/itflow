@@ -11,7 +11,7 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 - [x] 2.1 Verificar e completar `access-control`: níveis por módulo, gate do admin, `clientScopeSql`/`enforceClientAccess`, CSRF, audit; reproduzir no navegador "ID de outro cliente na URL" e "técnico só com leitura"
 - [x] 2.2 Verificar e completar `client-portal-access`: perfis de contato, "View as contact", MFA do portal; reproduzir com um contato só técnico abrindo faturas
 - [x] 2.3 Verificar e completar `scheduled-jobs`: registro, reivindicação, bloqueio, Run Now, interruptor geral, `interval_safe`; verificar com `ddev exec php cron/cron.php` e com o interruptor desligado
-- [ ] 2.4 Verificar e completar `backups`: criptografia, pendente via cron, validações da restauração, retenção; verificar gerando um backup com `ddev exec php cron/backup.php` e restaurando com `scripts/restore_cli.php` em um snapshot (`ddev snapshot`)
+- [x] 2.4 Verificar e completar `backups`: criptografia, pendente via cron, validações da restauração, retenção; verificar gerando um backup com `ddev exec php cron/backup.php` e restaurando com `scripts/restore_cli.php` em um snapshot (`ddev snapshot`)
 - [ ] 2.5 Verificar e completar `software-updates`: verificação, fila, migrações sequenciais com retomada; verificar o comportamento de retomada lendo `admin/database_updates.php` e rodando a tela de update em uma base atualizada
 
 ## 3. Dinheiro
@@ -34,6 +34,8 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 ## Achados
 
 <!-- Divergências encontradas durante a verificação: comportamento atual × esperado, arquivo:linha, e se merece change própria. -->
+
+- **backups: download direto de backup responde 500, não 403.** O guarda de `uploads/` (`BACKUP_UPLOADS_DENY_GUARD`, `functions/backup.php:20`, e `uploads/.htaccess`) usa `php_flag engine off`, que o Apache só entende com mod_php. Com PHP-FPM (DDEV, e a maioria das instalações novas) a diretiva derruba o `.htaccess` inteiro com erro 500. O arquivo continua protegido, mas por acidente: as demais regras do mesmo `.htaccess` (`Require all denied`, `-Indexes`) não chegam a ser aplicadas por causa do erro. Merece change própria: envolver `php_flag` em `<IfModule mod_php.c>`.
 
 ## Workflow follow-up
 
