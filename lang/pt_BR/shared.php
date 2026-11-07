@@ -107,7 +107,6 @@ return [
     'Archived' => 'Arquivado',
     'New Ticket' => 'Novo chamado',
     'New Project' => 'Novo projeto',
-    'Add Credit' => 'Adicionar crédito',
     'Ending or renewing soon' => 'Vencendo ou renovando em breve',
     'In force' => 'Em vigor',
     'Nothing to see here' => 'Nada para ver aqui',

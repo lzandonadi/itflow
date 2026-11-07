@@ -172,12 +172,6 @@ if (isset($_GET['client_id'])) {
         $num_unbilled_expenses = lookupUserPermission('module_financial') >= 1 ? expenseUnbilledCount($client_id)['count'] : 0;
         $num_unbilled_trips = lookupUserPermission('module_financial') >= 1 ? tripUnbilledCount($client_id)['count'] : 0;
 
-        // Get Credit Balance
-        $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT COALESCE(SUM(credit_amount), 0) AS credit_balance
-            FROM credits WHERE credit_client_id = $client_id"));
-
-        $credit_balance = floatval($row['credit_balance']);
-
         // Tickets - active and closed in one pass.
         $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT
             COALESCE(SUM(ticket_closed_at IS NULL AND ticket_status != 4), 0) AS num_active_tickets,

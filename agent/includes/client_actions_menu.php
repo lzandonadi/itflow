@@ -27,14 +27,6 @@
             <i class="fas fa-fw fa-route me-2"></i><?= ['none' => __('Onboard'), 'open' => __('Carry on onboarding'), 'finished' => __('Onboarding')][$client_onboarding_state] ?>
         </a>
     <?php } ?>
-    <?php if (lookupUserPermission("module_billing") >= 2) { ?>
-        <?php if ($show_add_credit) { ?>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addCreditModal">
-            <i class="fas fa-fw fa-wallet me-2"></i><?= __('Add Credit') ?>
-        </a>
-        <?php } ?>
-    <?php } ?>
     <?php if (lookupUserPermission("module_client") >= 1) { ?>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/client/client_export_data.php?client_id=<?= $client_id ?>" data-modal-size="lg">

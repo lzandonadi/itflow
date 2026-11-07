@@ -3386,19 +3386,6 @@ function demoBuildBilling($mysqli, $profile, $index, $client_id, $vendor_id, $mo
         $counts['billing']++;
     }
 
-    // Block hours bought up front leave a balance on the account
-    if ($profile['billing'] === 'break_fix') {
-        starterInsert($mysqli, 'credits', [
-            'credit_amount' => number_format(500.00, 2, '.', ''),
-            'credit_type' => 'prepaid',
-            'credit_note' => 'Remaining balance from the prepaid block of hours.',
-            'credit_created_by' => $context['user_id'],
-            'credit_client_id' => $client_id,
-            'credit_created_at' => demoMonthDateTime(min(6, $months), 22, 10, 20),
-        ]);
-        $counts['billing']++;
-    }
-
 }
 
 // ------------------------------

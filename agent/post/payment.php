@@ -1,11 +1,10 @@
 <?php
 
 /*
- * ITFlow - GET/POST request handler for credits & payments
+ * ITFlow - GET/POST request handler for payments
  *
  * Payments are accounting work - Financial, with Sales at Read to see the
- * invoices (billingMoneyCan()). Credits keep their old checks until the
- * feature is finished.
+ * invoices (billingMoneyCan()).
  */
 
 defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
@@ -147,119 +146,6 @@ if (isset($_POST['edit_payment'])) {
     redirect();
 
 }
-
-/*
-Apply Credit Not ready for use 2025-08-27 - JQ
-
-if (isset($_POST['apply_credit'])) {
-
-    validateCSRFToken();
-
-    enforceUserPermission('module_sales', 2);
-    enforceUserPermission('module_financial', 2);
-
-    $invoice_id = intval($_POST['invoice_id']);
-    $credit_amount_applied = floatval($_POST['credit_amount_applied']);
-
-    $sql = mysqli_query($mysqli, "SELECT invoice_client_id, invoice_credit_amount, invoice_number, invoice_prefix, invoice_status FROM invoices LEFT JOIN clients ON invoice_client_id = client_id WHERE invoice_id = $invoice_id");
-    $row = mysqli_fetch_assoc($sql);
-
-    $invoice_prefix = escapeSql($row['invoice_prefix']);
-    $invoice_number = intval($row['invoice_number']);
-    $invoice_status = escapeSql($row['invoice_status']);
-    $invoice_credit_amount = floatval($row['invoice_credit_amount']);
-    $invoice_amount = floatval('invoice_amount');
-    $client_id = intval($row['invoice_client_id']);
-
-    enforceClientAccess();
-
-    // Get Credit Balance
-    $sql_credit_balance = mysqli_query($mysqli, "SELECT SUM(credit_amount) AS credit_balance FROM credits WHERE credit_client_id = $client_id");
-    $row = mysqli_fetch_assoc($sql_credit_balance);
-
-    $credit_balance = floatval($row['credit_balance']);
-
-    // Get Invoice Balance
-    $sql_amount_paid = mysqli_query($mysqli, "SELECT SUM(payment_amount) AS amount_paid FROM payments WHERE payment_invoice_id = $invoice_id");
-    $row = mysqli_fetch_assoc($sql_amount_paid);
-    $amount_paid = floatval($row['amount_paid']);
-
-    $invoice_balance = $invoice_amount - $amount_paid;
-
-    // Get Credit Tally applied to invoice
-    $sql_credit_tally = mysqli_query($mysqli, "SELECT SUM(credit_tally) AS credit_balance FROM credits WHERE credit_invoice_id = $invoice_id");
-    $row = mysqli_fetch_assoc($sql_credit_tally);
-
-    $credit_tally = floatval($row['credit_tally']);
-
-    // Check to see if amount entered is greater than the balance of the invoice
-    if ($credit_amount_applied > $invoice_balance) {
-        flashAlert("Credit can not be more than the balance", 'alert');
-        redirect();
-    }
-
-    // Check to see if amount entered is greater than the credit balance
-    if ($credit_amount_applied > $credit_balance) {
-        flashAlert("Credit can not be more than the available credit", 'alert');
-        redirect();
-    }
-
-    // Insert a new credit usage record linked to the invoice
-    mysqli_query($mysqli, "
-        INSERT INTO credits SET
-            credit_amount = -$amount,
-            credit_type = 'usage',
-            credit_created_by = $session_user_id,
-            credit_client_id = $client_id,
-            credit_invoice_id = $invoice_id
-    ");
-
-    $new_invoice_amount = $invoice_amount - $credit_amount_applied;
-
-    // Calculate updated invoice credit sum
-    $result = mysqli_query($mysqli, "
-        SELECT SUM(credit_amount) AS credit_total
-        FROM credits
-        WHERE credit_invoice_id = $invoice_id
-    ");
-    $total_credit_applied = floatval(mysqli_fetch_assoc($result)['credit_total']);
-
-    // Get invoice amount
-    $invoice_amount = floatval(getFieldByID('invoices', $invoice_id, 'invoice_amount'));
-
-    // Determine new status
-    $invoice_due = $invoice_amount + $total_credit_applied;
-    $invoice_status = ($invoice_due <= 0) ? 'Paid' : 'Partial';
-
-    // Update the invoice credit amount
-    mysqli_query($mysqli, "
-        UPDATE invoices
-        SET invoice_credit_amount = $total_credit_applied
-        WHERE invoice_id = $invoice_id
-    ");
-
-    // Update invoice status only (not invoice_credit_amount)
-    mysqli_query($mysqli, "UPDATE invoices SET invoice_status = '$invoice_status' WHERE invoice_id = $invoice_id");
-
-    // Log credit application in history
-    mysqli_query($mysqli, "
-        INSERT INTO history SET
-            history_status = '$invoice_status',
-            history_description = 'Credit applied',
-            history_invoice_id = $invoice_id
-    ");
-
-    logAudit("Invoice", "Payment", "Credit " . numfmt_format_currency($currency_format, $amount, $session_company_currency) . " applied to invoice $invoice_prefix$invoice_number", $client_id, $invoice_id);
-
-    triggerCustomAction('invoice_pay', $invoice_id);
-
-    flashAlert("Credit amount <strong>" . numfmt_format_currency($currency_format, $amount, $session_company_currency) . "</strong> applied");
-
-    redirect();
-
-}
-
-*/
 
 if (isset($_POST['add_payment_stripe'])) {
 
