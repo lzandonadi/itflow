@@ -90,7 +90,7 @@ O sistema SHALL enviar todo mês, no dia definido nas configurações de fatura,
 - **THEN** cada cliente com saldo recebe o extrato e clientes sem saldo não recebem
 
 ### Requirement: Mudança manual de status respeita o status atual
-O sistema SHALL aceitar uma mudança manual de status de fatura só a partir dos status em que a tela a oferece: cancelar a partir de Draft, Sent, Viewed ou Partial; marcar como Non-Billable a partir de Sent ou Viewed com total zero; marcar como enviada a partir de Draft; registrar pagamento ou aplicar crédito a partir de Sent, Viewed ou Partial com saldo. Uma ação fora dessas regras SHALL ser recusada sem mudar status, histórico, estoque ou pagamentos, com um aviso de erro.
+O sistema SHALL aceitar uma mudança manual de status de fatura só a partir dos status em que a tela a oferece: cancelar a partir de Draft, Sent, Viewed ou Partial; marcar como Non-Billable a partir de Sent ou Viewed com total zero; marcar como enviada a partir de Draft; registrar pagamento a partir de Sent, Viewed ou Partial com saldo. Uma ação fora dessas regras SHALL ser recusada sem mudar status, histórico, estoque ou pagamentos, com um aviso de erro.
 
 #### Scenario: Cancelar uma fatura paga por link montado à mão
 - **WHEN** um técnico com permissão de edição abre o endereço de cancelamento de uma fatura Paid
@@ -134,3 +134,22 @@ O sistema SHALL conferir um pagamento manual contra o saldo que ele mesmo calcul
 #### Scenario: Edição que passaria do saldo
 - **WHEN** um pagamento de 40,00 numa fatura de 100,00 com 60,00 de saldo é editado para 120,00
 - **THEN** o pagamento continua com 40,00 e a edição é recusada com um aviso de erro; editar para 100,00 é aceito e a fatura passa a Paid
+
+### Requirement: Crédito de cliente não é criado nem aplicado
+O sistema não SHALL oferecer nem aceitar a criação de crédito de cliente nem a aplicação de crédito em fatura, por nenhuma tela ou pedido. Créditos gravados por versões anteriores SHALL continuar guardados e aparecer na exportação de dados do cliente, e uma fatura que tenha crédito aplicado SHALL continuar mostrando a linha de crédito no total.
+
+#### Scenario: Pedido de crédito montado à mão
+- **WHEN** um técnico com permissão de vendas envia um pedido de criação de crédito para um cliente
+- **THEN** nenhum crédito é gravado e o pedido fica registrado no log da aplicação como pedido não tratado
+
+#### Scenario: Endereço do antigo formulário de aplicar crédito
+- **WHEN** alguém abre o endereço do antigo formulário de aplicar crédito numa fatura
+- **THEN** o formulário não existe mais e nada muda na fatura
+
+#### Scenario: Página do cliente
+- **WHEN** um técnico abre a página de um cliente
+- **THEN** o menu de ações não oferece adicionar crédito
+
+#### Scenario: Crédito de uma versão anterior
+- **WHEN** um cliente tem um crédito gravado antes desta versão e uma fatura com crédito aplicado
+- **THEN** o crédito aparece na exportação de dados do cliente e a fatura mostra a linha de crédito no total, na impressão e no PDF
