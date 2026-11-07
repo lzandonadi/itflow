@@ -27,7 +27,7 @@ O sistema SHALL recusar um pagamento por cartão cujo valor atinja o limite conf
 - **THEN** o pagamento não é iniciado e o portal pede para pagar menos faturas de uma vez ou pagar de outra forma
 
 ### Requirement: Cobrança automática no vencimento
-O sistema SHALL cobrar automaticamente, no dia do vencimento, as faturas Sent ou Viewed geradas por uma fatura recorrente que tem cobrança automática configurada. Um cartão recusado no dia não SHALL ser cobrado de novo no mesmo dia.
+O sistema SHALL cobrar automaticamente, no dia do vencimento, as faturas Sent ou Viewed geradas por uma fatura recorrente que tem cobrança automática configurada com um cartão salvo do cliente. Um cartão recusado no dia não SHALL ser cobrado de novo no mesmo dia. Sem cobrança efetiva no provedor, o sistema não SHALL registrar pagamento: a fatura continua em aberto, a falha entra no histórico da fatura e no audit log, e a equipe é avisada uma vez por dia.
 
 #### Scenario: Cobrança aprovada
 - **WHEN** a tarefa noturna roda no vencimento de uma fatura com cobrança automática
@@ -35,15 +35,19 @@ O sistema SHALL cobrar automaticamente, no dia do vencimento, as faturas Sent ou
 
 #### Scenario: Cartão recusado e tarefa roda de novo
 - **WHEN** o cartão foi recusado e a tarefa noturna roda outra vez no mesmo dia
-- **THEN** não há nova tentativa de cobrança
+- **THEN** não há nova tentativa de cobrança nem novo aviso à equipe
 
 #### Scenario: Cobrança automática sem cartão
-- **WHEN** a cobrança automática de uma recorrência está configurada sem cartão salvo, só com conta e forma de pagamento
-- **THEN** no vencimento a fatura recebe um pagamento com essa forma de pagamento e fica paga, sem nenhuma cobrança externa
+- **WHEN** a cobrança automática de uma recorrência está configurada sem cartão salvo, só com conta e forma de pagamento, como nas versões antigas
+- **THEN** no vencimento nenhum pagamento é registrado, a fatura continua em aberto e a equipe é avisada de que a cobrança não aconteceu
 
 #### Scenario: Cartão removido ou provedor desligado
 - **WHEN** o cartão da cobrança automática não está mais salvo ou o provedor foi desligado
-- **THEN** nada é cobrado e a falha fica registrada no audit log da fatura
+- **THEN** nada é cobrado nem registrado como pagamento, a falha fica no histórico e no audit log da fatura e a equipe é avisada
+
+#### Scenario: Dados do provedor incompletos
+- **WHEN** o cartão existe, mas falta ao provedor o que ele precisa para cobrar, como a chave do provedor ou o cadastro do cliente no Stripe
+- **THEN** nada é cobrado nem registrado como pagamento, a falha fica no histórico e no audit log da fatura e a equipe é avisada
 
 ### Requirement: Taxas do provedor registradas como despesa
 O sistema SHALL registrar como despesa a taxa cobrada pelo Stripe em cada pagamento por cartão, depois que o Stripe liquidar o pagamento, por uma tarefa que roda a cada poucos minutos. Cada taxa SHALL ser registrada uma única vez, mesmo quando o registro manual é usado ao mesmo tempo.
