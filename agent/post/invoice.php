@@ -171,7 +171,7 @@ if (isset($_POST['mark_invoice_sent'])) {
     $invoice_id = intval($_POST['invoice_id']);
 
     // Get Invoice Number and Prefix and Client ID for Logging
-    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
+    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id, invoice_status FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
         flashAlert(__('That invoice no longer exists.'), 'error');
@@ -182,6 +182,12 @@ if (isset($_POST['mark_invoice_sent'])) {
     $client_id = intval($row['invoice_client_id']);
 
     enforceClientAccess();
+
+    // Only from where the invoice page offers it - not from a hand-made link or a stale tab
+    if (!invoiceCanMarkSent($row['invoice_status'])) {
+        flashAlert(__('Invoice %s is no longer in a status that allows this.', '<strong>' . escapeHtml($row['invoice_prefix'] . $row['invoice_number']) . '</strong>'), 'error');
+        redirect();
+    }
 
     // The modal offers a fixed list, so anything else is a tampered form
     $sent_method = $_POST['sent_method'] ?? '';
@@ -219,7 +225,7 @@ if (isset($_GET['mark_invoice_non-billable'])) {
     $invoice_id = intval($_GET['mark_invoice_non-billable']);
 
     // Get Invoice Number and Prefix and Client ID for Logging
-    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
+    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id, invoice_status, invoice_amount FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
         flashAlert(__('That invoice no longer exists.'), 'error');
@@ -230,6 +236,12 @@ if (isset($_GET['mark_invoice_non-billable'])) {
     $client_id = intval($row['invoice_client_id']);
 
     enforceClientAccess();
+
+    // Only from where the invoice page offers it - not from a hand-made link or a stale tab
+    if (!invoiceCanMarkNonBillable($row)) {
+        flashAlert(__('Invoice %s is no longer in a status that allows this.', '<strong>' . escapeHtml($row['invoice_prefix'] . $row['invoice_number']) . '</strong>'), 'error');
+        redirect();
+    }
 
     mysqli_query($mysqli,"UPDATE invoices SET invoice_status = 'Non-Billable' WHERE invoice_id = $invoice_id");
 
@@ -252,7 +264,7 @@ if (isset($_GET['cancel_invoice'])) {
     $invoice_id = intval($_GET['cancel_invoice']);
 
     // Get Invoice Number and Prefix and Client ID for Logging
-    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id FROM invoices WHERE invoice_id = $invoice_id");
+    $sql = mysqli_query($mysqli,"SELECT invoice_prefix, invoice_number, invoice_client_id, invoice_status FROM invoices WHERE invoice_id = $invoice_id");
     $row = mysqli_fetch_assoc($sql);
     if (!$row) {
         flashAlert(__('That invoice no longer exists.'), 'error');
@@ -263,6 +275,12 @@ if (isset($_GET['cancel_invoice'])) {
     $client_id = intval($row['invoice_client_id']);
 
     enforceClientAccess();
+
+    // Only from where the invoice page offers it - not from a hand-made link or a stale tab
+    if (!invoiceCanCancel($row['invoice_status'])) {
+        flashAlert(__('Invoice %s is no longer in a status that allows this.', '<strong>' . escapeHtml($row['invoice_prefix'] . $row['invoice_number']) . '</strong>'), 'error');
+        redirect();
+    }
 
     mysqli_query($mysqli,"UPDATE invoices SET invoice_status = 'Cancelled' WHERE invoice_id = $invoice_id");
 

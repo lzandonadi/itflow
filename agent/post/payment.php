@@ -30,6 +30,18 @@ if (isset($_POST['add_payment'])) {
 
     enforceClientAccess();
 
+    // Only an open invoice with something owed takes a payment - as the invoice page offers it
+    $pay_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT invoice_prefix, invoice_number, invoice_status, invoice_amount, invoice_due FROM invoices WHERE invoice_id = $invoice_id"));
+    if (!$pay_row) {
+        flashAlert(__('That invoice no longer exists.'), 'error');
+        redirect();
+    }
+    $pay_paid = floatval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT SUM(payment_amount) FROM payments WHERE payment_invoice_id = $invoice_id"))[0]);
+    if (!invoiceCanPay($pay_row, invoiceState($pay_row, $pay_paid))) {
+        flashAlert(__('Invoice %s is no longer in a status that allows this.', '<strong>' . escapeHtml($pay_row['invoice_prefix'] . $pay_row['invoice_number']) . '</strong>'), 'error');
+        redirect();
+    }
+
     //Check to see if amount entered is greater than the balance of the invoice
     if ($amount > $balance) {
         flashAlert(__('Payment can not be more than the balance'), 'error');

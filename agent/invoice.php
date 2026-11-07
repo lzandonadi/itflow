@@ -153,7 +153,7 @@ $paper = [
         </div>
 
         <div class="d-flex flex-wrap gap-2">
-            <?php if ($can_edit && $status === 'Draft') { ?>
+            <?php if ($can_edit && invoiceCanMarkSent($status)) { ?>
                 <div class="btn-group">
                     <?php if ($mail_ready) { ?>
                         <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/invoice/invoice_email.php?invoice_id=<?= $invoice_id ?>">
@@ -199,7 +199,7 @@ $paper = [
                 </button>
             <?php } ?>
 
-            <?php if ($can_edit && in_array($status, ['Sent', 'Viewed'], true) && floatval($invoice['invoice_amount']) == 0) { ?>
+            <?php if ($can_edit && invoiceCanMarkNonBillable($invoice)) { ?>
                 <a class="btn btn-outline-dark confirm-link" href="post.php?mark_invoice_non-billable=<?= $invoice_id ?>&csrf_token=<?= $csrf ?>"
                     data-confirm-text="<?= __('Nothing is owed on it - it is closed off as non-billable.') ?>">
                     <i class="fas fa-ban me-2"></i><?= __('Non-Billable') ?>
@@ -251,7 +251,7 @@ $paper = [
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/invoice/invoice_recurring_add.php?invoice_id=<?= $invoice_id ?>">
                             <i class="fas fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Make Recurring') ?>
                         </a>
-                        <?php if (!in_array($status, ['Cancelled', 'Paid', 'Non-Billable'], true)) { ?>
+                        <?php if (invoiceCanCancel($status)) { ?>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item text-danger confirm-link" href="post.php?cancel_invoice=<?= $invoice_id ?>&csrf_token=<?= $csrf ?>"
                                 data-confirm-text="<?= __('%s is cancelled - nothing more is owed on it. It stays on record.', escapeHtml($number)) ?>">

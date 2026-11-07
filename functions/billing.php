@@ -842,8 +842,26 @@ function enforceBillingMoney($action) {
         : permissionRefusedText('module_financial', $rule[0], intval(lookupUserPermission('module_financial'))));
 }
 
+/*
+ * Which manual status changes an invoice allows from where it stands. The invoice page
+ * offers each button by these, and the handlers refuse by the same ones - a hand-made
+ * link or a stale tab must not do what the page would not offer.
+ */
 function invoiceCanPay($row, $state) {
     return in_array($row['invoice_status'], invoiceOpenStatuses(), true) && $state['balance'] > 0;
+}
+
+function invoiceCanCancel($status) {
+    return in_array((string) $status, ['Draft', 'Sent', 'Viewed', 'Partial'], true);
+}
+
+/** Only a sent invoice with nothing on it can be closed off as non-billable. */
+function invoiceCanMarkNonBillable($row) {
+    return in_array((string) $row['invoice_status'], ['Sent', 'Viewed'], true) && floatval($row['invoice_amount']) == 0;
+}
+
+function invoiceCanMarkSent($status) {
+    return (string) $status === 'Draft';
 }
 
 /** Does the client have a card on file with an active provider, to charge from the invoice? */

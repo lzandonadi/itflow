@@ -10,7 +10,7 @@ Ver proposal.md, "Why". Onde o status de uma fatura muda hoje:
 | Non-Billable (`agent/post/invoice.php:213`) | Sent ou Viewed com total zero (`agent/invoice.php:202`) | nenhuma |
 | Marcar como enviada (`agent/post/invoice.php:165`, `mark_invoice_sent`) | só Draft (`agent/invoice.php:156`) | nenhuma; uma fatura Paid ou Cancelled volta para Sent |
 | Registrar pagamento (`agent/post/payment.php:13`, `add_payment`) | `invoiceCanPay()`: Sent, Viewed ou Partial com saldo | nenhuma de status; o saldo comparado vem do próprio formulário |
-| Aplicar crédito (`agent/post/payment.php:130`, `apply_credit`) | o modal `invoice_apply_credit.php` não é aberto por nenhuma tela | nenhuma de status |
+| Aplicar crédito (`agent/post/payment.php:127-238`, `apply_credit`) | o modal `invoice_apply_credit.php` não é aberto por nenhuma tela | o handler inteiro está comentado ("Not ready for use 2025-08-27"), então nenhum crédito pode ser aplicado; um POST com `apply_credit` não é tratado |
 | Envio por e-mail (`agent/post/invoice.php:422`) | — | só um Draft vira Sent |
 | Pagamento em lote (`agent/post/payment.php:399`) | — | filtra Sent, Viewed, Partial |
 | Cartão salvo pela tela (`agent/post/payment.php:240`) | — | só Sent ou Viewed (`:310`) |
@@ -37,7 +37,7 @@ Não há ação de status em lote para faturas (o único `bulk_*` de fatura troc
 ## Decisions
 
 ### D1. Funções de regra em `functions/billing.php`, usadas pela tela e pelos handlers
-`invoiceCanCancel($status)`, `invoiceCanMarkNonBillable($row)` e `invoiceCanMarkSent($status)`, ao lado de `invoiceCanPay($row, $state)`, que já existe e passa a ser usada também por `add_payment` e `apply_credit`. `agent/invoice.php` troca as condições escritas nas linhas dos botões por essas funções.
+`invoiceCanCancel($status)`, `invoiceCanMarkNonBillable($row)` e `invoiceCanMarkSent($status)`, ao lado de `invoiceCanPay($row, $state)`, que já existe e passa a ser usada também por `add_payment`. Na implementação se viu que `apply_credit` está comentado, então não há o que proteger; quando a ação for terminada, ela deve usar `invoiceCanPay()`. `agent/invoice.php` troca as condições escritas nas linhas dos botões por essas funções.
 - *Por quê:* o defeito é a regra existir só na tela. Com uma função só, mudar a regra muda os dois lados.
 - *Alternativa descartada:* repetir a lista de status em cada handler. Corrige agora, mas é a mesma duplicação que deixou os handlers sem regra.
 

@@ -106,6 +106,7 @@ return [
 
     // agent/modals/invoice - the invoice windows
     'That invoice no longer exists.' => 'Essa fatura não existe mais.',
+    'Invoice %s is no longer in a status that allows this.' => 'A fatura %s não está mais num status que permita isso.',
     'Edit Invoice' => 'Editar fatura',
     'Copy Invoice' => 'Copiar fatura',
     'A new draft for %2$s with the same %1$d line, scope, discount and notes - %3$s.' => ['Um novo rascunho para %2$s com a mesma %1$d linha, escopo, desconto e notas - %3$s.', 'Um novo rascunho para %2$s com as mesmas %1$d linhas, escopo, desconto e notas - %3$s.'],

@@ -25,7 +25,7 @@ A tela da fatura só oferece cada mudança manual de status quando ela faz senti
 
 ## Impact
 
-- **Código:** `functions/billing.php` (funções de regra novas, ao lado de `invoiceCanPay()`), `agent/post/invoice.php` (`mark_invoice_sent`, `mark_invoice_non-billable`, `cancel_invoice`), `agent/post/payment.php` (`add_payment`, `apply_credit`), `agent/invoice.php` (passa a usar as mesmas funções para mostrar os botões) e `lang/pt_BR/invoices.php` (a mensagem de recusa).
+- **Código:** `functions/billing.php` (funções de regra novas, ao lado de `invoiceCanPay()`), `agent/post/invoice.php` (`mark_invoice_sent`, `mark_invoice_non-billable`, `cancel_invoice`), `agent/post/payment.php` (`add_payment`; `apply_credit` está comentado e já não aplica crédito nenhum), `agent/invoice.php` (passa a usar as mesmas funções para mostrar os botões) e `lang/pt_BR/invoices.php` (a mensagem de recusa).
 - **Banco:** nenhuma mudança de esquema nem de dados.
 - **Uso normal pela tela:** nada muda; só pedidos que a tela não ofereceria passam a ser recusados.
 - **API:** nada muda (`api/v1/invoices/` só tem leitura).
