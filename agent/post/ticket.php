@@ -891,6 +891,10 @@ if (isset($_POST['bulk_ticket_reply'])) {
 
         mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $ticket_status, ticket_updated_at = NOW() WHERE ticket_id = $ticket_id");
         syncTicketSlaClock($ticket_id);
+        // Moving out of Resolved reopens it - the resolved date and the resolution SLA with it
+        if ($original_status === TICKET_STATUS_RESOLVED && $ticket_status !== TICKET_STATUS_RESOLVED) {
+            ticketUnresolve($ticket_id);
+        }
 
         if ($ticket_status !== $original_status && $ticket_status !== TICKET_STATUS_RESOLVED) {
             logTicketHistory($ticket_id, "$session_name set the status to " . escapeSql(getTicketStatusName($ticket_status)));
@@ -1101,6 +1105,11 @@ if (isset($_POST['add_ticket_reply'])) {
     // Update Ticket Status & updated at (in case status didn't change)
     mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $ticket_status, ticket_updated_at = NOW() WHERE ticket_id = $ticket_id");
     syncTicketSlaClock($ticket_id);
+
+    // Moving out of Resolved reopens it - the resolved date and the resolution SLA with it
+    if ($original_ticket_status === TICKET_STATUS_RESOLVED && $ticket_status !== TICKET_STATUS_RESOLVED) {
+        ticketUnresolve($ticket_id);
+    }
 
     // Resolve the ticket, if it is actually moving into Resolved - replying on an
     // already-resolved ticket must not restamp resolved_at or re-log the resolve

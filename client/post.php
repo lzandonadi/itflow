@@ -185,6 +185,10 @@ if (isset($_POST['add_ticket_comment'])) {
         $new_ticket_status = ticketStatusAfterClientReply($original_ticket_status);
         mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $new_ticket_status WHERE ticket_id = $ticket_id AND ticket_client_id = $session_client_id LIMIT 1");
         syncTicketSlaClock($ticket_id);
+        // A reply to a resolved ticket reopens it - as an emailed reply does
+        if ($original_ticket_status === TICKET_STATUS_RESOLVED && $new_ticket_status !== TICKET_STATUS_RESOLVED) {
+            ticketUnresolve($ticket_id);
+        }
 
         // Only record the reopen when the ticket was not already open
         if ($original_ticket_status !== $new_ticket_status) {

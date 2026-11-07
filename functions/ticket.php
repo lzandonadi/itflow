@@ -1329,6 +1329,24 @@ function ticketReopen($row, $status_id = TICKET_STATUS_OPEN, $how = '') {
     triggerCustomAction('ticket_update', $ticket_id);
 }
 
+/**
+ * Undo a resolution after the ticket's status has moved out of Resolved (to anything
+ * but Closed) some other way than ticketReopen() - a reply that sets a status. Clears
+ * the resolved date and restarts the resolution SLA as a reopen does, without the
+ * reopen's own history, audit and custom action, which the caller records its own way.
+ * A closed ticket keeps its resolved date. Returns whether anything changed.
+ */
+function ticketUnresolve($ticket_id) {
+    global $mysqli;
+    $ticket_id = intval($ticket_id);
+    mysqli_query($mysqli, "UPDATE tickets SET ticket_resolved_at = NULL WHERE ticket_id = $ticket_id AND ticket_resolved_at IS NOT NULL AND ticket_closed_at IS NULL");
+    if (mysqli_affected_rows($mysqli) !== 1) {
+        return false;
+    }
+    resetTicketResolutionSla($ticket_id);
+    return true;
+}
+
 /** The "your ticket is closed" email - to its contact and watchers, asking how we did. */
 function ticketMailClosed($ticket_id) {
     $row = ticketRow($ticket_id);
