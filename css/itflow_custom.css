@@ -6937,6 +6937,16 @@ a.itflow-billing-stat:hover {
     align-items: center;
     gap: .15rem;
 }
+/* Wide screens: the menu takes the room between the logo and the buttons on the
+   right and sits in the middle of it, rather than right up against the logo. Below
+   992px it is hidden (d-lg-flex) and the tab bar takes over. */
+@media (min-width: 992px) {
+    .itflow-portal-nav {
+        flex: 1 1 auto;
+        justify-content: center;
+        min-width: 0;
+    }
+}
 .itflow-portal-nav-link {
     display: inline-flex;
     align-items: center;

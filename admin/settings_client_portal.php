@@ -5,7 +5,8 @@
  * whether people can sign up themselves (saved by edit_client_portal_settings,
  * admin/post/settings_client_portal.php) with the clients that let them; and
  * the announcements shown on its home page (to every client, or one) between
- * their start and end.
+ * their start and end; and, once the 3.5.7 update has run, the text the portal's
+ * footer shows next to the company name.
  */
 
 require_once "includes/inc_all_admin.php";
@@ -25,6 +26,9 @@ $state_badges = ['showing' => 'text-bg-success', 'scheduled' => 'text-bg-info', 
 $signup_ready = portalInvitesReady();
 $signup_on = $signup_ready && portalSignupOn();
 $signup_clients = $signup_ready ? portalSignupClients() : [];
+
+// The footer's text - its column arrives with database 3.5.7, so the field waits for the update
+$footer_ready = portalFooterTextReady();
 
 ?>
 
@@ -64,6 +68,12 @@ $signup_clients = $signup_ready ? portalSignupClients() : [];
                             <div class="small text-body-secondary"><?= __('No client lets people sign up yet - turn it on for one on its Contacts &gt; Invites.') ?></div>
                         <?php } ?>
                     </div>
+                <?= settingsSectionEnd() ?>
+            <?php } ?>
+
+            <?php if ($footer_ready) { ?>
+                <?= settingsSectionStart('footer', __('Footer'), __('What the portal shows along the bottom of every page, after your company name.')) ?>
+                    <?= settingsInput('config_client_portal_footer_text', portalFooterText(), ['icon' => 'fa-shoe-prints', 'maxlength' => 200, 'label' => __('Footer text'), 'help' => __('Shown on every portal page, next to your company name, exactly as typed. Left empty, the footer shows Powered by ITFlow, unless white-label is on.')]) ?>
                 <?= settingsSectionEnd() ?>
             <?php } ?>
 

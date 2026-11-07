@@ -8,7 +8,7 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 1. Spec de base
 
-- [ ] 1.1 Conferir no código os requisitos de base de `specs/client-portal-layout/spec.md` que não mudam:
+- [x] 1.1 Conferir no código os requisitos de base de `specs/client-portal-layout/spec.md` que não mudam:
   - cabeçalho: logo, ou iniciais e nome; "Novo chamado" a partir de 576 px; conta; cabeçalho fixo;
   - navegação no celular: barra de abas com Faturamento só para quem tem acesso, e menu lateral.
 
@@ -16,7 +16,7 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 2. Banco
 
-- [ ] 2.1 Em `db.sql`, acrescentar `config_client_portal_footer_text varchar(200) NOT NULL DEFAULT ''` depois de `config_client_portal_signup`.
+- [x] 2.1 Em `db.sql`, acrescentar `config_client_portal_footer_text varchar(200) NOT NULL DEFAULT ''` depois de `config_client_portal_signup`.
 
   Criar `admin/database_updates/3.5.7.php` no modelo da `3.5.6.php`:
   - cabeçalho dizendo para que serve;
@@ -32,13 +32,13 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 3. Leitura e rodapé
 
-- [ ] 3.1 Em `functions/portal.php`, criar `portalFooterTextReady()` (versão do banco >= 3.5.7, no modelo de `portalInvitesReady()`) e `portalFooterText()` (o texto salvo, ou `''` se não estiver pronto). Em `client/includes/footer.php`, mostrar `escapeHtml(portalFooterText())` quando não vazio, senão o bloco de hoje (`if (!$config_whitelabel_enabled)` com `__('Powered by ITFlow')`). Validar:
+- [x] 3.1 Em `functions/portal.php`, criar `portalFooterTextReady()` (versão do banco >= 3.5.7, no modelo de `portalInvitesReady()`) e `portalFooterText()` (o texto salvo, ou `''` se não estiver pronto). Em `client/includes/footer.php`, mostrar `escapeHtml(portalFooterText())` quando não vazio, senão o bloco de hoje (`if (!$config_whitelabel_enabled)` com `__('Powered by ITFlow')`). Validar:
   - `ddev exec php -l` nos dois arquivos;
   - com a coluna vazia, o rodapé de `client/index.php` (curl como Maria) continua com "Desenvolvido com ITFlow".
 
 ## 4. Configuração no Admin
 
-- [ ] 4.1 Em `admin/settings_client_portal.php`, quando `portalFooterTextReady()`, acrescentar a seção "Rodapé" com `settingsInput('config_client_portal_footer_text', ...)` (`maxlength` 200, rótulo e ajuda do design D3) e ler o valor salvo para o campo.
+- [x] 4.1 Em `admin/settings_client_portal.php`, quando `portalFooterTextReady()`, acrescentar a seção "Rodapé" com `settingsInput('config_client_portal_footer_text', ...)` (`maxlength` 200, rótulo e ajuda do design D3) e ler o valor salvo para o campo.
 
   Em `admin/post/settings_client_portal.php`, no `edit_client_portal_settings`:
   - quando pronto, incluir a coluna;
@@ -57,20 +57,20 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 6. Verificação
 
-- [ ] 6.1 Admin, com curl como Lucas, no snapshot:
+- [x] 6.1 Admin, com curl como Lucas, no snapshot:
   - a seção "Rodapé" aparece em `admin/settings_client_portal.php`;
   - salvar "Presença Digital, Automação e Inteligência Artificial, Produtividade e Integração" com token CSRF grava a coluna e cria uma linha no audit log;
   - o mesmo POST sem token dá 403 e não muda nada;
   - um texto de 201 caracteres é recusado com o erro no campo e não grava;
   - um técnico sem acesso ao Admin não consegue salvar (pedido não tratado, sem mudança).
-- [ ] 6.2 Portal, com curl como Maria:
+- [x] 6.2 Portal, com curl como Maria:
   - em `client/index.php`, `client/tickets.php` e `client/invoices.php`, o rodapé tem o nome da empresa e a frase salva, e não tem "Desenvolvido com ITFlow";
   - com `config_whitelabel_enabled = 1`, posto dentro do snapshot, o rodapé fica igual;
   - salvar `<b>teste & "aspas"</b>` mostra o texto escapado (o `escapeSql()` tira a marcação ao salvar, então conferir o que foi gravado e o que aparece);
   - com o campo esvaziado pela tela, o rodapé volta a "Desenvolvido com ITFlow";
   - com o campo vazio e o white-label ligado, só aparece o nome da empresa;
   - a tela de login continua igual.
-- [ ] 6.3 Visual, com o Chrome headless (`google-chrome --headless --screenshot --ignore-certificate-errors`):
+- [x] 6.3 Visual, com o Chrome headless (`google-chrome --headless --screenshot --ignore-certificate-errors`):
   - salvar o HTML autenticado de `client/index.php`, com a frase configurada, num arquivo do scratchpad com `<base href="https://itsm.ddev.site/">`;
   - capturar a 1280×800, 992×800 e 390×844;
   - a 1280 e a 992: o menu está centralizado entre a logo e os botões, sem encostar na logo e sem transbordar;
@@ -83,12 +83,12 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 7. Fechamento
 
-- [ ] 7.1 Entradas em `CHANGELOG.md`:
+- [x] 7.1 Entradas em `CHANGELOG.md`:
   - em "New Features & Updates": texto do rodapé do portal configurável em Admin > Configurações > Portal do cliente, e menu do portal centralizado no cabeçalho;
   - em "Upgrading": a atualização de banco 3.5.7 acrescenta a configuração, vazia; preencha o texto depois de atualizar.
 
   Validar: leitura das entradas.
-- [ ] 7.2 `openspec validate client-portal-footer-and-menu --strict` sem erros. Revisar o diff, que deve tocar só:
+- [x] 7.2 `openspec validate client-portal-footer-and-menu --strict` sem erros. Revisar o diff, que deve tocar só:
   - `db.sql` e `admin/database_updates/3.5.7.php`;
   - `functions/portal.php`, `functions/settings.php`, `client/includes/footer.php` e `css/itflow_custom.css`;
   - `admin/settings_client_portal.php` e `admin/post/settings_client_portal.php`;

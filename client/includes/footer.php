@@ -14,7 +14,13 @@
 <footer class="itflow-portal-footer mt-auto">
     <div class="container d-flex flex-wrap justify-content-between gap-2">
         <span><?= escapeHtml($session_company_name) ?></span>
-        <?php if (!$config_whitelabel_enabled) { ?>
+        <?php
+        // The company's own footer text when one is set (Admin > Settings > Client Portal),
+        // shown as typed and whatever the white-label setting; otherwise the line it had before
+        $portal_footer_text = portalFooterText();
+        if ($portal_footer_text !== '') { ?>
+            <span><?= escapeHtml($portal_footer_text) ?></span>
+        <?php } elseif (!$config_whitelabel_enabled) { ?>
             <span><?= __('Powered by ITFlow') ?></span>
         <?php } ?>
     </div>

@@ -403,3 +403,41 @@ function portalViewAsAccess($agent_user_id, $contact_id) {
         'billing' => $level('module_sales') >= 1 && $level('module_financial') >= 1,
     ];
 }
+
+/** Has the 3.5.7 update run? Until it has, the footer text setting is neither read nor offered. */
+function portalFooterTextReady() {
+    global $mysqli;
+    static $ready = null;
+    if ($ready === null) {
+        if (defined('CURRENT_DATABASE_VERSION')) {
+            $version = CURRENT_DATABASE_VERSION;
+        } else {
+            $result = mysqli_query($mysqli, "SELECT config_current_database_version FROM settings WHERE company_id = 1");
+            $version = $result && ($row = mysqli_fetch_row($result)) ? (string) $row[0] : '0';
+        }
+        $ready = version_compare($version, '3.5.7', '>=');
+    }
+    return $ready;
+}
+
+/**
+ * The text the portal's footer shows next to the company name - the company's own
+ * wording, shown as typed and never translated. '' when none is set (the footer then
+ * shows Powered by ITFlow, unless white-label is on) or before the 3.5.7 update.
+ * Read here rather than in load_global_settings.php, so pages keep working while the
+ * code is ahead of the database.
+ */
+function portalFooterText() {
+    global $mysqli;
+    static $text = null;
+    if ($text === null) {
+        $text = '';
+        if (portalFooterTextReady()) {
+            $result = mysqli_query($mysqli, "SELECT config_client_portal_footer_text FROM settings WHERE company_id = 1");
+            if ($result && ($row = mysqli_fetch_row($result))) {
+                $text = trim((string) $row[0]);
+            }
+        }
+    }
+    return $text;
+}

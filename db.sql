@@ -3150,6 +3150,7 @@ CREATE TABLE `settings` (
   `config_client_portal_enable` tinyint(1) NOT NULL DEFAULT 1,
   `config_client_portal_require_mfa` tinyint(1) NOT NULL DEFAULT 0,
   `config_client_portal_signup` tinyint(1) NOT NULL DEFAULT 0,
+  `config_client_portal_footer_text` varchar(200) NOT NULL DEFAULT '',
   `config_getting_started` tinyint(1) NOT NULL DEFAULT 1,
   `config_getting_started_skipped` varchar(255) NOT NULL DEFAULT '',
   `config_getting_started_opened_at` datetime DEFAULT NULL,

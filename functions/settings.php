@@ -262,6 +262,7 @@ function settingsFields() {
         // Client portal
         'config_client_portal_require_mfa' => ['page' => 'client_portal', 'section' => __('Signing in'), 'label' => __('Require two-step sign-in'), 'words' => __('portal mfa 2fa two factor contacts')] + $on_off,
         'config_client_portal_signup' => ['page' => 'client_portal', 'section' => __('Signing up'), 'label' => __('Let people sign up'), 'words' => __('portal sign up register registration self create account domain')] + $on_off,
+        'config_client_portal_footer_text' => ['page' => 'client_portal', 'section' => __('Footer'), 'label' => __('Footer text'), 'words' => __('portal footer text tagline slogan powered by')],
 
         // Single sign-on
         'config_azure_client_id' => ['page' => 'identity', 'section' => __('Microsoft Entra'), 'label' => __('Application (client) ID'), 'words' => __('sso entra azure microsoft 365 single sign-on portal')],

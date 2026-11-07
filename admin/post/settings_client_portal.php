@@ -5,7 +5,8 @@
  * edit_client_portal_settings saves two-step sign-in for the portal - those
  * without it set up are taken to Your account to do it
  * (client/includes/check_login.php) - and, once the 3.4.6 update has run,
- * whether people can sign up themselves (functions/portal_invite.php).
+ * whether people can sign up themselves (functions/portal_invite.php), and once
+ * the 3.5.7 update has run, the portal's footer text (functions/portal.php).
  */
 
 defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
@@ -19,6 +20,14 @@ if (isset($_POST['edit_client_portal_settings'])) {
     if (portalInvitesReady()) {
         $columns[] = 'config_client_portal_signup';
         $after['config_client_portal_signup'] = empty($_POST['config_client_portal_signup']) ? 0 : 1;
+    }
+    if (portalFooterTextReady()) {
+        $footer_text = trim((string) ($_POST['config_client_portal_footer_text'] ?? ''));
+        if (mb_strlen($footer_text) > 200) {
+            settingsRefuse('client_portal', ['config_client_portal_footer_text' => __('That text is too long - keep it to 200 characters.')]);
+        }
+        $columns[] = 'config_client_portal_footer_text';
+        $after['config_client_portal_footer_text'] = $footer_text;
     }
     settingsSave('client_portal', settingsCurrent($columns), $after);
 

@@ -722,4 +722,11 @@ return [
     'Microsoft OAuth token exchange failed: refresh token or access token missing.' => 'A troca de token OAuth da Microsoft falhou: falta o refresh token ou o access token.',
     'Microsoft 365 connected - ITFlow can now use the mailbox' => 'Microsoft 365 conectado - o ITFlow já pode usar a caixa de correio',
 
+    // Client portal > Footer (database 3.5.7)
+    'Footer text' => 'Texto do rodapé',
+    'What the portal shows along the bottom of every page, after your company name.' => 'O que o portal mostra na parte de baixo de todas as páginas, depois do nome da empresa.',
+    'Shown on every portal page, next to your company name, exactly as typed. Left empty, the footer shows Powered by ITFlow, unless white-label is on.' => 'Aparece em todas as páginas do portal, ao lado do nome da empresa, exatamente como foi digitado. Vazio, o rodapé mostra Desenvolvido com ITFlow, a não ser que a marca branca esteja ligada.',
+    'That text is too long - keep it to 200 characters.' => 'Esse texto é longo demais - use no máximo 200 caracteres.',
+    'portal footer text tagline slogan powered by' => 'portal rodapé texto slogan frase desenvolvido com',
+
 ];
