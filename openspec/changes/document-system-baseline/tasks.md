@@ -23,7 +23,7 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 ## 4. Atendimento
 
 - [x] 4.1 Verificar e completar `ticketing`: status, reabertura, fechamento automático, tempo trabalhado, leitura de e-mail; reproduzir fechamento automático com `ddev exec php cron/nightly_tasks.php` e um e-mail com número no assunto (IMAP opcional; senão, por leitura do código)
-- [ ] 4.2 Verificar e completar `ticket-sla`: origem do SLA, horário comercial, pausa, estágios e percentual de aviso; reproduzir com um SLA de minutos e `ddev exec php cron/ticket_sla.php`
+- [x] 4.2 Verificar e completar `ticket-sla`: origem do SLA, horário comercial, pausa, estágios e percentual de aviso; reproduzir com um SLA de minutos e `ddev exec php cron/ticket_sla.php`
 
 ## 5. Fechamento
 
