@@ -16,7 +16,7 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 
 ## 3. Dinheiro
 
-- [ ] 3.1 Verificar e completar `invoicing`: transições de status (quem muda para Viewed, Overdue e Cancelled), regras de numeração, recorrentes, multas, lembretes, extratos; verificar rodando `ddev exec php cron/nightly_tasks.php` com uma fatura vencida há 30 dias
+- [x] 3.1 Verificar e completar `invoicing`: transições de status (quem muda para Viewed, Overdue e Cancelled), regras de numeração, recorrentes, multas, lembretes, extratos; verificar rodando `ddev exec php cron/nightly_tasks.php` com uma fatura vencida há 30 dias
 - [ ] 3.2 Verificar e completar `online-payments`: pagamento múltiplo, autopay, recusa, taxas; verificar lendo `functions/billing_pay.php`, o bloco de autopay de `cron/nightly_tasks.php` e `cron/payment_provider_fees.php` (sem Stripe real no DDEV)
 - [ ] 3.3 Verificar e completar `contracts`: ciclo de vida, condições em vigor, assinatura, horas pré-pagas; reproduzir uma assinatura completa pelo link guest e um consumo parcial de horas
 
@@ -36,6 +36,8 @@ Cada tarefa de verificação segue o mesmo roteiro. Primeiro, ler o código das 
 <!-- Divergências encontradas durante a verificação: comportamento atual × esperado, arquivo:linha, e se merece change própria. -->
 
 - **backups: download direto de backup responde 500, não 403.** O guarda de `uploads/` (`BACKUP_UPLOADS_DENY_GUARD`, `functions/backup.php:20`, e `uploads/.htaccess`) usa `php_flag engine off`, que o Apache só entende com mod_php. Com PHP-FPM (DDEV, e a maioria das instalações novas) a diretiva derruba o `.htaccess` inteiro com erro 500. O arquivo continua protegido, mas por acidente: as demais regras do mesmo `.htaccess` (`Require all denied`, `-Indexes`) não chegam a ser aplicadas por causa do erro. Merece change própria: envolver `php_flag` em `<IfModule mod_php.c>`.
+- **invoicing: cancelar e marcar Non-Billable não verificam o status atual.** `agent/post/invoice.php:213` e `:245` gravam o novo status sem olhar o anterior, então uma fatura Paid ou Partial pode ser cancelada por um link montado à mão, ficando com os pagamentos registrados. Não conferi se a tela esconde os botões nesses status. Merece change própria: recusar no handler.
+- **scheduled-jobs/invoicing: a segunda execução da tarefa noturna no mesmo dia repete notificações internas.** Reproduzido com Run Now duas vezes: "Pending Tickets", "Invoice Overdue" e "Update" foram criadas de novo para cada técnico. A multa, o histórico e o e-mail de lembrete ao cliente não se repetiram, então o requisito "não repetem efeitos" vale para o cliente e não para as notificações internas. Impacto baixo (só ruído). Merece change própria se o Run Now da noturna for usado com frequência.
 
 ## Workflow follow-up
 
