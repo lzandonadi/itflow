@@ -53,7 +53,7 @@ As senhas temporárias valem só dentro do snapshot. Cookie jars e capturas fica
 
 ## 5. Menu
 
-- [ ] 5.1 Em `css/itflow_custom.css`, no `@media (min-width: 992px)` junto das regras `.itflow-portal-nav`, dar ao `.itflow-portal-nav` `flex: 1 1 auto; justify-content: center; min-width: 0` (design D4). Nada de estilo inline nem mudança na marcação, salvo se o teste mostrar necessidade. Validar: conferência visual na tarefa 6.3.
+- [x] 5.1 Em `css/itflow_custom.css`, no `@media (min-width: 992px)` junto das regras `.itflow-portal-nav`, dar ao `.itflow-portal-nav` `flex: 1 1 auto; justify-content: center; min-width: 0` (design D4). Nada de estilo inline nem mudança na marcação, salvo se o teste mostrar necessidade. Validar: conferência visual na tarefa 6.3.
 
 ## 6. Verificação
 
