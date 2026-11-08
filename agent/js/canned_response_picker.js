@@ -106,7 +106,7 @@
             const chip = document.createElement('span');
             chip.className = 'badge rounded-pill text-bg-light border fw-normal d-inline-flex align-items-center gap-1 itflow-canned-file';
             chip.dataset.cannedFileId = file.id;
-            chip.title = 'Copied onto the ticket, and sent with the reply when it is emailed';
+            chip.title = __('Copied onto the ticket, and sent with the reply when it is emailed');
             const icon = document.createElement('i');
             icon.className = 'fas fa-fw fa-paperclip text-secondary';
             const name = document.createElement('span');
@@ -118,8 +118,8 @@
             const remove = document.createElement('button');
             remove.type = 'button';
             remove.className = 'btn-close';
-            remove.title = 'Leave it off';
-            remove.setAttribute('aria-label', 'Leave ' + file.name + ' off');
+            remove.title = __('Leave it off');
+            remove.setAttribute('aria-label', __('Leave %s off', file.name));
             remove.setAttribute('data-canned-file-remove', '');
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -154,18 +154,18 @@
                 if (!radio && data.reply_type === 2) {
                     // No email address to send to - a public note is the nearest
                     radio = form.querySelector('input[name="public_reply_type"][value="1"]');
-                    label = 'Public note, as there is nobody to email';
+                    label = __('Public note, as there is nobody to email');
                 }
                 if (radio) {
                     if (!radio.checked) {
                         radio.checked = true;
                         radio.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-                    done.push('set the reply to ' + label);
+                    done.push(__('set the reply to %s', label));
                 }
             } else if (internal) {
                 internal.checked = data.reply_type === 0;
-                done.push(data.reply_type === 0 ? 'marked it internal' : 'made it a public reply');
+                done.push(data.reply_type === 0 ? __('marked it internal') : __('made it a public reply'));
             }
         }
 
@@ -174,9 +174,9 @@
             const select = form.querySelector('select[name="status"], select[name="bulk_status"]');
             if (select && select.querySelector('option[value="' + data.ticket_status + '"]')) {
                 setSelect(select, String(data.ticket_status));
-                done.push('set the status to ' + data.status_name);
+                done.push(__('set the status to %s', data.status_name));
             } else if (select) {
-                done.push('left the status - ' + data.status_name + ' isn\'t on offer here');
+                done.push(__("left the status - %s isn't on offer here", data.status_name));
             }
         }
 
@@ -202,7 +202,7 @@
                 time.value = pad(Math.min(23, Math.floor(total / 3600))) + ':' + pad(Math.floor(total % 3600 / 60)) + ':' + pad(total % 60);
             }
             if (total !== null) {
-                done.push('added ' + data.minutes_text + ' to the time worked');
+                done.push(__('added %s to the time worked', data.minutes_text));
             }
         }
         return done;
@@ -222,7 +222,7 @@
             })
             .then(function (data) {
                 if (!data.found) {
-                    say(picker, 'That canned response is gone - it may have been archived or deleted.', true);
+                    say(picker, __('That canned response is gone - it may have been archived or deleted.'), true);
                     return;
                 }
                 const form = picker.closest('form');
@@ -237,12 +237,12 @@
                 const done = apply(form, data);
                 const files = addFiles(picker, data.files);
                 if (files) {
-                    done.push('put ' + (files === 1 ? 'a file' : files + ' files') + ' with it');
+                    done.push(files === 1 ? __('put a file with it') : __('put %d files with it', files));
                 }
-                say(picker, data.name + ' went in' + (done.length ? ', and ' + done.join(', ') : '') + '.');
+                say(picker, done.length ? __('%1$s went in, and %2$s.', data.name, done.join(', ')) : __('%s went in.', data.name));
             })
             .catch(function () {
-                say(picker, 'Could not load that canned response.', true);
+                say(picker, __('Could not load that canned response.'), true);
             });
     }
 
@@ -390,17 +390,17 @@
         e.stopImmediatePropagation();
         const submitter = e.submitter || null;
         const list = document.createElement('div');
-        list.textContent = 'Your reply still has ' + left.map(function (name) {
+        list.textContent = __('Your reply still has %s in it.', left.map(function (name) {
             return '[' + name + ']';
-        }).join(', ') + ' in it.';
+        }).join(', '));
         Swal.fire({
             theme: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light',
-            title: 'Still to fill in',
+            title: __('Still to fill in'),
             html: list,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Send anyway',
-            cancelButtonText: 'Fill them in',
+            confirmButtonText: __('Send anyway'),
+            cancelButtonText: __('Fill them in'),
             reverseButtons: true,
             focusCancel: true,
             // Back to the reply box, not the Send button

@@ -18,19 +18,19 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
     <input type="hidden" name="contact_id" value="<?= intval($contact['contact_id'] ?? 0) ?>">
 
     <div class="itflow-portal-panel-head">
-        <h2><i class="fas fa-address-card"></i>Details</h2>
+        <h2><i class="fas fa-address-card"></i><?= __('Details') ?></h2>
     </div>
     <div class="itflow-portal-panel-body">
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="form-label" for="contactName">Name <strong class="text-danger">*</strong></label>
+                <label class="form-label" for="contactName"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <input type="text" class="form-control" id="contactName" name="contact_name" value="<?= escapeHtml($value('contact_name')) ?>" required maxlength="200"<?= $new ? ' autofocus' : '' ?>>
                 </div>
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label" for="contactTitle">Job title</label>
+                <label class="form-label" for="contactTitle"><?= __('Job title') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-id-badge"></i></span>
                     <input type="text" class="form-control" id="contactTitle" name="contact_title" value="<?= escapeHtml($value('contact_title')) ?>" maxlength="200">
@@ -39,17 +39,17 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="contactEmail">Email <strong class="text-danger">*</strong></label>
+            <label class="form-label" for="contactEmail"><?= __('Email') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-envelope"></i></span>
                 <input type="email" class="form-control" id="contactEmail" name="contact_email" value="<?= escapeHtml($value('contact_email')) ?>" required maxlength="200">
             </div>
-            <?php if (!$new && !empty($contact['user_id'])) { ?><div class="form-text">It is also the address they sign in with.</div><?php } ?>
+            <?php if (!$new && !empty($contact['user_id'])) { ?><div class="form-text"><?= __('It is also the address they sign in with.') ?></div><?php } ?>
         </div>
 
         <div class="row">
             <div class="col-sm-8 mb-3">
-                <label class="form-label" for="contactPhone">Phone</label>
+                <label class="form-label" for="contactPhone"><?= __('Phone') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-phone"></i></span>
                     <input type="hidden" name="contact_phone_country_code" value="<?= escapeHtml($value('contact_phone_country_code')) ?>">
@@ -57,7 +57,7 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
                 </div>
             </div>
             <div class="col-sm-4 mb-3">
-                <label class="form-label" for="contactExtension">Extension</label>
+                <label class="form-label" for="contactExtension"><?= __('Extension') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
                     <input type="text" class="form-control" id="contactExtension" name="contact_extension" inputmode="numeric" maxlength="20" value="<?= escapeHtml($value('contact_extension')) ?>">
@@ -67,7 +67,7 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
 
         <div class="row">
             <div class="col-sm-8 mb-3">
-                <label class="form-label" for="contactMobile">Mobile</label>
+                <label class="form-label" for="contactMobile"><?= __('Mobile') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-mobile-alt"></i></span>
                     <input type="hidden" name="contact_mobile_country_code" value="<?= escapeHtml($value('contact_mobile_country_code')) ?>">
@@ -75,7 +75,7 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
                 </div>
             </div>
             <div class="col-sm-4 mb-3">
-                <label class="form-label" for="contactDepartment">Department</label>
+                <label class="form-label" for="contactDepartment"><?= __('Department') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-sitemap"></i></span>
                     <input type="text" class="form-control" id="contactDepartment" name="contact_department" value="<?= escapeHtml($value('contact_department')) ?>" maxlength="200">
@@ -84,14 +84,14 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
         </div>
 
         <fieldset class="mb-3">
-            <legend class="form-label fs-6">Roles</legend>
+            <legend class="form-label fs-6"><?= _x('Roles', 'contact') ?></legend>
             <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="contactBilling" name="contact_billing" value="1"<?= intval($value('contact_billing', '0')) ? ' checked' : '' ?>>
-                <label class="form-check-label" for="contactBilling">Billing <span class="d-block small text-body-secondary">Sees and pays invoices, quotes and statements, and gets the billing emails</span></label>
+                <label class="form-check-label" for="contactBilling"><?= __('Billing') ?> <span class="d-block small text-body-secondary"><?= __('Sees and pays invoices, quotes and statements, and gets the billing emails') ?></span></label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="contactTechnical" name="contact_technical" value="1"<?= intval($value('contact_technical', '0')) ? ' checked' : '' ?>>
-                <label class="form-check-label" for="contactTechnical">Technical <span class="d-block small text-body-secondary">Sees every ticket at <?= escapeHtml($session_client_name) ?>, and the devices, licenses and documents</span></label>
+                <label class="form-check-label" for="contactTechnical"><?= __('Technical') ?> <span class="d-block small text-body-secondary"><?= __('Sees every ticket at %s, and the devices, licenses and documents', escapeHtml($session_client_name)) ?></span></label>
             </div>
         </fieldset>
 
@@ -99,12 +99,12 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
             <fieldset class="itflow-portal-note d-block mb-3">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="contactInvite" name="invite" value="1"<?= !isset($form) || !empty($form['invite']) ? ' checked' : '' ?>>
-                    <label class="form-check-label" for="contactInvite">Give them portal access and email an invite <span class="d-block small text-body-secondary">So they can raise and follow tickets here themselves</span></label>
+                    <label class="form-check-label" for="contactInvite"><?= __('Give them portal access and email an invite') ?> <span class="d-block small text-body-secondary"><?= __('So they can raise and follow tickets here themselves') ?></span></label>
                 </div>
                 <?php if (count($methods) > 1) { ?>
                     <div class="input-group mt-2">
                         <span class="input-group-text"><i class="fa fa-fw fa-sign-in-alt"></i></span>
-                        <select class="form-select" name="method" aria-label="How they sign in">
+                        <select class="form-select" name="method" aria-label="<?= escapeHtml(__('How they sign in')) ?>">
                             <?php foreach ($methods as $key => $label) { ?>
                                 <option value="<?= $key ?>"<?= ($form['method'] ?? '') === $key ? ' selected' : '' ?>><?= escapeHtml($label) ?></option>
                             <?php } ?>
@@ -114,6 +114,6 @@ $mobile_input = $value('contact_mobile') !== '' ? formatPhoneNumber($value('cont
             </fieldset>
         <?php } ?>
 
-        <button type="submit" class="btn btn-primary" name="portal_contact_save"><i class="fas fa-check me-2"></i><?= $new ? 'Add them' : 'Save' ?></button>
+        <button type="submit" class="btn btn-primary" name="portal_contact_save"><i class="fas fa-check me-2"></i><?= $new ? __('Add them') : __('Save') ?></button>
     </div>
 </form>

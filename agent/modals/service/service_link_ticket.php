@@ -26,7 +26,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-life-ring me-2"></i>Tickets about <strong><?= escapeHtml($service['service_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-life-ring me-2"></i><?= __('Tickets about') ?> <strong><?= escapeHtml($service['service_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -34,31 +34,31 @@ ob_start();
     <input type="hidden" name="service_id" value="<?= $service_id ?>">
     <div class="modal-body">
         <?php if ($candidates) { ?>
-            <label class="form-label">Which tickets?</label>
+            <label class="form-label"><?= __('Which tickets?') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-life-ring"></i></span>
-                <select class="form-select select2" name="ticket_ids[]" multiple required data-placeholder="Search by number or subject">
+                <select class="form-select select2" name="ticket_ids[]" multiple required data-placeholder="<?= escapeHtml(__('Search by number or subject')) ?>">
                     <?php foreach ($candidates as $row) {
                         $is_open = ticketIsOpen($row); ?>
                         <option value="<?= intval($row['ticket_id']) ?>" data-icon="fas fa-<?= $is_open ? 'life-ring' : 'check-circle' ?>"
-                            data-description="<?= escapeHtml($row['ticket_prefix'] . $row['ticket_number'] . ' · ' . ($is_open ? 'Open' : 'Closed') . ' · ' . date('M j, Y', strtotime($row['ticket_created_at']))) ?>"
+                            data-description="<?= escapeHtml($row['ticket_prefix'] . $row['ticket_number'] . ' · ' . ($is_open ? __('Open') : __('Closed')) . ' · ' . date('M j, Y', strtotime($row['ticket_created_at']))) ?>"
                             data-keywords="<?= escapeHtml($row['ticket_prefix'] . $row['ticket_number']) ?>"><?= escapeHtml($row['ticket_subject']) ?></option>
                     <?php } ?>
                 </select>
             </div>
-            <div class="form-text">Tickets on its assets show on the service already - this is for the rest.</div>
+            <div class="form-text"><?= __('Tickets on its assets show on the service already - this is for the rest.') ?></div>
         <?php } else { ?>
             <div class="itflow-asset-empty py-4">
                 <i class="fas fa-life-ring fa-2x mb-2"></i>
-                <div>No other tickets for this client in the last year.</div>
+                <div><?= __('No other tickets for this client in the last year.') ?></div>
             </div>
         <?php } ?>
     </div>
     <div class="modal-footer">
         <?php if ($candidates) { ?>
-            <button type="submit" name="link_service_tickets" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i>Link</button>
+            <button type="submit" name="link_service_tickets" class="btn btn-primary text-bold"><i class="fas fa-link me-2"></i><?= __('Link') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

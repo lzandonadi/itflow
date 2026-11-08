@@ -66,26 +66,26 @@ foreach ($sources as $key => $source) {
             <div class="card-body">
 
                 <?php if ($can_add_event) { ?>
-                    <button type="button" class="btn btn-primary w-100 mb-3" id="calendarNewEvent"><i class="fas fa-plus me-2"></i>New event</button>
+                    <button type="button" class="btn btn-primary w-100 mb-3" id="calendarNewEvent"><i class="fas fa-plus me-2"></i><?= __('New event') ?></button>
                 <?php } ?>
 
-                <label class="form-label small text-body-secondary text-uppercase fw-semibold mb-1" for="calendarAgent">Whose</label>
+                <label class="form-label small text-body-secondary text-uppercase fw-semibold mb-1" for="calendarAgent"><?= __('Whose') ?></label>
                 <select class="form-select select2 mb-3" id="calendarAgent">
-                    <option value="0" data-icon="fas fa-users">Everyone</option>
+                    <option value="0" data-icon="fas fa-users"><?= __('Everyone') ?></option>
                     <?php foreach ($agents as $agent) { ?>
                         <option value="<?= intval($agent['user_id']) ?>"<?= selectOptionUser($agent['user_id'], $agent['user_name'], $agent['user_avatar']) ?>><?= escapeHtml($agent['user_name']) ?><?= intval($agent['user_id']) === intval($session_user_id) ? ' (me)' : '' ?></option>
                     <?php } ?>
                 </select>
 
                 <div class="d-flex align-items-center mb-1">
-                    <span class="small text-body-secondary text-uppercase fw-semibold">Calendars</span>
+                    <span class="small text-body-secondary text-uppercase fw-semibold"><?= __('Calendars') ?></span>
                     <?php if ($can_manage) { ?>
-                        <button type="button" class="btn btn-sm btn-link text-body-secondary ms-auto p-0 ajax-modal" title="New calendar" data-modal-url="modals/calendar/calendar_add.php"><i class="fas fa-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-link text-body-secondary ms-auto p-0 ajax-modal" title="<?= escapeHtml(__('New calendar')) ?>" data-modal-url="modals/calendar/calendar_add.php"><i class="fas fa-plus"></i></button>
                     <?php } ?>
                 </div>
                 <div class="mb-3" id="calendarCalendars">
                     <?php if (!$calendars) { ?>
-                        <div class="small text-body-secondary">None yet<?= $can_manage ? '' : ' - an admin adds them' ?>.</div>
+                        <div class="small text-body-secondary"><?= $can_manage ? __('None yet.') : __('None yet - an admin adds them.') ?></div>
                     <?php } ?>
                     <?php foreach ($calendars as $calendar_id => $calendar) {
                         $color = calendarColor($calendar['calendar_color']); ?>
@@ -93,18 +93,18 @@ foreach ($sources as $key => $source) {
                             <input class="form-check-input m-0 itflow-cal-check" type="checkbox" id="calendarShow<?= $calendar_id ?>" data-calendar="<?= $calendar_id ?>" checked>
                             <label class="flex-grow-1 text-truncate small" for="calendarShow<?= $calendar_id ?>"><?= escapeHtml($calendar['calendar_name']) ?></label>
                             <?php if (!empty($calendar['calendar_feed_key'])) { ?>
-                                <i class="fas fa-rss text-body-secondary small" title="Shared as a subscription link"></i>
+                                <i class="fas fa-rss text-body-secondary small" title="<?= escapeHtml(__('Shared as a subscription link')) ?>"></i>
                             <?php } ?>
                             <?php if ($can_manage) { ?>
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-link text-body-secondary p-0 px-1" type="button" data-bs-toggle="dropdown" title="More actions"><i class="fas fa-ellipsis-v"></i></button>
+                                    <button class="btn btn-sm btn-link text-body-secondary p-0 px-1" type="button" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More actions')) ?>"><i class="fas fa-ellipsis-v"></i></button>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/calendar/calendar_edit.php?id=<?= $calendar_id ?>"><i class="fas fa-fw fa-pen me-2"></i>Edit</a>
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/calendar/calendar_share.php?id=<?= $calendar_id ?>"><i class="fas fa-fw fa-share-alt me-2"></i><?= empty($calendar['calendar_feed_key']) ? 'Share' : 'Sharing' ?></a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/calendar/calendar_edit.php?id=<?= $calendar_id ?>"><i class="fas fa-fw fa-pen me-2"></i><?= __('Edit') ?></a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/calendar/calendar_share.php?id=<?= $calendar_id ?>"><i class="fas fa-fw fa-share-alt me-2"></i><?= empty($calendar['calendar_feed_key']) ? __('Share') : __('Sharing') ?></a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-danger confirm-link" href="post.php?delete_calendar=<?= $calendar_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Delete <?= escapeHtml($calendar['calendar_name']) ?>?" data-confirm-button="Delete"
-                                            data-confirm-text="Its events are deleted with it, and anyone sent an invitation to one is emailed the cancellation."><i class="fas fa-fw fa-trash-alt me-2"></i>Delete</a>
+                                            data-confirm-title="<?= escapeHtml(__('Delete %s?', $calendar['calendar_name'])) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
+                                            data-confirm-text="<?= escapeHtml(__('Its events are deleted with it, and anyone sent an invitation to one is emailed the cancellation.')) ?>"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Delete') ?></a>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -113,7 +113,7 @@ foreach ($sources as $key => $source) {
                 </div>
 
                 <?php if ($sources) { ?>
-                    <div class="small text-body-secondary text-uppercase fw-semibold mb-1">From ITFlow</div>
+                    <div class="small text-body-secondary text-uppercase fw-semibold mb-1"><?= __('From ITFlow') ?></div>
                     <div id="calendarSources">
                         <?php foreach ($sources as $key => $source) { ?>
                             <div class="itflow-cal-toggle d-flex align-items-center gap-2" style="--itflow-cal-color: <?= $source['color'] ?>" title="<?= escapeHtml($source['title']) ?>">
@@ -130,11 +130,11 @@ foreach ($sources as $key => $source) {
         <?php if ($can_schedule) { ?>
             <div class="card mb-3">
                 <div class="card-header py-2 d-flex align-items-center">
-                    <span class="fw-semibold text-nowrap"><i class="fas fa-fw fa-inbox text-secondary me-1"></i>To schedule</span>
+                    <span class="fw-semibold text-nowrap"><i class="fas fa-fw fa-inbox text-secondary me-1"></i><?= __('To schedule') ?></span>
                     <span class="badge rounded-pill bg-body-secondary text-body-secondary ms-auto" id="calendarUnscheduledCount"></span>
                 </div>
                 <div class="card-body p-2">
-                    <div class="small text-body-secondary px-1 mb-2" id="calendarUnscheduledHint">Open tickets with no time booked - drag one onto the calendar to book it.</div>
+                    <div class="small text-body-secondary px-1 mb-2" id="calendarUnscheduledHint"><?= __('Open tickets with no time booked - drag one onto the calendar to book it.') ?></div>
                     <div id="calendarUnscheduled"></div>
                 </div>
             </div>
@@ -144,16 +144,16 @@ foreach ($sources as $key => $source) {
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <i class="fas fa-mobile-alt fa-fw text-secondary"></i>
-                    <span class="fw-semibold small">Your schedule on your phone</span>
+                    <span class="fw-semibold small"><?= __('Your schedule on your phone') ?></span>
                 </div>
                 <div class="small text-body-secondary mb-2">
                     <?php if ($my_feed) { ?>
-                        <?= $my_feed['feed_accessed_at'] ? 'Subscribed - last fetched ' . escapeHtml(timeAgo($my_feed['feed_accessed_at'])) : 'Your link is made - not subscribed yet' ?>
+                        <?= $my_feed['feed_accessed_at'] ? escapeHtml(__('Subscribed - last fetched %s', timeAgo($my_feed['feed_accessed_at']))) : __('Your link is made - not subscribed yet') ?>
                     <?php } else { ?>
-                        In Outlook, Google, Apple or Nextcloud, kept up to date
+                        <?= __('In Outlook, Google, Apple or Nextcloud, kept up to date') ?>
                     <?php } ?>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary w-100 ajax-modal" data-modal-size="lg" data-modal-url="modals/calendar/calendar_feed.php" id="calendarMyLink"><i class="fas fa-link me-1"></i><?= $my_feed ? 'My calendar link' : 'Set it up' ?></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary w-100 ajax-modal" data-modal-size="lg" data-modal-url="modals/calendar/calendar_feed.php" id="calendarMyLink"><i class="fas fa-link me-1"></i><?= $my_feed ? __('My calendar link') : __('Set it up') ?></button>
             </div>
         </div>
 

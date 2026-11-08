@@ -54,10 +54,11 @@ foreach ($merging as $merge_id => $row) {
 $one = count($merging) === 1;
 $merge_text = '';
 if ($kind) {
-    $merge_text = ($records ? 'The ' . number_format($records) . ' ' . ($records === 1 ? strtolower($kind['title']) . ' with ' . ($one ? 'it gets' : 'one of these gets') : $kind['plural'] . ' with ' . ($one ? 'it get' : 'these get')) . ' the tag you keep instead.'
-            : 'Nothing has ' . ($one ? 'it' : 'these') . ' yet.')
-        . ($lines ? ' ' . ($lines === 1 ? 'The recurring invoice line counting by ' . ($one ? 'it counts' : 'them counts') : "The $lines recurring invoice lines counting by " . ($one ? 'it count' : 'them count')) . ' by the kept tag from now on.' : '')
-        . ($one ? ' It is then deleted.' : ' The others are then deleted.') . " This can't be undone.";
+    $merge_text = ($records ? ($records === 1 ? ($one ? __('The 1 %s with it gets the tag you keep instead.', strtolower($kind['title'])) : __('The 1 %s with one of these gets the tag you keep instead.', strtolower($kind['title'])))
+                : ($one ? __('The %1$s %2$s with it get the tag you keep instead.', number_format($records), $kind['plural']) : __('The %1$s %2$s with these get the tag you keep instead.', number_format($records), $kind['plural'])))
+            : ($one ? __('Nothing has it yet.') : __('Nothing has these yet.')))
+        . ($lines ? ' ' . ($one ? _n('The recurring invoice line counting by it counts by the kept tag from now on.', 'The %d recurring invoice lines counting by it count by the kept tag from now on.', $lines) : _n('The recurring invoice line counting by them counts by the kept tag from now on.', 'The %d recurring invoice lines counting by them count by the kept tag from now on.', $lines)) : '')
+        . ' ' . ($one ? __('It is then deleted.') : __('The others are then deleted.')) . ' ' . __("This can't be undone.");
 }
 
 ob_start();
@@ -65,14 +66,14 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-compress-alt me-2"></i>Merge <?= count($merging) === 1 ? 'Tag' : count($merging) . ' Tags' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-compress-alt me-2"></i><?= count($merging) === 1 ? __('Merge Tag') : __('Merge %d Tags', count($merging)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
 <?php if (!$merging || !$kind) { ?>
-    <div class="modal-body text-center text-secondary py-5"><?= $merging ? 'Tags of one kind can be merged - pick client tags, or asset tags, and so on.' : 'Those tags are gone - they may have been merged or deleted already.' ?></div>
+    <div class="modal-body text-center text-secondary py-5"><?= $merging ? __('Tags of one kind can be merged - pick client tags, or asset tags, and so on.') : __('Those tags are gone - they may have been merged or deleted already.') ?></div>
 <?php } elseif (!$into) { ?>
-    <div class="modal-body text-center text-secondary py-5">There's no other <?= strtolower($kind['title']) ?> tag to merge it into yet.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __("There's no other %s tag to merge it into yet.", strtolower($kind['title'])) ?></div>
 <?php } else { ?>
     <form action="post.php" method="post" autocomplete="off">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -81,7 +82,7 @@ ob_start();
         <?php } ?>
 
         <div class="modal-body">
-            <label class="form-label">Merging</label>
+            <label class="form-label"><?= __('Merging') ?></label>
             <div class="d-flex flex-wrap gap-2 mb-3">
                 <?php foreach ($merging as $merge_id => $row) { ?>
                     <span class="d-inline-flex align-items-center gap-1"><?= tagPill($row) ?><span class="small text-secondary"><?= number_format($usage[$merge_id] ?? 0) ?> <?= ($usage[$merge_id] ?? 0) === 1 ? strtolower($kind['title']) : $kind['plural'] ?></span></span>
@@ -89,10 +90,10 @@ ob_start();
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Into <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Into') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                    <select class="form-select select2" name="into_tag_id" data-placeholder="- Keep which tag -" required>
+                    <select class="form-select select2" name="into_tag_id" data-placeholder="<?= escapeHtml(__('- Keep which tag -')) ?>" required>
                         <option value=""></option>
                         <?php foreach ($into as $into_id => $row) { ?>
                             <option value="<?= intval($into_id) ?>"<?= intval($into_id) === $keep_id ? ' selected' : '' ?><?= tagOptionLook($row['tag_color'], $row['tag_icon']) ?>><?= escapeHtml($row['tag_name']) ?><?= isset($merging[$into_id]) ? ' (one of these)' : '' ?><?= $row['tag_archived_at'] ? ' (archived)' : '' ?></option>
@@ -104,8 +105,8 @@ ob_start();
             <p class="small text-secondary mb-0"><?= $merge_text ?></p>
         </div>
         <div class="modal-footer">
-            <button type="submit" name="merge_tags" class="btn btn-primary text-bold"><i class="fas fa-compress-alt me-2"></i>Merge</button>
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+            <button type="submit" name="merge_tags" class="btn btn-primary text-bold"><i class="fas fa-compress-alt me-2"></i><?= __('Merge') ?></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
         </div>
     </form>
 <?php } ?>

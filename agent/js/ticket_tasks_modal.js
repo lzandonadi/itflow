@@ -32,7 +32,7 @@
         nameInput.type = "text";
         nameInput.className = "form-control";
         nameInput.name = "tasks[]";
-        nameInput.placeholder = "Task name";
+        nameInput.placeholder = __('Task name');
         nameInput.maxLength = 255;
         nameInput.value = taskName || '';
         nameColumn.appendChild(nameInput);
@@ -43,7 +43,7 @@
             const note = document.createElement("div");
             note.className = "form-text mt-1";
             note.innerHTML = '<i class="fas fa-fw fa-code-branch me-1"></i>';
-            note.appendChild(document.createTextNode('Only when ' + when.fill_in + ' is ' + (when.value || '')));
+            note.appendChild(document.createTextNode(__('Only when %1$s is %2$s', when.fill_in, when.value || '')));
             nameColumn.appendChild(note);
         }
 
@@ -54,7 +54,7 @@
         estimateInput.type = "number";
         estimateInput.className = "form-control";
         estimateInput.name = "task_estimates[]";
-        estimateInput.placeholder = "Mins";
+        estimateInput.placeholder = __('Mins');
         estimateInput.min = 0;
         estimateInput.value = taskEstimate || '';
         estimateColumn.appendChild(estimateInput);
@@ -65,7 +65,7 @@
         const removeButton = document.createElement("button");
         removeButton.type = "button";
         removeButton.className = "btn btn-secondary w-100 ticket-task-remove";
-        removeButton.title = "Remove task";
+        removeButton.title = __('Remove task');
         removeButton.innerHTML = '<i class="fa fa-fw fa-trash"></i>';
         removeColumn.appendChild(removeButton);
 
@@ -157,9 +157,11 @@
             control = document.createElement('select');
             control.className = 'form-select' + (fillIn.type === 'list' ? ' select2' : '');
             const choices = fillIn.type === 'yesno' ? ['Yes', 'No'] : (fillIn.options || []);
-            control.appendChild(new Option('- Choose -', ''));
+            control.appendChild(new Option(__('- Choose -'), ''));
             choices.forEach(function (choice) {
-                control.appendChild(new Option(choice, choice));
+                // Yes and No go as they are stored, and read in the interface language
+                const label = fillIn.type === 'yesno' ? (choice === 'Yes' ? __('Yes') : __('No')) : choice;
+                control.appendChild(new Option(label, choice));
             });
             const match = choices.find(c => c.toLowerCase() === String(value || '').toLowerCase());
             control.value = match || '';
@@ -208,11 +210,11 @@
         const heading = document.createElement('div');
         heading.className = 'fw-semibold mb-1';
         heading.innerHTML = '<i class="fas fa-fw fa-pen-square text-secondary me-1"></i>';
-        heading.appendChild(document.createTextNode(option.text.replace(/ \(archived\)$/, '') + ' asks for'));
+        heading.appendChild(document.createTextNode(__('%s asks for', option.text.replace(new RegExp(' \\(' + __('archived') + '\\)$'), ''))));
         box.appendChild(heading);
         const intro = document.createElement('div');
         intro.className = 'small text-secondary mb-2';
-        intro.textContent = 'Each answer goes in wherever its [Name] is, and stays on the ticket. Leave one blank to answer it later.';
+        intro.textContent = __('Each answer goes in wherever its [Name] is, and stays on the ticket. Leave one blank to answer it later.');
         box.appendChild(intro);
 
         const grid = document.createElement('div');

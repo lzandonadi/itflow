@@ -16,7 +16,7 @@ $client_id = intval($row['ticket_client_id']);
 
 // A ticket with no client is internal work - nobody's assets
 if (!$client_id) {
-    echo json_encode(['error' => 'This ticket has no client, so no assets.']);
+    echo json_encode(['error' => __('This ticket has no client, so no assets.')]);
     exit;
 }
 
@@ -35,7 +35,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i>Assets <small class="ms-1 opacity-75"><?= "$ticket_prefix$ticket_number" ?></small></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i><?= __('Assets') ?> <small class="ms-1 opacity-75"><?= "$ticket_prefix$ticket_number" ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -44,11 +44,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Primary asset</label>
+            <label><?= __('Primary asset') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
                 <select class="form-select select2" name="asset">
-                    <option value="0">No asset</option>
+                    <option value="0"><?= __('No asset') ?></option>
                     <?php
 
                     $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type, asset_make, asset_model, asset_archived_at, contact_name FROM assets LEFT JOIN contacts ON contact_id = asset_contact_id WHERE asset_client_id = $client_id AND (asset_archived_at IS NULL OR asset_id IN ($linked_asset_ids)) ORDER BY asset_name ASC");
@@ -67,10 +67,10 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Other assets</label>
+            <label><?= __('Other assets') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
-                <select class="form-select select2" name="additional_assets[]" data-placeholder="- Any other assets involved -" multiple>
+                <select class="form-select select2" name="additional_assets[]" data-placeholder="<?= escapeHtml(__('- Any other assets involved -')) ?>" multiple>
                     <option value=""></option>
                     <?php
 
@@ -92,8 +92,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_ticket_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

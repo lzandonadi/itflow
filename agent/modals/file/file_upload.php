@@ -34,7 +34,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-cloud-upload-alt me-2"></i>Upload files</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-cloud-upload-alt me-2"></i><?= __('Upload files') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off" data-upload-form>
@@ -51,14 +51,14 @@ ob_start();
             <input type="file" class="visually-hidden" name="file[]" multiple data-upload-input
                 accept="<?= escapeHtml(implode(',', array_map(function ($extension) { return ".$extension"; }, $upload_extensions))) ?>">
             <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-            <span class="fw-semibold">Drop files here, or click to choose</span>
-            <span class="small text-body-secondary">Up to 20 at a time, 500 MB in all</span>
+            <span class="fw-semibold"><?= __('Drop files here, or click to choose') ?></span>
+            <span class="small text-body-secondary"><?= __('Up to 20 at a time, 500 MB in all') ?></span>
         </label>
         <ul class="list-unstyled mb-0 mt-2 itflow-upload-list" data-upload-list></ul>
         <div class="text-danger small mt-1" data-upload-error hidden></div>
 
         <div class="mt-3 mb-3">
-            <label class="form-label">Folder</label>
+            <label class="form-label"><?= __('Folder') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
                 <select class="form-select select2" name="folder_id">
@@ -68,23 +68,23 @@ ob_start();
         </div>
 
         <div class="mb-2">
-            <label class="form-label">Description <span class="text-body-secondary small">- optional, given to every file</span></label>
+            <label class="form-label"><?= __('Description') ?> <span class="text-body-secondary small"><?= __('- optional, given to every file') ?></span></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-align-left"></i></span>
-                <input type="text" class="form-control" name="description" maxlength="250" placeholder="What these are">
+                <input type="text" class="form-control" name="description" maxlength="250" placeholder="<?= escapeHtml(__('What these are')) ?>">
             </div>
         </div>
 
         <?php if ($link_name) { ?>
             <div class="small text-body-secondary mt-3">
-                <i class="fas fa-link me-1"></i>They will be linked to <strong><?= escapeHtml($link_name) ?></strong>.
+                <i class="fas fa-link me-1"></i><?= __('They will be linked to %s.', '<strong>' . escapeHtml($link_name) . '</strong>') ?>
             </div>
         <?php } ?>
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="upload_files" class="btn btn-primary text-bold" data-upload-submit disabled><i class="fa fa-upload me-2"></i>Upload</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="upload_files" class="btn btn-primary text-bold" data-upload-submit disabled><i class="fa fa-upload me-2"></i><?= __('Upload') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -131,8 +131,8 @@ ob_start();
                 li.append(icon, name, bytes);
                 list.appendChild(li);
             });
-            var problem = files.length > MAX_FILES ? 'That is ' + files.length + ' files - upload up to ' + MAX_FILES + ' at a time.'
-                : total > MAX_BYTES ? 'That is ' + size(total) + ' - keep each upload under 500 MB.' : '';
+            var problem = files.length > MAX_FILES ? <?= json_encode(__('That is %1$s files - upload up to %2$s at a time.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>.replace('%1$s', files.length).replace('%2$s', MAX_FILES)
+                : total > MAX_BYTES ? <?= json_encode(__('That is %s - keep each upload under 500 MB.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>.replace('%s', size(total)) : '';
             error.textContent = problem;
             error.hidden = !problem;
             submit.disabled = !files.length || !!problem;
@@ -166,7 +166,7 @@ ob_start();
             // Disabled after the browser has read the submitter, so upload_files still posts
             setTimeout(function () {
                 submit.disabled = true;
-                submit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+                submit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>' + <?= json_encode(__('Uploading...'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
             }, 0);
         });
     })();

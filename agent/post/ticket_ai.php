@@ -17,22 +17,22 @@ if (isset($_POST['add_ticket_ai_note'])) {
     $row = ticketForRequest($_POST['ticket_id'] ?? 0, 2);
     $ticket_id = intval($row['ticket_id']);
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert('Ticket <strong>' . escapeHtml(ticketReference($row)) . '</strong> is closed - nothing more goes on it.', 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed - nothing more goes on it.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
     // What the window showed, cleaned again - it came back from the page
     $note = trim(documentHtmlPurify((string) ($_POST['note'] ?? '')));
     if (trim(strip_tags($note)) === '') {
-        flashAlert('There was no summary to save - ask for it again.', 'error');
+        flashAlert(__('There was no summary to save - ask for it again.'), 'error');
         redirect();
     }
-    $note = mysqli_real_escape_string($mysqli, '<p><strong>AI summary</strong></p>' . $note);
+    $note = mysqli_real_escape_string($mysqli, '<p><strong>' . escapeHtml(__('AI summary')) . '</strong></p>' . $note);
 
     mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '$note', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
     mysqli_query($mysqli, "UPDATE tickets SET ticket_updated_at = NOW() WHERE ticket_id = $ticket_id");
 
     logAudit("Ticket", "Reply", "$session_name saved an AI summary as an internal note on ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
-    flashAlert('Summary saved as an internal note on <strong>' . escapeHtml(ticketReference($row)) . '</strong>');
+    flashAlert(__('Summary saved as an internal note on <strong>%s</strong>', escapeHtml(ticketReference($row))));
     redirect();
 
 }
@@ -48,11 +48,11 @@ if (isset($_GET['triage_ticket_ai'])) {
     }
     $result = aiTicketTriage(intval($row['ticket_id']));
     if (!$result['ok']) {
-        flashAlert('AI triage didn\'t work - ' . escapeHtml($result['error']), 'error');
+        flashAlert(__("AI triage didn't work - %s", escapeHtml($result['error'])), 'error');
         redirect();
     }
     $changes = aiTriageChanges($result['triage'], $row);
-    flashAlert($changes ? 'AI triage suggests a ' . escapeHtml(implode(' and a ', array_keys($changes))) . ' - apply it or dismiss it on the ticket' : 'AI triage agrees with the category and priority it has', 'info');
+    flashAlert(!$changes ? __('AI triage agrees with the category and priority it has') : (count($changes) > 1 ? __('AI triage suggests a category and a priority - apply them or dismiss them on the ticket') : (isset($changes['category']) ? __('AI triage suggests a category - apply it or dismiss it on the ticket') : __('AI triage suggests a priority - apply it or dismiss it on the ticket'))), 'info');
     redirect();
 
 }
@@ -66,32 +66,32 @@ if (isset($_POST['apply_ticket_ai_triage']) || isset($_POST['dismiss_ticket_ai_t
     $ticket_id = intval($row['ticket_id']);
     $triage = aiTriageRow($ticket_id);
     if (!$triage || $triage['ai_triage_state'] !== 'suggested') {
-        flashAlert('There is no AI triage waiting on this ticket.', 'info');
+        flashAlert(__('There is no AI triage waiting on this ticket.'), 'info');
         redirect();
     }
 
     if (isset($_POST['dismiss_ticket_ai_triage'])) {
         mysqli_query($mysqli, "UPDATE ai_ticket_triage SET ai_triage_state = 'dismissed', ai_triage_by = $session_user_id WHERE ai_triage_ticket_id = $ticket_id");
-        flashAlert('AI triage dismissed', 'info');
+        flashAlert(__('AI triage dismissed'), 'info');
         redirect();
     }
 
     if (!ticketIsOpen($row)) {
-        flashAlert('Ticket <strong>' . escapeHtml(ticketReference($row)) . '</strong> isn\'t open - reopen it to change it.', 'error');
+        flashAlert(__("Ticket <strong>%s</strong> isn't open - reopen it to change it.", escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
     // Those ticked - both, without the window's script
     $only = array_values(array_intersect((array) ($_POST['apply'] ?? ['category', 'priority']), ['category', 'priority']));
     $changes = aiTriageApply($ticket_id, stripslashes($session_name), $only, 'applied', $session_user_id);
     if (!$changes) {
-        flashAlert('Nothing to change - the ticket has that already', 'info');
+        flashAlert(__('Nothing to change - the ticket has that already'), 'info');
         redirect();
     }
     $said = [];
     foreach ($changes as $field => $change) {
-        $said[] = ucfirst($field) . ' <strong>' . escapeHtml($change[1]) . '</strong>';
+        $said[] = $field === 'priority' ? __('Priority <strong>%s</strong>', escapeHtml(ticketPriorityLabel($change[1]))) : __('Category <strong>%s</strong>', escapeHtml($change[1]));
     }
-    flashAlert(implode(' and ', $said) . ' set on <strong>' . escapeHtml(ticketReference($row)) . '</strong>');
+    flashAlert(__('%1$s set on <strong>%2$s</strong>', count($said) > 1 ? __('%1$s and %2$s', $said[0], $said[1]) : $said[0], escapeHtml(ticketReference($row))));
     redirect();
 
 }

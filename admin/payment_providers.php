@@ -68,11 +68,11 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-credit-card me-2"></i>Payment Providers</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-credit-card me-2"></i><?= __('Payment Providers') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light me-1" href="saved_payment_methods.php"><i class="fas fa-fw fa-wallet"></i><span class="d-none d-lg-inline ms-2">Saved Cards</span></a>
+            <a class="btn btn-outline-light me-1" href="saved_payment_methods.php"><i class="fas fa-fw fa-wallet"></i><span class="d-none d-lg-inline ms-2"><?= __('Saved Cards') ?></span></a>
             <?php if ($can_add) { ?>
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">Add Provider</span></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('Add Provider') ?></span></button>
             <?php } ?>
         </div>
     </div>
@@ -81,8 +81,8 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search payment providers..." title="Name, description, account, fee vendor or category">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search payment providers...')) ?>" title="<?= escapeHtml(__('Name, description, account, fee vendor or category')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -92,12 +92,12 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('payment_provider_name', 'Provider') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('account_name', 'Payments go into') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('payment_provider_threshold', 'Card limit') ?></th>
-                <th class="d-none d-lg-table-cell">Fees</th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('saved_cards', 'Saved cards') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_paid', 'Card payments') ?></th>
+                <th class="ps-3"><?= $sort_link('payment_provider_name', __('Provider')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('account_name', __('Payments go into')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('payment_provider_threshold', __('Card limit')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('Fees') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('saved_cards', __('Saved cards')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_paid', __('Card payments')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -122,12 +122,12 @@ $csrf = $_SESSION['csrf_token'];
                             <div class="min-w-0">
                                 <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="<?= $edit_url ?>"><?= escapeHtml($name) ?></a>
                                 <?php if (!$on) { ?>
-                                    <span class="badge text-bg-secondary ms-1" data-provider-state="off" title="Clients can't pay by card through it, and autopay with its cards is skipped">Off</span>
+                                    <span class="badge text-bg-secondary ms-1" data-provider-state="off" title="<?= escapeHtml(__('Clients can\'t pay by card through it, and autopay with its cards is skipped')) ?>"><?= __('Off') ?></span>
                                 <?php } ?>
                                 <?php if ($mode === 'test') { ?>
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" data-provider-mode="test" title="Its keys are test keys - no real money moves">Test</span>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" data-provider-mode="test" title="<?= escapeHtml(__('Its keys are test keys - no real money moves')) ?>"><?= __('Test') ?></span>
                                 <?php } elseif ($mode === 'live') { ?>
-                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle ms-1" data-provider-mode="live">Live</span>
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle ms-1" data-provider-mode="live"><?= __('Live') ?></span>
                                 <?php } ?>
                                 <?php if (trim((string) $row['payment_provider_description']) !== '') { ?>
                                     <div class="small text-body-secondary"><?= escapeHtml($row['payment_provider_description']) ?></div>
@@ -139,34 +139,34 @@ $csrf = $_SESSION['csrf_token'];
                     </td>
                     <td class="d-none d-md-table-cell small">
                         <?php if ($row['account_name'] === null) { ?>
-                            <span class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i>No account - pick one in Edit</span>
+                            <span class="text-danger-emphasis"><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('No account - pick one in Edit') ?></span>
                         <?php } else { ?>
                             <a class="text-reset" href="/agent/accounts.php"><?= escapeHtml($row['account_name']) ?></a>
-                            <?php if ($row['account_archived_at']) { ?><div class="text-danger-emphasis"><i class="fas fa-fw fa-archive me-1"></i>Archived - pick another in Edit</div><?php } ?>
+                            <?php if ($row['account_archived_at']) { ?><div class="text-danger-emphasis"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived - pick another in Edit') ?></div><?php } ?>
                         <?php } ?>
                     </td>
                     <td class="d-none d-lg-table-cell small text-nowrap"><?= escapeHtml(paymentProviderLimitText($row['payment_provider_threshold'])) ?></td>
                     <td class="d-none d-lg-table-cell small" data-provider-fees="<?= $fees_on ? 'on' : 'off' ?>">
                         <?php if ($fees_on) { ?>
-                            <div><i class="fas fa-fw fa-receipt text-secondary me-1"></i>Recorded</div>
+                            <div><i class="fas fa-fw fa-receipt text-secondary me-1"></i><?= __('Recorded') ?></div>
                             <div class="text-body-secondary"><?= escapeHtml(trim($row['vendor_name'] . ' · ' . $row['category_name'], ' ·')) ?></div>
                             <?php if ($activity['fees']) { ?>
                                 <div><a class="text-body-secondary" href="/agent/expenses.php?q=<?= urlencode($name . ' fee') ?>" data-provider-fees-total><?= escapeHtml(paymentProviderMoneyText($activity['fees'])) ?> in 30 days</a></div>
                             <?php } ?>
                             <?php if ($activity['waiting']) { ?>
                                 <span class="badge <?= $activity['stale'] ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'text-bg-light border' ?> fw-normal mt-1" data-provider-fees-waiting="<?= $activity['waiting'] ?>"
-                                    title="<?= $activity['stale'] ? 'Some are more than two days old - the Payment Provider Fees job in Maintenance > Cron should have had them' : 'Recorded a few minutes after Stripe settles them' ?>"><?= $activity['waiting'] ?> to record</span>
+                                    title="<?= $activity['stale'] ? __('Some are more than two days old - the Payment Provider Fees job in Maintenance > Cron should have had them') : __('Recorded a few minutes after Stripe settles them') ?>"><?= $activity['waiting'] ?> to record</span>
                             <?php } ?>
                         <?php } else { ?>
-                            <span class="text-body-secondary">Not recorded</span>
+                            <span class="text-body-secondary"><?= __('Not recorded') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap">
                         <?php if ($cards) { ?>
                             <a class="text-reset" href="saved_payment_methods.php?provider=<?= $provider_id ?>"><?= $cards ?> card<?= $cards === 1 ? '' : 's' ?></a>
-                            <?php if ($autopay) { ?><div><a class="text-body-secondary" href="saved_payment_methods.php?provider=<?= $provider_id ?>&amp;show=autopay">Autopay on <?= $autopay ?></a></div><?php } ?>
+                            <?php if ($autopay) { ?><div><a class="text-body-secondary" href="saved_payment_methods.php?provider=<?= $provider_id ?>&amp;show=autopay"><?= __('Autopay on %s', $autopay) ?></a></div><?php } ?>
                         <?php } else { ?>
-                            <span class="text-body-secondary">None yet</span>
+                            <span class="text-body-secondary"><?= __('None yet') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap" data-provider-payments="<?= $activity['payments'] ?>">
@@ -174,38 +174,38 @@ $csrf = $_SESSION['csrf_token'];
                             <div><?= $activity['payments'] ?> in 30 days</div>
                             <div class="text-body-secondary"><?= escapeHtml(paymentProviderMoneyText($activity['paid'])) ?></div>
                         <?php } ?>
-                        <div class="text-body-secondary"<?= $row['last_paid'] ? ' title="' . escapeHtml($row['last_paid']) . '"' : '' ?>><?= $row['last_paid'] ? 'Last ' . escapeHtml(date('M j, Y', strtotime($row['last_paid']))) : 'None yet' ?></div>
+                        <div class="text-body-secondary"<?= $row['last_paid'] ? ' title="' . escapeHtml($row['last_paid']) . '"' : '' ?>><?= $row['last_paid'] ? 'Last ' . escapeHtml(date('M j, Y', strtotime($row['last_paid']))) : __('None yet') ?></div>
                     </td>
                     <td class="text-end pe-3">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?check_payment_provider_connection=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="Whether <?= escapeHtml($name) ?> still takes its secret key, and whose account it is">
-                                    <i class="fas fa-fw fa-plug text-secondary me-2"></i>Check connection
+                                <a class="dropdown-item" href="post.php?check_payment_provider_connection=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="<?= __('Whether %s still takes its secret key, and whose account it is', escapeHtml($name)) ?>">
+                                    <i class="fas fa-fw fa-plug text-secondary me-2"></i><?= __('Check connection') ?>
                                 </a>
                                 <?php if ($fees_on && $activity['waiting']) { ?>
-                                    <a class="dropdown-item" href="post.php?record_payment_provider_fees=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="What the Payment Provider Fees job does every few minutes - for the card payments whose fee is still to record">
-                                        <i class="fas fa-fw fa-receipt text-secondary me-2"></i>Record fees now
+                                    <a class="dropdown-item" href="post.php?record_payment_provider_fees=<?= $provider_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('What the Payment Provider Fees job does every few minutes - for the card payments whose fee is still to record')) ?>">
+                                        <i class="fas fa-fw fa-receipt text-secondary me-2"></i><?= __('Record fees now') ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($on) { ?>
                                     <a class="dropdown-item confirm-link" href="post.php?turn_payment_provider_off=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                        data-confirm-title="Turn <?= escapeHtml($name) ?> off?" data-confirm-text="Clients won't be able to pay by card, and autopay with its saved cards is skipped until it is on again. Its cards are kept." data-confirm-button="Turn off">
-                                        <i class="fas fa-fw fa-toggle-off text-secondary me-2"></i>Turn off
+                                        data-confirm-title="<?= __('Turn %s off?', escapeHtml($name)) ?>" data-confirm-text="<?= escapeHtml(__('Clients won\'t be able to pay by card, and autopay with its saved cards is skipped until it is on again. Its cards are kept.')) ?>" data-confirm-button="<?= escapeHtml(__('Turn off')) ?>">
+                                        <i class="fas fa-fw fa-toggle-off text-secondary me-2"></i><?= __('Turn off') ?>
                                     </a>
                                 <?php } else { ?>
                                     <a class="dropdown-item" href="post.php?turn_payment_provider_on=<?= $provider_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-toggle-on text-secondary me-2"></i>Turn on
+                                        <i class="fas fa-fw fa-toggle-on text-secondary me-2"></i><?= __('Turn on') ?>
                                     </a>
                                 <?php } ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_payment_provider=<?= $provider_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="Delete"
-                                    data-confirm-text="<?= escapeHtml($ties !== '' ? "Its $ties go with it. To stop card payments and keep them, turn it off instead." : 'Clients will no longer be able to pay by card.') ?>">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', escapeHtml($name)) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"
+                                    data-confirm-text="<?= escapeHtml($ties !== '' ? __('Its %s go with it. To stop card payments and keep them, turn it off instead.', $ties) : __('Clients will no longer be able to pay by card.')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -217,10 +217,10 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'payment providers',
+        'thing' => __('payment providers'),
         'icon' => 'fa-credit-card',
-        'text' => 'Set up Stripe and clients can pay their invoices by card, save a card, and pay recurring invoices by autopay.',
-        'actions' => $can_add ? [['label' => 'Add Provider', 'modal' => $add_url]] : [],
+        'text' => __('Set up Stripe and clients can pay their invoices by card, save a card, and pay recurring invoices by autopay.'),
+        'actions' => $can_add ? [['label' => __('Add Provider'), 'modal' => $add_url]] : [],
     ];
     ?>
     <?php require_once "../includes/filter_footer.php"; ?>

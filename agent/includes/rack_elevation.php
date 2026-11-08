@@ -58,7 +58,7 @@ $elevation_rail = $elevation_descending ? range(1, $elevation_rack_units) : rang
                 if ($elevation_can_edit) { ?>
                     <button type="button" class="itflow-rack-slot ajax-modal" style="grid-row: <?= $slot_row ?>"
                         data-modal-url="modals/rack/rack_device_add.php?id=<?= $rack_id ?>&u=<?= $u ?>&face=<?= $elevation_face ?>"
-                        title="Add something at U<?= $u ?> (<?= $elevation_face ?>)">
+                        title="<?= escapeHtml(__('Add something at U%1$s (%2$s)', $u, ($elevation_face === 'rear' ? __('rear') : __('front')))) ?>">
                         <span><i class="fas fa-plus me-1"></i>U<?= $u ?></span>
                     </button>
                 <?php } else { ?>
@@ -80,10 +80,10 @@ $elevation_rail = $elevation_descending ? range(1, $elevation_rack_units) : rang
                 <div class="<?= $block_classes ?>" style="grid-row: <?= $block_row ?> / span <?= $block['height'] ?>">
 
                     <?php if ($block['ghost']) { ?>
-                        <div class="itflow-rack-item-body" title="<?= $block_title ?> - mounted on the <?= $elevation_other_face ?>, full depth">
+                        <div class="itflow-rack-item-body" title="<?= escapeHtml($elevation_other_face === 'rear' ? __('%s - mounted on the rear, full depth', html_entity_decode($block_title, ENT_QUOTES, 'UTF-8')) : __('%s - mounted on the front, full depth', html_entity_decode($block_title, ENT_QUOTES, 'UTF-8'))) ?>">
                             <span class="itflow-rack-item-text">
                                 <span class="itflow-rack-item-name"><?= $block['name'] ?></span>
-                                <span class="itflow-rack-item-meta">Full depth from the <?= $elevation_other_face ?></span>
+                                <span class="itflow-rack-item-meta"><?= $elevation_other_face === 'rear' ? __('Full depth from the rear') : __('Full depth from the front') ?></span>
                             </span>
                         </div>
                     <?php } else {
@@ -115,7 +115,7 @@ $elevation_rail = $elevation_descending ? range(1, $elevation_rack_units) : rang
                             <span class="itflow-rack-item-pos"><?= $block['position'] ?></span>
                         <?= $block_close ?>
                         <?php if ($elevation_can_edit && $block['asset_id']) { ?>
-                            <button type="button" class="itflow-rack-item-edit ajax-modal" title="Move or edit"
+                            <button type="button" class="itflow-rack-item-edit ajax-modal" title="<?= escapeHtml(__('Move or edit')) ?>"
                                 data-modal-url="modals/rack/rack_device_edit.php?id=<?= $block['id'] ?>">
                                 <i class="fas fa-pen"></i>
                             </button>

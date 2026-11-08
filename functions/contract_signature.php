@@ -31,27 +31,27 @@
 
 /** The placeholders a contract's terms can use - what each becomes. */
 const CONTRACT_PLACEHOLDERS = [
-    'Client' => "the client's name",
-    'Client Address' => "the client's main address, on one line",
-    'Contact' => 'the contact on the contract',
-    'Contact Title' => "the contact's job title",
-    'Contact Email' => "the contact's email",
+    'Client' => "the client's name", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Client Address' => "the client's main address, on one line", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact' => 'the contact on the contract', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact Title' => "the contact's job title", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Contact Email' => "the contact's email", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     'Company' => 'your company',
-    'Contract' => "the contract's name",
-    'Type' => 'what kind of contract - Fully managed',
-    'Start Date' => 'the day it starts',
-    'End Date' => 'its last day',
-    'Term' => 'how long it runs - 1 year',
-    'Renewal' => 'whether it renews itself, in a sentence',
-    'Notice' => 'the notice to end it - 30 days',
-    'Support Hours' => 'its support hours',
-    'Monthly Hours' => 'the hours of support included each month - 10 hours',
-    'Rate' => 'the hourly rate',
+    'Contract' => "the contract's name", // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Type' => 'what kind of contract - Fully managed', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Start Date' => 'the day it starts', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'End Date' => 'its last day', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Term' => 'how long it runs - 1 year', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Renewal' => 'whether it renews itself, in a sentence', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Notice' => 'the notice to end it - 30 days', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Support Hours' => 'its support hours', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Monthly Hours' => 'the hours of support included each month - 10 hours', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Rate' => 'the hourly rate', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     'After Hours Rate' => 'the after-hours rate',
-    'Net Terms' => 'when invoices are due - Net 30',
-    'Owner' => 'who looks after it for you',
-    'SLA' => 'on a line of its own, the response times for each priority as a table',
-    'Date' => 'the day it is sent',
+    'Net Terms' => 'when invoices are due - Net 30', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Owner' => 'who looks after it for you', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'SLA' => 'on a line of its own, the response times for each priority as a table', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+    'Date' => 'the day it is sent', // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
 ];
 
 /** The largest signature picture taken, in bytes. */
@@ -87,7 +87,36 @@ function contractMoney($amount, array $row) {
 /** Net terms in words - "Net 30", "Due on receipt". */
 function contractNetTermsText($days) {
     $days = intval($days);
-    return $days > 0 ? "Net $days" : 'Due on receipt';
+    return $days > 0 ? __('Net %d', $days) : __('Due on receipt');
+}
+
+/*
+ * A day as the document writes it - "Nov 6, 2026". In English always as
+ * date() writes it, so the fingerprint of a document sent before stays the
+ * same; formatDate() output can change with the ICU library.
+ */
+function contractDocumentDate($date) {
+    return i18nLocale() === 'en_US' ? date('M j, Y', strtotime((string) $date)) : formatDate($date, 'date');
+}
+
+/*
+ * Whether the document of $row as of $as_of is the one with fingerprint
+ * $hash - in any language ITFlow speaks, as the interface may have been in
+ * another one when it was sent.
+ */
+function contractDocumentSame(array $row, $as_of, $hash) {
+    $was = i18nLocale();
+    try {
+        foreach (array_unique(array_merge([$was], array_keys(i18nLanguages()))) as $locale) {
+            i18nSetLocale($locale);
+            if (contractDocumentHash(contractDocumentHtml($row, $as_of)) === (string) $hash) {
+                return true;
+            }
+        }
+        return false;
+    } finally {
+        i18nSetLocale($was);
+    }
 }
 
 /*
@@ -120,15 +149,15 @@ function contractSlaRows(array $row, $date = null) {
 /** The response times as a table - for [SLA] and the document's own section - as of $date. */
 function contractSlaTableHtml(array $row, $date = null) {
     $html = '<table class="itflow-contract-doc-table itflow-contract-doc-slas" width="100%" cellpadding="5" cellspacing="0"><thead><tr>'
-        . '<th width="22%">Priority</th><th width="38%">Respond within</th><th width="40%">Resolve within</th></tr></thead><tbody>';
+        . '<th width="22%">' . escapeHtml(__('Priority')) . '</th><th width="38%">' . escapeHtml(__('Respond within')) . '</th><th width="40%">' . escapeHtml(__('Resolve within')) . '</th></tr></thead><tbody>';
     foreach (contractSlaRows($row, $date) as $priority => $item) {
         $sla = $item['sla'];
-        $html .= '<tr><td width="22%">' . escapeHtml($priority) . '</td>';
+        $html .= '<tr><td width="22%">' . escapeHtml(_x($priority, 'ticket priority')) . '</td>'; // i18n-dynamic - Low, Medium, High, Urgent
         if ($sla) {
             $html .= '<td width="38%">' . escapeHtml(slaMinutesText($sla['sla_response_minutes'])) . '</td>'
-                . '<td width="40%">' . (intval($sla['sla_resolution_minutes']) > 0 ? escapeHtml(slaMinutesText($sla['sla_resolution_minutes'])) : 'No set time') . '</td>';
+                . '<td width="40%">' . (intval($sla['sla_resolution_minutes']) > 0 ? escapeHtml(slaMinutesText($sla['sla_resolution_minutes'])) : escapeHtml(__('No set time'))) . '</td>';
         } else {
-            $html .= '<td width="38%">No set time</td><td width="40%">No set time</td>';
+            $html .= '<td width="38%">' . escapeHtml(__('No set time')) . '</td><td width="40%">' . escapeHtml(__('No set time')) . '</td>';
         }
         $html .= '</tr>';
     }
@@ -144,7 +173,7 @@ function contractPlaceholderValues(array $row, $as_of = null) {
     $contact = intval($row['contract_contact_id']) ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT contact_name, contact_title, contact_email FROM contacts
         WHERE contact_id = " . intval($row['contract_contact_id']) . " AND contact_client_id = " . intval($row['contract_client_id']))) : null;
     $day = function ($date) {
-        return $date ? date('M j, Y', strtotime($date)) : '';
+        return $date ? contractDocumentDate($date) : '';
     };
     $start = (string) ($row['contract_start_date'] ?? '');
     $end = (string) ($row['contract_end_date'] ?? '');
@@ -161,7 +190,7 @@ function contractPlaceholderValues(array $row, $as_of = null) {
     $slas = [];
     foreach (contractSlaRows($row, $as_of) as $priority => $item) {
         if ($item['sla']) {
-            $slas[] = "$priority: " . strtolower(contractSlaTargets($item['sla']));
+            $slas[] = _x($priority, 'ticket priority') . ': ' . mb_strtolower(contractSlaTargets($item['sla'])); // i18n-dynamic - Low, Medium, High, Urgent
         }
     }
     return [
@@ -177,9 +206,9 @@ function contractPlaceholderValues(array $row, $as_of = null) {
         'end date' => $day($end),
         'term' => $term,
         'renewal' => intval($row['contract_auto_renew'])
-            ? "It renews itself for another $term" . ($notice ? " unless notice is given at least $notice days before it ends." : '.')
-            : 'It ends on its last day unless it is renewed.',
-        'notice' => $notice ? "$notice days" : 'none',
+            ? ($notice ? __('It renews itself for another %1$s unless notice is given at least %2$d days before it ends.', $term, $notice) : __('It renews itself for another %s.', $term))
+            : __('It ends on its last day unless it is renewed.'),
+        'notice' => $notice ? __('%d days', $notice) : __('none'),
         'support hours' => (string) ($row['contract_support_hours'] ?? ''),
         'monthly hours' => floatval($row['contract_monthly_hours'] ?? 0) > 0 ? contractHoursWords($row['contract_monthly_hours']) : '',
         'rate' => $rate !== null && $rate !== '' ? contractMoney($rate, $row) : '',
@@ -228,45 +257,47 @@ function contractDocumentHtml(array $row, $as_of = null) {
     ]);
     $to_lines = array_filter([
         $values['client address'] !== '' ? formatAddress($bill_to['location_address'] ?? '', $bill_to['location_city'] ?? '', $bill_to['location_state'] ?? '', $bill_to['location_zip'] ?? '', $bill_to['location_country'] ?? '', "\n") : '',
-        $values['contact'] !== '' ? 'Attention: ' . $values['contact'] . ($values['contact title'] !== '' ? ', ' . $values['contact title'] : '') : '',
+        $values['contact'] !== '' ? __('Attention: %s', $values['contact'] . ($values['contact title'] !== '' ? ', ' . $values['contact title'] : '')) : '',
         $values['contact email'],
     ]);
 
     $html = '<div class="itflow-contract-doc">';
     $html .= '<h1 class="itflow-contract-doc-title">' . $e($row['contract_name']) . '</h1>';
-    $html .= '<p class="itflow-contract-doc-between">' . $e(contractTypeLabel($row['contract_type'])) . ' agreement between <strong>' . $e($values['company']) . '</strong> and <strong>' . $e($values['client']) . '</strong>'
-        . ($values['start date'] !== '' ? ', from ' . $e($values['start date']) : '') . '.</p>';
+    $html .= '<p class="itflow-contract-doc-between">' . ($values['start date'] !== ''
+        ? __('%1$s agreement between <strong>%2$s</strong> and <strong>%3$s</strong>, from %4$s.', $e(contractTypeLabel($row['contract_type'])), $e($values['company']), $e($values['client']), $e($values['start date']))
+        : __('%1$s agreement between <strong>%2$s</strong> and <strong>%3$s</strong>.', $e(contractTypeLabel($row['contract_type'])), $e($values['company']), $e($values['client']))) . '</p>';
 
     $html .= '<table class="itflow-contract-doc-parties" width="100%" cellpadding="0" cellspacing="0"><tr>'
-        . '<td width="50%"><div class="itflow-contract-doc-label">Provider</div><strong>' . $e($values['company']) . '</strong><br><span class="itflow-contract-doc-muted">' . nl2br($e(implode("\n", $from_lines))) . '</span></td>'
-        . '<td width="50%"><div class="itflow-contract-doc-label">Client</div><strong>' . $e($values['client']) . '</strong><br><span class="itflow-contract-doc-muted">' . nl2br($e(implode("\n", $to_lines))) . '</span></td>'
+        . '<td width="50%"><div class="itflow-contract-doc-label">' . $e(__('Provider')) . '</div><strong>' . $e($values['company']) . '</strong><br><span class="itflow-contract-doc-muted">' . nl2br($e(implode("\n", $from_lines))) . '</span></td>'
+        . '<td width="50%"><div class="itflow-contract-doc-label">' . $e(__('Client')) . '</div><strong>' . $e($values['client']) . '</strong><br><span class="itflow-contract-doc-muted">' . nl2br($e(implode("\n", $to_lines))) . '</span></td>'
         . '</tr></table>';
 
     // The agreement in a few lines
     $term = $values['term'];
     if ($values['start date'] !== '') {
-        $term .= ', from ' . $values['start date'] . ($values['end date'] !== '' ? ' to ' . $values['end date'] : '');
+        $term = $values['end date'] !== '' ? __('%1$s, from %2$s to %3$s', $term, $values['start date'], $values['end date']) : __('%1$s, from %2$s', $term, $values['start date']);
     }
     $rates = [];
     if ($values['rate'] !== '') {
-        $rates[] = $values['rate'] . ' an hour';
+        $rates[] = __('%s an hour', $values['rate']);
     }
-    if ($values['after hours rate'] !== '') {
-        $rates[] = $values['after hours rate'] . ' an hour after hours';
+    if ($values['after hours rate'] !== '') { // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
+        $rates[] = __('%s an hour after hours', $values['after hours rate']);
     }
     $net = $values['net terms'];
+    $net_days = intval(preg_replace('/\D/', '', $net));
     $summary = [
-        'Type' => contractTypeLabel($row['contract_type']),
-        'Term' => $term,
-        'Renewal' => $values['renewal'],
-        'Notice' => intval($row['contract_notice_days']) ? $values['notice'] . ' before it ends, in writing' : 'None needed',
-        'Support hours' => $values['support hours'],
+        __('Type') => contractTypeLabel($row['contract_type']),
+        __('Term') => $term,
+        __('Renewal') => $values['renewal'],
+        __('Notice') => intval($row['contract_notice_days']) ? __('%s before it ends, in writing', $values['notice']) : __('None needed'),
+        __('Support hours') => $values['support hours'],
         // Only when there are some - documents without them come out as they always did
-        'Included hours' => $values['monthly hours'] !== '' ? $values['monthly hours'] . ' of support each month, used for that month only' : '',
-        'Rates' => implode('; ', $rates),
-        'Payment' => $net === '' ? '' : ($net === 'Due on receipt' ? 'Invoices are due on receipt' : 'Invoices are due ' . intval(preg_replace('/\D/', '', $net)) . " days after they are issued ($net)"),
+        __('Included hours') => $values['monthly hours'] !== '' ? __('%s of support each month, used for that month only', $values['monthly hours']) : '',
+        __('Rates') => implode('; ', $rates),
+        __('Payment') => $net === '' ? '' : (!$net_days ? __('Invoices are due on receipt') : __('Invoices are due %1$d days after they are issued (%2$s)', $net_days, $net)),
     ];
-    $html .= '<h2 class="itflow-contract-doc-heading">The agreement</h2>';
+    $html .= '<h2 class="itflow-contract-doc-heading">' . $e(__('The agreement')) . '</h2>';
     $html .= '<table class="itflow-contract-doc-table itflow-contract-doc-summary" width="100%" cellpadding="5" cellspacing="0"><tbody>';
     foreach ($summary as $label => $value) {
         if ($value !== '') {
@@ -275,12 +306,12 @@ function contractDocumentHtml(array $row, $as_of = null) {
     }
     $html .= '</tbody></table>';
 
-    $html .= '<h2 class="itflow-contract-doc-heading">Response times</h2>';
+    $html .= '<h2 class="itflow-contract-doc-heading">' . $e(__('Response times')) . '</h2>';
     $html .= contractSlaTableHtml($row, $as_of);
 
     $terms = trim((string) $row['contract_details']) !== '' ? contractFillTerms(documentHtmlPurify((string) $row['contract_details']), $row, $as_of) : '';
     if (trim(strip_tags($terms, '<img><table>')) !== '') {
-        $html .= '<h2 class="itflow-contract-doc-heading">Terms</h2>';
+        $html .= '<h2 class="itflow-contract-doc-heading">' . $e(_x('Terms', 'contract document')) . '</h2>';
         $html .= '<div class="itflow-contract-doc-terms">' . $terms . '</div>';
     }
     return $html . '</div>';
@@ -360,36 +391,36 @@ function contractSignatureState($round) {
         return null;
     }
     $day = function ($date) {
-        return date('M j, Y', strtotime((string) $date));
+        return formatDate($date, 'date');
     };
     $client = !empty($round['contract_signature_client_signed_at']);
     $agent = !empty($round['contract_signature_agent_signed_at']);
     if ($client && $agent) {
-        return ['key' => 'signed', 'label' => 'Signed', 'tone' => 'success', 'icon' => 'fa-file-signature', 'when' => 'Signed by both ' . $day(max($round['contract_signature_client_signed_at'], $round['contract_signature_agent_signed_at']))];
+        return ['key' => 'signed', 'label' => _x('Signed', 'contract signing'), 'tone' => 'success', 'icon' => 'fa-file-signature', 'when' => __('Signed by both %s', $day(max($round['contract_signature_client_signed_at'], $round['contract_signature_agent_signed_at'])))];
     }
     if (!empty($round['contract_signature_withdrawn_at'])) {
-        return ['key' => 'withdrawn', 'label' => 'Withdrawn', 'tone' => 'secondary', 'icon' => 'fa-undo', 'when' => 'Withdrawn ' . $day($round['contract_signature_withdrawn_at'])];
+        return ['key' => 'withdrawn', 'label' => _x('Withdrawn', 'contract signing'), 'tone' => 'secondary', 'icon' => 'fa-undo', 'when' => _x('Withdrawn %s', 'contract signing', $day($round['contract_signature_withdrawn_at']))];
     }
     // Waiting on a contract that is over, or an archived client's - nothing more is signed on it
     $closed = in_array($round['contract_status'] ?? '', ['Ended', 'Cancelled'], true) || !empty($round['client_archived_at']);
     if ($closed && !$agent && !empty($round['contract_signature_sent_at']) && (string) ($round['contract_signature_url_key'] ?? 'x') !== '') {
-        return ['key' => 'withdrawn', 'label' => 'Withdrawn', 'tone' => 'secondary', 'icon' => 'fa-undo',
-            'when' => ['Cancelled' => 'The contract was cancelled', 'Ended' => 'The contract ended'][$round['contract_status']] ?? 'The client was archived'];
+        return ['key' => 'withdrawn', 'label' => _x('Withdrawn', 'contract signing'), 'tone' => 'secondary', 'icon' => 'fa-undo',
+            'when' => ['Cancelled' => __('The contract was cancelled'), 'Ended' => __('The contract ended')][$round['contract_status']] ?? __('The client was archived')];
     }
     // One recorded before 3.4.3 has no link - it waits on no one
     if (array_key_exists('contract_signature_url_key', $round) && (string) $round['contract_signature_url_key'] === '') {
-        return ['key' => 'incomplete', 'label' => 'Not signed by both', 'tone' => 'secondary', 'icon' => 'fa-file-alt', 'when' => 'Recorded before signing came to ITFlow'];
+        return ['key' => 'incomplete', 'label' => __('Not signed by both'), 'tone' => 'secondary', 'icon' => 'fa-file-alt', 'when' => __('Recorded before signing came to ITFlow')];
     }
     if ($client) {
-        return ['key' => 'countersign', 'label' => 'To countersign', 'tone' => 'warning', 'icon' => 'fa-pen-nib', 'when' => 'Signed by ' . $round['contract_signature_client_name'] . ' ' . $day($round['contract_signature_client_signed_at'])];
+        return ['key' => 'countersign', 'label' => __('To countersign'), 'tone' => 'warning', 'icon' => 'fa-pen-nib', 'when' => __('Signed by %1$s %2$s', $round['contract_signature_client_name'], $day($round['contract_signature_client_signed_at']))];
     }
     if ($agent || empty($round['contract_signature_sent_at'])) {
-        return ['key' => 'incomplete', 'label' => 'Not signed by both', 'tone' => 'secondary', 'icon' => 'fa-file-alt', 'when' => 'Recorded before signing came to ITFlow'];
+        return ['key' => 'incomplete', 'label' => __('Not signed by both'), 'tone' => 'secondary', 'icon' => 'fa-file-alt', 'when' => __('Recorded before signing came to ITFlow')];
     }
     if (!empty($round['contract_signature_viewed_at'])) {
-        return ['key' => 'viewed', 'label' => 'Opened', 'tone' => 'info', 'icon' => 'fa-envelope-open', 'when' => 'Opened ' . $day($round['contract_signature_viewed_at'])];
+        return ['key' => 'viewed', 'label' => _x('Opened', 'contract signing'), 'tone' => 'info', 'icon' => 'fa-envelope-open', 'when' => _x('Opened %s', 'contract signing', $day($round['contract_signature_viewed_at']))];
     }
-    return ['key' => 'sent', 'label' => 'Out for signature', 'tone' => 'primary', 'icon' => 'fa-paper-plane', 'when' => 'Sent ' . $day($round['contract_signature_sent_at'])];
+    return ['key' => 'sent', 'label' => __('Out for signature'), 'tone' => 'primary', 'icon' => 'fa-paper-plane', 'when' => _x('Sent %s', 'contract signing', $day($round['contract_signature_sent_at']))];
 }
 
 /** Whether a round is waiting on someone - the client to sign, or us to countersign. */
@@ -419,19 +450,19 @@ function contractSignatureUrl(array $round) {
 function contractSignatureImageFromInput($value) {
     $value = trim((string) $value);
     if (!preg_match('/^data:image\/png;base64,([A-Za-z0-9+\/=\s]+)$/', $value, $match)) {
-        return [null, 'Draw your signature in the box, or type it.'];
+        return [null, __('Draw your signature in the box, or type it.')];
     }
     $binary = base64_decode(preg_replace('/\s+/', '', $match[1]), true);
     if ($binary === false || strlen($binary) > CONTRACT_SIGNATURE_MAX_BYTES) {
-        return [null, 'That signature is too big - clear it and draw it again.'];
+        return [null, __('That signature is too big - clear it and draw it again.')];
     }
     $info = @getimagesizefromstring($binary);
     if (!$info || $info[2] !== IMAGETYPE_PNG || $info[0] < 40 || $info[1] < 20 || $info[0] > 3000 || $info[1] > 1500 || !function_exists('imagecreatefromstring')) {
-        return [null, 'That signature could not be read - clear it and draw it again.'];
+        return [null, __('That signature could not be read - clear it and draw it again.')];
     }
     $image = @imagecreatefromstring($binary);
     if (!$image) {
-        return [null, 'That signature could not be read - clear it and draw it again.'];
+        return [null, __('That signature could not be read - clear it and draw it again.')];
     }
     if (!imageistruecolor($image)) {
         imagepalettetotruecolor($image);
@@ -459,7 +490,7 @@ function contractSignatureImageFromInput($value) {
     }
     if ($ink < 30 || $right - $left < 15) {
         imagedestroy($image);
-        return [null, 'Draw your signature in the box, or type it.'];
+        return [null, __('Draw your signature in the box, or type it.')];
     }
     // Cut down to the signature, with a little room round it, on a clear background
     $pad = 8;
@@ -491,7 +522,7 @@ function contractSignatureFromInput(array $in) {
     };
     $f = ['name' => $text('signer_name', 200), 'title' => $text('signer_title', 200), 'image' => null];
     if ($f['name'] === '') {
-        return [$f, 'Write your full name.'];
+        return [$f, __('Write your full name.')];
     }
     if (($in['signature_mode'] ?? 'type') === 'draw') {
         [$f['image'], $error] = contractSignatureImageFromInput($in['signature'] ?? '');
@@ -500,7 +531,7 @@ function contractSignatureFromInput(array $in) {
         }
     }
     if (empty($in['agree'])) {
-        return [$f, 'Tick the box to say you agree to sign it.'];
+        return [$f, __('Tick the box to say you agree to sign it.')];
     }
     return [$f, ''];
 }
@@ -516,7 +547,7 @@ function contractSignatureSend(array $row, $to_name, $to_email, $contact_id, $no
     $contract_id = intval($row['contract_id']);
     foreach (contractSignatureRounds($contract_id) as $round) {
         if (contractSignaturePending($round)) {
-            contractSignatureWithdraw($round, 'Replaced by a new request');
+            contractSignatureWithdraw($round, 'Replaced by a new request'); // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
         }
     }
     $document = contractDocumentHtml($row, date('Y-m-d'));
@@ -536,18 +567,18 @@ function contractSignatureRequestEmail(array $round, $note = '') {
     $company = billingCompany();
     $company_name = (string) ($company['company_name'] ?? '');
     $by = mysqli_fetch_row(mysqli_query($mysqli, "SELECT user_name FROM users WHERE user_id = " . intval($round['contract_signature_sent_by'])))[0] ?? '';
-    $term = contractTermLabel($round['contract_term_months']) . (!empty($round['contract_start_date']) ? ' from ' . date('M j, Y', strtotime($round['contract_start_date'])) : '');
+    $term = !empty($round['contract_start_date']) ? __('%1$s from %2$s', contractTermLabel($round['contract_term_months']), formatDate($round['contract_start_date'], 'date')) : contractTermLabel($round['contract_term_months']);
     $sent = emailQueue([[
         'email' => (string) $round['contract_signature_sent_to_email'],
         'name' => (string) $round['contract_signature_sent_to_name'],
-        'footnote' => "You received this because $company_name asked you to sign for {$round['client_name']}. The link is for you - please don't forward it.",
-    ]], "Please sign: {$round['contract_name']} - $company_name", [
-        'kind' => 'Contract', 'tone' => 'primary',
-        'title' => "$company_name sent you {$round['contract_name']} to sign",
-        'intro' => ['Please read it and sign it online - it takes a minute, on a phone or a computer. Once we have countersigned, you will get a copy signed by both of us.'],
+        'footnote' => __('You received this because %1$s asked you to sign for %2$s. The link is for you - please don\'t forward it.', $company_name, $round['client_name']),
+    ]], __('Please sign: %1$s - %2$s', $round['contract_name'], $company_name), [
+        'kind' => __('Contract'), 'tone' => 'primary',
+        'title' => __('%1$s sent you %2$s to sign', $company_name, $round['contract_name']),
+        'intro' => [__('Please read it and sign it online - it takes a minute, on a phone or a computer. Once we have countersigned, you will get a copy signed by both of us.')],
         'note' => trim((string) $note),
-        'summary' => array_filter(['Contract' => (string) $round['contract_name'], 'For' => (string) $round['client_name'], 'Term' => $term, 'Sent by' => (string) $by]),
-        'button' => ['label' => 'Review and sign', 'url' => contractSignatureUrl($round)],
+        'summary' => array_filter([__('Contract') => (string) $round['contract_name'], __('For') => (string) $round['client_name'], __('Term') => $term, __('Sent by') => (string) $by]),
+        'button' => ['label' => __('Review and sign'), 'url' => contractSignatureUrl($round)],
     ], ['from' => contractEmailFrom()]);
     return (bool) $sent;
 }
@@ -607,8 +638,9 @@ function contractSignatureViewed(array $round, $who = '') {
     }
     mysqli_query($mysqli, "UPDATE contract_signatures SET contract_signature_viewed_at = NOW() WHERE contract_signature_id = " . intval($round['contract_signature_id']) . " AND contract_signature_viewed_at IS NULL");
     if (mysqli_affected_rows($mysqli) === 1) {
-        $who = trim((string) $who) !== '' ? trim((string) $who) . ' in the client portal' : 'the client, from its link';
-        appNotify("Contract", escapeSql("{$round['contract_name']} for {$round['client_name']} was opened by $who"), contractAgentPath($round), intval($round['contract_client_id']), intval($round['contract_id']));
+        $text = trim((string) $who) !== '' ? __('%1$s for %2$s was opened by %3$s in the client portal', $round['contract_name'], $round['client_name'], trim((string) $who))
+            : __('%1$s for %2$s was opened by the client, from its link', $round['contract_name'], $round['client_name']);
+        appNotify("Contract", escapeSql($text), contractAgentPath($round), intval($round['contract_client_id']), intval($round['contract_id']));
     }
 }
 
@@ -641,17 +673,18 @@ function contractSignatureClientSign(array $round, array $f, $via, $contact_id =
         return false;
     }
     $name = escapeSql($f['name']);
-    $where = $via === 'portal' ? 'in the client portal' : 'from its link';
+    $where = $via === 'portal' ? 'in the client portal' : 'from its link'; // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
     logAudit("Contract", "Sign", "$name signed contract " . escapeSql($round['contract_name']) . " for " . escapeSql($round['client_name']) . " $where", intval($round['contract_client_id']), intval($round['contract_id']));
-    appNotify("Contract", escapeSql("{$f['name']} signed {$round['contract_name']} for {$round['client_name']} - it is ready to countersign"), contractAgentPath($round), intval($round['contract_client_id']), intval($round['contract_id']));
+    appNotify("Contract", escapeSql(__('%1$s signed %2$s for %3$s - it is ready to countersign', $f['name'], $round['contract_name'], $round['client_name'])), contractAgentPath($round), intval($round['contract_client_id']), intval($round['contract_id']));
     if (!empty($round['owner_email'])) {
-        emailQueue([['email' => $round['owner_email'], 'name' => $round['owner_name'], 'footnote' => 'You look after this contract in ITFlow.']],
-            "Signed by the client: {$round['contract_name']} - {$round['client_name']}", [
-                'kind' => 'Contract', 'tone' => 'success',
-                'title' => "{$f['name']} signed {$round['contract_name']}",
-                'intro' => ['It is ready for you to countersign. Once you have, the client gets a copy signed by both of you' . ($round['contract_status'] === 'Draft' ? ' and the contract becomes active.' : '.')],
-                'summary' => array_filter(['Client' => (string) $round['client_name'], 'Signed by' => $f['name'] . ($f['title'] !== '' ? ", {$f['title']}" : ''), 'Signed' => date('M j, Y g:i A') . " $where"]),
-                'button' => ['label' => 'Countersign', 'url' => "https://$config_base_url" . contractAgentPath($round)],
+        emailQueue([['email' => $round['owner_email'], 'name' => $round['owner_name'], 'footnote' => __('You look after this contract in ITFlow.')]],
+            __('Signed by the client: %1$s - %2$s', $round['contract_name'], $round['client_name']), [
+                'kind' => __('Contract'), 'tone' => 'success',
+                'title' => __('%1$s signed %2$s', $f['name'], $round['contract_name']),
+                'intro' => [$round['contract_status'] === 'Draft' ? __('It is ready for you to countersign. Once you have, the client gets a copy signed by both of you and the contract becomes active.') : __('It is ready for you to countersign. Once you have, the client gets a copy signed by both of you.')],
+                'summary' => array_filter([__('Client') => (string) $round['client_name'], __('Signed by') => $f['name'] . ($f['title'] !== '' ? ", {$f['title']}" : ''),
+                    _x('Signed', 'contract signing') => ($via === 'portal' ? __('%s in the client portal', formatDate(date('Y-m-d H:i:s'), 'datetime')) : __('%s from its link', formatDate(date('Y-m-d H:i:s'), 'datetime')))]),
+                'button' => ['label' => __('Countersign'), 'url' => "https://$config_base_url" . contractAgentPath($round)],
             ]);
     }
     return true;
@@ -708,7 +741,7 @@ function contractSignatureSignedEmail(array $round, $attach = true) {
         return [];
     }
     foreach ($recipients as $i => $recipient) {
-        $recipients[$i]['footnote'] = "You received this as the signer for {$round['client_name']}.";
+        $recipients[$i]['footnote'] = __('You received this as the signer for %s.', $round['client_name']);
     }
     $attachments = [];
     if ($attach) {
@@ -717,14 +750,18 @@ function contractSignatureSignedEmail(array $round, $attach = true) {
             $attachments[] = $file;
         }
     }
-    return emailQueue($recipients, "Signed: {$round['contract_name']} - $company_name", [
-        'kind' => 'Contract', 'tone' => 'success',
-        'title' => "{$round['contract_name']} is signed",
-        'intro' => ["Thank you - both of us have signed it. A copy signed by both is attached" . ($attach ? '' : ' as a PDF') . '. Keep it for your records.'],
+    $signed_on = function ($side) use ($round) {
+        $name = (string) $round["contract_signature_{$side}_name"];
+        return !empty($round["contract_signature_{$side}_signed_at"]) ? trim(__('%1$s on %2$s', $name, formatDate($round["contract_signature_{$side}_signed_at"], 'date'))) : trim($name);
+    };
+    return emailQueue($recipients, __('Signed: %1$s - %2$s', $round['contract_name'], $company_name), [
+        'kind' => __('Contract'), 'tone' => 'success',
+        'title' => __('%s is signed', $round['contract_name']),
+        'intro' => [$attach ? __('Thank you - both of us have signed it. A copy signed by both is attached. Keep it for your records.') : __('Thank you - both of us have signed it. A copy signed by both is attached as a PDF. Keep it for your records.')],
         'summary' => array_filter([
-            'Contract' => (string) $round['contract_name'],
-            'Signed for ' . $round['client_name'] => trim($round['contract_signature_client_name'] . ' ' . (!empty($round['contract_signature_client_signed_at']) ? 'on ' . date('M j, Y', strtotime($round['contract_signature_client_signed_at'])) : '')),
-            "Signed for $company_name" => trim($round['contract_signature_agent_name'] . ' ' . (!empty($round['contract_signature_agent_signed_at']) ? 'on ' . date('M j, Y', strtotime($round['contract_signature_agent_signed_at'])) : '')),
+            __('Contract') => (string) $round['contract_name'],
+            __('Signed for %s', $round['client_name']) => $signed_on('client'),
+            __('Signed for %s', $company_name) => $signed_on('agent'),
         ]),
     ], ['from' => contractEmailFrom(), 'attachments' => $attachments]);
 }
@@ -745,20 +782,20 @@ function contractSignatureBlockHtml(array $row, $round = null, $image_url = null
     foreach ($sides as $side => $info) {
         $signed = $round && !empty($round["contract_signature_{$side}_signed_at"]);
         $html .= '<div class="itflow-contract-signature' . ($signed ? ' is-signed' : '') . '" data-contract-signature="' . $side . '">';
-        $html .= '<div class="itflow-contract-doc-label">Signed for ' . escapeHtml($info['for']) . '</div>';
+        $html .= '<div class="itflow-contract-doc-label">' . escapeHtml(__('Signed for %s', $info['for'])) . '</div>';
         $html .= '<div class="itflow-contract-signature-mark">';
         if ($signed && !empty($round["contract_signature_{$side}_image"])) {
             $src = $image_url ? $image_url($side) : (string) $round["contract_signature_{$side}_image"];
-            $html .= '<img src="' . escapeHtml($src) . '" alt="Signature of ' . escapeHtml($round["contract_signature_{$side}_name"]) . '">';
+            $html .= '<img src="' . escapeHtml($src) . '" alt="' . escapeHtml(__('Signature of %s', $round["contract_signature_{$side}_name"])) . '">';
         } elseif ($signed) {
             $html .= '<span class="itflow-contract-signature-typed">' . escapeHtml($round["contract_signature_{$side}_name"]) . '</span>';
         }
         $html .= '</div>';
         if ($signed) {
             $html .= '<div class="fw-semibold">' . escapeHtml($round["contract_signature_{$side}_name"]) . '</div>';
-            $html .= '<div class="small text-body-secondary">' . escapeHtml(implode(' · ', array_filter([(string) $round["contract_signature_{$side}_title"], date('M j, Y', strtotime($round["contract_signature_{$side}_signed_at"]))]))) . '</div>';
+            $html .= '<div class="small text-body-secondary">' . escapeHtml(implode(' · ', array_filter([(string) $round["contract_signature_{$side}_title"], formatDate($round["contract_signature_{$side}_signed_at"], 'date')]))) . '</div>';
         } else {
-            $html .= '<div class="small text-body-secondary">Name, title and date</div>';
+            $html .= '<div class="small text-body-secondary">' . escapeHtml(__('Name, title and date')) . '</div>';
         }
         $html .= '</div>';
     }
@@ -767,39 +804,62 @@ function contractSignatureBlockHtml(array $row, $round = null, $image_url = null
 
 /*
  * What happened to a round, in order - for its page and the PDF's last
- * section: [when, what, detail] - raw text; the detail (from where, and how)
+ * section: kind (sent, opened, signed, countersigned, withdrawn) => [when,
+ * what, detail] - raw text; the detail (from where, and how)
  * may be ''.
  */
 function contractSignatureTrail(array $round) {
     global $mysqli;
     $trail = [];
     $at = function ($date) {
-        return date('M j, Y g:i A', strtotime((string) $date));
+        return formatDate($date, 'datetime');
     };
     if (!empty($round['contract_signature_sent_at'])) {
         $by = mysqli_fetch_row(mysqli_query($mysqli, "SELECT user_name FROM users WHERE user_id = " . intval($round['contract_signature_sent_by'])))[0] ?? '';
-        $trail[] = [$at($round['contract_signature_sent_at']), 'Sent to ' . $round['contract_signature_sent_to_name'] . ($by !== '' ? " by $by" : ''), (string) $round['contract_signature_sent_to_email']];
+        $trail['sent'] = [$at($round['contract_signature_sent_at']), $by !== '' ? __('Sent to %1$s by %2$s', $round['contract_signature_sent_to_name'], $by) : __('Sent to %s', $round['contract_signature_sent_to_name']), (string) $round['contract_signature_sent_to_email']];
     }
     if (!empty($round['contract_signature_viewed_at'])) {
-        $trail[] = [$at($round['contract_signature_viewed_at']), 'Opened by the client', ''];
+        $trail['opened'] = [$at($round['contract_signature_viewed_at']), __('Opened by the client'), ''];
     }
     if (!empty($round['contract_signature_client_signed_at'])) {
-        $how = ['link' => 'From the link in the email', 'portal' => 'In the client portal', 'recorded' => 'Recorded before signing came to ITFlow'][$round['contract_signature_client_via']] ?? '';
+        $how = ['link' => __('From the link in the email'), 'portal' => __('In the client portal'), 'recorded' => __('Recorded before signing came to ITFlow')][$round['contract_signature_client_via']] ?? '';
         $device = trim(strip_tags(getOS((string) $round['contract_signature_client_user_agent'])) . ', ' . strip_tags(getWebBrowser((string) $round['contract_signature_client_user_agent'])), ' ,-');
-        $trail[] = [$at($round['contract_signature_client_signed_at']), 'Signed for ' . $round['client_name'] . ' by ' . $round['contract_signature_client_name']
-            . (!empty($round['contract_signature_client_title']) ? ', ' . $round['contract_signature_client_title'] : ''),
-            implode(' · ', array_filter([$how, !empty($round['contract_signature_client_ip']) ? 'IP address ' . $round['contract_signature_client_ip'] : '', $device,
-                $round['contract_signature_client_via'] === 'recorded' ? '' : (!empty($round['contract_signature_client_image']) ? 'Signature drawn' : 'Signature typed')]))];
+        $trail['signed'] = [$at($round['contract_signature_client_signed_at']), __('Signed for %1$s by %2$s', $round['client_name'], $round['contract_signature_client_name']
+            . (!empty($round['contract_signature_client_title']) ? ', ' . $round['contract_signature_client_title'] : '')),
+            implode(' · ', array_filter([$how, !empty($round['contract_signature_client_ip']) ? __('IP address %s', $round['contract_signature_client_ip']) : '', $device,
+                $round['contract_signature_client_via'] === 'recorded' ? '' : (!empty($round['contract_signature_client_image']) ? __('Signature drawn') : __('Signature typed'))]))];
     }
     if (!empty($round['contract_signature_agent_signed_at'])) {
-        $trail[] = [$at($round['contract_signature_agent_signed_at']), 'Countersigned for ' . (billingCompany()['company_name'] ?? '') . ' by ' . $round['contract_signature_agent_name']
-            . (!empty($round['contract_signature_agent_title']) ? ', ' . $round['contract_signature_agent_title'] : ''),
-            !empty($round['contract_signature_agent_ip']) ? 'IP address ' . $round['contract_signature_agent_ip'] : ''];
+        $trail['countersigned'] = [$at($round['contract_signature_agent_signed_at']), __('Countersigned for %1$s by %2$s', billingCompany()['company_name'] ?? '', $round['contract_signature_agent_name']
+            . (!empty($round['contract_signature_agent_title']) ? ', ' . $round['contract_signature_agent_title'] : '')),
+            !empty($round['contract_signature_agent_ip']) ? __('IP address %s', $round['contract_signature_agent_ip']) : ''];
     }
     if (!empty($round['contract_signature_withdrawn_at']) && empty($round['contract_signature_agent_signed_at'])) {
-        $trail[] = [$at($round['contract_signature_withdrawn_at']), 'Withdrawn', (string) $round['contract_signature_withdrawn_reason']];
+        $trail['withdrawn'] = [$at($round['contract_signature_withdrawn_at']), _x('Withdrawn', 'contract signing'), contractWithdrawnReasonText($round['contract_signature_withdrawn_reason'])];
     }
     return $trail;
+}
+
+/*
+ * Why a round was withdrawn, as stored (in English) - in the interface
+ * language when ITFlow wrote it, else as it is.
+ */
+function contractWithdrawnReasonText($reason) {
+    $reason = (string) $reason;
+    $known = [
+        'Replaced by a new request' => __('Replaced by a new request'),
+        'The contract was changed after it was sent' => __('The contract was changed after it was sent'),
+        'The contract was cancelled' => __('The contract was cancelled'),
+        'The contract ended' => __('The contract ended'),
+        'The client was archived' => __('The client was archived'),
+    ];
+    if (isset($known[$reason])) {
+        return $known[$reason];
+    }
+    if (preg_match('/^Withdrawn by (.+)$/s', $reason, $m)) {
+        return __('Withdrawn by %s', $m[1]);
+    }
+    return $reason;
 }
 
 /*
@@ -813,10 +873,10 @@ function contractSignatureCheckChanged(array $row) {
         return null;
     }
     $as_of = date('Y-m-d', strtotime((string) $round['contract_signature_sent_at']));
-    if (contractDocumentHash(contractDocumentHtml($row, $as_of)) === (string) $round['contract_signature_document_hash']) {
+    if (contractDocumentSame($row, $as_of, $round['contract_signature_document_hash'])) {
         return null;
     }
-    return contractSignatureWithdraw($round, 'The contract was changed after it was sent') ? $round : null;
+    return contractSignatureWithdraw($round, 'The contract was changed after it was sent') ? $round : null; // i18n-ignore - placeholder names, and reasons stored and shown through contractWithdrawnReasonText()
 }
 
 /** Whether what a contract says now differs from a signed round - by what the document would be on the day that round was sent. */
@@ -825,7 +885,7 @@ function contractSignatureOutdated(array $row, array $round) {
         return false;
     }
     $as_of = date('Y-m-d', strtotime((string) $round['contract_signature_sent_at']));
-    return contractDocumentHash(contractDocumentHtml($row, $as_of)) !== (string) $round['contract_signature_document_hash'];
+    return !contractDocumentSame($row, $as_of, $round['contract_signature_document_hash']);
 }
 
 /** A contract as a PDF - the copy of a round ($round) when given, else the document as it is today. ['name', 'data']. */

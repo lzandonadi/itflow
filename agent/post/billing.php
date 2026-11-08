@@ -23,13 +23,13 @@ function billingPostDocument($type, $id) {
     $t = billingType($type);
     $row = $t ? billingRow($type, $id) : null;
     if (!$row) {
-        flashAlert('That document no longer exists, or is not one you can open.', 'error');
+        flashAlert(__('That document no longer exists, or is not one you can open.'), 'error');
         redirect();
     }
     $client_id = intval($row['client_id']);
     enforceClientAccess();
     if (!billingCanEditItems($type, $row)) {
-        flashAlert(billingNumber($type, $row) . " can't be changed now - " . ($type === 'quote' ? 'it has been answered or invoiced.' : 'it is paid, cancelled or non-billable.'), 'error');
+        flashAlert($type === 'quote' ? __("%s can't be changed now - it has been answered or invoiced.", billingNumber($type, $row)) : __("%s can't be changed now - it is paid, cancelled or non-billable.", billingNumber($type, $row)), 'error');
         redirect();
     }
     return $row;
@@ -47,11 +47,11 @@ function billingPostBack($type, $id, $hash = 'items') {
 /** What billing time did, for the flash - "TCK-12 and 3 more billed on INV-45 - 6.5 h on 4 lines". */
 function unbilledResultText(array $result) {
     $tickets = $result['tickets'];
-    $what = count($tickets) === 1 ? $tickets[0] : $tickets[0] . ' and ' . (count($tickets) - 1) . ' more';
-    $text = '<strong>' . escapeHtml($what) . '</strong> billed on <strong>' . escapeHtml($result['number']) . '</strong> - ' . billingQuantity($result['hours']) . ' h'
-        . ($result['lines'] > 1 ? ' on ' . $result['lines'] . ' lines' : '');
+    $what = count($tickets) === 1 ? $tickets[0] : _n('%2$s and %1$d more', '%2$s and %1$d more', count($tickets) - 1, count($tickets) - 1, $tickets[0]);
+    $text = __('%1$s billed on %2$s - %3$s h', '<strong>' . escapeHtml($what) . '</strong>', '<strong>' . escapeHtml($result['number']) . '</strong>', billingQuantity($result['hours']))
+        . ($result['lines'] > 1 ? ' ' . __('on %d lines', $result['lines']) : '');
     if ($result['no_charge']) {
-        $text .= '. ' . escapeHtml(implode(', ', $result['no_charge'])) . (count($result['no_charge']) === 1 ? ' had' : ' had') . ' no hours, so went on with no charge';
+        $text .= '. ' . __('%s had no hours, so went on with no charge', escapeHtml(implode(', ', $result['no_charge'])));
     }
     return $text;
 }
@@ -64,17 +64,15 @@ function unbilledBothText(array $result, $currency) {
     }
     if ($result['expenses']) {
         $e = $result['expenses'];
-        $parts[] = ($result['time'] ? '' : '<strong>' . escapeHtml($e['number']) . '</strong>: ') . '<strong>' . $e['expenses'] . ' expense' . ($e['expenses'] === 1 ? '' : 's') . '</strong> billed - '
-            . escapeHtml(billingMoney($e['amount'], $currency)) . ' on ' . escapeHtml(billingMoney($e['cost'], $currency)) . ' of cost';
+        $parts[] = ($result['time'] ? '' : '<strong>' . escapeHtml($e['number']) . '</strong>: ') . _n('%2$s billed - %3$s on %4$s of cost', '%2$s billed - %3$s on %4$s of cost', $e['expenses'], $e['expenses'], '<strong>' . _n('%d expense', '%d expenses', $e['expenses']) . '</strong>', escapeHtml(billingMoney($e['amount'], $currency)), escapeHtml(billingMoney($e['cost'], $currency)));
     }
     if (!empty($result['trips'])) {
         $t = $result['trips'];
-        $parts[] = ($result['time'] || $result['expenses'] ? '' : '<strong>' . escapeHtml($t['number']) . '</strong>: ') . '<strong>' . $t['trips'] . ' trip' . ($t['trips'] === 1 ? '' : 's') . '</strong> billed - '
-            . escapeHtml(billingMoney($t['amount'], $currency)) . ' for ' . escapeHtml(tripDistanceText($t['miles']));
+        $parts[] = ($result['time'] || $result['expenses'] ? '' : '<strong>' . escapeHtml($t['number']) . '</strong>: ') . _n('%2$s billed - %3$s for %4$s', '%2$s billed - %3$s for %4$s', $t['trips'], $t['trips'], '<strong>' . _n('%d trip', '%d trips', $t['trips']) . '</strong>', escapeHtml(billingMoney($t['amount'], $currency)), escapeHtml(tripDistanceText($t['miles'])));
     }
     $text = implode('. ', $parts);
     if ($result['error'] !== '') {
-        $text .= '. Not billed: ' . escapeHtml($result['error']);
+        $text .= '. ' . __('Not billed: %s', escapeHtml($result['error']));
     }
     return $text;
 }
@@ -105,7 +103,7 @@ function unbilledPostTripPrices() {
 
 /** The audit log's name for each kind. */
 function billingAuditType($type) {
-    return ['invoice' => 'Invoice', 'quote' => 'Quote', 'recurring' => 'Recurring Invoice'][$type] ?? 'Invoice';
+    return ['invoice' => 'Invoice', 'quote' => 'Quote', 'recurring' => 'Recurring Invoice'][$type] ?? 'Invoice'; // i18n-ignore - audit log
 }
 
 if (isset($_POST['billing_item_save'])) {
@@ -129,7 +127,7 @@ if (isset($_POST['billing_item_save'])) {
     $name = trim((string) $_POST['name']);
     logAudit(billingAuditType($type), 'Edit', escapeSql("$session_name " . ($item_id ? 'edited' : 'added') . " line $name " . ($item_id ? 'on' : 'to') . " $number"), $client_id, $doc_id);
 
-    flashAlert('<strong>' . escapeHtml($name) . '</strong> ' . ($item_id ? 'updated' : 'added'));
+    flashAlert($item_id ? _x('%s updated', 'billing line', '<strong>' . escapeHtml($name) . '</strong>') : _x('%s added', 'billing line', '<strong>' . escapeHtml($name) . '</strong>'));
 
     billingPostBack($type, $doc_id, $item_id ? "line-$saved" : 'add-line');
 
@@ -152,7 +150,7 @@ if (isset($_POST['billing_ai_lines'])) {
     $type = (string) ($_POST['type'] ?? '');
     $doc_id = intval($_POST['doc_id'] ?? 0);
     if (!in_array($type, ['quote', 'invoice'], true)) {
-        flashAlert('That document no longer exists, or is not one you can open.', 'error');
+        flashAlert(__('That document no longer exists, or is not one you can open.'), 'error');
         redirect();
     }
     $row = billingPostDocument($type, $doc_id);
@@ -174,7 +172,7 @@ if (isset($_POST['billing_ai_lines'])) {
             $product_id = 0;
         }
         if (trim((string) ($line['price'] ?? '')) === '') {
-            $failed[] = ($name !== '' ? $name : 'A line') . ' - it needs a price';
+            $failed[] = ($name !== '' ? $name : __('A line')) . ' - ' . __('it needs a price');
             continue;
         }
         $in = [
@@ -191,7 +189,7 @@ if (isset($_POST['billing_ai_lines'])) {
         if (billingItemSave($type, $doc_id, $in, 0, $error)) {
             $added[] = $name;
         } else {
-            $failed[] = ($name !== '' ? $name : 'A line') . ' - ' . rtrim($error, '.');
+            $failed[] = ($name !== '' ? $name : __('A line')) . ' - ' . rtrim($error, '.');
         }
     }
 
@@ -200,27 +198,33 @@ if (isset($_POST['billing_ai_lines'])) {
     $scope = trim((string) ($_POST['scope'] ?? ''));
     if (!empty($_POST['use_scope']) && $scope !== '') {
         mysqli_query($mysqli, "UPDATE {$t['table']} SET {$c}_scope = '" . escapeSql(mb_substr($scope, 0, 255)) . "' WHERE {$c}_id = $doc_id");
-        $kept[] = 'the scope';
+        $kept[] = 'scope';
     }
     $note = trim(str_replace("\r", '', (string) ($_POST['note'] ?? '')));
     if (!empty($_POST['use_note']) && $note !== '') {
         $old_note = trim((string) $row["{$c}_note"]);
         $note = $old_note === '' ? $note : "$old_note\n\n$note";
         mysqli_query($mysqli, "UPDATE {$t['table']} SET {$c}_note = '" . escapeSql($note) . "' WHERE {$c}_id = $doc_id");
-        $kept[] = 'the note';
+        $kept[] = 'note';
     }
 
-    $not_added = $failed ? '<br>Not added: ' . escapeHtml(implode('; ', $failed)) . '.' : '';
+    $not_added = $failed ? '<br>' . __('Not added: %s.', escapeHtml(implode('; ', $failed))) : '';
     if (!$added && !$kept) {
-        flashAlert('Nothing was added to <strong>' . escapeHtml($number) . '</strong> - ' . ($failed ? 'none of the lines could go on.' . $not_added : 'tick the lines to add.'), 'error');
+        flashAlert(($failed ? __('Nothing was added to %s - none of the lines could go on.', '<strong>' . escapeHtml($number) . '</strong>') . $not_added : __('Nothing was added to %s - tick the lines to add.', '<strong>' . escapeHtml($number) . '</strong>')), 'error');
         billingPostBack($type, $doc_id);
     }
 
-    $what = $added ? count($added) . ' line' . (count($added) === 1 ? '' : 's') : '';
-    $what = trim($what . ($what !== '' && $kept ? ', with ' : '') . implode(' and ', $kept));
-    logAudit(billingAuditType($type), 'Edit', "$session_name added " . escapeSql($what) . ' written with AI to ' . escapeSql($number), $client_id, $doc_id);
+    // What went on, in words - once in English for the audit log
+    $ai_what = function () use ($added, $kept) {
+        $what = $added ? _n('%d line', '%d lines', count($added)) : '';
+        $kept_words = array_map(function ($k) { return $k === 'scope' ? __('the scope') : __('the note'); }, $kept);
+        $kept_text = count($kept_words) > 1 ? __('%1$s and %2$s', $kept_words[0], $kept_words[1]) : implode('', $kept_words);
+        return $what !== '' && $kept_text !== '' ? __('%1$s, with %2$s', $what, $kept_text) : $what . $kept_text;
+    };
+    $what = $ai_what();
+    logAudit(billingAuditType($type), 'Edit', "$session_name added " . escapeSql(i18nEnglish($ai_what)) . ' written with AI to ' . escapeSql($number), $client_id, $doc_id);
 
-    flashAlert('<strong>' . escapeHtml(ucfirst($what)) . '</strong> added to <strong>' . escapeHtml($number) . '</strong>' . $not_added, $failed ? 'warning' : 'success');
+    flashAlert(__('%1$s added to %2$s', '<strong>' . escapeHtml(mb_strtoupper(mb_substr($what, 0, 1)) . mb_substr($what, 1)) . '</strong>', '<strong>' . escapeHtml($number) . '</strong>') . $not_added, $failed ? 'warning' : 'success');
 
     billingPostBack($type, $doc_id);
 
@@ -239,13 +243,13 @@ if (isset($_GET['billing_item_delete'])) {
 
     $item = billingItemDelete($type, $doc_id, $item_id);
     if (!$item) {
-        flashAlert('That line was already gone.', 'error');
+        flashAlert(__('That line was already gone.'), 'error');
         billingPostBack($type, $doc_id);
     }
 
     logAudit(billingAuditType($type), 'Edit', escapeSql("$session_name removed line {$item['item_name']} from " . billingNumber($type, $row)), $client_id, $doc_id);
 
-    flashAlert('<strong>' . escapeHtml($item['item_name']) . '</strong> removed', 'error');
+    flashAlert(__('%s removed', '<strong>' . escapeHtml($item['item_name']) . '</strong>'), 'error');
 
     billingPostBack($type, $doc_id);
 
@@ -267,7 +271,7 @@ if (isset($_GET['billing_remove_tax'])) {
 
     logAudit(billingAuditType($type), 'Edit', escapeSql("$session_name took the tax off $lines line" . ($lines === 1 ? '' : 's') . " on $number - the client is tax exempt"), $client_id, $doc_id);
 
-    flashAlert("Tax taken off $lines line" . ($lines === 1 ? '' : 's') . " on <strong>" . escapeHtml($number) . "</strong>");
+    flashAlert(_n('Tax taken off %1$d line on %2$s', 'Tax taken off %1$d lines on %2$s', $lines, $lines, '<strong>' . escapeHtml($number) . '</strong>'));
 
     billingPostBack($type, $doc_id);
 
@@ -287,7 +291,7 @@ if (isset($_GET['recurring_invoice_set_status'])) {
     $status = intval($_GET['status'] ?? 0) ? 1 : 0;
     $row = billingRow('recurring', $recurring_invoice_id);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['client_id']);
@@ -299,9 +303,9 @@ if (isset($_GET['recurring_invoice_set_status'])) {
     logAudit('Recurring Invoice', 'Edit', escapeSql("$session_name " . ($status ? 'resumed' : 'paused') . " recurring invoice $number"), $client_id, $recurring_invoice_id);
 
     if ($status && $row['recurring_invoice_next_date'] < date('Y-m-d')) {
-        flashAlert("<strong>" . escapeHtml($number) . "</strong> resumed - its next date has passed, so move it on before it will run again.", 'warning');
+        flashAlert(__('%s resumed - its next date has passed, so move it on before it will run again.', '<strong>' . escapeHtml($number) . '</strong>'), 'warning');
     } else {
-        flashAlert("<strong>" . escapeHtml($number) . "</strong> " . ($status ? 'resumed' : 'paused'));
+        flashAlert($status ? __('%s resumed', '<strong>' . escapeHtml($number) . '</strong>') : __('%s paused', '<strong>' . escapeHtml($number) . '</strong>'));
     }
 
     redirect();
@@ -321,7 +325,7 @@ if (isset($_GET['recurring_invoice_catch_up'])) {
     $recurring_invoice_id = intval($_GET['recurring_invoice_catch_up']);
     $row = billingRow('recurring', $recurring_invoice_id);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['client_id']);
@@ -330,14 +334,14 @@ if (isset($_GET['recurring_invoice_catch_up'])) {
     $next = recurringInvoiceCatchUp($row);
     $number = billingNumber('recurring', $row);
     if ($next === $row['recurring_invoice_next_date']) {
-        flashAlert("<strong>" . escapeHtml($number) . "</strong> is not behind.");
+        flashAlert(__('%s is not behind.', '<strong>' . escapeHtml($number) . '</strong>'));
         redirect();
     }
     mysqli_query($mysqli, "UPDATE recurring_invoices SET recurring_invoice_next_date = '" . escapeSql($next) . "' WHERE recurring_invoice_id = $recurring_invoice_id");
-    billingLog('recurring', $recurring_invoice_id, 'Rescheduled', "Next date moved from {$row['recurring_invoice_next_date']} to $next by $session_name");
+    billingLog('recurring', $recurring_invoice_id, 'Rescheduled', "Next date moved from {$row['recurring_invoice_next_date']} to $next by $session_name"); // i18n-ignore - history
     logAudit('Recurring Invoice', 'Edit', escapeSql("$session_name moved recurring invoice $number on to $next"), $client_id, $recurring_invoice_id);
 
-    flashAlert("<strong>" . escapeHtml($number) . "</strong> next runs on " . escapeHtml($next));
+    flashAlert(__('%1$s next runs on %2$s', '<strong>' . escapeHtml($number) . '</strong>', escapeHtml(formatDate($next, 'date'))));
 
     redirect();
 
@@ -356,19 +360,19 @@ if (isset($_GET['recurring_invoice_sync'])) {
     $recurring_invoice_id = intval($_GET['recurring_invoice_sync']);
     $row = billingRow('recurring', $recurring_invoice_id);
     if (!$row) {
-        flashAlert('That recurring invoice no longer exists.', 'error');
+        flashAlert(__('That recurring invoice no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['client_id']);
     enforceClientAccess();
 
-    $changes = recurringInvoiceRefresh($recurring_invoice_id, stripslashes($session_name));
+    $changes = recurringInvoiceRefresh($recurring_invoice_id, stripslashes($session_name), $shown);
     $number = billingNumber('recurring', $row);
     if ($changes) {
         logAudit('Recurring Invoice', 'Edit', escapeSql("$session_name updated the seats on recurring invoice $number: " . implode('; ', $changes)), $client_id, $recurring_invoice_id);
-        flashAlert('<strong>' . escapeHtml($number) . '</strong> seats updated - ' . escapeHtml(implode('; ', $changes)));
+        flashAlert(__('%1$s seats updated - %2$s', '<strong>' . escapeHtml($number) . '</strong>', escapeHtml(implode('; ', $shown))));
     } else {
-        flashAlert('<strong>' . escapeHtml($number) . '</strong> already bills what the client has.');
+        flashAlert(__('%s already bills what the client has.', '<strong>' . escapeHtml($number) . '</strong>'));
     }
 
     redirect();
@@ -461,7 +465,7 @@ if (isset($_POST['unbilled_invoice_clients'])) {
     }
 
     if (!$made) {
-        flashAlert($failed ? escapeHtml(implode(' ', $failed)) : 'Nothing billed - tick at least one client.', 'error');
+        flashAlert($failed ? escapeHtml(implode(' ', $failed)) : __('Nothing billed - tick at least one client.'), 'error');
         redirect('unbilled_time.php');
     }
 
@@ -472,17 +476,19 @@ if (isset($_POST['unbilled_invoice_clients'])) {
     $numbers = array_column($made, 'number');
     $what = [];
     if ($tickets) {
-        $what[] = $tickets . ' ticket' . ($tickets === 1 ? '' : 's') . ', ' . billingQuantity($hours) . ' h';
+        $what[] = _n('%1$d ticket, %2$s h', '%1$d tickets, %2$s h', $tickets, $tickets, billingQuantity($hours));
     }
     if ($expenses) {
-        $what[] = $expenses . ' expense' . ($expenses === 1 ? '' : 's');
+        $what[] = _n('%d expense', '%d expenses', $expenses);
     }
     if ($trips) {
-        $what[] = $trips . ' trip' . ($trips === 1 ? '' : 's');
+        $what[] = _n('%d trip', '%d trips', $trips);
     }
-    flashAlert('<strong>' . count($made) . ' invoice' . (count($made) === 1 ? '' : 's') . '</strong> ' . (array_filter(array_column($made, 'new')) ? 'made or added to' : 'added to') . ' - '
-        . implode(' and ', $what) . ': ' . escapeHtml(implode(', ', array_slice($numbers, 0, 12)) . (count($numbers) > 12 ? ' and more' : ''))
-        . ($failed ? '. Not billed: ' . escapeHtml(implode(' ', $failed)) : ''), $failed ? 'warning' : 'success');
+    $invoices_text = '<strong>' . _n('%d invoice', '%d invoices', count($made)) . '</strong>';
+    $what_text = count($what) > 1 ? __('%1$s and %2$s', implode(', ', array_slice($what, 0, -1)), end($what)) : implode('', $what);
+    $numbers_text = escapeHtml(count($numbers) > 12 ? __('%s and more', implode(', ', array_slice($numbers, 0, 12))) : implode(', ', $numbers));
+    flashAlert((array_filter(array_column($made, 'new')) ? __('%1$s made or added to - %2$s: %3$s', $invoices_text, $what_text, $numbers_text) : __('%1$s added to - %2$s: %3$s', $invoices_text, $what_text, $numbers_text))
+        . ($failed ? '. ' . __('Not billed: %s', escapeHtml(implode(' ', $failed))) : ''), $failed ? 'warning' : 'success');
     redirect('invoices.php?status=Draft');
 
 }
@@ -503,7 +509,7 @@ if (isset($_POST['unbilled_write_off'])) {
     $trip_ids = array_keys(unbilledPostTripPrices());
     $done_trips = $trip_ids ? tripWriteOff($client_id, $trip_ids, stripslashes($session_name)) : [];
     if (!$done && !$done_expenses && !$done_trips) {
-        flashAlert('Nothing changed - tick the tickets, expenses or trips that are not billable.', 'error');
+        flashAlert(__('Nothing changed - tick the tickets, expenses or trips that are not billable.'), 'error');
         redirect();
     }
     if ($done) {
@@ -512,15 +518,17 @@ if (isset($_POST['unbilled_write_off'])) {
 
     $what = [];
     if ($done) {
-        $what[] = count($done) === 1 ? '<strong>' . escapeHtml($done[0]) . '</strong>' : '<strong>' . count($done) . ' tickets</strong>';
+        $what[] = count($done) === 1 ? '<strong>' . escapeHtml($done[0]) . '</strong>' : '<strong>' . _n('%d ticket', '%d tickets', count($done)) . '</strong>';
     }
     if ($done_expenses) {
-        $what[] = count($done_expenses) === 1 ? 'the expense <strong>' . escapeHtml($done_expenses[0]) . '</strong>' : '<strong>' . count($done_expenses) . ' expenses</strong>';
+        $what[] = count($done_expenses) === 1 ? __('the expense %s', '<strong>' . escapeHtml($done_expenses[0]) . '</strong>') : '<strong>' . _n('%d expense', '%d expenses', count($done_expenses)) . '</strong>';
     }
     if ($done_trips) {
-        $what[] = count($done_trips) === 1 ? 'the trip <strong>' . escapeHtml($done_trips[0]) . '</strong>' : '<strong>' . count($done_trips) . ' trips</strong>';
+        $what[] = count($done_trips) === 1 ? __('the trip %s', '<strong>' . escapeHtml($done_trips[0]) . '</strong>') : '<strong>' . _n('%d trip', '%d trips', count($done_trips)) . '</strong>';
     }
-    flashAlert(ucfirst(implode(' and ', $what)) . (count($done) + count($done_expenses) + count($done_trips) === 1 ? ' is' : ' are') . ' not billable now');
+    $what_text = count($what) > 1 ? __('%1$s and %2$s', implode(', ', array_slice($what, 0, -1)), end($what)) : $what[0];
+    $what_text = mb_strtoupper(mb_substr($what_text, 0, 1)) . mb_substr($what_text, 1);
+    flashAlert(_n('%2$s is not billable now', '%2$s are not billable now', count($done) + count($done_expenses) + count($done_trips), count($done) + count($done_expenses) + count($done_trips), $what_text));
     redirect();
 
 }

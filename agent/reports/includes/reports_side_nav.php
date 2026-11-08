@@ -13,7 +13,7 @@ $reports_current = basename($_SERVER['PHP_SELF'], '.php');
     <div class="sidebar-brand">
         <a class="brand-link" href="/agent/<?= escapeHtml($config_start_page) ?>">
             <i class="fas fa-arrow-left me-2"></i>
-            <span class="brand-text h5 mb-0">Back | <strong>Reports</strong></span>
+            <span class="brand-text h5 mb-0"><?= __('Back') ?> | <strong><?= __('Reports') ?></strong></span>
         </a>
     </div>
 
@@ -28,7 +28,7 @@ $reports_current = basename($_SERVER['PHP_SELF'], '.php');
                 <li class="nav-item">
                     <a href="/agent/reports/index.php" class="nav-link <?php if ($reports_current === 'index') { echo "active"; } ?>">
                         <i class="nav-icon fas fa-th-large"></i>
-                        <p>All Reports</p>
+                        <p><?= __('All Reports') ?></p>
                     </a>
                 </li>
 
@@ -48,7 +48,7 @@ $reports_current = basename($_SERVER['PHP_SELF'], '.php');
                 // Your own links (Admin > Custom Links)
                 $custom_links = customLinksFor(5);
                 if ($custom_links) { ?>
-                    <li class="nav-header">MORE</li>
+                    <li class="nav-header"><?= __('MORE') ?></li>
                 <?php }
                 foreach ($custom_links as $custom_link) {
                     echo customLinkNavItemHtml($custom_link);

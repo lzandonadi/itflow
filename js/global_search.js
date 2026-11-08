@@ -274,17 +274,17 @@
                         '<input type="text" class="itflow-search-input" autofocus autocomplete="off" spellcheck="false"' +
                             ' maxlength="100" role="combobox" aria-expanded="true" aria-autocomplete="list"' +
                             ' aria-controls="itflowSearchResults" aria-label="Search everything"' +
-                            ' placeholder="Search clients, tickets, assets, credentials...">' +
+                            ' placeholder="' + __('Search clients, tickets, assets, credentials...') + '">' +
                         '<span class="spinner-border spinner-border-sm itflow-search-spinner" hidden aria-hidden="true"></span>' +
-                        '<kbd class="d-none d-sm-inline">Esc</kbd>' +
-                        '<button type="button" class="btn btn-link btn-sm d-sm-none" data-bs-dismiss="modal">Cancel</button>' +
+                        '<kbd class="d-none d-sm-inline">' + __('Esc') + '</kbd>' +
+                        '<button type="button" class="btn btn-link btn-sm d-sm-none" data-bs-dismiss="modal">' + __('Cancel') + '</button>' +
                     '</div>' +
-                    '<div class="itflow-search-results" id="itflowSearchResults" role="listbox" aria-label="Search results"></div>' +
+                    '<div class="itflow-search-results" id="itflowSearchResults" role="listbox" aria-label="' + __('Search results') + '"></div>' +
                     '<div class="itflow-search-footer d-none d-sm-flex">' +
-                        '<span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>' +
-                        '<span><kbd>&crarr;</kbd> to open</span>' +
-                        '<span><kbd class="itflow-search-mod"></kbd> + <kbd>&crarr;</kbd> new tab</span>' +
-                        '<span class="ms-auto"><kbd class="itflow-search-mod"></kbd> + <kbd>K</kbd> from any page</span>' +
+                        '<span>' + __('<kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move') + '</span>' +
+                        '<span>' + __('<kbd>&crarr;</kbd> to open') + '</span>' +
+                        '<span>' + __('<kbd class="itflow-search-mod"></kbd> + <kbd>&crarr;</kbd> new tab') + '</span>' +
+                        '<span class="ms-auto">' + __('<kbd class="itflow-search-mod"></kbd> + <kbd>K</kbd> from any page') + '</span>' +
                     '</div>' +
                     '<div class="visually-hidden" aria-live="polite"></div>' +
                 '</div>' +
@@ -541,8 +541,8 @@
                     return;
                 }
                 renderMessage(err.message === 'session'
-                    ? 'Your session has ended. Reload the page to sign in again.'
-                    : 'Search is not responding. Try again in a moment.', 'exclamation-triangle', query);
+                    ? __('Your session has ended. Reload the page to sign in again.')
+                    : __('Search is not responding. Try again in a moment.'), 'exclamation-triangle', query);
             })
             .finally(function () {
                 if (mine === requestSeq) {
@@ -568,7 +568,7 @@
         renderedQuery = query;
 
         if (announcer) {
-            announcer.textContent = query ? (count ? count + ' results' : 'No results') : '';
+            announcer.textContent = query ? (count ? __('%d results', count) : __('No results')) : '';
         }
 
         if (pendingOpen && options.length) {
@@ -581,10 +581,10 @@
 
     function searchEverything(query, hasResults) {
         return option(resultsPageUrl(query), 'search', '', {
-            title: 'Search everything for "' + query + '"',
+            title: __('Search everything for "%s"', query),
             subtitle: hasResults
-                ? 'See every match, including ticket conversations and document text'
-                : 'Also searches ticket conversations and document text'
+                ? __('See every match, including ticket conversations and document text')
+                : __('Also searches ticket conversations and document text')
         }, 'itflow-search-all');
     }
 
@@ -607,13 +607,13 @@
         if (key === '') {
             const recent = (data && data.recent) || [];
             if (recent.length) {
-                list.append(heading('Recent clients', 'history'));
+                list.append(heading(__('Recent clients'), 'history'));
                 recent.forEach(function (item) {
                     list.append(option(item.url, 'user-friends', '', item));
                 });
             }
             const hint = el('div', 'itflow-search-hint',
-                'Type a name, email, phone number, IP, serial, or a ticket, invoice or quote number.');
+                __('Type a name, email, phone number, IP, serial, or a ticket, invoice or quote number.'));
             list.append(hint);
             finish('', recent.length);
             renderedQuery = query;
@@ -622,7 +622,7 @@
 
         const pages = (data && data.pages) || [];
         if (pages.length) {
-            list.append(heading('Go to', 'compass'));
+            list.append(heading(__('Go to'), 'compass'));
             pages.forEach(function (page) {
                 list.append(option(page.url, 'arrow-right', key, page));
             });
@@ -645,14 +645,14 @@
             });
             if (group.more) {
                 list.append(option(resultsPageUrl(key, group.key), 'ellipsis-h', '', {
-                    title: 'See all matching ' + group.label.toLowerCase()
+                    title: __('See all matching %s', group.label.toLowerCase())
                 }, 'itflow-search-more'));
             }
         });
 
         if (!count && !pages.length && !settings.length) {
             const message = el('div', 'itflow-search-empty');
-            message.append(icon('search'), el('div', null, 'No quick matches for "' + key + '".'));
+            message.append(icon('search'), el('div', null, __('No quick matches for "%s".', key)));
             list.append(message);
         }
 

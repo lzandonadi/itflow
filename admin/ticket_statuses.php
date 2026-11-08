@@ -20,8 +20,8 @@ require_once "includes/inc_all_admin.php";
 $builtins = ticketStatusBuiltIns();
 
 $views = [
-    '' => ['label' => 'In use', 'icon' => 'fa-check-circle', 'where' => 'ticket_status_active = 1', 'title' => 'In the pickers and on the board'],
-    'off' => ['label' => 'Switched off', 'icon' => 'fa-power-off', 'where' => 'ticket_status_active = 0', 'title' => 'Kept, but can\'t be picked'],
+    '' => ['label' => __('In use'), 'icon' => 'fa-check-circle', 'where' => 'ticket_status_active = 1', 'title' => __('In the pickers and on the board')],
+    'off' => ['label' => __('Switched off'), 'icon' => 'fa-power-off', 'where' => 'ticket_status_active = 0', 'title' => __('Kept, but can\'t be picked')],
 ];
 $show = (string) ($_GET['show'] ?? '');
 $show = isset($views[$show]) ? $show : '';
@@ -70,10 +70,10 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-info-circle me-2"></i>Ticket Statuses</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-info-circle me-2"></i><?= __('Ticket Statuses') ?></h3>
         <div class="card-tools">
             <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/ticket_status/ticket_status_add.php">
-                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Status</span>
+                <i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Status') ?></span>
             </button>
         </div>
     </div>
@@ -83,8 +83,8 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search statuses..." title="Name or what it is for">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search statuses...')) ?>" title="<?= escapeHtml(__('Name or what it is for')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
@@ -99,11 +99,11 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden">Order</span></th><?php } ?>
-                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('ticket_status_name', 'Status') ?></th>
-                <th class="text-end"><?= $sort_link('tickets', 'Tickets') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('ticket_status_pauses_sla', 'SLA clock') ?></th>
-                <th class="d-none d-lg-table-cell">When the client replies</th>
+                <?php if ($can_reorder) { ?><th style="width: 1%"><span class="visually-hidden"><?= __('Order') ?></span></th><?php } ?>
+                <th class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>"><?= $sort_link('ticket_status_name', __('Status')) ?></th>
+                <th class="text-end"><?= $sort_link('tickets', __('Tickets')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('ticket_status_pauses_sla', __('SLA clock')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('When the client replies') ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -113,7 +113,7 @@ $csrf = $_SESSION['csrf_token'];
             while ($row = mysqli_fetch_assoc($sql)) {
                 $position++;
                 $ticket_status_id = intval($row['ticket_status_id']);
-                $name = escapeHtml($row['ticket_status_name']);
+                $name = escapeHtml(ticketStatusLabel($row['ticket_status_id'], $row['ticket_status_name']));
                 $builtin = $builtins[$ticket_status_id] ?? null;
                 $about = ticketStatusAbout($row);
                 $active = intval($row['ticket_status_active']) === 1;
@@ -122,26 +122,26 @@ $csrf = $_SESSION['csrf_token'];
                 $tickets = intval($row['n_tickets']);
                 $edit_url = "modals/ticket_status/ticket_status_edit.php?id=$ticket_status_id";
                 $tickets_url = "/agent/tickets.php?status[]=$ticket_status_id";
-                $fixed = $builtin ? ' <i class="fas fa-lock small text-body-tertiary" title="Fixed for the statuses ITFlow has"></i>' : '';
+                $fixed = $builtin ? ' <i class="fas fa-lock small text-body-tertiary" title="' . escapeHtml(__('Fixed for the statuses ITFlow has')) . '"></i>' : '';
                 $clock_html = $ticket_status_id === TICKET_STATUS_CLOSED
-                    ? '<span class="text-body-secondary">Stopped</span>'
-                    : ($paused ? '<span class="text-warning-emphasis"><i class="fas fa-fw fa-pause-circle me-1"></i>Paused</span>' : '<span class="text-body-secondary"><i class="fas fa-fw fa-play-circle me-1"></i>Runs</span>');
+                    ? __('<span class="text-body-secondary">Stopped</span>')
+                    : ($paused ? __('<span class="text-warning-emphasis"><i class="fas fa-fw fa-pause-circle me-1"></i>Paused</span>') : __('<span class="text-body-secondary"><i class="fas fa-fw fa-play-circle me-1"></i>Runs</span>'));
                 $reply_html = $ticket_status_id === TICKET_STATUS_CLOSED
-                    ? '<span class="text-body-secondary" title="A closed ticket can\'t be replied to - the client is told to raise a new one">Can\'t reply</span>'
-                    : '<span class="text-body-secondary"><i class="fas fa-fw ' . $reply['icon'] . ' me-1"></i>' . ([TICKET_STATUS_NEW => 'Opens it', TICKET_STATUS_OPEN => 'Stays Open', TICKET_STATUS_RESOLVED => 'Reopens it'][$ticket_status_id] ?? $reply['short']) . '</span>';
+                    ? __('<span class="text-body-secondary" title="A closed ticket can\'t be replied to - the client is told to raise a new one">Can\'t reply</span>')
+                    : '<span class="text-body-secondary"><i class="fas fa-fw ' . $reply['icon'] . ' me-1"></i>' . ([TICKET_STATUS_NEW => __('Opens it'), TICKET_STATUS_OPEN => __('Stays Open'), TICKET_STATUS_RESOLVED => __('Reopens it')][$ticket_status_id] ?? __($reply['short'])) . '</span>'; // i18n-dynamic
                 ?>
                 <tr data-ticket-status-id="<?= $ticket_status_id ?>">
                     <?php if ($can_reorder) { ?>
-                        <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="Drag to move" data-ticket-status-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
+                        <td class="pe-0"><span class="itflow-category-grip text-body-secondary" title="<?= escapeHtml(__('Drag to move')) ?>" data-ticket-status-grip><i class="fas fa-grip-vertical" aria-hidden="true"></i></span></td>
                     <?php } ?>
                     <td class="<?= $can_reorder ? 'ps-0' : 'ps-3' ?>">
                         <div class="d-flex align-items-start gap-3">
                             <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true"><i class="fas fa-fw <?= $builtin ? $builtin['icon'] : 'fa-tag' ?>"></i></span>
                             <div class="min-w-0">
                                 <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <a class="ajax-modal text-decoration-none" href="#" data-modal-url="<?= $edit_url ?>" title="Edit <?= $name ?>"><?= ticketStatusBadgeHtml($row['ticket_status_name'], $row['ticket_status_color'], 'list') ?></a>
+                                    <a class="ajax-modal text-decoration-none" href="#" data-modal-url="<?= $edit_url ?>" title="<?= __('Edit %s', $name) ?>"><?= ticketStatusBadgeHtml($row['ticket_status_name'], $row['ticket_status_color'], 'list') ?></a>
                                     <?php if ($builtin) { ?>
-                                        <span class="badge rounded-pill text-bg-light border fw-normal" title="<?= escapeHtml($builtin['set_by']) ?>"><i class="fas fa-fw fa-lock text-secondary me-1"></i>Built in</span>
+                                        <span class="badge rounded-pill text-bg-light border fw-normal" title="<?= escapeHtml($builtin['set_by']) ?>"><i class="fas fa-fw fa-lock text-secondary me-1"></i><?= __('Built in') ?></span>
                                     <?php } ?>
                                 </div>
                                 <?php if ($about !== '') { ?>
@@ -150,14 +150,14 @@ $csrf = $_SESSION['csrf_token'];
                                 <!-- On smaller screens the clock and replies come along under the name -->
                                 <div class="d-lg-none mt-1 small d-flex flex-wrap gap-3">
                                     <span class="d-md-none"><?= $clock_html ?></span>
-                                    <span title="When the client replies"><?= $reply_html ?></span>
+                                    <span title="<?= escapeHtml(__('When the client replies')) ?>"><?= $reply_html ?></span>
                                 </div>
                             </div>
                         </div>
                     </td>
                     <td class="text-end text-nowrap">
                         <?php if ($tickets) { ?>
-                            <a href="<?= escapeHtml($tickets_url) ?>" title="See the tickets in <?= $name ?>"><?= number_format($tickets) ?></a>
+                            <a href="<?= escapeHtml($tickets_url) ?>" title="<?= __('See the tickets in %s', $name) ?>"><?= number_format($tickets) ?></a>
                         <?php } else { ?>
                             <span class="text-body-tertiary">0</span>
                         <?php } ?>
@@ -166,41 +166,41 @@ $csrf = $_SESSION['csrf_token'];
                     <td class="d-none d-lg-table-cell text-nowrap"><?= $reply_html . $fixed ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if ($tickets) { ?>
                                     <a class="dropdown-item" href="<?= escapeHtml($tickets_url) ?>">
-                                        <i class="fas fa-fw fa-life-ring text-secondary me-2"></i>See its tickets
+                                        <i class="fas fa-fw fa-life-ring text-secondary me-2"></i><?= __('See its tickets') ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($can_reorder) { ?>
                                     <?php if ($position > 0) { ?>
                                         <a class="dropdown-item" href="post.php?move_ticket_status=<?= $ticket_status_id ?>&direction=up&csrf_token=<?= $csrf ?>">
-                                            <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i>Move up
+                                            <i class="fas fa-fw fa-arrow-up text-secondary me-2"></i><?= __('Move up') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($position < $num_rows[0] - 1) { ?>
                                         <a class="dropdown-item" href="post.php?move_ticket_status=<?= $ticket_status_id ?>&direction=down&csrf_token=<?= $csrf ?>">
-                                            <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i>Move down
+                                            <i class="fas fa-fw fa-arrow-down text-secondary me-2"></i><?= __('Move down') ?>
                                         </a>
                                     <?php } ?>
                                 <?php } ?>
                                 <?php if (!$builtin) { ?>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($active) { ?>
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket_status/ticket_status_remove.php?id=<?= $ticket_status_id ?>&action=off" title="Kept, but it can't be picked - and it comes off the board">
-                                            <i class="fas fa-fw fa-power-off text-secondary me-2"></i>Switch off
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket_status/ticket_status_remove.php?id=<?= $ticket_status_id ?>&action=off" title="<?= escapeHtml(__('Kept, but it can\'t be picked - and it comes off the board')) ?>">
+                                            <i class="fas fa-fw fa-power-off text-secondary me-2"></i><?= __('Switch off') ?>
                                         </a>
                                     <?php } else { ?>
-                                        <a class="dropdown-item" href="post.php?switch_on_ticket_status=<?= $ticket_status_id ?>&csrf_token=<?= $csrf ?>" title="Back in the pickers and on the board">
-                                            <i class="fas fa-fw fa-power-off text-secondary me-2"></i>Switch on
+                                        <a class="dropdown-item" href="post.php?switch_on_ticket_status=<?= $ticket_status_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Back in the pickers and on the board')) ?>">
+                                            <i class="fas fa-fw fa-power-off text-secondary me-2"></i><?= __('Switch on') ?>
                                         </a>
                                     <?php } ?>
                                     <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/ticket_status/ticket_status_remove.php?id=<?= $ticket_status_id ?>&action=delete">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -212,23 +212,23 @@ $csrf = $_SESSION['csrf_token'];
         </table>
     </div>
     <?php if ($can_reorder) { ?>
-        <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i>Drag them into the order the status pickers and the ticket board show them in.</div>
+        <div class="small text-body-secondary px-3 py-2 border-top"><i class="fas fa-fw fa-grip-vertical me-1"></i><?= __('Drag them into the order the status pickers and the ticket board show them in.') ?></div>
     <?php } elseif ($show === '' && $q !== '') { ?>
-        <div class="small text-body-secondary px-3 py-2 border-top">Clear the search to drag them into order.</div>
+        <div class="small text-body-secondary px-3 py-2 border-top"><?= __('Clear the search to drag them into order.') ?></div>
     <?php } ?>
     <?php
     $empty_state = [
-        'thing' => 'ticket statuses',
+        'thing' => __('ticket statuses'),
         'icon' => 'fa-info-circle',
         'filtered' => $q !== '',
         'views' => ['show'],
         'view' => $show === 'off' ? [
-            'title' => 'None switched off',
+            'title' => __('None switched off'),
             'icon' => 'fa-power-off',
-            'text' => 'A status you switch off is kept here - it can\'t be picked, and comes off the board.',
+            'text' => __('A status you switch off is kept here - it can\'t be picked, and comes off the board.'),
         ] : [],
-        'text' => 'The steps a ticket goes through - add your own, like Waiting on Vendor or Scheduled.',
-        'actions' => [['label' => 'New Status', 'modal' => 'modals/ticket_status/ticket_status_add.php']],
+        'text' => __('The steps a ticket goes through - add your own, like Waiting on Vendor or Scheduled.'),
+        'actions' => [['label' => __('New Status'), 'modal' => 'modals/ticket_status/ticket_status_add.php']],
     ];
     require_once "../includes/filter_footer.php";
     ?>
@@ -255,9 +255,9 @@ $csrf = $_SESSION['csrf_token'];
                         .then(function (text) {
                             const result = JSON.parse(text);
                             if (!result.ok) {
-                                throw new Error(result.error || 'Not saved');
+                                throw new Error(result.error || __('Not saved'));
                             }
-                            itflowToast('Order saved', 'success');
+                            itflowToast(__('Order saved'), 'success');
                         })
                         .catch(function () {
                             window.location.reload();

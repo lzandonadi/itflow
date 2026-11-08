@@ -23,11 +23,11 @@ if (!aiCan()) {
 
 $client_id = intval($ticket['ticket_client_id']) ?: intval($config_internal_client_id ?? 0);
 if (!$client_id) {
-    echo json_encode(['error' => 'This ticket has no client to keep the document with. Pick your own company\'s client record in Admin > Settings > Company, then try again.']);
+    echo json_encode(['error' => __("This ticket has no client to keep the document with. Pick your own company's client record in Admin > Settings > Company, then try again.")]);
     exit;
 }
 if (!hasClientAccess($client_id)) {
-    permissionRefuse("You don't have access to that client's documents.");
+    permissionRefuse(__("You don't have access to that client's documents."));
 }
 $client_name = (string) getFieldById('clients', $client_id, 'client_name');
 $asset_id = intval($ticket['ticket_asset_id']) && intval(getFieldById('assets', intval($ticket['ticket_asset_id']), 'asset_client_id')) === $client_id ? intval($ticket['ticket_asset_id']) : 0;
@@ -42,7 +42,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-file-medical me-2"></i>Write up <?= escapeHtml(ticketReference($ticket)) ?> as a document <small class="opacity-75 ms-1">for <?= escapeHtml($client_name) ?></small></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-file-medical me-2"></i><?= __('Write up %s as a document', escapeHtml(ticketReference($ticket))) ?> <small class="opacity-75 ms-1"><?= __('for %s', escapeHtml($client_name)) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-ai-document-form data-ticket-id="<?= $ticket_id ?>">
@@ -52,13 +52,13 @@ ob_start();
     <input type="hidden" name="from_ticket_id" value="<?= $ticket_id ?>">
     <div class="modal-body">
         <div class="alert alert-info py-2 small d-flex align-items-center gap-2" data-ai-document-status>
-            <i class="fas fa-spinner fa-spin"></i><span>AI is writing it up from the ticket - what was wrong, why, and how it was put right...</span>
+            <i class="fas fa-spinner fa-spin"></i><span><?= __('AI is writing it up from the ticket - what was wrong, why, and how it was put right...') ?></span>
         </div>
         <?php require __DIR__ . '/../document/document_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_document" class="btn btn-primary text-bold" data-ai-document-save disabled><i class="fa fa-check me-2"></i>Create document</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_document" class="btn btn-primary text-bold" data-ai-document-save disabled><i class="fa fa-check me-2"></i><?= __('Create document') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 
@@ -114,13 +114,13 @@ ob_start();
                 } else {
                     textarea.value = answer.html;
                 }
-                say('success', 'fa-check-circle', 'Drafted by AI from the ticket' + (answer.removed ? ' - ' + answer.removed + ' password' + (answer.removed === 1 ? '' : 's') + ' or key' + (answer.removed === 1 ? '' : 's') + ' left out as [removed]' : '') + '. Check it, change what you like, then create it.');
+                say('success', 'fa-check-circle', (!answer.removed ? __('Drafted by AI from the ticket. Check it, change what you like, then create it.') : answer.removed === 1 ? __('Drafted by AI from the ticket - 1 password or key left out as [removed]. Check it, change what you like, then create it.') : __('Drafted by AI from the ticket - %d passwords or keys left out as [removed]. Check it, change what you like, then create it.', answer.removed)));
                 status.setAttribute('data-ai-document-ready', '');
                 save.disabled = false;
             });
         })
         .catch(function (error) {
-            say('warning', 'fa-exclamation-triangle', (error && error.message ? error.message : 'It couldn\'t be drafted.') + ' You can still write it here yourself.');
+            say('warning', 'fa-exclamation-triangle', (error && error.message ? error.message : __("It couldn't be drafted.")) + ' ' + __('You can still write it here yourself.'));
             save.disabled = false;
         });
 })();

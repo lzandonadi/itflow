@@ -20,11 +20,11 @@ if ($row) {
 ob_start();
 
 if (!$row) { ?>
-    <div class="modal-body text-center text-secondary py-5">That task is gone - it may have been deleted.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That task is gone - it may have been deleted.') ?></div>
 <?php } else { ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-tasks me-2"></i>Task</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-tasks me-2"></i><?= __('Task') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -34,40 +34,40 @@ if (!$row) { ?>
     <div class="modal-body">
 
         <div class="mb-3">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-tasks"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="Name the task" maxlength="200" value="<?= escapeHtml($row['task_template_name']) ?>" required autofocus>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Name the task')) ?>" maxlength="200" value="<?= escapeHtml($row['task_template_name']) ?>" required autofocus>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">How long it takes</label>
+            <label class="form-label"><?= __('How long it takes') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="far fa-fw fa-clock"></i></span>
-                <input type="number" class="form-control" name="completion_estimate" min="0" placeholder="Minutes" value="<?= intval($row['task_template_completion_estimate']) ?: '' ?>">
-                <span class="input-group-text">minutes</span>
+                <input type="number" class="form-control" name="completion_estimate" min="0" placeholder="<?= escapeHtml(__('Minutes')) ?>" value="<?= intval($row['task_template_completion_estimate']) ?: '' ?>">
+                <span class="input-group-text"><?= __('minutes') ?></span>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">For</label>
+            <label class="form-label"><?= __('For') ?></label>
             <?php if ($when_html !== '') { ?>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-code-branch"></i></span>
                     <?= $when_html ?>
                 </div>
-                <div class="form-text">A task for one answer only is left off tickets given another. Until it is answered, the task is added.</div>
+                <div class="form-text"><?= __('A task for one answer only is left off tickets given another. Until it is answered, the task is added.') ?></div>
             <?php } else { ?>
-                <div class="form-text mt-0">Every ticket. A task can be for one answer only once the template has a list or yes-or-no fill-in.</div>
+                <div class="form-text mt-0"><?= __('Every ticket. A task can be for one answer only once the template has a list or yes-or-no fill-in.') ?></div>
             <?php } ?>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket_template_task" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_ticket_template_task" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 
 </form>

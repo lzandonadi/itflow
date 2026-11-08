@@ -30,17 +30,17 @@ foreach ($cards_on ? billingSavedCards($session_client_id) : [] as $card) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Recurring invoices</h1>
-        <p>What we bill you regularly</p>
+        <h1><?= escapeHtml(__('Recurring invoices')) ?></h1>
+        <p><?= escapeHtml(__('What we bill you regularly')) ?></p>
     </div>
     <?php if ($cards_on && mysqli_num_rows($recurring)) { ?>
-        <a class="btn btn-outline-secondary" href="saved_payment_methods.php"><i class="fas fa-sync-alt me-2"></i>Autopay</a>
+        <a class="btn btn-outline-secondary" href="saved_payment_methods.php"><i class="fas fa-sync-alt me-2"></i><?= escapeHtml(__('Autopay')) ?></a>
     <?php } ?>
 </div>
 
 <section class="itflow-portal-panel">
     <?php if (!mysqli_num_rows($recurring)) { ?>
-        <?= emptyStateHtml(['title' => 'No recurring invoices', 'text' => 'Services billed each month, quarter or year show here.', 'icon' => 'fa-redo-alt', 'filtered' => false]) ?>
+        <?= emptyStateHtml(['title' => __('No recurring invoices'), 'text' => __('Services billed each month, quarter or year show here.'), 'icon' => 'fa-redo-alt', 'filtered' => false]) ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">
             <?php while ($row = mysqli_fetch_assoc($recurring)) {
@@ -51,15 +51,15 @@ foreach ($cards_on ? billingSavedCards($session_client_id) : [] as $card) {
                             <span class="itflow-portal-ticket-subject d-block"><?= escapeHtml(trim((string) $row['recurring_invoice_scope']) !== '' ? $row['recurring_invoice_scope'] : $row['recurring_invoice_prefix'] . $row['recurring_invoice_number']) ?></span>
                             <span class="itflow-portal-ticket-meta">
                                 <span><?= escapeHtml(recurringInvoiceFrequencies()[$row['recurring_invoice_frequency']] ?? ucfirst((string) $row['recurring_invoice_frequency'])) ?></span>
-                                <span>Next invoice <?= escapeHtml(date('M j, Y', strtotime($row['recurring_invoice_next_date']))) ?></span>
+                                <span><?= escapeHtml(__('Next invoice %s', formatDate($row['recurring_invoice_next_date'], 'date'))) ?></span>
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">
                             <span class="itflow-portal-amount itflow-money"><?= escapeHtml(billingMoney($row['recurring_invoice_amount'], $row['recurring_invoice_currency_code'])) ?> <small class="fw-normal">/ <?= escapeHtml(recurringInvoicePeriodWord($row['recurring_invoice_frequency'])) ?></small></span>
                             <?php if ($cards_on) { ?>
                                 <?= portalStateBadge($card
-                                    ? ['label' => 'Autopay · ' . $card['label'], 'icon' => 'fa-sync-alt', 'class' => 'itflow-portal-state-resolved']
-                                    : ['label' => 'Autopay off', 'icon' => 'fa-hand-paper', 'class' => 'itflow-portal-state-closed']) ?>
+                                    ? ['label' => __('Autopay · %s', $card['label']), 'icon' => 'fa-sync-alt', 'class' => 'itflow-portal-state-resolved']
+                                    : ['label' => __('Autopay off'), 'icon' => 'fa-hand-paper', 'class' => 'itflow-portal-state-closed']) ?>
                             <?php } ?>
                         </span>
                     </a>

@@ -15,7 +15,7 @@ if (isset($_POST['add_api_key'])) {
     $secret = (string) ($_POST['key'] ?? '');
     $password = trim((string) ($_POST['password'] ?? ''));
     if ($error === '' && (!preg_match('/^[A-Za-z0-9_-]{32}$/', $secret) || $password === '')) {
-        $error = 'The window was missing its key - open New API Key again.';
+        $error = __('The window was missing its key - open New API Key again.');
     }
     if ($error !== '') {
         flashAlert(escapeHtml($error), 'error');
@@ -33,7 +33,7 @@ if (isset($_POST['add_api_key'])) {
 
     logAudit("API Key", "Create", "$session_name created API key " . escapeSql($fields['name']) . " acting as " . escapeSql($agent) . ", expiring " . $fields['expire'], 0, $api_key_id);
 
-    flashAlert("API key <strong>" . escapeHtml($fields['name']) . "</strong> created");
+    flashAlert(__('API key <strong>%s</strong> created', escapeHtml($fields['name'])));
 
     redirect();
 
@@ -45,7 +45,7 @@ if (isset($_POST['edit_api_key'])) {
 
     $row = apiKeyRow($_POST['api_key_id'] ?? 0);
     if (!$row) {
-        flashAlert("That key is gone - it may have been deleted", 'error');
+        flashAlert(__('That key is gone - it may have been deleted'), 'error');
         redirect();
     }
     $api_key_id = intval($row['api_key_id']);
@@ -74,7 +74,7 @@ if (isset($_POST['edit_api_key'])) {
         logAudit("API Key", "Edit", "$session_name edited API key " . escapeSql($fields['name']) . " - " . escapeSql(implode(', ', $changes)), 0, $api_key_id);
     }
 
-    flashAlert("API key <strong>" . escapeHtml($fields['name']) . "</strong> " . ($changes ? 'saved' : 'unchanged'));
+    flashAlert($changes ? __('API key <strong>%s</strong> saved', escapeHtml($fields['name'])) : __('API key <strong>%s</strong> unchanged', escapeHtml($fields['name'])));
 
     redirect();
 
@@ -86,7 +86,7 @@ if (isset($_GET['revoke_api_key'])) {
 
     $row = apiKeyRow($_GET['revoke_api_key']);
     if (!$row) {
-        flashAlert("That key is gone - it may have been deleted", 'error');
+        flashAlert(__('That key is gone - it may have been deleted'), 'error');
         redirect();
     }
 
@@ -95,7 +95,7 @@ if (isset($_GET['revoke_api_key'])) {
 
     logAudit("API Key", "Revoke", "$session_name revoked API key " . escapeSql($row['api_key_name']), 0, $row['api_key_id']);
 
-    flashAlert("API key <strong>" . escapeHtml($row['api_key_name']) . "</strong> revoked", 'error');
+    flashAlert(__('API key <strong>%s</strong> revoked', escapeHtml($row['api_key_name'])), 'error');
 
     redirect();
 
@@ -107,7 +107,7 @@ if (isset($_GET['delete_api_key'])) {
 
     $row = apiKeyRow($_GET['delete_api_key']);
     if (!$row) {
-        flashAlert("That key is gone - it may have been deleted", 'error');
+        flashAlert(__('That key is gone - it may have been deleted'), 'error');
         redirect();
     }
 
@@ -116,7 +116,7 @@ if (isset($_GET['delete_api_key'])) {
 
     logAudit("API Key", "Delete", "$session_name deleted API key " . escapeSql($row['api_key_name']), 0, $row['api_key_id']);
 
-    flashAlert("API key <strong>" . escapeHtml($row['api_key_name']) . "</strong> deleted", 'error');
+    flashAlert(__('API key <strong>%s</strong> deleted', escapeHtml($row['api_key_name'])), 'error');
 
     redirect();
 
@@ -138,7 +138,7 @@ if (isset($_POST['bulk_delete_api_keys'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> API key" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> API key', 'Deleted <strong>%d</strong> API keys', $count), 'error');
 
     redirect();
 

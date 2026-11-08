@@ -42,6 +42,7 @@
 
 function cronJobRegistry(): array
 {
+    // i18n-ignore-start - stays English (the CLI reads it too); admin/cron.php shows label and description through __()
     return [
         [
             'name' => 'mail_queue',
@@ -136,7 +137,8 @@ function cronJobRegistry(): array
             'enabled' => 0,
             'interval_safe' => false,
         ],
-    ];
+    ];    // i18n-ignore-end
+
 }
 
 /*
@@ -159,18 +161,18 @@ function cronJobRegistryByName(): array
 function cronJobScheduleDescription(string $schedule, int $interval_minutes, ?string $daily_at): string
 {
     if ($schedule === 'Daily') {
-        return 'Daily at ' . substr((string)$daily_at, 0, 5);
+        return __('Daily at %s', substr((string)$daily_at, 0, 5));
     }
 
     if ($interval_minutes === 1) {
-        return 'Every minute';
+        return __('Every minute');
     }
 
     if ($interval_minutes === 60) {
-        return 'Hourly';
+        return __('Hourly');
     }
 
-    return "Every $interval_minutes minutes";
+    return _n('Every %d minute', 'Every %d minutes', $interval_minutes);
 }
 
 /*
@@ -216,7 +218,7 @@ function cronJobNextRun(array $row): ?string
 function cronJobTimeAgo(?string $datetime): string
 {
     if (empty($datetime)) {
-        return 'Never';
+        return __('Never');
     }
 
     $seconds = time() - strtotime($datetime);
@@ -224,16 +226,14 @@ function cronJobTimeAgo(?string $datetime): string
     $seconds = abs($seconds);
 
     if ($seconds < 60) {
-        $text = 'less than a minute';
+        return $ahead ? __('in less than a minute') : __('less than a minute ago');
     } elseif ($seconds < 3600) {
-        $minutes = floor($seconds / 60);
-        $text = $minutes . ' minute' . ($minutes == 1 ? '' : 's');
+        $minutes = intval(floor($seconds / 60));
+        return $ahead ? _n('in %d minute', 'in %d minutes', $minutes) : _n('%d minute ago', '%d minutes ago', $minutes);
     } elseif ($seconds < 86400) {
-        $hours = floor($seconds / 3600);
-        $text = $hours . ' hour' . ($hours == 1 ? '' : 's');
-    } else {
-        return date('M j, g:i A', strtotime($datetime));
+        $hours = intval(floor($seconds / 3600));
+        return $ahead ? _n('in %d hour', 'in %d hours', $hours) : _n('%d hour ago', '%d hours ago', $hours);
     }
 
-    return $ahead ? "in $text" : "$text ago";
+    return formatDate($datetime, 'datetime_short');
 }

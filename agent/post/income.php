@@ -33,33 +33,38 @@ if (isset($_POST['bulk_edit_income'])) {
     if ($field === 'category') {
         $categories = incomeCategories();
         if (isset($categories[$value])) {
-            $label = 'the category to ' . $categories[$value]['category_name'];
+            $label = 'the category to ' . $categories[$value]['category_name']; // i18n-ignore - the audit log
+            $shown = __('the category to %s', $categories[$value]['category_name']);
             $revenue_set = "revenue_category_id = $value";
         }
     } elseif ($field === 'account') {
         $accounts = paymentAccounts();
         if (isset($accounts[$value]) && !$accounts[$value]['account_archived_at']) {
-            $label = 'the account to ' . $accounts[$value]['account_name'];
+            $label = 'the account to ' . $accounts[$value]['account_name']; // i18n-ignore - the audit log
+            $shown = __('the account to %s', $accounts[$value]['account_name']);
             $revenue_set = "revenue_account_id = $value";
             $payment_set = "payment_account_id = $value";
         }
     } elseif ($field === 'method') {
         if (in_array($raw, paymentMethods('in'), true)) {
-            $label = 'the payment method to ' . $raw;
+            $label = 'the payment method to ' . $raw; // i18n-ignore - the audit log
+            $shown = __('the payment method to %s', $raw);
             $revenue_set = "revenue_payment_method = '" . escapeSql($raw) . "'";
             $payment_set = "payment_method = '" . escapeSql($raw) . "'";
         }
     } elseif ($field === 'client') {
         if (!$value) {
-            $label = 'no client';
+            $label = 'no client'; // i18n-ignore - the audit log
+            $shown = __('no client');
             $revenue_set = 'revenue_client_id = 0';
         } elseif (mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $value " . clientScopeSql('client_id')))) {
-            $label = 'the client to ' . getFieldById('clients', $value, 'client_name');
+            $label = 'the client to ' . getFieldById('clients', $value, 'client_name'); // i18n-ignore - the audit log
+            $shown = __('the client to %s', getFieldById('clients', $value, 'client_name'));
             $revenue_set = "revenue_client_id = $value";
         }
     }
     if ($label === '' || (!$ids['payment'] && !$ids['revenue'])) {
-        flashAlert($ids['payment'] || $ids['revenue'] ? 'Pick what to set them to' : 'Tick the income to change first', 'error');
+        flashAlert($ids['payment'] || $ids['revenue'] ? __('Pick what to set them to') : __('Tick the income to change first'), 'error');
         redirect();
     }
     $label_sql = escapeSql($label);
@@ -80,7 +85,7 @@ if (isset($_POST['bulk_edit_income'])) {
             transferDepositRelease('revenue', $revenue_id, $value);
         }
         mysqli_query($mysqli, "UPDATE revenues SET $revenue_set WHERE revenue_id = $revenue_id");
-        logAudit("Revenue", "Edit", "$session_name set $label_sql on other income " . escapeSql(incomeRevenueLabel($row)), intval($row['revenue_client_id']), $revenue_id);
+        logAudit("Revenue", "Edit", "$session_name set $label_sql on other income " . escapeSql(i18nEnglish(fn () => incomeRevenueLabel($row))), intval($row['revenue_client_id']), $revenue_id);
         $count++;
     }
 
@@ -119,7 +124,7 @@ if (isset($_POST['bulk_edit_income'])) {
                 transferDepositRelease('payment', $payment_id, $value);
             }
             mysqli_query($mysqli, "UPDATE payments SET $payment_set WHERE payment_id = $payment_id");
-            logAudit("Payment", "Edit", "$session_name set $label_sql on the payment " . escapeSql(incomePaymentLabel($row)), intval($row['invoice_client_id']), $payment_id);
+            logAudit("Payment", "Edit", "$session_name set $label_sql on the payment " . escapeSql(i18nEnglish(fn () => incomePaymentLabel($row))), intval($row['invoice_client_id']), $payment_id);
             $count++;
         }
     }
@@ -127,16 +132,16 @@ if (isset($_POST['bulk_edit_income'])) {
 
     $notes = [];
     if ($invoices) {
-        $notes[] = "on the $invoices invoice" . ($invoices === 1 ? '' : 's') . ' behind the payments';
+        $notes[] = _n('on the %d invoice behind the payments', 'on the %d invoices behind the payments', $invoices);
     }
     if ($kept) {
-        $notes[] = "$kept payment" . ($kept === 1 ? '' : 's') . ' left as ' . ($kept === 1 ? 'it was' : 'they were')
-            . ($field === 'client' ? " - a payment's client is its invoice's" : ($can_payments ? ' - not on an invoice' : ($field === 'category' ? " - a payment's category is its invoice's, and changing the invoice takes write access to Sales" : ' - changing a payment takes write access to Financial')));
+        $why = $field === 'client' ? __("a payment's client is its invoice's") : ($can_payments ? __('not on an invoice') : ($field === 'category' ? __("a payment's category is its invoice's, and changing the invoice takes write access to Sales") : __('changing a payment takes write access to Financial')));
+        $notes[] = _n('%1$d payment left as it was - %2$s', '%1$d payments left as they were - %2$s', $kept, $kept, $why);
     }
     if ($cleared) {
-        $notes[] = "$cleared left on " . ($cleared === 1 ? 'its account - it' : 'their accounts - they') . ' cleared on a reconciled statement';
+        $notes[] = _n('%d left on its account - it cleared on a reconciled statement', '%d left on their accounts - they cleared on a reconciled statement', $cleared);
     }
-    flashAlert("Set " . escapeHtml($label) . " on <strong>$count</strong>" . ($notes ? ' - ' . escapeHtml(implode('; ', $notes)) : ''), $kept || $cleared ? 'warning' : 'success');
+    flashAlert(__('Set %1$s on %2$s', escapeHtml($shown ?? $label), "<strong>$count</strong>") . ($notes ? ' - ' . escapeHtml(implode('; ', $notes)) : ''), $kept || $cleared ? 'warning' : 'success');
 
     redirect();
 
@@ -157,14 +162,14 @@ if (isset($_POST['bulk_delete_income'])) {
             $cleared += reconcileLock('revenue', $revenue_id) ? 1 : 0;
             continue;
         }
-        logAudit("Revenue", "Delete", "$session_name deleted other income " . escapeSql(incomeRevenueLabel($row)), intval($row['revenue_client_id']));
+        logAudit("Revenue", "Delete", "$session_name deleted other income " . escapeSql(i18nEnglish(fn () => incomeRevenueLabel($row))), intval($row['revenue_client_id']));
         $count++;
     }
     logAudit("Income", "Bulk Delete", "$session_name deleted $count other income record" . ($count === 1 ? '' : 's'));
 
     $kept = count($ids['payment']);
-    flashAlert("<strong>$count</strong> other income deleted" . ($kept ? " - $kept payment" . ($kept === 1 ? ' was' : 's were') . ' kept; a payment is deleted from its invoice' : '')
-        . ($cleared ? " - $cleared kept, cleared on a reconciled statement" : ''), 'error');
+    flashAlert(__('%s other income deleted', "<strong>$count</strong>") . ($kept ? _n(' - %d payment was kept; a payment is deleted from its invoice', ' - %d payments were kept; a payment is deleted from its invoice', $kept) : '')
+        . ($cleared ? _n(' - %d kept, cleared on a reconciled statement', ' - %d kept, cleared on a reconciled statement', $cleared) : ''), 'error');
 
     redirect();
 
@@ -195,17 +200,18 @@ if (isExportRequest('export_income')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'income entries');
+    guardExportHasRows($num_rows, __('income entries'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('income', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Income', 'Income', summarizeExportFilters($filter_summary));
+        $export = beginExport('income', $format, ($client_id ? getFieldById('clients', $client_id, 'client_name') : $session_company_name) . '-Income', __('Income'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             $is_payment = $row['income_type'] === 'payment';
-            $row['income_type'] = $is_payment ? 'Invoice payment' : 'Other income';
+            $type = fn () => $is_payment ? __('Invoice payment') : __('Other income');
+            $row['income_type'] = $format === 'csv' ? i18nEnglish($type) : $type(); // CSV values stay English
             $row['income_invoice'] = $is_payment && $row['invoice_number'] !== null ? $row['invoice_prefix'] . $row['invoice_number'] : '';
             $row['income_source'] = trim(strtok((string) $row['income_description'], "\n"));
             $row['income_category'] = (string) $row['category_name'];

@@ -9,7 +9,7 @@ require_once '../../../includes/modal_header.php';
 
 $form = projectForModal($_GET['id'] ?? 0, 2);
 if (!empty($form['project_archived_at'])) {
-    echo json_encode(['error' => 'Project ' . projectReference($form) . ' is archived - restore it to change it.']);
+    echo json_encode(['error' => __('Project %s is archived - restore it to change it.', projectReference($form))]);
     exit;
 }
 $project_id = intval($form['project_id']);
@@ -23,7 +23,7 @@ ob_start();
 
 <div class="modal-header bg-dark">
     <h5 class="modal-title text-truncate">
-        <i class="fas fa-fw fa-project-diagram me-2"></i>Edit Project <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($form)) ?> &middot; <?= $form_client_id ? escapeHtml($form['client_name']) : 'Internal' ?></small>
+        <i class="fas fa-fw fa-project-diagram me-2"></i><?= __('Edit Project') ?> <small class="ms-1 opacity-75"><?= escapeHtml(projectReference($form)) ?> &middot; <?= $form_client_id ? escapeHtml($form['client_name']) : 'Internal' ?></small>
     </h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
@@ -35,10 +35,10 @@ ob_start();
     </div>
     <div class="modal-footer">
         <button type="submit" name="edit_project" class="btn btn-primary text-bold">
-            <i class="fas fa-check me-2"></i>Save
+            <i class="fas fa-check me-2"></i><?= __('Save') ?>
         </button>
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-            <i class="fa fa-times me-2"></i>Cancel
+            <i class="fa fa-times me-2"></i><?= __('Cancel') ?>
         </button>
     </div>
 </form>

@@ -16,7 +16,7 @@ $order = "ASC";
 
 require_once "includes/inc_all_admin.php";
 
-$page_title = 'AI Models';
+$page_title = __('AI Models');
 
 // Only these sort - an unknown column would take the page down
 $sortable_columns = [
@@ -67,18 +67,18 @@ $csrf = $_SESSION['csrf_token'];
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-    <li class="breadcrumb-item"><a href="ai_providers.php">AI Providers</a></li>
-    <li class="breadcrumb-item active">AI Models</li>
+    <li class="breadcrumb-item"><a href="/admin"><?= __('Admin') ?></a></li>
+    <li class="breadcrumb-item"><a href="ai_providers.php"><?= __('AI Providers') ?></a></li>
+    <li class="breadcrumb-item active"><?= __('AI Models') ?></li>
 </ol>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-brain me-2"></i>AI Models</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-brain me-2"></i><?= __('AI Models') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light me-1" href="ai_usage.php" title="Each request - who, for what, and the tokens it took"><i class="fas fa-fw fa-chart-bar"></i><span class="d-none d-lg-inline ms-2">Usage</span></a>
+            <a class="btn btn-outline-light me-1" href="ai_usage.php" title="<?= escapeHtml(__('Each request - who, for what, and the tokens it took')) ?>"><i class="fas fa-fw fa-chart-bar"></i><span class="d-none d-lg-inline ms-2"><?= __('Usage') ?></span></a>
             <?php if ($any_provider) { ?>
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">Add Model</span></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('Add Model') ?></span></button>
             <?php } ?>
         </div>
     </div>
@@ -87,13 +87,13 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search AI models..." title="Name, provider, use case or instructions">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search AI models...')) ?>" title="<?= escapeHtml(__('Name, provider, use case or instructions')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="provider" onchange="this.form.submit()" aria-label="Provider">
-                        <option value="">- Any provider -</option>
+                    <select class="form-select select2" name="provider" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Provider')) ?>">
+                        <option value=""><?= __('- Any provider -') ?></option>
                         <?php while ($provider = mysqli_fetch_assoc($providers)) { ?>
                             <option value="<?= intval($provider['ai_provider_id']) ?>" <?= intval($provider['ai_provider_id']) === $provider_filter ? 'selected' : '' ?><?= selectOptionData(['icon' => aiProviderIcon($provider['ai_provider_kind'])]) ?>><?= escapeHtml($provider['ai_provider_name']) ?></option>
                         <?php } ?>
@@ -109,11 +109,11 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('ai_model_name', 'Model') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('ai_provider_name', 'Provider') ?></th>
-                <th><?= $sort_link('ai_model_use_case', 'For') ?></th>
-                <th class="d-none d-lg-table-cell">Instructions</th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('requests', 'Last 30 days') ?></th>
+                <th class="ps-3"><?= $sort_link('ai_model_name', __('Model')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('ai_provider_name', __('Provider')) ?></th>
+                <th><?= $sort_link('ai_model_use_case', __('For')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('Instructions') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('requests', __('Last 30 days')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -130,22 +130,22 @@ $csrf = $_SESSION['csrf_token'];
                 $stopping = $is_unused ? [] : aiUseCasesStopping(['model' => $model_id]);
                 $then = $is_unused ? null : aiUseCaseMap(['model' => $model_id])['map'][$use_case] ?? null;
                 if ($is_unused) {
-                    $delete_text = 'Nothing uses it - ' . ($unused[$model_id] ? $unused[$model_id]['ai_model_name'] . " is the one used for $use_case." : "$use_case isn't a use case.");
+                    $delete_text = $unused[$model_id] ? __('Nothing uses it - %1$s is the one used for %2$s.', $unused[$model_id]['ai_model_name'], aiUseCaseLabel($use_case)) : __('Nothing uses it - %s isn\'t a use case.', $use_case);
                 } elseif ($stopping) {
-                    $delete_text = 'AI stops for ' . implode(' and ', $stopping) . ' until another model is set up.';
+                    $delete_text = __('AI stops for %s until another model is set up.', implode(__(' and '), array_map('aiUseCaseLabel', $stopping)));
                 } else {
-                    $delete_text = "$use_case uses " . ($then && $then['model'] ? $then['model']['ai_model_name'] . ($then['own'] ? '' : ' (General)') : 'nothing') . ' instead.';
+                    $delete_text = __('%1$s uses %2$s instead.', aiUseCaseLabel($use_case), $then && $then['model'] ? $then['model']['ai_model_name'] . ($then['own'] ? '' : ' (' . aiUseCaseLabel('General') . ')') : __('nothing'));
                 }
                 ?>
                 <tr data-ai-model-id="<?= $model_id ?>" class="<?= $is_unused ? 'text-body-secondary' : '' ?>">
                     <td class="ps-3">
                         <a class="fw-semibold text-body font-monospace ajax-modal" href="#" data-modal-url="<?= $edit_url ?>"><?= escapeHtml($name) ?></a>
                         <?php if ($is_unused) { ?>
-                            <span class="badge text-bg-light border fw-normal ms-1" data-model-unused title="<?= escapeHtml($unused[$model_id] ? $unused[$model_id]['ai_model_name'] . " is for $use_case already, and is the one used" : "$use_case isn't a use case") ?>">Not used</span>
+                            <span class="badge text-bg-light border fw-normal ms-1" data-model-unused title="<?= escapeHtml($unused[$model_id] ? __('%1$s is for %2$s already, and is the one used', $unused[$model_id]['ai_model_name'], aiUseCaseLabel($use_case)) : __('%s isn\'t a use case', $use_case)) ?>"><?= __('Not used') ?></span>
                         <?php } ?>
                         <div class="d-md-none small text-body-secondary"><?= escapeHtml($row['ai_provider_name']) ?></div>
                         <?php if ($row['ai_model_temperature'] !== null) { ?>
-                            <div class="small text-body-secondary" title="Temperature">Temperature <?= escapeHtml(aiTemperatureText($row['ai_model_temperature'])) ?></div>
+                            <div class="small text-body-secondary" title="<?= escapeHtml(__('Temperature')) ?>"><?= escapeHtml(__('Temperature %s', aiTemperatureText($row['ai_model_temperature']))) ?></div>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small">
@@ -159,37 +159,37 @@ $csrf = $_SESSION['csrf_token'];
                         <?php if ($prompt !== '') { ?>
                             <div class="text-truncate" title="<?= escapeHtml($prompt) ?>"><?= escapeHtml($prompt) ?></div>
                         <?php } else { ?>
-                            <span class="text-body-secondary">None</span>
+                            <span class="text-body-secondary"><?= __('None') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-nowrap" data-model-requests="<?= $requests ?>">
                         <?php if ($requests) { ?>
                             <div><a class="text-reset" href="ai_usage.php?model=<?= $model_id ?>"><?= number_format($requests) ?> request<?= $requests === 1 ? '' : 's' ?></a></div>
-                            <div class="text-body-secondary" title="Tokens sent and received"><?= aiTokensText($row['tokens_in']) ?> in · <?= aiTokensText($row['tokens_out']) ?> out</div>
+                            <div class="text-body-secondary" title="<?= escapeHtml(__('Tokens sent and received')) ?>"><?= aiTokensText($row['tokens_in']) ?> in · <?= aiTokensText($row['tokens_out']) ?> out</div>
                             <?php if ($failed) { ?>
                                 <div><a class="text-danger-emphasis" href="ai_usage.php?model=<?= $model_id ?>&amp;view=failed"><?= $failed ?> failed</a></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="text-body-secondary"><?= $row['last_used'] ? 'None' : 'Not used yet' ?></div>
+                            <div class="text-body-secondary"><?= $row['last_used'] ? 'None' : __('Not used yet') ?></div>
                         <?php } ?>
                         <?php if ($row['last_used']) { ?>
-                            <div class="text-body-secondary" title="<?= escapeHtml($row['last_used']) ?>">Last <?= escapeHtml(timeAgo($row['last_used'])) ?></div>
+                            <div class="text-body-secondary" title="<?= escapeHtml($row['last_used']) ?>"><?= escapeHtml(__('Last %s', timeAgo($row['last_used']))) ?></div>
                         <?php } ?>
                     </td>
                     <td class="text-end pe-3">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $edit_url ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <a class="dropdown-item" href="ai_usage.php?model=<?= $model_id ?>">
-                                    <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>Usage
+                                    <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('Usage') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?delete_ai_model=<?= $model_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= escapeHtml($name) ?>?" data-confirm-button="Delete" data-confirm-text="<?= escapeHtml($delete_text) ?>">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', escapeHtml($name)) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>" data-confirm-text="<?= escapeHtml($delete_text) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -201,10 +201,10 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'AI models',
+        'thing' => __('AI models'),
         'icon' => 'fa-brain',
-        'text' => $any_provider ? 'The model on each provider that ITFlow uses - one for everything (General), and others for tickets or documents if you like.' : 'Add an AI provider first - then the models on it ITFlow uses.',
-        'actions' => $any_provider ? [['label' => 'Add Model', 'modal' => $add_url]] : [['label' => 'AI Providers', 'href' => 'ai_providers.php', 'icon' => 'fa-robot']],
+        'text' => $any_provider ? __('The model on each provider that ITFlow uses - one for everything (General), and others for tickets or documents if you like.') : __('Add an AI provider first - then the models on it ITFlow uses.'),
+        'actions' => $any_provider ? [['label' => __('Add Model'), 'modal' => $add_url]] : [['label' => __('AI Providers'), 'href' => 'ai_providers.php', 'icon' => 'fa-robot']],
     ];
     ?>
     <?php require_once "../includes/filter_footer.php"; ?>

@@ -24,11 +24,11 @@ $provider = billingStripeProvider();
 if (!$provider) { ?>
     <div class="itflow-portal-page-head">
         <div>
-            <h1>Cards &amp; autopay</h1>
+            <h1><?= escapeHtml(__('Cards & autopay')) ?></h1>
         </div>
     </div>
     <section class="itflow-portal-panel">
-        <?= emptyStateHtml(['title' => 'Card payments are not set up', 'text' => 'To pay, use the payment details on each invoice.', 'icon' => 'fa-credit-card', 'filtered' => false]) ?>
+        <?= emptyStateHtml(['title' => __('Card payments are not set up'), 'text' => __('To pay, use the payment details on each invoice.'), 'icon' => 'fa-credit-card', 'filtered' => false]) ?>
     </section>
     <?php
     require_once "includes/footer.php";
@@ -52,8 +52,8 @@ $autostart = isset($_GET['add']) && $customer !== '';
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Cards &amp; autopay</h1>
-        <p>Save a card to pay invoices in a click, and have recurring invoices paid on their own.</p>
+        <h1><?= escapeHtml(__('Cards & autopay')) ?></h1>
+        <p><?= escapeHtml(__('Save a card to pay invoices in a click, and have recurring invoices paid on their own.')) ?></p>
     </div>
 </div>
 
@@ -61,10 +61,10 @@ $autostart = isset($_GET['add']) && $customer !== '';
     <div class="col-lg-7">
         <section class="itflow-portal-panel">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-credit-card"></i>Your cards</h2>
+                <h2><i class="fas fa-credit-card"></i><?= escapeHtml(__('Your cards')) ?></h2>
             </div>
             <?php if (!$cards) { ?>
-                <?= emptyStateHtml(['title' => 'No cards saved', 'text' => 'Save one to pay in a click, or to turn on autopay.', 'icon' => 'fa-credit-card', 'filtered' => false]) ?>
+                <?= emptyStateHtml(['title' => __('No cards saved'), 'text' => __('Save one to pay in a click, or to turn on autopay.'), 'icon' => 'fa-credit-card', 'filtered' => false]) ?>
             <?php } else { ?>
                 <ul class="itflow-portal-list">
                     <?php foreach ($cards as $card) {
@@ -75,37 +75,37 @@ $autostart = isset($_GET['add']) && $customer !== '';
                                 <div><?= escapeHtml($c['label']) ?></div>
                                 <div>
                                     <?php if ($c['expired']) { ?>
-                                        <span class="text-danger-emphasis">Expired <?= escapeHtml($c['exp']) ?></span>
+                                        <span class="text-danger-emphasis"><?= escapeHtml(_x('Expired %s', 'card', $c['exp'])) ?></span>
                                     <?php } elseif ($c['exp'] !== '') { ?>
-                                        Expires <?= escapeHtml($c['exp']) ?>
+                                        <?= escapeHtml(__('Expires %s', $c['exp'])) ?>
                                     <?php } ?>
                                     <?php if ($card['autopay']) { ?>
-                                        · Pays <?= $card['autopay'] ?> recurring <?= $card['autopay'] === 1 ? 'invoice' : 'invoices' ?> automatically
+                                        · <?= escapeHtml(_n('Pays %d recurring invoice automatically', 'Pays %d recurring invoices automatically', $card['autopay'])) ?>
                                     <?php } ?>
                                 </div>
                             </span>
                             <a class="btn btn-sm btn-outline-danger confirm-link" href="post.php?delete_saved_payment=<?= intval($card['saved_payment_id']) ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                data-confirm-title="Remove <?= escapeHtml($c['label']) ?>?"
-                                data-confirm-text="<?= $card['autopay'] ? 'Autopay with this card stops - those invoices will need paying by hand.' : 'You can save it again any time.' ?>"
-                                data-confirm-button="Remove" data-confirm-icon="warning"><i class="fas fa-trash-alt me-1"></i>Remove</a>
+                                data-confirm-title="<?= escapeHtml(__('Remove %s?', $c['label'])) ?>"
+                                data-confirm-text="<?= escapeHtml($card['autopay'] ? __('Autopay with this card stops - those invoices will need paying by hand.') : __('You can save it again any time.')) ?>"
+                                data-confirm-button="<?= escapeHtml(__('Remove')) ?>" data-confirm-icon="warning"><i class="fas fa-trash-alt me-1"></i><?= escapeHtml(__('Remove')) ?></a>
                         </li>
                     <?php } ?>
                 </ul>
             <?php } ?>
             <div class="itflow-portal-panel-body border-top">
                 <?php if ($customer !== '') { ?>
-                    <button type="button" class="btn btn-outline-primary" data-stripe-add-card<?= $autostart ? ' hidden' : '' ?>><i class="fas fa-plus me-2"></i>Add a card</button>
+                    <button type="button" class="btn btn-outline-primary" data-stripe-add-card<?= $autostart ? ' hidden' : '' ?>><i class="fas fa-plus me-2"></i><?= escapeHtml(__('Add a card')) ?></button>
                     <div data-stripe-add-card-holder data-stripe-key="<?= escapeHtml($provider['payment_provider_public_key']) ?>"<?= $autostart ? ' data-autostart' : '' ?> hidden>
-                        <p class="small text-body-secondary">By saving a card you agree <?= escapeHtml($company['company_name'] ?? 'we') ?> may charge it for invoices you pay with it, and for the recurring invoices you set to autopay.</p>
-                        <div class="text-body-secondary small" data-stripe-loading><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading Stripe...</div>
-                        <div class="alert alert-warning small mb-0" data-stripe-unavailable hidden>Stripe's form did not load - check your connection and reload the page.</div>
+                        <p class="small text-body-secondary"><?= escapeHtml(__('By saving a card you agree %s may charge it for invoices you pay with it, and for the recurring invoices you set to autopay.', $company['company_name'] ?? __('we'))) ?></p>
+                        <div class="text-body-secondary small" data-stripe-loading><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><?= escapeHtml(__('Loading Stripe...')) ?></div>
+                        <div class="alert alert-warning small mb-0" data-stripe-unavailable hidden><?= escapeHtml(__("Stripe's form did not load - check your connection and reload the page.")) ?></div>
                         <div id="checkout"></div>
                     </div>
                 <?php } else { ?>
                     <form action="post.php" method="post" data-portal-once>
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <p class="small text-body-secondary">By saving a card you agree <?= escapeHtml($company['company_name'] ?? 'we') ?> may charge it for invoices you pay with it, and for the recurring invoices you set to autopay. Stripe keeps the card details, under its privacy policy and terms.</p>
-                        <button type="submit" class="btn btn-outline-primary" name="create_stripe_customer"><i class="fas fa-plus me-2"></i>Add a card</button>
+                        <p class="small text-body-secondary"><?= escapeHtml(__('By saving a card you agree %s may charge it for invoices you pay with it, and for the recurring invoices you set to autopay. Stripe keeps the card details, under its privacy policy and terms.', $company['company_name'] ?? __('we'))) ?></p>
+                        <button type="submit" class="btn btn-outline-primary" name="create_stripe_customer"><i class="fas fa-plus me-2"></i><?= escapeHtml(__('Add a card')) ?></button>
                     </form>
                 <?php } ?>
             </div>
@@ -115,13 +115,13 @@ $autostart = isset($_GET['add']) && $customer !== '';
     <div class="col-lg-5">
         <section class="itflow-portal-panel">
             <div class="itflow-portal-panel-head">
-                <h2><i class="fas fa-sync-alt"></i>Autopay</h2>
+                <h2><i class="fas fa-sync-alt"></i><?= escapeHtml(__('Autopay')) ?></h2>
             </div>
             <?php if (!mysqli_num_rows($recurring)) { ?>
-                <?= emptyStateHtml(['title' => 'Nothing to autopay', 'text' => 'Recurring invoices - monthly services and the like - can be paid automatically once you have one.', 'icon' => 'fa-sync-alt', 'filtered' => false]) ?>
+                <?= emptyStateHtml(['title' => __('Nothing to autopay'), 'text' => __('Recurring invoices - monthly services and the like - can be paid automatically once you have one.'), 'icon' => 'fa-sync-alt', 'filtered' => false]) ?>
             <?php } else { ?>
                 <div class="itflow-portal-panel-body">
-                    <p class="small text-body-secondary mb-0">Autopay charges the card on each invoice's due date, and we email you a receipt every time.<?= !$usable ? ' Add a card to turn it on.' : '' ?></p>
+                    <p class="small text-body-secondary mb-0"><?= escapeHtml(__("Autopay charges the card on each invoice's due date, and we email you a receipt every time.")) ?><?= !$usable ? ' ' . escapeHtml(__('Add a card to turn it on.')) : '' ?></p>
                 </div>
                 <ul class="itflow-portal-list border-top">
                     <?php while ($row = mysqli_fetch_assoc($recurring)) {
@@ -138,13 +138,13 @@ $autostart = isset($_GET['add']) && $customer !== '';
                                 <input type="hidden" name="recurring_invoice_id" value="<?= $rid ?>">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
-                                    <select class="form-select" name="saved_payment_id" aria-label="Autopay for this recurring invoice" data-autosubmit<?= !$usable && !$on ? ' disabled' : '' ?>>
-                                        <option value="0">Off - I'll pay each invoice</option>
+                                    <select class="form-select" name="saved_payment_id" aria-label="<?= escapeHtml(__('Autopay for this recurring invoice')) ?>" data-autosubmit<?= !$usable && !$on ? ' disabled' : '' ?>>
+                                        <option value="0"><?= escapeHtml(__("Off - I'll pay each invoice")) ?></option>
                                         <?php foreach ($cards as $card) {
                                             if ($card['card']['expired'] && intval($card['saved_payment_id']) !== $on) {
                                                 continue;
                                             } ?>
-                                            <option value="<?= intval($card['saved_payment_id']) ?>"<?= intval($card['saved_payment_id']) === $on ? ' selected' : '' ?>>Pay with <?= escapeHtml($card['card']['label']) ?><?= $card['card']['expired'] ? ' (expired)' : '' ?></option>
+                                            <option value="<?= intval($card['saved_payment_id']) ?>"<?= intval($card['saved_payment_id']) === $on ? ' selected' : '' ?>><?= escapeHtml($card['card']['expired'] ? __('Pay with %s (expired)', $card['card']['label']) : __('Pay with %s', $card['card']['label'])) ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>

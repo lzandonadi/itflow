@@ -18,10 +18,10 @@ $review = serviceReview($service);
 $next = serviceNextReview($interval ?: 12);
 
 $checks = [
-    ['fa-desktop', $counts['asset'] ? "The {$counts['asset']} asset" . ($counts['asset'] === 1 ? ' it runs on is' : 's it runs on are') . ' still the ones in service' : 'Nothing is linked as what it runs on - link the assets'],
-    ['fa-building', $counts['vendor'] ? 'The vendor' . ($counts['vendor'] === 1 ? '' : 's') . ' and their support numbers are current' : 'No vendor is linked - who gets called when it breaks?'],
-    ['fa-user', $counts['contact'] ? 'The people at the client who own it are still there' : 'Nobody at the client is linked as its owner'],
-    ['fa-history', trim((string) $service['service_backup']) !== '' ? 'The backup is running, and the recovery steps still work' : 'No backup or recovery is written down'],
+    ['fa-desktop', $counts['asset'] ? _n('The %d asset it runs on is still the one in service', 'The %d assets it runs on are still the ones in service', $counts['asset']) : __('Nothing is linked as what it runs on - link the assets')],
+    ['fa-building', $counts['vendor'] ? _n('The vendor and its support numbers are current', 'The vendors and their support numbers are current', $counts['vendor']) : __('No vendor is linked - who gets called when it breaks?')],
+    ['fa-user', $counts['contact'] ? __('The people at the client who own it are still there') : __('Nobody at the client is linked as its owner')],
+    ['fa-history', trim((string) $service['service_backup']) !== '' ? __('The backup is running, and the recovery steps still work') : __('No backup or recovery is written down')],
 ];
 
 ob_start();
@@ -29,7 +29,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-clipboard-check me-2"></i>Review <strong><?= escapeHtml($service['service_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Review') ?> <strong><?= escapeHtml($service['service_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -43,12 +43,12 @@ ob_start();
 
         <?php if ($issues) { ?>
             <div class="alert alert-<?= in_array('danger', array_column($issues, 'tone'), true) ? 'danger' : 'warning' ?> py-2 small mb-3">
-                <div class="fw-semibold mb-1">Needs attention now</div>
+                <div class="fw-semibold mb-1"><?= __('Needs attention now') ?></div>
                 <?= serviceIssuesHtml($issues, 6) ?>
             </div>
         <?php } ?>
 
-        <div class="small text-body-secondary fw-semibold text-uppercase mb-1">Check</div>
+        <div class="small text-body-secondary fw-semibold text-uppercase mb-1"><?= __('Check') ?></div>
         <ul class="list-unstyled small mb-3 itflow-service-checks">
             <?php foreach ($checks as [$icon, $text]) { ?>
                 <li class="py-1"><i class="fas fa-fw <?= $icon ?> text-secondary me-2"></i><?= escapeHtml($text) ?></li>
@@ -57,18 +57,18 @@ ob_start();
 
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">Review it</label>
+                <label class="form-label"><?= __('Review it') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-redo"></i></span>
                     <select class="form-select select2" name="review_interval">
                         <?php foreach (SERVICE_REVIEW_INTERVALS as $months => $label) { ?>
-                            <option value="<?= $months ?>" <?= $interval === $months ? 'selected' : '' ?>><?= $label ?></option>
+                            <option value="<?= $months ?>" <?= $interval === $months ? 'selected' : '' ?>><?= serviceReviewIntervalLabel($months) ?></option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Next review</label>
+                <label class="form-label"><?= __('Next review') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-calendar-check"></i></span>
                     <input type="date" class="form-control" name="review_due" value="<?= $interval ? escapeHtml($next) : '' ?>">
@@ -76,15 +76,15 @@ ob_start();
             </div>
         </div>
 
-        <label class="form-label">Note <span class="text-body-secondary small fw-normal">- goes in its history</span></label>
-        <textarea class="form-control" name="note" rows="2" maxlength="400" placeholder="Walked through it with the client, swapped the backup target, all good..."></textarea>
+        <label class="form-label"><?= __('Note') ?> <span class="text-body-secondary small fw-normal">- goes in its history</span></label>
+        <textarea class="form-control" name="note" rows="2" maxlength="400" placeholder="<?= escapeHtml(__('Walked through it with the client, swapped the backup target, all good...')) ?>"></textarea>
 
     </div>
 
     <div class="modal-footer">
-        <a class="me-auto small" href="<?= escapeHtml(serviceUrl($service_id, $client_id)) ?>">Open the service</a>
-        <button type="submit" name="review_service" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Mark reviewed</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <a class="me-auto small" href="<?= escapeHtml(serviceUrl($service_id, $client_id)) ?>"><?= __('Open the service') ?></a>
+        <button type="submit" name="review_service" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Mark reviewed') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

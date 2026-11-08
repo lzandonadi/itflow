@@ -129,7 +129,7 @@ document.addEventListener('click', function (e) {
         })
         .catch(function (error) {
             clearSpinner();
-            alert('Error loading modal content. Please try again.');
+            alert(__('Error loading modal content. Please try again.'));
             console.error('Modal AJAX Error:', error);
         });
 });

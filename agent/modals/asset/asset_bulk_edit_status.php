@@ -11,7 +11,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-info me-2"></i>Set Status for <strong><?= $count ?></strong> asset<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-info me-2"></i><?= _n('Set Status for %s asset', 'Set Status for %s assets', $count, '<strong>' . $count . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -21,11 +21,11 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-circle"></i></span>
                 <select class="form-select select2" name="bulk_status">
-                    <option value="">- Select Status -</option>
+                    <option value=""><?= __('- Select Status -') ?></option>
                     <?= categoryOptionsHtml('asset_status') ?>
                 </select>
                 <?= categoryAddButtonHtml('asset_status', 'btn btn-secondary') ?>
@@ -35,8 +35,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_asset_status" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Set Status</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_asset_status" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Set Status') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

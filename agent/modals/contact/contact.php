@@ -29,7 +29,7 @@ $contact_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT contact_archived
     LIMIT 1
 "));
 if (!$contact_row) {
-    echo json_encode(['error' => 'That contact no longer exists.']);
+    echo json_encode(['error' => __('That contact no longer exists.')]);
     exit;
 }
 
@@ -116,14 +116,14 @@ while ($row = mysqli_fetch_assoc($sql_note_type_icons)) {
 
 // Only the tabs with something in them - same order as the contact page
 $quick_tabs = array_filter([
-    'assets' => ['label' => 'Assets', 'count' => $asset_count],
-    'credentials' => ['label' => 'Credentials', 'count' => $credential_count],
-    'tickets' => ['label' => 'Tickets', 'count' => $ticket_count, 'badge' => $ticket_open_count],
-    'recurring' => ['label' => 'Recurring', 'count' => $recurring_ticket_count],
-    'licenses' => ['label' => 'Licenses', 'count' => $software_count],
-    'documents' => ['label' => 'Documents', 'count' => $document_count],
-    'files' => ['label' => 'Files', 'count' => $file_count],
-    'notes' => ['label' => 'Notes', 'count' => $note_count],
+    'assets' => ['label' => __('Assets'), 'count' => $asset_count],
+    'credentials' => ['label' => __('Credentials'), 'count' => $credential_count],
+    'tickets' => ['label' => __('Tickets'), 'count' => $ticket_count, 'badge' => $ticket_open_count],
+    'recurring' => ['label' => __('Recurring'), 'count' => $recurring_ticket_count],
+    'licenses' => ['label' => __('Licenses'), 'count' => $software_count],
+    'documents' => ['label' => __('Documents'), 'count' => $document_count],
+    'files' => ['label' => __('Files'), 'count' => $file_count],
+    'notes' => ['label' => __('Notes'), 'count' => $note_count],
 ], function ($tab) {
     return $tab['count'] > 0;
 });
@@ -143,14 +143,14 @@ ob_start();
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
                 <span class="fw-semibold text-break"><?= $contact_name ?></span>
                 <span class="fs-6 d-inline-flex flex-wrap gap-1"><?= contactFlagPills($contact_row, false) ?></span>
-                <?php if ($contact_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if ($contact_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <?php if ($contact_role_line) { ?>
                 <div class="small text-body-secondary mt-1"><?= $contact_role_line ?></div>
             <?php } ?>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -163,10 +163,10 @@ ob_start();
                     $dial_number = $contact_row['contact_phone'] ?: $contact_row['contact_mobile'];
                     $dial_country = $contact_row['contact_phone'] ? $contact_row['contact_phone_country_code'] : $contact_row['contact_mobile_country_code'];
                     $dial = preg_replace('/[^0-9+]/', '', ($dial_country ? "+$dial_country" : '') . $dial_number); ?>
-                    <a class="btn btn-sm btn-outline-primary" href="tel:<?= escapeHtml($dial) ?>"><i class="fas fa-phone me-1"></i>Call</a>
+                    <a class="btn btn-sm btn-outline-primary" href="tel:<?= escapeHtml($dial) ?>"><i class="fas fa-phone me-1"></i><?= __('Call') ?></a>
                 <?php } ?>
                 <?php if ($contact_email) { ?>
-                    <a class="btn btn-sm btn-outline-primary" href="mailto:<?= $contact_email ?>"><i class="far fa-envelope me-1"></i>Email</a>
+                    <a class="btn btn-sm btn-outline-primary" href="mailto:<?= $contact_email ?>"><i class="far fa-envelope me-1"></i><?= __('Email') ?></a>
                 <?php } ?>
             </div>
         </div>
@@ -177,27 +177,27 @@ ob_start();
         <?php if ($has_reach) { ?>
             <div class="col-sm-6">
                 <?php if ($contact_phone_link) { ?>
-                    <div class="itflow-glance-item" title="Phone">
+                    <div class="itflow-glance-item" title="<?= escapeHtml(__('Phone')) ?>">
                         <i class="fas fa-fw fa-phone"></i>
-                        <span><?= $contact_phone_link ?><button type="button" class="itflow-copy clipboardjs" title="Copy phone" data-clipboard-text="<?= $contact_phone_copy ?>"><i class="far fa-copy"></i></button></span>
+                        <span><?= $contact_phone_link ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy phone')) ?>" data-clipboard-text="<?= $contact_phone_copy ?>"><i class="far fa-copy"></i></button></span>
                     </div>
                 <?php } ?>
                 <?php if ($contact_mobile_link) { ?>
-                    <div class="itflow-glance-item" title="Mobile">
+                    <div class="itflow-glance-item" title="<?= escapeHtml(__('Mobile')) ?>">
                         <i class="fas fa-fw fa-mobile-alt"></i>
-                        <span><?= $contact_mobile_link ?><button type="button" class="itflow-copy clipboardjs" title="Copy mobile" data-clipboard-text="<?= $contact_mobile_copy ?>"><i class="far fa-copy"></i></button></span>
+                        <span><?= $contact_mobile_link ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy mobile')) ?>" data-clipboard-text="<?= $contact_mobile_copy ?>"><i class="far fa-copy"></i></button></span>
                     </div>
                 <?php } ?>
                 <?php if ($contact_email) { ?>
-                    <div class="itflow-glance-item" title="Email">
+                    <div class="itflow-glance-item" title="<?= escapeHtml(__('Email')) ?>">
                         <i class="far fa-fw fa-envelope"></i>
-                        <span class="d-flex align-items-center min-w-0"><a class="text-truncate" href="mailto:<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="Copy email" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></span>
+                        <span class="d-flex align-items-center min-w-0"><a class="text-truncate" href="mailto:<?= $contact_email ?>"><?= $contact_email ?></a><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy email')) ?>" data-clipboard-text="<?= $contact_email ?>"><i class="far fa-copy"></i></button></span>
                     </div>
                 <?php } ?>
             </div>
         <?php } ?>
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Location">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Location')) ?>">
                 <i class="fas fa-fw fa-map-marker-alt"></i>
                 <div class="flex-grow-1 min-w-0">
                     <?php if ($can_edit && !$contact_archived) { ?>
@@ -208,22 +208,22 @@ ob_start();
                 </div>
             </div>
             <?php if ($contact_pin) { ?>
-                <div class="itflow-glance-item" title="PIN - ask for it to verify who's calling">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('PIN - ask for it to verify who\'s calling')) ?>">
                     <i class="fas fa-fw fa-key"></i>
-                    <span>PIN <span class="font-monospace"><?= $contact_pin ?></span></span>
+                    <span><?= __('PIN') ?> <span class="font-monospace"><?= $contact_pin ?></span></span>
                 </div>
             <?php } ?>
             <?php if ($contact_portal) { ?>
-                <div class="itflow-glance-item" title="Client portal">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Client portal')) ?>">
                     <i class="fas fa-fw fa-user-circle"></i>
-                    <span>Portal login <span class="text-body-secondary">&middot; <?= $contact_portal ?></span></span>
+                    <span><?= __('Portal login') ?> <span class="text-body-secondary">&middot; <?= contactPortalAccessLabel($contact_portal) ?></span></span>
                 </div>
             <?php } ?>
         </div>
     </div>
 
     <?php if ($can_edit || $contact_notes) { ?>
-        <textarea class="form-control form-control-sm mt-3 itflow-contact-quicknote" rows="2" placeholder="Quick notes - saves when you click away" aria-label="Quick notes"
+        <textarea class="form-control form-control-sm mt-3 itflow-contact-quicknote" rows="2" placeholder="<?= escapeHtml(__('Quick notes - saves when you click away')) ?>" aria-label="<?= escapeHtml(__('Quick notes')) ?>"
             data-contact-id="<?= $contact_id ?>" data-csrf="<?= escapeHtml($_SESSION['csrf_token'] ?? '') ?>" <?= $can_edit ? '' : 'readonly' ?>><?= $contact_notes ?></textarea>
     <?php } ?>
 
@@ -235,7 +235,7 @@ ob_start();
                     <li class="nav-item" role="presentation">
                         <button class="nav-link text-nowrap <?= $tab_key === $first_tab ? 'active' : '' ?>" data-bs-toggle="pill" data-bs-target="#contact-quick-<?= $contact_id ?>-<?= $tab_key ?>" data-contact-quick-tab="<?= $tab_key ?>" type="button" role="tab">
                             <?= $tab['label'] ?> <span class="badge rounded-pill ms-1"><?= $tab['count'] ?></span>
-                            <?php if (!empty($tab['badge'])) { ?><span class="badge rounded-pill text-bg-danger" title="Open"><?= intval($tab['badge']) ?> open</span><?php } ?>
+                            <?php if (!empty($tab['badge'])) { ?><span class="badge rounded-pill text-bg-danger" title="<?= escapeHtml(__('Open')) ?>"><?= __('%d open', intval($tab['badge'])) ?></span><?php } ?>
                         </button>
                     </li>
                 <?php } ?>
@@ -256,7 +256,7 @@ ob_start();
                                             <a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/asset/asset.php?id=<?= intval($row['asset_id']) ?>"><?= escapeHtml($row['asset_name']) ?></a>
                                             <span class="text-body-secondary small ms-1"><?= escapeHtml(trim($row['asset_make'] . ' ' . $row['asset_model'])) ?></span>
                                         </td>
-                                        <td class="text-nowrap"><?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="Copy IP" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } ?></td>
+                                        <td class="text-nowrap"><?php if ($asset_ip) { ?><span class="font-monospace"><?= $asset_ip ?></span><?php if ($asset_ip !== 'DHCP') { ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy IP')) ?>" data-clipboard-text="<?= $asset_ip ?>"><i class="far fa-copy"></i></button><?php } ?><?php } ?></td>
                                         <td class="text-nowrap"><?= assetStatusPill($row['asset_status']) ?></td>
                                     </tr>
                                 <?php } ?>
@@ -276,7 +276,7 @@ ob_start();
                     <div class="tab-pane fade <?= $first_tab === 'tickets' ? 'show active' : '' ?>" id="contact-quick-<?= $contact_id ?>-tickets" role="tabpanel">
                         <?= ticketTableHtml($related_tickets, ['compact' => true]) ?>
                         <?php if ($ticket_count > count($related_tickets)) { ?>
-                            <div class="small mt-2"><a href="contact.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>#tickets">All <?= $ticket_count ?> tickets on the contact page<i class="fas fa-arrow-right ms-1"></i></a></div>
+                            <div class="small mt-2"><a href="contact.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>#tickets"><?= __('All %d tickets on the contact page', $ticket_count) ?><i class="fas fa-arrow-right ms-1"></i></a></div>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -347,11 +347,11 @@ ob_start();
 </div>
 
 <div class="modal-footer">
-    <a href="contact.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i>Open contact</a>
+    <a href="contact.php?client_id=<?= $client_id ?>&contact_id=<?= $contact_id ?>" class="btn btn-primary text-bold"><i class="fas fa-arrow-right me-2"></i><?= __('Open contact') ?></a>
     <?php if ($can_edit) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_edit.php?id=<?= $contact_id ?>"><i class="fas fa-user-edit me-2"></i>Edit</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/contact/contact_edit.php?id=<?= $contact_id ?>"><i class="fas fa-user-edit me-2"></i><?= __('Edit') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <script>

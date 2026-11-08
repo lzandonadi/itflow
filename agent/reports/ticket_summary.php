@@ -62,7 +62,7 @@ $sql = mysqli_query($mysqli, "SELECT ticket_category AS cat, COUNT(ticket_id) AS
     FROM tickets WHERE $filter AND $opened_in GROUP BY ticket_category");
 while ($row = mysqli_fetch_assoc($sql)) {
     $cat = intval($row['cat']);
-    $categories[$cat] = ['category' => $category_names[$cat] ?? 'No category', 'cat' => $cat, 'opened' => intval($row['opened']), 'resolved' => intval($row['resolved']),
+    $categories[$cat] = ['category' => $category_names[$cat] ?? __('No category'), 'cat' => $cat, 'opened' => intval($row['opened']), 'resolved' => intval($row['resolved']),
         'urgent' => intval($row['urgent']), 'seconds' => 0, 'resolve' => null];
 }
 $resolve_times = [];
@@ -111,13 +111,13 @@ while ($row = mysqli_fetch_assoc($sql)) {
 }
 
 $category_columns = [
-    'category' => ['label' => 'Category'],
-    'opened' => ['label' => 'Opened', 'type' => 'count'],
-    'share' => ['label' => 'Share', 'type' => 'percent', 'class' => 'text-body-secondary'],
-    'urgent' => ['label' => 'Urgent or high', 'type' => 'count'],
-    'resolved' => ['label' => 'Resolved', 'type' => 'count'],
-    'resolve' => ['label' => 'Typical time to resolve', 'type' => 'duration', 'title' => 'The middle ticket - half took longer, half less'],
-    'seconds' => ['label' => 'Time logged', 'type' => 'hours'],
+    'category' => ['label' => __('Category')],
+    'opened' => ['label' => __('Opened'), 'type' => 'count'],
+    'share' => ['label' => __('Share'), 'type' => 'percent', 'class' => 'text-body-secondary'],
+    'urgent' => ['label' => __('Urgent or high'), 'type' => 'count'],
+    'resolved' => ['label' => __('Resolved'), 'type' => 'count'],
+    'resolve' => ['label' => __('Typical time to resolve'), 'type' => 'duration', 'title' => __('The middle ticket - half took longer, half less')],
+    'seconds' => ['label' => __('Time logged'), 'type' => 'hours'],
 ];
 
 if (reportExporting('tickets')) {
@@ -136,22 +136,22 @@ if (reportExporting('tickets')) {
         $tickets[] = $row;
     }
     reportCsv('Tickets ' . $period['start'] . ' to ' . $period['end'], [
-        'ticket' => ['label' => 'Ticket', 'csv' => function ($row) { return ticketReference($row); }],
-        'ticket_subject' => ['label' => 'Subject'],
-        'client_name' => ['label' => 'Client'],
-        'category' => ['label' => 'Category'],
-        'ticket_priority' => ['label' => 'Priority'],
-        'ticket_source' => ['label' => 'Source'],
-        'ticket_status_name' => ['label' => 'Status'],
-        'user_name' => ['label' => 'Assigned to'],
-        'ticket_created_at' => ['label' => 'Opened'],
-        'response' => ['label' => 'Hours to first reply', 'type' => 'hours'],
-        'ticket_resolved_at' => ['label' => 'Resolved'],
-        'seconds' => ['label' => 'Hours logged', 'type' => 'hours'],
+        'ticket' => ['label' => __('Ticket'), 'csv' => function ($row) { return ticketReference($row); }],
+        'ticket_subject' => ['label' => __('Subject')],
+        'client_name' => ['label' => __('Client')],
+        'category' => ['label' => __('Category')],
+        'ticket_priority' => ['label' => __('Priority')],
+        'ticket_source' => ['label' => __('Source')],
+        'ticket_status_name' => ['label' => __('Status')],
+        'user_name' => ['label' => __('Assigned to')],
+        'ticket_created_at' => ['label' => __('Opened')],
+        'response' => ['label' => __('Hours to first reply'), 'type' => 'hours'],
+        'ticket_resolved_at' => ['label' => __('Resolved')],
+        'seconds' => ['label' => __('Hours logged'), 'type' => 'hours'],
     ], $tickets);
 }
 if (reportExporting()) {
-    reportCsv('Tickets by Category ' . $period['start'] . ' to ' . $period['end'], $category_columns, $categories, ['category' => 'Total', 'opened' => $opened]);
+    reportCsv('Tickets by Category ' . $period['start'] . ' to ' . $period['end'], $category_columns, $categories, ['category' => __('Total'), 'opened' => $opened]);
 }
 
 require_once "includes/inc_report_layout.php";
@@ -173,82 +173,82 @@ $top_categories = array_slice($categories, 0, 10);
         'years' => reportPastYears("SELECT DISTINCT YEAR(ticket_created_at) AS y FROM tickets"),
         'client' => $client_id,
         'agent' => $agent_id,
-        'export' => ['categories' => 'By category', 'tickets' => 'Every ticket opened'],
+        'export' => ['categories' => __('By category'), 'tickets' => __('Every ticket opened')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Opened', 'value' => reportCount($opened), 'sub' => reportChangeHtml($opened, $opened_prev, 'down', $period['compare']), 'url' => $ticket_list . '&show=all'],
-        ['label' => 'Resolved', 'value' => reportCount($resolved), 'sub' => reportChangeHtml($resolved, $resolved_prev, 'up', $period['compare'])],
-        ['label' => 'Open now', 'value' => reportCount($open_now), 'url' => $ticket_list, 'sub' => '<span class="text-body-tertiary">Whenever they were raised</span>'],
-        ['label' => 'First reply', 'value' => reportDuration($response), 'title' => 'The middle ticket - half got a first reply sooner, half later',
-            'sub' => $response_prev !== null ? 'Typically · <span class="text-body-tertiary">was ' . reportDuration($response_prev) . '</span>' : '<span class="text-body-tertiary">Typically</span>'],
-        ['label' => 'Time to resolve', 'value' => reportDuration($resolve), 'title' => 'The middle ticket - half were resolved sooner, half later',
-            'sub' => $resolve_prev !== null ? 'Typically · <span class="text-body-tertiary">was ' . reportDuration($resolve_prev) . '</span>' : '<span class="text-body-tertiary">Typically</span>'],
-        ['label' => 'Time logged', 'value' => reportHours($time_logged) . ' h', 'sub' => '<span class="text-body-tertiary">On replies in the period</span>'],
+        ['label' => __('Opened'), 'value' => reportCount($opened), 'sub' => reportChangeHtml($opened, $opened_prev, 'down', $period['compare']), 'url' => $ticket_list . '&show=all'],
+        ['label' => __('Resolved'), 'value' => reportCount($resolved), 'sub' => reportChangeHtml($resolved, $resolved_prev, 'up', $period['compare'])],
+        ['label' => __('Open now'), 'value' => reportCount($open_now), 'url' => $ticket_list, 'sub' => '<span class="text-body-tertiary">' . __('Whenever they were raised') . '</span>'],
+        ['label' => __('First reply'), 'value' => reportDuration($response), 'title' => __('The middle ticket - half got a first reply sooner, half later'),
+            'sub' => $response_prev !== null ? __('Typically · %s', '<span class="text-body-tertiary">' . __('was %s', reportDuration($response_prev)) . '</span>') : '<span class="text-body-tertiary">' . __('Typically') . '</span>'],
+        ['label' => __('Time to resolve'), 'value' => reportDuration($resolve), 'title' => __('The middle ticket - half were resolved sooner, half later'),
+            'sub' => $resolve_prev !== null ? __('Typically · %s', '<span class="text-body-tertiary">' . __('was %s', reportDuration($resolve_prev)) . '</span>') : '<span class="text-body-tertiary">' . __('Typically') . '</span>'],
+        ['label' => __('Time logged'), 'value' => reportHours($time_logged) . ' h', 'sub' => '<span class="text-body-tertiary">' . __('On replies in the period') . '</span>'],
     ]) ?>
 
-    <?= reportSectionOpen('Opened and resolved', escapeHtml($period['range']) . ' · by ' . $buckets['unit']) ?>
+    <?= reportSectionOpen(__('Opened and resolved'), escapeHtml($period['range']) . ' · ' . mb_strtolower($buckets['by'])) ?>
         <div class="card-body">
             <?= reportChart([
                 'type' => 'bar',
                 'labels' => $buckets['labels'],
                 'series' => [
-                    ['label' => 'Opened', 'data' => $opened_series, 'tone' => 'accent'],
-                    ['label' => 'Resolved', 'data' => $resolved_series, 'tone' => 'success'],
+                    ['label' => __('Opened'), 'data' => $opened_series, 'tone' => 'accent'],
+                    ['label' => __('Resolved'), 'data' => $resolved_series, 'tone' => 'success'],
                 ],
                 'format' => 'count',
-            ], '', 'Tickets opened and resolved over the period') ?>
+            ], '', __('Tickets opened and resolved over the period')) ?>
         </div>
     </div>
 
     <div class="row g-3">
         <div class="col-md-6 col-xl-3">
-            <?= reportSectionOpen('Where they came from', '', 'h-100 mb-0') ?>
+            <?= reportSectionOpen(__('Where they came from'), '', 'h-100 mb-0') ?>
                 <div class="card-body">
                     <?php if ($source_rows) { ?>
-                        <?= reportChart(['type' => 'doughnut', 'labels' => array_column($source_rows, 'label'), 'series' => [['label' => 'Tickets', 'data' => array_column($source_rows, 'value')]], 'colors' => $source_colors, 'format' => 'count'], 'donut', 'Tickets by source') ?>
+                        <?= reportChart(['type' => 'doughnut', 'labels' => array_column($source_rows, 'label'), 'series' => [['label' => __('Tickets'), 'data' => array_column($source_rows, 'value')]], 'colors' => $source_colors, 'format' => 'count'], 'donut', __('Tickets by source')) ?>
                         <div class="mt-3"><?= reportLegendHtml(array_column($source_rows, 'label'), array_column($source_rows, 'value'), $source_colors, 'count') ?></div>
                     <?php } else { ?>
-                        <div class="text-center text-body-secondary py-4">No tickets.</div>
+                        <div class="text-center text-body-secondary py-4"><?= __('No tickets.') ?></div>
                     <?php } ?>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">
-            <?= reportSectionOpen('How urgent', '', 'h-100 mb-0') ?>
+            <?= reportSectionOpen(__('How urgent'), '', 'h-100 mb-0') ?>
                 <div class="card-body">
                     <?php if ($priority_order) {
                         $priority_colors = ['Urgent' => 'dark', 'High' => 'danger', 'Medium' => 'warning', 'Low' => 'info'];
                         $colors = array_map(function ($p) use ($priority_colors) { return $priority_colors[$p]; }, array_keys($priority_order)); ?>
-                        <?= reportChart(['type' => 'doughnut', 'labels' => array_keys($priority_order), 'series' => [['label' => 'Tickets', 'data' => array_values($priority_order)]], 'colors' => $colors, 'format' => 'count'], 'donut', 'Tickets by priority') ?>
+                        <?= reportChart(['type' => 'doughnut', 'labels' => array_keys($priority_order), 'series' => [['label' => __('Tickets'), 'data' => array_values($priority_order)]], 'colors' => $colors, 'format' => 'count'], 'donut', __('Tickets by priority')) ?>
                         <div class="mt-3"><?= reportLegendHtml(array_keys($priority_order), array_values($priority_order), $colors, 'count') ?></div>
                     <?php } else { ?>
-                        <div class="text-center text-body-secondary py-4">No tickets.</div>
+                        <div class="text-center text-body-secondary py-4"><?= __('No tickets.') ?></div>
                     <?php } ?>
                 </div>
             </div>
         </div>
         <div class="col-xl-6">
-            <?= reportSectionOpen('When they come in', 'Opened, by weekday and hour', 'h-100 mb-0') ?>
+            <?= reportSectionOpen(__('When they come in'), __('Opened, by weekday and hour'), 'h-100 mb-0') ?>
                 <div class="card-body">
                     <?= reportHeatmap($heat) ?>
-                    <p class="small text-body-secondary mt-2 mb-0">Darker is busier - useful for planning who is on when.</p>
+                    <p class="small text-body-secondary mt-2 mb-0"><?= __('Darker is busier - useful for planning who is on when.') ?></p>
                 </div>
             </div>
         </div>
     </div>
 
     <?php if ($top_categories) { ?>
-        <?= reportSectionOpen('What they were about', 'The most common categories') ?>
+        <?= reportSectionOpen(__('What they were about'), __('The most common categories')) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
                     'labels' => array_column($top_categories, 'category'),
-                    'series' => [['label' => 'Opened', 'data' => array_column($top_categories, 'opened'), 'tone' => 'accent']],
+                    'series' => [['label' => __('Opened'), 'data' => array_column($top_categories, 'opened'), 'tone' => 'accent']],
                     'format' => 'count',
                     'legend' => false,
-                ], '', 'Tickets opened in the most common categories') ?>
+                ], '', __('Tickets opened in the most common categories')) ?>
             </div>
         </div>
     <?php } ?>
@@ -256,7 +256,7 @@ $top_categories = array_slice($categories, 0, 10);
     <div class="row g-3">
         <?php if (!$client_id) { ?>
             <div class="col-lg-6">
-                <?= reportSectionOpen('Clients raising the most', '', 'h-100 mb-0') ?>
+                <?= reportSectionOpen(__('Clients raising the most'), '', 'h-100 mb-0') ?>
                     <?php if ($top_clients) {
                         $max = max(1, intval($top_clients[0]['n'])); ?>
                         <div class="card-body pt-2">
@@ -271,13 +271,13 @@ $top_categories = array_slice($categories, 0, 10);
                             </div>
                         </div>
                     <?php } else { ?>
-                        <div class="card-body text-center text-body-secondary py-4">No tickets.</div>
+                        <div class="card-body text-center text-body-secondary py-4"><?= __('No tickets.') ?></div>
                     <?php } ?>
                 </div>
             </div>
         <?php } ?>
         <div class="<?= $client_id ? 'col-12' : 'col-lg-6' ?>">
-            <?= reportSectionOpen('People raising the most', 'Contacts, with their client', 'h-100 mb-0') ?>
+            <?= reportSectionOpen(__('People raising the most'), __('Contacts, with their client'), 'h-100 mb-0') ?>
                 <?php if ($top_contacts) {
                     $max = max(1, intval($top_contacts[0]['n'])); ?>
                     <div class="card-body pt-2">
@@ -292,17 +292,17 @@ $top_categories = array_slice($categories, 0, 10);
                         </div>
                     </div>
                 <?php } else { ?>
-                    <div class="card-body text-center text-body-secondary py-4">No tickets with a contact.</div>
+                    <div class="card-body text-center text-body-secondary py-4"><?= __('No tickets with a contact.') ?></div>
                 <?php } ?>
             </div>
         </div>
     </div>
 
-    <?= reportSectionOpen('By category', 'Tickets opened in the period') ?>
-        <?= reportTable($category_columns, $categories, ['empty' => 'No tickets were opened in this period.', 'totals' => ['category' => 'Total', 'opened' => $opened,
+    <?= reportSectionOpen(__('By category'), __('Tickets opened in the period')) ?>
+        <?= reportTable($category_columns, $categories, ['empty' => __('No tickets were opened in this period.'), 'totals' => ['category' => __('Total'), 'opened' => $opened,
             'urgent' => array_sum(array_column($categories, 'urgent')), 'resolved' => array_sum(array_column($categories, 'resolved')), 'seconds' => array_sum(array_column($categories, 'seconds'))]]) ?>
         <div class="card-footer small text-body-secondary">
-            Times run on the clock from when a ticket was raised. "Typical" is the middle ticket, so a few that sat open for weeks do not skew it. Business-hours targets are in the SLA reports.
+            <?= __('Times run on the clock from when a ticket was raised. "Typical" is the middle ticket, so a few that sat open for weeks do not skew it. Business-hours targets are in the SLA reports.') ?>
         </div>
     </div>
 

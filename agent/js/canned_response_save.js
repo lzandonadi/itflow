@@ -37,10 +37,10 @@
 
     function swappedText(placeholders) {
         return placeholders.length
-            ? 'Swapped for placeholders: ' + placeholders.map(function (name) {
+            ? __('Swapped for placeholders: %s - filled in from each ticket it goes into.', placeholders.map(function (name) {
                 return '[' + name + ']';
-            }).join(', ') + ' - filled in from each ticket it goes into.'
-            : "None of this ticket's details were in it to swap.";
+            }).join(', '))
+            : __("None of this ticket's details were in it to swap.");
     }
 
     // Set up the window just opened
@@ -75,11 +75,11 @@
                 state.original = data.original;
                 state.unfilled = data.html;
                 state.placeholders = data.placeholders || [];
-                swapped.textContent = written.trim() === '' ? 'Your reply is empty - write the response here.' : swappedText(state.placeholders);
+                swapped.textContent = written.trim() === '' ? __('Your reply is empty - write the response here.') : swappedText(state.placeholders);
                 put(toggle.checked ? state.unfilled : state.original);
             })
             .catch(function () {
-                swapped.textContent = "Couldn't swap this ticket's details - your reply is here as you wrote it.";
+                swapped.textContent = __("Couldn't swap this ticket's details - your reply is here as you wrote it.");
                 toggle.checked = false;
                 toggle.disabled = true;
                 put(written);
@@ -94,7 +94,7 @@
             const wanted = toggle.checked ? state.unfilled : state.original;
             const go = function () {
                 put(wanted);
-                swapped.textContent = toggle.checked ? swappedText(state.placeholders) : 'As you wrote it, with this ticket\'s details in it.';
+                swapped.textContent = toggle.checked ? swappedText(state.placeholders) : __("As you wrote it, with this ticket's details in it.");
             };
             if (state.lastSet === null || editor.getContent() === state.lastSet || typeof Swal === 'undefined') {
                 go();
@@ -102,12 +102,12 @@
             }
             Swal.fire({
                 theme: document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light',
-                title: 'Start again from your reply?',
-                text: 'What you changed here goes.',
+                title: __('Start again from your reply?'),
+                text: __('What you changed here goes.'),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Start again',
-                cancelButtonText: 'Keep my changes',
+                confirmButtonText: __('Start again'),
+                cancelButtonText: __('Keep my changes'),
                 reverseButtons: true,
                 focusCancel: true,
                 buttonsStyling: false,
@@ -143,14 +143,15 @@
             header.className = 'dropdown-header';
             header.textContent = data.group;
             group.appendChild(header);
-            // Yours first, Every ticket last, a category's before it
+            // Yours first, Every ticket last, a category's before it - the
+            // server's labels are in the interface language, so these are too
             const groups = list.querySelectorAll('[data-canned-group]');
             const every = Array.from(groups).find(function (each) {
                 const h = each.querySelector('.dropdown-header');
-                return h && h.textContent === 'Every ticket';
+                return h && h.textContent === __('Every ticket');
             });
             const end = list.querySelector('[data-canned-empty], [data-canned-none]');
-            list.insertBefore(group, (data.group === 'Yours' ? groups[0] : every) || end);
+            list.insertBefore(group, (data.group === __('Yours') ? groups[0] : every) || end);
         }
         const item = document.createElement('button');
         item.type = 'button';
@@ -214,13 +215,13 @@
         fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
             .then(function (response) {
                 if (!response.ok) {
-                    throw new Error(response.status === 403 ? 'your session may have expired - reload the page and try again' : 'HTTP ' + response.status);
+                    throw new Error(response.status === 403 ? __('your session may have expired - reload the page and try again') : 'HTTP ' + response.status);
                 }
                 return response.json();
             })
             .then(function (data) {
                 if (!data.ok) {
-                    showError(form, data.error || "It wasn't saved.");
+                    showError(form, data.error || __("It wasn't saved."));
                     button.disabled = false;
                     return;
                 }
@@ -234,7 +235,7 @@
                 }
             })
             .catch(function (error) {
-                showError(form, "Couldn't save it - " + error.message + '.');
+                showError(form, __("Couldn't save it - %s.", error.message));
                 button.disabled = false;
             });
     });

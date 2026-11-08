@@ -23,7 +23,7 @@ $from = "$year-01-01";
 $to = $current_year ? date('Y-m-d') : "$year-12-31";
 $prev_from = ($year - 1) . '-01-01';
 $prev_to = $current_year ? dashboardShiftMonths(date('Y-m-d'), -12) : ($year - 1) . '-12-31';
-$compare = $current_year ? 'the same time last year' : (string) ($year - 1);
+$compare = $current_year ? __('the same time last year') : (string) ($year - 1);
 
 $income = reportIncomeByCategory($from, $to);
 $expenses = reportExpensesByCategory($from, $to);
@@ -67,21 +67,21 @@ $active = function ($line) {
 };
 $income_lines = array_values(array_filter($category_lines($income_categories, $income, $income_prev, 'income'), $active));
 $expense_lines = array_values(array_filter($category_lines($expense_categories, $expenses, $expenses_prev, 'expense'), $active));
-$income_line = ['kind' => 'income_total', 'name' => 'Total income', 'cells' => reportSumColumns($income_total['months'], $columns), 'total' => $income_total['total'], 'prev' => $income_prev_total];
-$expense_line = ['kind' => 'expense_total', 'name' => 'Total expenses', 'cells' => reportSumColumns($expense_total['months'], $columns), 'total' => $expense_total['total'], 'prev' => $expense_prev_total];
+$income_line = ['kind' => 'income_total', 'name' => __('Total income'), 'cells' => reportSumColumns($income_total['months'], $columns), 'total' => $income_total['total'], 'prev' => $income_prev_total];
+$expense_line = ['kind' => 'expense_total', 'name' => __('Total expenses'), 'cells' => reportSumColumns($expense_total['months'], $columns), 'total' => $expense_total['total'], 'prev' => $expense_prev_total];
 $profit_cells = [];
 foreach ($columns as $i => $column) {
     $profit_cells[$i] = $income_line['cells'][$i] - $expense_line['cells'][$i];
 }
-$profit_line = ['kind' => 'profit', 'name' => 'Net profit', 'cells' => $profit_cells, 'total' => $profit, 'prev' => $profit_prev];
+$profit_line = ['kind' => 'profit', 'name' => __('Net profit'), 'cells' => $profit_cells, 'total' => $profit, 'prev' => $profit_prev];
 
 if (reportExporting()) {
-    $csv_columns = ['section' => ['label' => 'Section'], 'name' => ['label' => 'Category']];
+    $csv_columns = ['section' => ['label' => __('Section')], 'name' => ['label' => __('Category')]];
     foreach ($columns as $i => [$label]) {
         $csv_columns["c$i"] = ['label' => $label, 'type' => 'money'];
     }
-    $csv_columns['total'] = ['label' => $current_year ? "$year to date" : "$year total", 'type' => 'money'];
-    $csv_columns['prev'] = ['label' => $current_year ? 'Same time last year' : (string) ($year - 1), 'type' => 'money'];
+    $csv_columns['total'] = ['label' => $current_year ? __('%d to date', $year) : __('%d total', $year), 'type' => 'money'];
+    $csv_columns['prev'] = ['label' => $current_year ? __('Same time last year') : (string) ($year - 1), 'type' => 'money'];
     $flatten = function ($line, $section) use ($columns) {
         $row = ['section' => $section, 'name' => $line['name'], 'total' => $line['total'], 'prev' => $line['prev']];
         foreach ($columns as $i => $column) {
@@ -98,7 +98,7 @@ if (reportExporting()) {
         $csv_rows[] = $flatten($line, 'Expenses');
     }
     $csv_rows[] = $flatten($expense_line, 'Expenses');
-    $csv_rows[] = $flatten($profit_line, 'Net profit');
+    $csv_rows[] = $flatten($profit_line, __('Net profit'));
     reportCsv("Profit and Loss $year", $csv_columns, $csv_rows);
 }
 
@@ -121,7 +121,7 @@ $render = function ($line, $class = '') use ($columns, $year) {
     $cat = $line['cat'] ?? 0;
     $list = $kind === 'income' ? 'income.php' : ($kind === 'expense' ? 'expenses.php' : '');
     $html = '<tr' . ($class !== '' ? ' class="' . $class . '"' : '') . '><td' . ($list ? ' class="itflow-report-sub"' : '') . '>'
-        . escapeHtml($line['name']) . (!empty($line['archived']) ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">Archived</span>' : '') . '</td>';
+        . escapeHtml($line['name']) . (!empty($line['archived']) ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">' . __('Archived') . '</span>' : '') . '</td>';
     foreach ($columns as $i => [$label, $first, $last]) {
         $url = '';
         if ($list && ($cat || $kind === 'income')) {
@@ -147,64 +147,64 @@ $span = count($columns) + 4;
 
     <?php reportHeader('profit_loss', [
         'year' => [$year, $years],
-        'controls' => reportSegmentControl('view', $view, ['month' => 'Monthly', 'quarter' => 'Quarterly']),
-        'subtitle' => $current_year ? "$year to date" : (string) $year,
-        'print_meta' => $current_year ? "January 1 to " . date('F j, Y') : "Year $year",
+        'controls' => reportSegmentControl('view', $view, ['month' => __('Monthly'), 'quarter' => __('Quarterly')]),
+        'subtitle' => $current_year ? __('%d to date', $year) : (string) $year,
+        'print_meta' => $current_year ? __('January 1 to %s', formatDate('now', 'date_long')) : __('Year %d', $year),
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Income', 'value' => reportMoney($income_total['total']), 'sub' => reportChangeHtml($income_total['total'], $income_prev_total, 'up', $compare),
+        ['label' => __('Income'), 'value' => reportMoney($income_total['total']), 'sub' => reportChangeHtml($income_total['total'], $income_prev_total, 'up', $compare),
             'url' => "/agent/income.php?canned_date=custom&dtf=$from&dtt=$to"],
-        ['label' => 'Expenses', 'value' => reportMoney($expense_total['total']), 'sub' => reportChangeHtml($expense_total['total'], $expense_prev_total, 'down', $compare),
+        ['label' => __('Expenses'), 'value' => reportMoney($expense_total['total']), 'sub' => reportChangeHtml($expense_total['total'], $expense_prev_total, 'down', $compare),
             'url' => "/agent/expenses.php?canned_date=custom&dtf=$from&dtt=$to"],
-        ['label' => 'Net profit', 'value' => reportMoney($profit), 'tone' => $profit < 0 ? 'danger' : '', 'sub' => reportChangeHtml($profit, $profit_prev, 'up', $compare)],
-        ['label' => 'Profit margin', 'value' => reportPercent($margin), 'tone' => $margin !== null && $margin < 0 ? 'danger' : '',
-            'sub' => $margin_prev === null ? '<span class="text-body-tertiary">Nothing before to compare</span>' : escapeHtml(reportPercent($margin_prev)) . ' <span class="text-body-tertiary">' . escapeHtml($current_year ? 'same time last year' : 'in ' . ($year - 1)) . '</span>'],
+        ['label' => __('Net profit'), 'value' => reportMoney($profit), 'tone' => $profit < 0 ? 'danger' : '', 'sub' => reportChangeHtml($profit, $profit_prev, 'up', $compare)],
+        ['label' => __('Profit margin'), 'value' => reportPercent($margin), 'tone' => $margin !== null && $margin < 0 ? 'danger' : '',
+            'sub' => $margin_prev === null ? '<span class="text-body-tertiary">' . __('Nothing before to compare') . '</span>' : escapeHtml(reportPercent($margin_prev)) . ' <span class="text-body-tertiary">' . escapeHtml($current_year ? __('same time last year') : __('in %d', $year - 1)) . '</span>'],
     ]) ?>
 
-    <?= reportSectionOpen('Income, expenses and profit by month', escapeHtml((string) $year)) ?>
+    <?= reportSectionOpen(__('Income, expenses and profit by month'), escapeHtml((string) $year)) ?>
         <div class="card-body">
             <?= reportChart([
                 'type' => 'bar',
-                'labels' => array_map(function ($m) { return date('M', mktime(0, 0, 0, $m, 1)); }, range(1, 12)),
+                'labels' => array_map(function ($m) { return formatDate(mktime(0, 0, 0, $m, 1), 'month'); }, range(1, 12)),
                 'series' => [
-                    ['label' => 'Income', 'data' => $chart['income'], 'tone' => 'success'],
-                    ['label' => 'Expenses', 'data' => $chart['expenses'], 'tone' => 'danger'],
-                    ['label' => 'Net profit', 'data' => $chart['profit'], 'tone' => 'accent', 'type' => 'line'],
+                    ['label' => __('Income'), 'data' => $chart['income'], 'tone' => 'success'],
+                    ['label' => __('Expenses'), 'data' => $chart['expenses'], 'tone' => 'danger'],
+                    ['label' => __('Net profit'), 'data' => $chart['profit'], 'tone' => 'accent', 'type' => 'line'],
                 ],
                 'format' => 'money',
-            ], 'lg', 'Income, expenses and net profit per month') ?>
+            ], 'lg', __('Income, expenses and net profit per month')) ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('Statement', escapeHtml($current_year ? 'Last year is ' . ($year - 1) . ' to ' . date('M j', strtotime($prev_to)) : 'Last year is ' . ($year - 1)), 'itflow-report-long') ?>
+    <?= reportSectionOpen(__('Statement'), escapeHtml($current_year ? __('Last year is %1$d to %2$s', $year - 1, formatDate($prev_to, 'date_short')) : __('Last year is %d', $year - 1)), 'itflow-report-long') ?>
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0 itflow-report-table itflow-report-grid">
                 <thead class="table-light">
                 <tr>
-                    <th>Category</th>
+                    <th><?= __('Category') ?></th>
                     <?php foreach ($columns as [$label, $first, $last]) { ?>
-                        <th class="text-end"<?php if ($view === 'quarter') { ?> title="<?= date('M', mktime(0, 0, 0, $first, 1)) ?> – <?= date('M', mktime(0, 0, 0, $last, 1)) ?>"<?php } ?>><?= $label ?></th>
+                        <th class="text-end"<?php if ($view === 'quarter') { ?> title="<?= formatDate(mktime(0, 0, 0, $first, 1), 'month') ?> – <?= formatDate(mktime(0, 0, 0, $last, 1), 'month') ?>"<?php } ?>><?= $label ?></th>
                     <?php } ?>
                     <th class="text-end"><?= $year ?></th>
-                    <th class="text-end">Last year</th>
-                    <th class="text-end">Change</th>
+                    <th class="text-end"><?= __('Last year') ?></th>
+                    <th class="text-end"><?= __('Change') ?></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="itflow-report-group-row"><td colspan="<?= $span ?>">Income</td></tr>
+                <tr class="itflow-report-group-row"><td colspan="<?= $span ?>"><?= __('Income') ?></td></tr>
                 <?php foreach ($income_lines as $line) { echo $render($line); } ?>
-                <?php if (!$income_lines) { ?><tr><td colspan="<?= $span ?>" class="itflow-report-sub text-body-secondary">No income this year or last.</td></tr><?php } ?>
+                <?php if (!$income_lines) { ?><tr><td colspan="<?= $span ?>" class="itflow-report-sub text-body-secondary"><?= __('No income this year or last.') ?></td></tr><?php } ?>
                 <?= $render($income_line, 'fw-semibold') ?>
-                <tr class="itflow-report-group-row"><td colspan="<?= $span ?>">Expenses</td></tr>
+                <tr class="itflow-report-group-row"><td colspan="<?= $span ?>"><?= __('Expenses') ?></td></tr>
                 <?php foreach ($expense_lines as $line) { echo $render($line); } ?>
-                <?php if (!$expense_lines) { ?><tr><td colspan="<?= $span ?>" class="itflow-report-sub text-body-secondary">No spending this year or last.</td></tr><?php } ?>
+                <?php if (!$expense_lines) { ?><tr><td colspan="<?= $span ?>" class="itflow-report-sub text-body-secondary"><?= __('No spending this year or last.') ?></td></tr><?php } ?>
                 <?= $render($expense_line, 'fw-semibold') ?>
                 </tbody>
                 <tfoot>
                 <?= $render($profit_line, 'fw-semibold') ?>
                 <tr>
-                    <td>Margin</td>
+                    <td><?= __('Margin') ?></td>
                     <?php foreach ($columns as $i => $column) {
                         $cell_margin = reportShare($profit_line['cells'][$i], $income_line['cells'][$i], 1); ?>
                         <td class="text-end<?= $cell_margin !== null && $cell_margin < 0 ? ' text-danger' : '' ?>"><?= $cell_margin === null ? '<span class="itflow-report-zero">–</span>' : reportPercent($cell_margin) ?></td>
@@ -217,8 +217,7 @@ $span = count($columns) + 4;
             </table>
         </div>
         <div class="card-footer small text-body-secondary">
-            Cash basis - money counts when it arrives or leaves. Payments are filed under the category of the invoice they paid,
-            and transfers between your own accounts are left out of both sides. Click an amount to see what makes it up.
+            <?= __('Cash basis - money counts when it arrives or leaves. Payments are filed under the category of the invoice they paid, and transfers between your own accounts are left out of both sides. Click an amount to see what makes it up.') ?>
         </div>
     </div>
 

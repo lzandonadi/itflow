@@ -15,11 +15,12 @@ $sql = mysqli_query($mysqli, "SELECT ticket_client_id, ticket_reply, ticket_repl
 
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    echo json_encode(['error' => 'That reply no longer exists.']);
+    echo json_encode(['error' => __('That reply no longer exists.')]);
     exit;
 }
 $ticket_reply_type = escapeHtml($row['ticket_reply_type']);
-$ticket_reply_time_worked = date_create($row['ticket_reply_time_worked']);
+// A client's reply has no time worked - NULL, which date_create() took for now
+$ticket_reply_time_worked = date_create((string) ($row['ticket_reply_time_worked'] ?: '00:00:00'));
 $ticket_reply_time_worked_formatted = date_format($ticket_reply_time_worked, 'H:i:s');
 $ticket_reply = escapeHtml($row['ticket_reply']);
 $client_id = intval($row['ticket_client_id']);
@@ -44,7 +45,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-edit me-2"></i>Edit reply</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-edit me-2"></i><?= __('Edit reply') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -56,16 +57,17 @@ ob_start();
         <div class="mb-3">
             <div class="btn-group w-100" role="group">
                 <input class="btn-check" id="ticket_reply_type_opt0" type="radio" name="ticket_reply_type" value="Internal" <?php if ($ticket_reply_type == 'Internal') { echo "checked"; } ?>>
-                <label class="btn btn-outline-secondary" for="ticket_reply_type_opt0"><i class="fas fa-fw fa-lock me-1"></i>Internal note</label>
+                <label class="btn btn-outline-secondary" for="ticket_reply_type_opt0"><i class="fas fa-fw fa-lock me-1"></i><?= __('Internal note') ?></label>
                 <input class="btn-check" id="ticket_reply_type_opt1" type="radio" name="ticket_reply_type" value="Public" <?php if ($ticket_reply_type == 'Public') { echo "checked"; } ?>>
-                <label class="btn btn-outline-secondary" for="ticket_reply_type_opt1"><i class="fas fa-fw fa-eye me-1"></i>Public</label>
+                <label class="btn btn-outline-secondary" for="ticket_reply_type_opt1"><i class="fas fa-fw fa-eye me-1"></i><?= _x('Public', 'ticket reply') ?></label>
             </div>
-            <small class="text-muted">Public replies show in the client portal. Saving here never sends an email.</small>
+            <small class="text-muted"><?= __('Public replies show in the client portal. Saving here never sends an email.') ?></small>
         </div>
 
         <?php if ($emailed_to !== '') { ?>
             <div class="alert alert-info small py-2" data-reply-edit-emailed>
-                <i class="fas fa-fw fa-paper-plane me-1"></i>This was emailed to <strong><?= escapeHtml($emailed_to) ?></strong>. They keep the email as it was sent - what you change here only changes the ticket<?= $ticket_reply_type == 'Public' ? ' and the portal' : '' ?>.
+                <i class="fas fa-fw fa-paper-plane me-1"></i><?= $ticket_reply_type == 'Public' ? __('This was emailed to <strong>%s</strong>. They keep the email as it was sent - what you change here only changes the ticket and the portal.', escapeHtml($emailed_to)) : __('This was emailed to <strong>%s</strong>. They keep the email as it was sent - what you change here only changes the ticket.', escapeHtml($emailed_to)) ?>
+
             </div>
         <?php } ?>
 
@@ -76,18 +78,18 @@ ob_start();
         <div class="mb-3">
             <textarea class="form-control tinymce" name="ticket_reply"<?= $mention_attr ?>><?= $ticket_reply ?></textarea>
             <?php if ($mention_attr !== '') { ?>
-                <div class="form-text" data-mention-hint hidden><i class="fas fa-fw fa-at me-1"></i>Type @ to mention someone on your team - anyone you add is told in ITFlow and by email.</div>
-                <div class="form-text text-warning-emphasis" data-mention-public hidden><i class="fas fa-fw fa-exclamation-triangle me-1"></i>Mentions only tell people in an internal note - made public, they're plain text, and nobody is told.</div>
+                <div class="form-text" data-mention-hint hidden><i class="fas fa-fw fa-at me-1"></i><?= __('Type @ to mention someone on your team - anyone you add is told in ITFlow and by email.') ?></div>
+                <div class="form-text text-warning-emphasis" data-mention-public hidden><i class="fas fa-fw fa-exclamation-triangle me-1"></i><?= __('Mentions only tell people in an internal note - made public, they\'re plain text, and nobody is told.') ?></div>
             <?php } ?>
         </div>
 
         <?php if (!empty($ticket_reply_time_worked)) { ?>
             <div class="col-6 col-md-3">
                 <div class="mb-3">
-                    <label>Time worked</label>
+                    <label><?= __('Time worked') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-fw fa-stopwatch"></i></span>
-                        <input class="form-control" name="time" type="text" placeholder="HH:MM:SS" pattern="([01]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])" value="<?= $ticket_reply_time_worked_formatted ?>" required>
+                        <input class="form-control" name="time" type="text" placeholder="<?= escapeHtml(__('HH:MM:SS')) ?>" pattern="([01]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])" value="<?= $ticket_reply_time_worked_formatted ?>" required>
                     </div>
                 </div>
             </div>
@@ -95,8 +97,8 @@ ob_start();
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket_reply" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_ticket_reply" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

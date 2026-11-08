@@ -17,7 +17,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function documentTemplateForRequest($document_template_id) {
     $row = documentTemplateRow($document_template_id);
     if (!$row) {
-        flashAlert('That document template no longer exists.', 'error');
+        flashAlert(__('That document template no longer exists.'), 'error');
         redirect('document_templates.php');
     }
     return $row;
@@ -40,7 +40,7 @@ if (isset($_POST['add_document_template']) || isset($_POST['edit_document_templa
 
     logAudit("Document Template", $editing ? "Edit" : "Create", "$session_name " . ($editing ? 'edited' : 'created') . " document template $name", 0, $document_template_id);
 
-    flashAlert("Document template <strong>" . escapeHtml($fields['name']) . "</strong> " . ($editing ? 'saved' : 'created'));
+    flashAlert(($editing ? __('Document template <strong>%s</strong> saved', escapeHtml($fields['name'])) : __('Document template <strong>%s</strong> created', escapeHtml($fields['name']))));
 
     // A new one opens on its page
     redirect($editing ? null : "document_template.php?document_template_id=$document_template_id");
@@ -57,7 +57,7 @@ if (isset($_GET['copy_document_template'])) {
 
     logAudit("Document Template", "Create", "$session_name copied document template " . escapeSql($row['document_template_name']) . " as " . escapeSql($new_name), 0, $new_id);
 
-    flashAlert("Document template <strong>" . escapeHtml($row['document_template_name']) . "</strong> copied as <strong>" . escapeHtml($new_name) . "</strong>");
+    flashAlert(__('Document template <strong>%1$s</strong> copied as <strong>%2$s</strong>', escapeHtml($row['document_template_name']), escapeHtml($new_name)));
 
     redirect("document_template.php?document_template_id=$new_id");
 
@@ -76,7 +76,7 @@ if (isset($_GET['archive_document_template']) || isset($_GET['restore_document_t
 
     logAudit("Document Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " document template " . escapeSql($row['document_template_name']), 0, $document_template_id);
 
-    flashAlert("Document template <strong>" . escapeHtml($row['document_template_name']) . "</strong> " . ($archive ? 'archived' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Document template <strong>%s</strong> archived', escapeHtml($row['document_template_name'])) : __('Document template <strong>%s</strong> restored', escapeHtml($row['document_template_name']))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -93,7 +93,7 @@ if (isset($_GET['delete_document_template'])) {
 
     logAudit("Document Template", "Delete", "$session_name deleted document template " . escapeSql($row['document_template_name']));
 
-    flashAlert("Document template <strong>" . escapeHtml($row['document_template_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Document template <strong>%s</strong> deleted', escapeHtml($row['document_template_name'])), 'error');
 
     // From its own page, back to the list
     redirect(!empty($_GET['from_page']) ? 'document_templates.php' : null);
@@ -111,13 +111,13 @@ if (isset($_POST['save_document_template_fill_in'])) {
 
     $name = documentFillInName($_POST['name'] ?? '');
     if ($name === '') {
-        flashAlert("A fill-in's name is what goes in square brackets - a letter first, then letters, digits, spaces, _ - or /, up to 41 in all. [Client], [Site] and the others filled in from the client, and the tables of records, are taken.", 'error');
+        flashAlert(__('A fill-in\'s name is what goes in square brackets - a letter first, then letters, digits, spaces, _ - or /, up to 41 in all. [Client], [Site] and the others filled in from the client, and the tables of records, are taken.'), 'error');
         redirect();
     }
     $type = isset(TICKET_FILL_IN_TYPES[$_POST['type'] ?? '']) ? $_POST['type'] : 'text';
     $options = $type === 'list' ? ticketFillInOptions($_POST['options'] ?? '') : [];
     if ($type === 'list' && count($options) < 2) {
-        flashAlert('A list needs at least two choices - one per line.', 'error');
+        flashAlert(__('A list needs at least two choices - one per line.'), 'error');
         redirect();
     }
     $required = intval($_POST['required'] ?? 0) ? 1 : 0;
@@ -130,7 +130,7 @@ if (isset($_POST['save_document_template_fill_in'])) {
             continue;
         }
         if (strtolower($fill_in['name']) === strtolower($name) && strtolower($fill_in['name']) !== strtolower($original)) {
-            flashAlert("<strong>" . escapeHtml($row['document_template_name']) . "</strong> already asks for <strong>" . escapeHtml($fill_in['name']) . "</strong>.", 'error');
+            flashAlert(__('<strong>%1$s</strong> already asks for <strong>%2$s</strong>.', escapeHtml($row['document_template_name']), escapeHtml($fill_in['name'])), 'error');
             redirect();
         }
     }
@@ -153,7 +153,7 @@ if (isset($_POST['save_document_template_fill_in'])) {
 
     logAudit("Document Template", "Edit", "$session_name " . ($original === '' ? 'added' : 'changed') . " fill-in " . escapeSql($name) . " on document template " . escapeSql($row['document_template_name']), 0, $document_template_id);
 
-    flashAlert("Fill-in <strong>" . escapeHtml($name) . "</strong> saved" . ($original === '' ? " - put <code>[" . escapeHtml($name) . "]</code> in what it says where the answer goes" : ''));
+    flashAlert($original === '' ? __('Fill-in <strong>%1$s</strong> saved - put <code>[%1$s]</code> in what it says where the answer goes', escapeHtml($name)) : __('Fill-in <strong>%s</strong> saved', escapeHtml($name)));
 
     redirect();
 
@@ -180,8 +180,8 @@ if (isset($_GET['delete_document_template_fill_in'])) {
     logAudit("Document Template", "Edit", "$session_name removed fill-in " . escapeSql($name) . " from document template " . escapeSql($row['document_template_name']), 0, $document_template_id);
 
     flashAlert($still_asked
-        ? "Fill-in <strong>" . escapeHtml($name) . "</strong> reset - <code>[" . escapeHtml($name) . "]</code> is still in what it says, so it is asked for as plain, optional text"
-        : "Fill-in <strong>" . escapeHtml($name) . "</strong> removed", 'error');
+        ? __('Fill-in <strong>%1$s</strong> reset - <code>[%1$s]</code> is still in what it says, so it is asked for as plain, optional text', escapeHtml($name))
+        : __('Fill-in <strong>%s</strong> removed', escapeHtml($name)), 'error');
 
     redirect();
 
@@ -193,12 +193,12 @@ if (isset($_POST['reorder_document_template_fill_ins'])) {
     // Every one dragged keeps its place from now on, so each gets a row.
     header('Content-Type: application/json');
     if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => 'The page is out of date - reload it']);
+        echo json_encode(['ok' => false, 'error' => __('The page is out of date - reload it')]);
         exit;
     }
     $row = documentTemplateRow($_POST['document_template_id'] ?? 0);
     if (!$row) {
-        echo json_encode(['ok' => false, 'error' => 'That document template no longer exists']);
+        echo json_encode(['ok' => false, 'error' => __('That document template no longer exists')]);
         exit;
     }
     $document_template_id = intval($row['document_template_id']);
@@ -236,19 +236,23 @@ if (isset($_POST['save_document_template_required'])) {
     $required = intval($_POST['required'] ?? 0);
     $tag_ids = array_map('intval', (array) ($_POST['tags'] ?? []));
     if ($required === DOCUMENT_TEMPLATE_REQUIRED_TAGGED && !array_filter($tag_ids)) {
-        flashAlert('Pick the client tags - or Every client.', 'error');
+        flashAlert(__('Pick the client tags - or Every client.'), 'error');
         redirect();
     }
     documentTemplateSetRequired($document_template_id, $required, $required === DOCUMENT_TEMPLATE_REQUIRED_TAGGED ? $tag_ids : [], $_POST['review_months'] ?? 0);
 
     $saved = documentTemplateRow($document_template_id);
-    $scope = documentTemplateScopeText($saved['document_template_required'], documentTemplateRequiredTags([$document_template_id])[$document_template_id]);
+    $required_tags = documentTemplateRequiredTags([$document_template_id])[$document_template_id];
     $months = intval($saved['document_template_review_months']);
-    $said = ($scope !== '' ? "required of " . lcfirst($scope) : 'not required of anyone') . ($months ? ", reviewed " . lcfirst(DOCUMENT_TEMPLATE_REVIEW_MONTHS[$months]) : ', with no reviews');
+    $said_in = function () use ($saved, $required_tags, $months) {
+        $scope = documentTemplateScopeText($saved['document_template_required'], $required_tags);
+        return ($scope !== '' ? __('required of %s', lcfirst($scope)) : __('not required of anyone')) . ($months ? __(', reviewed %s', documentTemplateReviewLabel($months, true)) : __(', with no reviews'));
+    };
+    $said = i18nEnglish($said_in);
 
     logAudit("Document Template", "Edit", "$session_name set document template " . escapeSql($row['document_template_name']) . " " . escapeSql($said), 0, $document_template_id);
 
-    flashAlert("<strong>" . escapeHtml($row['document_template_name']) . "</strong> is " . escapeHtml($said));
+    flashAlert(__('<strong>%1$s</strong> is %2$s', escapeHtml($row['document_template_name']), escapeHtml($said_in())));
 
     redirect();
 
@@ -262,12 +266,12 @@ if (isset($_POST['make_documents_from_template'])) {
     $row = documentTemplateForRequest($_POST['document_template_id'] ?? 0);
     $document_template_id = intval($row['document_template_id']);
     if ($row['document_template_archived_at']) {
-        flashAlert('That template is archived - restore it to make documents from it.', 'error');
+        flashAlert(__('That template is archived - restore it to make documents from it.'), 'error');
         redirect();
     }
     $client_ids = array_values(array_filter(array_map('intval', (array) ($_POST['client_ids'] ?? []))));
     if (!$client_ids) {
-        flashAlert('Pick the clients to make one for.', 'error');
+        flashAlert(__('Pick the clients to make one for.'), 'error');
         redirect();
     }
     $answers = ticketFillInAnswers(documentTemplateFillInsFor($document_template_id), $_POST['fill_ins'] ?? [], $fill_in_error);
@@ -285,8 +289,8 @@ if (isset($_POST['make_documents_from_template'])) {
 
     $made = count($result['made']);
     $skipped = count($result['skipped']);
-    flashAlert(($made ? "Made $made document" . ($made === 1 ? '' : 's') : 'Made no documents') . " from <strong>" . escapeHtml($row['document_template_name']) . "</strong>"
-        . ($skipped ? " - skipped " . ($skipped === 1 ? escapeHtml(reset($result['skipped'])) . ", which already has one" : "$skipped clients that already have one") : ''), $made ? 'success' : 'warning');
+    flashAlert(($made ? _n('Made %1$d document from <strong>%2$s</strong>', 'Made %1$d documents from <strong>%2$s</strong>', $made, $made, escapeHtml($row['document_template_name'])) : __('Made no documents from <strong>%s</strong>', escapeHtml($row['document_template_name'])))
+        . ($skipped ? ($skipped === 1 ? __(' - skipped %s, which already has one', escapeHtml(reset($result['skipped']))) : __(' - skipped %d clients that already have one', $skipped)) : ''), $made ? 'success' : 'warning');
 
     redirect("document_template.php?document_template_id=$document_template_id");
 
@@ -304,7 +308,7 @@ if (isset($_POST['export_document_templates']) || isset($_GET['export_document_t
         $export = documentTemplatesExport((array) ($_POST['document_template_ids'] ?? []), !empty($_POST['archived']));
     }
     if (!$export['templates']) {
-        flashAlert('There are no document templates to export.', 'error');
+        flashAlert(__('There are no document templates to export.'), 'error');
         redirect();
     }
 
@@ -326,15 +330,15 @@ if (isset($_POST['import_document_templates'])) {
 
     $file = $_FILES['file'] ?? null;
     if ($file && in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
-        flashAlert('That file is bigger than this server takes in an upload - export a few at a time.', 'error');
+        flashAlert(__('That file is bigger than this server takes in an upload - export a few at a time.'), 'error');
         redirect('document_templates.php');
     }
     if (!$file || $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-        flashAlert('Pick the file to import.', 'error');
+        flashAlert(__('Pick the file to import.'), 'error');
         redirect('document_templates.php');
     }
     if ($file['size'] > 100 * 1024 * 1024) {
-        flashAlert('That file is too big to be document templates.', 'error');
+        flashAlert(__('That file is too big to be document templates.'), 'error');
         redirect('document_templates.php');
     }
     $templates = documentTemplatesImportRead(file_get_contents($file['tmp_name']), $import_error);

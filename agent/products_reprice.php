@@ -31,7 +31,8 @@ $can_edit = lookupUserPermission('module_sales') >= 2;
 $line_count = array_sum(array_map(function ($group) {
     return count($group['lines']);
 }, $groups));
-$period_words = ['month' => 'a month', 'quarter' => 'a quarter', 'year' => 'a year'];
+$period_words = ['month' => __('a month'), 'quarter' => __('a quarter'), 'year' => __('a year')];
+$frequency_words = ['month' => _x('monthly', 'billing frequency'), 'quarter' => _x('quarterly', 'billing frequency'), 'year' => _x('yearly', 'billing frequency')];
 $doc_pages = ['recurring' => 'recurring_invoice.php?recurring_invoice_id=', 'invoice' => 'invoice.php?invoice_id=', 'quote' => 'quote.php?quote_id='];
 
 // What it is narrowed to, each with a link that takes it off
@@ -41,26 +42,26 @@ $clear_url = function ($keys) use ($filters) {
     return 'products_reprice.php' . ($params ? '?' . http_build_query($params) : '');
 };
 if ($filters['product_id']) {
-    $narrowed[] = ['Product', getFieldById('products', $filters['product_id'], 'product_name') ?: 'a product', $clear_url(['product_id'])];
+    $narrowed[] = [__('Product'), getFieldById('products', $filters['product_id'], 'product_name') ?: __('a product'), $clear_url(['product_id'])];
 }
 if ($filters['client_id']) {
-    $narrowed[] = ['Client', getFieldById('clients', $filters['client_id'], 'client_name') ?: 'a client', $clear_url(['client_id'])];
+    $narrowed[] = [__('Client'), getFieldById('clients', $filters['client_id'], 'client_name') ?: __('a client'), $clear_url(['client_id'])];
 }
 if ($filters['kind']) {
     $doc = $filters['doc_id'] ? billingRow($filters['kind'], $filters['doc_id']) : null;
     $narrowed[] = [$kinds[$filters['kind']]['one'], $doc ? billingNumber($filters['kind'], $doc) : $kinds[$filters['kind']]['label'], $clear_url(['kind', 'doc_id'])];
 }
 
-$page_title = 'Update Prices';
+$page_title = __('Update Prices');
 
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="products.php">Products</a></li>
+    <li class="breadcrumb-item"><a href="products.php"><?= __('Products') ?></a></li>
     <?php if ($filters['product_id'] && count($groups) <= 1) { ?>
         <li class="breadcrumb-item"><a href="product.php?product_id=<?= $filters['product_id'] ?>"><?= escapeHtml((string) getFieldById('products', $filters['product_id'], 'product_name')) ?></a></li>
     <?php } ?>
-    <li class="breadcrumb-item active">Update Prices</li>
+    <li class="breadcrumb-item active"><?= __('Update Prices') ?></li>
 </ol>
 
 <form action="post.php" method="post" autocomplete="off" id="productsReprice">
@@ -68,19 +69,17 @@ $page_title = 'Update Prices';
 
     <div class="card">
         <div class="card-header bg-dark py-2">
-            <h3 class="card-title mt-1 mb-1"><i class="fas fa-fw fa-tags me-2"></i>Update Prices</h3>
+            <h3 class="card-title mt-1 mb-1"><i class="fas fa-fw fa-tags me-2"></i><?= __('Update Prices') ?></h3>
         </div>
 
         <div class="card-header py-3">
             <p class="small text-body-secondary mb-0">
-                Catalog lines on recurring invoices, draft invoices and draft quotes whose price isn't the product's price now.
-                Lines still at one of its old prices are picked. A price it never had looks agreed with the client, so it is left alone unless you pick it.
-                Invoices already sent, and quotes out with clients, keep their prices.
+                <?= __('Catalog lines on recurring invoices, draft invoices and draft quotes whose price isn\'t the product\'s price now. Lines still at one of its old prices are picked. A price it never had looks agreed with the client, so it is left alone unless you pick it. Invoices already sent, and quotes out with clients, keep their prices.') ?>
             </p>
             <?php if ($narrowed) { ?>
                 <div class="small text-body-secondary mt-2 d-flex flex-wrap column-gap-3 row-gap-1">
                     <?php foreach ($narrowed as [$what, $name, $url]) { ?>
-                        <span><i class="fas fa-filter me-1"></i><?= escapeHtml($what) ?>: <strong><?= escapeHtml($name) ?></strong> <a class="ms-1" href="<?= escapeHtml($url) ?>">Clear</a></span>
+                        <span><i class="fas fa-filter me-1"></i><?= escapeHtml($what) ?>: <strong><?= escapeHtml($name) ?></strong> <a class="ms-1" href="<?= escapeHtml($url) ?>"><?= __('Clear') ?></a></span>
                     <?php } ?>
                 </div>
             <?php } ?>
@@ -98,18 +97,18 @@ $page_title = 'Update Prices';
                     <div class="min-w-0 flex-grow-1">
                         <a class="fw-semibold" href="product.php?product_id=<?= $product_id ?>"><?= escapeHtml($group['product_name']) ?></a>
                         <div class="small text-body-secondary">
-                            Now <strong class="text-body"><?= escapeHtml(billingMoney($group['product_price'], $currency)) ?></strong>
+                            <?= __('Now <strong class="text-body">%s</strong>', escapeHtml(billingMoney($group['product_price'], $currency))) ?>
                             <?php if ($last) { ?>
-                                &middot; was <?= escapeHtml(billingMoney($last['price_old'], $currency)) ?> until <?= escapeHtml(date('M j, Y', strtotime($last['price_created_at']))) ?>
+                                &middot; <?= __('was %1$s until %2$s', escapeHtml(billingMoney($last['price_old'], $currency)), escapeHtml(formatDate($last['price_created_at'], 'date'))) ?>
                                 (<?= $percent > 0 ? '+' : '' ?><?= escapeHtml((string) $percent) ?>%)
                             <?php } ?>
                         </div>
                     </div>
                     <?php if ($can_edit) { ?>
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Set the new prices">
-                            <button type="button" class="btn btn-outline-secondary" data-reprice-fill="catalog" title="Every line here at <?= escapeHtml(billingMoney($group['product_price'], $currency)) ?>"><i class="fas fa-tag me-1"></i>Catalog price</button>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="<?= escapeHtml(__('Set the new prices')) ?>">
+                            <button type="button" class="btn btn-outline-secondary" data-reprice-fill="catalog" title="<?= escapeHtml(__('Every line here at %s', billingMoney($group['product_price'], $currency))) ?>"><i class="fas fa-tag me-1"></i><?= __('Catalog price') ?></button>
                             <?php if ($ratio && $percent != 0) { ?>
-                                <button type="button" class="btn btn-outline-secondary" data-reprice-fill="ratio" data-ratio="<?= $ratio ?>" title="Each line's price changed by the same <?= escapeHtml((string) $percent) ?>%"><i class="fas fa-percent me-1"></i><?= $percent > 0 ? '+' : '' ?><?= escapeHtml((string) $percent) ?>% each</button>
+                                <button type="button" class="btn btn-outline-secondary" data-reprice-fill="ratio" data-ratio="<?= $ratio ?>" title="<?= escapeHtml(__('Each line\'s price changed by the same %s', $percent . '%')) ?>"><i class="fas fa-percent me-1"></i><?= escapeHtml(__('%s each', ($percent > 0 ? '+' : '') . $percent . '%')) ?></button>
                             <?php } ?>
                         </div>
                     <?php } ?>
@@ -119,15 +118,15 @@ $page_title = 'Update Prices';
                         <thead class="text-nowrap small">
                         <tr>
                             <?php if ($can_edit) { ?>
-                                <th class="checkbox-column"><input class="form-check-input" type="checkbox" title="Pick them all" aria-label="Pick them all" data-reprice-all></th>
+                                <th class="checkbox-column"><input class="form-check-input" type="checkbox" title="<?= escapeHtml(__('Pick them all')) ?>" aria-label="<?= escapeHtml(__('Pick them all')) ?>" data-reprice-all></th>
                             <?php } ?>
-                            <th>On</th>
-                            <th>Client</th>
-                            <th class="d-none d-lg-table-cell">Line</th>
-                            <th class="text-end">Qty</th>
-                            <th class="text-end">Now</th>
-                            <th class="text-end" style="width: 9.5rem;">New price</th>
-                            <th class="text-end d-none d-sm-table-cell">Change</th>
+                            <th><?= _x('On', 'document a line is on') ?></th>
+                            <th><?= __('Client') ?></th>
+                            <th class="d-none d-lg-table-cell"><?= __('Line') ?></th>
+                            <th class="text-end"><?= __('Qty') ?></th>
+                            <th class="text-end"><?= _x('Now', 'current price') ?></th>
+                            <th class="text-end" style="width: 9.5rem;"><?= __('New price') ?></th>
+                            <th class="text-end d-none d-sm-table-cell"><?= _x('Change', 'price change') ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -142,12 +141,12 @@ $page_title = 'Update Prices';
                                 data-period="<?= escapeHtml($period_words[$frequency] ?? '') ?>">
                                 <?php if ($can_edit) { ?>
                                     <td class="checkbox-column">
-                                        <input class="form-check-input" type="checkbox" name="pick[]" value="<?= $key ?>" aria-label="Update this line" <?= $line['old'] ? 'checked' : '' ?> data-reprice-pick>
+                                        <input class="form-check-input" type="checkbox" name="pick[]" value="<?= $key ?>" aria-label="<?= escapeHtml(__('Update this line')) ?>" <?= $line['old'] ? 'checked' : '' ?> data-reprice-pick>
                                     </td>
                                 <?php } ?>
                                 <td class="text-nowrap">
-                                    <i class="fas fa-fw <?= $kinds[$kind]['icon'] ?> text-secondary me-1" title="<?= $kinds[$kind]['one'] ?>"></i><a class="fw-semibold" href="<?= $doc_pages[$kind] . intval($line['doc_id']) ?>"><?= escapeHtml($line['number']) ?></a>
-                                    <div class="small text-body-secondary"><?= escapeHtml($kind === 'recurring' ? $line['status'] . ($frequency ? ', ' . recurringInvoicePeriodWord($frequency) . 'ly' : '') : $line['status']) ?></div>
+                                    <i class="fas fa-fw <?= $kinds[$kind]['icon'] ?> text-secondary me-1" title="<?= escapeHtml($kinds[$kind]['one']) ?>"></i><a class="fw-semibold" href="<?= $doc_pages[$kind] . intval($line['doc_id']) ?>"><?= escapeHtml($line['number']) ?></a>
+                                    <div class="small text-body-secondary"><?= escapeHtml($kind === 'recurring' ? ($line['status'] === 'Active' ? _x('Active', 'recurring invoice') : _x('Paused', 'recurring invoice')) . ($frequency ? ', ' . ($frequency_words[$frequency] ?? $frequency) : '') : ($kind === 'quote' ? quoteStatusLabel($line['status']) : invoiceStatusLabel($line['status']))) ?></div>
                                 </td>
                                 <td><a class="text-reset" href="client_overview.php?client_id=<?= intval($line['client_id']) ?>"><?= escapeHtml($line['client_name']) ?></a></td>
                                 <td class="d-none d-lg-table-cell small"><?= escapeHtml($line['item_name']) ?></td>
@@ -155,14 +154,14 @@ $page_title = 'Update Prices';
                                 <td class="text-end text-nowrap">
                                     <span class="itflow-money"><?= escapeHtml(billingMoney($line['item_price'], $line_currency)) ?></span>
                                     <?php if (!$line['old']) { ?>
-                                        <div><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal" title="A price this product never had - agreed with the client?">Own price</span></div>
+                                        <div><span class="badge rounded-pill bg-info-subtle text-info-emphasis fw-normal" title="<?= escapeHtml(__('A price this product never had - agreed with the client?')) ?>"><?= __('Own price') ?></span></div>
                                     <?php } ?>
                                 </td>
                                 <td class="text-end">
                                     <?php if ($can_edit) { ?>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text"><i class="fas fa-fw fa-dollar-sign"></i></span>
-                                            <input type="text" class="form-control text-end" name="price[<?= $key ?>]" inputmode="decimal" value="<?= number_format($line['suggested'], 2, '.', '') ?>" aria-label="New price" data-reprice-price>
+                                            <input type="text" class="form-control text-end" name="price[<?= $key ?>]" inputmode="decimal" value="<?= number_format($line['suggested'], 2, '.', '') ?>" aria-label="<?= escapeHtml(__('New price')) ?>" data-reprice-price>
                                         </div>
                                     <?php } else { ?>
                                         <span class="itflow-money"><?= escapeHtml(billingMoney($line['product_price'], $line_currency)) ?></span>
@@ -180,17 +179,17 @@ $page_title = 'Update Prices';
         <?php if (!$groups) { ?>
             <div class="itflow-asset-empty">
                 <i class="fas fa-tags fa-2x mb-2 opacity-50"></i>
-                <div><?= $narrowed ? 'Every catalog line here is at its product\'s price.' : 'Every catalog line on recurring invoices, drafts and quotes is at its product\'s price.' ?></div>
+                <div><?= $narrowed ? __('Every catalog line here is at its product\'s price.') : __('Every catalog line on recurring invoices, drafts and quotes is at its product\'s price.') ?></div>
             </div>
         <?php } elseif ($line_count >= 1000) { ?>
-            <div class="small text-body-secondary px-3 py-2 border-top">The first 1000 lines - update these, or narrow it to a product, and the rest show.</div>
+            <div class="small text-body-secondary px-3 py-2 border-top"><?= __('The first 1000 lines - update these, or narrow it to a product, and the rest show.') ?></div>
         <?php } ?>
 
         <?php if ($groups && $can_edit) { ?>
             <div class="card-footer d-flex flex-wrap gap-2 align-items-center itflow-reprice-footer">
-                <span class="small text-body-secondary me-auto" data-reprice-summary>Nothing picked</span>
+                <span class="small text-body-secondary me-auto" data-reprice-summary><?= __('Nothing picked') ?></span>
                 <button type="submit" name="products_reprice_save" class="btn btn-primary text-bold" data-reprice-save disabled
-                    ><i class="fas fa-check me-2"></i><span data-reprice-save-label>Update Prices</span></button>
+                    ><i class="fas fa-check me-2"></i><span data-reprice-save-label><?= __('Update Prices') ?></span></button>
             </div>
         <?php } ?>
     </div>
@@ -207,6 +206,18 @@ $page_title = 'Update Prices';
     var summary = form.querySelector('[data-reprice-summary]');
     var save = form.querySelector('[data-reprice-save]');
     var label = form.querySelector('[data-reprice-save-label]');
+    var t = <?= json_encode([
+        'noChange' => __('No change'),
+        'picked' => [__('%s line picked'), __('%s lines picked')],
+        'monthly' => __(' - recurring invoices bring in %s a month'),
+        'bad' => __(', %s without a price'),
+        'none' => __('Nothing picked'),
+        'update' => [__('Update %s Price'), __('Update %s Prices')],
+        'updateAll' => __('Update Prices'),
+    ], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    function plural(forms, n) {
+        return forms[n === 1 ? 0 : 1].replace('%s', n);
+    }
 
     function money(amount, currency) {
         try {
@@ -240,7 +251,7 @@ $page_title = 'Update Prices';
                 return;
             }
             var change = Math.round((price - Number(row.dataset.price)) * Number(row.dataset.qty) * 100) / 100;
-            cell.textContent = change === 0 ? 'No change' : signed(change, row.dataset.currency) + (row.dataset.period ? ' ' + row.dataset.period : '');
+            cell.textContent = change === 0 ? t.noChange : signed(change, row.dataset.currency) + (row.dataset.period ? ' ' + row.dataset.period : '');
             cell.className = 'text-end text-nowrap small d-none d-sm-table-cell ' + (change > 0 ? 'text-success-emphasis' : (change < 0 ? 'text-danger-emphasis' : 'text-body-secondary'));
             if (on) {
                 picked++;
@@ -259,9 +270,9 @@ $page_title = 'Update Prices';
         if (summary) {
             monthly = Math.round(monthly * 100) / 100;
             summary.textContent = picked
-                ? picked + ' line' + (picked === 1 ? '' : 's') + ' picked' + (monthly !== 0 ? ' - recurring invoices bring in ' + signed(monthly) + ' a month' : '') + (bad ? ', ' + bad + ' without a price' : '')
-                : 'Nothing picked';
-            label.textContent = picked ? 'Update ' + picked + ' Price' + (picked === 1 ? '' : 's') : 'Update Prices';
+                ? plural(t.picked, picked) + (monthly !== 0 ? t.monthly.replace('%s', signed(monthly)) : '') + (bad ? t.bad.replace('%s', bad) : '')
+                : t.none;
+            label.textContent = picked ? plural(t.update, picked) : t.updateAll;
             save.disabled = !picked || bad > 0;
         }
     }

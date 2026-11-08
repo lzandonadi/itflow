@@ -30,10 +30,10 @@ if (isset($_GET['delete_saved_payment'])) {
         . ($stopped ? ' - autopay stopped on ' . implode(', ', $stopped) : '')
         . ($removed['told'] ? '' : " - $provider_name couldn't be told: " . $removed['provider_error'])), $client_id, intval($row['saved_payment_id']));
 
-    $said = '<strong>' . escapeHtml($removed['label']) . '</strong> removed from ' . escapeHtml($client_name)
-        . ($stopped ? ' - autopay stopped on ' . escapeHtml(implode(', ', $stopped)) : '');
+    $said = __('<strong>%1$s</strong> removed from %2$s', escapeHtml($removed['label']), escapeHtml($client_name))
+        . ($stopped ? __(' - autopay stopped on %s', escapeHtml(implode(', ', $stopped))) : '');
     if (!$removed['told']) {
-        flashAlert($said . '. ' . escapeHtml($provider_name) . " couldn't be told, so it is still saved there - remove it in " . escapeHtml($provider_name) . ' too', 'warning');
+        flashAlert(__('%1$s. %2$s couldn\'t be told, so it is still saved there - remove it in %3$s too', $said, escapeHtml($provider_name), escapeHtml($provider_name)), 'warning');
     } else {
         flashAlert($said, 'error');
     }

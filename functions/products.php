@@ -17,26 +17,26 @@
 /** Product types => label, plural and icon. */
 function productTypes() {
     return [
-        'service' => ['label' => 'Service', 'plural' => 'Services', 'icon' => 'fa-wrench'],
-        'product' => ['label' => 'Product', 'plural' => 'Products', 'icon' => 'fa-box-open'],
+        'service' => ['label' => __('Service'), 'plural' => __('Services'), 'icon' => 'fa-wrench'],
+        'product' => ['label' => __('Product'), 'plural' => __('Products'), 'icon' => 'fa-box-open'],
     ];
 }
 
 /** How a recurring product is counted by default => label. Empty is as typed. */
 function productSeatSources() {
-    return ['' => 'As typed', 'contacts' => 'Per user', 'assets' => 'Per device'];
+    return ['' => __('As typed'), 'contacts' => __('Per user'), 'assets' => __('Per device')];
 }
 
 /** A product's default billing in words - "One time", "Monthly, per user". */
 function productBilledText($frequency, $seat_source = '') {
     $frequency = quoteFrequency($frequency);
     if ($frequency === '') {
-        return 'One time';
+        return _x('One time', 'billing frequency');
     }
     $text = recurringInvoiceFrequencies()[$frequency];
     $seat = (string) $seat_source;
     if ($seat !== '' && isset(productSeatSources()[$seat])) {
-        $text .= ', ' . strtolower(productSeatSources()[$seat]);
+        $text .= ', ' . mb_strtolower(productSeatSources()[$seat]);
     }
     return $text;
 }
@@ -61,7 +61,7 @@ function productMarginPill($margin) {
     }
     $percent = $margin['percent'];
     $tone = $percent >= 30 ? 'success' : ($percent > 0 ? 'warning' : 'danger');
-    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis fw-normal" title="Margin on the price">' . escapeHtml(rtrim(rtrim(number_format($percent, 1), '0'), '.')) . '%</span>';
+    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis fw-normal" title="' . escapeHtml(__('Margin on the price')) . '">' . escapeHtml(rtrim(rtrim(number_format($percent, 1), '0'), '.')) . '%</span>';
 }
 
 /** What is on the shelf, in SQL - use with products in the FROM. */
@@ -122,7 +122,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
     $product_id = intval($product_id);
     $old = $product_id ? productRow($product_id) : null;
     if ($product_id && !$old) {
-        $error = 'That product no longer exists.';
+        $error = __('That product no longer exists.');
         return 0;
     }
     $has = function ($key) use ($in, $old) {
@@ -133,7 +133,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
     if ($has('name')) {
         $name = trim((string) ($in['name'] ?? ''));
         if ($name === '') {
-            $error = 'A product needs a name.';
+            $error = __('A product needs a name.');
             return 0;
         }
         $set[] = "product_name = '" . escapeSql(mb_substr($name, 0, 200)) . "'";
@@ -141,7 +141,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
 
     $type = $has('type') ? (string) ($in['type'] ?? 'service') : $old['product_type'];
     if (!isset(productTypes()[$type])) {
-        $error = 'A product is a service or a product.';
+        $error = __('A product is a service or a product.');
         return 0;
     }
     if ($has('type')) {
@@ -157,11 +157,11 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
             $raw = '0';
         }
         if (!is_numeric($raw) || abs(floatval($raw)) >= 1e13) {
-            $error = ucfirst($key) . ' has to be a number.';
+            $error = $key === 'price' ? __('Price has to be a number.') : __('Cost has to be a number.');
             return 0;
         }
         if ($key === 'cost' && floatval($raw) < 0) {
-            $error = 'Cost can\'t be below zero.';
+            $error = __('Cost can\'t be below zero.');
             return 0;
         }
         $set[] = "$column = " . round(floatval($raw), 2);
@@ -170,7 +170,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
     if ($has('category')) {
         $category_id = intval($in['category'] ?? 0);
         if ($category_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM categories WHERE category_id = $category_id AND category_type = 'Income'"))) {
-            $error = 'That category is not an income category.';
+            $error = __('That category is not an income category.');
             return 0;
         }
         $set[] = "product_category_id = $category_id";
@@ -187,7 +187,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
     if ($has('vendor')) {
         $vendor_id = intval($in['vendor'] ?? 0);
         if ($vendor_id && !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM vendors WHERE vendor_id = $vendor_id AND vendor_client_id = 0"))) {
-            $error = 'That vendor is not one of yours.';
+            $error = __('That vendor is not one of yours.');
             return 0;
         }
         $set[] = "product_vendor_id = $vendor_id";
@@ -222,7 +222,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
             $raw = '0';
         }
         if (!is_numeric($raw) || floatval($raw) < 0 || floatval($raw) >= 1e9) {
-            $error = ($key === 'reorder_level' ? 'Reorder at' : 'Order') . ' has to be a number, zero or more.';
+            $error = $key === 'reorder_level' ? __('Reorder at has to be a number, zero or more.') : __('Order has to be a number, zero or more.');
             return 0;
         }
         $set[] = "$column = " . round(floatval($raw), 2);
@@ -236,7 +236,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
         } else {
             $asset_type = productAssetType($asset_type);
             if ($asset_type === '') {
-                $error = "\"" . trim((string) ($in['asset_type'] ?? '')) . "\" isn't an asset type - use one of " . implode(', ', array_keys(productAssetTypes())) . '.';
+                $error = __('"%1$s" isn\'t an asset type - use one of %2$s.', trim((string) ($in['asset_type'] ?? '')), implode(', ', array_keys(productAssetTypes())));
                 return 0;
             }
         }
@@ -251,7 +251,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
             $raw = '0';
         }
         if (!ctype_digit($raw) || intval($raw) > 600) {
-            $error = 'Warranty is a number of months, up to 600.';
+            $error = __('Warranty is a number of months, up to 600.');
             return 0;
         }
         $set[] = 'product_warranty_months = ' . intval($raw);
@@ -285,7 +285,7 @@ function productSave(array $in, $product_id = 0, &$error = '', $source = 'edit')
 
 /** Where a price change came from => label. */
 function productPriceSources() {
-    return ['edit' => 'Edited', 'import' => 'Imported', 'receive' => 'Stock received'];
+    return ['edit' => _x('Edited', 'price change'), 'import' => _x('Imported', 'price change'), 'receive' => __('Stock received')];
 }
 
 /** Put a change to a product's price or cost in its history - $old is the product before. */
@@ -422,17 +422,29 @@ function productUsage($product_id) {
 /** Kinds of stock move => label, icon and tone. */
 function productStockTypes() {
     return [
-        'received' => ['label' => 'Received', 'icon' => 'fa-dolly', 'tone' => 'success'],
-        'sold' => ['label' => 'Sold', 'icon' => 'fa-file-invoice-dollar', 'tone' => 'primary'],
-        'returned' => ['label' => 'Returned', 'icon' => 'fa-undo', 'tone' => 'info'],
-        'adjusted' => ['label' => 'Counted', 'icon' => 'fa-clipboard-check', 'tone' => 'secondary'],
-        'written_off' => ['label' => 'Written off', 'icon' => 'fa-minus-circle', 'tone' => 'danger'],
+        'received' => ['label' => _x('Received', 'stock move'), 'icon' => 'fa-dolly', 'tone' => 'success'],
+        'sold' => ['label' => _x('Sold', 'stock move'), 'icon' => 'fa-file-invoice-dollar', 'tone' => 'primary'],
+        'returned' => ['label' => _x('Returned', 'stock move'), 'icon' => 'fa-undo', 'tone' => 'info'],
+        'adjusted' => ['label' => _x('Counted', 'stock move'), 'icon' => 'fa-clipboard-check', 'tone' => 'secondary'],
+        'written_off' => ['label' => _x('Written off', 'stock move'), 'icon' => 'fa-minus-circle', 'tone' => 'danger'],
     ];
 }
 
 /** Why stock is written off. */
 function productWriteOffReasons() {
-    return ['Damaged', 'Lost or stolen', 'Used by us', 'Sent back to the vendor', 'Other'];
+    return ['Damaged', 'Lost or stolen', 'Used by us', 'Sent back to the vendor', 'Other']; // i18n-ignore - stored values, or the stock history
+}
+
+/** A write-off reason (stored in English) in the interface language. */
+function productWriteOffReasonLabel($reason) {
+    $labels = [
+        'Damaged' => _x('Damaged', 'write-off reason'),
+        'Lost or stolen' => __('Lost or stolen'),
+        'Used by us' => __('Used by us'),
+        'Sent back to the vendor' => __('Sent back to the vendor'),
+        'Other' => _x('Other', 'write-off reason'),
+    ];
+    return $labels[$reason] ?? $reason;
 }
 
 /** What is on the shelf now. */
@@ -499,19 +511,19 @@ function productReorderCheck($product_id, $before, $after) {
     $level = floatval($product['product_reorder_level']);
     $name = $product['product_name'];
     if ($after <= 0 && $before > 0) {
-        $text = "$name is out of stock";
+        $text = __('%s is out of stock', $name);
     } elseif ($level > 0 && $before > $level && $after <= $level) {
-        $text = "$name is down to " . billingQuantity($after) . " - reorder at " . billingQuantity($level);
+        $text = __('%1$s is down to %2$s - reorder at %3$s', $name, billingQuantity($after), billingQuantity($level));
     } else {
         return;
     }
     if (floatval($product['product_reorder_qty']) > 0) {
-        $text .= ', order ' . billingQuantity($product['product_reorder_qty']);
+        $text .= __(', order %s', billingQuantity($product['product_reorder_qty']));
     }
     if ($product['vendor_name']) {
-        $text .= ' from ' . $product['vendor_name'];
+        $text .= __(' from %s', $product['vendor_name']);
     }
-    appNotify('Low Stock', escapeSql($text), 'product.php?product_id=' . intval($product['product_id']), 0, intval($product['product_id']));
+    appNotify('Low Stock', escapeSql($text), 'product.php?product_id=' . intval($product['product_id']), 0, intval($product['product_id'])); // i18n-ignore - stored values, or the stock history
 }
 
 /**
@@ -552,7 +564,7 @@ function productStockShortfall(array $items) {
     while ($row = mysqli_fetch_assoc($sql)) {
         $want = round($needed[intval($row['product_id'])], 2);
         if (floatval($row['on_hand']) < $want) {
-            return 'Not enough ' . $row['product_name'] . ' in stock - ' . billingQuantity($row['on_hand']) . ' left, ' . billingQuantity($want) . ' needed.';
+            return __('Not enough %1$s in stock - %2$s left, %3$s needed.', $row['product_name'], billingQuantity($row['on_hand']), billingQuantity($want));
         }
     }
     return '';
@@ -773,14 +785,14 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
     $error = '';
     $invoice = billingRow('invoice', $invoice_id);
     if (!$invoice) {
-        $error = 'That invoice no longer exists.';
+        $error = __('That invoice no longer exists.');
         return null;
     }
     $invoice_id = intval($invoice['invoice_id']);
     $client_id = intval($invoice['client_id']);
     $number = billingNumber('invoice', $invoice);
     if ($invoice['invoice_status'] === 'Cancelled') {
-        $error = "$number is cancelled - nothing on it was sold.";
+        $error = __('%s is cancelled - nothing on it was sold.', $number);
         return null;
     }
     $date = substr((string) $invoice['invoice_date'], 0, 10);
@@ -806,7 +818,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
         $model = trim((string) ($line_in['model'] ?? $line['product_model']));
         $warranty = trim((string) ($line_in['warranty'] ?? ''));
         if ($warranty !== '' && (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $warranty) || !strtotime($warranty))) {
-            $error = "The warranty date for {$line['item_name']} isn't a date.";
+            $error = __('The warranty date for %s isn\'t a date.', $line['item_name']);
             return null;
         }
         foreach ($rows as $n => $row) {
@@ -814,7 +826,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
             if ($existing) {
                 $asset = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_invoice_item_id FROM assets WHERE asset_id = $existing AND asset_client_id = $client_id"));
                 if (!$asset || intval($asset['asset_invoice_item_id']) || isset($picked[$existing])) {
-                    $error = isset($picked[$existing]) ? "{$asset['asset_name']} is picked twice." : "An asset picked for {$line['item_name']} isn't one of {$invoice['client_name']}'s, or came from another sale.";
+                    $error = isset($picked[$existing]) ? __('%s is picked twice.', $asset['asset_name']) : __('An asset picked for %1$s isn\'t one of %2$s\'s, or came from another sale.', $line['item_name'], $invoice['client_name']);
                     return null;
                 }
                 $picked[$existing] = true;
@@ -823,7 +835,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
             }
             $name = trim((string) ($row['name'] ?? ''));
             if ($name === '') {
-                $error = "Each new asset needs a name - " . ($n + 1) . " of {$line['item_name']} has none.";
+                $error = __('Each new asset needs a name - %1$d of %2$s has none.', $n + 1, $line['item_name']);
                 return null;
             }
             $plan[] = ['line' => $line, 'existing' => 0, 'name' => mb_substr($name, 0, 200), 'serial' => mb_substr(trim((string) ($row['serial'] ?? '')), 0, 200),
@@ -831,7 +843,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
         }
     }
     if (!$plan) {
-        $error = "Nothing to add - every unit of hardware on $number is on {$invoice['client_name']}'s assets.";
+        $error = __('Nothing to add - every unit of hardware on %1$s is on %2$s\'s assets.', $number, $invoice['client_name']);
         return null;
     }
 
@@ -860,7 +872,7 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
                         asset_make = IF(asset_make = '', '$make', asset_make),
                         asset_model = IF(COALESCE(asset_model, '') = '', $model, asset_model)
                     WHERE asset_id = $asset_id");
-                $history = escapeSql(mb_substr("$by linked {$unit['name']} to $number, where it was sold", 0, 255));
+                $history = escapeSql(mb_substr("$by linked {$unit['name']} to $number, where it was sold", 0, 255)); // i18n-ignore - stored values, or the stock history
                 mysqli_query($mysqli, "INSERT INTO asset_history SET asset_history_status = COALESCE((SELECT asset_status FROM assets WHERE asset_id = $asset_id), ''), asset_history_description = '$history', asset_history_asset_id = $asset_id");
                 logAudit("Asset", "Edit", "$session_name linked asset $name to invoice $number_sql", $client_id, $asset_id);
                 $done['linked']++;
@@ -902,9 +914,9 @@ function productSaleAssets($invoice_id, array $lines, array $units, array $share
 /** The documents whose lines can follow a price change => label and icon. */
 function productRepriceKinds() {
     return [
-        'recurring' => ['label' => 'Recurring invoices', 'one' => 'Recurring invoice', 'icon' => 'fa-redo-alt'],
-        'invoice' => ['label' => 'Draft invoices', 'one' => 'Draft invoice', 'icon' => 'fa-file-invoice-dollar'],
-        'quote' => ['label' => 'Draft quotes', 'one' => 'Draft quote', 'icon' => 'fa-comment-dollar'],
+        'recurring' => ['label' => __('Recurring invoices'), 'one' => __('Recurring invoice'), 'icon' => 'fa-redo-alt'],
+        'invoice' => ['label' => __('Draft invoices'), 'one' => __('Draft invoice'), 'icon' => 'fa-file-invoice-dollar'],
+        'quote' => ['label' => __('Draft quotes'), 'one' => __('Draft quote'), 'icon' => 'fa-comment-dollar'],
     ];
 }
 
@@ -1038,12 +1050,12 @@ function productRepriceApply(array $changes, &$error = '') {
             JOIN products ON products.product_id = l.item_product_id
             WHERE l.kind = '$kind' AND l.item_id = $item_id AND products.product_archived_at IS NULL" . clientScopeSql('l.client_id')));
         if (!$line) {
-            $error = 'A line picked is no longer on a recurring invoice, draft or draft quote you can change - nothing was updated.';
+            $error = __('A line picked is no longer on a recurring invoice, draft or draft quote you can change - nothing was updated.');
             return null;
         }
         $price = billingNumberInput($raw);
         if ($price === null || $price < 0 || $price >= 1e11) {
-            $error = "The new price for {$line['item_name']} on {$line['number']} has to be a number, zero or more - nothing was updated.";
+            $error = __('The new price for %1$s on %2$s has to be a number, zero or more - nothing was updated.', $line['item_name'], $line['number']);
             return null;
         }
         if (round($price, 2) != round(floatval($line['item_price']), 2)) {
@@ -1051,7 +1063,7 @@ function productRepriceApply(array $changes, &$error = '') {
         }
     }
     if (!$plan) {
-        $error = 'Nothing to update - pick the lines to change, with a new price.';
+        $error = __('Nothing to update - pick the lines to change, with a new price.');
         return null;
     }
 
@@ -1138,10 +1150,11 @@ function billingMarginHtml($type, array $items, $currency, $period = '') {
     $lines = 0;
     foreach ($groups as $key => $group) {
         $lines += $group['lines'];
-        $when = $type === 'quote' ? ($key === '' ? ' up front' : ' a ' . recurringInvoicePeriodWord($key)) : ($period !== '' ? " a $period" : '');
+        $word = $type === 'quote' ? ($key === '' ? '' : recurringInvoicePeriodWord($key)) : (string) $period;
+        $when = $type === 'quote' && $key === '' ? ' ' . __('up front') : ($word !== '' ? ' ' . (['month' => __('a month'), 'quarter' => __('a quarter'), 'year' => __('a year')][$word] ?? "a $word") : '');
         $percent = $group['percent'] === null ? '' : ' <span class="text-body-secondary">(' . escapeHtml(rtrim(rtrim(number_format($group['percent'], 1), '0'), '.')) . '%)</span>';
         $tone = $group['margin'] < 0 ? 'text-danger-emphasis' : '';
         $parts[] = '<span class="' . $tone . '">' . escapeHtml(billingMoney($group['margin'], $currency)) . '</span>' . $percent . escapeHtml($when);
     }
-    return '<span title="On the ' . $lines . ' line' . ($lines === 1 ? '' : 's') . ' from products with a cost, at today\'s cost - only you see this">' . implode(', ', $parts) . '</span>';
+    return '<span title="' . escapeHtml(_n('On the %d line from products with a cost, at today\'s cost - only you see this', 'On the %d lines from products with a cost, at today\'s cost - only you see this', $lines)) . '">' . implode(', ', $parts) . '</span>';
 }

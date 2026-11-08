@@ -34,7 +34,7 @@ header("X-Robots-Tag: noindex, nofollow");
 function feedNotFound() {
     header("HTTP/1.1 404 Not Found");
     header("Content-Type: text/plain; charset=utf-8");
-    echo "Not found.";
+    echo "Not found."; // i18n-ignore - read by calendar apps
     exit();
 }
 
@@ -101,7 +101,7 @@ if ($calendar) {
 
     $items = calendarUserFeedItems($feed, $window_start, $window_end);
     $company = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT company_name FROM companies WHERE company_id = 1"));
-    $name = ($feed['feed_scope'] === 'everyone' ? 'Team schedule' : $feed['user_name']) . ' - ' . ($company['company_name'] ?? 'ITFlow');
+    $name = ($feed['feed_scope'] === 'everyone' ? __('Team schedule') : $feed['user_name']) . ' - ' . ($company['company_name'] ?? 'ITFlow');
 
     $ics = icsCalendar(['name' => $name], $items, $config_timezone);
     $filename = $name;

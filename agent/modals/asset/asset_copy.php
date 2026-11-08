@@ -17,7 +17,7 @@ $sql = mysqli_query($mysqli, "SELECT asset_client_id, asset_contact_id, asset_de
 
 $row = mysqli_fetch_assoc($sql);
 if (!$row) {
-    echo json_encode(['error' => 'That asset no longer exists.']);
+    echo json_encode(['error' => __('That asset no longer exists.')]);
     exit;
 }
 $client_id = intval($row['asset_client_id']);
@@ -70,7 +70,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class='fa fa-fw fa-<?= $device_icon ?> me-2'></i>Copying asset: <strong><?= $asset_name ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class='fa fa-fw fa-<?= $device_icon ?> me-2'></i><?= __('Copying asset:') ?> <strong><?= $asset_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -78,12 +78,12 @@ ob_start();
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
 
     <div class="modal-body ui-front">
-        <div class="alert alert-info small py-2"><i class="fas fa-info-circle me-2"></i>Serial, addresses, links, photo and details like an IMEI start empty - they belong to the unit you're copying.</div>
+        <div class="alert alert-info small py-2"><i class="fas fa-info-circle me-2"></i><?= __('Serial, addresses, links, photo and details like an IMEI start empty - they belong to the unit you\'re copying.') ?></div>
         <?php require 'asset_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create Copy</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create Copy') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

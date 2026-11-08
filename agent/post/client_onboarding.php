@@ -20,19 +20,19 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function clientOnboardingPostClient() {
     global $mysqli;
     if (!clientOnboardingReady()) {
-        flashAlert('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update', 'error');
+        flashAlert(__('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update'), 'error');
         redirect('/agent/clients.php');
     }
     enforceUserPermission('module_client', 2);
     $client_id = intval($_POST['client_id'] ?? 0);
     $client = $client_id ? mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT * FROM clients WHERE client_id = $client_id LIMIT 1")) : null;
     if (!$client) {
-        flashAlert('That client no longer exists.', 'error');
+        flashAlert(__('That client no longer exists.'), 'error');
         redirect('/agent/clients.php');
     }
     enforceClientAccess($client_id);
     if ($client['client_archived_at']) {
-        flashAlert('An archived client isn\'t onboarded - restore it first.', 'error');
+        flashAlert(__('An archived client isn\'t onboarded - restore it first.'), 'error');
         redirect("/agent/client_overview.php?client_id=$client_id");
     }
     clientOnboardingRow($client_id) ?? clientOnboardingStart($client_id);
@@ -56,7 +56,7 @@ if (isset($_POST['client_onboarding_company'])) {
         $client = clientOnboardingPostClient();
     } else {
         if (!clientOnboardingReady()) {
-            flashAlert('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update', 'error');
+            flashAlert(__('Onboarding a client needs the database update - ask an admin to run it from Maintenance &gt; Update'), 'error');
             redirect('/agent/clients.php');
         }
         enforceUserPermission('module_client', 2);
@@ -66,9 +66,9 @@ if (isset($_POST['client_onboarding_company'])) {
     $name = trim(preg_replace('/\s+/u', ' ', (string) ($_POST['name'] ?? '')));
     $errors = [];
     if ($name === '') {
-        $errors['name'] = 'The name you know them by.';
+        $errors['name'] = __('The name you know them by.');
     } elseif (mb_strlen($name) > 200) {
-        $errors['name'] = 'Up to 200 characters.';
+        $errors['name'] = __('Up to 200 characters.');
     }
     if ($errors) {
         $_SESSION['co_kept_tags'] = array_map('intval', (array) ($_POST['tags'] ?? []));
@@ -110,7 +110,7 @@ if (isset($_POST['client_onboarding_company'])) {
         }
         logAudit("Client", "Create", "$session_name created client $name_sql$extended", $client_id, $client_id);
         clientOnboardingStart($client_id);
-        flashAlert("Client <strong>" . escapeHtml($name) . "</strong> added - now where they work");
+        flashAlert(__('Client <strong>%s</strong> added - now where they work', escapeHtml($name)));
         clientOnboardingSaved($client_id, 'company');
     }
 
@@ -119,7 +119,7 @@ if (isset($_POST['client_onboarding_company'])) {
         client_abbreviation = '$abbreviation', client_notes = '$notes', client_lead = 0 WHERE client_id = $client_id");
     tagSetForRecord('client', $client_id, (array) ($_POST['tags'] ?? []));
     logAudit("Client", "Edit", "$session_name " . ($was_lead ? "made lead $name_sql a client" : "edited client $name_sql") . ", onboarding them", $client_id, $client_id);
-    flashAlert("<strong>" . escapeHtml($name) . "</strong> " . ($was_lead ? 'is a client now' : 'saved'));
+    flashAlert($was_lead ? __('<strong>%s</strong> is a client now', escapeHtml($name)) : __('<strong>%s</strong> saved', escapeHtml($name)));
     clientOnboardingSaved($client_id, 'company');
 
 }
@@ -133,7 +133,7 @@ if (isset($_POST['client_onboarding_location'])) {
 
     $set = locationFormSet($_POST, $client_id);
     if ($set === null) {
-        settingsRefuse('client_onboarding_locations', ['name' => 'Give it a name - Main office, say.'], clientOnboardingUrl($client_id, 'locations'));
+        settingsRefuse('client_onboarding_locations', ['name' => __('Give it a name - Main office, say.')], clientOnboardingUrl($client_id, 'locations'));
     }
     $first = !mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM locations WHERE location_client_id = $client_id AND location_archived_at IS NULL LIMIT 1"));
     mysqli_query($mysqli, "INSERT INTO locations SET $set, location_client_id = $client_id");
@@ -144,7 +144,8 @@ if (isset($_POST['client_onboarding_location'])) {
     $location_name = trim((string) $_POST['name']);
     logAudit("Location", "Create", "$session_name created location " . escapeSql($location_name) . ($first || !empty($_POST['primary']) ? ', the primary' : ''), $client_id, $location_id);
 
-    flashAlert("Location <strong>" . escapeHtml($location_name) . "</strong> added" . ($first ? ' as the primary' : (!empty($_POST['primary']) ? ', and made the primary' : '')) . " - add another, or carry on");
+    flashAlert($first ? __('Location <strong>%s</strong> added as the primary - add another, or carry on', escapeHtml($location_name))
+        : (!empty($_POST['primary']) ? __('Location <strong>%s</strong> added, and made the primary - add another, or carry on', escapeHtml($location_name)) : __('Location <strong>%s</strong> added - add another, or carry on', escapeHtml($location_name))));
     clientOnboardingSaved($client_id, 'locations', true);
 
 }
@@ -162,16 +163,16 @@ if (isset($_POST['client_onboarding_contact'])) {
     $portal = !empty($_POST['portal']) && intval($config_client_portal_enable) === 1 && portalMailReady();
     $errors = [];
     if ($name === '') {
-        $errors['name'] = 'Their name.';
+        $errors['name'] = __('Their name.');
     } elseif (mb_strlen($name) > 200) {
-        $errors['name'] = 'Up to 200 characters.';
+        $errors['name'] = __('Up to 200 characters.');
     }
     if ($email !== '' && (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 200)) {
-        $errors['email'] = "That isn't an email address.";
+        $errors['email'] = __("That isn't an email address.");
     } elseif ($portal && $email === '') {
-        $errors['email'] = 'Client portal access needs their email address - they sign in with it.';
+        $errors['email'] = __('Client portal access needs their email address - they sign in with it.');
     } elseif ($portal && mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM users WHERE user_email = '" . escapeSql($email) . "' AND user_archived_at IS NULL LIMIT 1"))) {
-        $errors['email'] = 'That address signs in already - an agent or another client\'s contact - so it can\'t be given portal access too. Leave portal access off, or use another address.';
+        $errors['email'] = __('That address signs in already - an agent or another client\'s contact - so it can\'t be given portal access too. Leave portal access off, or use another address.');
     }
     if ($errors) {
         settingsRefuse('client_onboarding_people', $errors, clientOnboardingUrl($client_id, 'people'));
@@ -212,8 +213,7 @@ if (isset($_POST['client_onboarding_contact'])) {
     logAudit("Contact", "Create", "$session_name created contact $name_sql" . ($primary ? ', the primary contact' : '') . ($invited ? ' and emailed a client portal invite' : ($portal ? ', with portal access' : '')), $client_id, $contact_id);
     triggerCustomAction('contact_create', $contact_id);
 
-    flashAlert("<strong>" . escapeHtml($name) . "</strong> added" . ($primary ? ' as the primary contact' : '')
-        . ($invited ? ' and emailed a link to the client portal' : ($invited === false ? ' - with portal access, but the email with their link could not be sent' : '')) . " - add someone else, or carry on", $invited === false ? 'warning' : 'success');
+    flashAlert(clientOnboardingPersonMessage(escapeHtml($name), $primary, $invited), $invited === false ? 'warning' : 'success');
     clientOnboardingSaved($client_id, 'people', true);
 
 }
@@ -225,7 +225,7 @@ if (isset($_POST['client_onboarding_agreement'])) {
     $client = clientOnboardingPostClient();
     $client_id = intval($client['client_id']);
     if (!contractClientPickReady()) {
-        flashAlert('Starting a contract needs Sales at Modify, with accounting on.', 'error');
+        flashAlert(__('Starting a contract needs Sales at Modify, with accounting on.'), 'error');
         redirect(clientOnboardingUrl($client_id, 'agreement'));
     }
 
@@ -240,12 +240,12 @@ if (isset($_POST['client_onboarding_agreement'])) {
         $signer = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_email FROM contacts
             WHERE contact_id = " . intval($_POST['signer_id'] ?? 0) . " AND contact_client_id = $client_id AND contact_archived_at IS NULL"));
         if (!$signer || !filter_var(trim((string) $signer['contact_email']), FILTER_VALIDATE_EMAIL)) {
-            $errors['signer_id'] = 'Pick who signs it - one of their people with an email address.';
+            $errors['signer_id'] = __('Pick who signs it - one of their people with an email address.');
         }
     }
     $template = contractTemplateRow($_POST['template_id'] ?? 0);
     if (!$template || $template['contract_template_archived_at']) {
-        $errors['template_id'] = 'Pick a template.';
+        $errors['template_id'] = __('Pick a template.');
     }
     if ($errors) {
         settingsRefuse('client_onboarding_agreement', $errors, clientOnboardingUrl($client_id, 'agreement'));
@@ -256,11 +256,11 @@ if (isset($_POST['client_onboarding_agreement'])) {
         settingsRefuse('client_onboarding_agreement', [stripos($error, 'date') !== false ? 'start' : 'template_id' => $error], clientOnboardingUrl($client_id, 'agreement'));
     }
     $row = contractRow($contract_id);
-    logAudit("Contract", "Create", "$session_name added " . ($send ? 'draft' : 'active') . " contract " . escapeSql($row['contract_name']) . " (" . escapeSql(contractTypeLabel($row['contract_type'])) . ") from "
+    logAudit("Contract", "Create", "$session_name added " . ($send ? 'draft' : 'active') . " contract " . escapeSql($row['contract_name']) . " (" . escapeSql(i18nEnglish(fn () => contractTypeLabel($row['contract_type']))) . ") from "
         . escapeSql($row['contract_start_date']) . ($row['contract_end_date'] ? " to " . escapeSql($row['contract_end_date']) : '') . ", from its template, onboarding the client", $client_id, $contract_id);
     clientOnboardingMade($client_id, 'contract', $contract_id);
 
-    $message = "Contract <strong>" . escapeHtml($row['contract_name']) . "</strong> started";
+    $message = __('Contract <strong>%s</strong> started', escapeHtml($row['contract_name']));
     $tone = 'success';
     if ($send) {
         $note = mb_substr(trim((string) ($_POST['note'] ?? '')), 0, 2000);
@@ -269,7 +269,7 @@ if (isset($_POST['client_onboarding_agreement'])) {
         if ($queued) {
             $message .= " and sent to <strong>" . escapeHtml($signer['contact_name']) . "</strong> to sign - it is a draft until you countersign it";
         } else {
-            $message .= " - it is ready to sign, but nothing was emailed as mail isn't set up. Copy its signing link from the contract and send it yourself";
+            $message .= ' - ' . __("it is ready to sign, but nothing was emailed as mail isn't set up. Copy its signing link from the contract and send it yourself");
             $tone = 'warning';
         }
     } else {
@@ -293,7 +293,7 @@ if (isset($_POST['client_onboarding_billing'])) {
     if (!empty($_POST['recurring']) && contractBillingReady() && lookupUserPermission('module_sales') >= 2) {
         $contract = clientOnboardingContract($client_id);
         if (!$contract || contractRecurringRow($contract) || (!contractRecurringShouldRun($contract) && $contract['contract_status'] !== 'Draft')) {
-            flashAlert("There's no agreement to bill now - it may have a recurring invoice already, or have ended.", 'error');
+            flashAlert(__('There\'s no agreement to bill now - it may have a recurring invoice already, or have ended.'), 'error');
             redirect(clientOnboardingUrl($client_id, 'billing'));
         }
         [$recurring, $error] = contractRecurringFromInput([
@@ -327,13 +327,14 @@ if (isset($_POST['client_onboarding_billing'])) {
     $client_name_sql = escapeSql($client['client_name']);
     logAudit("Client", "Edit", "$session_name set the billing of client $client_name_sql, onboarding them", $client_id, $client_id);
 
-    $message = "Billing saved";
+    $message = __('Billing saved');
     if ($recurring) {
         [$recurring_id, $number, $state] = contractRecurringCreate($contract, $recurring, stripslashes($session_name));
         logAudit("Contract", "Edit", "$session_name made recurring invoice " . escapeSql($number) . " for contract " . escapeSql($contract['contract_name']), $client_id, intval($contract['contract_id']));
         clientOnboardingMade($client_id, 'recurring_invoice', $recurring_id);
-        $message .= ", and recurring invoice <strong>" . escapeHtml($number) . "</strong> made for <strong>" . escapeHtml($contract['contract_name']) . "</strong>"
-            . ($state === 'started' ? ' - the first invoice is on ' . date('M j, Y', strtotime($recurring['start'])) : ' - paused until the contract is active');
+        $message = $state === 'started'
+            ? __('Billing saved, and recurring invoice <strong>%1$s</strong> made for <strong>%2$s</strong> - the first invoice is on %3$s', escapeHtml($number), escapeHtml($contract['contract_name']), formatDate($recurring['start'], 'date'))
+            : __('Billing saved, and recurring invoice <strong>%1$s</strong> made for <strong>%2$s</strong> - paused until the contract is active', escapeHtml($number), escapeHtml($contract['contract_name']));
     }
     flashAlert($message);
     clientOnboardingSaved($client_id, 'billing');
@@ -363,7 +364,7 @@ if (isset($_POST['client_onboarding_it'])) {
     }
     if ($bad) {
         $_SESSION['co_kept_it'] = ['vendor_templates' => (array) ($_POST['vendor_templates'] ?? []), 'license_templates' => (array) ($_POST['license_templates'] ?? [])];
-        settingsRefuse('client_onboarding_it', ['domains' => 'Not domain names: ' . implode(', ', $bad) . ' - something like example.com.'], clientOnboardingUrl($client_id, 'it'));
+        settingsRefuse('client_onboarding_it', ['domains' => __('Not domain names: %s - something like example.com.', implode(', ', $bad))], clientOnboardingUrl($client_id, 'it'));
     }
 
     set_time_limit(0);
@@ -416,14 +417,13 @@ if (isset($_POST['client_onboarding_it'])) {
         }
     }
 
-    $parts = [];
-    foreach (['domains' => 'domain', 'vendors' => 'vendor', 'licenses' => 'license'] as $key => $word) {
-        if ($made[$key]) {
-            $parts[] = '<strong>' . $made[$key] . '</strong> ' . $word . ($made[$key] === 1 ? '' : 's');
-        }
-    }
+    $parts = array_filter([
+        $made['domains'] ? _n('<strong>%d</strong> domain', '<strong>%d</strong> domains', $made['domains']) : '',
+        $made['vendors'] ? _n('<strong>%d</strong> vendor', '<strong>%d</strong> vendors', $made['vendors']) : '',
+        $made['licenses'] ? _n('<strong>%d</strong> license', '<strong>%d</strong> licenses', $made['licenses']) : '',
+    ]);
     $last = array_pop($parts);
-    flashAlert($last === null ? 'Nothing new to add - IT basics saved' : 'Added ' . ($parts ? implode(', ', $parts) . ' and ' : '') . $last);
+    flashAlert($last === null ? __('Nothing new to add - IT basics saved') : ($parts ? __('Added %1$s and %2$s', implode(', ', $parts), $last) : __('Added %s', $last)));
     clientOnboardingSaved($client_id, 'it');
 
 }
@@ -435,7 +435,7 @@ if (isset($_POST['client_onboarding_kickoff'])) {
     $client = clientOnboardingPostClient();
     $client_id = intval($client['client_id']);
     if (intval($config_module_enable_ticketing) !== 1 || lookupUserPermission('module_support') < 2) {
-        flashAlert('Starting a project needs Support at Modify, with ticketing on.', 'error');
+        flashAlert(__('Starting a project needs Support at Modify, with ticketing on.'), 'error');
         redirect(clientOnboardingUrl($client_id, 'kickoff'));
     }
 
@@ -444,10 +444,10 @@ if (isset($_POST['client_onboarding_kickoff'])) {
     $due = projectDateSql($_POST['due'] ?? '');
     $errors = [];
     if ($name === '') {
-        $errors['name'] = 'A project needs a name.';
+        $errors['name'] = __('A project needs a name.');
     }
     if ($start !== 'NULL' && $due !== 'NULL' && $due < $start) {
-        $errors['due'] = 'The due date is before the start.';
+        $errors['due'] = __('The due date is before the start.');
     }
     if ($errors) {
         settingsRefuse('client_onboarding_kickoff', $errors, clientOnboardingUrl($client_id, 'kickoff'));
@@ -471,7 +471,9 @@ if (isset($_POST['client_onboarding_kickoff'])) {
     logAudit("Project", "Create", "$session_name created project " . escapeSql(projectReference($row)) . " - $name_sql, onboarding the client", $client_id, $project_id);
     clientOnboardingMade($client_id, 'project', $project_id);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> started" . ($raised ? " with <strong>$raised</strong> ticket" . ($raised === 1 ? '' : 's') . " from the template" : ''));
+    $project_label = escapeHtml(projectReference($row) . ' - ' . $row['project_name']);
+    flashAlert($raised ? _n('Project <strong>%2$s</strong> started with <strong>%1$d</strong> ticket from the template', 'Project <strong>%2$s</strong> started with <strong>%1$d</strong> tickets from the template', $raised, $raised, $project_label)
+        : __('Project <strong>%s</strong> started', $project_label));
     clientOnboardingSaved($client_id, 'kickoff');
 
 }
@@ -501,7 +503,7 @@ if (isset($_POST['client_onboarding_finish'])) {
     if (clientOnboardingFinish($client_id)) {
         logAudit("Client", "Finish", "$session_name finished onboarding client " . escapeSql($client['client_name']), $client_id, $client_id);
     }
-    flashAlert("Onboarding <strong>" . escapeHtml($client['client_name']) . "</strong> finished - it is in the client's menu if anything is left to do");
+    flashAlert(__('Onboarding <strong>%s</strong> finished - it is in the client\'s menu if anything is left to do', escapeHtml($client['client_name'])));
     redirect("/agent/client_overview.php?client_id=$client_id");
 
 }

@@ -71,7 +71,7 @@ if (!empty($_SESSION['alert_message'])) {
                          whole toast, and this button sits inside it. */ ?>
                 <button type="button"
                         class="btn-close <?= $alert_dark_text ? '' : 'btn-close-white' ?> me-2 m-auto"
-                        aria-label="Close"></button>
+                        aria-label="<?= escapeHtml(__('Close')) ?>"></button>
             </div>
             <div class="itflow-toast-progress"></div>
         </div>

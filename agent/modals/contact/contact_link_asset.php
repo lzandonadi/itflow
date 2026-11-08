@@ -20,7 +20,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i>Link Asset to <strong><?= $contact_name ?></strong></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i><?= __('Link Asset to %s', "<strong>$contact_name</strong>") ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -32,7 +32,7 @@ ob_start();
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
                 <select class="form-select select2" name="asset_id">
-                    <option value="">- Select an Asset -</option>
+                    <option value=""><?= __('- Select an Asset -') ?></option>
                     <?php
                     $sql_assets_select = mysqli_query($mysqli, "
                         SELECT asset_id, asset_name, asset_type, asset_make, asset_model
@@ -55,8 +55,8 @@ ob_start();
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="link_contact_to_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Link</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="link_contact_to_asset" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Link') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

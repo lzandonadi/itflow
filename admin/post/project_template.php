@@ -12,7 +12,7 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function projectTemplateName($project_template_id) {
     $name = getFieldById('project_templates', intval($project_template_id), 'project_template_name');
     if ($name === null || $name === '') {
-        flashAlert('That project template no longer exists.', 'error');
+        flashAlert(__('That project template no longer exists.'), 'error');
         redirect('project_templates.php');
     }
     return $name;
@@ -24,7 +24,7 @@ if (isset($_POST['add_project_template'])) {
 
     $name_input = trim((string) ($_POST['name'] ?? ''));
     if ($name_input === '') {
-        flashAlert('A project template needs a name.', 'error');
+        flashAlert(__('A project template needs a name.'), 'error');
         redirect();
     }
     $name = escapeSql(mb_substr($name_input, 0, 200));
@@ -36,7 +36,7 @@ if (isset($_POST['add_project_template'])) {
 
     logAudit("Project Template", "Create", "$session_name created project template $name", 0, $project_template_id);
 
-    flashAlert("Project template <strong>" . escapeHtml($name_input) . "</strong> created - now add its ticket templates");
+    flashAlert(__('Project template <strong>%s</strong> created - now add its ticket templates', escapeHtml($name_input)));
 
     redirect("project_template.php?project_template_id=$project_template_id");
 
@@ -51,7 +51,7 @@ if (isset($_POST['edit_project_template'])) {
 
     $name_input = trim((string) ($_POST['name'] ?? ''));
     if ($name_input === '') {
-        flashAlert('A project template needs a name.', 'error');
+        flashAlert(__('A project template needs a name.'), 'error');
         redirect();
     }
     $name = escapeSql(mb_substr($name_input, 0, 200));
@@ -61,7 +61,7 @@ if (isset($_POST['edit_project_template'])) {
 
     logAudit("Project Template", "Edit", "$session_name edited project template $name", 0, $project_template_id);
 
-    flashAlert("Project template <strong>" . escapeHtml($name_input) . "</strong> saved");
+    flashAlert(__('Project template <strong>%s</strong> saved', escapeHtml($name_input)));
 
     redirect();
 
@@ -108,7 +108,7 @@ if (isset($_POST['add_ticket_template_to_project_template'])) {
 
     logAudit("Project Template", "Edit", "$session_name added $added ticket template" . ($added === 1 ? '' : 's') . " to project template $name", 0, $project_template_id);
 
-    flashAlert("<strong>$added</strong> ticket template" . ($added === 1 ? '' : 's') . " added");
+    flashAlert(($added === 1 ? __('<strong>%s</strong> ticket template added', $added) : __('<strong>%s</strong> ticket templates added', $added)));
 
     redirect();
 
@@ -126,7 +126,7 @@ if (isset($_POST['remove_ticket_template_from_project_template'])) {
 
     logAudit("Project Template", "Edit", "$session_name removed a ticket template from project template $name", 0, $project_template_id);
 
-    flashAlert("Ticket template taken out of the project template", 'error');
+    flashAlert(__('Ticket template taken out of the project template'), 'error');
 
     redirect();
 
@@ -144,7 +144,7 @@ if (isset($_GET['archive_project_template']) || isset($_GET['restore_project_tem
 
     logAudit("Project Template", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " project template " . escapeSql($name), 0, $project_template_id);
 
-    flashAlert("Project template <strong>" . escapeHtml($name) . "</strong> " . ($archive ? 'archived - it is no longer offered on New Project' : 'restored'), $archive ? 'error' : 'success');
+    flashAlert(($archive ? __('Project template <strong>%s</strong> archived - it is no longer offered on New Project', escapeHtml($name)) : __('Project template <strong>%s</strong> restored', escapeHtml($name))), $archive ? 'error' : 'success');
 
     redirect();
 
@@ -167,7 +167,7 @@ if (isset($_GET['duplicate_project_template'])) {
 
     logAudit("Project Template", "Create", "$session_name duplicated project template " . escapeSql($name), 0, $copy_id);
 
-    flashAlert("Project template <strong>" . escapeHtml($name) . "</strong> duplicated");
+    flashAlert(__('Project template <strong>%s</strong> duplicated', escapeHtml($name)));
 
     redirect("project_template.php?project_template_id=$copy_id");
 
@@ -185,7 +185,7 @@ if (isset($_GET['delete_project_template'])) {
 
     logAudit("Project Template", "Delete", "$session_name deleted project template " . escapeSql($name), 0, $project_template_id);
 
-    flashAlert("Project template <strong>" . escapeHtml($name) . "</strong> deleted - its ticket templates stay", 'error');
+    flashAlert(__('Project template <strong>%s</strong> deleted - its ticket templates stay', escapeHtml($name)), 'error');
 
     // Its own page is gone
     redirect(strpos((string) ($_SERVER['HTTP_REFERER'] ?? ''), 'project_template.php') !== false ? 'project_templates.php' : null);

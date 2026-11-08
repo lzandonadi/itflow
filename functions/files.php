@@ -491,10 +491,30 @@ function fileTypeInfo($extension) {
     ];
     foreach ($kinds as [$tone, $extensions, $icon, $label]) {
         if (in_array($extension, $extensions, true)) {
-            return ['tone' => $tone, 'icon' => $icon, 'label' => $label];
+            return ['tone' => $tone, 'icon' => $icon, 'label' => fileTypeLabel($label)];
         }
     }
-    return ['tone' => 'other', 'icon' => getFileIcon($extension), 'label' => $extension !== '' ? strtoupper($extension) . ' file' : 'File'];
+    return ['tone' => 'other', 'icon' => getFileIcon($extension), 'label' => $extension !== '' ? __('%s file', strtoupper($extension)) : __('File')];
+}
+
+/** fileTypeInfo()'s kind label ('Spreadsheet', 'Config / script') in the interface language. */
+function fileTypeLabel($label) {
+    $labels = [
+        'PDF' => 'PDF',
+        'Word' => 'Word',
+        'Spreadsheet' => _x('Spreadsheet', 'file type'),
+        'Presentation' => _x('Presentation', 'file type'),
+        'Image' => _x('Image', 'file type'),
+        'Video' => _x('Video', 'file type'),
+        'Audio' => _x('Audio', 'file type'),
+        'Archive' => _x('Archive', 'file type'),
+        'Text' => _x('Text', 'file type'),
+        'Email' => _x('Email', 'file type'),
+        'Config / script' => _x('Config / script', 'file type'),
+        'Diagram' => _x('Diagram', 'file type'),
+        'Certificate / key' => _x('Certificate / key', 'file type'),
+    ];
+    return $labels[$label] ?? $label;
 }
 
 /** A file's type as a coloured tile - the files list, linked items, the quick look. $size is '', 'sm' or 'lg'. */
@@ -505,7 +525,7 @@ function fileTypeTile($extension, $size = '') {
 
 /** A created document's tile, in the same family as fileTypeTile(). */
 function documentTile($size = '') {
-    return '<span class="itflow-file-icon itflow-file-tone-document' . ($size ? " itflow-file-icon-$size" : '') . '" title="Document" aria-hidden="true"><i class="fas fa-fw fa-file-alt"></i></span>';
+    return '<span class="itflow-file-icon itflow-file-tone-document' . ($size ? " itflow-file-icon-$size" : '') . '" title="' . escapeHtml(__('Document')) . '" aria-hidden="true"><i class="fas fa-fw fa-file-alt"></i></span>';
 }
 
 /**
@@ -572,7 +592,7 @@ function folderOptionsHtml($client_id, $selected = 0, $exclude = 0) {
     $tree = folderTree($client_id);
     $skip = $exclude ? array_flip(folderSubtree($tree, $exclude)) : [];
     $selected = intval($selected);
-    $html = '<option value="0"' . ($selected === 0 ? ' selected' : '') . selectOptionData(['icon' => 'fas fa-home']) . '>Top level</option>';
+    $html = '<option value="0"' . ($selected === 0 ? ' selected' : '') . selectOptionData(['icon' => 'fas fa-home']) . '>' . __('Top level') . '</option>';
     $walk = function ($parent_id, $depth) use (&$walk, $tree, $skip, $selected, &$html) {
         foreach ($tree[$parent_id]['children'] as $folder_id) {
             if (isset($skip[$folder_id])) {
@@ -603,7 +623,7 @@ function folderOwnedId($folder_id, $client_id) {
 /** A folder's name for messages and logs - "Top level" for the root. Raw. */
 function folderDisplayName($folder_id) {
     $folder_id = intval($folder_id);
-    return $folder_id ? (string) getFieldById('folders', $folder_id, 'folder_name') : 'Top level';
+    return $folder_id ? (string) getFieldById('folders', $folder_id, 'folder_name') : __('Top level');
 }
 
 /*

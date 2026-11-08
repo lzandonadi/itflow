@@ -17,10 +17,10 @@ ob_start();
 
 if (!$template || $template['document_template_archived_at']) { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-copy me-2"></i>New documents</h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-copy me-2"></i><?= __('New documents') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
-    <div class="modal-body text-center text-secondary py-5">That document template is gone or archived.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That document template is gone or archived.') ?></div>
 <?php } else {
     $document_template_id = intval($template['document_template_id']);
     $picked = [];
@@ -34,7 +34,7 @@ if (!$template || $template['document_template_archived_at']) { ?>
     ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-copy me-2"></i>New documents from <strong><?= escapeHtml($template['document_template_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-copy me-2"></i><?= __('New documents from') ?> <strong><?= escapeHtml($template['document_template_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -43,10 +43,10 @@ if (!$template || $template['document_template_archived_at']) { ?>
 
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Clients <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Clients') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-                <select class="form-select select2" name="client_ids[]" multiple required data-placeholder="- Pick clients -">
+                <select class="form-select select2" name="client_ids[]" multiple required data-placeholder="<?= escapeHtml(__('- Pick clients -')) ?>">
                     <?php
                     $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name, client_lead FROM clients WHERE client_archived_at IS NULL ORDER BY client_name ASC");
                     while ($row = mysqli_fetch_assoc($sql_clients)) { ?>
@@ -55,27 +55,27 @@ if (!$template || $template['document_template_archived_at']) { ?>
                 </select>
             </div>
             <?php if (!empty($_GET['missing'])) { ?>
-                <div class="form-text"><?= $picked ? 'The ' . count($picked) . ' client' . (count($picked) === 1 ? '' : 's') . ' it is required of with none yet.' : 'Every client it is required of has one.' ?></div>
+                <div class="form-text"><?= $picked ? escapeHtml(_n('The %d client it is required of with none yet.', 'The %d clients it is required of with none yet.', count($picked))) : __('Every client it is required of has one.') ?></div>
             <?php } ?>
         </div>
 
         <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" role="switch" name="skip_existing" value="1" id="documentTemplateSkipExisting" checked>
-            <label class="form-check-label" for="documentTemplateSkipExisting">Skip clients that already have one</label>
+            <label class="form-check-label" for="documentTemplateSkipExisting"><?= __('Skip clients that already have one') ?></label>
         </div>
 
         <?php if ($used['placeholder'] || $used['table']) { ?>
             <div class="small text-secondary mb-3">
-                <i class="fas fa-fw fa-magic me-1"></i>Each is filled in from its own client: <span class="font-monospace"><?= escapeHtml(implode(' ', array_map(function ($word) {
+                <i class="fas fa-fw fa-magic me-1"></i><?= __('Each is filled in from its own client:') ?> <span class="font-monospace"><?= escapeHtml(implode(' ', array_map(function ($word) {
                     return "[$word]";
-                }, array_values($used['placeholder'] + $used['table'])))) ?></span><?= $from_client ? ' - with its primary site and contact' : '' ?>.
+                }, array_values($used['placeholder'] + $used['table'])))) ?></span><?= $from_client ? __(' - with its primary site and contact') : '' ?>.
             </div>
         <?php } ?>
 
         <?php if ($fill_ins) { ?>
             <div class="border rounded p-3 bg-body-tertiary mb-3">
-                <div class="fw-semibold mb-1"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i>It asks for</div>
-                <div class="small text-secondary mb-2">Answered once, for every one of them. Leave one blank to fill it in on each document later.</div>
+                <div class="fw-semibold mb-1"><i class="fas fa-fw fa-pen-square text-secondary me-1"></i><?= __('It asks for') ?></div>
+                <div class="small text-secondary mb-2"><?= __('Answered once, for every one of them. Leave one blank to fill it in on each document later.') ?></div>
                 <div class="row g-2">
                     <?php foreach ($fill_ins as $fill_in) { ?>
                         <div class="col-md-6"><?= ticketFillInFieldHtml($fill_in, '') ?></div>
@@ -84,11 +84,11 @@ if (!$template || $template['document_template_archived_at']) { ?>
             </div>
         <?php } ?>
 
-        <small class="text-secondary">Each goes in its client's Files at the top level, named and summed up as the template is.</small>
+        <small class="text-secondary"><?= __('Each goes in its client\'s Files at the top level, named and summed up as the template is.') ?></small>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="make_documents_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="make_documents_from_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

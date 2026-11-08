@@ -26,7 +26,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i>Update & Reply <strong><?= $count ?></strong> ticket<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-paper-plane me-2"></i><?= _n('Update &amp; Reply <strong>%d</strong> ticket', 'Update &amp; Reply <strong>%d</strong> tickets', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -45,7 +45,7 @@ ob_start();
                 <?php $sql_ticket_status = mysqli_query($mysqli, "SELECT ticket_status_id, ticket_status_name, ticket_status_color FROM ticket_statuses WHERE ticket_status_id != 1 AND ticket_status_id != 5 AND ticket_status_active = 1");
                 while ($row = mysqli_fetch_assoc($sql_ticket_status)) {
                     $ticket_status_id_select = intval($row['ticket_status_id']);
-                    $ticket_status_name_select = escapeHtml($row['ticket_status_name']); ?>
+                    $ticket_status_name_select = escapeHtml(ticketStatusLabel($ticket_status_id_select, $row['ticket_status_name'])); ?>
 
                     <option value="<?= $ticket_status_id_select ?>"<?= selectOptionColor($row['ticket_status_color'] ?? '') ?>> <?= $ticket_status_name_select ?> </option>
 
@@ -57,16 +57,16 @@ ob_start();
         <?php require __DIR__ . '/../../includes/inc_canned_response_picker.php'; ?>
 
         <div class="mb-1">
-            <textarea class="form-control tinymce" rows="5" id="bulkReplyDetails" name="bulk_reply_details" placeholder="Type an update here"<?= $canned_picker_groups ? ' data-canned-picker="cannedPickerBulk"' : '' ?>></textarea>
+            <textarea class="form-control tinymce" rows="5" id="bulkReplyDetails" name="bulk_reply_details" placeholder="<?= escapeHtml(__('Type an update here')) ?>"<?= $canned_picker_groups ? ' data-canned-picker="cannedPickerBulk"' : '' ?>></textarea>
         </div>
-        <div class="small text-secondary mb-3">[First Name], [Ticket], [Subject] and the other placeholders are filled in for each ticket as it is sent.</div>
+        <div class="small text-secondary mb-3"><?= __('[First Name], [Ticket], [Subject] and the other placeholders are filled in for each ticket as it is sent.') ?></div>
 
         <div class="col-3">
             <div class="mb-3">
-                <label>Time worked</label>
+                <label><?= __('Time worked') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-stopwatch"></i></span>
-                    <input class="form-control timepicker" id="time_worked" name="time" type="text" placeholder="HH:MM:SS" pattern="([01]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])" value="00:01:00" required/>
+                    <input class="form-control timepicker" id="time_worked" name="time" type="text" placeholder="<?= escapeHtml(__('HH:MM:SS')) ?>" pattern="([01]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])" value="00:01:00" required/>
                 </div>
             </div>
         </div>
@@ -74,15 +74,15 @@ ob_start();
         <div class="mb-3">
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="bulkPrivateReplyCheckbox" name="bulk_private_reply" value="1">
-                <label class="form-check-label" for="bulkPrivateReplyCheckbox">Mark as internal</label>
-                <small class="form-text text-muted">Only agents see it.</small>
+                <label class="form-check-label" for="bulkPrivateReplyCheckbox"><?= __('Mark as internal') ?></label>
+                <small class="form-text text-muted"><?= __('Only agents see it.') ?></small>
             </div>
         </div>
 
     </div>
     <div class="modal-footer">
-        <button type="submit" name="bulk_ticket_reply" class="btn btn-primary text-bold"><i class="fas fa-paper-plane me-2"></i>Update & Reply</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_ticket_reply" class="btn btn-primary text-bold"><i class="fas fa-paper-plane me-2"></i><?= __('Update & Reply') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

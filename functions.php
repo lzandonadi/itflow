@@ -11,6 +11,7 @@ DEFINE("MAX_EMAIL_ATTACHMENT_BYTES", 10 * 1024 * 1024);
 // functions.php is now a loader. Helper functions live in topical files
 // under functions/ - see each file's header comment for scope.
 
+require_once __DIR__ . '/functions/i18n.php';
 require_once __DIR__ . '/functions/security.php';
 require_once __DIR__ . '/functions/sanitize.php';
 require_once __DIR__ . '/functions/format.php';

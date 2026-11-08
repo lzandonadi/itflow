@@ -12,7 +12,7 @@ enforceBillingMoney('take');
 $invoice_id = intval($_GET['id'] ?? 0);
 $invoice = billingRow('invoice', $invoice_id);
 if (!$invoice) {
-    exit(json_encode(['error' => 'That invoice no longer exists.']));
+    exit(json_encode(['error' => __('That invoice no longer exists.')]));
 }
 $client_id = intval($invoice['client_id']);
 enforceClientAccess();
@@ -26,14 +26,14 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $cards[] = $row;
 }
 if (!$cards) {
-    exit(json_encode(['error' => $invoice['client_name'] . ' has no card on file with a payment provider that is turned on.']));
+    exit(json_encode(['error' => __('%s has no card on file with a payment provider that is turned on.', $invoice['client_name'])]));
 }
 
 ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-wallet me-2"></i>Charge Saved Card <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $invoice)) ?> &middot; <?= escapeHtml($invoice['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-wallet me-2"></i><?= __('Charge Saved Card') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml(billingNumber('invoice', $invoice)) ?> &middot; <?= escapeHtml($invoice['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -42,10 +42,10 @@ ob_start();
 
     <div class="modal-body">
         <div class="text-center p-3 mb-3 rounded bg-body-tertiary">
-            <div class="itflow-billing-stat-label">Charging</div>
+            <div class="itflow-billing-stat-label"><?= __('Charging') ?></div>
             <div class="itflow-billing-stat-value"><?= escapeHtml(billingMoney($invoice['invoice_amount'], $invoice['invoice_currency_code'])) ?></div>
         </div>
-        <label class="form-label">Card <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Card') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
             <select class="form-select" name="saved_payment_id" required>
@@ -54,14 +54,14 @@ ob_start();
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">Charged straight away - the payment is recorded on the invoice and a receipt goes to the client.</div>
+        <div class="form-text"><?= __('Charged straight away - the payment is recorded on the invoice and a receipt goes to the client.') ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_payment_stripe" class="btn btn-success text-bold confirm-link" data-confirm-title="Charge the card?"
-            data-confirm-text="<?= escapeHtml(billingMoney($invoice['invoice_amount'], $invoice['invoice_currency_code'])) ?> is taken from the card now." data-confirm-button="Charge">
-            <i class="fas fa-bolt me-2"></i>Charge
+        <button type="submit" name="add_payment_stripe" class="btn btn-success text-bold confirm-link" data-confirm-title="<?= escapeHtml(__('Charge the card?')) ?>"
+            data-confirm-text="<?= escapeHtml(billingMoney($invoice['invoice_amount'], $invoice['invoice_currency_code'])) ?> is taken from the card now." data-confirm-button="<?= escapeHtml(__('Charge')) ?>">
+            <i class="fas fa-bolt me-2"></i><?= __('Charge') ?>
         </button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

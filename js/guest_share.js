@@ -57,15 +57,15 @@
             body: JSON.stringify(body)
         }).then(function (res) {
             return res.json().catch(function () {
-                return { error: 'Something went wrong - try again in a moment.' };
+                return { error: __('Something went wrong - try again in a moment.') };
             });
         }, function () {
-            return { error: 'Could not reach the server - check your connection and try again.' };
+            return { error: __('Could not reach the server - check your connection and try again.') };
         });
     }
 
     function gone(reason) {
-        $('[data-share-gone-reason]').textContent = reason || 'It may have expired, been used up or been turned off.';
+        $('[data-share-gone-reason]').textContent = reason || __('It may have expired, been used up or been turned off.');
         stopOtp();
         show('gone');
     }
@@ -93,7 +93,7 @@
         if (on) {
             button.dataset.label = button.innerHTML;
             button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>One moment...';
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>' + __('One moment...');
         } else if (button.dataset.label) {
             button.disabled = false;
             button.innerHTML = button.dataset.label;
@@ -109,7 +109,7 @@
         const write = typeof itflowCopyText === 'function'
             ? itflowCopyText(text, button)
             : navigator.clipboard.writeText(text);
-        write.then(function () { done('Copied!'); }, function () { done('Copy it by hand'); });
+        write.then(function () { done(__('Copied!')); }, function () { done(__('Copy it by hand')); });
     }
 
     // What the link is, and what it needs - nothing secret yet, and nothing used up
@@ -149,7 +149,7 @@
         $('[data-share-title]', ready).textContent = data.title;
         $('[data-share-intro]', ready).textContent = data.intro;
         $('[data-share-limits]', ready).textContent = data.limits;
-        $('[data-share-reveal-label]', ready).textContent = data.type === 'File' ? 'Download' : (data.type === 'Document' ? 'Open the document' : 'Reveal');
+        $('[data-share-reveal-label]', ready).textContent = data.type === 'File' ? __('Download') : (data.type === 'Document' ? __('Open the document') : __('Reveal'));
         $('[data-share-reveal]', ready).querySelector('i').className = 'fas me-2 ' + (data.type === 'File' ? 'fa-download' : 'fa-eye');
         $('[data-share-reveal-hint]', ready).textContent = data.hint || '';
         note(ready, data.note);
@@ -293,7 +293,7 @@
                     if (data.state === 'gone') {
                         gone(data.reason);
                     } else {
-                        error('ready', data.error || 'The file could not be downloaded.');
+                        error('ready', data.error || __('The file could not be downloaded.'));
                     }
                 });
             }
@@ -314,7 +314,7 @@
             });
         }, function () {
             busy(button, false);
-            error('ready', 'Could not reach the server - check your connection and try again.');
+            error('ready', __('Could not reach the server - check your connection and try again.'));
         });
     }
 
@@ -330,7 +330,7 @@
             const field = $('[data-share-otp]');
             const bar = $('[data-share-otp-bar]');
             if (!data.code) {
-                field.value = data.error ? 'Ended' : '------';
+                field.value = data.error ? __('Ended') : '------';
                 bar.style.width = '0%';
                 return;
             }
@@ -381,7 +381,7 @@
         e.preventDefault();
         const form = e.currentTarget;
         if (!form.username.value.trim() && !form.password.value) {
-            error('request', 'Fill in the username, the password, or both.');
+            error('request', __('Fill in the username, the password, or both.'));
             return;
         }
         const button = form.querySelector('button[type=submit]');
@@ -406,7 +406,7 @@
     });
 
     if (!id || !key) {
-        gone('The link is not complete - copy the whole of it from the email, including everything after the #.');
+        gone(__('The link is not complete - copy the whole of it from the email, including everything after the #.'));
         return;
     }
     post('open').then(open);

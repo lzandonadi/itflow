@@ -20,7 +20,7 @@ $client_id = reportClientId();
 $agent_id = reportAgentId();
 $billable_only = !empty($_GET['billable_only']);
 
-$increments = ['0.1' => [360, '6 minutes'], '0.25' => [900, '15 minutes'], '0.5' => [1800, '30 minutes']];
+$increments = ['0.1' => [360, __('6 minutes')], '0.25' => [900, __('15 minutes')], '0.5' => [1800, __('30 minutes')]];
 $increment_key = isset($increments[$_GET['billing_increment'] ?? '']) ? $_GET['billing_increment'] : '0.25';
 [$increment, $increment_label] = $increments[$increment_key];
 $default_rate = floatval($config_default_hourly_rate);
@@ -38,7 +38,7 @@ $sql = mysqli_query($mysqli, "
     AND " . reportRangeSql('ticket_reply_created_at', $period) . "
     " . reportClientSql('ticket_client_id', $client_id) . "
     " . ($agent_id ? "AND ticket_reply_by = $agent_id" : '') . "
-    " . ($billable_only ? "AND ticket_billable = 1" : '') . "
+    " . ($billable_only ? 'AND ticket_billable = 1' : '') . "
     ORDER BY client_name ASC, ticket_number ASC, ticket_reply_created_at ASC");
 
 // Client > ticket > replies, with rounded totals at each level
@@ -84,27 +84,27 @@ $ticket_count = array_sum(array_map(function ($c) { return count($c['tickets']);
 
 if (reportExporting()) {
     $columns = [
-        'client_name' => ['label' => 'Client'],
-        'ticket' => ['label' => 'Ticket', 'csv' => function ($row) { return ticketReference($row); }],
-        'ticket_subject' => ['label' => 'Subject'],
-        'date' => ['label' => 'Date', 'csv' => function ($row) { return date('Y-m-d H:i', strtotime($row['ticket_reply_created_at'])); }],
-        'user_name' => ['label' => 'Agent'],
-        'ticket_reply_type' => ['label' => 'Reply'],
-        'billable' => ['label' => 'Billable ticket', 'csv' => function ($row) { return intval($row['ticket_billable']) ? 'Yes' : 'No'; }],
-        'seconds' => ['label' => 'Hours', 'type' => 'hours'],
-        'billed' => ['label' => "Hours rounded up to {$increment_label}", 'type' => 'hours'],
-        'to_bill' => ['label' => 'Hours to bill', 'type' => 'hours'],
-        'rate' => ['label' => 'Rate', 'type' => 'money'],
-        'value' => ['label' => 'Value', 'type' => 'money'],
-        'text' => ['label' => 'Work done'],
+        'client_name' => ['label' => __('Client')],
+        'ticket' => ['label' => __('Ticket'), 'csv' => function ($row) { return ticketReference($row); }],
+        'ticket_subject' => ['label' => __('Subject')],
+        'date' => ['label' => __('Date'), 'csv' => function ($row) { return date('Y-m-d H:i', strtotime($row['ticket_reply_created_at'])); }],
+        'user_name' => ['label' => __('Agent')],
+        'ticket_reply_type' => ['label' => __('Reply')],
+        'billable' => ['label' => __('Billable ticket'), 'csv' => function ($row) { return intval($row['ticket_billable']) ? 'Yes' : 'No'; }],
+        'seconds' => ['label' => __('Hours'), 'type' => 'hours'],
+        'billed' => ['label' => __('Hours rounded up to %s', $increment_label), 'type' => 'hours'],
+        'to_bill' => ['label' => __('Hours to bill'), 'type' => 'hours'],
+        'rate' => ['label' => __('Rate'), 'type' => 'money'],
+        'value' => ['label' => __('Value'), 'type' => 'money'],
+        'text' => ['label' => __('Work done')],
     ];
-    reportCsv('Time Detail ' . $period['start'] . ' to ' . $period['end'], $columns, $replies, ['client_name' => 'Total', 'seconds' => $total_seconds, 'billed' => $total_billed, 'to_bill' => $total_to_bill, 'value' => $total_value]);
+    reportCsv('Time Detail ' . $period['start'] . ' to ' . $period['end'], $columns, $replies, ['client_name' => __('Total'), 'seconds' => $total_seconds, 'billed' => $total_billed, 'to_bill' => $total_to_bill, 'value' => $total_value]);
 }
 
 require_once "includes/inc_report_layout.php";
 
-$controls = reportSelectControl('billing_increment', $increment_key, ['0.1' => 'Round up to 6 minutes', '0.25' => 'Round up to 15 minutes', '0.5' => 'Round up to 30 minutes'], 'fa-stopwatch', '', 'col-sm-6 col-lg-auto')
-    . reportSwitchControl('billable_only', $billable_only, 'Billable tickets only');
+$controls = reportSelectControl('billing_increment', $increment_key, ['0.1' => __('Round up to 6 minutes'), '0.25' => __('Round up to 15 minutes'), '0.5' => __('Round up to 30 minutes')], 'fa-stopwatch', '', 'col-sm-6 col-lg-auto')
+    . reportSwitchControl('billable_only', $billable_only, __('Billable tickets only'));
 
 $hours = function ($seconds) {
     return number_format($seconds / 3600, 2);
@@ -122,14 +122,14 @@ $hours = function ($seconds) {
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Time logged', 'value' => reportHours($total_seconds, 2) . ' h', 'sub' => reportCount(count($replies)) . ' <span class="text-body-tertiary">replies on</span> ' . reportCount($ticket_count) . ' <span class="text-body-tertiary">tickets</span>'],
-        ['label' => 'To bill', 'value' => reportHours($total_to_bill, 2) . ' h', 'sub' => '<span class="text-body-tertiary">On billable tickets, each reply rounded up to ' . escapeHtml($increment_label) . '</span>'],
-        ['label' => 'Value', 'value' => reportMoney($total_value), 'sub' => '<span class="text-body-tertiary">The hours to bill at each client\'s rate</span>'],
-        ['label' => 'Clients', 'value' => reportCount(count($clients)), 'sub' => '<span class="text-body-tertiary">With time in the period</span>'],
+        ['label' => __('Time logged'), 'value' => reportHours($total_seconds, 2) . ' h', 'sub' => reportCount(count($replies)) . ' <span class="text-body-tertiary">' . __('replies on') . '</span> ' . reportCount($ticket_count) . ' <span class="text-body-tertiary">' . __('tickets') . '</span>'],
+        ['label' => __('To bill'), 'value' => reportHours($total_to_bill, 2) . ' h', 'sub' => '<span class="text-body-tertiary">' . __('On billable tickets, each reply rounded up to %s', escapeHtml($increment_label)) . '</span>'],
+        ['label' => __('Value'), 'value' => reportMoney($total_value), 'sub' => '<span class="text-body-tertiary">' . __('The hours to bill at each client\'s rate') . '</span>'],
+        ['label' => __('Clients'), 'value' => reportCount(count($clients)), 'sub' => '<span class="text-body-tertiary">' . __('With time in the period') . '</span>'],
     ]) ?>
 
     <?php if (!$replies) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty('No time was logged on ticket replies in this period.', 'fa-stopwatch', 'secondary') ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty(__('No time was logged on ticket replies in this period.'), 'fa-stopwatch', 'secondary') ?></div></div>
     <?php } ?>
 
     <?php foreach ($clients as $cid => $client) { ?>
@@ -140,7 +140,7 @@ $hours = function ($seconds) {
                     <?= count($client['tickets']) ?> ticket<?= count($client['tickets']) === 1 ? '' : 's' ?> ·
                     <?= $hours($client['seconds']) ?> h logged ·
                     <span class="text-body fw-semibold"><?= $hours($client['to_bill']) ?> h to bill</span>
-                    <?php if (count($client['rates']) > 1) { ?>· <span title="A contract's after-hours rate, or work on either side of a contract's start, makes more than one">rates vary</span> · <span class="text-body fw-semibold"><?= reportMoney($client['value']) ?></span>
+                    <?php if (count($client['rates']) > 1) { ?>· <span title="<?= escapeHtml(__('A contract\'s after-hours rate, or work on either side of a contract\'s start, makes more than one')) ?>"><?= __('rates vary') ?></span> · <span class="text-body fw-semibold"><?= reportMoney($client['value']) ?></span>
                     <?php } elseif ($client['rate'] > 0) { ?>· <?= reportMoney($client['rate']) ?>/h<?= $client['default_rate'] ? ' (default)' : ($client['rate_note'] !== '' ? ' (' . escapeHtml($client['rate_note']) . ')' : '') ?> · <span class="text-body fw-semibold"><?= reportMoney($client['value']) ?></span><?php } ?>
                 </span>
             </div>
@@ -148,10 +148,10 @@ $hours = function ($seconds) {
                 <table class="table table-sm align-middle mb-0 itflow-report-table">
                     <thead class="table-light">
                     <tr>
-                        <th>Ticket and work done</th>
-                        <th class="text-nowrap">Agent</th>
-                        <th class="text-end text-nowrap">Logged</th>
-                        <th class="text-end text-nowrap" title="Rounded up to <?= escapeHtml($increment_label) ?>">Rounded</th>
+                        <th><?= __('Ticket and work done') ?></th>
+                        <th class="text-nowrap"><?= __('Agent') ?></th>
+                        <th class="text-end text-nowrap"><?= __('Logged') ?></th>
+                        <th class="text-end text-nowrap" title="<?= escapeHtml(__('Rounded up to %s', $increment_label)) ?>"><?= __('Rounded') ?></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -171,7 +171,7 @@ $hours = function ($seconds) {
                                 <td class="itflow-report-sub">
                                     <div class="small text-body-secondary">
                                         <i class="far fa-clock me-1"></i><?= escapeHtml(date('D, M j, Y g:i A', strtotime($reply['ticket_reply_created_at']))) ?>
-                                        <?php if ($reply['ticket_reply_type'] === 'Internal') { ?><span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal ms-1">Internal note</span><?php } ?>
+                                        <?php if ($reply['ticket_reply_type'] === 'Internal') { ?><span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal ms-1"><?= __('Internal note') ?></span><?php } ?>
                                     </div>
                                     <?php if ($reply['text'] !== '') { ?>
                                         <div class="mt-1" style="white-space: pre-line"><?= escapeHtml($reply['text']) ?></div>
@@ -192,11 +192,11 @@ $hours = function ($seconds) {
     <?php if ($replies) { ?>
         <div class="card">
             <div class="card-body d-flex flex-wrap justify-content-between gap-2 fw-semibold">
-                <span>All clients - <?= reportCount($ticket_count) ?> tickets</span>
+                <span><?= __('All clients - %s tickets', reportCount($ticket_count)) ?></span>
                 <span><?= $hours($total_seconds) ?> h logged · <?= $hours($total_to_bill) ?> h to bill · <?= reportMoney($total_value) ?></span>
             </div>
             <div class="card-footer small text-body-secondary">
-                Only replies with time on them, by the date they were written. Each reply is rounded up to <?= escapeHtml($increment_label) ?> on its own, and the rounded figures on billable tickets are what is to bill.
+                <?= __('Only replies with time on them, by the date they were written. Each reply is rounded up to %s on its own, and the rounded figures on billable tickets are what is to bill.', escapeHtml($increment_label)) ?>
             </div>
         </div>
     <?php } ?>

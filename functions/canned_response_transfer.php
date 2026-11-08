@@ -107,15 +107,15 @@ function cannedResponseFileText($value, $max) {
 function cannedResponsesImportRead($contents, &$error = '') {
     $data = is_array($contents) ? $contents : json_decode((string) $contents, true);
     if (!is_array($data) || ($data['format'] ?? '') !== CANNED_RESPONSE_FILE_FORMAT || !isset($data['responses']) || !is_array($data['responses'])) {
-        $error = "That isn't a canned responses file - export one from Admin > Canned Responses.";
+        $error = __("That isn't a canned responses file - export one from Admin > Canned Responses.");
         return null;
     }
     if (intval($data['version'] ?? 0) > CANNED_RESPONSE_FILE_VERSION) {
-        $error = 'That file was made by a newer version of ITFlow - update this one first.';
+        $error = __('That file was made by a newer version of ITFlow - update this one first.');
         return null;
     }
     if (count($data['responses']) > 1000) {
-        $error = 'That file holds more than 1000 canned responses - split it up.';
+        $error = __('That file holds more than 1000 canned responses - split it up.');
         return null;
     }
 
@@ -149,7 +149,7 @@ function cannedResponsesImportRead($contents, &$error = '') {
                 $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
                 if ($file_name === '' || $bytes === false || $bytes === '' || strlen($bytes) > CANNED_RESPONSE_TRANSFER_FILE_MAX
                     || !in_array($extension, TICKET_ATTACHMENT_EXTENSIONS, true) || count($files) >= CANNED_RESPONSE_MAX_FILES) {
-                    $refused[] = $file_name !== '' ? $file_name : 'a file with no name';
+                    $refused[] = $file_name !== '' ? $file_name : __('a file with no name');
                     continue;
                 }
                 $files[] = ['name' => $file_name, 'data' => $bytes];
@@ -169,7 +169,7 @@ function cannedResponsesImportRead($contents, &$error = '') {
         ];
     }
     if (!$responses) {
-        $error = 'There are no canned responses in that file.';
+        $error = __('There are no canned responses in that file.');
         return null;
     }
     return $responses;
@@ -281,21 +281,21 @@ function cannedResponsesImport(array $responses, $existing = 'skip', $only_exist
 /* What an import did, in words - for its message. HTML. */
 function cannedResponsesImportSummary(array $counts) {
     $parts = [];
-    foreach (['added' => 'added', 'replaced' => 'replaced', 'skipped' => 'already here, left as they were'] as $key => $word) {
+    foreach (['added' => _x('added', 'import count'), 'replaced' => _x('replaced', 'import count'), 'skipped' => __('already here, left as they were')] as $key => $word) {
         if ($counts[$key]) {
             $parts[] = '<strong>' . $counts[$key] . '</strong> ' . $word;
         }
     }
     $made = [];
     if ($counts['categories']) {
-        $made[] = 'Made ' . $counts['categories'] . ' ticket categor' . ($counts['categories'] === 1 ? 'y' : 'ies') . ' they are offered on';
+        $made[] = _n('Made %d ticket category they are offered on', 'Made %d ticket categories they are offered on', $counts['categories']);
     }
     if ($counts['files']) {
-        $made[] = 'Brought in ' . $counts['files'] . ' file' . ($counts['files'] === 1 ? '' : 's') . ' that go with them';
+        $made[] = _n('Brought in %d file that goes with them', 'Brought in %d files that go with them', $counts['files']);
     }
-    return ucfirst(implode(', ', $parts) ?: 'nothing brought in')
+    return ucfirst(implode(', ', $parts) ?: __('nothing brought in'))
         . ($made ? '. ' . implode('. ', $made) : '')
-        . ($counts['files_refused'] ? '. Left out <strong>' . escapeHtml(implode(', ', array_slice($counts['files_refused'], 0, 10))) . '</strong>'
-            . (count($counts['files_refused']) > 10 ? ' and ' . (count($counts['files_refused']) - 10) . ' more' : '') . " - a kind a ticket doesn't take, too big or more than " . CANNED_RESPONSE_MAX_FILES . ' on one' : '')
+        . ($counts['files_refused'] ? __('. Left out <strong>%s</strong>', escapeHtml(implode(', ', array_slice($counts['files_refused'], 0, 10))))
+            . (count($counts['files_refused']) > 10 ? ' ' . __('and %d more', count($counts['files_refused']) - 10) : '') . __(" - a kind a ticket doesn't take, too big or more than %d on one", CANNED_RESPONSE_MAX_FILES) : '')
         . '.';
 }

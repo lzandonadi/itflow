@@ -1,5 +1,7 @@
 Options -ExecCGI -Indexes
-php_flag engine off
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
 RemoveHandler .php .phtml .phar .phps
 RemoveType .php .phtml .phar .phps
 <FilesMatch "\.(php|phtml|phar|phps|cgi|pl|sh)$">

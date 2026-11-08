@@ -24,7 +24,7 @@ $co_sql = mysqli_query($mysqli, "SELECT project_template_id, project_template_na
     FROM project_templates WHERE project_template_archived_at IS NULL ORDER BY project_template_name ASC");
 while ($co_template = mysqli_fetch_assoc($co_sql)) {
     $co_id = intval($co_template['project_template_id']);
-    $co_templates[$co_id] = $co_template['project_template_name'] . ' - ' . intval($co_template['tickets']) . ' ticket' . (intval($co_template['tickets']) === 1 ? '' : 's');
+    $co_templates[$co_id] = $co_template['project_template_name'] . ' - ' . _n('%d ticket', '%d tickets', intval($co_template['tickets']));
     // One about onboarding is the likely one
     if ($co_pick === '' && stripos($co_template['project_template_name'], 'onboard') !== false) {
         $co_pick = (string) $co_id;
@@ -53,13 +53,13 @@ while ($co_contact = mysqli_fetch_assoc($co_sql)) {
                 <span class="itflow-gs-person-initials" aria-hidden="true"><i class="fas fa-project-diagram"></i></span>
                 <div class="min-w-0 flex-grow-1">
                     <a href="/agent/<?= projectUrl($co_project['project_id'], $client_id) ?>" class="fw-semibold text-truncate d-block" target="_blank"><?= escapeHtml(projectReference($co_project) . ' - ' . $co_project['project_name']) ?></a>
-                    <div class="small text-body-secondary"><?= intval($co_project['tickets']) ?> ticket<?= intval($co_project['tickets']) === 1 ? '' : 's' ?><?= !empty($co_project['project_due']) ? ' - due ' . escapeHtml(date('M j, Y', strtotime($co_project['project_due']))) : '' ?></div>
+                    <div class="small text-body-secondary"><?= _n('%d ticket', '%d tickets', intval($co_project['tickets'])) ?><?= !empty($co_project['project_due']) ? ' - ' . __('due %s', escapeHtml(formatDate($co_project['project_due'], 'date'))) : '' ?></div>
                 </div>
-                <?php if (!empty($co_project['project_completed_at'])) { ?><span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal">Completed</span><?php } ?>
+                <?php if (!empty($co_project['project_completed_at'])) { ?><span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><?= __('Completed') ?></span><?php } ?>
             </li>
         <?php } ?>
     </ul>
-    <h2 class="h6 fw-semibold">Start another</h2>
+    <h2 class="h6 fw-semibold"><?= __('Start another') ?></h2>
 <?php } ?>
 
 <form action="post.php" method="post" autocomplete="off" data-gs-form data-co-form="kickoff">
@@ -68,32 +68,32 @@ while ($co_contact = mysqli_fetch_assoc($co_sql)) {
     <div class="row g-3 mb-3">
         <div class="col-12">
             <?php if ($co_templates) { ?>
-                <?= settingsSelect('project_template_id', $co_pick, ['0' => '- None - an empty project -'] + $co_templates, ['id' => 'coProjectTemplate', 'icon' => 'fa-clone', 'label' => 'Template',
-                    'help' => 'Its tickets are raised on the project, with their tasks - for the client, not emailed to them.']) ?>
+                <?= settingsSelect('project_template_id', $co_pick, ['0' => __('- None - an empty project -')] + $co_templates, ['id' => 'coProjectTemplate', 'icon' => 'fa-clone', 'label' => __('Template'),
+                    'help' => __('Its tickets are raised on the project, with their tasks - for the client, not emailed to them.')]) ?>
             <?php } else { ?>
-                <div class="small text-body-secondary" data-co-no-templates><i class="fas fa-info-circle me-1"></i>No project templates yet - New Client Onboarding is in the Project templates pack in Maintenance &gt; Starter Content. Without one the project starts empty.</div>
+                <div class="small text-body-secondary" data-co-no-templates><i class="fas fa-info-circle me-1"></i><?= __('No project templates yet - New Client Onboarding is in the Project templates pack in Maintenance &gt; Starter Content. Without one the project starts empty.') ?></div>
             <?php } ?>
         </div>
         <div class="col-12">
-            <?= settingsInput('name', 'Onboarding - ' . $co_name, ['id' => 'coProjectName', 'icon' => 'fa-project-diagram', 'label' => 'Name', 'required' => true, 'maxlength' => 255]) ?>
+            <?= settingsInput('name', 'Onboarding - ' . $co_name, ['id' => 'coProjectName', 'icon' => 'fa-project-diagram', 'label' => __('Name'), 'required' => true, 'maxlength' => 255]) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsSelect('manager', (string) intval($session_user_id), ['0' => '- Nobody -'] + $co_agents, ['id' => 'coProjectManager', 'icon' => 'fa-user-tie', 'label' => 'Manager']) ?>
+            <?= settingsSelect('manager', (string) intval($session_user_id), ['0' => '- Nobody -'] + $co_agents, ['id' => 'coProjectManager', 'icon' => 'fa-user-tie', 'label' => __('Manager')]) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsSelect('contact_id', $co_contact_pick, ['0' => '- Nobody -'] + $co_contacts, ['id' => 'coProjectContact', 'icon' => 'fa-user', 'label' => 'Their contact']) ?>
+            <?= settingsSelect('contact_id', $co_contact_pick, ['0' => '- Nobody -'] + $co_contacts, ['id' => 'coProjectContact', 'icon' => 'fa-user', 'label' => __('Their contact')]) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('start', date('Y-m-d'), ['id' => 'coProjectStart', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => 'Starts', 'max' => '2999-12-31']) ?>
+            <?= settingsInput('start', date('Y-m-d'), ['id' => 'coProjectStart', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => __('Starts'), 'max' => '2999-12-31']) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('due', date('Y-m-d', strtotime('+30 days')), ['id' => 'coProjectDue', 'icon' => 'fa-calendar-check', 'type' => 'date', 'label' => 'Due', 'max' => '2999-12-31']) ?>
+            <?= settingsInput('due', date('Y-m-d', strtotime('+30 days')), ['id' => 'coProjectDue', 'icon' => 'fa-calendar-check', 'type' => 'date', 'label' => __('Due'), 'max' => '2999-12-31']) ?>
         </div>
         <?php if ($co_templates) { ?>
             <div class="col-12">
-                <?= settingsSwitch('assign_to_manager', '1', ['id' => 'coProjectAssign', 'label' => 'Assign its tickets to the manager', 'help' => 'Off, each goes to whoever its ticket template names, or nobody.']) ?>
+                <?= settingsSwitch('assign_to_manager', '1', ['id' => 'coProjectAssign', 'label' => __('Assign its tickets to the manager'), 'help' => __('Off, each goes to whoever its ticket template names, or nobody.')]) ?>
             </div>
         <?php } ?>
     </div>
-    <button type="submit" name="client_onboarding_kickoff" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-flag me-2"></i>Start the project</button>
+    <button type="submit" name="client_onboarding_kickoff" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-flag me-2"></i><?= __('Start the project') ?></button>
 </form>

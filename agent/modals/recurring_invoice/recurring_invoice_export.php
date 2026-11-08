@@ -29,7 +29,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Recurring Invoices</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Recurring Invoices') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -44,38 +44,38 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label>Search</label>
+            <label><?= __('Search') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Number, scope, frequency, client">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Number, scope, frequency, client')) ?>">
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-toggle-on"></i></span>
                 <select class="form-select select2" name="status">
-                    <option value="">- Any Status -</option>
-                    <option <?php if ($status_filter === 'active') { echo "selected"; } ?> value="active">Active</option>
-                    <option <?php if ($status_filter === 'inactive') { echo "selected"; } ?> value="inactive">Inactive</option>
+                    <option value=""><?= __('- Any Status -') ?></option>
+                    <option <?php if ($status_filter === 'active') { echo "selected"; } ?> value="active"><?= __('Active') ?></option>
+                    <option <?php if ($status_filter === 'inactive') { echo "selected"; } ?> value="inactive"><?= _x('Inactive', 'recurring invoice') ?></option>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Category</label>
+            <label><?= __('Category') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
                 <select class="form-select select2" name="category">
-                    <option value="">- Any category -</option>
+                    <option value=""><?= __('- Any category -') ?></option>
                     <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT DISTINCT recurring_invoice_category_id FROM recurring_invoices WHERE recurring_invoice_archived_at IS NULL") ?>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Created From</label>
+            <label><?= __('Created From') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
@@ -83,7 +83,7 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Created To</label>
+            <label><?= __('Created To') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

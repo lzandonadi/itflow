@@ -46,16 +46,16 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
 
 <ul class="nav nav-pills nav-fill flex-nowrap overflow-auto mb-3 itflow-asset-form-tabs" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Login"><i class="fas fa-fw fa-key me-2 d-none d-lg-inline"></i>Login</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#<?= $form_id ?>Login"><i class="fas fa-fw fa-key me-2 d-none d-lg-inline"></i><?= __('Login') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Belongs"><i class="fas fa-fw fa-link me-2 d-none d-lg-inline"></i>Belongs to</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Belongs"><i class="fas fa-fw fa-link me-2 d-none d-lg-inline"></i><?= __('Belongs to') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-tags me-2 d-none d-lg-inline"></i>Details</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Details"><i class="fas fa-fw fa-tags me-2 d-none d-lg-inline"></i><?= __('Details') ?></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i>Notes</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#<?= $form_id ?>Notes"><i class="fas fa-fw fa-sticky-note me-2 d-none d-lg-inline"></i><?= __('Notes') ?></a>
     </li>
 </ul>
 
@@ -66,52 +66,52 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
     <div class="row g-3">
         <?php if (!$client_id) { ?>
             <div class="col-12">
-                <label class="form-label">Client <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="client_id" required>
-                        <option value="">- Select Client -</option>
+                        <option value=""><?= __('- Select Client -') ?></option>
                         <?php foreach ($client_options as $client_option) { ?>
                             <option value="<?= intval($client_option['client_id']) ?>"<?= selectOptionClient($client_option['client_id'], $client_option['client_name'], $client_option['client_abbreviation'] ?? '') ?>><?= escapeHtml($client_option['client_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">Pick the asset and contact it belongs to once it's saved.</div>
+                <div class="form-text"><?= __('Pick the asset and contact it belongs to once it\'s saved.') ?></div>
             </div>
         <?php } ?>
         <div class="col-md-8">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-key"></i></span>
-                <input type="text" class="form-control" name="name" placeholder="Firewall admin, Microsoft 365 break glass, Guest Wi-Fi" maxlength="200" value="<?= $credential_name ?>" required <?= $credential_form_mode === 'edit' ? '' : 'autofocus' ?>>
+                <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Firewall admin, Microsoft 365 break glass, Guest Wi-Fi')) ?>" maxlength="200" value="<?= $credential_name ?>" required <?= $credential_form_mode === 'edit' ? '' : 'autofocus' ?>>
             </div>
         </div>
         <div class="col-md-4">
             <label class="form-label d-none d-md-block">&nbsp;</label>
             <div class="form-check form-switch mt-md-2">
                 <input class="form-check-input" type="checkbox" role="switch" name="favorite" value="1" id="<?= $form_id ?>Favorite" <?= $credential_favorite ? 'checked' : '' ?>>
-                <label class="form-check-label" for="<?= $form_id ?>Favorite"><i class="fas fa-star text-warning me-1"></i>Starred</label>
+                <label class="form-check-label" for="<?= $form_id ?>Favorite"><i class="fas fa-star text-warning me-1"></i><?= __('Starred') ?></label>
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Username / ID</label>
+            <label class="form-label"><?= __('Username / ID') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
-                <input type="text" class="form-control" name="username" placeholder="Username, email or ID" maxlength="350" value="<?= $credential_username ?>" autocomplete="off">
+                <input type="text" class="form-control" name="username" placeholder="<?= escapeHtml(__('Username, email or ID')) ?>" maxlength="350" value="<?= $credential_username ?>" autocomplete="off">
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Password / key</label>
+            <label class="form-label"><?= __('Password / key') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
-                <input type="password" class="form-control font-monospace" data-toggle="password" name="password" placeholder="Password, key or PSK" maxlength="350" value="<?= $credential_password ?>" autocomplete="new-password" data-credential-password>
+                <input type="password" class="form-control font-monospace" data-toggle="password" name="password" placeholder="<?= escapeHtml(__('Password, key or PSK')) ?>" maxlength="350" value="<?= $credential_password ?>" autocomplete="new-password" data-credential-password>
                 <span class="input-group-text"><i class="fa fa-fw fa-eye"></i></span>
-                <button class="btn btn-outline-secondary clipboardjs" title="Copy password" type="button" data-clipboard-target="input[name=password]"><i class="far fa-fw fa-copy"></i></button>
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="Make one up"><i class="fas fa-fw fa-magic"></i></button>
+                <button class="btn btn-outline-secondary clipboardjs" title="<?= escapeHtml(__('Copy password')) ?>" type="button" data-clipboard-target="input[name=password]"><i class="far fa-fw fa-copy"></i></button>
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="<?= escapeHtml(__('Make one up')) ?>"><i class="fas fa-fw fa-magic"></i></button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="#" data-credential-generate="passphrase"><i class="fas fa-fw fa-font text-secondary me-2"></i>Passphrase <small class="text-body-secondary">easy to read out</small></a>
-                    <a class="dropdown-item" href="#" data-credential-generate="20"><i class="fas fa-fw fa-random text-secondary me-2"></i>Random, 20 characters</a>
-                    <a class="dropdown-item" href="#" data-credential-generate="32"><i class="fas fa-fw fa-random text-secondary me-2"></i>Random, 32 characters</a>
+                    <a class="dropdown-item" href="#" data-credential-generate="passphrase"><i class="fas fa-fw fa-font text-secondary me-2"></i><?= __('Passphrase') ?> <small class="text-body-secondary"><?= __('easy to read out') ?></small></a>
+                    <a class="dropdown-item" href="#" data-credential-generate="20"><i class="fas fa-fw fa-random text-secondary me-2"></i><?= __('Random, 20 characters') ?></a>
+                    <a class="dropdown-item" href="#" data-credential-generate="32"><i class="fas fa-fw fa-random text-secondary me-2"></i><?= __('Random, 32 characters') ?></a>
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2 mt-1 small" data-credential-strength hidden>
@@ -120,28 +120,28 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">2FA secret</label>
+            <label class="form-label"><?= __('2FA secret') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-clock"></i></span>
-                <input type="password" class="form-control font-monospace" data-toggle="password" name="otp_secret" placeholder="The key behind the QR code, or the otpauth:// link" maxlength="200" value="<?= $credential_otp_secret ?>" autocomplete="off" data-credential-otp-input>
+                <input type="password" class="form-control font-monospace" data-toggle="password" name="otp_secret" placeholder="<?= escapeHtml(__('The key behind the QR code, or the otpauth:// link')) ?>" maxlength="200" value="<?= $credential_otp_secret ?>" autocomplete="off" data-credential-otp-input>
                 <span class="input-group-text"><i class="fa fa-fw fa-eye"></i></span>
             </div>
-            <div class="form-text" data-credential-otp-check>Every agent who can see this credential gets the current code, so nobody needs the phone.</div>
+            <div class="form-text" data-credential-otp-check><?= __('Every agent who can see this credential gets the current code, so nobody needs the phone.') ?></div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Opens at</label>
+            <label class="form-label"><?= __('Opens at') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-link"></i></span>
                 <input type="text" class="form-control" name="uri" placeholder="https://192.168.1.1, rdp://server" maxlength="500" value="<?= $credential_uri ?>">
-                <button class="btn btn-outline-secondary clipboardjs" title="Copy URI" type="button" data-clipboard-target="input[name=uri]"><i class="far fa-fw fa-copy"></i></button>
+                <button class="btn btn-outline-secondary clipboardjs" title="<?= escapeHtml(__('Copy URI')) ?>" type="button" data-clipboard-target="input[name=uri]"><i class="far fa-fw fa-copy"></i></button>
             </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Also at</label>
+            <label class="form-label"><?= __('Also at') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-link"></i></span>
                 <input type="text" class="form-control" name="uri_2" placeholder="https://server.company.com:5001" maxlength="500" value="<?= $credential_uri_2 ?>">
-                <button class="btn btn-outline-secondary clipboardjs" title="Copy URI 2" type="button" data-clipboard-target="input[name=uri_2]"><i class="far fa-fw fa-copy"></i></button>
+                <button class="btn btn-outline-secondary clipboardjs" title="<?= escapeHtml(__('Copy URI 2')) ?>" type="button" data-clipboard-target="input[name=uri_2]"><i class="far fa-fw fa-copy"></i></button>
             </div>
         </div>
     </div>
@@ -152,39 +152,39 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
     <?php if ($client_id) { ?>
         <div class="row g-3">
             <div class="col-12">
-                <label class="form-label">Asset</label>
+                <label class="form-label"><?= __('Asset') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
                     <select class="form-select select2" name="asset">
-                        <option value="0">- No asset -</option>
+                        <option value="0"><?= __('- No asset -') ?></option>
                         <?php foreach ($asset_options as $asset_option) {
                             $asset_option_id = intval($asset_option['asset_id']); ?>
                             <option value="<?= $asset_option_id ?>" <?= intval($credential_asset_id) === $asset_option_id ? 'selected' : '' ?><?= selectOptionAsset($asset_option['asset_type'], implode(' · ', array_filter([trim($asset_option['asset_make'] . ' ' . $asset_option['asset_model']), $asset_option['location_name']]))) ?>><?= escapeHtml($asset_option['asset_name']) ?><?= $asset_option['asset_archived_at'] ? ' (archived)' : '' ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">The device this login is for - it shows on the asset's Credentials tab.</div>
+                <div class="form-text"><?= __('The device this login is for - it shows on the asset\'s Credentials tab.') ?></div>
             </div>
             <div class="col-12">
-                <label class="form-label">Contact</label>
+                <label class="form-label"><?= __('Contact') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
                     <select class="form-select select2" name="contact">
-                        <option value="0">- Nobody -</option>
+                        <option value="0"><?= __('- Nobody -') ?></option>
                         <?php foreach ($contact_options as $contact_option) {
                             $contact_option_id = intval($contact_option['contact_id']); ?>
                             <option value="<?= $contact_option_id ?>" <?= intval($credential_contact_id) === $contact_option_id ? 'selected' : '' ?><?= selectOptionContact($contact_option['contact_client_id'], $contact_option['contact_name'], $contact_option['contact_photo'], $contact_option['contact_title'], $contact_option_id) ?>><?= escapeHtml($contact_option['contact_name']) ?><?= $contact_option['contact_archived_at'] ? ' (archived)' : '' ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text">Whose login it is - it shows on their contact page.</div>
+                <div class="form-text"><?= __('Whose login it is - it shows on their contact page.') ?></div>
             </div>
             <div class="col-12">
-                <div class="form-text mt-0"><i class="fas fa-info-circle me-1"></i>Vendors and licenses link from the credential's quick look, or from the vendor or license itself.</div>
+                <div class="form-text mt-0"><i class="fas fa-info-circle me-1"></i><?= __('Vendors and licenses link from the credential\'s quick look, or from the vendor or license itself.') ?></div>
             </div>
         </div>
     <?php } else { ?>
-        <div class="itflow-asset-empty">Pick the client first - the asset and contact are theirs.</div>
+        <div class="itflow-asset-empty"><?= __('Pick the client first - the asset and contact are theirs.') ?></div>
     <?php } ?>
 </div>
 
@@ -192,33 +192,33 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
 <div class="tab-pane fade" id="<?= $form_id ?>Details">
     <div class="row g-3">
         <div class="col-12">
-            <label class="form-label">Description</label>
+            <label class="form-label"><?= __('Description') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-                <input type="text" class="form-control" name="description" placeholder="What it opens, and who uses it" maxlength="500" value="<?= $credential_description ?>">
+                <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('What it opens, and who uses it')) ?>" maxlength="500" value="<?= $credential_description ?>">
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Tags</label>
+            <label class="form-label"><?= __('Tags') ?></label>
             <input type="hidden" name="tags_form" value="1">
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-tags"></i></span>
-                <select class="form-select select2" name="tags[]" data-placeholder="Domain Admin, Break Glass, Vendor Portal" multiple<?= !empty($session_is_admin) ? ' data-tags="true"' : '' ?>>
+                <select class="form-select select2" name="tags[]" data-placeholder="<?= escapeHtml(__('Domain Admin, Break Glass, Vendor Portal')) ?>" multiple<?= !empty($session_is_admin) ? ' data-tags="true"' : '' ?>>
                     <?= tagOptionsHtml('credential', $credential_tag_ids) ?>
                 </select>
             </div>
         </div>
     </div>
     <?php if ($credential_form_mode === 'edit') { ?>
-        <p class="text-body-secondary small text-end mt-3 mb-0">Credential ID <span class="font-monospace"><?= $credential_id ?></span></p>
+        <p class="text-body-secondary small text-end mt-3 mb-0"><?= __('Credential ID') ?> <span class="font-monospace"><?= $credential_id ?></span></p>
     <?php } ?>
 </div>
 
 <!-- Everything else -->
 <div class="tab-pane fade" id="<?= $form_id ?>Notes">
-    <label class="form-label">Notes</label>
-    <textarea class="form-control" rows="10" name="note" placeholder="What it is for, who may use it, when it was last rotated and by whom"><?= $credential_note ?></textarea>
-    <div class="form-text">Notes are not encrypted - keep recovery codes and second passwords in their own credential.</div>
+    <label class="form-label"><?= __('Notes') ?></label>
+    <textarea class="form-control" rows="10" name="note" placeholder="<?= escapeHtml(__('What it is for, who may use it, when it was last rotated and by whom')) ?>"><?= $credential_note ?></textarea>
+    <div class="form-text"><?= __('Notes are not encrypted - keep recovery codes and second passwords in their own credential.') ?></div>
 </div>
 
 </div>
@@ -347,16 +347,16 @@ $form_id = 'credentialForm' . ($credential_form_mode === 'edit' ? $credential_id
             var secret = seed(value);
             if (!secret) {
                 check.classList.add('text-danger');
-                check.textContent = 'That is not a 2FA secret - it is the long key shown under "can\'t scan the code", or the otpauth:// link.';
+                check.textContent = <?= json_encode(__('That is not a 2FA secret - it is the long key shown under "can\'t scan the code", or the otpauth:// link.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
                 return;
             }
             if (!window.crypto || !crypto.subtle) {
-                check.textContent = 'Looks like a 2FA secret.';
+                check.textContent = <?= json_encode(__('Looks like a 2FA secret.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>;
                 return;
             }
             totp(secret).then(function (code) {
                 check.classList.add('text-success');
-                check.textContent = 'The code now is ' + code.slice(0, 3) + ' ' + code.slice(3) + ' - check it matches the app.';
+                check.textContent = <?= json_encode(__('The code now is %s - check it matches the app.'), JSON_HEX_TAG | JSON_HEX_AMP) ?>.replace('%s', code.slice(0, 3) + ' ' + code.slice(3));
             });
         }
         otp.addEventListener('input', checkOtp);

@@ -14,7 +14,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Users</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Users') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -28,19 +28,19 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label class="form-label">Search</label>
+            <label class="form-label"><?= __('Search') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= escapeHtml($q_filter) ?>" placeholder="Name, email or role">
+                <input type="text" class="form-control" name="q" value="<?= escapeHtml($q_filter) ?>" placeholder="<?= escapeHtml(__('Name, email or role')) ?>">
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Role</label>
+            <label class="form-label"><?= __('Role') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-user-shield"></i></span>
                 <select class="form-select select2" name="role">
-                    <option value="">- Any role -</option>
+                    <option value=""><?= __('- Any role -') ?></option>
                     <?php foreach ($roles as $role_id => $role) { ?>
                         <option value="<?= $role_id ?>" <?= $role_filter === $role_id ? 'selected' : '' ?><?= selectOptionRole($role) ?>><?= escapeHtml($role['role_name']) ?></option>
                     <?php } ?>
@@ -49,12 +49,12 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Archived</label>
+            <label class="form-label"><?= __('Archived') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-archive"></i></span>
                 <select class="form-select select2" name="archived">
-                    <option <?php if (!$archived_filter) { echo "selected"; } ?> value="0">Not archived</option>
-                    <option <?php if ($archived_filter) { echo "selected"; } ?> value="1">Archived only</option>
+                    <option <?php if (!$archived_filter) { echo "selected"; } ?> value="0"><?= __('Not archived') ?></option>
+                    <option <?php if ($archived_filter) { echo "selected"; } ?> value="1"><?= __('Archived only') ?></option>
                 </select>
             </div>
         </div>

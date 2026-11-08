@@ -14,3 +14,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/check_login.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/page_title.php';
 
 enforceUserPermission('module_reporting');
+
+// A CSV keeps English headings and values in every language, like the other exports, so it reads the same anywhere
+if (reportExporting()) {
+    i18nSetLocale('en_US');
+}

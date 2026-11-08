@@ -17,7 +17,7 @@ $order = "DESC";
 
 require_once "includes/inc_all_admin.php";
 
-$page_title = 'Mail Queue';
+$page_title = __('Mail Queue');
 
 $tabs = mailQueueTabs();
 $show = (string) ($_GET['show'] ?? '');
@@ -81,9 +81,9 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-inbox me-2"></i>Mail Queue</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-inbox me-2"></i><?= __('Mail Queue') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light" href="settings_mail.php?tab=tests" title="Send a test email"><i class="fas fa-vial"></i><span class="d-none d-lg-inline ms-2">Send a test</span></a>
+            <a class="btn btn-outline-light" href="settings_mail.php?tab=tests" title="<?= escapeHtml(__('Send a test email')) ?>"><i class="fas fa-vial"></i><span class="d-none d-lg-inline ms-2"><?= __('Send a test') ?></span></a>
         </div>
     </div>
 
@@ -101,28 +101,28 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search the mail queue..." title="Who it is to or from, the subject, why it failed, or its number">
-                        <button class="btn btn-secondary" title="When it was queued" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter"><i class="fas fa-calendar-alt"></i></button>
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search the mail queue...')) ?>" title="<?= escapeHtml(__('Who it is to or from, the subject, why it failed, or its number')) ?>">
+                        <button class="btn btn-secondary" title="<?= escapeHtml(__('When it was queued')) ?>" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter"><i class="fas fa-calendar-alt"></i></button>
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-7 col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action') ?> (<span id="selectedCount">0</span>)
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_retry_emails" title="Failed or cancelled ones - from the start, at the next run">
-                                    <i class="fas fa-fw fa-redo-alt text-secondary me-2"></i>Retry now
+                                <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_retry_emails" title="<?= escapeHtml(__('Failed or cancelled ones - from the start, at the next run')) ?>">
+                                    <i class="fas fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Retry now') ?>
                                 </button>
-                                <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_cancel_emails" title="Ones still to be sent or tried again">
-                                    <i class="fas fa-fw fa-ban text-secondary me-2"></i>Cancel
+                                <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_cancel_emails" title="<?= escapeHtml(__('Ones still to be sent or tried again')) ?>">
+                                    <i class="fas fa-fw fa-ban text-secondary me-2"></i><?= __('Cancel') ?>
                                 </button>
                                 <div class="dropdown-divider"></div>
                                 <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_delete_emails"
-                                    data-confirm-title="Delete these emails?" data-confirm-text="Any not sent yet never will be." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= escapeHtml(__('Delete these emails?')) ?>" data-confirm-text="<?= escapeHtml(__('Any not sent yet never will be.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </button>
                             </div>
                         </div>
@@ -132,7 +132,7 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
             <div class="collapse mt-3 <?= $filtered_dates ? 'show' : '' ?>" id="advancedFilter">
                 <div class="row g-3">
                     <div class="col-md-4 col-lg-3">
-                        <label class="form-label" for="dateFilter">Queued</label>
+                        <label class="form-label" for="dateFilter"><?= __('Queued') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-fw fa-calendar-alt"></i></span>
                             <input type="text" id="dateFilter" class="form-control" autocomplete="off">
@@ -144,7 +144,7 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
                 </div>
             </div>
         </form>
-        <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-2" aria-label="Where the email is">
+        <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-2" aria-label="<?= escapeHtml(__('Where the email is')) ?>">
             <?php foreach ($tabs as $key => [$label, $icon]) {
                 $alert = '';
                 if ($show !== $key && $counts[$key]) {
@@ -168,13 +168,13 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
                 <tr>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
-                    <th class="d-none d-sm-table-cell"><?= $sort_link('email_status', 'Status') ?></th>
-                    <th><?= $sort_link('email_recipient', 'To') ?></th>
-                    <th class="d-none d-md-table-cell"><?= $sort_link('email_subject', 'Subject') ?></th>
-                    <th class="d-none d-lg-table-cell"><?= $sort_link('email_queued_at', 'Queued') ?></th>
+                    <th class="d-none d-sm-table-cell"><?= $sort_link('email_status', __('Status')) ?></th>
+                    <th><?= $sort_link('email_recipient', __('To')) ?></th>
+                    <th class="d-none d-md-table-cell"><?= $sort_link('email_subject', __('Subject')) ?></th>
+                    <th class="d-none d-lg-table-cell"><?= $sort_link('email_queued_at', __('Queued')) ?></th>
                     <th></th>
                 </tr>
                 </thead>
@@ -190,7 +190,7 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
                         <td class="checkbox-column bg-light border-end">
                             <?php if (mailQueueCan($row, 'delete')) { ?>
                                 <div class="form-check">
-                                    <input class="form-check-input bulk-select" type="checkbox" name="email_ids[]" value="<?= $email_id ?>" aria-label="Select email <?= $email_id ?>">
+                                    <input class="form-check-input bulk-select" type="checkbox" name="email_ids[]" value="<?= $email_id ?>" aria-label="<?= escapeHtml(__('Select email %d', $email_id)) ?>">
                                 </div>
                             <?php } ?>
                         </td>
@@ -212,9 +212,9 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
                         </td>
                         <td class="d-none d-md-table-cell min-w-0">
                             <a class="ajax-modal fw-semibold text-body" href="#" <?= $view ?>><?= $subject ?></a>
-                            <?php if ($row['has_attachments']) { ?><i class="fas fa-fw fa-paperclip text-body-secondary ms-1" title="With attachments"></i><?php } ?>
-                            <?php if ($row['has_invite']) { ?><i class="fas fa-fw fa-calendar-plus text-body-secondary ms-1" title="With a calendar file"></i><?php } ?>
-                            <div class="small text-body-secondary">From <?= $from ?></div>
+                            <?php if ($row['has_attachments']) { ?><i class="fas fa-fw fa-paperclip text-body-secondary ms-1" title="<?= escapeHtml(__('With attachments')) ?>"></i><?php } ?>
+                            <?php if ($row['has_invite']) { ?><i class="fas fa-fw fa-calendar-plus text-body-secondary ms-1" title="<?= escapeHtml(__('With a calendar file')) ?>"></i><?php } ?>
+                            <div class="small text-body-secondary"><?= __('From %s', $from) ?></div>
                         </td>
                         <td class="d-none d-lg-table-cell text-nowrap small" title="<?= escapeHtml(date('M j, Y g:i:s A', strtotime($row['email_queued_at']))) ?>">
                             <?= escapeHtml(date('M j, g:i A', strtotime($row['email_queued_at']))) ?>
@@ -222,19 +222,19 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
                         </td>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item ajax-modal" href="#" <?= $view ?>><i class="fas fa-fw fa-envelope-open text-secondary me-2"></i>View</a>
+                                    <a class="dropdown-item ajax-modal" href="#" <?= $view ?>><i class="fas fa-fw fa-envelope-open text-secondary me-2"></i><?= __('View') ?></a>
                                     <?php if (mailQueueCan($row, 'retry')) { ?>
-                                        <a class="dropdown-item" href="post.php?retry_mail=<?= $email_id ?>&csrf_token=<?= $csrf ?>" title="From the start, at the next run" data-email-retry><i class="fas fa-fw fa-redo-alt text-secondary me-2"></i>Retry now</a>
+                                        <a class="dropdown-item" href="post.php?retry_mail=<?= $email_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('From the start, at the next run')) ?>" data-email-retry><i class="fas fa-fw fa-redo-alt text-secondary me-2"></i><?= __('Retry now') ?></a>
                                     <?php } ?>
                                     <?php if (mailQueueCan($row, 'cancel')) { ?>
-                                        <a class="dropdown-item" href="post.php?cancel_mail=<?= $email_id ?>&csrf_token=<?= $csrf ?>" data-email-cancel><i class="fas fa-fw fa-ban text-secondary me-2"></i>Cancel</a>
+                                        <a class="dropdown-item" href="post.php?cancel_mail=<?= $email_id ?>&csrf_token=<?= $csrf ?>" data-email-cancel><i class="fas fa-fw fa-ban text-secondary me-2"></i><?= __('Cancel') ?></a>
                                     <?php } ?>
                                     <?php if (mailQueueCan($row, 'delete')) { ?>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-danger confirm-link" href="post.php?delete_mail=<?= $email_id ?>&csrf_token=<?= $csrf ?>" data-email-delete
-                                            data-confirm-title="Delete this email?" data-confirm-text="<?= intval($row['email_status']) === 3 ? 'It has been sent - this only takes it off the list.' : 'It won\'t be sent.' ?>" data-confirm-button="Delete"><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                                            data-confirm-title="<?= escapeHtml(__('Delete this email?')) ?>" data-confirm-text="<?= intval($row['email_status']) === 3 ? __('It has been sent - this only takes it off the list.') : __('It won\'t be sent.') ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -248,10 +248,10 @@ $filtered_dates = isset($_GET['dtf']) && $_GET['dtf'] !== '' && $_GET['dtf'] !==
 
     <?php
     $empty_state = [
-        'thing' => 'emails',
+        'thing' => __('emails'),
         'icon' => 'fa-inbox',
-        'title' => $show !== '' ? 'Nothing ' . strtolower($tabs[$show][0]) : 'Nothing in the mail queue',
-        'text' => 'The email ITFlow sends waits here until it goes, and stays ' . MAIL_QUEUE_KEEP_DAYS . ' days after.',
+        'title' => $show !== '' ? 'Nothing ' . strtolower($tabs[$show][0]) : __('Nothing in the mail queue'),
+        'text' => __('The email ITFlow sends waits here until it goes, and stays %d days after.', MAIL_QUEUE_KEEP_DAYS),
     ];
     ?>
     <?php require_once "../includes/filter_footer.php"; ?>

@@ -25,8 +25,8 @@ $view = ($_GET['view'] ?? '') === 'ips' ? 'ips' : '';
 $types = "log_type IN ('" . implode("', '", SIGN_IN_TYPES) . "')";
 $failed = "log_action IN ('" . implode("', '", SIGN_IN_FAILED) . "')";
 $dated = $dtf !== '1970-01-01' || $dtt !== '2099-12-31';
-$range = $dated ? "AND log_created_at >= '$dtf 00:00:00' AND log_created_at < '$dtt' + INTERVAL 1 DAY" : '';
-$like = $q !== '' ? "AND (user_name LIKE '%$q%' OR user_email LIKE '%$q%' OR log_ip LIKE '%$q%')" : '';
+$range = $dated ? "AND log_created_at >= '$dtf 00:00:00' AND log_created_at < '$dtt' + INTERVAL 1 DAY" : ''; // i18n-ignore - SQL or the audit log
+$like = $q !== '' ? "AND (user_name LIKE '%$q%' OR user_email LIKE '%$q%' OR log_ip LIKE '%$q%')" : ''; // i18n-ignore - SQL or the audit log
 $joins = "LEFT JOIN users ON users.user_id = log_user_id AND log_user_id > 0";
 
 // Only these sort, for the view on show
@@ -157,10 +157,10 @@ $audit_url = function (array $query) use ($dates_query) {
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-sign-in-alt me-2"></i>Sign-ins</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-sign-in-alt me-2"></i><?= __('Sign-ins') ?></h3>
         <div class="card-tools">
-            <a class="btn btn-outline-light" href="settings_security.php" title="When admins are told about failed sign-ins">
-                <i class="fas fa-fw fa-bell"></i><span class="d-none d-lg-inline ms-2">Alerts</span>
+            <a class="btn btn-outline-light" href="settings_security.php" title="<?= escapeHtml(__('When admins are told about failed sign-ins')) ?>">
+                <i class="fas fa-fw fa-bell"></i><span class="d-none d-lg-inline ms-2"><?= __('Alerts') ?></span>
             </a>
         </div>
     </div>
@@ -170,12 +170,12 @@ $audit_url = function (array $query) use ($dates_query) {
             <div class="row g-2 align-items-center">
                 <div class="col-lg-6 col-md-7">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Name, email or IP address">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Name, email or IP address')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-5">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="When" aria-label="When">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('When')) ?>" aria-label="<?= escapeHtml(__('When')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml(is_string($_GET['canned_date'] ?? null) ? $_GET['canned_date'] : '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
@@ -183,11 +183,11 @@ $audit_url = function (array $query) use ($dates_query) {
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-3">
-            <a class="nav-link text-nowrap <?= $view === '' ? 'active' : '' ?>" href="<?= escapeHtml($view_url('')) ?>" data-sign-in-view="people" title="Agents and portal contacts">
-                <i class="fas fa-fw fa-user me-1"></i>People <span class="badge rounded-pill ms-1"><?= number_format(intval($counts[0])) ?></span>
+            <a class="nav-link text-nowrap <?= $view === '' ? 'active' : '' ?>" href="<?= escapeHtml($view_url('')) ?>" data-sign-in-view="people" title="<?= escapeHtml(__('Agents and portal contacts')) ?>">
+                <i class="fas fa-fw fa-user me-1"></i><?= __('People') ?> <span class="badge rounded-pill ms-1"><?= number_format(intval($counts[0])) ?></span>
             </a>
-            <a class="nav-link text-nowrap <?= $view === 'ips' ? 'active' : '' ?>" href="<?= escapeHtml($view_url('ips')) ?>" data-sign-in-view="ips" title="Where sign-ins came from">
-                <i class="fas fa-fw fa-network-wired me-1"></i>IP addresses <span class="badge rounded-pill ms-1"><?= number_format(intval($counts[1])) ?></span>
+            <a class="nav-link text-nowrap <?= $view === 'ips' ? 'active' : '' ?>" href="<?= escapeHtml($view_url('ips')) ?>" data-sign-in-view="ips" title="<?= escapeHtml(__('Where sign-ins came from')) ?>">
+                <i class="fas fa-fw fa-network-wired me-1"></i><?= __('IP addresses') ?> <span class="badge rounded-pill ms-1"><?= number_format(intval($counts[1])) ?></span>
             </a>
         </nav>
     </div>
@@ -196,22 +196,22 @@ $audit_url = function (array $query) use ($dates_query) {
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <?php if ($view === 'ips') { ?>
                 <tr>
-                    <th class="ps-3"><?= $sort_link('log_ip', 'IP address') ?></th>
-                    <th><?= $sort_link('accounts', 'Accounts tried') ?></th>
-                    <th class="text-end"><?= $sort_link('sign_ins', 'Sign-ins') ?></th>
-                    <th class="text-end"><?= $sort_link('failures', 'Failed') ?></th>
-                    <th class="d-none d-lg-table-cell"><?= $sort_link('first_seen', 'First seen') ?></th>
-                    <th><?= $sort_link('last_seen', 'Last seen') ?></th>
+                    <th class="ps-3"><?= $sort_link('log_ip', __('IP address')) ?></th>
+                    <th><?= $sort_link('accounts', __('Accounts tried')) ?></th>
+                    <th class="text-end"><?= $sort_link('sign_ins', __('Sign-ins')) ?></th>
+                    <th class="text-end"><?= $sort_link('failures', __('Failed')) ?></th>
+                    <th class="d-none d-lg-table-cell"><?= $sort_link('first_seen', __('First seen')) ?></th>
+                    <th><?= $sort_link('last_seen', __('Last seen')) ?></th>
                     <th></th>
                 </tr>
             <?php } else { ?>
                 <tr>
-                    <th class="ps-3"><?= $sort_link('user_name', 'Who') ?></th>
-                    <th class="d-none d-md-table-cell">Last sign in</th>
-                    <th class="text-end"><?= $sort_link('sign_ins', 'Sign-ins') ?></th>
-                    <th class="text-end"><?= $sort_link('failures', 'Failed') ?></th>
-                    <th class="text-end d-none d-sm-table-cell"><?= $sort_link('ips', 'IP addresses') ?></th>
-                    <th class="d-none d-lg-table-cell"><?= $sort_link('last_seen', 'Last seen') ?></th>
+                    <th class="ps-3"><?= $sort_link('user_name', __('Who')) ?></th>
+                    <th class="d-none d-md-table-cell"><?= __('Last sign in') ?></th>
+                    <th class="text-end"><?= $sort_link('sign_ins', __('Sign-ins')) ?></th>
+                    <th class="text-end"><?= $sort_link('failures', __('Failed')) ?></th>
+                    <th class="text-end d-none d-sm-table-cell"><?= $sort_link('ips', __('IP addresses')) ?></th>
+                    <th class="d-none d-lg-table-cell"><?= $sort_link('last_seen', __('Last seen')) ?></th>
                     <th></th>
                 </tr>
             <?php } ?>
@@ -227,15 +227,15 @@ $audit_url = function (array $query) use ($dates_query) {
                             <div class="font-monospace"><?= escapeHtml($ip) ?></div>
                             <div class="small text-body-secondary"><?= escapeHtml($last_devices[$ip] ?? '') ?></div>
                             <?php if (isset($turned_away[$ip])) { ?>
-                                <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal mt-1" title="<?= SIGN_IN_LOCKOUT ?> or more failed sign-ins in the last <?= SIGN_IN_WINDOW_MINUTES ?> minutes" data-turned-away><i class="fas fa-ban me-1"></i>Turned away now</span>
+                                <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal mt-1" title="<?= SIGN_IN_LOCKOUT ?> or more failed sign-ins in the last <?= SIGN_IN_WINDOW_MINUTES ?> minutes" data-turned-away><i class="fas fa-ban me-1"></i><?= __('Turned away now') ?></span>
                             <?php } elseif (intval($row['blocked'])) { ?>
-                                <span class="badge rounded-pill text-bg-light border fw-normal mt-1" title="Turned away for a while, for too many failed sign-ins"><i class="fas fa-ban me-1"></i>Turned away <?= number_format(intval($row['blocked'])) ?>×</span>
+                                <span class="badge rounded-pill text-bg-light border fw-normal mt-1" title="<?= escapeHtml(__('Turned away for a while, for too many failed sign-ins')) ?>"><i class="fas fa-ban me-1"></i><?= __('Turned away %s×', number_format(intval($row['blocked']))) ?></span>
                             <?php } ?>
                         </td>
                         <td class="small" style="min-width: 14rem;">
                             <div class="d-flex flex-wrap gap-2">
                                 <?php foreach (array_slice($people, 0, 3) as $person) { ?>
-                                    <span class="d-inline-flex align-items-center gap-1 text-nowrap"><?= userAvatar($person['user_id'], $person['user_name'], (string) $person['user_avatar'], 'xs') ?><?= escapeHtml($person['user_name']) ?><?= intval($person['user_type']) === 2 ? ' <span class="badge rounded-pill text-bg-light border fw-normal">Portal</span>' : '' ?></span>
+                                    <span class="d-inline-flex align-items-center gap-1 text-nowrap"><?= userAvatar($person['user_id'], $person['user_name'], (string) $person['user_avatar'], 'xs') ?><?= escapeHtml($person['user_name']) ?><?= intval($person['user_type']) === 2 ? ' <span class="badge rounded-pill text-bg-light border fw-normal">' . __('Portal') . '</span>' : '' ?></span>
                                 <?php } ?>
                                 <?php if (count($people) > 3) { ?><span class="text-body-secondary">and <?= count($people) - 3 ?> more</span><?php } ?>
                             </div>
@@ -248,7 +248,7 @@ $audit_url = function (array $query) use ($dates_query) {
                         <td class="d-none d-lg-table-cell small text-nowrap" title="<?= escapeHtml($row['first_seen']) ?>"><?= escapeHtml(date('M j, Y g:i A', strtotime($row['first_seen']))) ?></td>
                         <td class="small text-nowrap" title="<?= escapeHtml($row['last_seen']) ?>"><?= escapeHtml(timeAgo($row['last_seen'])) ?></td>
                         <td class="text-end pe-3">
-                            <a class="btn btn-sm btn-light" href="<?= escapeHtml($audit_url(['q' => $ip])) ?>" title="Its sign-ins in the audit log"><i class="fas fa-fw fa-history"></i></a>
+                            <a class="btn btn-sm btn-light" href="<?= escapeHtml($audit_url(['q' => $ip])) ?>" title="<?= escapeHtml(__('Its sign-ins in the audit log')) ?>"><i class="fas fa-fw fa-history"></i></a>
                         </td>
                     </tr>
                 <?php }
@@ -271,7 +271,7 @@ $audit_url = function (array $query) use ($dates_query) {
                                     <?php } else { ?>
                                         <span class="fw-semibold"><?= escapeHtml($row['user_name']) ?></span>
                                     <?php } ?>
-                                    <?= $portal ? '<span class="badge rounded-pill text-bg-light border fw-normal">Portal</span>' : '' ?>
+                                    <?= $portal ? __('<span class="badge rounded-pill text-bg-light border fw-normal">Portal</span>') : '' ?>
                                     <?= $state !== '' ? '<span class="badge rounded-pill text-bg-secondary fw-normal">' . escapeHtml($state) . '</span>' : '' ?>
                                     <div class="small text-body-secondary text-truncate"><?= escapeHtml($row['user_email']) ?></div>
                                 </div>
@@ -282,25 +282,25 @@ $audit_url = function (array $query) use ($dates_query) {
                                 <div title="<?= escapeHtml($success['log_created_at']) ?>"><?= escapeHtml(timeAgo($success['log_created_at'])) ?></div>
                                 <div class="text-body-secondary"><span class="font-monospace"><?= escapeHtml($success['log_ip']) ?></span><?= auditLogDevice($success['log_user_agent']) !== '' ? ' · ' . escapeHtml(auditLogDevice($success['log_user_agent'])) : '' ?></div>
                             <?php } else { ?>
-                                <span class="text-body-secondary">None<?= $dated ? ' in these dates' : '' ?></span>
+                                <span class="text-body-secondary"><?= $dated ? __('None in these dates') : __('None') ?></span>
                             <?php } ?>
                         </td>
                         <td class="text-end"><?= number_format(intval($row['sign_ins'])) ?></td>
                         <td class="text-end">
                             <span class="<?= intval($row['failures']) ? 'text-danger-emphasis fw-semibold' : 'text-body-secondary' ?>"><?= number_format(intval($row['failures'])) ?></span>
                             <?php if (intval($row['mfa_failures'])) { ?>
-                                <div class="small text-danger-emphasis" title="The password was right, the MFA code wrong"><?= number_format(intval($row['mfa_failures'])) ?> MFA</div>
+                                <div class="small text-danger-emphasis" title="<?= escapeHtml(__('The password was right, the MFA code wrong')) ?>"><?= number_format(intval($row['mfa_failures'])) ?> MFA<?php /* i18n-ignore */ ?></div>
                             <?php } ?>
                         </td>
                         <td class="text-end d-none d-sm-table-cell">
                             <?= number_format(intval($row['ips'])) ?>
                             <?php if (!empty($new_ips[$user_id])) { ?>
-                                <div><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="First used to sign in in these dates" data-new-ips><?= $new_ips[$user_id] ?> new</span></div>
+                                <div><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal" title="<?= escapeHtml(__('First used to sign in in these dates')) ?>" data-new-ips><?= $new_ips[$user_id] ?> new</span></div>
                             <?php } ?>
                         </td>
                         <td class="d-none d-lg-table-cell small text-nowrap" title="<?= escapeHtml($row['last_seen']) ?>"><?= escapeHtml(timeAgo($row['last_seen'])) ?></td>
                         <td class="text-end pe-3">
-                            <a class="btn btn-sm btn-light" href="<?= escapeHtml($audit_url(['user' => $user_id])) ?>" title="Their sign-ins in the audit log"><i class="fas fa-fw fa-history"></i></a>
+                            <a class="btn btn-sm btn-light" href="<?= escapeHtml($audit_url(['user' => $user_id])) ?>" title="<?= escapeHtml(__('Their sign-ins in the audit log')) ?>"><i class="fas fa-fw fa-history"></i></a>
                         </td>
                     </tr>
                 <?php }
@@ -310,11 +310,11 @@ $audit_url = function (array $query) use ($dates_query) {
     </div>
     <?php
     $empty_state = [
-        'thing' => $view === 'ips' ? 'IP addresses' : 'sign-ins',
+        'thing' => $view === 'ips' ? __('IP addresses') : 'sign-ins',
         'icon' => 'fa-sign-in-alt',
         'filtered' => $q !== '' || $dated,
         'views' => ['view'],
-        'text' => 'Agents and portal contacts signing in - and failing to - show here, by who and by where from.',
+        'text' => __('Agents and portal contacts signing in - and failing to - show here, by who and by where from.'),
     ];
     require_once "../includes/filter_footer.php";
     ?>

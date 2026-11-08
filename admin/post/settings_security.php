@@ -34,13 +34,13 @@ if (isset($_POST['edit_security_settings'])) {
 
     $errors = [];
     if ($after['config_login_key_secret'] !== '' && !preg_match('/^\w{3,99}$/', $after['config_login_key_secret'])) {
-        $errors['config_login_key_secret'] = '3 to 99 letters, numbers and underscores - it goes in the address.';
+        $errors['config_login_key_secret'] = __('3 to 99 letters, numbers and underscores - it goes in the address.');
     } elseif ($after['config_login_key_required'] && $after['config_login_key_secret'] === '') {
-        $errors['config_login_key_secret'] = 'Required with no key, agents couldn\'t sign in at all - set one, or switch it off.';
+        $errors['config_login_key_secret'] = __('Required with no key, agents couldn\'t sign in at all - set one, or switch it off.');
     }
     $days = $after['config_login_remember_me_expire'];
     if ($days !== intval($before['config_login_remember_me_expire']) && ($days < 1 || $days > 365)) {
-        $errors['config_login_remember_me_expire'] = 'From 1 day to 365.';
+        $errors['config_login_remember_me_expire'] = __('From 1 day to 365.');
     }
     // Choices from a list settle to one of them, as they always have
     if (!isset(signInAlertOptions()[$after['config_login_alert_failures']])) {

@@ -81,8 +81,8 @@
 
     function copy(button, text) {
         itflowCopyText(text, button).then(
-            function () { flashTooltip(button, 'Copied!'); },
-            function () { flashTooltip(button, 'Copy it by hand'); }
+            function () { flashTooltip(button, __('Copied!')); },
+            function () { flashTooltip(button, __('Copy it by hand')); }
         );
     }
 
@@ -112,7 +112,7 @@
         }
         // A code goes to the recipient, so it needs their address
         if (protection() === 'code' && !isEmail.test((recipient.value || '').trim())) {
-            showError('An emailed code goes to the recipient - pick a contact or type their email address.');
+            showError(__('An emailed code goes to the recipient - pick a contact or type their email address.'));
             return;
         }
         error.hidden = true;
@@ -129,7 +129,7 @@
             try {
                 response = JSON.parse(text);
             } catch (err) {
-                showError('The link could not be made - try again.');
+                showError(__('The link could not be made - try again.'));
                 return;
             }
             if (response.error) {
@@ -150,17 +150,17 @@
             donePane.hidden = false;
             make.hidden = true;
             again.hidden = false;
-            closeLabel.textContent = 'Done';
+            closeLabel.textContent = __('Done');
 
             // Straight onto the clipboard - flash on the link's own copy button
             const linkCopy = form.querySelector('[data-share-copy="link"]');
             itflowCopyText(response.url, linkCopy).then(function () {
                 form.querySelector('[data-share-copied]').hidden = false;
-                flashTooltip(linkCopy, 'Copied!');
+                flashTooltip(linkCopy, __('Copied!'));
             }, function () {});
         }, function () {
             make.disabled = false;
-            showError('The link could not be made - check your connection and try again.');
+            showError(__('The link could not be made - check your connection and try again.'));
         });
     });
 
@@ -171,7 +171,7 @@
         formPane.hidden = false;
         make.hidden = false;
         again.hidden = true;
-        closeLabel.textContent = 'Cancel';
+        closeLabel.textContent = __('Cancel');
         form.querySelector('[data-share-copied]').hidden = true;
         form.querySelector('[data-share-link]').value = '';
         form.querySelector('[data-share-passphrase-value]').value = '';

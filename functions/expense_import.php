@@ -46,11 +46,11 @@ function expenseImportRead($path, &$error = '') {
     $error = '';
     $text = @file_get_contents($path);
     if ($text === false || trim($text) === '') {
-        $error = 'That file is empty';
+        $error = __('That file is empty');
         return null;
     }
     if (strlen($text) > EXPENSE_IMPORT_MAX_BYTES) {
-        $error = 'That file is too big - export a month or two at a time';
+        $error = __('That file is too big - export a month or two at a time');
         return null;
     }
     $text = preg_replace('/^\xEF\xBB\xBF/', '', $text);
@@ -59,7 +59,7 @@ function expenseImportRead($path, &$error = '') {
     }
     $text = str_replace(["\r\n", "\r"], "\n", $text);
     if (strpos($text, "\0") !== false) {
-        $error = "That doesn't look like a CSV file - export the statement as CSV";
+        $error = __('That doesn\'t look like a CSV file - export the statement as CSV');
         return null;
     }
 
@@ -94,7 +94,7 @@ function expenseImportRead($path, &$error = '') {
     }
     fclose($handle);
     if (count($rows) < 1) {
-        $error = 'There are no lines in that file';
+        $error = __('There are no lines in that file');
         return null;
     }
 
@@ -109,7 +109,7 @@ function expenseImportRead($path, &$error = '') {
         }
     }
     if ($first_data === null) {
-        $error = "There are no dates in that file - export the statement's transactions as CSV";
+        $error = __('There are no dates in that file - export the statement\'s transactions as CSV');
         return null;
     }
     $width = max(array_map('count', array_slice($rows, $first_data, 50)));
@@ -128,7 +128,7 @@ function expenseImportRead($path, &$error = '') {
         $data[] = array_pad(array_slice($cells, 0, $width), $width, '');
     }
     if (count($data) > EXPENSE_IMPORT_MAX_LINES) {
-        $error = 'That file has more than ' . EXPENSE_IMPORT_MAX_LINES . ' lines - export a shorter period';
+        $error = __('That file has more than %d lines - export a shorter period', EXPENSE_IMPORT_MAX_LINES);
         return null;
     }
     return ['header' => $names, 'rows' => $data];
@@ -387,7 +387,7 @@ function expenseImportLines(array $rows, array $map) {
         if ($memo !== '' && $memo !== $description) {
             $description = trim("$description - $memo", ' -');
         }
-        $problem = $date === null ? "The date isn't in the format picked" : ($amount === null ? 'There is no amount' : ($amount == 0 ? 'The amount is zero' : ''));
+        $problem = $date === null ? __("The date isn't in the format picked") : ($amount === null ? __('There is no amount') : ($amount == 0 ? __('The amount is zero') : ''));
         $lines[] = [
             'n' => count($lines),
             'date' => $date,
@@ -463,7 +463,7 @@ function expenseImportVendorName($description) {
     if ($shouting) {
         $words = array_map(function ($word) { return mb_convert_case(mb_strtolower($word), MB_CASE_TITLE); }, $words);
     }
-    return mb_substr(implode(' ', $words), 0, 200) ?: 'New vendor';
+    return mb_substr(implode(' ', $words), 0, 200) ?: __('New vendor');
 }
 
 /** The remembered merchants - match => [vendor_id, category_id, client_id, billable, id]. */
@@ -627,7 +627,7 @@ function expenseImportDuplicates($account_id, array $lines) {
         if ($best) {
             $used[$best[0]] = true;
             $lines[$i]['entered'] = $best[0];
-            $lines[$i]['entered_label'] = trim($existing[$best[0]]['vendor_name'] . ' on ' . $existing[$best[0]]['expense_date']);
+            $lines[$i]['entered_label'] = trim(__('%1$s on %2$s', $existing[$best[0]]['vendor_name'], $existing[$best[0]]['expense_date']));
         }
     }
     return $lines;
@@ -677,7 +677,7 @@ function expenseImportSave(array $import, array $picks, &$error = '') {
     $account_id = intval($import['account_id']);
     $accounts = paymentAccounts();
     if (!isset($accounts[$account_id])) {
-        $error = 'The account the statement is for no longer exists';
+        $error = __('The account the statement is for no longer exists');
         return null;
     }
     $method = (string) $import['method'];
@@ -706,17 +706,17 @@ function expenseImportSave(array $import, array $picks, &$error = '') {
         $new_name = trim((string) ($pick['new_vendor'] ?? ''));
         $category = intval($pick['category'] ?? 0);
         $client = intval($pick['client'] ?? 0);
-        $what = date('M j', strtotime($line['date'])) . ' ' . billingMoney(abs($line['amount']), $accounts[$account_id]['account_currency_code']);
+        $what = formatDate($line['date'], 'date_short') . ' ' . billingMoney(abs($line['amount']), $accounts[$account_id]['account_currency_code']);
         if ($vendor === 'new' ? $new_name === '' : !isset($vendors[intval($vendor)])) {
-            $error = "Pick the vendor for $what";
+            $error = __('Pick the vendor for %s', $what);
             return null;
         }
         if (!isset($categories[$category])) {
-            $error = "Pick the category for $what";
+            $error = __('Pick the category for %s', $what);
             return null;
         }
         if ($client && !isset($clients[$client])) {
-            $error = "The client picked for $what isn't one you can file expenses against";
+            $error = __("The client picked for %s isn't one you can file expenses against", $what);
             return null;
         }
         $bring[] = ['line' => $line, 'vendor' => $vendor === 'new' ? 0 : intval($vendor), 'new_vendor' => mb_substr($new_name, 0, 200), 'category' => $category, 'client' => $client,
@@ -739,7 +739,7 @@ function expenseImportSave(array $import, array $picks, &$error = '') {
             if ($existing) {
                 $by_name[$name_key] = intval($existing[0]);
             } else {
-                mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => $item['new_vendor'], 'description' => 'Added from a statement import']) . ", vendor_client_id = 0");
+                mysqli_query($mysqli, "INSERT INTO vendors SET " . vendorFormSet(['name' => $item['new_vendor'], 'description' => __('Added from a statement import')]) . ", vendor_client_id = 0");
                 $by_name[$name_key] = mysqli_insert_id($mysqli);
                 logAudit('Vendor', 'Create', escapeSql(stripslashes((string) ($GLOBALS['session_name'] ?? 'ITFlow')) . " created vendor {$item['new_vendor']} from a statement import"), 0, $by_name[$name_key]);
                 $made++;

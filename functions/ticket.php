@@ -63,7 +63,7 @@ function ticketForRequest($ticket_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = ticketRow($ticket_id);
     if (!$row) {
-        flashAlert('That ticket no longer exists.', 'error');
+        flashAlert(__('That ticket no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['ticket_client_id']);
@@ -83,7 +83,7 @@ function ticketForModal($ticket_id, $level = 2, $open_only = false) {
     enforceUserPermission('module_support', $level);
     $row = ticketRow($ticket_id);
     if (!$row) {
-        echo json_encode(['error' => 'That ticket no longer exists.']);
+        echo json_encode(['error' => __('That ticket no longer exists.')]);
         exit;
     }
     $client_id = intval($row['ticket_client_id']);
@@ -347,14 +347,49 @@ function ticketEmailSla($ticket_id) {
     $phone = billingCompany()['phone_display'] ?? '';
     $callout = '';
     if ($phone !== '' && $row['ticket_priority'] === 'Urgent') {
-        $callout = "This ticket is marked Urgent. If it is stopping work right now, call us on $phone rather than waiting for a reply.";
+        $callout = __('This ticket is marked Urgent. If it is stopping work right now, call us on %s rather than waiting for a reply.', $phone);
     } elseif ($phone !== '' && $row['ticket_priority'] === 'High') {
-        $callout = "This ticket is marked High priority. If it is holding up your business, calling us on $phone gets you the fastest answer.";
+        $callout = __('This ticket is marked High priority. If it is holding up your business, calling us on %s gets you the fastest answer.', $phone);
     }
     return [
-        'summary' => ['We will respond' => 'within ' . formatSlaMinutes(intval($row['sla_response_minutes'])) . ', by ' . date('D j M, g:i A', strtotime($row['ticket_response_due_at']))],
+        'summary' => [__('We will respond') => __('within %1$s, by %2$s', formatSlaMinutes(intval($row['sla_response_minutes'])), formatDate($row['ticket_response_due_at'], 'datetime_weekday'))],
         'callout' => $callout,
     ];
+}
+
+/**
+ * The line the portal adds to a ticket when its contact resolves, reopens or
+ * closes it ($action: resolved, reopened, closed), in the interface language -
+ * raw; $name is the contact's, raw. It is kept as written, so
+ * ticketIsClientEventLine() knows it in any language.
+ */
+function ticketClientEventLine($action, $name) {
+    switch ($action) {
+        case 'resolved':
+            return __('Ticket resolved by %s.', $name);
+        case 'reopened':
+            return __('Ticket reopened by %s.', $name);
+    }
+    return __('Ticket closed by %s.', $name);
+}
+
+/** Is this text (no tags) one of ticketClientEventLine()'s lines - in English or any language ITFlow offers, whatever it is in now? */
+function ticketIsClientEventLine($text) {
+    static $pattern = null;
+    if ($pattern === null) {
+        $name = '{{name}}';
+        $lines = [];
+        $was = i18nLocale();
+        foreach (array_keys(i18nLanguages()) as $locale) {
+            i18nSetLocale($locale);
+            foreach (['resolved', 'reopened', 'closed'] as $action) {
+                $lines[] = str_replace(preg_quote($name, '/'), '.{1,200}', preg_quote(ticketClientEventLine($action, $name), '/'));
+            }
+        }
+        i18nSetLocale($was);
+        $pattern = '/^(?:' . implode('|', array_unique($lines)) . ')$/u';
+    }
+    return preg_match($pattern, trim((string) $text)) === 1;
 }
 
 /*
@@ -398,7 +433,7 @@ function ticketEmailHistory(array $row, array $opts = []) {
         foreach ($replies as $reply) {
             $text = ticketEmailExcerpt($reply['ticket_reply']);
             $client = $reply['ticket_reply_type'] === 'Client';
-            if ($text === '' || ($client && preg_match('/^Ticket (resolved|reopened|closed) by .{1,200}\.$/', $text))) {
+            if ($text === '' || ($client && ticketIsClientEventLine($text))) {
                 continue;
             }
             if (count($items) >= $limit) {
@@ -406,9 +441,9 @@ function ticketEmailHistory(array $row, array $opts = []) {
                 continue;
             }
             $items[] = [
-                'by' => $client ? ((string) $reply['contact_name'] ?: 'Client') : ((string) $reply['user_name'] ?: $company_name),
+                'by' => $client ? ((string) $reply['contact_name'] ?: __('Client')) : ((string) $reply['user_name'] ?: $company_name),
                 'org' => $client ? '' : $company_name,
-                'when' => date('D j M, g:i A', strtotime($reply['ticket_reply_created_at'])),
+                'when' => formatDate($reply['ticket_reply_created_at'], 'datetime_weekday'),
                 'text' => $text,
                 'client' => $client,
             ];
@@ -424,20 +459,20 @@ function ticketEmailHistory(array $row, array $opts = []) {
             }
             $asked_by = trim((string) ($row['contact_name'] ?? ''));
             $items[] = [
-                'by' => $asked_by !== '' ? $asked_by : 'The request',
-                'action' => $asked_by !== '' ? 'the request' : '',
-                'when' => date('D j M, g:i A', strtotime($row['ticket_created_at'])),
+                'by' => $asked_by !== '' ? $asked_by : __('The request'),
+                'action' => $asked_by !== '' ? _x('the request', 'email history') : '',
+                'when' => formatDate($row['ticket_created_at'], 'datetime_weekday'),
                 'text' => $text,
                 'client' => true,
             ];
         }
     }
-    return $items ? ['label' => (string) ($opts['label'] ?? 'Earlier on this ticket'), 'items' => $items] : [];
+    return $items ? ['label' => (string) ($opts['label'] ?? __('Earlier on this ticket')), 'items' => $items] : [];
 }
 
-/** A ticket message as a short plain-text excerpt - without the "Email from: ... :-" line the email parser puts on what it saves. */
+/** A ticket message as a short plain-text excerpt - without the "Email from: ... :-" line the email parser puts on what it saves, in whatever language it was written. */
 function ticketEmailExcerpt($html, $limit = 700) {
-    $html = preg_replace('#^\s*<i>\s*Email from:.*?</i>(\s*<br\s*/?>)*#is', '', (string) $html);
+    $html = preg_replace('#^\s*<i>[^\n]{0,600}?:-</i>(\s*<br\s*/?>)*#is', '', (string) $html);
     return emailPlainText($html, $limit);
 }
 
@@ -459,82 +494,94 @@ function ticketEmailContent(array $row, $kind, array $opts = []) {
     $url = ticketEmailUrl($row);
     $company_name = (string) (billingCompany()['company_name'] ?? '');
     $by = trim((string) ($opts['by'] ?? '')) !== '' ? trim((string) $opts['by']) : $company_name;
-    $summary = ['Ticket' => $reference, 'Subject' => $subject, 'Status' => (string) ($row['ticket_status_name'] ?? '')];
+    $summary = [__('Ticket') => $reference, __('Subject') => $subject, __('Status') => ticketStatusLabel($row['ticket_status'] ?? 0, $row['ticket_status_name'] ?? '')];
     $email = [
         'marker' => true,
         'preview' => "$reference - $subject",
         'tone' => 'primary',
         'contact' => ticketEmailContactLine(),
-        'button' => ['label' => 'View the ticket', 'url' => $url],
+        'button' => ['label' => __('View the ticket'), 'url' => $url],
     ];
 
     if ($kind === 'created') {
         $how = (string) ($opts['how'] ?? 'agent');
         $sla = ticketEmailSla($row['ticket_id']);
-        $email['kind'] = 'New ticket';
+        $email['kind'] = __('New ticket');
         if ($how === 'email') {
-            $email['title'] = 'We have your email';
-            $email['intro'] = ["Thank you - it is ticket $reference now, and we will reply to you here. To add anything, just reply to this email."];
+            $email['title'] = __('We have your email');
+            $email['intro'] = [__('Thank you - it is ticket %s now, and we will reply to you here. To add anything, just reply to this email.', $reference)];
             // Never their own words back: the sender of an email can be forged, and an echo would carry whatever it said to them
         } else {
-            $email['title'] = $how === 'scheduled' ? 'A scheduled ticket was opened for you' : 'We have opened a ticket for you';
-            $email['intro'] = [($how === 'scheduled' ? "Ticket $reference was opened for you, as scheduled." : "We have opened ticket $reference for you.")
-                . " We will keep you posted here - to add anything, just reply to this email."];
-            $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => 'Details'];
+            $email['title'] = $how === 'scheduled' ? __('A scheduled ticket was opened for you') : __('We have opened a ticket for you');
+            $email['intro'] = [($how === 'scheduled' ? __('Ticket %s was opened for you, as scheduled.', $reference) : __('We have opened ticket %s for you.', $reference))
+                . ' ' . __('We will keep you posted here - to add anything, just reply to this email.')];
+            $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => __('Details')];
         }
-        $email['summary'] = $summary + ['Priority' => (string) $row['ticket_priority']] + $sla['summary'];
+        $email['summary'] = $summary + [__('Priority') => ticketPriorityLabel($row['ticket_priority'])] + $sla['summary'];
         $email['callout'] = $sla['callout'];
-        $email['button']['label'] = 'View your ticket';
+        $email['button']['label'] = __('View your ticket');
     } elseif ($kind === 'reply') {
-        $email['kind'] = 'Ticket update';
+        $email['kind'] = __('Ticket update');
         $email['title'] = $subject;
-        $email['intro'] = ["There is a new reply on your ticket $reference."];
-        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => "$by replied"];
+        $email['intro'] = [__('There is a new reply on your ticket %s.', $reference)];
+        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => __('%s replied', $by)];
         $email['summary'] = $summary;
-        $email['after'] = ['To answer, just reply to this email.'];
+        $email['after'] = [__('To answer, just reply to this email.')];
         $email['history'] = ticketEmailHistory($row, ['skip' => (string) ($opts['message'] ?? '')]);
     } elseif ($kind === 'resolved') {
         $hours = intval($config_ticket_autoclose_hours);
-        $closes = $hours > 0 ? ' - it closes by itself after ' . ($hours % 24 === 0 ? ($hours / 24) . ' day' . ($hours === 24 ? '' : 's') : "$hours hours") : '';
-        $email['kind'] = 'Resolved';
+        $email['kind'] = __('Resolved');
         $email['tone'] = 'success';
-        $email['title'] = 'Your ticket is resolved';
-        $email['intro'] = ["We have marked ticket $reference resolved.", "If that sorts it, there is nothing more to do$closes. If not, reply to this email or reopen it and tell us what is still wrong."];
-        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => "$by wrote"];
+        $email['title'] = __('Your ticket is resolved');
+        $email['intro'] = [__('We have marked ticket %s resolved.', $reference), $hours > 0
+            ? __('If that sorts it, there is nothing more to do - it closes by itself after %s. If not, reply to this email or reopen it and tell us what is still wrong.',
+                $hours % 24 === 0 ? _n('%d day', '%d days', $hours / 24) : _n('%d hour', '%d hours', $hours))
+            : __('If that sorts it, there is nothing more to do. If not, reply to this email or reopen it and tell us what is still wrong.')];
+        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => __('%s wrote', $by)];
         $email['summary'] = $summary;
-        $email['button']['label'] = 'View or reopen it';
+        $email['button']['label'] = __('View or reopen it');
         // Resolved from the button or the board there is no note - the conversation says what was done
         $email['history'] = ticketEmailHistory($row, ['skip' => (string) ($opts['message'] ?? ''),
-            'label' => emailPlainText($opts['message'] ?? '') !== '' ? 'Earlier on this ticket' : 'The conversation']);
+            'label' => emailPlainText($opts['message'] ?? '') !== '' ? __('Earlier on this ticket') : __('The conversation')]);
     } elseif ($kind === 'closed') {
         $email['marker'] = false;
-        $email['kind'] = 'Closed';
+        $email['kind'] = __('Closed');
         $email['tone'] = 'secondary';
-        $email['title'] = 'Your ticket is closed';
-        $email['intro'] = ["Ticket $reference is closed. We hope it was sorted the way you wanted."];
+        $email['title'] = __('Your ticket is closed');
+        $email['intro'] = [__('Ticket %s is closed. We hope it was sorted the way you wanted.', $reference)];
         $email['summary'] = $summary;
-        $email['button']['label'] = 'Tell us how we did';
-        $email['after'] = ['Need more help with this? Raise a new ticket - replies to this email do not reach us.'];
-        $email['history'] = ticketEmailHistory($row, ['limit' => 3, 'label' => 'The conversation']);
+        $email['button']['label'] = __('Tell us how we did');
+        $email['after'] = [__('Need more help with this? Raise a new ticket - replies to this email do not reach us.')];
+        $email['history'] = ticketEmailHistory($row, ['limit' => 3, 'label' => __('The conversation')]);
     } elseif ($kind === 'scheduled') {
         $cancelled = !empty($opts['cancelled']);
-        $email['kind'] = $cancelled ? 'Visit cancelled' : 'Work booked';
+        $email['kind'] = $cancelled ? __('Visit cancelled') : __('Work booked');
         $email['tone'] = $cancelled ? 'secondary' : 'primary';
-        $email['title'] = $cancelled ? 'The booked work is cancelled' : 'Your ticket is booked in';
+        $email['title'] = $cancelled ? __('The booked work is cancelled') : __('Your ticket is booked in');
         $email['intro'] = [$cancelled
-            ? "The work booked on ticket $reference is cancelled - the calendar file with this email takes it out of your calendar. We will be in touch to book it again."
-            : "We have booked the work on ticket $reference for " . $opts['when'] . ". The calendar file with this email adds it to your calendar."];
-        $email['summary'] = $summary + ($cancelled ? [] : ['When' => (string) $opts['when'], 'Where' => !empty($row['ticket_onsite']) ? (trim((string) ($opts['where'] ?? '')) !== '' ? (string) $opts['where'] : 'Onsite') : 'Remote']);
-        $email['history'] = $cancelled ? [] : ticketEmailHistory($row, ['limit' => 2, 'label' => 'What it is about']);
+            ? __('The work booked on ticket %s is cancelled - the calendar file with this email takes it out of your calendar. We will be in touch to book it again.', $reference)
+            : __('We have booked the work on ticket %1$s for %2$s. The calendar file with this email adds it to your calendar.', $reference, $opts['when'])];
+        $email['summary'] = $summary + ($cancelled ? [] : [__('When') => (string) $opts['when'], __('Where') => ticketEmailWhere($row, $opts)]);
+        $email['history'] = $cancelled ? [] : ticketEmailHistory($row, ['limit' => 2, 'label' => __('What it is about')]);
     } elseif ($kind === 'watcher') {
-        $email['kind'] = 'Watching';
-        $email['title'] = 'You were added to a ticket';
-        $email['intro'] = ["$by added you to ticket $reference" . (!empty($row['client_name']) ? ' for ' . $row['client_name'] : '') . ", so you will get its updates. To add anything, just reply to this email."];
-        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => 'Details'];
+        $email['kind'] = __('Watching');
+        $email['title'] = __('You were added to a ticket');
+        $email['intro'] = [!empty($row['client_name'])
+            ? __('%1$s added you to ticket %2$s for %3$s, so you will get its updates. To add anything, just reply to this email.', $by, $reference, $row['client_name'])
+            : __('%1$s added you to ticket %2$s, so you will get its updates. To add anything, just reply to this email.', $by, $reference)];
+        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => __('Details')];
         $email['summary'] = $summary;
-        $email['history'] = ticketEmailHistory($row, ['request' => false, 'label' => 'Replies so far']);
+        $email['history'] = ticketEmailHistory($row, ['request' => false, 'label' => __('Replies so far')]);
     }
     return ticketEmailPreview($email);
+}
+
+/** Where booked work happens, for a scheduled email's summary - the site's address ($opts['where']) or Onsite, or Remote. */
+function ticketEmailWhere(array $row, array $opts) {
+    if (empty($row['ticket_onsite'])) {
+        return __('Remote');
+    }
+    return trim((string) ($opts['where'] ?? '')) !== '' ? (string) $opts['where'] : __('Onsite');
 }
 
 /*
@@ -585,24 +632,24 @@ function ticketMailSend($ticket_id, $subject, array $email, array $opts = []) {
         return 0;
     }
     $reference = ticketReference($row);
-    $company_name = (string) (billingCompany()['company_name'] ?? 'us');
+    $company_name = (string) (billingCompany()['company_name'] ?? __('us'));
     $recipients = [];
     if (isset($opts['to'])) {
         foreach ((array) $opts['to'] as $to) {
-            $recipients[] = ['email' => $to['email'], 'name' => (string) ($to['name'] ?? ''), 'footnote' => "You get this because you emailed $company_name."];
+            $recipients[] = ['email' => $to['email'], 'name' => (string) ($to['name'] ?? ''), 'footnote' => __('You get this because you emailed %s.', $company_name)];
         }
     } elseif (($opts['to_contact'] ?? true) && ticketContactWantsEmail($row['contact_ticket_emails'] ?? 'all', $kind)) {
-        $recipients[] = ['email' => (string) $row['contact_email'], 'name' => (string) $row['contact_name'], 'footnote' => "You get this as the contact on ticket $reference with $company_name."];
+        $recipients[] = ['email' => (string) $row['contact_email'], 'name' => (string) $row['contact_name'], 'footnote' => __('You get this as the contact on ticket %1$s with %2$s.', $reference, $company_name)];
     }
     if ($to_watchers) {
         $sql = mysqli_query($mysqli, "SELECT watcher_email FROM ticket_watchers WHERE watcher_ticket_id = $ticket_id");
         while ($watcher = mysqli_fetch_assoc($sql)) {
-            $recipients[] = ['email' => trim((string) $watcher['watcher_email']), 'greet' => '', 'footnote' => "You get this because you are watching ticket $reference - ask $company_name if you would like to stop."];
+            $recipients[] = ['email' => trim((string) $watcher['watcher_email']), 'greet' => '', 'footnote' => __('You get this because you are watching ticket %1$s - ask %2$s if you would like to stop.', $reference, $company_name)];
         }
         // A new ticket reaches them by ticketMailColleaguesNew(), in an email of its own
         if ($kind !== 'created') {
             foreach (ticketColleagueRecipients($ticket_id, $kind) as $address => $colleague) {
-                $recipients[] = ['email' => $address, 'name' => $colleague['name'], 'footnote' => "You get this because you asked for every update on " . $colleague['client_name'] . "'s tickets - change that under Your account in the client portal."];
+                $recipients[] = ['email' => $address, 'name' => $colleague['name'], 'footnote' => __('You get this because you asked for every update on the tickets of %s - change that under Your account in the client portal.', $colleague['client_name'])];
             }
         }
     }
@@ -663,7 +710,7 @@ function ticketMailColleaguesNew($ticket_id) {
     }
     $ticket_id = intval($ticket['ticket_id']);
     $reference = ticketReference($ticket);
-    $raised_by = trim((string) $ticket['contact_name']) !== '' ? (string) $ticket['contact_name'] : 'We';
+    $raised_by = trim((string) $ticket['contact_name']);
     // What was asked - not for an emailed ticket, sent on by itself: a forged sender would have us carry their words to the client
     $echo = (string) $ticket['ticket_source'] !== 'Email';
     $sent = 0;
@@ -671,14 +718,15 @@ function ticketMailColleaguesNew($ticket_id) {
         $url = $colleague['portal'] ? "https://$config_base_url/client/ticket.php?id=$ticket_id" : ticketEmailUrl($ticket);
         $sent += count(emailQueue([[
             'email' => $email, 'name' => $colleague['name'],
-            'footnote' => "You get this because you asked to hear about new tickets at " . $colleague['client_name'] . ($colleague['portal'] ? ' - change that under Your account in the client portal.' : '.'),
-        ]], "New ticket - [$reference] - " . $ticket['ticket_subject'], [
-            'kind' => 'New ticket', 'tone' => 'primary', 'preview' => ($echo ? preg_replace('/\s+/', ' ', emailPlainText($ticket['ticket_details'], 140)) : '') ?: "$reference - " . $ticket['ticket_subject'],
-            'title' => "New ticket at " . $colleague['client_name'],
-            'intro' => ["$raised_by raised a ticket at " . $colleague['client_name'] . '.'],
-            'message' => ['html' => $echo ? (string) $ticket['ticket_details'] : '', 'label' => 'Details'],
-            'summary' => ['Ticket' => $reference, 'Subject' => (string) $ticket['ticket_subject'], 'Priority' => (string) $ticket['ticket_priority'], 'Raised by' => $raised_by === 'We' ? 'Us' : $raised_by],
-            'button' => ['label' => $colleague['portal'] ? 'View it in the portal' : 'View the ticket', 'url' => $url],
+            'footnote' => $colleague['portal'] ? __('You get this because you asked to hear about new tickets at %s - change that under Your account in the client portal.', $colleague['client_name'])
+                : __('You get this because you asked to hear about new tickets at %s.', $colleague['client_name']),
+        ]], __('New ticket - [%1$s] - %2$s', $reference, $ticket['ticket_subject']), [
+            'kind' => __('New ticket'), 'tone' => 'primary', 'preview' => ($echo ? preg_replace('/\s+/', ' ', emailPlainText($ticket['ticket_details'], 140)) : '') ?: "$reference - " . $ticket['ticket_subject'],
+            'title' => __('New ticket at %s', $colleague['client_name']),
+            'intro' => [$raised_by !== '' ? __('%1$s raised a ticket at %2$s.', $raised_by, $colleague['client_name']) : __('We raised a ticket at %s.', $colleague['client_name'])],
+            'message' => ['html' => $echo ? (string) $ticket['ticket_details'] : '', 'label' => __('Details')],
+            'summary' => [__('Ticket') => $reference, __('Subject') => (string) $ticket['ticket_subject'], __('Priority') => ticketPriorityLabel($ticket['ticket_priority']), __('Raised by') => $raised_by !== '' ? $raised_by : __('Us')],
+            'button' => ['label' => $colleague['portal'] ? __('View it in the portal') : __('View the ticket'), 'url' => $url],
             'contact' => ticketEmailContactLine(),
         ], ['from' => ticketEmailFrom()]));
     }
@@ -711,7 +759,7 @@ function ticketMailReply($ticket_id, $reply_html, $by, $resolved = false, $attac
         ticketReplyEmailed($reply_id, false);
         return 0;
     }
-    $sent = ticketMailSend($row['ticket_id'], ($resolved ? 'Ticket resolved' : 'Ticket update') . " - [" . ticketReference($row) . "] - " . $row['ticket_subject'] . ($resolved ? ' | (pending closure)' : ''),
+    $sent = ticketMailSend($row['ticket_id'], $resolved ? __('Ticket resolved - [%1$s] - %2$s | (pending closure)', ticketReference($row), $row['ticket_subject']) : __('Ticket update - [%1$s] - %2$s', ticketReference($row), $row['ticket_subject']),
         ticketEmailContent($row, $resolved ? 'resolved' : 'reply', ['message' => (string) $reply_html, 'by' => (string) $by]), ['attachments' => $attachments, 'ticket_reply_id' => intval($reply_id)]);
     ticketReplyEmailed($reply_id, $sent > 0);
     return $sent;
@@ -821,10 +869,10 @@ function ticketMailWatchersAdded($ticket_id, array $emails, $by) {
     if (!$row || !$emails) {
         return 0;
     }
-    $company_name = (string) (billingCompany()['company_name'] ?? 'us');
+    $company_name = (string) (billingCompany()['company_name'] ?? __('us'));
     return count(emailQueue(array_map(function ($watcher_email) use ($row, $company_name) {
-        return ['email' => $watcher_email, 'greet' => '', 'footnote' => "You get this because you are watching ticket " . ticketReference($row) . " - ask $company_name if you would like to stop."];
-    }, $emails), "Ticket Notification - [" . ticketReference($row) . "] - " . $row['ticket_subject'], ticketEmailContent($row, 'watcher', ['by' => (string) $by]), ['from' => ticketEmailFrom()]));
+        return ['email' => $watcher_email, 'greet' => '', 'footnote' => __('You get this because you are watching ticket %1$s - ask %2$s if you would like to stop.', ticketReference($row), $company_name)];
+    }, $emails), __('Ticket Notification - [%1$s] - %2$s', ticketReference($row), $row['ticket_subject']), ticketEmailContent($row, 'watcher', ['by' => (string) $by]), ['from' => ticketEmailFrom()]));
 }
 
 /* ------------------------------------------------------------ Emails about a ticket, to agents */
@@ -858,61 +906,74 @@ function ticketMailAgent($user_id) {
 function ticketAgentEmailContent(array $row, $kind, array $opts = []) {
     $reference = ticketReference($row);
     $subject = (string) $row['ticket_subject'];
-    $client = !empty($row['client_name']) ? (string) $row['client_name'] : (intval($row['ticket_client_id'] ?? 0) ? 'A client' : 'No client');
+    $client = !empty($row['client_name']) ? (string) $row['client_name'] : (intval($row['ticket_client_id'] ?? 0) ? __('A client') : __('No client'));
     $by = trim((string) ($opts['by'] ?? ''));
+    $priority = ticketPriorityLabel($row['ticket_priority']);
     $email = [
-        'kind' => 'Ticket', 'tone' => 'primary', 'title' => $subject, 'preview' => "$reference - $subject",
-        'summary' => ['Client' => $client, 'Ticket' => $reference, 'Priority' => (string) $row['ticket_priority'], 'Status' => (string) ($row['ticket_status_name'] ?? '')],
-        'button' => ['label' => 'Open in ITFlow', 'url' => ticketAgentUrl($row)],
+        'kind' => __('Ticket'), 'tone' => 'primary', 'title' => $subject, 'preview' => "$reference - $subject",
+        'summary' => [__('Client') => $client, __('Ticket') => $reference, __('Priority') => $priority, __('Status') => ticketStatusLabel($row['ticket_status'] ?? 0, $row['ticket_status_name'] ?? '')],
+        'button' => ['label' => __('Open in ITFlow'), 'url' => ticketAgentUrl($row)],
     ];
     if ($kind === 'new') {
-        $how = ['portal' => ' in the client portal', 'email' => ' by email', 'scheduled' => ', as scheduled'][$opts['how'] ?? ''] ?? '';
-        $who = ($opts['how'] ?? '') === 'scheduled' ? 'A recurring ticket was raised' : (trim((string) ($row['contact_name'] ?? '')) !== '' ? $row['contact_name'] . ' raised a ticket' : 'A ticket was raised');
-        $email['kind'] = 'New ticket';
-        $email['intro'] = [($opts['how'] ?? '') === 'scheduled' ? "$who for $client, as scheduled." : "$who$how for $client."];
-        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => 'Details'];
-        $email['summary'] = ['Client' => $client, 'Ticket' => $reference, 'Priority' => (string) $row['ticket_priority']]
-            + (trim((string) ($row['contact_name'] ?? '')) !== '' ? ['Contact' => (string) $row['contact_name']] : []);
+        $how = (string) ($opts['how'] ?? '');
+        $contact = trim((string) ($row['contact_name'] ?? ''));
+        if ($how === 'scheduled') {
+            $intro = __('A recurring ticket was raised for %s, as scheduled.', $client);
+        } elseif ($how === 'portal') {
+            $intro = $contact !== '' ? __('%1$s raised a ticket in the client portal for %2$s.', $contact, $client) : __('A ticket was raised in the client portal for %s.', $client);
+        } elseif ($how === 'email') {
+            $intro = $contact !== '' ? __('%1$s raised a ticket by email for %2$s.', $contact, $client) : __('A ticket was raised by email for %s.', $client);
+        } else {
+            $intro = $contact !== '' ? __('%1$s raised a ticket for %2$s.', $contact, $client) : __('A ticket was raised for %s.', $client);
+        }
+        $email['kind'] = __('New ticket');
+        $email['intro'] = [$intro];
+        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => __('Details')];
+        $email['summary'] = [__('Client') => $client, __('Ticket') => $reference, __('Priority') => $priority]
+            + ($contact !== '' ? [__('Contact') => $contact] : []);
     } elseif ($kind === 'replied') {
-        $how = ['portal' => ' in the client portal', 'email' => ' by email'][$opts['how'] ?? ''] ?? '';
-        $email['kind'] = 'Client replied';
-        $email['intro'] = [($by !== '' ? $by : 'The client') . " replied to $reference$how."];
-        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => ($by !== '' ? $by : 'They') . ' wrote'];
-        $email['after'] = ['Answer it in ITFlow, so the client gets your reply.'];
+        $how = (string) ($opts['how'] ?? '');
+        $who = $by !== '' ? $by : __('The client');
+        $email['kind'] = __('Client replied');
+        $email['intro'] = [$how === 'portal' ? __('%1$s replied to %2$s in the client portal.', $who, $reference)
+            : ($how === 'email' ? __('%1$s replied to %2$s by email.', $who, $reference) : __('%1$s replied to %2$s.', $who, $reference))];
+        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => $by !== '' ? __('%s wrote', $by) : __('They wrote')];
+        $email['after'] = [__('Answer it in ITFlow, so the client gets your reply.')];
         $email['history'] = ticketEmailHistory($row, ['skip' => (string) ($opts['message'] ?? '')]);
     } elseif ($kind === 'mentioned') {
-        $email['kind'] = 'Mentioned you';
-        $email['intro'] = [($by !== '' ? $by : 'Someone') . " mentioned you in an internal note on $reference."];
-        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => ($by !== '' ? $by : 'They') . ' wrote - only your team can see this'];
-        $email['history'] = ticketEmailHistory($row, ['limit' => 2, 'label' => 'The conversation']);
+        $email['kind'] = __('Mentioned you');
+        $email['intro'] = [__('%1$s mentioned you in an internal note on %2$s.', $by !== '' ? $by : __('Someone'), $reference)];
+        $email['message'] = ['html' => (string) ($opts['message'] ?? ''), 'label' => $by !== '' ? __('%s wrote - only your team can see this', $by) : __('They wrote - only your team can see this')];
+        $email['history'] = ticketEmailHistory($row, ['limit' => 2, 'label' => __('The conversation')]);
         if (!empty($opts['reply_id'])) {
-            $email['button'] = ['label' => 'Open the note', 'url' => ticketMentionUrl($row, $opts['reply_id'], true)];
+            $email['button'] = ['label' => __('Open the note'), 'url' => ticketMentionUrl($row, $opts['reply_id'], true)];
         }
     } elseif ($kind === 'assigned') {
-        $email['kind'] = 'Assigned to you';
-        $email['intro'] = [($by !== '' ? $by : 'Someone') . " assigned $reference to you."];
-        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => 'Details'];
-        $email['history'] = ticketEmailHistory($row, ['request' => false, 'label' => 'Replies so far']);
+        $email['kind'] = __('Assigned to you');
+        $email['intro'] = [__('%1$s assigned %2$s to you.', $by !== '' ? $by : __('Someone'), $reference)];
+        $email['message'] = ['html' => (string) $row['ticket_details'], 'label' => __('Details')];
+        $email['history'] = ticketEmailHistory($row, ['request' => false, 'label' => __('Replies so far')]);
     } elseif ($kind === 'scheduled') {
         $cancelled = !empty($opts['cancelled']);
-        $email['kind'] = $cancelled ? 'Visit cancelled' : 'Work booked';
+        $email['kind'] = $cancelled ? __('Visit cancelled') : __('Work booked');
         $email['tone'] = $cancelled ? 'secondary' : 'primary';
-        $email['intro'] = [$cancelled ? "The work booked on $reference is cancelled - the calendar file with this email takes it out of your calendar." : "$reference is booked for " . $opts['when'] . " - the calendar file with this email adds it to your calendar."];
+        $email['intro'] = [$cancelled ? __('The work booked on %s is cancelled - the calendar file with this email takes it out of your calendar.', $reference)
+            : __('%1$s is booked for %2$s - the calendar file with this email adds it to your calendar.', $reference, $opts['when'])];
         if (!$cancelled) {
-            $email['summary'] += ['When' => (string) $opts['when'], 'Where' => !empty($row['ticket_onsite']) ? (trim((string) ($opts['where'] ?? '')) !== '' ? (string) $opts['where'] : 'Onsite') : 'Remote'];
-            $email['history'] = ticketEmailHistory($row, ['limit' => 2, 'label' => 'What it is about']);
+            $email['summary'] += [__('When') => (string) $opts['when'], __('Where') => ticketEmailWhere($row, $opts)];
+            $email['history'] = ticketEmailHistory($row, ['limit' => 2, 'label' => __('What it is about')]);
         }
     } elseif ($kind === 'sla') {
-        $track = ($opts['track'] ?? 'response') === 'resolution' ? 'resolution' : 'response';
-        $due = !empty($opts['due']) ? date('D j M, g:i A', strtotime($opts['due'])) : '';
+        $resolution = ($opts['track'] ?? 'response') === 'resolution';
+        $due = !empty($opts['due']) ? formatDate($opts['due'], 'datetime_weekday') : '';
         $breached = !empty($opts['breached']);
-        $email['kind'] = ucfirst($track) . ($breached ? ' SLA missed' : ' SLA at risk');
+        $email['kind'] = $resolution ? ($breached ? __('Resolution SLA missed') : __('Resolution SLA at risk')) : ($breached ? __('Response SLA missed') : __('Response SLA at risk'));
         $email['tone'] = $breached ? 'danger' : 'warning';
-        $email['intro'] = [$breached
-            ? "The $track due on $reference by $due was missed."
-            : "$reference is close to its $track SLA - it is due by $due."];
-        $email['summary'] += ['Assigned' => !empty($row['user_name']) ? (string) $row['user_name'] : 'Nobody', ucfirst($track) . ' due' => $due];
-        $email['history'] = ticketEmailHistory($row, ['limit' => 3, 'label' => 'The conversation']);
+        $email['intro'] = [$resolution
+            ? ($breached ? __('The resolution due on %1$s by %2$s was missed.', $reference, $due) : __('%1$s is close to its resolution SLA - it is due by %2$s.', $reference, $due))
+            : ($breached ? __('The response due on %1$s by %2$s was missed.', $reference, $due) : __('%1$s is close to its response SLA - it is due by %2$s.', $reference, $due))];
+        $email['summary'] += [__('Assigned') => !empty($row['user_name']) ? (string) $row['user_name'] : __('Nobody'), ($resolution ? __('Resolution due') : __('Response due')) => $due];
+        $email['history'] = ticketEmailHistory($row, ['limit' => 3, 'label' => __('The conversation')]);
     }
     return ticketEmailPreview($email);
 }
@@ -933,9 +994,10 @@ function ticketMailNewTicketAddress($ticket_id, $how) {
     if (!filter_var($address, FILTER_VALIDATE_EMAIL) || !$row) {
         return 0;
     }
-    $client = !empty($row['client_name']) ? $row['client_name'] : 'Guest';
-    $subject = ($config_app_name ?: 'ITFlow') . ($how === 'scheduled' ? ' - New Recurring Ticket - ' : ' - New Ticket - ') . "$client: " . $row['ticket_subject'];
-    return ticketMailAgents([['email' => $address, 'greet' => '', 'footnote' => 'You get this at the new-ticket address in Admin > Ticket.']],
+    $client = !empty($row['client_name']) ? $row['client_name'] : __('Guest');
+    $subject = $how === 'scheduled' ? __('%1$s - New Recurring Ticket - %2$s: %3$s', $config_app_name ?: 'ITFlow', $client, $row['ticket_subject'])
+        : __('%1$s - New Ticket - %2$s: %3$s', $config_app_name ?: 'ITFlow', $client, $row['ticket_subject']);
+    return ticketMailAgents([['email' => $address, 'greet' => '', 'footnote' => __('You get this at the new-ticket address in Admin > Ticket.')]],
         $subject, ticketAgentEmailContent($row, 'new', ['how' => $how]));
 }
 
@@ -947,8 +1009,8 @@ function ticketMailAssigneeReplied($ticket_id, $how, $reply, $by) {
     if (!$agent) {
         return 0;
     }
-    return ticketMailAgents([$agent + ['footnote' => 'You get this as the agent ' . ticketReference($row) . ' is assigned to.']],
-        ($config_app_name ?: 'ITFlow') . " - Ticket updated - [" . ticketReference($row) . "] " . $row['ticket_subject'],
+    return ticketMailAgents([$agent + ['footnote' => __('You get this as the agent %s is assigned to.', ticketReference($row))]],
+        __('%1$s - Ticket updated - [%2$s] %3$s', $config_app_name ?: 'ITFlow', ticketReference($row), $row['ticket_subject']),
         ticketAgentEmailContent($row, 'replied', ['how' => $how, 'message' => (string) $reply, 'by' => (string) $by]));
 }
 
@@ -964,21 +1026,22 @@ function ticketMailAssigned($user_id, array $ticket_ids, $by) {
         return 0;
     }
     $app = $config_app_name ?: 'ITFlow';
-    $agent['footnote'] = 'You get this because ' . (count($rows) === 1 ? 'the ticket was' : 'they were') . ' assigned to you in ITFlow.';
+    $agent['footnote'] = count($rows) === 1 ? __('You get this because the ticket was assigned to you in ITFlow.') : __('You get this because they were assigned to you in ITFlow.');
     if (count($rows) === 1) {
         $row = $rows[0];
-        return ticketMailAgents([$agent], "$app - Ticket " . ticketReference($row) . " assigned to you - " . $row['ticket_subject'], ticketAgentEmailContent($row, 'assigned', ['by' => $by]));
+        return ticketMailAgents([$agent], __('%1$s - Ticket %2$s assigned to you - %3$s', $app, ticketReference($row), $row['ticket_subject']), ticketAgentEmailContent($row, 'assigned', ['by' => $by]));
     }
     $lines = [];
     foreach ($rows as $row) {
-        $lines[] = [['text' => ticketReference($row), 'url' => ticketAgentUrl($row)], (string) $row['ticket_subject'], !empty($row['client_name']) ? (string) $row['client_name'] : '-', (string) $row['ticket_priority']];
+        $lines[] = [['text' => ticketReference($row), 'url' => ticketAgentUrl($row)], (string) $row['ticket_subject'], !empty($row['client_name']) ? (string) $row['client_name'] : '-', ticketPriorityLabel($row['ticket_priority'])];
     }
-    return ticketMailAgents([$agent], "$app - " . count($rows) . " tickets have been assigned to you", [
-        'kind' => 'Assigned to you', 'tone' => 'primary', 'preview' => "$by assigned " . count($rows) . ' tickets to you',
-        'title' => count($rows) . ' tickets are yours',
-        'intro' => ["$by assigned these tickets to you."],
-        'lines' => ['head' => ['Ticket', 'Subject', 'Client', 'Priority'], 'rows' => $lines],
-        'button' => ['label' => 'Open your tickets', 'url' => "https://$config_base_url/agent/tickets.php?assigned=" . intval($user_id)],
+    $count = count($rows);
+    return ticketMailAgents([$agent], _n('%1$s - %2$d ticket has been assigned to you', '%1$s - %2$d tickets have been assigned to you', $count, $app, $count), [
+        'kind' => __('Assigned to you'), 'tone' => 'primary', 'preview' => _n('%1$s assigned %2$d ticket to you', '%1$s assigned %2$d tickets to you', $count, $by, $count),
+        'title' => _n('%d ticket is yours', '%d tickets are yours', $count),
+        'intro' => [__('%s assigned these tickets to you.', $by)],
+        'lines' => ['head' => [__('Ticket'), __('Subject'), __('Client'), __('Priority')], 'rows' => $lines],
+        'button' => ['label' => __('Open your tickets'), 'url' => "https://$config_base_url/agent/tickets.php?assigned=" . intval($user_id)],
     ]);
 }
 
@@ -994,13 +1057,14 @@ function recurringTicketMailAssigned($user_id, array $subjects, $by) {
         return 0;
     }
     $count = count($subjects);
-    $agent['footnote'] = 'You get this because ' . ($count === 1 ? 'it was' : 'they were') . ' assigned to you in ITFlow.';
-    return ticketMailAgents([$agent], ($config_app_name ?: 'ITFlow') . ($count === 1 ? " - Recurring ticket " . $subjects[0] . " assigned to you" : " - $count recurring tickets assigned to you"), [
-        'kind' => 'Assigned to you', 'tone' => 'primary', 'preview' => "$by assigned recurring tickets to you",
-        'title' => $count === 1 ? 'A recurring ticket is yours' : "$count recurring tickets are yours",
-        'intro' => ["$by assigned " . ($count === 1 ? 'this recurring ticket' : 'these recurring tickets') . " to you - the tickets " . ($count === 1 ? 'it raises' : 'they raise') . " will be yours."],
-        'lines' => ['head' => ['Recurring ticket'], 'rows' => array_map(function ($subject) { return [(string) $subject]; }, array_values($subjects))],
-        'button' => ['label' => 'Open Recurring Tickets', 'url' => "https://$config_base_url/agent/recurring_tickets.php?assigned_agent=" . intval($user_id)],
+    $app = $config_app_name ?: 'ITFlow';
+    $agent['footnote'] = $count === 1 ? __('You get this because it was assigned to you in ITFlow.') : __('You get this because they were assigned to you in ITFlow.');
+    return ticketMailAgents([$agent], $count === 1 ? __('%1$s - Recurring ticket %2$s assigned to you', $app, $subjects[0]) : __('%1$s - %2$d recurring tickets assigned to you', $app, $count), [
+        'kind' => __('Assigned to you'), 'tone' => 'primary', 'preview' => __('%s assigned recurring tickets to you', $by),
+        'title' => _n('A recurring ticket is yours', '%d recurring tickets are yours', $count),
+        'intro' => [_n('%s assigned this recurring ticket to you - the tickets it raises will be yours.', '%s assigned these recurring tickets to you - the tickets they raise will be yours.', $count, $by)],
+        'lines' => ['head' => [__('Recurring ticket')], 'rows' => array_map(function ($subject) { return [(string) $subject]; }, array_values($subjects))],
+        'button' => ['label' => __('Open Recurring Tickets'), 'url' => "https://$config_base_url/agent/recurring_tickets.php?assigned_agent=" . intval($user_id)],
     ]);
 }
 
@@ -1023,7 +1087,7 @@ function ticketMailTaskApproval($approval_id, $by) {
     $recipients = [];
     if ($approval['approval_scope'] === 'internal' && $type === 'specific' && intval($approval['approval_required_user_id']) !== intval($session_user_id)) {
         if ($agent = ticketMailAgent($approval['approval_required_user_id'])) {
-            $recipients[] = $agent + ['footnote' => "You get this because $by asked you to approve it."];
+            $recipients[] = $agent + ['footnote' => __('You get this because %s asked you to approve it.', $by)];
         }
     } elseif ($approval['approval_scope'] === 'client') {
         $where = $type === 'technical' ? "contact_client_id = $client_id AND contact_technical = 1"
@@ -1031,16 +1095,17 @@ function ticketMailTaskApproval($approval_id, $by) {
         $sql_contacts = mysqli_query($mysqli, "SELECT contact_name, contact_email FROM contacts WHERE $where AND contact_archived_at IS NULL AND contact_email != ''");
         while ($contact = mysqli_fetch_assoc($sql_contacts)) {
             $recipients[] = ['email' => $contact['contact_email'], 'name' => $contact['contact_name'],
-                'footnote' => $type === 'any' ? "You get this as the contact on ticket $reference." : "You get this as a $type contact for " . $row['client_name'] . "."];
+                'footnote' => $type === 'any' ? __('You get this as the contact on ticket %s.', $reference)
+                    : ($type === 'billing' ? __('You get this as a billing contact for %s.', $row['client_name']) : __('You get this as a technical contact for %s.', $row['client_name']))];
         }
     }
-    return count(emailQueue($recipients, "Ticket task approval required - [$reference] - " . $row['ticket_subject'], [
-        'marker' => true, 'kind' => 'Approval needed', 'tone' => 'warning', 'preview' => "$by needs your approval - " . $approval['task_name'],
-        'title' => 'Your approval is needed',
-        'intro' => ["$by needs your approval for a task on ticket $reference before the work goes ahead."],
-        'summary' => ['Task' => (string) $approval['task_name'], 'Ticket' => $reference, 'Subject' => (string) $row['ticket_subject'], 'Status' => (string) $row['ticket_status_name']],
-        'button' => ['label' => 'Review and approve', 'url' => "https://$config_base_url/guest/guest_approve_ticket_task.php?task_approval_id=" . intval($approval['approval_id']) . '&url_key=' . rawurlencode((string) $approval['approval_url_key'])],
-        'after' => ['Want to know more first? Just reply to this email.'],
+    return count(emailQueue($recipients, __('Ticket task approval required - [%1$s] - %2$s', $reference, $row['ticket_subject']), [
+        'marker' => true, 'kind' => __('Approval needed'), 'tone' => 'warning', 'preview' => __('%1$s needs your approval - %2$s', $by, $approval['task_name']),
+        'title' => __('Your approval is needed'),
+        'intro' => [__('%1$s needs your approval for a task on ticket %2$s before the work goes ahead.', $by, $reference)],
+        'summary' => [__('Task') => (string) $approval['task_name'], __('Ticket') => $reference, __('Subject') => (string) $row['ticket_subject'], __('Status') => ticketStatusLabel($row['ticket_status'], $row['ticket_status_name'])],
+        'button' => ['label' => __('Review and approve'), 'url' => "https://$config_base_url/guest/guest_approve_ticket_task.php?task_approval_id=" . intval($approval['approval_id']) . '&url_key=' . rawurlencode((string) $approval['approval_url_key'])],
+        'after' => [__('Want to know more first? Just reply to this email.')],
         'contact' => ticketEmailContactLine(),
     ], ['from' => ticketEmailFrom()]));
 }
@@ -1055,11 +1120,11 @@ function ticketMailClosedReply($ticket_id, $from_email) {
         return 0;
     }
     $support = ticketEmailFrom()['email'];
-    return count(emailQueue([['email' => (string) $from_email, 'greet' => '', 'footnote' => 'You get this because you replied to a closed ticket.']], "Action required: This ticket is already closed", [
-        'kind' => 'Ticket closed', 'tone' => 'warning', 'preview' => 'Your reply did not reach us - raise a new ticket instead',
-        'title' => 'That ticket is closed',
-        'intro' => ["You replied to ticket " . ticketReference($closed) . " - \"" . $closed['ticket_subject'] . "\" - which is closed, so your reply won't reach us.", "To raise a new ticket, send a new email to $support."],
-        'button' => ['label' => 'Email us', 'url' => "mailto:$support"],
+    return count(emailQueue([['email' => (string) $from_email, 'greet' => '', 'footnote' => __('You get this because you replied to a closed ticket.')]], __('Action required: This ticket is already closed'), [
+        'kind' => __('Ticket closed'), 'tone' => 'warning', 'preview' => __('Your reply did not reach us - raise a new ticket instead'),
+        'title' => __('That ticket is closed'),
+        'intro' => [__('You replied to ticket %1$s - "%2$s" - which is closed, so your reply won\'t reach us.', ticketReference($closed), $closed['ticket_subject']), __('To raise a new ticket, send a new email to %s.', $support)],
+        'button' => ['label' => __('Email us'), 'url' => "mailto:$support"],
         'contact' => ticketEmailContactLine(),
     ], ['from' => ticketEmailFrom()]));
 }
@@ -1076,20 +1141,21 @@ function ticketSlaAlert($ticket_id, $track, $breached, $due, $address) {
     }
     $ticket_id = intval($row['ticket_id']);
     $ticket_ref = ticketReference($row);
-    $subject_line = ucfirst($track) . ' SLA ' . ($breached ? 'breached' : 'at risk');
+    $resolution = $track === 'resolution';
+    $subject_line = $resolution ? ($breached ? __('Resolution SLA breached') : __('Resolution SLA at risk')) : ($breached ? __('Response SLA breached') : __('Response SLA at risk'));
 
     // appNotify inserts what it is given - escape at the boundary
-    appNotify("Ticket SLA", escapeSql("$subject_line - $ticket_ref - " . $row['ticket_subject']), "/agent/ticket.php?ticket_id=$ticket_id", intval($row['ticket_client_id']), $ticket_id);
+    appNotify("Ticket SLA", escapeSql(__('%1$s - %2$s - %3$s', $subject_line, $ticket_ref, $row['ticket_subject'])), "/agent/ticket.php?ticket_id=$ticket_id", intval($row['ticket_client_id']), $ticket_id); // i18n-ignore - notification kind is a key
 
     $recipients = [];
     if (filter_var($address, FILTER_VALIDATE_EMAIL)) {
-        $recipients[] = ['email' => $address, 'greet' => '', 'footnote' => 'You get this at the SLA alert address in Admin > SLAs.'];
+        $recipients[] = ['email' => $address, 'greet' => '', 'footnote' => __('You get this at the SLA alert address in Admin > SLAs.')];
     }
     // The assigned agent - once, if they are also the alert address
     if ($agent = ticketMailAgent($row['ticket_assigned_to'])) {
-        $recipients[] = $agent + ['footnote' => "You get this as the agent $ticket_ref is assigned to."];
+        $recipients[] = $agent + ['footnote' => __('You get this as the agent %s is assigned to.', $ticket_ref)];
     }
-    return ticketMailAgents($recipients, "$subject_line: $ticket_ref - " . $row['ticket_subject'],
+    return ticketMailAgents($recipients, __('%1$s: %2$s - %3$s', $subject_line, $ticket_ref, $row['ticket_subject']),
         ticketAgentEmailContent($row, 'sla', ['track' => $track, 'breached' => $breached, 'due' => $due]));
 }
 
@@ -1166,8 +1232,8 @@ function ticketTableHtml(array $rows, $options = []) {
     $with_client = !empty($options['client']);
     $html = '<div class="table-responsive"><table class="table ' . ($compact ? 'table-sm ' : '') . 'table-hover align-middle mb-0 itflow-ticket-table">';
     if (!$compact) {
-        $html .= '<thead class="text-nowrap table-light"><tr><th>Ticket</th><th>Subject</th>' . ($vendor_ref ? '<th>Their reference</th>' : '')
-            . ($with_client ? '<th>Client</th>' : '') . '<th>Priority</th><th>Status</th><th>Assigned</th><th>Updated</th></tr></thead>';
+        $html .= '<thead class="text-nowrap table-light"><tr><th>' . __('Ticket') . '</th><th>' . __('Subject') . '</th>' . ($vendor_ref ? '<th>' . __('Their reference') . '</th>' : '')
+            . ($with_client ? '<th>' . __('Client') . '</th>' : '') . '<th>' . __('Priority') . '</th><th>' . __('Status') . '</th><th>' . __('Assigned') . '</th><th>' . __('Updated') . '</th></tr></thead>';
     }
     $html .= '<tbody>';
     foreach ($rows as $row) {
@@ -1180,7 +1246,7 @@ function ticketTableHtml(array $rows, $options = []) {
             . '<td class="' . ($compact ? 'w-100' : 'itflow-ticket-subject') . '"><a class="' . ($is_open ? 'text-body' . ($compact ? '' : ' fw-semibold') : 'text-body-secondary') . '" href="' . $url . '">' . escapeHtml($row['ticket_subject']) . '</a></td>';
         if ($vendor_ref) {
             $html .= '<td class="text-nowrap small">' . ($their_ref !== ''
-                ? '<span class="font-monospace">' . $their_ref . '</span><button type="button" class="itflow-copy clipboardjs" title="Copy their reference" data-clipboard-text="' . $their_ref . '"><i class="far fa-copy"></i></button>'
+                ? '<span class="font-monospace">' . $their_ref . '</span><button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy their reference')) . '" data-clipboard-text="' . $their_ref . '"><i class="far fa-copy"></i></button>'
                 : '<span class="text-body-secondary">-</span>') . '</td>';
         }
         if ($with_client) {
@@ -1263,13 +1329,32 @@ function ticketReopen($row, $status_id = TICKET_STATUS_OPEN, $how = '') {
     triggerCustomAction('ticket_update', $ticket_id);
 }
 
+/**
+ * Undo a resolution after the ticket's status has moved out of Resolved (to anything
+ * but Closed) some other way than ticketReopen() - a reply that sets a status. Clears
+ * the resolved date and restarts the resolution SLA as a reopen does, without the
+ * reopen's own history, audit and custom action, which the caller records its own way.
+ * A closed ticket keeps its resolved date. Returns whether anything changed.
+ */
+function ticketUnresolve($ticket_id) {
+    global $mysqli;
+    $ticket_id = intval($ticket_id);
+    mysqli_query($mysqli, "UPDATE tickets SET ticket_resolved_at = NULL WHERE ticket_id = $ticket_id AND ticket_resolved_at IS NOT NULL AND ticket_closed_at IS NULL");
+    if (mysqli_affected_rows($mysqli) !== 1) {
+        return false;
+    }
+    resetTicketResolutionSla($ticket_id);
+    return true;
+}
+
 /** The "your ticket is closed" email - to its contact and watchers, asking how we did. */
 function ticketMailClosed($ticket_id) {
     $row = ticketRow($ticket_id);
     if (!$row) {
         return 0;
     }
-    return ticketMailSend($row['ticket_id'], "Ticket closed - [" . ticketReference($row) . "] - " . $row['ticket_subject'] . " | (do not reply)",
+    // The [reference] is what the email parser knows a reply by - every translation keeps it
+    return ticketMailSend($row['ticket_id'], __('Ticket closed - [%1$s] - %2$s | (do not reply)', ticketReference($row), $row['ticket_subject']),
         ticketEmailContent($row, 'closed'), ['kind' => 'closed']);
 }
 
@@ -1284,34 +1369,34 @@ function ticketReplyEmailHtml($reply_id, array $state, $queue_url = '') {
     $to = $state['to'] ?? [];
     if (!$to) {
         // Marked emailed, but who to wasn't kept
-        return ['line' => '<span class="ticket-reply-emailed"><i class="fas fa-fw fa-paper-plane me-1"></i>Emailed</span>', 'panel' => ''];
+        return ['line' => '<span class="ticket-reply-emailed"><i class="fas fa-fw fa-paper-plane me-1"></i>' . __('Emailed') . '</span>', 'panel' => ''];
     }
     $who = function ($recipient) {
         return $recipient['name'] !== '' ? $recipient['name'] : $recipient['email'];
     };
-    $first = escapeHtml($who($to[0])) . (count($to) > 1 ? ' and ' . (count($to) - 1) . ' more' : '');
+    $first = count($to) > 1 ? _n('%1$s and %2$d more', '%1$s and %2$d more', count($to) - 1, escapeHtml($who($to[0])), count($to) - 1) : escapeHtml($who($to[0]));
     $failed = count(array_filter($to, function ($recipient) {
         return ($recipient['state']['key'] ?? '') === 'failed';
     }));
     switch ($state['key'] ?? 'gone') {
         case 'sent':
-            [$icon, $text, $title] = ['fa-check text-success', "Emailed to $first", 'Sent'];
+            [$icon, $text, $title] = ['fa-check text-success', __('Emailed to %s', $first), _x('Sent', 'email')];
             break;
         case 'waiting':
-            [$icon, $text, $title] = ['fa-hourglass-half text-primary', "Sending to $first", 'Waiting in the mail queue'];
+            [$icon, $text, $title] = ['fa-hourglass-half text-primary', __('Sending to %s', $first), __('Waiting in the mail queue')];
             break;
         case 'failed':
-            [$icon, $text, $title] = ['fa-exclamation-circle text-danger', $failed === count($to) ? "<span class=\"text-danger\">Couldn't email $first</span>"
-                : "Emailed to $first <span class=\"text-danger\">&middot; $failed not sent</span>", 'Not sent'];
+            [$icon, $text, $title] = ['fa-exclamation-circle text-danger', $failed === count($to) ? '<span class="text-danger">' . __('Couldn\'t email %s', $first) . '</span>'
+                : __('Emailed to %s', $first) . ' <span class="text-danger">&middot; ' . _n('%d not sent', '%d not sent', $failed) . '</span>', __('Not sent')];
             break;
         case 'cancelled':
-            [$icon, $text, $title] = ['fa-ban', "Email to $first cancelled", 'Cancelled'];
+            [$icon, $text, $title] = ['fa-ban', __('Email to %s cancelled', $first), __('Cancelled')];
             break;
         default:
-            [$icon, $text, $title] = ['fa-paper-plane', "Emailed to $first", ''];
+            [$icon, $text, $title] = ['fa-paper-plane', __('Emailed to %s', $first), ''];
     }
     $line = '<a class="ticket-reply-emailed text-reset" data-bs-toggle="collapse" href="#replyEmailed' . $reply_id . '" role="button" aria-expanded="false" aria-controls="replyEmailed' . $reply_id . '"'
-        . ' title="' . escapeHtml(($title !== '' ? "$title - " : '') . 'who it went to') . '" data-reply-emailed="' . escapeHtml($state['key'] ?? 'gone') . '">'
+        . ' title="' . escapeHtml($title !== '' ? __('%s - who it went to', $title) : __('Who it went to')) . '" data-reply-emailed="' . escapeHtml($state['key'] ?? 'gone') . '">'
         . '<i class="fas fa-fw ' . $icon . ' me-1"></i>' . $text . '</a>';
 
     $items = '';
@@ -1329,8 +1414,8 @@ function ticketReplyEmailHtml($reply_id, array $state, $queue_url = '') {
     $panel = '<div class="collapse" id="replyEmailed' . $reply_id . '">'
         . '<div class="ticket-reply-recipients small mt-2">'
         . '<ul class="list-unstyled d-grid gap-1 mb-0">' . $items . '</ul>'
-        . ($gone ? '<div class="text-body-secondary mt-1">The mail queue keeps email ' . MAIL_QUEUE_KEEP_DAYS . ' days, so whether each one went is no longer known.</div>' : '')
-        . ($queue_url !== '' ? '<a class="d-inline-block mt-1" href="' . escapeHtml($queue_url) . '"><i class="fas fa-fw fa-mail-bulk me-1"></i>This ticket\'s email in the Mail Queue</a>' : '')
+        . ($gone ? '<div class="text-body-secondary mt-1">' . __('The mail queue keeps email %d days, so whether each one went is no longer known.', MAIL_QUEUE_KEEP_DAYS) . '</div>' : '')
+        . ($queue_url !== '' ? '<a class="d-inline-block mt-1" href="' . escapeHtml($queue_url) . '"><i class="fas fa-fw fa-mail-bulk me-1"></i>' . __('This ticket\'s email in the Mail Queue') . '</a>' : '')
         . '</div></div>';
     return ['line' => $line, 'panel' => $panel];
 }
@@ -1347,7 +1432,7 @@ function ticketMailResolved($ticket_id, $note = '', $reply_id = 0) {
         ticketReplyEmailed($reply_id, false);
         return 0;
     }
-    $sent = ticketMailSend($row['ticket_id'], "Ticket resolved - [" . ticketReference($row) . "] - " . $row['ticket_subject'] . " | (pending closure)",
+    $sent = ticketMailSend($row['ticket_id'], __('Ticket resolved - [%1$s] - %2$s | (pending closure)', ticketReference($row), $row['ticket_subject']),
         ticketEmailContent($row, 'resolved', ['message' => (string) $note, 'by' => stripslashes((string) ($session_name ?? ''))]), ['ticket_reply_id' => intval($reply_id)]);
     ticketReplyEmailed($reply_id, $sent > 0);
     return $sent;
@@ -1424,7 +1509,7 @@ function ticketSlaState($row) {
     $responded = !empty($row['ticket_first_response_at']);
     $state = [
         'due' => $responded ? ($row['ticket_resolution_due_at'] ?? null) : ($row['ticket_response_due_at'] ?? null),
-        'what' => $responded ? 'Resolution due' : 'First response due',
+        'what' => $responded ? __('Resolution due') : __('First response due'),
     ];
     if ($stage === 2) {
         return ['key' => 'breached'] + $state;
@@ -1443,17 +1528,17 @@ function ticketSlaPill($sla) {
     $due = !empty($sla['due']) ? ' title="' . escapeHtml($sla['what'] . ' ' . $sla['due']) . '"' : '';
     switch ($sla['key']) {
         case 'breached':
-            return '<span class="badge rounded-pill text-bg-danger"' . $due . '><i class="fas fa-stopwatch me-1"></i>Breached</span>';
+            return '<span class="badge rounded-pill text-bg-danger"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . __('Breached') . '</span>';
         case 'at_risk':
-            return '<span class="badge rounded-pill text-bg-warning"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . (!empty($sla['due']) ? timeAgo($sla['due']) : 'At risk') . '</span>';
+            return '<span class="badge rounded-pill text-bg-warning"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . (!empty($sla['due']) ? timeAgo($sla['due']) : __('At risk')) . '</span>';
         case 'paused':
-            return '<span class="badge rounded-pill text-bg-secondary" title="The SLA clock is paused in this status"><i class="fas fa-pause me-1"></i>Paused</span>';
+            return '<span class="badge rounded-pill text-bg-secondary" title="' . escapeHtml(__('The SLA clock is paused in this status')) . '"><i class="fas fa-pause me-1"></i>' . __('Paused') . '</span>';
         case 'running':
             return '<span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal"' . $due . '><i class="fas fa-stopwatch me-1"></i>' . timeAgo($sla['due']) . '</span>';
         case 'met':
-            return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><i class="fas fa-check me-1"></i>SLA met</span>';
+            return '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal"><i class="fas fa-check me-1"></i>' . __('SLA met') . '</span>';
         case 'missed':
-            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal"><i class="fas fa-stopwatch me-1"></i>SLA missed</span>';
+            return '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal"><i class="fas fa-stopwatch me-1"></i>' . __('SLA missed') . '</span>';
     }
     return '';
 }
@@ -1471,11 +1556,11 @@ function ticketDuePill($due) {
     if (!$due) {
         return '';
     }
-    $title = ' title="Due ' . escapeHtml(date('M j, Y g:i A', strtotime($due['at']))) . '"';
+    $title = ' title="' . escapeHtml(__('Due %s', formatDate($due['at'], 'datetime'))) . '"';
     if ($due['key'] === 'overdue') {
-        return '<span class="badge rounded-pill text-bg-danger"' . $title . '><i class="far fa-calendar-times me-1"></i>Due ' . timeAgo($due['at']) . '</span>';
+        return '<span class="badge rounded-pill text-bg-danger"' . $title . '><i class="far fa-calendar-times me-1"></i>' . escapeHtml(_x('Due %s', 'past', timeAgo($due['at']))) . '</span>';
     }
-    return '<span class="badge rounded-pill ' . ($due['key'] === 'soon' ? 'text-bg-warning' : 'bg-body-secondary text-body-secondary fw-normal') . '"' . $title . '><i class="far fa-calendar me-1"></i>Due ' . timeAgo($due['at']) . '</span>';
+    return '<span class="badge rounded-pill ' . ($due['key'] === 'soon' ? 'text-bg-warning' : 'bg-body-secondary text-body-secondary fw-normal') . '"' . $title . '><i class="far fa-calendar me-1"></i>' . escapeHtml(_x('Due %s', 'future', timeAgo($due['at']))) . '</span>';
 }
 
 /** The edge a row or card gets: danger (late), warning (close to it) or ''. */
@@ -1533,7 +1618,7 @@ function ticketTasksHtml($counts) {
     }
     [$done, $all] = $counts;
     $percent = round($done / $all * 100);
-    return '<span class="itflow-ticket-tasks" title="' . "$done of $all tasks done" . '">'
+    return '<span class="itflow-ticket-tasks" title="' . escapeHtml(_n('%1$d of %2$d task done', '%1$d of %2$d tasks done', $all, $done, $all)) . '">'
         . '<span class="progress" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100"><span class="progress-bar ' . ($done === $all ? 'bg-success' : 'bg-secondary') . '" style="width: ' . $percent . '%"></span></span>'
         . "$done/$all</span>";
 }
@@ -1546,14 +1631,14 @@ function ticketTasksHtml($counts) {
 function ticketActivityHtml($reply, $row) {
     if (!$reply) {
         $created = $row['ticket_created_at'];
-        return '<span class="text-body-secondary" title="Opened ' . escapeHtml($created) . '"><i class="far fa-fw fa-clock me-1"></i>No replies</span>';
+        return '<span class="text-body-secondary" title="' . escapeHtml(__('Opened %s', $created)) . '"><i class="far fa-fw fa-clock me-1"></i>' . __('No replies') . '</span>';
     }
     $type = $reply['ticket_reply_type'];
     $who = $type === 'Client' ? ($reply['contact_name'] ?? '') : ($reply['user_name'] ?? '');
     $icons = [
-        'Client' => ['fa-reply text-warning', 'The client replied'],
-        'Public' => ['fa-paper-plane text-body-secondary', 'We replied'],
-        'Internal' => ['fa-sticky-note text-body-secondary', 'Internal note'],
+        'Client' => ['fa-reply text-warning', __('The client replied')],
+        'Public' => ['fa-paper-plane text-body-secondary', __('We replied')],
+        'Internal' => ['fa-sticky-note text-body-secondary', __('Internal note')],
     ];
     [$icon, $label] = $icons[$type] ?? $icons['Internal'];
     return '<span title="' . escapeHtml($label . ($who !== '' ? " - $who" : '') . ', ' . $reply['ticket_reply_created_at']) . '">'
@@ -1563,12 +1648,12 @@ function ticketActivityHtml($reply, $row) {
 
 /** Where it came in from, as an icon - '' for one an agent raised. */
 function ticketSourceIcon($source) {
-    $icons = ['Email' => ['fa-envelope', 'Came in by email'], 'Portal' => ['fa-globe', 'Raised in the client portal'],
-        'Recurring' => ['fa-redo-alt', 'Raised by a recurring ticket'], 'API' => ['fa-plug', 'Raised through the API'],
-        'Project' => ['fa-project-diagram', 'From a project template']];
+    $icons = ['Email' => ['fa-envelope', __('Came in by email')], 'Portal' => ['fa-globe', __('Raised in the client portal')],
+        'Recurring' => ['fa-redo-alt', __('Raised by a recurring ticket')], 'API' => ['fa-plug', __('Raised through the API')],
+        'Project' => ['fa-project-diagram', __('From a project template')]];
     foreach ($icons as $match => [$icon, $title]) {
         if (stripos((string) $source, $match) !== false) {
-            return '<i class="fas fa-fw ' . $icon . '" title="' . $title . '"></i>';
+            return '<i class="fas fa-fw ' . $icon . '" title="' . escapeHtml($title) . '"></i>';
         }
     }
     return '';
@@ -1599,6 +1684,21 @@ function recurringTicketFrequency($frequency) {
         }
     }
     return '';
+}
+
+/** A stored frequency ('Weekly') as shown, in the interface language - escaped. */
+function recurringTicketFrequencyLabel($frequency) {
+    $labels = [
+        'Three Days' => _x('Three Days', 'recurring frequency'),
+        'Weekly' => _x('Weekly', 'recurring frequency'),
+        'Biweekly' => _x('Biweekly', 'recurring frequency'),
+        'Monthly' => _x('Monthly', 'recurring frequency'),
+        'Quarterly' => _x('Quarterly', 'recurring frequency'),
+        'Biannually' => _x('Biannually', 'recurring frequency'),
+        'Annually' => _x('Annually', 'recurring frequency'),
+    ];
+    $known = recurringTicketFrequency($frequency);
+    return escapeHtml($known !== '' ? $labels[$known] : (string) $frequency);
 }
 
 /**
@@ -1644,7 +1744,14 @@ function recurringTicketCadenceText($row) {
     }
     $step = RECURRING_TICKET_FREQUENCIES[$frequency];
     if (isset($step['days'])) {
-        return $step['days'] === 7 ? 'on ' . $next->format('l') . 's' : ($step['days'] === 14 ? 'every other ' . $next->format('l') : 'every three days');
+        $weekday = intval($next->format('N'));
+        if ($step['days'] === 7) {
+            return [1 => __('on Mondays'), __('on Tuesdays'), __('on Wednesdays'), __('on Thursdays'), __('on Fridays'), __('on Saturdays'), __('on Sundays')][$weekday];
+        }
+        if ($step['days'] === 14) {
+            return [1 => __('every other Monday'), __('every other Tuesday'), __('every other Wednesday'), __('every other Thursday'), __('every other Friday'), __('every other Saturday'), __('every other Sunday')][$weekday];
+        }
+        return __('every three days');
     }
     $day = intval($next->format('j'));
     $start = DateTime::createFromFormat('!Y-m-d', substr((string) ($row['recurring_ticket_start_date'] ?? ''), 0, 10));
@@ -1652,10 +1759,21 @@ function recurringTicketCadenceText($row) {
         $day = intval($start->format('j'));
     }
     if ($day >= 31 || ($day >= 29 && $day === intval($next->format('t')) && (!$start || intval($start->format('j')) >= 31))) {
-        return 'on the last day of the month';
+        return __('on the last day of the month');
     }
-    $suffix = ($day % 100 >= 11 && $day % 100 <= 13) ? 'th' : (['th', 'st', 'nd', 'rd'][$day % 10] ?? 'th');
-    return "on the $day$suffix";
+    // One entry per English ordinal ending, so each language words it its own way
+    if ($day % 100 >= 11 && $day % 100 <= 13) {
+        return _x('on the %dth', 'day of the month', $day);
+    }
+    switch ($day % 10) {
+        case 1:
+            return _x('on the %dst', 'day of the month', $day);
+        case 2:
+            return _x('on the %dnd', 'day of the month', $day);
+        case 3:
+            return _x('on the %drd', 'day of the month', $day);
+    }
+    return _x('on the %dth', 'day of the month', $day);
 }
 
 /** Is a recurring ticket paused? */
@@ -1666,23 +1784,23 @@ function recurringTicketPaused($row) {
 /** When it runs next, in words - "Today", "Tomorrow", "In 3 days", "Missed - was due 2 days ago", or "Paused". */
 function recurringTicketNextRunText($row) {
     if (recurringTicketPaused($row)) {
-        return ['text' => 'Paused', 'tone' => 'secondary', 'icon' => 'fa-pause'];
+        return ['text' => __('Paused'), 'tone' => 'secondary', 'icon' => 'fa-pause'];
     }
     $next = DateTime::createFromFormat('!Y-m-d', substr((string) $row['recurring_ticket_next_run'], 0, 10));
     if (!$next) {
-        return ['text' => 'Not scheduled', 'tone' => 'secondary', 'icon' => 'fa-question'];
+        return ['text' => __('Not scheduled'), 'tone' => 'secondary', 'icon' => 'fa-question'];
     }
     $days = intval((new DateTime('today'))->diff($next)->format('%r%a'));
     if ($days < 0) {
-        return ['text' => 'Missed - was due ' . ($days === -1 ? 'yesterday' : abs($days) . ' days ago'), 'tone' => 'danger', 'icon' => 'fa-exclamation-triangle'];
+        return ['text' => $days === -1 ? __('Missed - was due yesterday') : __('Missed - was due %d days ago', abs($days)), 'tone' => 'danger', 'icon' => 'fa-exclamation-triangle'];
     }
     if ($days === 0) {
-        return ['text' => 'Today', 'tone' => 'warning', 'icon' => 'fa-clock'];
+        return ['text' => __('Today'), 'tone' => 'warning', 'icon' => 'fa-clock'];
     }
     if ($days === 1) {
-        return ['text' => 'Tomorrow', 'tone' => 'info', 'icon' => 'fa-clock'];
+        return ['text' => __('Tomorrow'), 'tone' => 'info', 'icon' => 'fa-clock'];
     }
-    return ['text' => $days <= 14 ? "In $days days" : timeAgo($next->format('Y-m-d')), 'tone' => $days <= 7 ? 'info' : 'success', 'icon' => 'fa-calendar-alt'];
+    return ['text' => $days <= 14 ? __('In %d days', $days) : timeAgo($next->format('Y-m-d')), 'tone' => $days <= 7 ? 'info' : 'success', 'icon' => 'fa-calendar-alt'];
 }
 
 /** The next run as a soft pill. */
@@ -1774,7 +1892,7 @@ function recurringTicketRaise($recurring_ticket_id, $by = 'Cron') {
     // The client is told (when general notifications are on) - the contact alone
     $new = ticketRow($ticket_id);
     if (intval($config_ticket_client_general_notifications) === 1 && $new) {
-        ticketMailSend($ticket_id, "Ticket created - [" . ticketReference($new) . "] - " . $new['ticket_subject'] . " (scheduled)",
+        ticketMailSend($ticket_id, __('Ticket created - [%1$s] - %2$s (scheduled)', ticketReference($new), $new['ticket_subject']),
             ticketEmailContent($new, 'created', ['how' => 'scheduled']), ['kind' => 'created', 'to_watchers' => false]);
     }
 
@@ -1812,7 +1930,7 @@ function recurringTicketForRequest($recurring_ticket_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = recurringTicketRow($recurring_ticket_id);
     if (!$row) {
-        flashAlert('That recurring ticket no longer exists.', 'error');
+        flashAlert(__('That recurring ticket no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['recurring_ticket_client_id']);
@@ -1910,9 +2028,9 @@ function ticketMailSchedule($row, $cal_str, $cancelled, $when_text) {
     }
     $reference = ticketReference($ticket);
     $opts = ['cancelled' => $cancelled, 'when' => $when_text, 'where' => (string) ($row['location_address'] ?? '')];
-    $subject = ($cancelled ? 'Ticket Schedule Cancelled' : 'Ticket Scheduled') . " - [$reference] - " . $ticket['ticket_subject'];
+    $subject = $cancelled ? __('Ticket Schedule Cancelled - [%1$s] - %2$s', $reference, $ticket['ticket_subject']) : __('Ticket Scheduled - [%1$s] - %2$s', $reference, $ticket['ticket_subject']);
     if ($agent = ticketMailAgent($ticket['ticket_assigned_to'])) {
-        emailQueue([$agent + ['footnote' => "You get this as the agent $reference is assigned to."]], $subject,
+        emailQueue([$agent + ['footnote' => __('You get this as the agent %s is assigned to.', $reference)]], $subject,
             ticketAgentEmailContent($ticket, 'scheduled', $opts), ['from' => ticketEmailFrom(), 'cal_str' => $cal_str]);
     }
     if (intval($config_ticket_client_general_notifications) === 1) {
@@ -1972,22 +2090,24 @@ function ticketSetSchedule(array $row, $schedule, $onsite) {
             WHERE ticket_schedule BETWEEN '$start' AND '$end' AND ticket_id <> $ticket_id AND ticket_assigned_to = $assigned_to
             AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL ORDER BY ticket_schedule");
         while ($conflict = mysqli_fetch_assoc($sql)) {
-            $conflicts[] = ticketReference($conflict) . ' - ' . $conflict['ticket_subject'] . ' @ ' . date('g:ia', strtotime($conflict['ticket_schedule']));
+            $conflicts[] = ticketReference($conflict) . ' - ' . $conflict['ticket_subject'] . ' @ ' . formatDate($conflict['ticket_schedule'], 'time');
         }
     }
 
     // Who to tell, with the calendar file
     $mail_row = ticketScheduleRow($ticket_id);
     $cal_str = ticketScheduleIcs($mail_row, $schedule);
-    $when_text = date('l, F j, Y \a\t g:ia', strtotime($schedule));
+    // Shown and emailed in the interface language; the history and the audit log keep English
+    $when_text = formatDate($schedule, 'datetime_weekday');
+    $when_text_log = escapeSql(date('l, F j, Y \a\t g:ia', strtotime($schedule)));
     ticketMailSchedule($mail_row, $cal_str, false, $when_text);
 
     // Note it on the ticket
-    $note = escapeSql("Ticket scheduled for $when_text " . ($onsite ? '(onsite).' : '(remote).'));
+    $note = escapeSql($onsite ? __('Ticket scheduled for %s (onsite).', $when_text) : __('Ticket scheduled for %s (remote).', $when_text));
     mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '$note', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
 
-    logTicketHistory($ticket_id, "$session_name scheduled the work for " . escapeSql($when_text) . ($onsite ? ' (onsite)' : ' (remote)'));
-    logAudit("Ticket", "Edit", "$session_name scheduled ticket " . escapeSql(ticketReference($row)) . " for " . escapeSql($when_text), $client_id, $ticket_id);
+    logTicketHistory($ticket_id, "$session_name scheduled the work for $when_text_log" . ($onsite ? ' (onsite)' : ' (remote)'));
+    logAudit("Ticket", "Edit", "$session_name scheduled ticket " . escapeSql(ticketReference($row)) . " for $when_text_log", $client_id, $ticket_id);
     triggerCustomAction('ticket_schedule', $ticket_id);
 
     return ['when_text' => $when_text, 'conflicts' => $conflicts];
@@ -2013,7 +2133,7 @@ function ticketCancelSchedule(array $row) {
     $cal_str = createiCalStrCancel($old_schedule, $cal_subject, getTicketCalendarUid($ticket_id));
     ticketMailSchedule($mail_row, $cal_str, true, '');
 
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket schedule cancelled.', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(__('Ticket schedule cancelled.')) . "', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = " . intval($session_user_id) . ", ticket_reply_ticket_id = $ticket_id");
 
     logTicketHistory($ticket_id, "$session_name cancelled the scheduled work");
     logAudit("Ticket", "Edit", "$session_name cancelled the schedule of ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);

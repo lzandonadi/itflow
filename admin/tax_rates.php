@@ -74,9 +74,9 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
     <div class="col-xl-8">
         <div class="card">
             <div class="card-header bg-dark py-2">
-                <h3 class="card-title mt-2"><i class="fas fa-fw fa-balance-scale me-2"></i>Taxes</h3>
+                <h3 class="card-title mt-2"><i class="fas fa-fw fa-balance-scale me-2"></i><?= __('Taxes') ?></h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tax/tax_add.php" data-modal-size="lg"><i class="fas fa-plus me-2"></i>New Tax</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tax/tax_add.php" data-modal-size="lg"><i class="fas fa-plus me-2"></i><?= __('New Tax') ?></button>
                 </div>
             </div>
             <div class="card-header py-3">
@@ -85,15 +85,15 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                     <div class="row g-2 align-items-center">
                         <div class="col-md-7">
                             <div class="input-group">
-                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search taxes..." title="Name, description or registration number">
-                                <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                                <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search taxes...')) ?>" title="<?= escapeHtml(__('Name, description or registration number')) ?>">
+                                <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                             </div>
                         </div>
                     </div>
                 </form>
                 <nav class="nav nav-pills itflow-asset-tabs mt-2">
-                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-balance-scale me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>" title="Kept on what was billed with them, not offered for new lines"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+                    <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-balance-scale me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+                    <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>" title="<?= escapeHtml(__('Kept on what was billed with them, not offered for new lines')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
                 </nav>
             </div>
 
@@ -101,9 +101,9 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
                     <tr>
-                        <th class="ps-3"><?= $sort_link('tax_name', 'Tax') ?></th>
-                        <th><?= $sort_link('tax_percent', 'Rate') ?></th>
-                        <th class="d-none d-sm-table-cell"><?= $sort_link('invoice_count', 'Used on') ?></th>
+                        <th class="ps-3"><?= $sort_link('tax_name', __('Tax')) ?></th>
+                        <th><?= $sort_link('tax_percent', __('Rate')) ?></th>
+                        <th class="d-none d-sm-table-cell"><?= $sort_link('invoice_count', __('Used on')) ?></th>
                         <th></th>
                     </tr>
                     </thead>
@@ -121,21 +121,21 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                                     <div class="min-w-0">
                                         <a class="ajax-modal fw-semibold text-body" href="#" data-modal-url="modals/tax/tax_edit.php?id=<?= $tax_id ?>" data-modal-size="lg"><?= escapeHtml($rate['tax_name']) ?></a>
                                         <?php if ($u['default']) { ?>
-                                            <span class="badge rounded-pill text-bg-primary ms-1" title="New lines get this rate unless the client or product has its own">Default</span>
+                                            <span class="badge rounded-pill text-bg-primary ms-1" title="<?= escapeHtml(__('New lines get this rate unless the client or product has its own')) ?>"><?= __('Default') ?></span>
                                         <?php } ?>
                                         <?php if ($rate['tax_description']) { ?>
                                             <div class="small text-body-secondary"><?= escapeHtml($rate['tax_description']) ?></div>
                                         <?php } ?>
                                         <?php if ($rate['tax_registration_number']) { ?>
-                                            <div class="small text-body-secondary" title="Registration number - printed on invoices"><i class="fas fa-fw fa-id-card me-1"></i><?= escapeHtml($rate['tax_registration_number']) ?></div>
+                                            <div class="small text-body-secondary" title="<?= escapeHtml(__('Registration number - printed on invoices')) ?>"><i class="fas fa-fw fa-id-card me-1"></i><?= escapeHtml($rate['tax_registration_number']) ?></div>
                                         <?php } ?>
                                         <?php if ($rate['tax_archived_at']) { ?>
                                             <div class="small text-body-secondary">
-                                                <i class="fas fa-fw fa-archive me-1"></i><?= $replaced_by ? 'Replaced by ' . escapeHtml(taxLabel($replaced_by)) . ' on ' : 'Archived ' ?><?= date('M j, Y', strtotime($rate['tax_archived_at'])) ?>
+                                                <i class="fas fa-fw fa-archive me-1"></i><?= $replaced_by ? __('Replaced by %1$s on %2$s', escapeHtml(taxLabel($replaced_by)), formatDate($rate['tax_archived_at'], 'date')) : _x('Archived %s', 'archived on', formatDate($rate['tax_archived_at'], 'date')) ?>
                                             </div>
                                         <?php } ?>
                                         <!-- On a phone what uses it comes along under the name -->
-                                        <div class="d-sm-none small text-body-secondary mt-1"><?= $used ? escapeHtml(implode(', ', $used)) : 'Not used yet' ?></div>
+                                        <div class="d-sm-none small text-body-secondary mt-1"><?= $used ? escapeHtml(implode(', ', $used)) : __('Not used yet') ?></div>
                                     </div>
                                 </div>
                             </td>
@@ -150,25 +150,25 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                                 <?php } ?>
                             </td>
                             <td class="d-none d-sm-table-cell small">
-                                <?= $used ? escapeHtml(implode(', ', $used)) : '<span class="text-body-secondary">Not used yet</span>' ?>
+                                <?= $used ? escapeHtml(implode(', ', $used)) : __('<span class="text-body-secondary">Not used yet</span>') ?>
                             </td>
                             <td class="text-end">
                                 <div class="dropdown dropstart">
-                                    <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                    <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/tax/tax_edit.php?id=<?= $tax_id ?>" data-modal-size="lg"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
+                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/tax/tax_edit.php?id=<?= $tax_id ?>" data-modal-size="lg"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
                                         <?php if ($rate['tax_archived_at']) { ?>
-                                            <a class="dropdown-item" href="post.php?restore_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore</a>
+                                            <a class="dropdown-item" href="post.php?restore_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?></a>
                                         <?php } else { ?>
                                             <?php if (!$u['default']) { ?>
-                                                <a class="dropdown-item" href="post.php?default_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-star text-secondary me-2"></i>Make default</a>
+                                                <a class="dropdown-item" href="post.php?default_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-star text-secondary me-2"></i><?= __('Make default') ?></a>
                                             <?php } ?>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/tax/tax_archive.php?id=<?= $tax_id ?>"><i class="fas fa-fw fa-archive me-2"></i>Archive</a>
+                                            <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="modals/tax/tax_archive.php?id=<?= $tax_id ?>"><i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?></a>
                                         <?php } ?>
                                         <?php if ($unused) { ?>
                                             <?php if ($rate['tax_archived_at']) { ?><div class="dropdown-divider"></div><?php } ?>
-                                            <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                                            <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_tax=<?= $tax_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                                         <?php } ?>
                                     </div>
                                 </div>
@@ -180,13 +180,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
             </div>
             <?php
             $empty_state = [
-                'thing' => 'taxes',
+                'thing' => __('taxes'),
                 'icon' => 'fa-balance-scale',
                 'filtered' => $q !== '',
                 'archived' => $show_archived,
                 'views' => ['show'],
-                'text' => 'Sales tax, VAT or GST - one rate, or parts like a state\'s and a county\'s charged together.',
-                'actions' => [['label' => 'New Tax', 'modal' => 'modals/tax/tax_add.php', 'size' => 'lg']],
+                'text' => __('Sales tax, VAT or GST - one rate, or parts like a state\'s and a county\'s charged together.'),
+                'actions' => [['label' => __('New Tax'), 'modal' => 'modals/tax/tax_add.php', 'size' => 'lg']],
             ];
             require_once "../includes/filter_footer.php";
             ?>
@@ -196,57 +196,57 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
     <div class="col-xl-4">
         <div class="card card-dark">
             <div class="card-header py-3">
-                <h3 class="card-title"><i class="fas fa-fw fa-sliders-h me-2"></i>How lines are taxed</h3>
+                <h3 class="card-title"><i class="fas fa-fw fa-sliders-h me-2"></i><?= __('How lines are taxed') ?></h3>
             </div>
             <form action="post.php" method="post" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Default rate</label>
+                        <label class="form-label"><?= __('Default rate') ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-star"></i></span>
                             <select class="form-select" name="default_tax_id">
-                                <option value="0">No default</option>
+                                <option value="0"><?= __('No default') ?></option>
                                 <?php foreach ($active_taxes as $id => $tax) { ?>
                                     <option value="<?= intval($id) ?>"<?= intval($id) === $tax_settings['default_id'] ? ' selected' : '' ?>><?= escapeHtml(taxLabel($tax)) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
-                        <small class="text-secondary">For new lines when the client has no rate of its own - after the product's rate, for a product's line. Products set to no tax stay untaxed, and tax exempt clients get none.</small>
+                        <small class="text-secondary"><?= __('For new lines when the client has no rate of its own - after the product\'s rate, for a product\'s line. Products set to no tax stay untaxed, and tax exempt clients get none.') ?></small>
                     </div>
 
-                    <label class="form-label">Also tax</label>
+                    <label class="form-label"><?= __('Also tax') ?></label>
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="tax_time" value="1" id="taxTime"<?= $tax_settings['time'] ? ' checked' : '' ?>>
-                        <label class="form-check-label" for="taxTime">Billed time</label>
+                        <label class="form-check-label" for="taxTime"><?= __('Billed time') ?></label>
                     </div>
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="tax_trips" value="1" id="taxTrips"<?= $tax_settings['trip'] ? ' checked' : '' ?>>
-                        <label class="form-check-label" for="taxTrips">Trips</label>
+                        <label class="form-check-label" for="taxTrips"><?= __('Trips') ?></label>
                     </div>
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="tax_expenses" value="1" id="taxExpenses"<?= $tax_settings['expense'] ? ' checked' : '' ?>>
-                        <label class="form-check-label" for="taxExpenses">Expenses billed to clients</label>
+                        <label class="form-check-label" for="taxExpenses"><?= __('Expenses billed to clients') ?></label>
                     </div>
-                    <small class="text-secondary d-block mb-3">Lines added from tickets, Unbilled Time, trips and expenses get the client's rate when these are on, and no tax when off. Any line can still be changed.</small>
+                    <small class="text-secondary d-block mb-3"><?= __('Lines added from tickets, Unbilled Time, trips and expenses get the client\'s rate when these are on, and no tax when off. Any line can still be changed.') ?></small>
 
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" name="tax_discount_before" value="1" id="taxDiscountBefore"<?= $tax_settings['discount_before'] ? ' checked' : '' ?>>
-                        <label class="form-check-label" for="taxDiscountBefore">Take discounts off before tax</label>
+                        <label class="form-check-label" for="taxDiscountBefore"><?= __('Take discounts off before tax') ?></label>
                     </div>
-                    <small class="text-secondary d-block">Tax is worked out on what the client pays after the discount, shared across the lines. Off, tax is on the full price. Paid, cancelled and answered invoices and quotes never change; the rest follow the next time they are edited.</small>
+                    <small class="text-secondary d-block"><?= __('Tax is worked out on what the client pays after the discount, shared across the lines. Off, tax is on the full price. Paid, cancelled and answered invoices and quotes never change; the rest follow the next time they are edited.') ?></small>
                 </div>
                 <div class="card-footer">
-                    <button type="submit" name="edit_tax_settings" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
+                    <button type="submit" name="edit_tax_settings" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
                 </div>
             </form>
         </div>
 
         <div class="card">
             <div class="card-body small text-secondary">
-                <p class="mb-2"><i class="fas fa-fw fa-history me-1"></i><strong>Changing a rate.</strong> Once a rate is on an invoice or quote, saving a new percent or parts makes a new rate with the same name. What was already billed keeps the old rate; products, clients, the default and recurring invoices move to the new one.</p>
-                <p class="mb-2"><i class="fas fa-fw fa-user-shield me-1"></i><strong>Exempt clients.</strong> Mark a client tax exempt, with its certificate, on the client's Billing tab. Its new lines get no tax, and its invoices say why.</p>
-                <p class="mb-0"><i class="fas fa-fw fa-percent me-1"></i><strong>Filing.</strong> The <a href="/agent/reports/tax_summary.php">Tax Collected</a> report adds up each part by month or quarter, invoiced or paid, with exempt sales and the tax paid on expenses.</p>
+                <p class="mb-2"><i class="fas fa-fw fa-history me-1"></i><strong><?= __('Changing a rate.') ?></strong> <?= __('Once a rate is on an invoice or quote, saving a new percent or parts makes a new rate with the same name. What was already billed keeps the old rate; products, clients, the default and recurring invoices move to the new one.') ?></p>
+                <p class="mb-2"><i class="fas fa-fw fa-user-shield me-1"></i><strong><?= __('Exempt clients.') ?></strong> <?= __('Mark a client tax exempt, with its certificate, on the client\'s Billing tab. Its new lines get no tax, and its invoices say why.') ?></p>
+                <p class="mb-0"><i class="fas fa-fw fa-percent me-1"></i><strong><?= __('Filing.') ?></strong> <?= __('The') ?> <a href="/agent/reports/tax_summary.php"><?= __('Tax Collected') ?></a> <?= __('report adds up each part by month or quarter, invoiced or paid, with exempt sales and the tax paid on expenses.') ?></p>
             </div>
         </div>
     </div>

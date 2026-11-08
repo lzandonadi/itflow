@@ -1,0 +1,27 @@
+schema: spec-driven
+
+context: |
+  Language: pt-BR
+  All artifacts must be written in pt-BR.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Projeto: fork independente do ITFlow (PSA para MSPs), sem acompanhar o upstream.
+  Stack: PHP 8.2+ procedural, MariaDB via mysqli (queries em string, sem prepared
+  statements), Bootstrap 4 / AdminLTE, jQuery. Sem framework, ORM, build step,
+  Composer ou npm em runtime; bibliotecas vendorizadas em libs/ (nunca editar).
+  Não há suíte de testes automatizados; validação = ddev exec php -l, import do db.sql e
+  teste manual no navegador em https://itsm.ddev.site (ambiente DDEV; PHP só via ddev exec).
+  Convenções obrigatórias: ver CONTRIBUTING.md e CLAUDE.md (escapeSql/intval em
+  SQL, validateCSRFToken, enforceUserPermission, clientScopeSql, escapeHtml na
+  leitura da linha). Mudança de schema exige db.sql + admin/database_updates/<x.y.z>.php.
+  Código e comentários permanecem em inglês; textos de interface passam a ser
+  traduzíveis (en_US default, pt_BR).
+  Glossário pt-BR fixado: Ticket = Chamado, Agent/Technician = Técnico,
+  Quote = Orçamento, Asset = Ativo.
+
+rules:
+  tasks:
+    - Cada tarefa de migração de textos cobre um módulo/diretório e cabe em um PR revisável
+    - Toda tarefa que toca código lista como validar (php -l, tela a conferir)
+  design:
+    - Declarar explicitamente o que fica fora do escopo

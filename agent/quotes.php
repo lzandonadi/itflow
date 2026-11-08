@@ -47,13 +47,13 @@ $category_query = $category_filter ? "AND quote_category_id = $category_filter" 
 
 $unanswered_sql = "quote_status IN ('Draft', 'Sent', 'Viewed')";
 $statuses = [
-    '' => ['label' => 'All', 'where' => ''],
-    'Draft' => ['label' => 'Draft', 'icon' => 'fa-pencil-ruler', 'where' => "quote_status = 'Draft'", 'title' => 'Not sent yet - the client can\'t see them'],
-    'Awaiting' => ['label' => 'Awaiting answer', 'icon' => 'fa-hourglass-half', 'where' => "quote_status IN ('Sent', 'Viewed') AND quote_expire >= CURDATE()", 'title' => 'Sent, not answered, and not run out'],
-    'Expired' => ['label' => 'Expired', 'icon' => 'fa-hourglass-end', 'where' => "$unanswered_sql AND quote_expire < CURDATE()", 'title' => 'Ran out without an answer'],
-    'Accepted' => ['label' => 'Accepted', 'icon' => 'fa-thumbs-up', 'where' => "quote_status = 'Accepted'", 'title' => 'Accepted and not invoiced yet'],
-    'Invoiced' => ['label' => 'Invoiced', 'icon' => 'fa-file-invoice-dollar', 'where' => "quote_status = 'Invoiced'"],
-    'Declined' => ['label' => 'Declined', 'icon' => 'fa-thumbs-down', 'where' => "quote_status = 'Declined'"],
+    '' => ['label' => __('All'), 'where' => ''],
+    'Draft' => ['label' => _x('Draft', 'quote status'), 'icon' => 'fa-pencil-ruler', 'where' => "quote_status = 'Draft'", 'title' => _x("Not sent yet - the client can't see them", 'quotes')],
+    'Awaiting' => ['label' => __('Awaiting answer'), 'icon' => 'fa-hourglass-half', 'where' => "quote_status IN ('Sent', 'Viewed') AND quote_expire >= CURDATE()", 'title' => __('Sent, not answered, and not run out')],
+    'Expired' => ['label' => _x('Expired', 'quote status'), 'icon' => 'fa-hourglass-end', 'where' => "$unanswered_sql AND quote_expire < CURDATE()", 'title' => __('Ran out without an answer')],
+    'Accepted' => ['label' => _x('Accepted', 'quote status'), 'icon' => 'fa-thumbs-up', 'where' => "quote_status = 'Accepted'", 'title' => __('Accepted and not invoiced yet')],
+    'Invoiced' => ['label' => _x('Invoiced', 'quote status'), 'icon' => 'fa-file-invoice-dollar', 'where' => "quote_status = 'Invoiced'"],
+    'Declined' => ['label' => _x('Declined', 'quote status'), 'icon' => 'fa-thumbs-down', 'where' => "quote_status = 'Declined'"],
 ];
 $status = isset($statuses[$_GET['status'] ?? '']) ? ($_GET['status'] ?? '') : '';
 $status_query = $statuses[$status]['where'] ? 'AND ' . $statuses[$status]['where'] : '';
@@ -118,7 +118,7 @@ $stat_money = function ($amount) use ($session_company_currency) {
 };
 // "+ $2,400.00/mo" under a figure, when there is recurring in it
 $stat_monthly = function ($amount) use ($stat_money) {
-    return floatval($amount) != 0 ? '<span class="fs-6 fw-normal text-body-secondary ms-1">+ ' . $stat_money($amount) . '/mo</span>' : '';
+    return floatval($amount) != 0 ? '<span class="fs-6 fw-normal text-body-secondary ms-1">' . __('+ %s/mo', $stat_money($amount)) . '</span>' : '';
 };
 
 ?>
@@ -127,47 +127,47 @@ $stat_monthly = function ($amount) use ($stat_money) {
 <div class="row g-3 mb-3">
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $status === 'Awaiting' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['status' => 'Awaiting'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-hourglass-half me-1"></i>Awaiting answer</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-hourglass-half me-1"></i><?= __('Awaiting answer') ?></div>
             <div class="itflow-billing-stat-value"><?= $stat_money($pipeline['awaiting']) ?><?= $stat_monthly($pipeline['awaiting_monthly']) ?></div>
-            <div class="itflow-billing-stat-note"><?= intval($pipeline['awaiting_count']) ?> out with clients</div>
+            <div class="itflow-billing-stat-note"><?= escapeHtml(_n('%d out with clients', '%d out with clients', intval($pipeline['awaiting_count']))) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a class="itflow-billing-stat <?= $status === 'Accepted' ? 'active' : '' ?>" href="<?= escapeHtml($filter_url(['status' => 'Accepted'])) ?>">
-            <div class="itflow-billing-stat-label"><i class="fas fa-thumbs-up me-1"></i>Accepted, to invoice</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-thumbs-up me-1"></i><?= __('Accepted, to invoice') ?></div>
             <div class="itflow-billing-stat-value <?= $pipeline['accepted'] > 0 || $pipeline['accepted_monthly'] > 0 ? 'text-primary-emphasis' : '' ?>"><?= $stat_money($pipeline['accepted']) ?><?= $stat_monthly($pipeline['accepted_monthly']) ?></div>
-            <div class="itflow-billing-stat-note"><?= intval($pipeline['accepted_count']) ?> ready to bill</div>
+            <div class="itflow-billing-stat-note"><?= escapeHtml(_n('%d ready to bill', '%d ready to bill', intval($pipeline['accepted_count']))) ?></div>
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
         <div class="itflow-billing-stat">
-            <div class="itflow-billing-stat-label"><i class="fas fa-trophy me-1"></i>Won, 90 days</div>
+            <div class="itflow-billing-stat-label"><i class="fas fa-trophy me-1"></i><?= __('Won, 90 days') ?></div>
             <div class="itflow-billing-stat-value text-success-emphasis"><?= $stat_money($pipeline['won']) ?><?= $stat_monthly($pipeline['won_monthly']) ?></div>
-            <div class="itflow-billing-stat-note"><?= intval($pipeline['won_count']) ?> quote<?= intval($pipeline['won_count']) === 1 ? '' : 's' ?> accepted</div>
+            <div class="itflow-billing-stat-note"><?= escapeHtml(_n('%d quote accepted', '%d quotes accepted', intval($pipeline['won_count']))) ?></div>
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="itflow-billing-stat" title="Of the quotes dated in the last 90 days that have been answered, the share accepted">
-            <div class="itflow-billing-stat-label"><i class="fas fa-percentage me-1"></i>Win rate, 90 days</div>
+        <div class="itflow-billing-stat" title="<?= escapeHtml(__('Of the quotes dated in the last 90 days that have been answered, the share accepted')) ?>">
+            <div class="itflow-billing-stat-label"><i class="fas fa-percentage me-1"></i><?= __('Win rate, 90 days') ?></div>
             <div class="itflow-billing-stat-value"><?= $win_rate === null ? '-' : $win_rate . '%' ?></div>
-            <div class="itflow-billing-stat-note"><?= intval($pipeline['answered_count']) ?> answered</div>
+            <div class="itflow-billing-stat-note"><?= escapeHtml(_n('%d answered', '%d answered', intval($pipeline['answered_count']))) ?></div>
         </div>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-comment-dollar me-2"></i>Quotes</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-comment-dollar me-2"></i><?= __('Quotes') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
-                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/quote/quote_add.php?<?= $client_url ?>"><i class="fas fa-plus me-2"></i>New Quote</button>
+                    <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/quote/quote_add.php?<?= $client_url ?>"><i class="fas fa-plus me-2"></i><?= __('New Quote') ?></button>
                 <?php } ?>
                 <?php if ($num_rows[0] > 0) { ?>
                     <button type="button" class="btn btn-primary dropdown-toggle <?= $can_edit ? 'dropdown-toggle-split' : '' ?>" data-bs-toggle="dropdown"><?= $can_edit ? '' : '<i class="fas fa-ellipsis-h"></i>' ?></button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= buildExportModalUrl('modals/quote/quote_export.php', ['client_id', 'category', 'q'], ['dtf' => $dtf, 'dtt' => $dtt, 'client_id' => $client ?: '']) ?>">
-                            <i class="fa fa-fw fa-download text-secondary me-2"></i>Export
+                            <i class="fa fa-fw fa-download text-secondary me-2"></i><?= __('Export') ?>
                         </a>
                     </div>
                 <?php } ?>
@@ -184,26 +184,26 @@ $stat_monthly = function ($amount) use ($stat_money) {
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-5' : 'col-lg-4' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search number, scope, client, amount...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search number, scope, client, amount...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="Quote date" aria-label="Quote date">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('Quote date')) ?>" aria-label="<?= escapeHtml(__('Quote date')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml($_GET['canned_date'] ?? '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
                 </div>
                 <div class="<?= $client_url ? 'col-lg-4' : 'col-lg-2' ?> col-md-6">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Category">
-                        <option value="">- Any category -</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Category')) ?>">
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT DISTINCT quote_category_id FROM quotes") ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                     <div class="col-lg-3 col-md-6">
                         <select class="form-select select2" name="client" onchange="this.form.submit()">
-                            <option value="">- All Clients -</option>
+                            <option value=""><?= __('- All Clients -') ?></option>
                             <?php
                             $sql_clients_filter = mysqli_query($mysqli, "SELECT DISTINCT client_id, client_name, client_abbreviation FROM clients
                                 JOIN quotes ON quote_client_id = client_id WHERE 1 " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
@@ -231,14 +231,14 @@ $stat_monthly = function ($amount) use ($stat_money) {
         <table class="table table-hover align-middle mb-0 itflow-billing-table">
             <thead class="<?= $num_rows[0] ? '' : 'd-none' ?> text-nowrap table-light">
             <tr>
-                <th class="ps-3"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_number&order=<?= $disp ?>">Quote <?php if ($sort == 'quote_number') { echo $order_icon; } ?></a></th>
+                <th class="ps-3"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_number&order=<?= $disp ?>"><?= __('Quote') ?> <?php if ($sort == 'quote_number') { echo $order_icon; } ?></a></th>
                 <?php if (!$client_url) { ?>
-                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">Client <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
+                    <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>"><?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?></a></th>
                 <?php } ?>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_date&order=<?= $disp ?>">Date <?php if ($sort == 'quote_date') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_expire&order=<?= $disp ?>">Valid until <?php if ($sort == 'quote_expire') { echo $order_icon; } ?></a></th>
-                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_amount&order=<?= $disp ?>">Total <?php if ($sort == 'quote_amount') { echo $order_icon; } ?></a></th>
-                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_status&order=<?= $disp ?>">Status <?php if ($sort == 'quote_status') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_date&order=<?= $disp ?>"><?= __('Date') ?> <?php if ($sort == 'quote_date') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_expire&order=<?= $disp ?>"><?= __('Valid until') ?> <?php if ($sort == 'quote_expire') { echo $order_icon; } ?></a></th>
+                <th class="text-end"><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_amount&order=<?= $disp ?>"><?= __('Total') ?> <?php if ($sort == 'quote_amount') { echo $order_icon; } ?></a></th>
+                <th><a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=quote_status&order=<?= $disp ?>"><?= __('Status') ?> <?php if ($sort == 'quote_status') { echo $order_icon; } ?></a></th>
                 <th></th>
             </tr>
             </thead>
@@ -258,57 +258,57 @@ $stat_monthly = function ($amount) use ($stat_money) {
                     <?php if (!$client_url) { ?>
                         <td><a class="text-reset" href="quotes.php?client_id=<?= $row_client_id ?>"><?= escapeHtml($row['client_name']) ?></a></td>
                     <?php } ?>
-                    <td class="text-nowrap"><?= escapeHtml($row['quote_date']) ?></td>
+                    <td class="text-nowrap"><?= escapeHtml(formatDate($row['quote_date'], 'date')) ?></td>
                     <td class="text-nowrap">
-                        <?= escapeHtml($row['quote_expire']) ?>
+                        <?= escapeHtml(formatDate($row['quote_expire'], 'date')) ?>
                         <?php $expiry_pill = quoteExpiryPill($row); if ($expiry_pill) { ?><div><?= $expiry_pill ?></div><?php } ?>
                     </td>
                     <td class="text-end itflow-money">
                         <div class="fw-semibold"><?= escapeHtml(billingMoney($row['quote_amount'], $row['quote_currency_code'])) ?></div>
                         <?php if (floatval($row['quote_monthly_amount']) != 0) { ?>
-                            <div class="small text-body-secondary text-nowrap" title="Its recurring lines, as so much a month">+ <?= escapeHtml(billingMoney($row['quote_monthly_amount'], $row['quote_currency_code'])) ?>/mo</div>
+                            <div class="small text-body-secondary text-nowrap" title="<?= escapeHtml(__('Its recurring lines, as so much a month')) ?>"><?= escapeHtml(__('+ %s/mo', billingMoney($row['quote_monthly_amount'], $row['quote_currency_code']))) ?></div>
                         <?php } ?>
                     </td>
                     <td class="text-nowrap"><?= quoteStatusBadge($row) ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i>Open</a>
-                                <a class="dropdown-item" href="post.php?export_quote_pdf=<?= $quote_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" target="_blank"><i class="fas fa-fw fa-file-pdf text-secondary me-2"></i>Download PDF</a>
+                                <a class="dropdown-item" href="<?= $row_url ?>"><i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Open') ?></a>
+                                <a class="dropdown-item" href="post.php?export_quote_pdf=<?= $quote_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" target="_blank"><i class="fas fa-fw fa-file-pdf text-secondary me-2"></i><?= __('Download PDF') ?></a>
                                 <?php if ($can_edit) { ?>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($mail_ready && in_array($row_status, ['Draft', 'Sent', 'Viewed'], true)) { ?>
                                         <button type="submit" class="dropdown-item confirm-link" form="quickSendQuote" name="quote_id" value="<?= $quote_id ?>"
-                                            data-confirm-title="Send <?= escapeHtml($row_number) ?> now?" data-confirm-text="It goes to the client's primary contact." data-confirm-button="Send">
-                                            <i class="fas fa-fw fa-bolt text-secondary me-2"></i>Quick Send
+                                            data-confirm-title="<?= escapeHtml(__('Send %s now?', $row_number)) ?>" data-confirm-text="<?= escapeHtml(__("It goes to the client's primary contact.")) ?>" data-confirm-button="<?= escapeHtml(__('Send')) ?>">
+                                            <i class="fas fa-fw fa-bolt text-secondary me-2"></i><?= __('Quick Send') ?>
                                         </button>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/quote/quote_email.php?quote_id=<?= $quote_id ?>">
-                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i>Send Email<span class="text-body-secondary">...</span>
+                                            <i class="fas fa-fw fa-paper-plane text-secondary me-2"></i><?= __('Send Email') ?><span class="text-body-secondary">...</span>
                                         </a>
                                     <?php } ?>
                                     <?php if ($row_status === 'Draft') { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/quote/quote_mark_sent.php?quote_id=<?= $quote_id ?>">
-                                            <i class="fas fa-fw fa-check text-secondary me-2"></i>Mark Sent<span class="text-body-secondary">...</span>
+                                            <i class="fas fa-fw fa-check text-secondary me-2"></i><?= _x('Mark Sent', 'quote') ?><span class="text-body-secondary">...</span>
                                         </a>
                                     <?php } ?>
                                     <?php if ($row_status === 'Accepted') { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/quote/quote_to_invoice.php?quote_id=<?= $quote_id ?>">
-                                            <i class="fas fa-fw fa-file-invoice-dollar text-secondary me-2"></i>Make Invoice<span class="text-body-secondary">...</span>
+                                            <i class="fas fa-fw fa-file-invoice-dollar text-secondary me-2"></i><?= __('Make Invoice') ?><span class="text-body-secondary">...</span>
                                         </a>
                                     <?php } ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/quote/quote_edit.php?id=<?= $quote_id ?>">
-                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                     </a>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/quote/quote_copy.php?id=<?= $quote_id ?>">
-                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                     </a>
                                 <?php } ?>
                                 <?php if ($can_delete) { ?>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_quote=<?= $quote_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                        data-confirm-text="<?= escapeHtml($row_number) ?> goes for good, with its lines and history.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        data-confirm-text="<?= escapeHtml(__('%s goes for good, with its lines and history.', $row_number)) ?>">
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -321,13 +321,13 @@ $stat_monthly = function ($amount) use ($stat_money) {
     </div>
     <?php
     $empty_state = [
-        'thing' => 'quotes',
+        'thing' => __('quotes'),
         'icon' => 'fa-comment-dollar',
         'filtered' => $q || $dtf !== '1970-01-01',
         'views' => ['status'],
         'view' => emptyStatePill($statuses, $status, '', ['Expired']),
-        'text' => 'Price up work for a client, and turn it into an invoice once they accept.',
-        'actions' => $can_edit ? [['label' => 'New Quote', 'modal' => "modals/quote/quote_add.php?$client_url"]] : [],
+        'text' => __('Price up work for a client, and turn it into an invoice once they accept.'),
+        'actions' => $can_edit ? [['label' => __('New Quote'), 'modal' => "modals/quote/quote_add.php?$client_url"]] : [],
     ];
     require_once "../includes/filter_footer.php";
     ?>

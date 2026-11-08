@@ -28,7 +28,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-trash-alt me-2"></i>Clear App Logs</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Clear App Logs') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -41,10 +41,10 @@ ob_start();
     <div class="modal-body">
 
         <?php if (!$total) { ?>
-            <div class="text-center text-secondary py-4">There is nothing in the app logs to clear.</div>
+            <div class="text-center text-secondary py-4"><?= __('There is nothing in the app logs to clear.') ?></div>
         <?php } else { ?>
 
-            <p class="mb-3">The entries are deleted for good. Clearing is in the audit log, with what was cleared.</p>
+            <p class="mb-3"><?= __('The entries are deleted for good. Clearing is in the audit log, with what was cleared.') ?></p>
 
             <?php if ($filtered) { ?>
                 <div class="form-check mb-2">
@@ -58,7 +58,7 @@ ob_start();
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="scope" value="all" id="appLogClearAll" <?= $filtered && $matching ? '' : 'checked' ?>>
                 <label class="form-check-label" for="appLogClearAll">
-                    <span class="fw-semibold" data-app-log-clear-total="<?= $total ?>">Every entry - all <?= number_format($total) ?></span>
+                    <span class="fw-semibold" data-app-log-clear-total="<?= $total ?>"><?= __('Every entry - all %s', number_format($total)) ?></span>
                 </label>
             </div>
 
@@ -67,9 +67,9 @@ ob_start();
     </div>
     <div class="modal-footer">
         <?php if ($total) { ?>
-            <button type="submit" name="clear_app_logs" class="btn btn-danger text-bold"><i class="fas fa-trash-alt me-2"></i>Clear</button>
+            <button type="submit" name="clear_app_logs" class="btn btn-danger text-bold"><i class="fas fa-trash-alt me-2"></i><?= __('Clear') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

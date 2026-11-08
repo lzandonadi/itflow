@@ -26,7 +26,7 @@ if (!isset($_GET['client_id'])) {
 
 require_once "includes/inc_all_client.php";
 
-$page_title = 'Audit Log';
+$page_title = __('Audit Log');
 
 $sortable_columns = [
     'log_id' => "log_id $order",
@@ -43,7 +43,7 @@ if (!isset($sortable_columns[$sort])) {
 // Security is sign-ins, users and settings - an admin's, and in Admin > Audit Logs
 $views = auditLogViews();
 unset($views['security']);
-$views['signins']['title'] = 'Their contacts signing in to the client portal';
+$views['signins']['title'] = __('Their contacts signing in to the client portal');
 
 $view = isset($_GET['view']) && is_string($_GET['view']) && isset($views[$_GET['view']]) ? $_GET['view'] : '';
 $scope = "log_client_id = $client_id AND " . auditLogRoleSql();
@@ -94,21 +94,21 @@ $view_url = function ($key) {
     }));
 };
 $view_empty = [
-    'changes' => 'No changes yet',
-    'deletions' => 'Nothing deleted yet',
-    'signins' => 'No portal sign-ins yet',
-    'data' => 'Nothing looked at or taken out yet',
+    'changes' => __('No changes yet'),
+    'deletions' => __('Nothing deleted yet'),
+    'signins' => __('No portal sign-ins yet'),
+    'data' => __('Nothing looked at or taken out yet'),
 ];
 
 ?>
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-history me-2"></i>Audit Log</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-history me-2"></i><?= __('Audit Log') ?></h3>
         <?php if ($session_is_admin) { ?>
             <div class="card-tools">
-                <a class="btn btn-outline-light" href="/admin/audit_logs.php?<?= escapeHtml(http_build_query(array_filter(['client' => $client_id, 'view' => $view, 'q' => $_GET['q'] ?? '', 'type' => $type_filter, 'entity' => $entity_filter ?: '']))) ?>" title="Every client's, with each entry's quick look and export">
-                    <i class="fas fa-fw fa-user-shield"></i><span class="d-none d-lg-inline ms-2">Admin &gt; Audit Logs</span>
+                <a class="btn btn-outline-light" href="/admin/audit_logs.php?<?= escapeHtml(http_build_query(array_filter(['client' => $client_id, 'view' => $view, 'q' => $_GET['q'] ?? '', 'type' => $type_filter, 'entity' => $entity_filter ?: '']))) ?>" title="<?= escapeHtml(__('Every client\'s, with each entry\'s quick look and export')) ?>">
+                    <i class="fas fa-fw fa-user-shield"></i><span class="d-none d-lg-inline ms-2"><?= __('Admin &gt; Audit Logs') ?></span>
                 </a>
             </div>
         <?php } ?>
@@ -120,21 +120,21 @@ $view_empty = [
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search <?= $client_name ?>'s audit log" title="What was done, who did it, the IP address or the browser">
-                        <button class="btn btn-outline-secondary <?= $more_filters ? 'active' : '' ?>" title="More filters" type="button" data-bs-toggle="collapse" data-bs-target="#auditMoreFilters"><i class="fas fa-filter"></i></button>
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= __('Search %s\'s audit log', $client_name) ?>" title="<?= escapeHtml(__('What was done, who did it, the IP address or the browser')) ?>">
+                        <button class="btn btn-outline-secondary <?= $more_filters ? 'active' : '' ?>" title="<?= escapeHtml(__('More filters')) ?>" type="button" data-bs-toggle="collapse" data-bs-target="#auditMoreFilters"><i class="fas fa-filter"></i></button>
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="When" aria-label="When">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('When')) ?>" aria-label="<?= escapeHtml(__('When')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml(is_string($_GET['canned_date'] ?? null) ? $_GET['canned_date'] : '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select class="form-select select2" name="user" onchange="this.form.submit()" aria-label="Who">
-                        <option value="">- Anyone -</option>
-                        <option value="system" <?= $user_filter === 'system' ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cog', 'description' => 'Cron, the API, the email parser']) ?>>ITFlow itself</option>
+                    <select class="form-select select2" name="user" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Who')) ?>">
+                        <option value=""><?= __('- Anyone -') ?></option>
+                        <option value="system" <?= $user_filter === 'system' ? 'selected' : '' ?><?= selectOptionData(['icon' => 'fas fa-cog', 'description' => __('Cron, the API, the email parser')]) ?>><?= __('ITFlow itself') ?></option>
                         <?php
                         $sql_filter = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar, user_type FROM users
                             WHERE EXISTS (SELECT 1 FROM logs WHERE log_user_id = user_id AND log_client_id = $client_id AND " . auditLogRoleSql() . ")
@@ -146,12 +146,12 @@ $view_empty = [
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <select class="form-select select2" name="type" onchange="this.form.submit()" aria-label="Type">
-                        <option value="">- Any type -</option>
+                    <select class="form-select select2" name="type" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Type')) ?>">
+                        <option value=""><?= __('- Any type -') ?></option>
                         <?php
                         $sql_filter = mysqli_query($mysqli, "SELECT DISTINCT log_type FROM logs WHERE $scope ORDER BY log_type ASC");
                         while ($row = mysqli_fetch_row($sql_filter)) { ?>
-                            <option <?= $type_filter === $row[0] ? 'selected' : '' ?> value="<?= escapeHtml($row[0]) ?>"<?= selectOptionData(['icon' => 'fas ' . auditLogTypeIcon($row[0])]) ?>><?= escapeHtml($row[0]) ?></option>
+                            <option <?= $type_filter === $row[0] ? 'selected' : '' ?> value="<?= escapeHtml($row[0]) ?>"<?= selectOptionData(['icon' => 'fas ' . auditLogTypeIcon($row[0])]) ?>><?= escapeHtml(auditLogTypeLabel($row[0])) ?></option>
                         <?php } ?>
                     </select>
                 </div>
@@ -161,12 +161,12 @@ $view_empty = [
                     <div class="col-lg-3 col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-bolt"></i></span>
-                            <select class="form-select select2" name="action" onchange="this.form.submit()" aria-label="Action">
-                                <option value="">- Any action -</option>
+                            <select class="form-select select2" name="action" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Action')) ?>">
+                                <option value=""><?= __('- Any action -') ?></option>
                                 <?php
                                 $sql_filter = mysqli_query($mysqli, "SELECT DISTINCT log_action FROM logs WHERE $scope ORDER BY log_action ASC");
                                 while ($row = mysqli_fetch_row($sql_filter)) { ?>
-                                    <option <?= $action_filter === $row[0] ? 'selected' : '' ?> value="<?= escapeHtml($row[0]) ?>"<?= selectOptionData(['icon' => 'fas ' . auditLogActionStyle($row[0])['icon']]) ?>><?= escapeHtml($row[0]) ?></option>
+                                    <option <?= $action_filter === $row[0] ? 'selected' : '' ?> value="<?= escapeHtml($row[0]) ?>"<?= selectOptionData(['icon' => 'fas ' . auditLogActionStyle($row[0])['icon']]) ?>><?= escapeHtml(auditLogActionLabel($row[0])) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -175,13 +175,13 @@ $view_empty = [
                         $entity_record = auditLogRecords([['log_type' => $type_filter, 'log_entity_id' => $entity_filter]])[$type_filter . '|' . $entity_filter] ?? null; ?>
                         <div class="col-lg-9 col-md-6 small" data-audit-entity="<?= $entity_filter ?>">
                             <input type="hidden" name="entity" value="<?= $entity_filter ?>">
-                            <span class="text-body-secondary"><i class="fas fa-fw fa-filter me-1"></i>Just one record:</span>
+                            <span class="text-body-secondary"><i class="fas fa-fw fa-filter me-1"></i><?= __('Just one record:') ?></span>
                             <?php if ($entity_record) { ?>
                                 <a href="<?= escapeHtml($entity_record['url']) ?>"><?= escapeHtml($type_filter . ' ' . $entity_record['name']) ?></a>
                             <?php } else { ?>
                                 <span class="text-body-secondary"><?= escapeHtml($type_filter !== '' ? $type_filter : 'record') ?> #<?= $entity_filter ?></span>
                             <?php } ?>
-                            <a class="ms-2" href="<?= escapeHtml('?' . http_build_query(array_diff_key($_GET, ['entity' => 1, 'page' => 1]))) ?>">Every record</a>
+                            <a class="ms-2" href="<?= escapeHtml('?' . http_build_query(array_diff_key($_GET, ['entity' => 1, 'page' => 1]))) ?>"><?= __('Every record') ?></a>
                         </div>
                     <?php } ?>
                 </div>
@@ -200,11 +200,11 @@ $view_empty = [
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('log_created_at', 'When') ?></th>
-                <th><?= $sort_link('user_name', 'Who') ?></th>
-                <th><?= $sort_link('log_type', 'What') ?></th>
-                <th>Description</th>
-                <th class="d-none d-xl-table-cell"><?= $sort_link('log_ip', 'From') ?></th>
+                <th class="ps-3"><?= $sort_link('log_created_at', __('When')) ?></th>
+                <th><?= $sort_link('user_name', __('Who')) ?></th>
+                <th><?= $sort_link('log_type', __('What')) ?></th>
+                <th><?= __('Description') ?></th>
+                <th class="d-none d-xl-table-cell"><?= $sort_link('log_ip', __('From')) ?></th>
                 <?php if ($session_is_admin) { ?><th></th><?php } ?>
             </tr>
             </thead>
@@ -220,12 +220,12 @@ $view_empty = [
                 ?>
                 <tr data-log-id="<?= $log_id ?>">
                     <td class="ps-3 text-nowrap small" title="<?= escapeHtml($row['log_created_at']) ?>">
-                        <div><?= escapeHtml(date('M j, Y g:i A', strtotime($row['log_created_at']))) ?></div>
+                        <div><?= escapeHtml(formatDate($row['log_created_at'], 'datetime')) ?></div>
                         <div class="text-body-secondary"><?= escapeHtml(timeAgo($row['log_created_at'])) ?></div>
                     </td>
                     <td class="small" style="max-width: 14rem;"><?= $who['html'] ?></td>
                     <td class="text-nowrap">
-                        <div class="small mb-1"><i class="fas fa-fw <?= auditLogTypeIcon($type) ?> text-secondary me-1"></i><?= escapeHtml($type) ?></div>
+                        <div class="small mb-1"><i class="fas fa-fw <?= auditLogTypeIcon($type) ?> text-secondary me-1"></i><?= escapeHtml(auditLogTypeLabel($type)) ?></div>
                         <?= auditLogActionPill($row['log_action']) ?><?= isset($new_ips[intval($row['log_id'])]) ? ' ' . signInNewIpBadge() : '' ?>
                     </td>
                     <td class="small" style="min-width: 16rem;">
@@ -233,7 +233,7 @@ $view_empty = [
                         <?php if ($link !== '') { ?>
                             <div class="mt-1" data-audit-record><i class="fas fa-fw fa-external-link-alt text-secondary me-1"></i><?= $link ?></div>
                         <?php } elseif ($gone) { ?>
-                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="The <?= escapeHtml(strtolower($type)) ?> this is about has been deleted"><i class="fas fa-fw fa-ghost me-1"></i>No longer here</div>
+                            <div class="mt-1 text-body-secondary" data-audit-record-gone title="<?= __('The %s this is about has been deleted', escapeHtml(strtolower($type))) ?>"><i class="fas fa-fw fa-ghost me-1"></i><?= __('No longer here') ?></div>
                         <?php } ?>
                         <?php if ($from !== '') { ?>
                             <div class="d-xl-none text-body-secondary mt-1"><?= escapeHtml($from) ?></div>
@@ -245,7 +245,7 @@ $view_empty = [
                     </td>
                     <?php if ($session_is_admin) { ?>
                         <td class="text-end pe-3">
-                            <button type="button" class="btn btn-sm btn-light ajax-modal" data-modal-size="lg" data-modal-url="/admin/modals/audit_log/audit_log.php?id=<?= $log_id ?>" title="All of it" aria-label="All of it"><i class="fas fa-fw fa-search-plus"></i></button>
+                            <button type="button" class="btn btn-sm btn-light ajax-modal" data-modal-size="lg" data-modal-url="/admin/modals/audit_log/audit_log.php?id=<?= $log_id ?>" title="<?= escapeHtml(__('All of it')) ?>" aria-label="<?= escapeHtml(__('All of it')) ?>"><i class="fas fa-fw fa-search-plus"></i></button>
                         </td>
                     <?php } ?>
                 </tr>
@@ -255,12 +255,12 @@ $view_empty = [
     </div>
     <?php
     $empty_state = [
-        'thing' => 'audit log entries',
+        'thing' => __('audit log entries'),
         'icon' => 'fa-history',
         'filtered' => $any_filter,
         'views' => ['view'],
         'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => $view_empty[$view], 'text' => escapeHtml($views[$view]['title']) . ' show here.'] : null,
-        'text' => 'Who changed what for ' . $client_name . ', looked at a password or took something out - when, and from where - shows here.',
+        'text' => __('Who changed what for %s, looked at a password or took something out - when, and from where - shows here.', $client_name),
     ];
     require_once "../includes/filter_footer.php";
     ?>

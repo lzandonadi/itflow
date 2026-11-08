@@ -19,7 +19,7 @@ $from = "$year-01-01";
 $to = $current_year ? date('Y-m-d') : "$year-12-31";
 $prev_from = ($year - 1) . '-01-01';
 $prev_to = $current_year ? dashboardShiftMonths(date('Y-m-d'), -12) : ($year - 1) . '-12-31';
-$compare = $current_year ? 'the same time last year' : (string) ($year - 1);
+$compare = $current_year ? __('the same time last year') : (string) ($year - 1);
 
 $grid = reportIncomeByCategory($from, $to);
 $categories = reportCategoryRows('Income', $grid);
@@ -30,7 +30,7 @@ $prev_grid = reportIncomeByCategory($prev_from, $prev_to);
 $prev_total = reportGridTotals($prev_grid)['total'];
 
 if (reportExporting()) {
-    reportCategoryYearCsv($categories, $grid, $year, "Income $year", 'Total income');
+    reportCategoryYearCsv($categories, $grid, $year, "Income $year", __('Total income'));
 }
 
 // Where it came from: invoices paid, or other income
@@ -57,39 +57,39 @@ require_once "includes/inc_report_layout.php";
 
     <?php reportHeader('income_summary', [
         'year' => [$year, $years],
-        'subtitle' => $current_year ? "$year to date" : (string) $year,
+        'subtitle' => $current_year ? __('%d to date', $year) : (string) $year,
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Income', 'value' => reportMoney($totals['total']), 'sub' => reportChangeHtml($totals['total'], $prev_total, 'up', $compare),
+        ['label' => __('Income'), 'value' => reportMoney($totals['total']), 'sub' => reportChangeHtml($totals['total'], $prev_total, 'up', $compare),
             'url' => "/agent/income.php?canned_date=custom&dtf=$from&dtt=$to"],
-        ['label' => 'Invoice payments', 'value' => reportMoney($from_invoices), 'sub' => escapeHtml(reportPercent(reportShare($from_invoices, $totals['total']))) . ' <span class="text-body-tertiary">of income</span>',
+        ['label' => __('Invoice payments'), 'value' => reportMoney($from_invoices), 'sub' => escapeHtml(reportPercent(reportShare($from_invoices, $totals['total']))) . ' <span class="text-body-tertiary">' . __('of income') . '</span>',
             'url' => "/agent/income.php?show=payments&canned_date=custom&dtf=$from&dtt=$to"],
-        ['label' => 'Other income', 'value' => reportMoney($from_other), 'sub' => escapeHtml(reportPercent(reportShare($from_other, $totals['total']))) . ' <span class="text-body-tertiary">of income</span>',
+        ['label' => __('Other income'), 'value' => reportMoney($from_other), 'sub' => escapeHtml(reportPercent(reportShare($from_other, $totals['total']))) . ' <span class="text-body-tertiary">' . __('of income') . '</span>',
             'url' => "/agent/income.php?show=other&canned_date=custom&dtf=$from&dtt=$to"],
-        ['label' => 'Monthly average', 'value' => reportMoney($average), 'sub' => $best_month ? 'Best month <span class="text-body">' . date('F', mktime(0, 0, 0, $best_month, 1)) . '</span>' : ''],
+        ['label' => __('Monthly average'), 'value' => reportMoney($average), 'sub' => $best_month ? __('Best month %s', '<span class="text-body">' . formatDate(mktime(0, 0, 0, $best_month, 1), 'month_long') . '</span>') : ''],
     ]) ?>
 
-    <?= reportSectionOpen('Income by month', escapeHtml("$year, with " . ($year - 1) . ' as a line')) ?>
+    <?= reportSectionOpen(__('Income by month'), escapeHtml(__('%1$d, with %2$d as a line', $year, $year - 1))) ?>
         <div class="card-body">
             <?php
             $series = reportCategoryChartSeries($categories, $grid, $current_year ? intval(date('n')) : 12);
             $series[] = ['label' => (string) ($year - 1), 'data' => array_map(function ($v) { return round($v, 2); }, array_values($prev_full)), 'tone' => 'muted', 'type' => 'line', 'dashed' => true];
             echo reportChart([
                 'type' => 'bar',
-                'labels' => array_map(function ($m) { return date('M', mktime(0, 0, 0, $m, 1)); }, range(1, 12)),
+                'labels' => array_map(function ($m) { return formatDate(mktime(0, 0, 0, $m, 1), 'month'); }, range(1, 12)),
                 'series' => $series,
                 'stacked' => true,
                 'format' => 'money',
-            ], 'lg', 'Income per month by category, with last year as a line');
+            ], 'lg', __('Income per month by category, with last year as a line'));
             ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('By category', 'Click an amount to see the payments and other income behind it', 'itflow-report-long') ?>
-        <?= reportCategoryYearTable($categories, $grid, $year, 'income.php', 'Total income', 'show=uncategorised') ?>
+    <?= reportSectionOpen(__('By category'), __('Click an amount to see the payments and other income behind it'), 'itflow-report-long') ?>
+        <?= reportCategoryYearTable($categories, $grid, $year, 'income.php', __('Total income'), 'show=uncategorised') ?>
         <div class="card-footer small text-body-secondary">
-            Payments are filed under the category of the invoice they paid, other income under its own - No category when it has none. Transfers between your own accounts are left out.
+            <?= __('Payments are filed under the category of the invoice they paid, other income under its own - No category when it has none. Transfers between your own accounts are left out.') ?>
         </div>
     </div>
 

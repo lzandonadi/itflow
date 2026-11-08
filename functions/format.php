@@ -232,7 +232,8 @@ function formatAddress($address, $city, $state, $zip, $country = '', $separator 
  * doesn't. Takes the RAW user columns and escapes them itself.
  * Bootstrap 5.3 utilities and Font Awesome only - no custom CSS.
  */
-function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigned = true, $none_label = 'Unassigned') {
+function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigned = true, $none_label = null) {
+    $none_label = $none_label ?? __('Unassigned');
     $pill = "badge rounded-pill d-inline-flex align-items-center align-middle gap-1 p-1 pe-2";
     $user_id = intval($user_id);
 
@@ -253,6 +254,87 @@ function formatAssignee($user_id, $user_name, $user_avatar, $highlight_unassigne
 }
 
 
+/*
+ * A date as people read it, in the interface language (functions/i18n.php) - for
+ * showing only. Dates that are stored, posted, exported or compared keep date()
+ * with a numeric format (Y-m-d, H:i).
+ *
+ * $value is a timestamp, a DateTimeInterface or a MySQL date / datetime string,
+ * shown in ITFlow's timezone; null, '', a zero date or anything that isn't a
+ * date gives ''. Each style is an ICU skeleton, so every language gets its own
+ * order and punctuation:
+ *
+ *   style        en_US                   pt_BR                     replaces
+ *   date         Nov 5, 2026             5 de nov. de 2026         date('M j, Y')
+ *   date_short   Nov 5                   5 de nov.                 date('M j')
+ *   datetime     Nov 5, 2026, 3:04 PM    5 de nov. de 2026, 15:04  date('M j, Y g:i A')
+ *   datetime_short Nov 5, 3:04 PM        5 de nov., 15:04          date('M j, g:i A')
+ *   datetime_weekday Thu, Nov 5, 2026, 3:04 PM  qui., 5 de nov. de 2026, 15:04  date('D j M Y, g:i A')
+ *   date_weekday Thu, Nov 5, 2026         qui., 5 de nov. de 2026   date('D M j, Y')
+ *   time         3:04 PM                 15:04                     date('g:i A')
+ *   weekday_short Mon                    seg.                      date('D')
+ *   month        Nov                     nov.                      date('M')
+ *   month_year   November 2026           novembro de 2026          date('F Y')
+ *   month_year_short Nov 26              nov. de 26                date('M y')
+ *   date_long    November 5, 2026        5 de novembro de 2026     date('F j, Y')
+ *   day_long     Thursday, November 5    quinta-feira, 5 de novembro  date('l, F j')
+ *
+ * An unknown style is shown as date.
+ */
+function formatDate($value, string $style = 'date'): string {
+    static $skeletons = [
+        'date' => 'yMMMd',
+        'date_short' => 'MMMd',
+        'datetime' => 'yMMMdjmm',
+        'datetime_short' => 'MMMdjmm',
+        'datetime_weekday' => 'yMMMEdjmm',
+        'date_weekday' => 'yMMMEd',
+        'time' => 'jmm',
+        'weekday_short' => 'EEE',
+        'month' => 'MMM',
+        'month_long' => 'MMMM',
+        'month_year' => 'yMMMM',
+        'month_year_short' => 'yyMMM',
+        'date_long' => 'yMMMMd',
+        'day_long' => 'MMMMEEEEd',
+    ];
+    static $formatters = [];
+
+    if ($value instanceof DateTimeInterface) {
+        $timestamp = $value->getTimestamp();
+    } elseif (is_int($value)) {
+        $timestamp = $value;
+    } else {
+        $value = trim((string) $value);
+        if ($value === '' || str_starts_with($value, '0000-00-00')) {
+            return '';
+        }
+        $timestamp = ctype_digit($value) ? intval($value) : strtotime($value);
+        if ($timestamp === false) {
+            return '';
+        }
+    }
+
+    $skeleton = $skeletons[$style] ?? $skeletons['date'];
+    $locale = i18nLocale();
+    $timezone = date_default_timezone_get();
+    $key = "$locale|$skeleton|$timezone";
+    if (!isset($formatters[$key])) {
+        $pattern = (new IntlDatePatternGenerator($locale))->getBestPattern($skeleton);
+        $formatters[$key] = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $timezone, IntlDateFormatter::GREGORIAN, $pattern);
+    }
+    $formatted = $formatters[$key]->format($timestamp);
+
+    return $formatted === false ? '' : $formatted;
+}
+
+
+/** $text with its first letter a capital, multibyte-safe - "às segundas" -> "Às segundas". */
+function mbUcfirst($text) {
+    $text = (string) $text;
+    return mb_strtoupper(mb_substr($text, 0, 1)) . mb_substr($text, 1);
+}
+
 function timeAgo($datetime) {
     if (is_null($datetime)) {
         return "-";
@@ -262,7 +344,7 @@ function timeAgo($datetime) {
     $difference = $time - time(); // Changed to handle future dates
 
     if ($difference == 0) {
-        return 'right now';
+        return __('right now');
     }
 
     $isFuture = $difference > 0; // Check if the date is in the future
@@ -281,9 +363,24 @@ function timeAgo($datetime) {
     foreach ($timeRules as $secs => $str) {
         $div = $difference / $secs;
         if ($div >= 1) {
-            $t = round($div);
-            $timeStr = $t . ' ' . $str . ($t > 1 ? 's' : '');
-            return $isFuture ? 'in ' . $timeStr : $timeStr . ' ago';
+            $t = intval(round($div));
+            // Whole phrases, so a language can put the number and the word where it goes
+            return match ($str . ($isFuture ? '+' : '-')) {
+                'year+' => _n('in %d year', 'in %d years', $t),
+                'year-' => _n('%d year ago', '%d years ago', $t),
+                'month+' => _n('in %d month', 'in %d months', $t),
+                'month-' => _n('%d month ago', '%d months ago', $t),
+                'week+' => _n('in %d week', 'in %d weeks', $t),
+                'week-' => _n('%d week ago', '%d weeks ago', $t),
+                'day+' => _n('in %d day', 'in %d days', $t),
+                'day-' => _n('%d day ago', '%d days ago', $t),
+                'hour+' => _n('in %d hour', 'in %d hours', $t),
+                'hour-' => _n('%d hour ago', '%d hours ago', $t),
+                'minute+' => _n('in %d minute', 'in %d minutes', $t),
+                'minute-' => _n('%d minute ago', '%d minutes ago', $t),
+                'second+' => _n('in %d second', 'in %d seconds', $t),
+                default => _n('%d second ago', '%d seconds ago', $t),
+            };
         }
     }
 }
@@ -617,7 +714,7 @@ function emptyStatePill(array $pills, $key, $default = '', array $good = []) {
         return null;
     }
     $pill = $pills[$key];
-    $view = ['title' => 'Nothing in ' . escapeHtml($pill['label'] ?? $key), 'text' => escapeHtml($pill['title'] ?? '')];
+    $view = ['title' => __('Nothing in %s', escapeHtml($pill['label'] ?? $key)), 'text' => escapeHtml($pill['title'] ?? '')];
     if (!empty($pill['alarm']) || in_array($key, array_map('strval', $good), true)) {
         return $view + ['icon' => 'fa-check'];
     }
@@ -626,7 +723,9 @@ function emptyStatePill(array $pills, $key, $default = '', array $good = []) {
 
 /**
  * A list's empty state. $o:
- *   thing   - what the list holds, plural ('vendors')
+ *   thing   - what the list holds, plural and in the interface language
+ *             (__('vendors')) - the titles built from it are worded to take
+ *             any plural, so a page needs its own only for a better sentence
  *   icon    - the list's icon ('fa-building', or full classes 'fab fa-...')
  *   title   - HTML; "No {thing} yet" when left out
  *   text    - HTML; a line on what goes there
@@ -655,17 +754,17 @@ function emptyStateHtml(array $o) {
 
     if ($filtered) {
         $icon = 'fas fa-filter';
-        $title = $o['match_title'] ?? 'No ' . escapeHtml($thing) . ' match';
-        $text = $o['match_text'] ?? 'Try a different search, or clear the filters to see everything.';
-        $buttons = '<a class="btn btn-outline-secondary" href="' . escapeHtml($o['clear_url'] ?? emptyStateClearUrl($views)) . '"><i class="fas fa-times me-2"></i>Clear filters</a>';
+        $title = $o['match_title'] ?? __('No %s match', escapeHtml($thing));
+        $text = $o['match_text'] ?? __('Try a different search, or clear the filters to see everything.');
+        $buttons = '<a class="btn btn-outline-secondary" href="' . escapeHtml($o['clear_url'] ?? emptyStateClearUrl($views)) . '"><i class="fas fa-times me-2"></i>' . __('Clear filters') . '</a>';
     } elseif (!empty($o['archived'])) {
         $icon = 'fas fa-archive';
-        $title = $o['archived_title'] ?? 'No archived ' . escapeHtml($thing);
+        $title = $o['archived_title'] ?? __('No archived %s', escapeHtml($thing));
         $text = '';
     } else {
         $icon = (string) ($o['icon'] ?? 'fa-inbox');
         $icon = strpos($icon, ' ') === false ? "fas $icon" : $icon;
-        $title = $o['title'] ?? 'No ' . escapeHtml($thing) . ' yet';
+        $title = $o['title'] ?? __('No %s yet', escapeHtml($thing));
         $text = (string) ($o['text'] ?? '');
         foreach (array_values((array) ($o['actions'] ?? [])) as $i => $action) {
             $class = 'btn ' . ($i ? 'btn-outline-primary' : 'btn-primary');

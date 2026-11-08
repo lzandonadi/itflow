@@ -18,13 +18,13 @@ defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 function projectFromPost($client_id) {
     $name = trim((string) ($_POST['name'] ?? ''));
     if ($name === '') {
-        flashAlert('A project needs a name.', 'error');
+        flashAlert(__('A project needs a name.'), 'error');
         redirect();
     }
     $start = projectDateSql($_POST['start'] ?? '');
     $due = projectDateSql($_POST['due_date'] ?? '');
     if ($start !== 'NULL' && $due !== 'NULL' && $due < $start) {
-        flashAlert('The due date is before the start date.', 'error');
+        flashAlert(__('The due date is before the start date.'), 'error');
         redirect();
     }
     $budget = projectBudgetHours($_POST['budget_hours'] ?? '');
@@ -54,7 +54,7 @@ if (isset($_POST['add_project'])) {
     $client_id = intval($_POST['client_id'] ?? 0);
     if ($client_id) {
         if (!getFieldById('clients', $client_id, 'client_name')) {
-            flashAlert('That client no longer exists.', 'error');
+            flashAlert(__('That client no longer exists.'), 'error');
             redirect();
         }
         enforceClientAccess();
@@ -84,7 +84,7 @@ if (isset($_POST['add_project'])) {
 
     logAudit("Project", "Create", "$session_name created project " . escapeSql(projectReference($row)) . " - {$p['name']}", $client_id, $project_id);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> created" . ($raised ? " with <strong>$raised</strong> ticket" . ($raised === 1 ? '' : 's') . " from the template" : ''));
+    flashAlert($raised ? _n('Project <strong>%2$s</strong> created with <strong>%1$d</strong> ticket from the template', 'Project <strong>%2$s</strong> created with <strong>%1$d</strong> tickets from the template', $raised, $raised, escapeHtml(projectReference($row) . ' - ' . $row['project_name'])) : __('Project <strong>%s</strong> created', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])));
 
     redirect(projectBackUrl($client_id, $project_id));
 
@@ -98,7 +98,7 @@ if (isset($_POST['edit_project'])) {
     $project_id = intval($row['project_id']);
 
     if (!empty($row['project_archived_at'])) {
-        flashAlert("Project <strong>" . escapeHtml(projectReference($row)) . "</strong> is archived - restore it to change it.", 'error');
+        flashAlert(__('Project <strong>%s</strong> is archived - restore it to change it.', escapeHtml(projectReference($row))), 'error');
         redirect();
     }
 
@@ -114,7 +114,7 @@ if (isset($_POST['edit_project'])) {
 
     logAudit("Project", "Edit", "$session_name edited project " . escapeSql(projectReference($row)) . " - {$p['name']}", $client_id, $project_id);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . stripslashes($p['name'])) . "</strong> saved");
+    flashAlert(__('Project <strong>%s</strong> saved', escapeHtml(projectReference($row) . ' - ' . stripslashes($p['name']))));
 
     redirect();
 
@@ -129,11 +129,11 @@ if (isset($_GET['complete_project']) || isset($_GET['close_project'])) {
 
     $why_not = projectComplete($row);
     if ($why_not !== '') {
-        flashAlert("Project <strong>" . escapeHtml(projectReference($row)) . "</strong> can't be completed - " . escapeHtml($why_not) . ".", 'error');
+        flashAlert(__('Project <strong>%1$s</strong> can\'t be completed - %2$s.', escapeHtml(projectReference($row)), escapeHtml($why_not)), 'error');
         redirect();
     }
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> completed");
+    flashAlert(__('Project <strong>%s</strong> completed', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])));
 
     redirect();
 
@@ -146,13 +146,13 @@ if (isset($_GET['reopen_project'])) {
     $row = projectForRequest($_GET['reopen_project'], 2);
 
     if (empty($row['project_completed_at']) || !empty($row['project_archived_at'])) {
-        flashAlert("Project <strong>" . escapeHtml(projectReference($row)) . "</strong> isn't completed" . (!empty($row['project_archived_at']) ? ' - it is archived, restore it first' : '') . ".", 'error');
+        flashAlert(!empty($row['project_archived_at']) ? __('Project <strong>%s</strong> isn\'t completed - it is archived, restore it first.', escapeHtml(projectReference($row))) : __('Project <strong>%s</strong> isn\'t completed.', escapeHtml(projectReference($row))), 'error');
         redirect();
     }
 
     projectReopen($row);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> reopened");
+    flashAlert(__('Project <strong>%s</strong> reopened', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])));
 
     redirect();
 
@@ -166,7 +166,7 @@ if (isset($_GET['archive_project'])) {
 
     projectArchive($row);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> archived", 'error');
+    flashAlert(__('Project <strong>%s</strong> archived', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])), 'error');
 
     redirect();
 
@@ -180,7 +180,7 @@ if (isset($_GET['restore_project'])) {
 
     projectRestore($row);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> restored");
+    flashAlert(__('Project <strong>%s</strong> restored', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])));
 
     redirect();
 
@@ -194,7 +194,7 @@ if (isset($_GET['delete_project'])) {
 
     projectDelete($row);
 
-    flashAlert("Project <strong>" . escapeHtml(projectReference($row) . ' - ' . $row['project_name']) . "</strong> deleted - its tickets stay", 'error');
+    flashAlert(__('Project <strong>%s</strong> deleted - its tickets stay', escapeHtml(projectReference($row) . ' - ' . $row['project_name'])), 'error');
 
     // From its own page, back to the list - the page is gone
     $referer = (string) ($_SERVER['HTTP_REFERER'] ?? '');
@@ -217,7 +217,7 @@ if (isset($_POST['link_ticket_to_project'])) {
     $row = projectForRequest($_POST['project_id'] ?? 0, 2);
 
     if (!projectIsOpen($row)) {
-        flashAlert("Project <strong>" . escapeHtml(projectReference($row)) . "</strong> isn't open - reopen it to add tickets.", 'error');
+        flashAlert(__('Project <strong>%s</strong> isn\'t open - reopen it to add tickets.', escapeHtml(projectReference($row))), 'error');
         redirect();
     }
 
@@ -259,11 +259,11 @@ if (isset($_POST['link_ticket_to_project'])) {
 
     // One message - a second flashAlert() would replace the first
     $message = array_filter([
-        $added ? "<strong>$added</strong> ticket" . ($added === 1 ? '' : 's') . " added to <strong>" . escapeHtml($row['project_name']) . "</strong>" : '',
-        $skipped ? 'Skipped ' . implode(', ', $skipped) : '',
-        $not_found ? 'No ticket numbered ' . implode(', ', $not_found) : '',
+        $added ? _n('<strong>%1$d</strong> ticket added to <strong>%2$s</strong>', '<strong>%1$d</strong> tickets added to <strong>%2$s</strong>', $added, $added, escapeHtml($row['project_name'])) : '',
+        $skipped ? __('Skipped %s', implode(', ', $skipped)) : '',
+        $not_found ? __('No ticket numbered %s', implode(', ', $not_found)) : '',
     ]);
-    flashAlert($message ? implode('. ', $message) : 'Nothing to add - those tickets are on the project already.', $added ? 'success' : 'error');
+    flashAlert($message ? implode('. ', $message) : __('Nothing to add - those tickets are on the project already.'), $added ? 'success' : 'error');
 
     redirect();
 
@@ -290,7 +290,7 @@ if (isset($_POST['remove_tickets_from_project'])) {
         logAudit("Project", "Edit", "$session_name took $removed ticket" . ($removed === 1 ? '' : 's') . " out of project " . escapeSql(projectReference($row) . ' - ' . $row['project_name']), intval($row['project_client_id']), $project_id);
     }
 
-    flashAlert("<strong>$removed</strong> ticket" . ($removed === 1 ? '' : 's') . " taken out of <strong>" . escapeHtml($row['project_name']) . "</strong>", 'error');
+    flashAlert(_n('<strong>%1$d</strong> ticket taken out of <strong>%2$s</strong>', '<strong>%1$d</strong> tickets taken out of <strong>%2$s</strong>', $removed, $removed, escapeHtml($row['project_name'])), 'error');
 
     redirect();
 
@@ -304,13 +304,13 @@ if (isset($_POST['apply_project_template'])) {
     $row = projectForRequest($_POST['project_id'] ?? 0, 2);
 
     if (!projectIsOpen($row)) {
-        flashAlert("Project <strong>" . escapeHtml(projectReference($row)) . "</strong> isn't open.", 'error');
+        flashAlert(__('Project <strong>%s</strong> isn\'t open.', escapeHtml(projectReference($row))), 'error');
         redirect();
     }
 
     $project_template_id = intval($_POST['project_template_id'] ?? 0);
     if (!mysqli_num_rows(mysqli_query($mysqli, "SELECT 1 FROM project_templates WHERE project_template_id = $project_template_id AND project_template_archived_at IS NULL"))) {
-        flashAlert('Pick a project template.', 'error');
+        flashAlert(__('Pick a project template.'), 'error');
         redirect();
     }
 
@@ -318,7 +318,7 @@ if (isset($_POST['apply_project_template'])) {
 
     logAudit("Project", "Edit", "$session_name added $raised ticket" . ($raised === 1 ? '' : 's') . " from a template to project " . escapeSql(projectReference($row) . ' - ' . $row['project_name']), intval($row['project_client_id']), intval($row['project_id']));
 
-    flashAlert("<strong>$raised</strong> ticket" . ($raised === 1 ? '' : 's') . " added from the template");
+    flashAlert(_n('<strong>%d</strong> ticket added from the template', '<strong>%d</strong> tickets added from the template', $raised));
 
     redirect();
 
@@ -346,8 +346,8 @@ if (isset($_POST['bulk_complete_projects'])) {
         }
     }
 
-    flashAlert("<strong>$done</strong> project" . ($done === 1 ? '' : 's') . " completed"
-        . ($refused ? ". Still open tickets on " . implode(', ', $refused) . " - left as they were" : ''), $refused && !$done ? 'error' : 'success');
+    flashAlert(_n('<strong>%d</strong> project completed', '<strong>%d</strong> projects completed', $done)
+        . ($refused ? '. ' . __('Still open tickets on %s - left as they were', implode(', ', $refused)) : ''), $refused && !$done ? 'error' : 'success');
 
     redirect();
 
@@ -366,7 +366,7 @@ if (isset($_POST['bulk_reopen_projects'])) {
         $done++;
     }
 
-    flashAlert("<strong>$done</strong> project" . ($done === 1 ? '' : 's') . " reopened");
+    flashAlert(_n('<strong>%d</strong> project reopened', '<strong>%d</strong> projects reopened', $done));
 
     redirect();
 
@@ -385,7 +385,7 @@ if (isset($_POST['bulk_archive_projects'])) {
         $done++;
     }
 
-    flashAlert("<strong>$done</strong> project" . ($done === 1 ? '' : 's') . " archived", 'error');
+    flashAlert(_n('<strong>%d</strong> project archived', '<strong>%d</strong> projects archived', $done), 'error');
 
     redirect();
 
@@ -404,7 +404,7 @@ if (isset($_POST['bulk_restore_projects'])) {
         $done++;
     }
 
-    flashAlert("<strong>$done</strong> project" . ($done === 1 ? '' : 's') . " restored");
+    flashAlert(_n('<strong>%d</strong> project restored', '<strong>%d</strong> projects restored', $done));
 
     redirect();
 
@@ -420,7 +420,7 @@ if (isset($_POST['bulk_delete_projects'])) {
         $done++;
     }
 
-    flashAlert("<strong>$done</strong> project" . ($done === 1 ? '' : 's') . " deleted - their tickets stay", 'error');
+    flashAlert(_n('<strong>%d</strong> project deleted - their tickets stay', '<strong>%d</strong> projects deleted - their tickets stay', $done), 'error');
 
     redirect();
 
@@ -431,7 +431,7 @@ if (isset($_POST['bulk_edit_project_manager'])) {
     validateCSRFToken();
 
     $manager_id = ticketAgentId($_POST['project_manager'] ?? 0);
-    $manager_name = $manager_id ? escapeSql((string) getFieldById('users', $manager_id, 'user_name')) : 'No One';
+    $manager_name = $manager_id ? escapeSql((string) getFieldById('users', $manager_id, 'user_name')) : 'No One'; // i18n-ignore - the audit log
 
     $done = 0;
     foreach (projectsForBulk(2) as $row) {
@@ -444,7 +444,7 @@ if (isset($_POST['bulk_edit_project_manager'])) {
         $done++;
     }
 
-    flashAlert("Manager of <strong>$done</strong> project" . ($done === 1 ? '' : 's') . " set to <strong>" . escapeHtml(stripslashes($manager_name)) . "</strong>");
+    flashAlert(_n('Manager of <strong>%1$d</strong> project set to <strong>%2$s</strong>', 'Manager of <strong>%1$d</strong> projects set to <strong>%2$s</strong>', $done, $done, escapeHtml($manager_id ? stripslashes($manager_name) : __('No One'))));
 
     redirect();
 
@@ -472,8 +472,8 @@ if (isset($_POST['bulk_edit_project_due'])) {
         $done++;
     }
 
-    flashAlert("Due date of <strong>$done</strong> project" . ($done === 1 ? '' : 's') . ($due === 'NULL' ? ' cleared' : ' set to <strong>' . escapeHtml(date('M j, Y', strtotime(trim($due, "'")))) . '</strong>')
-        . ($skipped ? ", <strong>$skipped</strong> skipped - they start after it" : ''));
+    flashAlert((!$done ? __('No open projects were changed') : ($due === 'NULL' ? _n('Due date of <strong>%d</strong> project cleared', 'Due date of <strong>%d</strong> projects cleared', $done) : _n('Due date of <strong>%1$d</strong> project set to <strong>%2$s</strong>', 'Due date of <strong>%1$d</strong> projects set to <strong>%2$s</strong>', $done, $done, escapeHtml(formatDate(trim($due, "'"))))))
+        . ($skipped ? ', ' . __('<strong>%d</strong> skipped - they start after it', $skipped) : ''));
 
     redirect();
 
@@ -498,16 +498,16 @@ if (isExportRequest('export_projects')) {
         enforceClientAccess();
         $where[] = "AND project_client_id = $client_id";
         $file_name_prepend = getFieldById('clients', $client_id, 'client_name') . '-';
-        $filter_summary['Client'] = getFieldById('clients', $client_id, 'client_name');
+        $filter_summary[__('Client')] = getFieldById('clients', $client_id, 'client_name');
     } else {
         $file_name_prepend = "$session_company_name-";
         $client_filter = (string) ($_POST['client'] ?? '');
         if ($client_filter === 'internal') {
             $where[] = 'AND project_client_id = 0';
-            $filter_summary['Client'] = 'Internal';
+            $filter_summary[__('Client')] = __('Internal');
         } elseif (intval($client_filter)) {
             $where[] = 'AND project_client_id = ' . intval($client_filter);
-            $filter_summary['Client'] = exportClientName($client_filter);
+            $filter_summary[__('Client')] = exportClientName($client_filter);
         }
     }
 
@@ -519,20 +519,20 @@ if (isExportRequest('export_projects')) {
     if ($views[$show]['where'] !== '') {
         $where[] = 'AND ' . $views[$show]['where'];
     }
-    $filter_summary['Showing'] = $views[$show]['label'];
+    $filter_summary[__('Showing')] = $views[$show]['label'];
 
     $manager = (string) ($_POST['manager'] ?? '');
     if ($manager === 'none') {
         $where[] = 'AND project_manager = 0';
-        $filter_summary['Manager'] = 'None';
+        $filter_summary[__('Manager')] = __('None');
     } elseif (intval($manager)) {
         $where[] = 'AND project_manager = ' . intval($manager);
-        $filter_summary['Manager'] = getFieldById('users', intval($manager), 'user_name');
+        $filter_summary[__('Manager')] = getFieldById('users', intval($manager), 'user_name');
     }
 
     $q = escapeSql($_POST['q'] ?? '');
     if ($q !== '') {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query($mysqli, "SELECT projects.*, client_name, user_name, contact_name
@@ -556,7 +556,7 @@ if (isExportRequest('export_projects')) {
         guardExportPdfRowCount($format, $num_rows);
 
         $stats = projectStats(array_keys($rows));
-        $export = beginExport('projects', $format, $file_name_prepend . 'Projects', 'Projects', summarizeExportFilters($filter_summary));
+        $export = beginExport('projects', $format, $file_name_prepend . 'Projects', __('Projects'), summarizeExportFilters($filter_summary));
 
         foreach ($rows as $project_id => $row) {
             $s = $stats[$project_id];
@@ -580,7 +580,7 @@ if (isExportRequest('export_projects')) {
         exit;
     }
 
-    flashAlert('No projects match - nothing to export.', 'error');
+    flashAlert(__('No projects match - nothing to export.'), 'error');
 
     redirect();
 

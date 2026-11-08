@@ -76,7 +76,7 @@ ob_start();
 
 <div class="modal-header bg-dark">
     <h5 class="modal-title text-white">
-        <i class="fa fa-fw fa-file-alt me-2"></i>Send Account Statement
+        <i class="fa fa-fw fa-file-alt me-2"></i><?= __('Send Account Statement') ?>
         <span class="fw-normal text-white-50 ms-1"><?= $client_name ?></span>
     </h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -90,30 +90,29 @@ ob_start();
         <?php if ($contact_count == 0) { ?>
 
             <p class="text-muted mb-0">
-                This client has no primary or billing contact with an email address, so there is
-                nobody to send a statement to. Flag a contact as billing first.
+                <?= __('This client has no primary or billing contact with an email address, so there is nobody to send a statement to. Flag a contact as billing first.') ?>
             </p>
 
         <?php } else { ?>
 
             <div class="alert alert-secondary">
-                <i class="fa fa-fw fa-balance-scale me-2"></i>Current outstanding balance:
+                <i class="fa fa-fw fa-balance-scale me-2"></i><?= __('Current outstanding balance:') ?>
                 <strong><?= numfmt_format_currency($currency_format, $outstanding_balance, $client_currency_code) ?></strong>
             </div>
 
-            <h6 class="text-bold">Statement Options</h6>
+            <h6 class="text-bold"><?= __('Statement Options') ?></h6>
 
             <div class="row g-2">
                 <div class="col-sm-6 mb-3">
-                    <label>From</label>
+                    <label><?= __('From') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                         <input type="date" class="form-control" name="dtf" max="2999-12-31" data-statement-option>
                     </div>
-                    <small class="text-muted">Leave blank for all history</small>
+                    <small class="text-muted"><?= __('Leave blank for all history') ?></small>
                 </div>
                 <div class="col-sm-6 mb-3">
-                    <label>To</label>
+                    <label><?= __('To') ?></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                         <input type="date" class="form-control" name="dtt" max="2999-12-31" value="<?= date("Y-m-d") ?>" data-statement-option>
@@ -125,21 +124,21 @@ ob_start();
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="statementIncludePaid" name="include_paid" value="1" data-statement-option>
                     <label class="form-check-label" for="statementIncludePaid">
-                        Include paid invoices
+                        <?= __('Include paid invoices') ?>
                         <span class="text-muted">- off means outstanding items only</span>
                     </label>
                 </div>
             </div>
 
             <a class="btn btn-sm btn-outline-secondary mb-1" href="post.php?export_client_statement_pdf=<?= $client_id ?>&amp;csrf_token=<?= $_SESSION['csrf_token'] ?>" target="_blank" data-statement-pdf>
-                <i class="fas fa-fw fa-file-pdf me-1"></i>Download PDF
+                <i class="fas fa-fw fa-file-pdf me-1"></i><?= __('Download PDF') ?>
             </a>
 
             <hr>
 
-            <h6 class="text-bold">Email Options</h6>
+            <h6 class="text-bold"><?= __('Email Options') ?></h6>
 
-            <label class="mb-2">Send to <strong class="text-danger">*</strong></label>
+            <label class="mb-2"><?= __('Send to') ?> <strong class="text-danger">*</strong></label>
 
             <div class="list-group mb-0">
 
@@ -178,15 +177,15 @@ ob_start();
 
             </div>
 
-            <label class="form-label mt-3">Message <span class="text-body-secondary fw-normal small">in the email, above the statement</span></label>
+            <label class="form-label mt-3"><?= __('Message') ?> <span class="text-body-secondary fw-normal small"><?= __('in the email, above the statement') ?></span></label>
             <div class="input-group mb-3">
                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-fw fa-comment"></i></span>
-                <textarea class="form-control" name="note" rows="2" maxlength="2000" placeholder="Optional - a word of your own"></textarea>
+                <textarea class="form-control" name="note" rows="2" maxlength="2000" placeholder="<?= escapeHtml(__('Optional - a word of your own')) ?>"></textarea>
             </div>
 
             <div class="form-check form-switch mb-0">
                 <input class="form-check-input" type="checkbox" role="switch" name="attach_pdf" value="1" id="statementPdf<?= $client_id ?>" <?= billingReminderRules()['attach_pdf'] ? 'checked' : '' ?>>
-                <label class="form-check-label" for="statementPdf<?= $client_id ?>">Attach the statement as a PDF</label>
+                <label class="form-check-label" for="statementPdf<?= $client_id ?>"><?= __('Attach the statement as a PDF') ?></label>
             </div>
 
         <?php } ?>
@@ -195,11 +194,11 @@ ob_start();
     <div class="modal-footer">
         <?php if ($contact_count > 0) { ?>
             <button type="submit" name="send_statement" class="btn btn-primary text-bold">
-                <i class="fa fa-fw fa-paper-plane me-2"></i>Send Statement
+                <i class="fa fa-fw fa-paper-plane me-2"></i><?= __('Send Statement') ?>
             </button>
         <?php } ?>
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-            <i class="fa fa-fw fa-times me-2"></i>Cancel
+            <i class="fa fa-fw fa-times me-2"></i><?= __('Cancel') ?>
         </button>
     </div>
 </form>

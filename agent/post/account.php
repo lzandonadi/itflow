@@ -36,7 +36,7 @@ if (isset($_POST['add_account'])) {
 
     logAudit("Account", "Create", "$session_name created account " . escapeSql($row['account_name']), 0, $account_id);
 
-    flashAlert("Account <strong>" . escapeHtml($row['account_name']) . "</strong> created");
+    flashAlert(__('Account %s created', '<strong>' . escapeHtml($row['account_name']) . '</strong>'));
 
     redirect();
 
@@ -60,7 +60,7 @@ if (isset($_POST['edit_account'])) {
 
     logAudit("Account", "Edit", "$session_name edited account " . escapeSql($row['account_name'] . $changed), 0, $account_id);
 
-    flashAlert("Account <strong>" . escapeHtml($row['account_name']) . "</strong> saved");
+    flashAlert(__('Account %s saved', '<strong>' . escapeHtml($row['account_name']) . '</strong>'));
 
     redirect();
 
@@ -80,7 +80,7 @@ if (isset($_GET['archive_account'])) {
 
     logAudit("Account", "Archive", "$session_name archived account " . escapeSql($row['account_name']), 0, intval($row['account_id']));
 
-    flashAlert("Account <strong>" . escapeHtml($row['account_name']) . "</strong> archived", 'error');
+    flashAlert(__('Account %s archived', '<strong>' . escapeHtml($row['account_name']) . '</strong>'), 'error');
 
     redirect();
 
@@ -100,7 +100,7 @@ if (isset($_GET['restore_account'])) {
 
     logAudit("Account", "Restore", "$session_name restored account " . escapeSql($row['account_name']), 0, intval($row['account_id']));
 
-    flashAlert("Account <strong>" . escapeHtml($row['account_name']) . "</strong> restored");
+    flashAlert(__('Account %s restored', '<strong>' . escapeHtml($row['account_name']) . '</strong>'));
 
     redirect();
 
@@ -120,7 +120,7 @@ if (isset($_GET['delete_account'])) {
 
     logAudit("Account", "Delete", "$session_name deleted account " . escapeSql($row['account_name']));
 
-    flashAlert("Account <strong>" . escapeHtml($row['account_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Account %s deleted', '<strong>' . escapeHtml($row['account_name']) . '</strong>'), 'error');
 
     redirect('accounts.php');
 

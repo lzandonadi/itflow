@@ -32,7 +32,7 @@ $sql = mysqli_query(
 
 if (mysqli_num_rows($sql) == 0) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='racks.php?client_id=$client_id'><i class='fa fa-fw fa-arrow-left'></i> Back to racks</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='racks.php?client_id=$client_id'><i class='fa fa-fw fa-arrow-left'></i> " . __('Back to racks') . "</a></center>";
 
 } else {
 
@@ -91,7 +91,7 @@ if (mysqli_num_rows($sql) == 0) {
             <a href="client_overview.php?client_id=<?= $client_id ?>"><?= $client_name ?></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="racks.php?client_id=<?= $client_id ?>">Racks</a>
+            <a href="racks.php?client_id=<?= $client_id ?>"><?= __('Racks') ?></a>
         </li>
         <li class="breadcrumb-item active"><?= $rack_name ?></li>
     </ol>
@@ -104,7 +104,7 @@ if (mysqli_num_rows($sql) == 0) {
                 <h1 class="h4 mb-1 fw-semibold">
                     <?= $rack_name ?>
                     <?php if ($rack_archived_at) { ?>
-                        <span class="badge rounded-pill text-bg-secondary fw-normal align-middle fs-6 ms-1">Archived</span>
+                        <span class="badge rounded-pill text-bg-secondary fw-normal align-middle fs-6 ms-1"><?= __('Archived') ?></span>
                     <?php } ?>
                 </h1>
                 <div class="text-body-secondary small d-flex flex-wrap column-gap-3 row-gap-1">
@@ -125,36 +125,36 @@ if (mysqli_num_rows($sql) == 0) {
             <div class="d-flex flex-wrap gap-2 d-print-none">
                 <?php if ($can_edit && !$rack_archived_at) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/rack/rack_device_add.php?id=<?= $rack_id ?>">
-                        <i class="fas fa-plus me-2"></i>Add Item
+                        <i class="fas fa-plus me-2"></i><?= __('Add Item') ?>
                     </button>
                 <?php } ?>
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/rack/rack_edit.php?id=<?= $rack_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                 <?php } ?>
-                <button type="button" class="btn btn-outline-secondary" onclick="window.print()" title="Print the elevation and item list">
-                    <i class="fas fa-print"></i><span class="visually-hidden">Print</span>
+                <button type="button" class="btn btn-outline-secondary" onclick="window.print()" title="<?= escapeHtml(__('Print the elevation and item list')) ?>">
+                    <i class="fas fa-print"></i><span class="visually-hidden"><?= __('Print') ?></span>
                 </button>
                 <?php if ($can_edit) { ?>
                     <div class="dropdown dropstart">
-                        <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-fw fa-ellipsis-v"></i>
                         </button>
                         <div class="dropdown-menu">
                             <?php if ($rack_archived_at) { ?>
                                 <a class="dropdown-item confirm-link" href="post.php?restore_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                 </a>
                             <?php } else { ?>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                             <?php } ?>
                             <?php if ($can_delete) { ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_rack=<?= $rack_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             <?php } ?>
                         </div>
@@ -171,10 +171,10 @@ if (mysqli_num_rows($sql) == 0) {
 
             <div class="card mb-3">
                 <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-columns me-2 text-secondary"></i>Elevation</h3>
+                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-columns me-2 text-secondary"></i><?= __('Elevation') ?></h3>
                     <span class="small text-body-secondary d-print-none">
                         <?php if ($can_edit && !$rack_archived_at) { ?>
-                            Click an empty U to add something there
+                            <?= __('Click an empty U to add something there') ?>
                         <?php } ?>
                     </span>
                 </div>
@@ -191,33 +191,33 @@ if (mysqli_num_rows($sql) == 0) {
                         ?>
                     </div>
                     <div class="itflow-rack-legend small text-body-secondary mt-3">
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-server"></i>Servers</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-network"></i>Network</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-firewall"></i>Firewalls</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-power"></i>Power</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-patch"></i>Patching</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-tone-device"></i>Other</span>
-                        <span><i class="itflow-rack-swatch itflow-rack-swatch-ghost"></i>Full depth from the other side</span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-server"></i><?= __('Servers') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-network"></i><?= __('Network') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-firewall"></i><?= __('Firewalls') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-power"></i><?= __('Power') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-patch"></i><?= __('Patching') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-tone-device"></i><?= __('Other') ?></span>
+                        <span><i class="itflow-rack-swatch itflow-rack-swatch-ghost"></i><?= __('Full depth from the other side') ?></span>
                     </div>
                 </div>
             </div>
 
             <div class="card mb-3 itflow-rack-items">
                 <div class="card-header d-flex align-items-center">
-                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-list me-2 text-secondary"></i>In this rack <span class="text-body-secondary fw-normal">(<?= $item_count ?>)</span></h3>
+                    <h3 class="card-title mb-0 me-auto"><i class="fas fa-fw fa-list me-2 text-secondary"></i><?= __('In this rack') ?> <span class="text-body-secondary fw-normal">(<?= $item_count ?>)</span></h3>
                 </div>
                 <?php if ($item_count) { ?>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover align-middle mb-0">
                             <thead class="text-nowrap">
                                 <tr>
-                                    <th class="ps-3">Position</th>
-                                    <th style="min-width: 15rem">Item</th>
-                                    <th>Make / Model</th>
-                                    <th>Serial</th>
-                                    <th>IP</th>
-                                    <th>Mounted</th>
-                                    <th class="text-end">Power</th>
+                                    <th class="ps-3"><?= __('Position') ?></th>
+                                    <th style="min-width: 15rem"><?= __('Item') ?></th>
+                                    <th><?= __('Make / Model') ?></th>
+                                    <th><?= __('Serial') ?></th>
+                                    <th><?= __('IP') ?></th>
+                                    <th><?= __('Mounted') ?></th>
+                                    <th class="text-end"><?= __('Power') ?></th>
                                     <?php if ($can_edit) { ?>
                                         <th class="d-print-none"></th>
                                     <?php } ?>
@@ -256,13 +256,13 @@ if (mysqli_num_rows($sql) == 0) {
                                         <td class="small text-nowrap">
                                             <?= ucfirst($item['face']) ?>
                                             <?php if ($item['full_depth']) { ?>
-                                                <span class="badge rounded-pill text-bg-light border fw-normal ms-1">Full depth</span>
+                                                <span class="badge rounded-pill text-bg-light border fw-normal ms-1"><?= __('Full depth') ?></span>
                                             <?php } ?>
                                         </td>
                                         <td class="small text-end text-nowrap"><?= $item['power'] ? number_format($item['power']) . ' W' : '<span class="text-body-secondary">-</span>' ?></td>
                                         <?php if ($can_edit) { ?>
                                             <td class="text-end pe-3 d-print-none">
-                                                <button type="button" class="btn btn-sm btn-light ajax-modal" title="Move or edit"
+                                                <button type="button" class="btn btn-sm btn-light ajax-modal" title="<?= escapeHtml(__('Move or edit')) ?>"
                                                     data-modal-url="modals/rack/rack_device_edit.php?id=<?= $item['id'] ?>">
                                                     <i class="fas fa-fw fa-pen"></i>
                                                 </button>
@@ -274,7 +274,7 @@ if (mysqli_num_rows($sql) == 0) {
                             <?php if ($power_used) { ?>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="6" class="ps-3 text-end small text-body-secondary">Total draw</td>
+                                        <td colspan="6" class="ps-3 text-end small text-body-secondary"><?= __('Total draw') ?></td>
                                         <td class="text-end small fw-semibold text-nowrap"><?= number_format($power_used) ?> W</td>
                                         <?php if ($can_edit) { ?><td class="d-print-none"></td><?php } ?>
                                     </tr>
@@ -285,9 +285,9 @@ if (mysqli_num_rows($sql) == 0) {
                 <?php } else { ?>
                     <div class="card-body text-center text-body-secondary py-5">
                         <i class="fas fa-server fa-2x mb-3 opacity-50"></i>
-                        <div>Nothing racked yet.</div>
+                        <div><?= __('Nothing racked yet.') ?></div>
                         <?php if ($can_edit && !$rack_archived_at) { ?>
-                            <div class="small">Click an empty U on the elevation, or use <strong>Add Item</strong>.</div>
+                            <div class="small"><?= __('Click an empty U on the elevation, or use') ?> <strong><?= __('Add Item') ?></strong>.</div>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -303,30 +303,30 @@ if (mysqli_num_rows($sql) == 0) {
                     <div class="d-flex align-items-baseline justify-content-between mb-2">
                         <div>
                             <span class="fs-3 fw-semibold"><?= $occupancy['any'] ?></span>
-                            <span class="text-body-secondary">of <?= $rack_units ?>U used</span>
+                            <span class="text-body-secondary"><?= __('of %dU used', $rack_units) ?></span>
                         </div>
                         <span class="fw-semibold text-<?= $usage_tone ?>-emphasis"><?= $used_percent ?>%</span>
                     </div>
-                    <div class="progress mb-3" role="progressbar" aria-label="Units used" aria-valuenow="<?= $used_percent ?>" aria-valuemin="0" aria-valuemax="100" style="height: .5rem">
+                    <div class="progress mb-3" role="progressbar" aria-label="<?= escapeHtml(__('Units used')) ?>" aria-valuenow="<?= $used_percent ?>" aria-valuemin="0" aria-valuemax="100" style="height: .5rem">
                         <div class="progress-bar bg-<?= $usage_tone ?>" style="width: <?= $used_percent ?>%"></div>
                     </div>
                     <div class="row g-2 text-center itflow-rack-stats">
                         <div class="col-4">
                             <div class="fw-semibold"><?= $occupancy['free_any'] ?>U</div>
-                            <div class="small text-body-secondary">Free</div>
+                            <div class="small text-body-secondary"><?= __('Free') ?></div>
                         </div>
                         <div class="col-4">
                             <div class="fw-semibold"><?= $gap['size'] ?>U</div>
-                            <div class="small text-body-secondary" title="The tallest full-depth item that still fits">Largest gap</div>
+                            <div class="small text-body-secondary" title="<?= escapeHtml(__('The tallest full-depth item that still fits')) ?>"><?= __('Largest gap') ?></div>
                         </div>
                         <div class="col-4">
                             <div class="fw-semibold"><?= $item_count ?></div>
-                            <div class="small text-body-secondary">Items</div>
+                            <div class="small text-body-secondary"><?= __('Items') ?></div>
                         </div>
                     </div>
                     <?php if ($gap['size']) { ?>
                         <div class="small text-body-secondary mt-2 text-center">
-                            Room for up to <?= $gap['size'] ?>U at <?= rackPositionLabel($gap['start'], $gap['end']) ?>
+                            <?= __('Room for up to %1$dU at %2$s', $gap['size'], rackPositionLabel($gap['start'], $gap['end'])) ?>
                         </div>
                     <?php } ?>
 
@@ -345,14 +345,14 @@ if (mysqli_num_rows($sql) == 0) {
                             <?php } ?>
                         </div>
                         <?php if ($rack_power_capacity) { ?>
-                            <div class="progress" role="progressbar" aria-label="Power used" aria-valuenow="<?= min(100, $power_percent) ?>" aria-valuemin="0" aria-valuemax="100" style="height: .5rem">
+                            <div class="progress" role="progressbar" aria-label="<?= escapeHtml(__('Power used')) ?>" aria-valuenow="<?= min(100, $power_percent) ?>" aria-valuemin="0" aria-valuemax="100" style="height: .5rem">
                                 <div class="progress-bar bg-<?= $power_tone ?>" style="width: <?= min(100, $power_percent) ?>%"></div>
                             </div>
                             <?php if ($power_used > $rack_power_capacity) { ?>
-                                <div class="small text-danger mt-2"><i class="fas fa-exclamation-triangle me-1"></i>Over budget by <?= number_format($power_used - $rack_power_capacity) ?> W</div>
+                                <div class="small text-danger mt-2"><i class="fas fa-exclamation-triangle me-1"></i><?= __('Over budget by %s W', number_format($power_used - $rack_power_capacity)) ?></div>
                             <?php } ?>
                         <?php } else { ?>
-                            <div class="small text-body-secondary">Set a power budget on the rack to track headroom.</div>
+                            <div class="small text-body-secondary"><?= __('Set a power budget on the rack to track headroom.') ?></div>
                         <?php } ?>
                     <?php } ?>
                 </div>
@@ -360,25 +360,25 @@ if (mysqli_num_rows($sql) == 0) {
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle me-2 text-secondary"></i>Details</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-info-circle me-2 text-secondary"></i><?= __('Details') ?></h3>
                 </div>
                 <div class="card-body">
                     <dl class="itflow-rack-dl mb-0">
                         <?php if ($rack_model) { ?>
-                            <dt>Model</dt><dd><?= $rack_model ?></dd>
+                            <dt><?= __('Model') ?></dt><dd><?= $rack_model ?></dd>
                         <?php } ?>
                         <?php if ($rack_depth) { ?>
-                            <dt>Depth</dt><dd><?= $rack_depth ?></dd>
+                            <dt><?= __('Depth') ?></dt><dd><?= $rack_depth ?></dd>
                         <?php } ?>
-                        <dt>Numbering</dt><dd>U1 at the <?= $rack_units_descending ? 'top' : 'bottom' ?></dd>
+                        <dt><?= __('Numbering') ?></dt><dd><?= $rack_units_descending ? __('U1 at the top') : __('U1 at the bottom') ?></dd>
                         <?php if ($location_name) { ?>
-                            <dt>Location</dt><dd><a href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><?= $location_name ?></a></dd>
+                            <dt><?= __('Location') ?></dt><dd><a href="location.php?client_id=<?= $client_id ?>&location_id=<?= $location_id ?>"><?= $location_name ?></a></dd>
                         <?php } ?>
                         <?php if ($rack_physical_location) { ?>
-                            <dt>In the building</dt><dd><?= $rack_physical_location ?></dd>
+                            <dt><?= __('In the building') ?></dt><dd><?= $rack_physical_location ?></dd>
                         <?php } ?>
-                        <dt>Front / rear</dt><dd><?= $occupancy['front'] ?>U / <?= $occupancy['rear'] ?>U in use</dd>
-                        <dt>Updated</dt><dd title="<?= $rack_updated_at ?>"><?= timeAgo($rack_updated_at) ?></dd>
+                        <dt><?= __('Front / rear') ?></dt><dd><?= __('%1$dU / %2$dU in use', $occupancy['front'], $occupancy['rear']) ?></dd>
+                        <dt><?= __('Updated') ?></dt><dd title="<?= $rack_updated_at ?>"><?= timeAgo($rack_updated_at) ?></dd>
                     </dl>
                 </div>
             </div>
@@ -386,7 +386,7 @@ if (mysqli_num_rows($sql) == 0) {
             <?php if ($rack_photo || $rack_photo_rear) { ?>
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-camera me-2 text-secondary"></i>Photos</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-camera me-2 text-secondary"></i><?= __('Photos') ?></h3>
                     </div>
                     <div class="card-body">
                         <div class="row g-2">
@@ -395,7 +395,7 @@ if (mysqli_num_rows($sql) == 0) {
                                     continue;
                                 } ?>
                                 <div class="col-6">
-                                    <a class="itflow-rack-photo" href="<?= "../uploads/clients/$client_id/$photo_file" ?>" target="_blank" rel="noopener" title="Open full size">
+                                    <a class="itflow-rack-photo" href="<?= "../uploads/clients/$client_id/$photo_file" ?>" target="_blank" rel="noopener" title="<?= escapeHtml(__('Open full size')) ?>">
                                         <img src="<?= "../uploads/clients/$client_id/$photo_file" ?>" alt="<?= $photo_side ?> of <?= $rack_name ?>" loading="lazy">
                                         <span><?= $photo_side ?></span>
                                     </a>
@@ -409,7 +409,7 @@ if (mysqli_num_rows($sql) == 0) {
             <?php if ($rack_notes) { ?>
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-sticky-note me-2 text-secondary"></i>Notes</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-sticky-note me-2 text-secondary"></i><?= __('Notes') ?></h3>
                     </div>
                     <div class="card-body small" style="white-space: pre-line"><?= $rack_notes ?></div>
                 </div>
@@ -418,7 +418,7 @@ if (mysqli_num_rows($sql) == 0) {
             <?php if ($unracked_assets) { ?>
                 <div class="card mb-3 d-print-none">
                     <div class="card-header">
-                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-dolly me-2 text-secondary"></i>Not racked yet</h3>
+                        <h3 class="card-title mb-0"><i class="fas fa-fw fa-dolly me-2 text-secondary"></i><?= __('Not racked yet') ?></h3>
                     </div>
                     <div class="list-group list-group-flush">
                         <?php foreach ($unracked_assets as $unracked) {
@@ -429,11 +429,11 @@ if (mysqli_num_rows($sql) == 0) {
                                 <span class="itflow-rack-chip itflow-rack-tone-<?= $unracked_style['tone'] ?>"><i class="fas fa-fw <?= $unracked_style['icon'] ?>"></i></span>
                                 <div class="min-w-0 flex-grow-1">
                                     <div class="text-truncate fw-semibold small"><?= escapeHtml($unracked['asset_name']) ?></div>
-                                    <div class="text-truncate small text-body-secondary"><?= escapeHtml(trim($unracked['asset_make'] . ' ' . $unracked['asset_model'])) ?: escapeHtml($unracked['asset_type']) ?></div>
+                                    <div class="text-truncate small text-body-secondary"><?= escapeHtml(trim($unracked['asset_make'] . ' ' . $unracked['asset_model'])) ?: escapeHtml(assetTypeLabel($unracked['asset_type'])) ?></div>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-outline-primary ajax-modal flex-shrink-0"
                                     data-modal-url="modals/rack/rack_device_add.php?id=<?= $rack_id ?>&asset_id=<?= $unracked_id ?>">
-                                    Rack it
+                                    <?= __('Rack it') ?>
                                 </button>
                             </div>
                         <?php } ?>

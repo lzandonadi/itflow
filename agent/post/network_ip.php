@@ -24,7 +24,7 @@ if (isset($_POST['add_network_ip'])) {
     $ip_address = trim((string) ($_POST['ip_address'] ?? ''));
     $range_end = trim((string) ($_POST['ip_range_end'] ?? ''));
     if ($range_end !== '' && ($_POST['type'] ?? '') === 'Reservation') {
-        flashAlert('A DHCP reservation is for one device - add them one at a time.', 'error');
+        flashAlert(__('A DHCP reservation is for one device - add them one at a time.'), 'error');
         redirect();
     }
 
@@ -42,11 +42,11 @@ if (isset($_POST['add_network_ip'])) {
         $first_int = $first === false ? null : ipv4ToInt($first);
         $last_int = $last === false ? null : ipv4ToInt($last);
         if ($first_int === null || $last_int === null || $first_int > $last_int) {
-            flashAlert('A range is two IPv4 addresses, the lower first.', 'error');
+            flashAlert(__('A range is two IPv4 addresses, the lower first.'), 'error');
             redirect();
         }
         if ($last_int - $first_int >= 256) {
-            flashAlert('A range is up to 256 addresses at a time.', 'error');
+            flashAlert(__('A range is up to 256 addresses at a time.'), 'error');
             redirect();
         }
         $added = 0;
@@ -61,7 +61,7 @@ if (isset($_POST['add_network_ip'])) {
             $added++;
         }
         logAudit("IP Address", "Create", "$session_name documented $added address(es), $first - $last, on network " . escapeSql($network['network_name']), $client_id, $network_id);
-        flashAlert("Documented <strong>$added</strong> address" . ($added === 1 ? '' : 'es') . " from $first to $last" . ($skipped ? " - $skipped skipped (outside the subnet or already documented)" : ''), $skipped && !$added ? 'warning' : 'success');
+        flashAlert(_n('Documented <strong>%1$d</strong> address from %2$s to %3$s', 'Documented <strong>%1$d</strong> addresses from %2$s to %3$s', $added, $added, $first, $last) . ($skipped ? ' - ' . __('%d skipped (outside the subnet or already documented)', $skipped) : ''), $skipped && !$added ? 'warning' : 'success');
         redirect();
     }
 
@@ -76,7 +76,7 @@ if (isset($_POST['add_network_ip'])) {
 
     logAudit("IP Address", "Create", "$session_name documented IP " . escapeSql($ip_address) . " on network " . escapeSql($network['network_name']), $client_id, $ip_id);
 
-    flashAlert("IP <strong>$ip_address</strong> documented");
+    flashAlert(__('IP <strong>%s</strong> documented', $ip_address));
 
     redirect();
 
@@ -110,7 +110,7 @@ if (isset($_POST['edit_network_ip'])) {
 
     logAudit("IP Address", "Edit", "$session_name edited IP " . escapeSql($ip_address) . " on network " . escapeSql($row['network_name']), $client_id, $ip_id);
 
-    flashAlert("IP <strong>$ip_address</strong> saved");
+    flashAlert(__('IP <strong>%s</strong> saved', $ip_address));
 
     redirect();
 
@@ -126,7 +126,7 @@ if (isset($_GET['delete_network_ip'])) {
 
     logAudit("IP Address", "Delete", "$session_name deleted IP " . escapeSql($row['ip_address']) . " from network " . escapeSql($row['network_name']), $client_id);
 
-    flashAlert("IP <strong>" . $row['ip_address'] . "</strong> deleted", 'error');
+    flashAlert(__('IP <strong>%s</strong> deleted', $row['ip_address']), 'error');
 
     redirect();
 
@@ -152,7 +152,7 @@ if (isset($_POST['bulk_ip_type'])) {
 
     $type = (string) $_POST['bulk_ip_type'];
     if (!isset(NETWORK_IP_TYPES[$type])) {
-        flashAlert('Pick what the addresses are.', 'warning');
+        flashAlert(__('Pick what the addresses are.'), 'warning');
         redirect();
     }
 
@@ -163,7 +163,7 @@ if (isset($_POST['bulk_ip_type'])) {
         $count++;
     }
 
-    flashAlert("Made <strong>$count</strong> address" . ($count === 1 ? '' : 'es') . " <strong>" . strtolower(NETWORK_IP_TYPES[$type][3]) . "</strong>");
+    flashAlert(_n('Made <strong>%1$d</strong> address %2$s', 'Made <strong>%1$d</strong> addresses %2$s', $count, $count, '<strong>' . mb_strtolower(networkIpTypes()[$type][3]) . '</strong>'));
 
     redirect();
 
@@ -180,7 +180,7 @@ if (isset($_POST['bulk_delete_network_ips'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> address" . ($count === 1 ? '' : 'es'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> address', 'Deleted <strong>%d</strong> addresses', $count), 'error');
 
     redirect();
 
@@ -214,14 +214,14 @@ if (isset($_POST['document_network_interfaces'])) {
 
     logAudit("IP Address", "Create", "$session_name documented $added device address(es) on network " . escapeSql($network['network_name']), $client_id, $network_id);
 
-    flashAlert($added ? "Documented <strong>$added</strong> device address" . ($added === 1 ? '' : 'es') : 'Every device address on this network is documented already.', $added ? 'success' : 'info');
+    flashAlert($added ? _n('Documented <strong>%d</strong> device address', 'Documented <strong>%d</strong> device addresses', $added) : __('Every device address on this network is documented already.'), $added ? 'success' : 'info');
 
     redirect();
 
 }
 
 // The import's columns - the original three, then type and MAC (optional)
-const NETWORK_IP_CSV_COLUMNS = ['IP Address', 'Hostname', 'Description', 'Type', 'MAC'];
+const NETWORK_IP_CSV_COLUMNS = ['IP Address', 'Hostname', 'Description', 'Type', 'MAC']; // i18n-ignore - CSV headings stay English, so files import in any language
 
 if (isset($_GET['download_network_ips_csv_template'])) {
 
@@ -252,15 +252,15 @@ if (isset($_POST['import_network_ips_csv'])) {
     $network_id = intval($network['network_id']);
 
     if (empty($_FILES['file']['tmp_name'])) {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
     if (strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        flashAlert("Bad file extension - only .csv files are accepted.", 'error');
+        flashAlert(__('Bad file extension - only .csv files are accepted.'), 'error');
         redirect();
     }
     if ($_FILES['file']['size'] < 1) {
-        flashAlert("Bad file size (empty file?).", 'error');
+        flashAlert(__('Bad file size (empty file?).'), 'error');
         redirect();
     }
 
@@ -268,7 +268,7 @@ if (isset($_POST['import_network_ips_csv'])) {
     $header = fgetcsv($file, 1000, ',');
     if (!is_array($header) || !in_array(count($header), [3, 5], true)) {
         fclose($file);
-        flashAlert("Bad column count - use the template: " . implode(', ', NETWORK_IP_CSV_COLUMNS) . " (Type and MAC may be left off).", 'error');
+        flashAlert(__('Bad column count - use the template: %s (Type and MAC may be left off).', implode(', ', NETWORK_IP_CSV_COLUMNS)), 'error');
         redirect();
     }
 
@@ -305,7 +305,7 @@ if (isset($_POST['import_network_ips_csv'])) {
 
     logAudit("IP Address", "Import", "$session_name imported $row_count IP(s) to network " . escapeSql($network['network_name']) . ". $skipped_count row(s) skipped", $client_id);
 
-    flashAlert("<strong>$row_count</strong> IP(s) imported, <strong>$skipped_count</strong> skipped (invalid, outside the subnet or already documented)", $skipped_count ? 'warning' : 'success');
+    flashAlert(__('<strong>%1$s</strong> IP(s) imported, <strong>%2$s</strong> skipped (invalid, outside the subnet or already documented)', $row_count, $skipped_count), $skipped_count ? 'warning' : 'success');
 
     redirect();
 
@@ -334,13 +334,13 @@ if (isExportRequest('export_network_ips')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'IP addresses');
+    guardExportHasRows($num_rows, __('IP addresses'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('network_ips', $format, toAlphanumeric($network_name) . '-IPs', "$network_name - IP Addresses", '');
+        $export = beginExport('network_ips', $format, toAlphanumeric($network_name) . '-IPs', __('%s - IP Addresses', $network_name), '');
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);

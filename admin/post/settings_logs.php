@@ -42,10 +42,10 @@ if (isset($_POST['edit_log_settings']) || isset($_POST['test_log_forward'])) {
     // Nowhere to send to - saved, but off
     $warning = '';
     if ($posted_host !== '' && $forward['host'] === '') {
-        $warning = "That isn't a server name or address, so sending stays off.";
+        $warning = __('That isn\'t a server name or address, so sending stays off.');
         $forward['enabled'] = 0;
     } elseif ($forward['enabled'] && $forward['host'] === '') {
-        $warning = 'Sending stays off until there is a server to send to.';
+        $warning = __('Sending stays off until there is a server to send to.');
         $forward['enabled'] = 0;
     }
 
@@ -57,28 +57,33 @@ if (isset($_POST['edit_log_settings']) || isset($_POST['test_log_forward'])) {
         WHERE company_id = 1");
 
     // What changed, in words
-    $changes = [];
+    $changes = []; // i18n-ignore - the audit log, in English
     if ($audit_days !== $was_retention['audit']) {
-        $changes[] = 'the audit log kept ' . strtolower(appLogRetentionText($audit_days)) . ' (was ' . strtolower(appLogRetentionText($was_retention['audit'])) . ')';
+        $changes[] = 'the audit log kept ' // i18n-ignore - the audit log
+             . strtolower(i18nEnglish(fn () => appLogRetentionText($audit_days))) . ' (was ' . strtolower(i18nEnglish(fn () => appLogRetentionText($was_retention['audit']))) . ')';
     }
     if ($app_days !== $was_retention['app']) {
-        $changes[] = 'app logs kept ' . strtolower(appLogRetentionText($app_days)) . ' (was ' . strtolower(appLogRetentionText($was_retention['app'])) . ')';
+        $changes[] = 'app logs kept ' // i18n-ignore - the audit log
+             . strtolower(i18nEnglish(fn () => appLogRetentionText($app_days))) . ' (was ' . strtolower(i18nEnglish(fn () => appLogRetentionText($was_retention['app']))) . ')';
     }
     $target = function ($settings) {
         return logForwardTarget($settings) . ($settings['protocol'] === 'tls' && !$settings['tls_verify'] ? ' (certificate not checked)' : '');
     };
     $what = function ($settings) {
-        return implode(' and ', array_filter([$settings['audit'] ? 'the audit log' : '', $settings['app_level'] !== '' ? 'app ' . strtolower(logForwardAppLevels()[$settings['app_level']]) : ''])) ?: 'nothing';
+        return implode(' and ', array_filter([$settings['audit'] ? 'the audit log' : '' /* i18n-ignore - the audit log */, $settings['app_level'] !== '' ? 'app ' . strtolower(i18nEnglish(fn () => logForwardAppLevels()[$settings['app_level']])) : ''])) ?: 'nothing';
     };
     $on = logForwardOn($forward);
     $was_on = logForwardOn($was);
     if ($on && !$was_on) {
-        $changes[] = 'sending logs to ' . $target($forward) . ' as ' . LOG_FORWARD_FORMATS[$forward['format']] . ' - ' . $what($forward);
+        $changes[] = 'sending logs to ' . $target($forward) . ' as ' // i18n-ignore - the audit log
+             . LOG_FORWARD_FORMATS[$forward['format']] . ' - ' . $what($forward);
     } elseif (!$on && $was_on) {
-        $changes[] = 'stopped sending logs (was to ' . $target($was) . ')';
+        $changes[] = 'stopped sending logs (was to ' // i18n-ignore - the audit log
+             . $target($was) . ')';
     } elseif ($on) {
         if ($target($forward) !== $target($was)) {
-            $changes[] = 'sending logs to ' . $target($forward) . ' (was ' . $target($was) . ')';
+            $changes[] = 'sending logs to ' . $target($forward) . ' (was ' // i18n-ignore - the audit log
+                 . $target($was) . ')';
         }
         if ($forward['format'] !== $was['format']) {
             $changes[] = 'sent as ' . LOG_FORWARD_FORMATS[$forward['format']] . ' (was ' . LOG_FORWARD_FORMATS[$was['format']] . ')';
@@ -97,22 +102,22 @@ if (isset($_POST['edit_log_settings']) || isset($_POST['test_log_forward'])) {
 
     if (isset($_POST['test_log_forward'])) {
         if ($forward['host'] === '') {
-            flashAlert($warning !== '' ? $warning : 'Give the server to send to first.', 'error');
+            flashAlert($warning !== '' ? $warning : __('Give the server to send to first.'), 'error');
             redirect();
         }
         $test = logForwardTest($forward, stripslashes($session_name));
         $target = logForwardTarget($forward);
         if ($test['ok']) {
             flashAlert(($forward['protocol'] === 'udp'
-                ? "Saved, and a test message went to $target. UDP doesn't say whether it arrived - check the server for it."
-                : "Saved, and $target took the test message.") . ($forward['enabled'] ? '' : ' Sending is still off - switch it on to send entries.'));
+                ? __("Saved, and a test message went to %s. UDP doesn't say whether it arrived - check the server for it.", $target)
+                : __('Saved, and %s took the test message.', $target)) . ($forward['enabled'] ? '' : ' ' . __('Sending is still off - switch it on to send entries.')));
         } else {
-            flashAlert("Saved, but the test message couldn't be sent to $target - " . $test['error'] . '.', 'error');
+            flashAlert(__('Saved, but the test message couldn\'t be sent to %1$s - %2$s.', $target, $test['error']), 'error');
         }
         redirect();
     }
 
-    flashAlert($warning !== '' ? "Log settings saved. $warning" : 'Log settings saved', $warning !== '' ? 'warning' : 'success');
+    flashAlert($warning !== '' ? __('Log settings saved. %s', $warning) : __('Log settings saved'), $warning !== '' ? 'warning' : 'success');
 
     redirect();
 

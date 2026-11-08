@@ -24,7 +24,7 @@ function linkHandle($action, $from, $id, $to, $ids) {
     $relation = linkRelation($from, $to);
     $source = linkRecord($from, $id);
     if (!$relation || !$source) {
-        flashAlert('That link no longer exists.', 'error');
+        flashAlert(__('That link no longer exists.'), 'error');
         redirect();
     }
 
@@ -32,8 +32,6 @@ function linkHandle($action, $from, $id, $to, $ids) {
 
     $client_id = intval($source['client_id']);
     enforceClientAccess();
-
-    $to_entity = LINK_ENTITIES[$to];
 
     if ($action === 'link') {
         $added = linkAdd($from, $source['id'], $to, $ids);
@@ -47,16 +45,16 @@ function linkHandle($action, $from, $id, $to, $ids) {
         }
 
         if (!$added) {
-            flashAlert("Nothing new to link to <strong>{$source['name']}</strong>.", 'warning');
+            flashAlert(__('Nothing new to link to %s.', "<strong>{$source['name']}</strong>"), 'warning');
         } elseif (count($added) === 1) {
-            flashAlert(ucfirst($to_entity['label']) . " <strong>{$added[0]}</strong> linked to <strong>{$source['name']}</strong>$seat_warning", $seat_warning ? 'warning' : 'success');
+            flashAlert(linkEntityText($to, 'linked_one', "<strong>{$added[0]}</strong>", "<strong>{$source['name']}</strong>") . $seat_warning, $seat_warning ? 'warning' : 'success');
         } else {
-            flashAlert("Linked <strong>" . count($added) . "</strong> " . strtolower($to_entity['plural']) . " to <strong>{$source['name']}</strong>$seat_warning", $seat_warning ? 'warning' : 'success');
+            flashAlert(linkEntityText($to, 'linked_many', count($added), '<strong>' . count($added) . '</strong>', "<strong>{$source['name']}</strong>") . $seat_warning, $seat_warning ? 'warning' : 'success');
         }
     } else {
         $removed = linkRemove($from, $source['id'], $to, intval($ids[0] ?? 0));
         if ($removed !== '') {
-            flashAlert(ucfirst($to_entity['label']) . " <strong>$removed</strong> unlinked from <strong>{$source['name']}</strong>", 'error');
+            flashAlert(linkEntityText($to, 'unlinked', "<strong>$removed</strong>", "<strong>{$source['name']}</strong>"), 'error');
         }
     }
 

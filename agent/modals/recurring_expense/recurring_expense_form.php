@@ -74,22 +74,22 @@ while ($row = mysqli_fetch_assoc($sql)) {
 <div class="row g-3" id="<?= $form_id ?>" data-recurring-expense-form>
 
     <div class="col-md-7">
-        <label class="form-label">Vendor <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Vendor') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-building"></i></span>
             <select class="form-select select2" name="vendor" required data-expense-vendor>
-                <option value="">- Who it is paid to -</option>
+                <option value=""><?= __('- Who it is paid to -') ?></option>
                 <?php foreach ($form_vendors as $vendor_id => $vendor) { ?>
                     <option value="<?= $vendor_id ?>" <?= $form_vendor === $vendor_id ? 'selected' : '' ?><?= selectOptionVendor($vendor['vendor_name'], $vendor['vendor_archived_at'] ? 'Archived' : (string) $vendor['vendor_description']) ?>><?= escapeHtml($vendor['vendor_name']) ?></option>
                 <?php } ?>
             </select>
-            <a class="btn btn-outline-secondary" title="Add a vendor - opens Vendors in a new tab" href="vendors.php" target="_blank"><i class="fas fa-fw fa-plus"></i></a>
+            <a class="btn btn-outline-secondary" title="<?= escapeHtml(__('Add a vendor - opens Vendors in a new tab')) ?>" href="vendors.php" target="_blank"><i class="fas fa-fw fa-plus"></i></a>
         </div>
-        <div class="form-text" data-expense-filled hidden>Filled in from the last expense with them.</div>
+        <div class="form-text" data-expense-filled hidden><?= __('Filled in from the last expense with them.') ?></div>
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Amount each time <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Amount each time') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-dollar-sign"></i></span>
             <input type="text" class="form-control text-end fw-semibold" inputmode="decimal" pattern="[0-9,]*\.?[0-9]{0,2}" name="amount" placeholder="0.00" required
@@ -108,7 +108,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     ?>
 
     <div class="col-md-4">
-        <label class="form-label">How often <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('How often') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-sync-alt"></i></span>
             <select class="form-select" name="frequency" required data-recurring-frequency>
@@ -120,7 +120,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-md-4">
-        <label class="form-label"><?= $form_edit ? 'Next one on' : 'First one on' ?> <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= $form_edit ? __('Next one on') : __('First one on') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar-day"></i></span>
             <input type="date" class="form-control" name="next_date" max="2999-12-31" value="<?= escapeHtml($form_next) ?>" required data-recurring-next>
@@ -128,7 +128,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">Ends</label>
+        <label class="form-label"><?= __('Ends') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-flag-checkered"></i></span>
             <input type="date" class="form-control" name="end_date" max="2999-12-31" value="<?= escapeHtml($form_end) ?>" data-recurring-end>
@@ -136,15 +136,15 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-12">
-        <div class="small text-body-secondary"><i class="fas fa-fw fa-redo-alt me-1"></i><span data-recurring-summary><?= $form_edit ? escapeHtml(recurringExpenseScheduleText($form_row)) : '' ?></span>. Leave Ends empty unless it stops - a lease or financing that is paid off on a date.</div>
+        <div class="small text-body-secondary"><i class="fas fa-fw fa-redo-alt me-1"></i><span data-recurring-summary><?= $form_edit ? escapeHtml(recurringExpenseScheduleText($form_row)) : '' ?></span>. <?= __('Leave Ends empty unless it stops - a lease or financing that is paid off on a date.') ?></div>
     </div>
 
     <div class="col-md-7">
-        <label class="form-label">Category <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Category') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
             <select class="form-select select2" name="category" required data-expense-category>
-                <option value="">- What it is for -</option>
+                <option value=""><?= __('- What it is for -') ?></option>
                 <?= categoryOptionsHtml('Expense', $form_category) ?>
             </select>
             <?= categoryAddButtonHtml('Expense') ?>
@@ -152,11 +152,11 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Client</label>
+        <label class="form-label"><?= __('Client') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
             <select class="form-select select2" name="client_id" data-recurring-client>
-                <option value="0">- Not for a client -</option>
+                <option value="0"><?= __('- Not for a client -') ?></option>
                 <?php foreach ($form_clients as $client) { ?>
                     <option value="<?= intval($client['client_id']) ?>" <?= $form_client === intval($client['client_id']) ? 'selected' : '' ?><?= selectOptionClient($client['client_id'], $client['client_name'], $client['client_abbreviation'] ?? '') ?>><?= escapeHtml($client['client_name']) ?></option>
                 <?php } ?>
@@ -167,25 +167,25 @@ while ($row = mysqli_fetch_assoc($sql)) {
     <div class="col-12" data-recurring-billing <?= $form_client ? '' : 'hidden' ?>>
         <div class="row g-2 align-items-start p-2 rounded border bg-body-tertiary mx-0">
             <div class="col-md-5">
-                <label class="form-label small mb-1">For them</label>
+                <label class="form-label small mb-1"><?= __('For them') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-file-invoice-dollar"></i></span>
                     <select class="form-select" name="billing" data-recurring-billing-mode>
-                        <option value="" <?= $form_billing === '' ? 'selected' : '' ?>>Our cost - not billed on</option>
-                        <option value="bill" <?= $form_billing === 'bill' ? 'selected' : '' ?>>Billed on to them each time</option>
-                        <option value="covered" <?= $form_billing === 'covered' ? 'selected' : '' ?>>Covered by their recurring invoice</option>
+                        <option value="" <?= $form_billing === '' ? 'selected' : '' ?>><?= __('Our cost - not billed on') ?></option>
+                        <option value="bill" <?= $form_billing === 'bill' ? 'selected' : '' ?>><?= __('Billed on to them each time') ?></option>
+                        <option value="covered" <?= $form_billing === 'covered' ? 'selected' : '' ?>><?= __('Covered by their recurring invoice') ?></option>
                     </select>
                 </div>
             </div>
             <div class="col-md-3" data-recurring-billing-for="bill">
-                <label class="form-label small mb-1">Markup</label>
+                <label class="form-label small mb-1"><?= __('Markup') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-percent"></i></span>
-                    <input type="text" class="form-control text-end" name="markup" inputmode="decimal" value="<?= rtrim(rtrim(number_format($form_markup, 2, '.', ''), '0'), '.') ?>" aria-label="Markup">
+                    <input type="text" class="form-control text-end" name="markup" inputmode="decimal" value="<?= rtrim(rtrim(number_format($form_markup, 2, '.', ''), '0'), '.') ?>" aria-label="<?= escapeHtml(__('Markup')) ?>">
                 </div>
             </div>
             <div class="col-md-7" data-recurring-billing-for="covered">
-                <label class="form-label small mb-1">Recurring invoice</label>
+                <label class="form-label small mb-1"><?= __('Recurring invoice') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-redo-alt"></i></span>
                     <select class="form-select" name="recurring_invoice_id" data-recurring-cover data-selected="<?= $form_covered_by ?>"></select>
@@ -196,11 +196,11 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-md-7">
-        <label class="form-label">Paid from <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Paid from') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-piggy-bank"></i></span>
             <select class="form-select select2" name="account" required data-expense-account>
-                <option value="">- Which account -</option>
+                <option value=""><?= __('- Which account -') ?></option>
                 <?php foreach ($form_accounts as $account_id => $account) { ?>
                     <option value="<?= $account_id ?>" <?= $form_account === $account_id ? 'selected' : '' ?> data-icon="fas fa-piggy-bank"
                         data-description="<?= escapeHtml(billingMoney($account['balance'], $account['account_currency_code'])) ?><?= $account['account_archived_at'] ? ' - archived' : '' ?>"><?= escapeHtml($account['account_name']) ?></option>
@@ -210,11 +210,11 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-md-5">
-        <label class="form-label">Paid by</label>
+        <label class="form-label"><?= __('Paid by') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-credit-card"></i></span>
             <select class="form-select select2" name="payment_method" data-expense-method>
-                <option value="">- How it is paid -</option>
+                <option value=""><?= __('- How it is paid -') ?></option>
                 <?php foreach ($form_methods as $method) { ?>
                     <option value="<?= escapeHtml($method) ?>" <?= $form_method === $method ? 'selected' : '' ?>><?= escapeHtml($method) ?></option>
                 <?php } ?>
@@ -223,18 +223,18 @@ while ($row = mysqli_fetch_assoc($sql)) {
     </div>
 
     <div class="col-12">
-        <label class="form-label">Reference</label>
+        <label class="form-label"><?= __('Reference') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-hashtag"></i></span>
-            <input type="text" class="form-control" name="reference" maxlength="255" placeholder="Account or contract number - it goes on each expense" value="<?= escapeHtml($form_value('recurring_expense_reference')) ?>">
+            <input type="text" class="form-control" name="reference" maxlength="255" placeholder="<?= escapeHtml(__('Account or contract number - it goes on each expense')) ?>" value="<?= escapeHtml($form_value('recurring_expense_reference')) ?>">
         </div>
     </div>
 
     <div class="col-12">
-        <label class="form-label">Description</label>
+        <label class="form-label"><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text align-items-start pt-2"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="2" name="description" placeholder="What it is - office rent, colocation, M365 partner licensing"><?= escapeHtml($form_value('recurring_expense_description')) ?></textarea>
+            <textarea class="form-control" rows="2" name="description" placeholder="<?= escapeHtml(__('What it is - office rent, colocation, M365 partner licensing')) ?>"><?= escapeHtml($form_value('recurring_expense_description')) ?></textarea>
         </div>
     </div>
 
@@ -253,27 +253,58 @@ while ($row = mysqli_fetch_assoc($sql)) {
     var next = root.querySelector('[data-recurring-next]');
     var end = root.querySelector('[data-recurring-end]');
     var summary = root.querySelector('[data-recurring-summary]');
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var t = <?= json_encode([
+        'english' => i18nLocale() === 'en_US',
+        'set' => $form_edit ? __('Set the date of the next one') : __('Set the date of the first one'),
+        'year' => __('Every year on %s'),
+        'quarter' => __('Every quarter on the %s'),
+        'month' => __('Every month on the %s'),
+        'start' => $form_edit ? __('%1$s, next on %2$s') : __('%1$s, starting %2$s'),
+        'until' => __('%1$s, until %2$s'),
+        'after' => __('%1$s - but that is after it ends on %2$s'),
+        'bill' => __('Each one it records waits in Unbilled Time to go on their next invoice, with the markup.'),
+        'covered' => __('Not billed on by itself - the recurring invoice shows it as a cost against what it bills, with the margin.'),
+    ], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // i18n-ignore - English only, other languages use Intl
+    function fill(tpl, a, b) {
+        return tpl.replace('%1$s', a).replace('%2$s', b).replace('%s', a);
+    }
+    function local(d, year) {
+        var o = { day: 'numeric', month: 'short', timeZone: 'UTC' };
+        if (year) {
+            o.year = 'numeric';
+        }
+        return new Intl.DateTimeFormat(document.documentElement.lang, o).format(Date.UTC(d.y, d.m - 1, d.d));
+    }
+    function day(d) {
+        return t.english ? months[d.m - 1] + ' ' + d.d : local(d, false);
+    }
+    function full(d) {
+        return t.english ? full(d) : local(d, true);
+    }
     function parse(value) {
         var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
         return m ? { y: +m[1], m: +m[2], d: +m[3] } : null;
     }
     function ordinal(n) {
+        if (!t.english) {
+            return String(n);
+        }
         var s = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] || 'th');
         return n + s;
     }
     function update() {
         var d = parse(next.value);
         if (!d) {
-            summary.textContent = 'Set the date of the ' + <?= json_encode($form_edit ? 'next' : 'first') ?> + ' one';
+            summary.textContent = t.set;
             return;
         }
-        var text = frequency.value === 'year' ? 'Every year on ' + months[d.m - 1] + ' ' + d.d
-            : 'Every ' + (frequency.value === 'quarter' ? 'quarter' : 'month') + ' on the ' + ordinal(d.d);
-        text += ', ' + <?= json_encode($form_edit ? 'next on ' : 'starting ') ?> + months[d.m - 1] + ' ' + d.d + ', ' + d.y;
+        var text = frequency.value === 'year' ? fill(t.year, day(d))
+            : fill(frequency.value === 'quarter' ? t.quarter : t.month, ordinal(d.d));
+        text = fill(t.start, text, full(d));
         var e = parse(end.value);
         if (e) {
-            text += (end.value < next.value ? ' - but that is after it ends on ' : ', until ') + months[e.m - 1] + ' ' + e.d + ', ' + e.y;
+            text = fill(end.value < next.value ? t.after : t.until, text, full(e));
         }
         summary.textContent = text;
     }
@@ -312,9 +343,9 @@ while ($row = mysqli_fetch_assoc($sql)) {
                 input.disabled = el.hidden;
             });
         });
-        billingNote.textContent = mode.value === 'bill' ? 'Each one it records waits in Unbilled Time to go on their next invoice, with the markup.'
-            : mode.value === 'covered' ? 'Not billed on by itself - the recurring invoice shows it as a cost against what it bills, with the margin.'
-            : (options.length ? 'Filed against them as a cost. It can also be shown against one of their recurring invoices.' : 'Filed against them as a cost - they have no recurring invoice to cover it.');
+        billingNote.textContent = mode.value === 'bill' ? t.bill
+            : mode.value === 'covered' ? t.covered
+            : (options.length ? __('Filed against them as a cost. It can also be shown against one of their recurring invoices.') : __('Filed against them as a cost - they have no recurring invoice to cover it.'));
     }
     client.addEventListener('change', billing);
     mode.addEventListener('change', billing);

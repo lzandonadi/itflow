@@ -13,9 +13,9 @@
 defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 
 $mail_queue_actions = [
-    'retry' => ['retry_mail', 'bulk_retry_emails', 'retried', 'Retry', ['it goes at the next run', 'they go at the next run'], 'A sent one can\'t be - what it said was cleared on sending - nor one waiting or going now.'],
-    'cancel' => ['cancel_mail', 'bulk_cancel_emails', 'cancelled', 'Cancel', ['it won\'t be sent', 'they won\'t be sent'], 'Only one still to be sent or tried again can be.'],
-    'delete' => ['delete_mail', 'bulk_delete_emails', 'deleted', 'Delete', ['', ''], 'One going this minute can\'t be.'],
+    'retry' => ['retry_mail', 'bulk_retry_emails', 'retried', 'Retry', [__('it goes at the next run'), __('they go at the next run')], __('A sent one can\'t be - what it said was cleared on sending - nor one waiting or going now.')],
+    'cancel' => ['cancel_mail', 'bulk_cancel_emails', 'cancelled', 'Cancel', [__('it won\'t be sent'), __('they won\'t be sent')], __('Only one still to be sent or tried again can be.')],
+    'delete' => ['delete_mail', 'bulk_delete_emails', 'deleted', 'Delete', ['', ''], __('One going this minute can\'t be.')],
 ];
 // The Resend link before this page was rebuilt
 if (isset($_GET['send_failed_mail'])) {
@@ -37,7 +37,7 @@ foreach ($mail_queue_actions as $mail_queue_action => [$one_key, $bulk_key, $don
 
     $asked = count(array_unique(array_filter(array_map('intval', $mail_queue_ids))));
     if (!$asked) {
-        flashAlert('None were ticked.', 'warning');
+        flashAlert(__('None were ticked.'), 'warning');
         redirect();
     }
 
@@ -49,16 +49,18 @@ foreach ($mail_queue_actions as $mail_queue_action => [$one_key, $bulk_key, $don
         logAudit("Email", $log_action, "$session_name $done_word " . ($count === 1 ? 'email' : "$count emails") . " in the mail queue: $ids", 0, $count === 1 ? $done[0] : 0);
     }
 
-    $email_word = function ($n) {
-        return $n === 1 ? 'email' : 'emails';
-    };
+    $done_text = [
+        'retry' => [_n('Retried <strong>%d</strong> email', 'Retried <strong>%d</strong> emails', $count), _n('Retried <strong>%1$d</strong> of %2$d email.', 'Retried <strong>%1$d</strong> of %2$d emails.', $asked, $count, $asked), __('That email couldn\'t be retried.'), __('None of those emails could be retried.')],
+        'cancel' => [_n('Cancelled <strong>%d</strong> email', 'Cancelled <strong>%d</strong> emails', $count), _n('Cancelled <strong>%1$d</strong> of %2$d email.', 'Cancelled <strong>%1$d</strong> of %2$d emails.', $asked, $count, $asked), __('That email couldn\'t be cancelled.'), __('None of those emails could be cancelled.')],
+        'delete' => [_n('Deleted <strong>%d</strong> email', 'Deleted <strong>%d</strong> emails', $count), _n('Deleted <strong>%1$d</strong> of %2$d email.', 'Deleted <strong>%1$d</strong> of %2$d emails.', $asked, $count, $asked), __('That email couldn\'t be deleted.'), __('None of those emails could be deleted.')],
+    ][$mail_queue_action];
     if ($count === $asked) {
         $note = $done_note[$count === 1 ? 0 : 1];
-        flashAlert(ucfirst($done_word) . " <strong>$count</strong> " . $email_word($count) . ($note !== '' ? " - $note" : ''), $mail_queue_action === 'delete' ? 'error' : 'success');
+        flashAlert($done_text[0] . ($note !== '' ? " - $note" : ''), $mail_queue_action === 'delete' ? 'error' : 'success');
     } elseif ($count) {
-        flashAlert(ucfirst($done_word) . " <strong>$count</strong> of $asked " . $email_word($asked) . ". $why_not", 'warning');
+        flashAlert($done_text[1] . " $why_not", 'warning');
     } else {
-        flashAlert(($asked === 1 ? 'That email' : 'None of those emails') . " couldn't be $done_word. $why_not", 'error');
+        flashAlert(($asked === 1 ? $done_text[2] : $done_text[3]) . " $why_not", 'error');
     }
 
     redirect();

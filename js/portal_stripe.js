@@ -73,7 +73,7 @@
                     if (result.error) {
                         errorBox.textContent = result.error.type === 'card_error' || result.error.type === 'validation_error'
                             ? result.error.message
-                            : 'Something went wrong taking the payment - nothing has been charged. Try again.';
+                            : __('Something went wrong taking the payment - nothing has been charged. Try again.');
                         show(errorBox, true);
                     }
                     busy(false);
@@ -106,7 +106,7 @@
                         .then(function (response) { return response.json(); })
                         .then(function (data) {
                             if (!data.clientSecret) {
-                                throw new Error(data.error || 'No checkout');
+                                throw new Error(data.error || __('No checkout'));
                             }
                             return data.clientSecret;
                         });

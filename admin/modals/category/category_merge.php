@@ -50,10 +50,10 @@ foreach ($merging as $merge_id => $row) {
 }
 $merge_text = '';
 if ($config) {
-    $merge_text = ($records ? 'The ' . number_format($records) . ' ' . ($records === 1 ? 'record' : 'records') . ' with ' . ($one ? 'it get' : 'these get') . ' the ' . $config['one'] . ' you keep instead'
-            . ($config['by'] === 'name' ? ' - renamed to it' : '') . ($config['kind'] === 'Expense' ? ', and a month budgeted under more than one ends with one line of their total' : '') . '.'
-            : 'Nothing uses ' . ($one ? 'it' : 'these') . ' yet.')
-        . ($one ? ' It is then deleted.' : ' The others are then deleted.') . " This can't be undone.";
+    $merge_text = ($records ? ($one ? _n('The %1$s record with it gets the %2$s you keep instead', 'The %1$s records with it get the %2$s you keep instead', $records, number_format($records), $config['one']) : _n('The %1$s record with these gets the %2$s you keep instead', 'The %1$s records with these get the %2$s you keep instead', $records, number_format($records), $config['one']))
+            . ($config['by'] === 'name' ? __(' - renamed to it') : '') . ($config['kind'] === 'Expense' ? __(', and a month budgeted under more than one ends with one line of their total') : '') . '.'
+            : ($one ? __('Nothing uses it yet.') : __('Nothing uses these yet.')))
+        . ' ' . ($one ? __('It is then deleted.') : __('The others are then deleted.')) . ' ' . __("This can't be undone.");
 }
 
 ob_start();
@@ -61,14 +61,14 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-compress-alt me-2"></i>Merge <?= $one ? 'Category' : count($merging) . ' Categories' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-compress-alt me-2"></i><?= $one ? __('Merge Category') : __('Merge %d Categories', count($merging)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
 <?php if (!$merging || !$config) { ?>
-    <div class="modal-body text-center text-secondary py-5"><?= $merging ? 'Categories of one kind can be merged - pick expense categories, or asset statuses, and so on.' : 'Those categories are gone - they may have been merged or deleted already.' ?></div>
+    <div class="modal-body text-center text-secondary py-5"><?= $merging ? __('Categories of one kind can be merged - pick expense categories, or asset statuses, and so on.') : __('Those categories are gone - they may have been merged or deleted already.') ?></div>
 <?php } elseif (!$into) { ?>
-    <div class="modal-body text-center text-secondary py-5">There's no other <?= escapeHtml($config['one']) ?> to merge it into yet.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __("There's no other %s to merge it into yet.", escapeHtml($config['one'])) ?></div>
 <?php } else { ?>
     <form action="/admin/post.php" method="post" autocomplete="off">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -77,7 +77,7 @@ ob_start();
         <?php } ?>
 
         <div class="modal-body">
-            <label class="form-label">Merging</label>
+            <label class="form-label"><?= __('Merging') ?></label>
             <div class="d-flex flex-wrap gap-3 mb-3">
                 <?php foreach ($merging as $merge_id => $row) { ?>
                     <span class="d-inline-flex align-items-center gap-2"><?= categoryChip($row) ?><span class="small text-secondary"><?= number_format($used($merge_id)) ?> <?= $used($merge_id) === 1 ? 'record' : 'records' ?></span></span>
@@ -85,10 +85,10 @@ ob_start();
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Into <strong class="text-danger">*</strong></label>
+                <label class="form-label"><?= __('Into') ?> <strong class="text-danger">*</strong></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-list-ul"></i></span>
-                    <select class="form-select select2" name="into_category_id" data-placeholder="- Keep which <?= escapeHtml($config['one']) ?> -" required>
+                    <select class="form-select select2" name="into_category_id" data-placeholder="<?= __('- Keep which %s -', escapeHtml($config['one'])) ?>" required>
                         <option value=""></option>
                         <?php foreach ($into as $into_id => $row) { ?>
                             <option value="<?= intval($into_id) ?>"<?= intval($into_id) === $keep_id ? ' selected' : '' ?><?= selectOptionColor(categoryColor($row['category_color']), categoryIcon($row['category_icon'])) ?>><?= escapeHtml($row['category_name']) ?><?= isset($merging[$into_id]) ? ' (one of these)' : '' ?><?= $row['category_archived_at'] ? ' (archived)' : '' ?></option>
@@ -100,8 +100,8 @@ ob_start();
             <p class="small text-secondary mb-0"><?= escapeHtml($merge_text) ?></p>
         </div>
         <div class="modal-footer">
-            <button type="submit" name="merge_categories" class="btn btn-primary text-bold"><i class="fas fa-compress-alt me-2"></i>Merge</button>
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+            <button type="submit" name="merge_categories" class="btn btn-primary text-bold"><i class="fas fa-compress-alt me-2"></i><?= __('Merge') ?></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
         </div>
     </form>
 <?php } ?>

@@ -31,14 +31,14 @@ while ($row = mysqli_fetch_row($sql)) {
     $locations[] = $row[0];
 }
 
-$page_title = 'Count Stock';
+$page_title = __('Count Stock');
 
 ?>
 
 <ol class="breadcrumb d-print-none">
-    <li class="breadcrumb-item"><a href="products.php">Products</a></li>
-    <li class="breadcrumb-item"><a href="products.php?type=stocked">Stocked</a></li>
-    <li class="breadcrumb-item active">Count Stock</li>
+    <li class="breadcrumb-item"><a href="products.php"><?= __('Products') ?></a></li>
+    <li class="breadcrumb-item"><a href="products.php?type=stocked"><?= __('Stocked') ?></a></li>
+    <li class="breadcrumb-item active"><?= __('Count Stock') ?></li>
 </ol>
 
 <form action="post.php" method="post" autocomplete="off" id="stockCount">
@@ -46,9 +46,9 @@ $page_title = 'Count Stock';
 
     <div class="card">
         <div class="card-header bg-dark py-2 d-flex align-items-center">
-            <h3 class="card-title mt-1 mb-1 flex-grow-1"><i class="fas fa-fw fa-clipboard-check me-2"></i>Count Stock<?= $location !== '' ? ' <span class="fw-normal text-white-50">' . escapeHtml($location) . '</span>' : '' ?></h3>
+            <h3 class="card-title mt-1 mb-1 flex-grow-1"><i class="fas fa-fw fa-clipboard-check me-2"></i><?= __('Count Stock') ?><?= $location !== '' ? ' <span class="fw-normal text-white-50">' . escapeHtml($location) . '</span>' : '' ?></h3>
             <div class="d-flex gap-2 d-print-none">
-                <button type="button" class="btn btn-outline-light" onclick="window.print()"><i class="fas fa-print me-2"></i>Count Sheet</button>
+                <button type="button" class="btn btn-outline-light" onclick="window.print()"><i class="fas fa-print me-2"></i><?= __('Count Sheet') ?></button>
             </div>
         </div>
 
@@ -57,8 +57,8 @@ $page_title = 'Count Stock';
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>
-                        <select class="form-select" onchange="location.href = 'products_count.php' + (this.value ? '?location=' + encodeURIComponent(this.value) : '')" aria-label="Location">
-                            <option value="">Everywhere</option>
+                        <select class="form-select" onchange="location.href = 'products_count.php' + (this.value ? '?location=' + encodeURIComponent(this.value) : '')" aria-label="<?= escapeHtml(__('Location')) ?>">
+                            <option value=""><?= __('Everywhere') ?></option>
                             <?php foreach ($locations as $place) { ?>
                                 <option value="<?= escapeHtml($place) ?>" <?= $location === $place ? 'selected' : '' ?>><?= escapeHtml($place) ?></option>
                             <?php } ?>
@@ -66,7 +66,7 @@ $page_title = 'Count Stock';
                     </div>
                 </div>
                 <div class="col-md-8 small text-body-secondary">
-                    Count what is on the shelf and type it in. Leave a product blank to skip it. Each one counted is recorded as a stock move.
+                    <?= __('Count what is on the shelf and type it in. Leave a product blank to skip it. Each one counted is recorded as a stock move.') ?>
                 </div>
             </div>
         </div>
@@ -75,11 +75,11 @@ $page_title = 'Count Stock';
             <table class="table table-hover align-middle mb-0 itflow-stock-count">
                 <thead class="text-nowrap">
                 <tr>
-                    <th>Product</th>
-                    <th class="d-none d-md-table-cell">Location</th>
-                    <th class="text-end">ITFlow has</th>
-                    <th class="text-end" style="width: 9rem;">Counted</th>
-                    <th class="text-end d-print-none" style="width: 7rem;">Difference</th>
+                    <th><?= __('Product') ?></th>
+                    <th class="d-none d-md-table-cell"><?= __('Location') ?></th>
+                    <th class="text-end"><?= __('ITFlow has') ?></th>
+                    <th class="text-end" style="width: 9rem;"><?= _x('Counted', 'stock count') ?></th>
+                    <th class="text-end d-print-none" style="width: 7rem;"><?= __('Difference') ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -94,13 +94,13 @@ $page_title = 'Count Stock';
                         <td class="d-none d-md-table-cell"><?= $row['product_location'] ? escapeHtml($row['product_location']) : '<span class="text-body-secondary">-</span>' ?></td>
                         <td class="text-end"><?= escapeHtml(billingQuantity($on_hand)) ?></td>
                         <td class="text-end">
-                            <input type="text" class="form-control form-control-sm text-end" name="counted[<?= $product_id ?>]" inputmode="decimal" aria-label="Counted <?= escapeHtml($row['product_name']) ?>" data-count-input>
+                            <input type="text" class="form-control form-control-sm text-end" name="counted[<?= $product_id ?>]" inputmode="decimal" aria-label="<?= escapeHtml(__('Counted %s', $row['product_name'])) ?>" data-count-input>
                         </td>
                         <td class="text-end fw-semibold d-print-none" data-count-diff></td>
                     </tr>
                 <?php } ?>
                 <?php if (!$products) { ?>
-                    <tr><td colspan="5" class="text-center text-body-secondary py-5">No product here tracks its stock. Turn on Track stock on a product to count it.</td></tr>
+                    <tr><td colspan="5" class="text-center text-body-secondary py-5"><?= __('No product here tracks its stock. Turn on Track stock on a product to count it.') ?></td></tr>
                 <?php } ?>
                 </tbody>
             </table>
@@ -110,10 +110,10 @@ $page_title = 'Count Stock';
             <div class="card-footer d-flex flex-wrap gap-2 align-items-center d-print-none">
                 <div class="input-group" style="max-width: 28rem;">
                     <span class="input-group-text"><i class="fas fa-fw fa-sticky-note"></i></span>
-                    <input type="text" class="form-control" name="note" maxlength="200" placeholder="Note on every move - year end count, who counted">
+                    <input type="text" class="form-control" name="note" maxlength="200" placeholder="<?= escapeHtml(__('Note on every move - year end count, who counted')) ?>">
                 </div>
-                <span class="small text-body-secondary ms-auto" data-count-summary>Nothing counted yet</span>
-                <button type="submit" name="product_stock_count" class="btn btn-primary text-bold" data-count-save disabled><i class="fas fa-check me-2"></i>Save Count</button>
+                <span class="small text-body-secondary ms-auto" data-count-summary><?= __('Nothing counted yet') ?></span>
+                <button type="submit" name="product_stock_count" class="btn btn-primary text-bold" data-count-save disabled><i class="fas fa-check me-2"></i><?= __('Save Count') ?></button>
             </div>
         <?php } ?>
     </div>
@@ -127,6 +127,12 @@ $page_title = 'Count Stock';
     }
     var summary = form.querySelector('[data-count-summary]');
     var save = form.querySelector('[data-count-save]');
+    var t = <?= json_encode([
+        'same' => _x('Same', 'stock count'),
+        'summary' => __('%1$s counted, %2$s different'),
+        'bad' => __(', %s not a number'),
+        'none' => __('Nothing counted yet'),
+    ], JSON_HEX_TAG | JSON_HEX_AMP) ?>;
     function update() {
         var counted = 0, changed = 0, bad = 0;
         form.querySelectorAll('[data-count-row]').forEach(function (row) {
@@ -151,11 +157,11 @@ $page_title = 'Count Stock';
             if (diff !== 0) {
                 changed++;
             }
-            cell.textContent = diff === 0 ? 'Same' : (diff > 0 ? '+' : '') + diff;
+            cell.textContent = diff === 0 ? t.same : (diff > 0 ? '+' : '') + diff;
             cell.classList.add(diff === 0 ? 'text-body-secondary' : (diff > 0 ? 'text-success-emphasis' : 'text-danger-emphasis'));
         });
         if (summary) {
-            summary.textContent = counted ? counted + ' counted, ' + changed + ' different' + (bad ? ', ' + bad + ' not a number' : '') : 'Nothing counted yet';
+            summary.textContent = counted ? t.summary.replace('%1$s', counted).replace('%2$s', changed) + (bad ? t.bad.replace('%s', bad) : '') : t.none;
         }
         if (save) {
             save.disabled = !counted || bad > 0;

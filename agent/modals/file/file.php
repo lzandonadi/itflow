@@ -21,7 +21,7 @@ $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT file_id, file_name, file
     FROM files LEFT JOIN users ON file_created_by = user_id
     WHERE file_id = $file_id LIMIT 1"));
 if (!$row) {
-    echo json_encode(['error' => 'That file no longer exists.']);
+    echo json_encode(['error' => __('That file no longer exists.')]);
     exit;
 }
 
@@ -47,7 +47,7 @@ if (!in_array($file_mime, getInlineViewableMimeTypes(), true)) {
 
 $folder_tree = folderTree($client_id);
 $folder_id = isset($folder_tree[intval($row['file_folder_id'])]) ? intval($row['file_folder_id']) : 0;
-$folder_label = $folder_id ? implode(' / ', array_column(folderPath($folder_tree, $folder_id), 'folder_name')) : 'Top level';
+$folder_label = $folder_id ? implode(' / ', array_column(folderPath($folder_tree, $folder_id), 'folder_name')) : __('Top level');
 
 $share = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT item_recipient, item_expire_at FROM shared_items
     WHERE item_client_id = $client_id AND item_type = 'File' AND item_related_id = $file_id AND " . shareOpenSql() . "
@@ -63,12 +63,12 @@ ob_start();
         <div class="min-w-0">
             <h5 class="modal-title d-flex flex-wrap align-items-center column-gap-2">
                 <span class="fw-semibold text-break"><?= $file_name ?></span>
-                <?php if ($file_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                <?php if ($file_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
             </h5>
             <div class="small text-body-secondary mt-1"><?= escapeHtml($file_info['label']) ?> &middot; <?= formatBytes(intval($row['file_size'])) ?></div>
         </div>
     </div>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<?= escapeHtml(__('Close')) ?>"></button>
 </div>
 
 <div class="modal-body">
@@ -76,7 +76,7 @@ ob_start();
     <!-- Preview -->
     <div class="itflow-file-preview mb-3">
         <?php if ($preview_kind === 'image') { ?>
-            <a href="file.php?file_id=<?= $file_id ?>&action=view" target="_blank" title="Open full size"><img src="file.php?file_id=<?= $file_id ?>&thumb=1" alt="<?= $file_name ?>"></a>
+            <a href="file.php?file_id=<?= $file_id ?>&action=view" target="_blank" title="<?= escapeHtml(__('Open full size')) ?>"><img src="file.php?file_id=<?= $file_id ?>&thumb=1" alt="<?= $file_name ?>"></a>
         <?php } elseif ($preview_kind === 'pdf') { ?>
             <iframe src="file.php?file_id=<?= $file_id ?>&action=view#view=FitH" title="<?= $file_name ?>"></iframe>
         <?php } elseif ($preview_kind === 'text') { ?>
@@ -84,7 +84,7 @@ ob_start();
         <?php } else { ?>
             <div class="itflow-asset-empty py-4">
                 <?= fileTypeTile($row['file_ext'], 'lg') ?>
-                <div class="mt-2">No preview for this kind of file - download it to open it.</div>
+                <div class="mt-2"><?= __('No preview for this kind of file - download it to open it.') ?></div>
             </div>
         <?php } ?>
     </div>
@@ -92,26 +92,26 @@ ob_start();
     <!-- At a glance -->
     <div class="row g-2 itflow-asset-glance">
         <div class="col-sm-6">
-            <div class="itflow-glance-item" title="Folder">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Folder')) ?>">
                 <i class="fas fa-fw fa-folder"></i>
                 <a class="text-truncate" href="files.php?client_id=<?= $client_id ?>&folder_id=<?= $folder_id ?>"><?= escapeHtml($folder_label) ?></a>
             </div>
-            <div class="itflow-glance-item" title="Uploaded">
+            <div class="itflow-glance-item" title="<?= escapeHtml(__('Uploaded')) ?>">
                 <i class="fas fa-fw fa-cloud-upload-alt"></i>
                 <span><span title="<?= escapeHtml($row['file_created_at']) ?>"><?= timeAgo($row['file_created_at']) ?></span><?php if ($row['user_name']) { ?> <span class="text-body-secondary">by <?= escapeHtml($row['user_name']) ?></span><?php } ?></span>
             </div>
         </div>
         <div class="col-sm-6">
             <?php if ($row['file_description']) { ?>
-                <div class="itflow-glance-item" title="Description">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Description')) ?>">
                     <i class="fas fa-fw fa-align-left"></i>
                     <span><?= escapeHtml($row['file_description']) ?></span>
                 </div>
             <?php } ?>
             <?php if ($share) { ?>
-                <div class="itflow-glance-item" title="Shared">
+                <div class="itflow-glance-item" title="<?= escapeHtml(__('Shared')) ?>">
                     <i class="fas fa-fw fa-link"></i>
-                    <span>Shared<?= $share['item_recipient'] ? ' with ' . escapeHtml($share['item_recipient']) : '' ?> <span class="text-body-secondary">&middot; link expires <?= timeAgo($share['item_expire_at']) ?></span></span>
+                    <span><?= $share['item_recipient'] ? __('Shared with %s', escapeHtml($share['item_recipient'])) : __('Shared') ?> <span class="text-body-secondary">&middot; <?= __('link expires %s', timeAgo($share['item_expire_at'])) ?></span></span>
                 </div>
             <?php } ?>
         </div>
@@ -119,7 +119,7 @@ ob_start();
 
     <!-- What it is linked to -->
     <div class="mt-3">
-        <div class="small fw-semibold text-uppercase text-body-secondary mb-2">Linked</div>
+        <div class="small fw-semibold text-uppercase text-body-secondary mb-2"><?= __('Linked') ?></div>
         <?= linkGroupsHtml('file', $file_id, $client_id, $file_archived) ?>
     </div>
 
@@ -129,15 +129,15 @@ ob_start();
 </div>
 
 <div class="modal-footer">
-    <a class="btn btn-primary text-bold" href="file.php?file_id=<?= $file_id ?>"><i class="fas fa-download me-2"></i>Download</a>
+    <a class="btn btn-primary text-bold" href="file.php?file_id=<?= $file_id ?>"><i class="fas fa-download me-2"></i><?= __('Download') ?></a>
     <?php if (!$file_archived && shareCanMake('File')) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/share/share_add.php?type=File&amp;id=<?= $file_id ?>"><i class="fas fa-share-alt me-2"></i>Share</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/share/share_add.php?type=File&amp;id=<?= $file_id ?>"><i class="fas fa-share-alt me-2"></i><?= __('Share') ?></button>
     <?php } ?>
     <?php if ($can_edit && !$file_archived) { ?>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/file/file_rename.php?id=<?= $file_id ?>"><i class="fas fa-pen me-2"></i>Rename</button>
-        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/file/file_move.php?id=<?= $file_id ?>"><i class="fas fa-folder-open me-2"></i>Move</button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/file/file_rename.php?id=<?= $file_id ?>"><i class="fas fa-pen me-2"></i><?= __('Rename') ?></button>
+        <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="modals/file/file_move.php?id=<?= $file_id ?>"><i class="fas fa-folder-open me-2"></i><?= __('Move') ?></button>
     <?php } ?>
-    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Close</button>
+    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Close') ?></button>
 </div>
 
 <?php

@@ -34,17 +34,17 @@ $co_offer_recurring = $co_contract && !$co_contract_recurring && (contractRecurr
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
             <?php if ($co_billing_people) { ?>
-                <?= settingsSelect('billing_contact_id', (string) $co_billing_now, ['0' => '- Nobody in particular -'] + $co_billing_people, ['id' => 'coBillingContact', 'icon' => 'fa-user-tag', 'label' => 'Invoices go to',
-                    'help' => 'Marked as their billing contact - invoices, quotes and statements go to them.']) ?>
+                <?= settingsSelect('billing_contact_id', (string) $co_billing_now, ['0' => __('- Nobody in particular -')] + $co_billing_people, ['id' => 'coBillingContact', 'icon' => 'fa-user-tag', 'label' => __('Invoices go to'),
+                    'help' => __('Marked as their billing contact - invoices, quotes and statements go to them.')]) ?>
             <?php } else { ?>
                 <div class="itflow-settings-field">
-                    <label class="form-label">Invoices go to</label>
-                    <div class="small text-body-secondary">Nobody yet - add their people on <a href="<?= clientOnboardingUrl($client_id, 'people') ?>">People</a>.</div>
+                    <label class="form-label"><?= __('Invoices go to') ?></label>
+                    <div class="small text-body-secondary"><?= __('Nobody yet - add their people on %s.', '<a href="' . clientOnboardingUrl($client_id, 'people') . '">' . _x('People', 'onboarding step') . '</a>') ?></div>
                 </div>
             <?php } ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('tax_id_number', $co_c['client_tax_id_number'] ?? '', ['id' => 'coTaxId', 'icon' => 'fa-balance-scale', 'label' => 'Tax ID', 'maxlength' => 255, 'placeholder' => 'Their tax number, for invoices']) ?>
+            <?= settingsInput('tax_id_number', $co_c['client_tax_id_number'] ?? '', ['id' => 'coTaxId', 'icon' => 'fa-balance-scale', 'label' => __('Tax ID'), 'maxlength' => 255, 'placeholder' => __('Their tax number, for invoices')]) ?>
         </div>
     </div>
 
@@ -56,56 +56,56 @@ $co_offer_recurring = $co_contract && !$co_contract_recurring && (contractRecurr
 
     <div class="mb-4">
         <input type="hidden" name="reminders_field" value="1">
-        <?= settingsSwitch('reminders', intval($co_c['client_reminders'] ?? 1) ? '1' : '', ['id' => 'coReminders', 'label' => 'Payment reminders and statements',
-            'help' => 'Emailed as set in Admin &gt; Settings &gt; Invoice. Off, they get neither - invoices can still be sent by hand.']) ?>
+        <?= settingsSwitch('reminders', intval($co_c['client_reminders'] ?? 1) ? '1' : '', ['id' => 'coReminders', 'label' => __('Payment reminders and statements'),
+            'help' => __('Emailed as set in Admin &gt; Settings &gt; Invoice. Off, they get neither - invoices can still be sent by hand.')]) ?>
     </div>
 
     <?php if ($co_can_bill) { ?>
-        <h2 class="h6 fw-semibold">The agreement's recurring invoice</h2>
+        <h2 class="h6 fw-semibold"><?= __('The agreement\'s recurring invoice') ?></h2>
         <?php if (!$co_contract) { ?>
-            <p class="small text-body-secondary" data-co-no-contract>There's no agreement to bill yet - start one on <a href="<?= clientOnboardingUrl($client_id, 'agreement') ?>">Agreement</a>, or add a recurring invoice on the client's <a href="/agent/recurring_invoices.php?client_id=<?= $client_id ?>">Recurring Invoices</a>.</p>
+            <p class="small text-body-secondary" data-co-no-contract><?= __("There's no agreement to bill yet - start one on %1\$s, or add a recurring invoice on the client's %2\$s.", '<a href="' . clientOnboardingUrl($client_id, 'agreement') . '">' . __('Agreement') . '</a>', '<a href="/agent/recurring_invoices.php?client_id=' . $client_id . '">' . __('Recurring Invoices') . '</a>') ?></p>
         <?php } elseif ($co_contract_recurring) { ?>
             <p class="small" data-co-recurring="<?= intval($co_contract_recurring['recurring_invoice_id']) ?>"><i class="fas fa-check-circle text-success me-1"></i>
                 <a href="/agent/recurring_invoice.php?recurring_invoice_id=<?= intval($co_contract_recurring['recurring_invoice_id']) ?>"><?= escapeHtml(billingNumber('recurring', $co_contract_recurring)) ?></a>
-                bills <?= escapeHtml($co_contract['contract_name']) ?> - <?= escapeHtml(contractRecurringAmountText($co_contract_recurring)) ?>.</p>
+                <?= __('bills %1$s - %2$s.', escapeHtml($co_contract['contract_name']), escapeHtml(contractRecurringAmountText($co_contract_recurring))) ?></p>
         <?php } elseif (!$co_offer_recurring) { ?>
-            <p class="small text-body-secondary"><?= escapeHtml($co_contract['contract_name']) ?> has ended, so it isn't billed - renew it from its page first.</p>
+            <p class="small text-body-secondary"><?= __("%s has ended, so it isn't billed - renew it from its page first.", escapeHtml($co_contract['contract_name'])) ?></p>
         <?php } else { ?>
             <div class="itflow-gs-optional mb-3" data-co-recurring-form>
-                <?= settingsSwitch('recurring', '1', ['id' => 'coRecurring', 'label' => 'Bill ' . $co_contract['contract_name'] . ' with a recurring invoice', 'data' => ['gs-reveal' => 'coRecurringFields'],
-                    'help' => $co_contract['contract_status'] === 'Draft' ? 'It is paused until the contract is countersigned and active, and paused again once it ends.' : 'It runs while the contract is active, and is paused once it ends.']) ?>
+                <?= settingsSwitch('recurring', '1', ['id' => 'coRecurring', 'label' => __('Bill %s with a recurring invoice', $co_contract['contract_name']), 'data' => ['gs-reveal' => 'coRecurringFields'],
+                    'help' => $co_contract['contract_status'] === 'Draft' ? __('It is paused until the contract is countersigned and active, and paused again once it ends.') : __('It runs while the contract is active, and is paused once it ends.')]) ?>
                 <div id="coRecurringFields" class="row g-3 mt-0">
                     <div class="col-sm-6">
-                        <?= settingsInput('amount', '', ['id' => 'coAmount', 'icon' => 'fa-dollar-sign', 'label' => 'Amount each time', 'inputmode' => 'decimal', 'placeholder' => '1,500.00']) ?>
+                        <?= settingsInput('amount', '', ['id' => 'coAmount', 'icon' => 'fa-dollar-sign', 'label' => __('Amount each time'), 'inputmode' => 'decimal', 'placeholder' => '1,500.00']) ?>
                     </div>
                     <div class="col-sm-6">
-                        <?= settingsSelect('frequency', 'month', recurringInvoiceFrequencies(), ['id' => 'coFrequency', 'icon' => 'fa-sync-alt', 'label' => 'How often']) ?>
+                        <?= settingsSelect('frequency', 'month', recurringInvoiceFrequencies(), ['id' => 'coFrequency', 'icon' => 'fa-sync-alt', 'label' => __('How often')]) ?>
                     </div>
                     <div class="col-sm-6">
-                        <?= settingsInput('first', contractRecurringFirstDate($co_contract), ['id' => 'coFirst', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => 'First invoice', 'max' => '2999-12-31']) ?>
+                        <?= settingsInput('first', contractRecurringFirstDate($co_contract), ['id' => 'coFirst', 'icon' => 'fa-calendar-day', 'type' => 'date', 'label' => __('First invoice'), 'max' => '2999-12-31']) ?>
                     </div>
                     <div class="col-sm-6">
-                        <?= settingsSelect('category', '0', [], ['id' => 'coCategory', 'icon' => 'fa-tag', 'label' => 'Category',
-                            'options_html' => '<option value="0">- Category -</option>' . categoryOptionsHtml('Income', settingsValue('category', '0'))]) ?>
+                        <?= settingsSelect('category', '0', [], ['id' => 'coCategory', 'icon' => 'fa-tag', 'label' => __('Category'),
+                            'options_html' => '<option value="0">' . __('- Category -') . '</option>' . categoryOptionsHtml('Income', settingsValue('category', '0'))]) ?>
                     </div>
                     <div class="col-12">
-                        <?= settingsInput('item_name', $co_contract['contract_name'], ['id' => 'coItemName', 'icon' => 'fa-cube', 'label' => 'Line', 'maxlength' => 200]) ?>
+                        <?= settingsInput('item_name', $co_contract['contract_name'], ['id' => 'coItemName', 'icon' => 'fa-cube', 'label' => __('Line'), 'maxlength' => 200]) ?>
                     </div>
                     <div class="col-12">
-                        <?= settingsInput('description', contractTypeLabel($co_contract['contract_type']) . ' - {period}', ['id' => 'coItemDescription', 'icon' => 'fa-align-left', 'label' => 'Description', 'maxlength' => 1000,
-                            'help' => '{month}, {quarter}, {year} and {period} become the dates each invoice covers.']) ?>
+                        <?= settingsInput('description', contractTypeLabel($co_contract['contract_type']) . ' - {period}', ['id' => 'coItemDescription', 'icon' => 'fa-align-left', 'label' => __('Description'), 'maxlength' => 1000,
+                            'help' => __('{month}, {quarter}, {year} and {period} become the dates each invoice covers.')]) ?>
                     </div>
                     <div class="col-sm-6">
-                        <?= settingsSelect('tax_id', (string) taxDefaultFor($client_id, 'goods'), [], ['id' => 'coItemTax', 'icon' => 'fa-percent', 'label' => 'Tax',
+                        <?= settingsSelect('tax_id', (string) taxDefaultFor($client_id, 'goods'), [], ['id' => 'coItemTax', 'icon' => 'fa-percent', 'label' => __('Tax'),
                             'options_html' => taxOptionsHtml(billingTaxes(), intval(settingsValue('tax_id', taxDefaultFor($client_id, 'goods'))))]) ?>
                     </div>
                     <div class="col-sm-6 d-flex align-items-end">
-                        <?= settingsSwitch('auto_send', '1', ['id' => 'coAutoSend', 'label' => 'Email each invoice by itself']) ?>
+                        <?= settingsSwitch('auto_send', '1', ['id' => 'coAutoSend', 'label' => __('Email each invoice by itself')]) ?>
                     </div>
                 </div>
             </div>
         <?php } ?>
     <?php } ?>
 
-    <button type="submit" name="client_onboarding_billing" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-check me-2"></i>Save</button>
+    <button type="submit" name="client_onboarding_billing" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
 </form>

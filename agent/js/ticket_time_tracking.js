@@ -89,7 +89,7 @@
         }
 
         function resetTimer() {
-            if (confirm("Are you sure you want to reset the timer?")) {
+            if (confirm(__('Are you sure you want to reset the timer?'))) {
                 clearInterval(timerInterval);
                 timerInterval = null;
                 elapsedSecs = 0;

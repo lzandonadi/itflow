@@ -11,7 +11,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-briefcase me-2"></i>Set Industry for <strong><?= $count ?></strong> client<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-briefcase me-2"></i><?= _n('Set Industry for <strong>%d</strong> client', 'Set Industry for <strong>%d</strong> clients', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -22,18 +22,18 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Industry</label>
+            <label><?= __('Industry') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-briefcase"></i></span>
-                <input type="text" class="form-control" name="bulk_industry" placeholder="Enter an Industry" maxlength="200" required>
+                <input type="text" class="form-control" name="bulk_industry" placeholder="<?= escapeHtml(__('Enter an Industry')) ?>" maxlength="200" required>
             </div>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_client_industry" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Set</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_client_industry" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Set') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

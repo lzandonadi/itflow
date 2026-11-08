@@ -30,7 +30,7 @@ $sql = mysqli_query($mysqli, "
 while ($row = mysqli_fetch_assoc($sql)) {
     $vendors[intval($row['vendor_id'])] = [
         'vendor_id' => intval($row['vendor_id']),
-        'vendor' => $row['vendor_name'] ?? 'Deleted vendor',
+        'vendor' => $row['vendor_name'] ?? __('Deleted vendor'),
         'exists' => $row['vendor_name'] !== null,
         'count' => intval($row['n']),
         'total' => floatval($row['v']),
@@ -90,31 +90,31 @@ foreach ($vendors as &$vendor) {
 unset($vendor);
 
 $columns = [
-    'vendor' => ['label' => 'Vendor', 'html' => function ($row) {
+    'vendor' => ['label' => __('Vendor'), 'html' => function ($row) {
         $name = escapeHtml($row['vendor']);
         return $row['exists'] ? '<a class="fw-semibold text-body" href="/agent/vendor.php?vendor_id=' . $row['vendor_id'] . '">' . $name . '</a>' : '<span class="text-body-secondary fst-italic">' . $name . '</span>';
     }],
-    'category' => ['label' => 'Mostly', 'class' => 'small text-body-secondary'],
-    'count' => ['label' => 'Expenses', 'type' => 'count'],
-    'total' => ['label' => 'Paid', 'type' => 'money', 'class' => 'fw-semibold', 'html' => function ($row) use ($period) {
+    'category' => ['label' => __('Mostly'), 'class' => 'small text-body-secondary'],
+    'count' => ['label' => __('Expenses'), 'type' => 'count'],
+    'total' => ['label' => __('Paid'), 'type' => 'money', 'class' => 'fw-semibold', 'html' => function ($row) use ($period) {
         return '<a class="itflow-report-amount" href="/agent/expenses.php?vendor=' . $row['vendor_id'] . '&canned_date=custom&dtf=' . $period['start'] . '&dtt=' . $period['end'] . '">' . reportMoney($row['total']) . '</a>';
     }],
-    'share' => ['label' => 'Share', 'type' => 'percent', 'html' => function ($row) {
+    'share' => ['label' => __('Share'), 'type' => 'percent', 'html' => function ($row) {
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="itflow-report-meter d-none d-lg-flex" style="width: 5rem"><span style="width: ' . min(100, floatval($row['share'])) . '%"></span></div>'
             . '<span class="small text-body-secondary">' . reportPercent($row['share']) . '</span></div>';
     }],
-    'prev' => ['label' => 'Period before', 'type' => 'money', 'class' => 'text-body-secondary'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
-        return $row['change'] === null ? '<span class="itflow-report-zero">New</span>' : '<span class="small">' . reportChangeHtml($row['total'], $row['prev'], 'down') . '</span>';
+    'prev' => ['label' => __('Period before'), 'type' => 'money', 'class' => 'text-body-secondary'],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+        return $row['change'] === null ? '<span class="itflow-report-zero">' . __('New') . '</span>' : '<span class="small">' . reportChangeHtml($row['total'], $row['prev'], 'down') . '</span>';
     }],
-    'recurring' => ['label' => 'Recurring / month', 'type' => 'money', 'title' => 'Active recurring expenses to this vendor, per month', 'html' => function ($row) {
+    'recurring' => ['label' => __('Recurring / month'), 'type' => 'money', 'title' => __('Active recurring expenses to this vendor, per month'), 'html' => function ($row) {
         return $row['recurring'] > 0 ? reportMoney($row['recurring']) : '<span class="itflow-report-zero">–</span>';
     }],
-    'last' => ['label' => 'Last paid', 'type' => 'date', 'class' => 'text-nowrap'],
+    'last' => ['label' => __('Last paid'), 'type' => 'date', 'class' => 'text-nowrap'],
 ];
 
 if (reportExporting()) {
-    reportCsv('Spend by Vendor ' . $period['start'] . ' to ' . $period['end'], $columns, array_values($vendors), ['vendor' => 'Total', 'total' => $only_1099 ? array_sum(array_column($vendors, 'total')) : $total]);
+    reportCsv('Spend by Vendor ' . $period['start'] . ' to ' . $period['end'], $columns, array_values($vendors), ['vendor' => __('Total'), 'total' => $only_1099 ? array_sum(array_column($vendors, 'total')) : $total]);
 }
 
 require_once "includes/inc_report_layout.php";
@@ -129,41 +129,41 @@ $biggest = $top[0] ?? null;
     <?php reportHeader('expense_by_vendor', [
         'period' => $period,
         'years' => reportPastYears("SELECT DISTINCT YEAR(expense_date) AS y FROM expenses WHERE expense_vendor_id > 0"),
-        'controls' => reportSwitchControl('over600', $only_1099, 'Only vendors paid 600 or more'),
+        'controls' => reportSwitchControl('over600', $only_1099, __('Only vendors paid 600 or more')),
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Paid to vendors', 'value' => reportMoney($total), 'sub' => reportChangeHtml($total, $prev_total, 'down', $period['compare']),
+        ['label' => __('Paid to vendors'), 'value' => reportMoney($total), 'sub' => reportChangeHtml($total, $prev_total, 'down', $period['compare']),
             'url' => '/agent/expenses.php?canned_date=custom&dtf=' . $period['start'] . '&dtt=' . $period['end']],
-        ['label' => 'Vendors paid', 'value' => reportCount(count($vendors)), 'sub' => '<span class="text-body-tertiary">' . ($only_1099 ? 'Paid 600 or more' : 'In the period') . '</span>'],
-        ['label' => 'Biggest', 'value' => $biggest ? $biggest['vendor'] : '-', 'sub' => $biggest ? reportMoney($biggest['total']) . ' <span class="text-body-tertiary">· ' . reportPercent($biggest['share']) . ' of spending</span>' : ''],
-        ['label' => 'Paid 600 or more', 'value' => reportCount($count_1099), 'sub' => '<span class="text-body-tertiary">Vendors to check for a 1099</span>', 'url' => reportUrl(['over600' => 1])],
+        ['label' => __('Vendors paid'), 'value' => reportCount(count($vendors)), 'sub' => '<span class="text-body-tertiary">' . ($only_1099 ? __('Paid 600 or more') : __('In the period')) . '</span>'],
+        ['label' => __('Biggest'), 'value' => $biggest ? $biggest['vendor'] : '-', 'sub' => $biggest ? reportMoney($biggest['total']) . ' <span class="text-body-tertiary">· ' . __('%s of spending', reportPercent($biggest['share'])) . '</span>' : ''],
+        ['label' => __('Paid 600 or more'), 'value' => reportCount($count_1099), 'sub' => '<span class="text-body-tertiary">' . __('Vendors to check for a 1099') . '</span>', 'url' => reportUrl(['over600' => 1])],
     ]) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Top vendors', escapeHtml($period['range'])) ?>
+        <?= reportSectionOpen(__('Top vendors'), escapeHtml($period['range'])) ?>
             <div class="card-body">
                 <?= reportChart([
                     'type' => 'bar',
                     'horizontal' => true,
                     'labels' => array_map(function ($v) { return $v['vendor']; }, $top),
-                    'series' => [['label' => 'Paid', 'data' => array_map(function ($v) { return round($v['total'], 2); }, $top), 'tone' => 'accent']],
+                    'series' => [['label' => __('Paid'), 'data' => array_map(function ($v) { return round($v['total'], 2); }, $top), 'tone' => 'accent']],
                     'format' => 'money',
                     'legend' => false,
-                ], '', 'What was paid to each of the biggest vendors') ?>
+                ], '', __('What was paid to each of the biggest vendors')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen($only_1099 ? 'Vendors paid 600 or more' : 'Every vendor paid', reportCount(count($vendors)) . ' vendor' . (count($vendors) === 1 ? '' : 's')) ?>
+    <?= reportSectionOpen($only_1099 ? __('Vendors paid 600 or more') : __('Every vendor paid'), _n('%s vendor', '%s vendors', count($vendors), reportCount(count($vendors)))) ?>
         <?= reportTable($columns, array_values($vendors), [
-            'empty' => 'No vendor was paid in this period.',
-            'totals' => ['vendor' => 'Total', 'count' => array_sum(array_column($vendors, 'count')), 'total' => array_sum(array_column($vendors, 'total')),
+            'empty' => __('No vendor was paid in this period.'),
+            'totals' => ['vendor' => __('Total'), 'count' => array_sum(array_column($vendors, 'count')), 'total' => array_sum(array_column($vendors, 'total')),
                 'prev' => array_sum(array_column($vendors, 'prev')), 'recurring' => array_sum(array_column($vendors, 'recurring'))],
         ]) ?>
         <div class="card-footer small text-body-secondary">
-            Expenses with a vendor, by the date they were paid. "Period before" is <?= escapeHtml($period['compare']) ?>.
-            <?php if ($only_1099) { ?>A 1099 is filed per calendar year - pick This year, Last year or a year above, and check with your accountant which vendors need one.<?php } ?>
+            <?= __('Expenses with a vendor, by the date they were paid. "Period before" is %s.', escapeHtml($period['compare'])) ?>
+            <?php if ($only_1099) { ?><?= __('A 1099 is filed per calendar year - pick This year, Last year or a year above, and check with your accountant which vendors need one.') ?><?php } ?>
         </div>
     </div>
 

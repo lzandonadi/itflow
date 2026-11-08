@@ -44,12 +44,12 @@ function auditLogKinds() {
         'Document' => ['icon' => 'fa-file-alt', 'module' => 'module_support', 'table' => 'documents', 'id' => 'document_id', 'name' => 'document_name', 'client' => 'document_client_id', 'url' => '/agent/document.php?client_id={client}&document_id={id}'],
         'File' => ['icon' => 'fa-file', 'module' => 'module_client', 'table' => 'files', 'id' => 'file_id', 'name' => 'file_name', 'client' => 'file_client_id', 'url' => '/agent/files.php?client_id={client}&open={id}'],
         'Share' => ['icon' => 'fa-share-alt', 'module' => 'module_support', 'table' => 'shared_items', 'id' => 'item_id', 'name' => 'item_name', 'client' => 'item_client_id', 'url' => '/agent/shares.php?{client_q}share={id}'],
-        'Ticket' => ['icon' => 'fa-life-ring', 'module' => 'module_support', 'table' => 'tickets', 'id' => 'ticket_id', 'name' => "CONCAT(ticket_prefix, ticket_number, ' - ', ticket_subject)", 'client' => 'ticket_client_id', 'url' => '/agent/ticket.php?{client_q}ticket_id={id}'],
-        'Project' => ['icon' => 'fa-project-diagram', 'module' => 'module_support', 'table' => 'projects', 'id' => 'project_id', 'name' => "CONCAT(project_prefix, project_number, ' - ', project_name)", 'client' => 'project_client_id', 'url' => '/agent/project.php?{client_q}project_id={id}'],
-        'Quote' => ['icon' => 'fa-comment-dollar', 'module' => 'module_sales', 'table' => 'quotes', 'id' => 'quote_id', 'name' => "CONCAT(quote_prefix, quote_number)", 'client' => 'quote_client_id', 'url' => '/agent/quote.php?quote_id={id}'],
-        'Invoice' => ['icon' => 'fa-file-invoice', 'module' => 'module_sales', 'table' => 'invoices', 'id' => 'invoice_id', 'name' => "CONCAT(invoice_prefix, invoice_number)", 'client' => 'invoice_client_id', 'url' => '/agent/invoice.php?invoice_id={id}'],
+        'Ticket' => ['icon' => 'fa-life-ring', 'module' => 'module_support', 'table' => 'tickets', 'id' => 'ticket_id', 'name' => "CONCAT(ticket_prefix, ticket_number, ' - ', ticket_subject)", 'client' => 'ticket_client_id', 'url' => '/agent/ticket.php?{client_q}ticket_id={id}'], // i18n-ignore - SQL
+        'Project' => ['icon' => 'fa-project-diagram', 'module' => 'module_support', 'table' => 'projects', 'id' => 'project_id', 'name' => "CONCAT(project_prefix, project_number, ' - ', project_name)", 'client' => 'project_client_id', 'url' => '/agent/project.php?{client_q}project_id={id}'], // i18n-ignore - SQL
+        'Quote' => ['icon' => 'fa-comment-dollar', 'module' => 'module_sales', 'table' => 'quotes', 'id' => 'quote_id', 'name' => "CONCAT(quote_prefix, quote_number)", 'client' => 'quote_client_id', 'url' => '/agent/quote.php?quote_id={id}'], // i18n-ignore - SQL
+        'Invoice' => ['icon' => 'fa-file-invoice', 'module' => 'module_sales', 'table' => 'invoices', 'id' => 'invoice_id', 'name' => "CONCAT(invoice_prefix, invoice_number)", 'client' => 'invoice_client_id', 'url' => '/agent/invoice.php?invoice_id={id}'], // i18n-ignore - SQL
         'Contract' => ['icon' => 'fa-file-contract', 'module' => 'module_sales', 'table' => 'contracts', 'id' => 'contract_id', 'name' => 'contract_name', 'client' => 'contract_client_id', 'url' => '/agent/contract.php?contract_id={id}'],
-        'Recurring Invoice' => ['icon' => 'fa-redo-alt', 'module' => 'module_sales', 'table' => 'recurring_invoices', 'id' => 'recurring_invoice_id', 'name' => "CONCAT(recurring_invoice_prefix, recurring_invoice_number)", 'client' => 'recurring_invoice_client_id', 'url' => '/agent/recurring_invoice.php?recurring_invoice_id={id}'],
+        'Recurring Invoice' => ['icon' => 'fa-redo-alt', 'module' => 'module_sales', 'table' => 'recurring_invoices', 'id' => 'recurring_invoice_id', 'name' => "CONCAT(recurring_invoice_prefix, recurring_invoice_number)", 'client' => 'recurring_invoice_client_id', 'url' => '/agent/recurring_invoice.php?recurring_invoice_id={id}'], // i18n-ignore - SQL
         'Product' => ['icon' => 'fa-box-open', 'module' => 'module_sales', 'table' => 'products', 'id' => 'product_id', 'name' => 'product_name', 'url' => '/agent/product.php?product_id={id}'],
         'Expense' => ['icon' => 'fa-shopping-cart', 'module' => 'module_financial', 'table' => 'expenses', 'id' => 'expense_id', 'name' => 'expense_description', 'client' => 'expense_client_id', 'url' => '/agent/expenses.php?open={id}'],
         'Recurring Expense' => ['icon' => 'fa-redo-alt', 'module' => 'module_financial', 'table' => 'recurring_expenses', 'id' => 'recurring_expense_id', 'name' => 'recurring_expense_description', 'client' => 'recurring_expense_client_id', 'url' => '/agent/recurring_expenses.php?open={id}'],
@@ -156,11 +156,23 @@ function auditLogActionStyle($action) {
     return ['tone' => $style[0], 'icon' => $style[1]];
 }
 
+/*
+ * An action or a type as shown - the log keeps them in English, the screen
+ * shows them in the interface language where there is a translation.
+ */
+function auditLogActionLabel($action) {
+    return _x((string) $action, 'audit action'); // i18n-dynamic - log_action, entries in lang/pt_BR/dashboard.php
+}
+
+function auditLogTypeLabel($type) {
+    return _x((string) $type, 'audit type'); // i18n-dynamic - log_type, entries in lang/pt_BR/dashboard.php
+}
+
 /** An action as a soft pill, in its tone. */
 function auditLogActionPill($action) {
     $style = auditLogActionStyle($action);
     $tone = $style['tone'];
-    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal text-nowrap"><i class="fas ' . $style['icon'] . ' me-1"></i>' . escapeHtml($action) . '</span>';
+    return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal text-nowrap"><i class="fas ' . $style['icon'] . ' me-1"></i>' . escapeHtml(auditLogActionLabel($action)) . '</span>';
 }
 
 /*
@@ -176,13 +188,13 @@ function auditLogViews() {
     $signins = "log_type IN ('Login', 'Login 2FA', 'Logout', 'Client Login')";
     $data_out = "(log_action IN ('View', 'View TOTP', 'Export', 'Download', 'Share') OR log_type IN ('Share', 'Sharing'))";
     return [
-        '' => ['label' => 'All', 'icon' => 'fa-list', 'title' => 'Everything', 'where' => ''],
-        'changes' => ['label' => 'Changes', 'icon' => 'fa-pen', 'title' => 'Records made, changed, archived, restored and deleted', 'where' => "NOT $signins AND NOT $data_out"],
-        'deletions' => ['label' => 'Deletions', 'icon' => 'fa-trash-alt', 'title' => 'Records deleted for good', 'where' => "log_action IN ('Delete', 'Bulk Delete')"],
-        'signins' => ['label' => 'Sign-ins', 'icon' => 'fa-sign-in-alt', 'title' => 'Agents and portal contacts signing in and out', 'where' => $signins],
-        'security' => ['label' => 'Security', 'icon' => 'fa-shield-alt', 'title' => 'Failed and turned away sign-ins and the alerts about them, API calls turned away, access denied, the portal viewed as a contact, app logs cleared, and changes to users, roles, API keys, the master key, settings and backups',
+        '' => ['label' => __('All'), 'icon' => 'fa-list', 'title' => __('Everything'), 'where' => ''],
+        'changes' => ['label' => __('Changes'), 'icon' => 'fa-pen', 'title' => __('Records made, changed, archived, restored and deleted'), 'where' => "NOT $signins AND NOT $data_out"], // i18n-ignore - SQL
+        'deletions' => ['label' => __('Deletions'), 'icon' => 'fa-trash-alt', 'title' => __('Records deleted for good'), 'where' => "log_action IN ('Delete', 'Bulk Delete')"],
+        'signins' => ['label' => __('Sign-ins'), 'icon' => 'fa-sign-in-alt', 'title' => __('Agents and portal contacts signing in and out'), 'where' => $signins],
+        'security' => ['label' => __('Security'), 'icon' => 'fa-shield-alt', 'title' => __('Failed and turned away sign-ins and the alerts about them, API calls turned away, access denied, the portal viewed as a contact, app logs cleared, and changes to users, roles, API keys, the master key, settings and backups'),
             'where' => "(($signins AND log_action IN ('Failed', 'MFA Failed', 'Blocked', 'Alert')) OR (log_type = 'API' AND log_action = 'Failed') OR log_action IN ('Denied', 'View As') OR (log_type = 'App Log' AND log_action = 'Delete') OR log_type IN ('User', 'User Account', 'User Role', 'API Key', 'Master Key', 'Settings', 'Backup', 'Identity Provider'))"],
-        'data' => ['label' => 'Data out', 'icon' => 'fa-file-export', 'title' => 'Passwords looked at, exports, downloads and shared links', 'where' => $data_out],
+        'data' => ['label' => __('Data out'), 'icon' => 'fa-file-export', 'title' => __('Passwords looked at, exports, downloads and shared links'), 'where' => $data_out],
     ];
 }
 
@@ -207,38 +219,38 @@ function auditLogFiltersSql(array $src, &$summary = []) {
         $like = escapeSql($q);
         $sql .= " AND (log_description LIKE '%$like%' OR log_type LIKE '%$like%' OR log_action LIKE '%$like%' OR log_ip LIKE '%$like%' OR log_user_agent LIKE '%$like%'
             OR user_name LIKE '%$like%' OR client_name LIKE '%$like%')";
-        $summary['Search'] = $q;
+        $summary[__('Search')] = $q;
     }
     $client = intval($src['client'] ?? 0);
     if ($client) {
         $sql .= " AND log_client_id = $client";
-        $summary['Client'] = (string) getFieldById('clients', $client, 'client_name');
+        $summary[__('Client')] = (string) getFieldById('clients', $client, 'client_name');
     }
     $user = $src['user'] ?? '';
     if ($user === 'system') {
         $sql .= " AND log_user_id = 0";
-        $summary['Who'] = 'ITFlow itself';
+        $summary[__('Who')] = __('ITFlow itself');
     } elseif (intval($user)) {
         $sql .= " AND log_user_id = " . intval($user);
-        $summary['Who'] = (string) getFieldById('users', intval($user), 'user_name');
+        $summary[__('Who')] = (string) getFieldById('users', intval($user), 'user_name');
     }
     foreach (['type' => ['log_type', 'Type'], 'action' => ['log_action', 'Action']] as $key => [$column, $label]) {
         $value = $src[$key] ?? '';
         if ($value !== '') {
             $sql .= " AND $column = '" . escapeSql($value) . "'";
-            $summary[$label] = $value;
+            $summary[__($label)] = $key === 'type' ? auditLogTypeLabel($value) : auditLogActionLabel($value); // i18n-dynamic
         }
     }
     $entity = intval($src['entity'] ?? 0);
     if ($entity) {
         $sql .= " AND log_entity_id = $entity";
-        $summary['Record'] = "#$entity";
+        $summary[__('Record')] = "#$entity";
     }
     $views = auditLogViews();
     $view = $src['view'] ?? '';
     if (isset($views[$view]) && $views[$view]['where'] !== '') {
         $sql .= " AND {$views[$view]['where']}";
-        $summary['Showing'] = $views[$view]['label'];
+        $summary[__('Showing')] = $views[$view]['label'];
     }
     // A half-open range on the column itself, so KEY log_created_at serves it
     $dtf = $src['dtf'] ?? '';
@@ -249,7 +261,7 @@ function auditLogFiltersSql(array $src, &$summary = []) {
         $sql .= " AND log_created_at >= '$dtf 00:00:00' AND log_created_at < '$dtt' + INTERVAL 1 DAY";
         $range = formatExportDateRange($dtf, $dtt);
         if ($range) {
-            $summary['Dated'] = $range;
+            $summary[__('Dated')] = $range;
         }
     }
     return $sql;
@@ -326,7 +338,7 @@ function auditLogDescription(array $row) {
 function auditLogWho(array $row) {
     $user_id = intval($row['log_user_id']);
     if (!$user_id || $row['user_name'] === null) {
-        $name = $user_id ? 'A user no longer here' : 'ITFlow';
+        $name = $user_id ? __('A user no longer here') : 'ITFlow';
         return ['name' => $name, 'kind' => 'system', 'html' => '<span class="d-inline-flex align-items-center gap-2 text-body-secondary"><span class="itflow-asset-icon itflow-asset-icon-xs itflow-asset-tone-other" aria-hidden="true"><i class="fas fa-fw ' . ($user_id ? 'fa-user-slash' : 'fa-cog') . '"></i></span>' . escapeHtml($name) . '</span>'];
     }
     $portal = intval($row['user_type'] ?? 1) === 2;
@@ -334,8 +346,8 @@ function auditLogWho(array $row) {
     $against = in_array($row['log_type'] ?? '', SIGN_IN_TYPES, true) && in_array($row['log_action'] ?? '', SIGN_IN_FAILED, true);
     $html = '<span class="d-inline-flex align-items-center gap-2 text-nowrap">' . userAvatar($user_id, $row['user_name'], (string) ($row['user_avatar'] ?? ''), 'xs')
         . '<span class="text-truncate">' . escapeHtml($row['user_name']) . '</span>'
-        . ($portal ? '<span class="badge rounded-pill text-bg-light border fw-normal" title="A client contact, in the client portal">Portal</span>' : '')
-        . ($against ? '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="A failed sign in to their account - not necessarily by them" data-their-account>Their account</span>' : '') . '</span>';
+        . ($portal ? '<span class="badge rounded-pill text-bg-light border fw-normal" title="' . escapeHtml(__('A client contact, in the client portal')) . '">' . __('Portal') . '</span>' : '')
+        . ($against ? '<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-normal" title="' . escapeHtml(__('A failed sign in to their account - not necessarily by them')) . '" data-their-account>' . __('Their account') . '</span>' : '') . '</span>';
     return ['name' => (string) $row['user_name'], 'kind' => $portal ? 'portal' : 'agent', 'html' => $html];
 }
 
@@ -429,7 +441,7 @@ function auditLogHistoryUrl(array $history, $client_id = 0) {
 function auditLogHistoryHtml(array $history, array $opts = []) {
     global $session_is_admin;
     if (!$history['rows']) {
-        return '<div class="itflow-asset-empty" data-audit-history-empty>' . escapeHtml($opts['empty'] ?? 'Nothing logged yet.') . '</div>';
+        return '<div class="itflow-asset-empty" data-audit-history-empty>' . escapeHtml($opts['empty'] ?? __('Nothing logged yet.')) . '</div>';
     }
     $flush = $opts['flush'] ?? true;
     $html = '<ul class="list-group ' . ($flush ? 'list-group-flush' : '') . ' itflow-audit-history" data-audit-history="' . escapeHtml($history['type']) . '">';
@@ -438,7 +450,7 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
         $who = auditLogWho($row);
         $ip = trim((string) $row['log_ip']);
         $html .= '<li class="list-group-item d-flex gap-3 py-2" data-log-id="' . intval($row['log_id']) . '">'
-            . '<span class="itflow-asset-icon itflow-asset-icon-sm bg-' . $style['tone'] . '-subtle text-' . $style['tone'] . '-emphasis" title="' . escapeHtml($row['log_action']) . '"><i class="fas fa-fw ' . $style['icon'] . '"></i></span>'
+            . '<span class="itflow-asset-icon itflow-asset-icon-sm bg-' . $style['tone'] . '-subtle text-' . $style['tone'] . '-emphasis" title="' . escapeHtml(auditLogActionLabel($row['log_action'])) . '"><i class="fas fa-fw ' . $style['icon'] . '"></i></span>'
             . '<div class="flex-grow-1 min-w-0">'
             . '<div class="text-break">' . escapeHtml(auditLogDescription($row)) . '</div>'
             . '<div class="small text-body-secondary d-flex flex-wrap align-items-center column-gap-2 row-gap-1 mt-1">' . $who['html']
@@ -452,8 +464,8 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
     $url = auditLogHistoryUrl($history, $opts['client_id'] ?? 0);
     if ($more > 0 || $url !== '') {
         $html .= '<div class="d-flex flex-wrap align-items-center gap-2 small px-3 py-2 ' . ($flush ? 'border-top' : '') . '" data-audit-history-more>'
-            . ($more > 0 ? '<span class="text-body-secondary">and ' . number_format($more) . ' more</span>' : '')
-            . ($url !== '' ? '<a class="ms-auto" href="' . escapeHtml($url) . '"><i class="fas fa-fw fa-history me-1"></i>' . ($history['count'] > 1 ? 'All ' . number_format($history['count']) . ' in the audit log' : 'In the audit log') . '</a>' : '')
+            . ($more > 0 ? '<span class="text-body-secondary">' . __('and %s more', number_format($more)) . '</span>' : '')
+            . ($url !== '' ? '<a class="ms-auto" href="' . escapeHtml($url) . '"><i class="fas fa-fw fa-history me-1"></i>' . ($history['count'] > 1 ? __('All %s in the audit log', number_format($history['count'])) : __('In the audit log')) . '</a>' : '')
             . '</div>';
     }
     return $html;
@@ -463,7 +475,7 @@ function auditLogHistoryHtml(array $history, array $opts = []) {
 function auditLogHistoryCard(array $history, array $opts = []) {
     $opts += ['compact' => true];
     return '<div class="card mb-3" data-audit-history-card>'
-        . '<div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-history me-2 text-secondary"></i>' . escapeHtml($opts['title'] ?? 'History')
+        . '<div class="card-header"><h3 class="card-title mb-0"><i class="fas fa-fw fa-history me-2 text-secondary"></i>' . escapeHtml($opts['title'] ?? __('History'))
         . ($history['count'] ? ' <span class="text-body-secondary fw-normal">(' . number_format($history['count']) . ')</span>' : '') . '</h3></div>'
         . auditLogHistoryHtml($history, $opts)
         . '</div>';
@@ -480,7 +492,7 @@ function auditLogHistorySection(array $history, array $opts = []) {
     $id = 'auditHistory' . bin2hex(random_bytes(4));
     return '<div class="mt-3" data-audit-history-section>'
         . '<button class="btn btn-link btn-sm p-0 text-decoration-none small fw-semibold text-uppercase text-body-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#' . $id . '" aria-expanded="false" aria-controls="' . $id . '">'
-        . '<i class="fas fa-fw fa-history me-1"></i>History <span class="badge rounded-pill text-bg-light border fw-normal ms-1">' . number_format($history['count']) . '</span><i class="fas fa-chevron-down ms-2 small"></i></button>'
+        . '<i class="fas fa-fw fa-history me-1"></i>' . __('History') . ' <span class="badge rounded-pill text-bg-light border fw-normal ms-1">' . number_format($history['count']) . '</span><i class="fas fa-chevron-down ms-2 small"></i></button>'
         . '<div class="collapse mt-2" id="' . $id . '">' . auditLogHistoryHtml($history, ['flush' => false] + $opts) . '</div>'
         . '</div>';
 }

@@ -35,7 +35,7 @@ if (isset($_POST['edit_your_user_details'])) {
 
     $email_changed = strcasecmp($email, $me['user_email']) !== 0;
     if ($email_changed && !userCurrentPasswordOk($_POST['current_password'] ?? '')) {
-        flashAlert('Your email signs you in - enter your current password to change it.', 'error');
+        flashAlert(__('Your email signs you in - enter your current password to change it.'), 'error');
         redirect();
     }
 
@@ -47,7 +47,7 @@ if (isset($_POST['edit_your_user_details'])) {
 
     $changes = [];
     if ($email_changed) {
-        userNotifyChange($name, $me['user_email'], 'its email address is now ' . $email);
+        userNotifyChange($name, $me['user_email'], __('its email address is now %s', $email));
         $changes[] = 'email changed';
     }
     $avatar_error = '';
@@ -60,7 +60,7 @@ if (isset($_POST['edit_your_user_details'])) {
 
     logAudit("User Account", "Edit", "$session_name edited their account" . ($changes ? ' - ' . escapeSql(implode(', ', $changes)) : ''));
 
-    flashAlert("Your details are saved" . ($avatar_error ? " - $avatar_error" : ''), $avatar_error ? 'warning' : 'success');
+    flashAlert(__('Your details are saved') . ($avatar_error ? " - $avatar_error" : ''), $avatar_error ? 'warning' : 'success');
 
     redirect();
 
@@ -74,7 +74,7 @@ if (isset($_GET['clear_your_user_avatar'])) {
 
     logAudit("User Account", "Edit", "$session_name cleared their avatar");
 
-    flashAlert("Picture removed");
+    flashAlert(__('Picture removed'));
 
     redirect();
 
@@ -87,7 +87,7 @@ if (isset($_POST['edit_your_user_password'])) {
     $new_password = (string) ($_POST['new_password'] ?? '');
 
     if (!userCurrentPasswordOk($_POST['current_password'] ?? '')) {
-        flashAlert('That is not your current password - nothing was changed.', 'error');
+        flashAlert(__('That is not your current password - nothing was changed.'), 'error');
         redirect('user_security.php');
     }
     if ($problem = userPasswordProblem($new_password)) {
@@ -95,17 +95,17 @@ if (isset($_POST['edit_your_user_password'])) {
         redirect('user_security.php');
     }
     if ($new_password !== (string) ($_POST['confirm_password'] ?? '')) {
-        flashAlert('The new password and its confirmation are not the same.', 'error');
+        flashAlert(__('The new password and its confirmation are not the same.'), 'error');
         redirect('user_security.php');
     }
 
     $me = userRow($session_user_id);
     userSetPassword($session_user_id, $new_password);
-    userNotifyChange($me['user_name'], $me['user_email'], 'its password was changed');
+    userNotifyChange($me['user_name'], $me['user_email'], __('its password was changed'));
 
     logAudit("User Account", "Edit", "$session_name changed their password");
 
-    flashAlert("Your password was changed - sign in with the new one");
+    flashAlert(__('Your password was changed - sign in with the new one'));
 
     redirect('post.php?logout');
 }
@@ -126,7 +126,7 @@ if (isset($_POST['edit_your_user_preferences'])) {
 
     logAudit("User Account", "Edit", "$session_name updated their preferences");
 
-    flashAlert("Your preferences are saved");
+    flashAlert(__('Your preferences are saved'));
 
     redirect();
 
@@ -160,9 +160,9 @@ if (isset($_POST['enable_mfa'])) {
         // Setting MFA up needs only the password, so whoever holds it can do it - the email
         // is how the real owner finds out an authenticator was added (the portal sends one too)
         $me = userRow($session_user_id);
-        userNotifyChange($me['user_name'], $me['user_email'], 'multi-factor authentication was turned on');
+        userNotifyChange($me['user_name'], $me['user_email'], __('multi-factor authentication was turned on'));
 
-        flashAlert("Multi-factor authentication is on - you will be asked for a code when you sign in");
+        flashAlert(__('Multi-factor authentication is on - you will be asked for a code when you sign in'));
 
         // Clear the mfa_token from the session to avoid re-use.
         unset($_SESSION['mfa_token']);
@@ -173,7 +173,7 @@ if (isset($_POST['enable_mfa'])) {
 
     } else {
 
-        flashAlert("That code did not match - check the time on your phone, and try the newest code.", 'error');
+        flashAlert(__('That code did not match - check the time on your phone, and try the newest code.'), 'error');
 
         // Open the set up again, with the same secret
         $_SESSION['show_mfa_modal'] = true;
@@ -192,21 +192,21 @@ if (isset($_POST['disable_your_mfa'])) {
     validateCSRFToken();
 
     if ($session_user_config_force_mfa) {
-        flashAlert("Your administrator requires multi-factor authentication on your account - it cannot be turned off.", 'error');
+        flashAlert(__('Your administrator requires multi-factor authentication on your account - it cannot be turned off.'), 'error');
         redirect("user_security.php");
     }
     if (!userCurrentPasswordOk($_POST['current_password'] ?? '')) {
-        flashAlert('That is not your current password - MFA is still on.', 'error');
+        flashAlert(__('That is not your current password - MFA is still on.'), 'error');
         redirect("user_security.php");
     }
 
     $me = userRow($session_user_id);
     userResetMfa($session_user_id);
-    userNotifyChange($me['user_name'], $me['user_email'], 'multi-factor authentication was turned off');
+    userNotifyChange($me['user_name'], $me['user_email'], __('multi-factor authentication was turned off'));
 
     logAudit("User Account", "Edit", "$session_name disabled MFA on their account");
 
-    flashAlert("Multi-factor authentication is off", 'error');
+    flashAlert(__('Multi-factor authentication is off'), 'error');
 
     redirect("user_security.php");
 
@@ -220,7 +220,7 @@ if (isset($_POST['revoke_your_2fa_remember_tokens'])) {
 
     logAudit("User Account", "Edit", "$session_name revoked all their remember-me tokens");
 
-    flashAlert("Every remembered browser is forgotten - each asks for your code at the next sign in");
+    flashAlert(__('Every remembered browser is forgotten - each asks for your code at the next sign in'));
 
     redirect("user_security.php");
 
@@ -235,7 +235,7 @@ if (isset($_POST['revoke_your_remember_token'])) {
 
     if (mysqli_affected_rows($mysqli)) {
         logAudit("User Account", "Edit", "$session_name revoked a remember-me token");
-        flashAlert("That browser is forgotten - it asks for your code at the next sign in");
+        flashAlert(__('That browser is forgotten - it asks for your code at the next sign in'));
     }
 
     redirect("user_security.php");

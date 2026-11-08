@@ -51,14 +51,18 @@
         function drawNotice() {
             const days = Number(field('notice_days').value || 0);
             if (!end.value) {
-                noticeNote.textContent = 'No end date - it runs until it is cancelled.';
+                noticeNote.textContent = __('No end date - it runs until it is cancelled.');
                 return;
             }
             const notice = new Date(end.value + 'T00:00:00Z');
             notice.setUTCDate(notice.getUTCDate() - days);
             const renews = field('auto_renew').checked;
-            noticeNote.textContent = (renews ? 'Renews itself after ' : 'Ends on ') + niceDate(end.value)
-                + (days ? ' - notice ' + (renews ? 'to stop it ' : '') + 'by ' + niceDate(notice.toISOString().slice(0, 10)) + '.' : '.');
+            const by = niceDate(notice.toISOString().slice(0, 10));
+            if (renews) {
+                noticeNote.textContent = days ? __('Renews itself after %1$s - notice to stop it by %2$s.', niceDate(end.value), by) : __('Renews itself after %s.', niceDate(end.value));
+            } else {
+                noticeNote.textContent = days ? __('Ends on %1$s - notice by %2$s.', niceDate(end.value), by) : __('Ends on %s.', niceDate(end.value));
+            }
         }
 
         function followTerm() {

@@ -20,14 +20,14 @@ function initPortalDataTables() {
             return;
         }
 
-        new DataTable(el, {
+        new DataTable(el, Object.assign({
             // The server already ordered these rows - newest first for an
             // activity log. DataTables' default is to re-sort on column 0
             // ascending, which would silently reverse that.
             order: [],
             pageLength: 25,
             lengthMenu: [10, 25, 50, 100]
-        });
+        }, window.itflowI18n ? itflowI18n.dataTables() : {}));
     });
 }
 

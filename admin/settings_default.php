@@ -20,7 +20,7 @@ if ($kept_start_page !== '' && !isset($start_pages[$kept_start_page])) {
     $start_pages[$kept_start_page] = $kept_start_page;
 }
 
-$calendars = [0 => '- None -'];
+$calendars = [0 => __('- None -')];
 $sql = mysqli_query($mysqli, "SELECT calendar_id, calendar_name FROM calendars ORDER BY calendar_name ASC");
 while ($row = mysqli_fetch_assoc($sql)) {
     $calendars[intval($row['calendar_id'])] = $row['calendar_name'];
@@ -28,7 +28,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
 
 // Accounts in use, and any saved one since archived - so saving doesn't lose it
 $saved_accounts = array_map('intval', [$config_default_payment_account, $config_default_expense_account, $config_default_transfer_from_account, $config_default_transfer_to_account]);
-$accounts = [0 => '- None -'];
+$accounts = [0 => __('- None -')];
 $sql = mysqli_query($mysqli, "SELECT account_id, account_name, account_archived_at FROM accounts
     WHERE account_archived_at IS NULL OR account_id IN (" . implode(',', $saved_accounts) . ") ORDER BY account_name ASC");
 while ($row = mysqli_fetch_assoc($sql)) {
@@ -37,7 +37,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
 
 // Admin > Payment Methods - the ones for money in, or out - and a saved one, should it no longer be among them
 $methods = function ($saved, $way) {
-    $choices = ['' => '- None -'];
+    $choices = ['' => __('- None -')];
     foreach (paymentMethods($way) as $method) {
         $choices[$method] = $method;
     }
@@ -57,29 +57,29 @@ echo settingsPageStart('default');
     <div class="card itflow-settings-card">
         <div class="card-body">
 
-            <?= settingsSectionStart('opening', 'Opening ITFlow', 'Where everyone lands on signing in or clicking the logo, and the calendar a new event goes on.') ?>
+            <?= settingsSectionStart('opening', __('Opening ITFlow'), __('Where everyone lands on signing in or clicking the logo, and the calendar a new event goes on.')) ?>
                 <?= settingsSelect('config_start_page', $config_start_page, $start_pages, ['icon' => 'fa-home', 'search' => true, 'required' => true, 'data' => ['tags' => 'true'],
-                    'help' => 'Or type another page, as it is after /agent/ in its address - tickets.php?status=Open.']) ?>
+                    'help' => __('Or type another page, as it is after /agent/ in its address - tickets.php?status=Open.')]) ?>
                 <?= settingsSelect('config_default_calendar', intval($config_default_calendar), $calendars, ['icon' => 'fa-calendar']) ?>
             <?= settingsSectionEnd() ?>
 
-            <?= settingsSectionStart('clients', 'Rates and terms', 'What a client is billed on when no contract in force sets it - a client has no rates or terms of its own; its contract\'s apply. The SLAs are in Admin > SLAs.') ?>
+            <?= settingsSectionStart('clients', __('Rates and terms'), __('What a client is billed on when no contract in force sets it - a client has no rates or terms of its own; its contract\'s apply. The SLAs are in Admin > SLAs.')) ?>
                 <div class="row g-3">
                     <div class="col-md-6"><?= settingsSelect('config_default_net_terms', intval($config_default_net_terms), settingsNetTerms(), ['icon' => 'fa-calendar-check',
-                        'help' => 'When an invoice is due.']) ?></div>
+                        'help' => __('When an invoice is due.')]) ?></div>
                     <div class="col-md-6"><?= settingsInput('config_default_hourly_rate', number_format(floatval($config_default_hourly_rate), 2, '.', ''), ['icon' => 'fa-clock', 'inputmode' => 'decimal',
-                        'placeholder' => '0.00', 'suffix' => escapeHtml($session_company_currency) . ' an hour', 'help' => 'What time bills at.']) ?></div>
+                        'placeholder' => '0.00', 'suffix' => escapeHtml($session_company_currency) . ' an hour', 'help' => __('What time bills at.')]) ?></div>
                     <?php if (billingAfterHoursReady()) {
                         $after_hours_saved = billingDefaults()['after_hours']; ?>
                         <div class="col-md-6"><?= settingsInput('config_default_after_hours_rate', $after_hours_saved > 0 ? number_format($after_hours_saved, 2, '.', '') : '', ['icon' => 'fa-moon', 'inputmode' => 'decimal',
-                            'placeholder' => 'The hourly rate', 'suffix' => escapeHtml($session_company_currency) . ' an hour',
-                            'help' => 'What time bills at on a ticket opened outside the business days and hours in Admin > SLAs. Empty, the hourly rate.']) ?></div>
+                            'placeholder' => __('The hourly rate'), 'suffix' => escapeHtml($session_company_currency) . ' an hour',
+                            'help' => __('What time bills at on a ticket opened outside the business days and hours in Admin > SLAs. Empty, the hourly rate.')]) ?></div>
                     <?php } ?>
                 </div>
             <?= settingsSectionEnd() ?>
 
             <?php if ($config_module_enable_accounting) { ?>
-                <?= settingsSectionStart('accounts', 'Accounts', 'The account and payment method a payment, an expense or a transfer starts with.') ?>
+                <?= settingsSectionStart('accounts', 'Accounts', __('The account and payment method a payment, an expense or a transfer starts with.')) ?>
                     <div class="row g-3">
                         <div class="col-md-6"><?= settingsSelect('config_default_payment_account', intval($config_default_payment_account), $accounts, ['icon' => 'fa-piggy-bank', 'search' => true]) ?></div>
                         <div class="col-md-6"><?= settingsSelect('config_default_payment_method', (string) $config_default_payment_method, $methods($config_default_payment_method, 'in'), ['icon' => 'fa-credit-card', 'search' => true]) ?></div>
@@ -88,7 +88,7 @@ echo settingsPageStart('default');
                         <div class="col-md-6"><?= settingsSelect('config_default_transfer_from_account', intval($config_default_transfer_from_account), $accounts, ['icon' => 'fa-sign-out-alt', 'search' => true]) ?></div>
                         <div class="col-md-6"><?= settingsSelect('config_default_transfer_to_account', intval($config_default_transfer_to_account), $accounts, ['icon' => 'fa-sign-in-alt', 'search' => true]) ?></div>
                     </div>
-                    <div class="form-text mt-2">Accounts are in <a href="/agent/accounts.php">Accounts</a>, payment methods in <a href="payment_methods.php">Payment methods</a>.</div>
+                    <div class="form-text mt-2"><?= __('Accounts are in') ?> <a href="/agent/accounts.php"><?= __('Accounts') ?></a><?= __(', payment methods in') ?> <a href="payment_methods.php"><?= __('Payment methods') ?></a>.</div>
                 <?= settingsSectionEnd() ?>
             <?php } ?>
 

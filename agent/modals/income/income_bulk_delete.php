@@ -14,7 +14,7 @@ $ids = incomeBulkIds($_GET['income_ids'] ?? []);
 $count = count($ids['revenue']);
 $payments = count($ids['payment']);
 if (!$count) {
-    echo json_encode(['error' => $payments ? "A payment is deleted from its invoice - tick other income to delete it here." : 'Tick the income to delete first.']);
+    echo json_encode(['error' => $payments ? __('A payment is deleted from its invoice - tick other income to delete it here.') : __('Tick the income to delete first.')]);
     exit;
 }
 $total = [];
@@ -28,7 +28,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-trash me-2"></i>Delete <?= $count ?> Other Income</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-trash me-2"></i><?= escapeHtml(__('Delete %d Other Income', $count)) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -41,17 +41,17 @@ ob_start();
         <div class="d-flex gap-3 align-items-start">
             <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
             <div>
-                <div class="fw-semibold"><?= $count === 1 ? 'This income goes' : "These $count go" ?> for good<?= $total ? ' - ' . escapeHtml(implode(' and ', $total)) : '' ?>.</div>
-                <div class="text-body-secondary small mt-1">It comes out of the account balances and the reports. This can't be undone.</div>
+                <div class="fw-semibold"><?= escapeHtml($total ? _n('This income goes for good - %2$s.', 'These %1$d go for good - %2$s.', $count, $count, implode(__(' and '), $total)) : _n('This income goes for good.', 'These %d go for good.', $count)) ?></div>
+                <div class="text-body-secondary small mt-1"><?= __('It comes out of the account balances and the reports. This can\'t be undone.') ?></div>
                 <?php if ($payments) { ?>
-                    <div class="text-body-secondary small mt-1">The <?= $payments === 1 ? 'payment' : "$payments payments" ?> ticked with <?= $count === 1 ? 'it' : 'them' ?> <?= $payments === 1 ? 'stays' : 'stay' ?> - a payment is deleted from its invoice.</div>
+                    <div class="text-body-secondary small mt-1"><?= escapeHtml(_n('The payment ticked with it stays - a payment is deleted from its invoice.', 'The %d payments ticked with it stay - a payment is deleted from its invoice.', $payments)) ?></div>
                 <?php } ?>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="bulk_delete_income" class="btn btn-danger text-bold"><i class="fas fa-trash me-2"></i>Delete <?= $count ?></button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_delete_income" class="btn btn-danger text-bold"><i class="fas fa-trash me-2"></i><?= escapeHtml(__('Delete %d', $count)) ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -32,28 +32,53 @@
 
 /** The placeholders filled in from the ticket as a response goes in - what each becomes. */
 const CANNED_RESPONSE_PLACEHOLDERS = [
-    'Contact' => "the contact's name",
-    'First Name' => "the contact's first name",
-    'Client' => "the client's name",
-    'Ticket' => 'its number - TCK-123',
-    'Subject' => "the ticket's subject",
-    'Ticket Link' => 'a link to the ticket, as its emails have',
-    'Asset' => "the asset's name",
-    'Site' => "the site's name",
-    'Project' => "the project's name",
-    'Agent' => 'you - the agent replying',
-    'Date' => "today's date",
-    'Month' => 'the month - October 2026',
-    'Quarter' => 'the quarter - Q4 2026',
-    'Year' => 'the year',
+    'Contact' => "the contact's name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'First Name' => "the contact's first name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Client' => "the client's name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Ticket' => 'its number - TCK-123', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Subject' => "the ticket's subject", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Ticket Link' => 'a link to the ticket, as its emails have', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Asset' => "the asset's name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Site' => "the site's name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Project' => "the project's name", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Agent' => 'you - the agent replying', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Date' => "today's date", // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Month' => 'the month - October 2026', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Quarter' => 'the quarter - Q4 2026', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
+    'Year' => 'the year', // i18n-ignore - shown through cannedResponsePlaceholderMeaning()
 ];
 
 /** Who a reply is for, as a response can set it - the ticket page's reply types: [label, icon]. */
 const CANNED_RESPONSE_REPLY_TYPES = [
-    0 => ['Internal note', 'fa-lock'],
-    1 => ['Public note', 'fa-eye'],
-    2 => ['Email reply', 'fa-paper-plane'],
+    0 => ['Internal note', 'fa-lock'], // i18n-ignore - shown through cannedResponseReplyTypeLabel()
+    1 => ['Public note', 'fa-eye'], // i18n-ignore - shown through cannedResponseReplyTypeLabel()
+    2 => ['Email reply', 'fa-paper-plane'], // i18n-ignore - shown through cannedResponseReplyTypeLabel()
 ];
+
+/** What a placeholder becomes (CANNED_RESPONSE_PLACEHOLDERS), in the interface language - raw. The placeholder itself stays English: it is what is typed. */
+function cannedResponsePlaceholderMeaning($placeholder) {
+    return [
+        'Contact' => __("the contact's name"),
+        'First Name' => __("the contact's first name"),
+        'Client' => __("the client's name"),
+        'Ticket' => __('its number - TCK-123'),
+        'Subject' => __("the ticket's subject"),
+        'Ticket Link' => __('a link to the ticket, as its emails have'),
+        'Asset' => __("the asset's name"),
+        'Site' => __("the site's name"),
+        'Project' => __("the project's name"),
+        'Agent' => __('you - the agent replying'),
+        'Date' => __("today's date"),
+        'Month' => __('the month - October 2026'),
+        'Quarter' => __('the quarter - Q4 2026'),
+        'Year' => __('the year'),
+    ][$placeholder] ?? (CANNED_RESPONSE_PLACEHOLDERS[$placeholder] ?? '');
+}
+
+/** A reply type (CANNED_RESPONSE_REPLY_TYPES) as shown, in the interface language - raw. */
+function cannedResponseReplyTypeLabel($reply_type) {
+    return [0 => __('Internal note'), 1 => __('Public note'), 2 => __('Email reply')][intval($reply_type)] ?? '';
+}
 
 /** The longest time worked a response can add, in minutes - a day. */
 const CANNED_RESPONSE_MAX_MINUTES = 1440;
@@ -138,11 +163,11 @@ function cannedResponseFields(array $post, &$error = '') {
     $error = '';
     $name = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($post['name'] ?? ''))));
     if ($name === '') {
-        $error = 'A canned response needs a name';
+        $error = __('A canned response needs a name');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'Keep the name to 200 characters';
+        $error = __('Keep the name to %d characters', 200);
         return null;
     }
     // Ticket categories that are there
@@ -161,7 +186,7 @@ function cannedResponseFields(array $post, &$error = '') {
     $ticket_status = isset(cannedResponseStatuses()[$ticket_status]) ? $ticket_status : null;
     $minutes = intval($post['minutes'] ?? 0);
     if ($minutes < 0 || $minutes > CANNED_RESPONSE_MAX_MINUTES) {
-        $error = 'The time worked it adds is up to ' . CANNED_RESPONSE_MAX_MINUTES . ' minutes - a day';
+        $error = __('The time worked it adds is up to %d minutes - a day', CANNED_RESPONSE_MAX_MINUTES);
         return null;
     }
     return ['name' => $name, 'body' => (string) ($post['body'] ?? ''), 'category_ids' => $category_ids,
@@ -210,7 +235,7 @@ function cannedResponseCopy($canned_response_id, $owner_id = null) {
         return 0;
     }
     $new_id = cannedResponseSave(0, [
-        'name' => mb_substr('Copy of ' . $row['canned_response_name'], 0, 200),
+        'name' => mb_substr(__('Copy of %s', $row['canned_response_name']), 0, 200),
         'body' => (string) $row['canned_response_body'],
         'category_ids' => cannedResponseCategoryIds($row['canned_response_id']),
         'reply_type' => $row['canned_response_reply_type'] === null ? null : intval($row['canned_response_reply_type']),
@@ -243,8 +268,8 @@ function cannedResponseSetsUpHtml(array $row) {
     $chips = [];
     $reply_type = $row['canned_response_reply_type'];
     if ($reply_type !== null && isset(CANNED_RESPONSE_REPLY_TYPES[intval($reply_type)])) {
-        [$label, $icon] = CANNED_RESPONSE_REPLY_TYPES[intval($reply_type)];
-        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw ' . $icon . ' text-secondary me-1"></i>' . $label . '</span>';
+        $icon = CANNED_RESPONSE_REPLY_TYPES[intval($reply_type)][1];
+        $chips[] = '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw ' . $icon . ' text-secondary me-1"></i>' . escapeHtml(cannedResponseReplyTypeLabel($reply_type)) . '</span>';
     }
     $status = cannedResponseStatuses()[intval($row['canned_response_ticket_status'])] ?? null;
     if ($row['canned_response_ticket_status'] !== null && $status) {
@@ -258,7 +283,8 @@ function cannedResponseSetsUpHtml(array $row) {
 
 /*
  * The responses offered to agent $user_id on tickets in these ticket
- * categories, for the picker - [label => rows]: Yours first (their own for
+ * categories, for the picker - [label => rows], the labels in the interface
+ * language (agent/js/canned_response_save.js knows them by it): Yours first (their own for
  * these categories or every ticket), then a group for each of the
  * categories with any shared ones (by name), then Every ticket. Current
  * ones only, each by name, with what it sets up and how many files go with
@@ -296,7 +322,7 @@ function cannedResponsePickerGroups(array $category_ids, $user_id) {
         }
     }
     if ($yours) {
-        $groups['Yours'] = $yours;
+        $groups[__('Yours')] = $yours;
     }
     if ($category_ids && $rows) {
         $sql = mysqli_query($mysqli, "SELECT canned_response_id, categories.category_id, category_name FROM canned_response_categories
@@ -319,7 +345,7 @@ function cannedResponsePickerGroups(array $category_ids, $user_id) {
         }
     }
     if ($general) {
-        $groups['Every ticket'] = $general;
+        $groups[__('Every ticket')] = $general;
     }
     return $groups;
 }
@@ -574,7 +600,7 @@ function cannedResponseUnfill($html, $ticket_id, $agent_name) {
         $html = preg_replace('#<a\b[^>]*href="' . preg_quote($form, '#') . '"[^>]*>.*?</a>#is', '[Ticket Link]', $html, -1, $count);
         $html = str_replace($form, '[Ticket Link]', $html, $more);
         if ($count + $more) {
-            $made['Ticket Link'] = true;
+            $made[__('Ticket Link')] = true;
         }
     }
     // The subject first, as it can have the client's or contact's name in it

@@ -27,7 +27,7 @@ if (isExportRequest('export_audit_logs')) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('audit_logs', $format, "$session_company_name-Audit-Logs", 'Audit Logs', summarizeExportFilters($filter_summary));
+        $export = beginExport('audit_logs', $format, "$session_company_name-Audit-Logs", __('Audit Logs'), summarizeExportFilters($filter_summary));
 
         // Written 500 at a time - each lot's records looked up together, one query per kind
         $sql = mysqli_query($mysqli, "SELECT log_id, log_type, log_action, log_description, log_ip, log_user_agent, log_created_at, log_client_id, log_user_id, log_entity_id,
@@ -64,7 +64,7 @@ if (isExportRequest('export_audit_logs')) {
         exit;
     }
 
-    flashAlert('No audit log entries match - nothing to export.', 'error');
+    flashAlert(__('No audit log entries match - nothing to export.'), 'error');
 
     redirect();
 

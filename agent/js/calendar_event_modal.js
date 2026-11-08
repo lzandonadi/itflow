@@ -93,7 +93,7 @@
             }
             contacts.forEach(function (contact) {
                 const option = new Option(contact.contact_name, contact.contact_id);
-                option.dataset.description = contact.contact_email || 'No email';
+                option.dataset.description = contact.contact_email || __('No email');
                 if (contact.contact_photo_url) {
                     option.dataset.image = contact.contact_photo_url;
                 } else {

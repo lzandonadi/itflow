@@ -33,7 +33,7 @@ if (isset($_GET['client_id'])) {
     if (mysqli_num_rows($sql) == 0) {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/header.php';
 
-        echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+        echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
         exit;
     } else {
 
@@ -171,12 +171,6 @@ if (isset($_GET['client_id'])) {
         // ...and their expenses to bill on, for those who can see expenses
         $num_unbilled_expenses = lookupUserPermission('module_financial') >= 1 ? expenseUnbilledCount($client_id)['count'] : 0;
         $num_unbilled_trips = lookupUserPermission('module_financial') >= 1 ? tripUnbilledCount($client_id)['count'] : 0;
-
-        // Get Credit Balance
-        $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT COALESCE(SUM(credit_amount), 0) AS credit_balance
-            FROM credits WHERE credit_client_id = $client_id"));
-
-        $credit_balance = floatval($row['credit_balance']);
 
         // Tickets - active and closed in one pass.
         $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT

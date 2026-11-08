@@ -48,15 +48,15 @@ $issuer_query = $issuer_filter !== '' ? "AND certificates.certificate_issued_by 
 // Which ones - the pills along the top. The old "Expiring in" filter
 // (?expire_days=30 from links and bookmarks) still works.
 $shows = [
-    '' => ['label' => 'All', 'where' => ''],
-    'starred' => ['label' => 'Starred', 'icon' => 'fa-star', 'where' => 'certificates.certificate_favorite = 1'],
-    'soon' => ['label' => 'Expiring soon', 'icon' => 'fa-hourglass-half', 'where' => certificateSoonSql(),
-        'title' => 'In the next ' . CERTIFICATE_SOON_DAYS . " days - or 20 for a short-lived one, which should have renewed itself by then"],
-    'expired' => ['label' => 'Expired', 'icon' => 'fa-calendar-times', 'where' => 'certificates.certificate_expire < CURDATE()'],
-    'problems' => ['label' => 'Problems', 'icon' => 'fa-exclamation-triangle', 'where' => certificateProblemSql(),
-        'title' => "The last check found it serving one for another name, an untrusted or expired one - or nothing answered"],
-    'unchecked' => ['label' => 'Not checked', 'icon' => 'fa-eye-slash', 'where' => 'certificates.certificate_check_status IS NULL',
-        'title' => 'No host to check, or not checked yet'],
+    '' => ['label' => __('All'), 'where' => ''],
+    'starred' => ['label' => __('Starred'), 'icon' => 'fa-star', 'where' => 'certificates.certificate_favorite = 1'],
+    'soon' => ['label' => __('Expiring soon'), 'icon' => 'fa-hourglass-half', 'where' => certificateSoonSql(),
+        'title' => __('In the next %d days - or 20 for a short-lived one, which should have renewed itself by then', CERTIFICATE_SOON_DAYS)],
+    'expired' => ['label' => __('Expired'), 'icon' => 'fa-calendar-times', 'where' => 'certificates.certificate_expire < CURDATE()'],
+    'problems' => ['label' => __('Problems'), 'icon' => 'fa-exclamation-triangle', 'where' => certificateProblemSql(),
+        'title' => __('The last check found it serving one for another name, an untrusted or expired one - or nothing answered')],
+    'unchecked' => ['label' => __('Not checked'), 'icon' => 'fa-eye-slash', 'where' => 'certificates.certificate_check_status IS NULL',
+        'title' => __('No host to check, or not checked yet')],
 ];
 $show = isset($shows[$_GET['show'] ?? '']) ? ($_GET['show'] ?? '') : '';
 $show_query = $shows[$show]['where'] ? 'AND ' . $shows[$show]['where'] : '';
@@ -131,13 +131,13 @@ $export_extra = [
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fa fa-fw fa-lock me-2"></i>Certificates</h3>
+        <h3 class="card-title mt-2"><i class="fa fa-fw fa-lock me-2"></i><?= __('Certificates') ?></h3>
         <div class="card-tools">
             <?php if ($can_edit || $num_rows[0]) { ?>
             <div class="btn-group">
                 <?php if ($can_edit) { ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="modals/certificate/certificate_add.php?<?= $client_url ?>">
-                        <i class="fas fa-plus me-2"></i>New Certificate
+                        <i class="fas fa-plus me-2"></i><?= __('New Certificate') ?>
                     </button>
                 <?php } ?>
                 <?php if ($num_rows[0] > 0) { ?>
@@ -145,7 +145,7 @@ $export_extra = [
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item text-dark ajax-modal" href="#"
                             data-modal-url="<?= buildExportModalUrl('modals/certificate/certificate_export.php', ['client_id', 'client', 'expire_days', 'archived', 'q'], $export_extra) ?>">
-                            <i class="fa fa-fw fa-download me-2"></i>Export
+                            <i class="fa fa-fw fa-download me-2"></i><?= __('Export') ?>
                         </a>
                     </div>
                 <?php } ?>
@@ -164,22 +164,22 @@ $export_extra = [
             <div class="row g-2 align-items-center">
                 <div class="<?= $client_url ? 'col-lg-5' : 'col-lg-4' ?> col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search name, host, names covered, issuer...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search name, host, names covered, issuer...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="<?= $client_url ? 'col-lg-4' : 'col-lg-3' ?> col-md-6">
                     <select class="form-select select2" name="issuer" onchange="this.form.submit()">
-                        <option value="">- Any issuer -</option>
+                        <option value=""><?= __('- Any issuer -') ?></option>
                         <?php while ($row = mysqli_fetch_assoc($sql_issuers_filter)) { ?>
-                            <option <?= $issuer_filter === $row['certificate_issued_by'] ? 'selected' : '' ?> value="<?= escapeHtml($row['certificate_issued_by']) ?>" data-icon="fas fa-building" data-description="<?= intval($row['issued']) ?> certificate<?= intval($row['issued']) === 1 ? '' : 's' ?>"><?= escapeHtml($row['certificate_issued_by']) ?></option>
+                            <option <?= $issuer_filter === $row['certificate_issued_by'] ? 'selected' : '' ?> value="<?= escapeHtml($row['certificate_issued_by']) ?>" data-icon="fas fa-building" data-description="<?= _n('%d certificate', '%d certificates', intval($row['issued'])) ?>"><?= escapeHtml($row['certificate_issued_by']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <?php if (!$client_url) { ?>
                 <div class="col-lg-3 col-md-6">
                     <select class="form-select select2" name="client" onchange="this.form.submit()">
-                        <option value="" <?php if ($client == "") { echo "selected"; } ?>>- All Clients -</option>
+                        <option value="" <?php if ($client == "") { echo "selected"; } ?>><?= __('- All Clients -') ?></option>
                         <?php
                         $sql_clients_filter = mysqli_query($mysqli, "
                             SELECT DISTINCT client_id, client_name, client_abbreviation
@@ -199,40 +199,40 @@ $export_extra = [
                 <div class="<?= $client_url ? 'col-lg-3' : 'col-lg-2' ?> col-md-6">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="<?= escapeHtml($filter_url(['archived' => $archived ? '' : 1])) ?>"
-                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? 'Back to active certificates' : 'Show archived certificates' ?>">
-                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2">Archived</span>
+                            class="btn <?= $archived ? 'btn-dark' : 'btn-outline-dark' ?>" title="<?= $archived ? __('Back to active certificates') : __('Show archived certificates') ?>">
+                            <i class="fa fa-fw fa-archive"></i><span class="d-lg-none ms-2"><?= __('Archived') ?></span>
                         </a>
                         <?php if ($can_edit) { ?>
                         <div class="dropdown" id="bulkActionButton" hidden>
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-fw fa-layer-group me-2"></i>Bulk Action (<span id="selectedCount">0</span>)
+                                <i class="fas fa-fw fa-layer-group me-2"></i><?= __('Bulk Action (%s)', '<span id="selectedCount">0</span>') ?>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <?php if (!$archived) { ?>
                                     <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_check_certificates">
-                                        <i class="fas fa-fw fa-sync-alt me-2"></i>Check now
+                                        <i class="fas fa-fw fa-sync-alt me-2"></i><?= __('Check now') ?>
                                     </button>
                                 <?php } ?>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_favorite_certificates">
-                                    <i class="fas fa-fw fa-star text-warning me-2"></i>Star
+                                    <i class="fas fa-fw fa-star text-warning me-2"></i><?= __('Star') ?>
                                 </button>
                                 <button class="dropdown-item" type="submit" form="bulkActions" name="bulk_unfavorite_certificates">
-                                    <i class="far fa-fw fa-star me-2"></i>Unstar
+                                    <i class="far fa-fw fa-star me-2"></i><?= __('Unstar') ?>
                                 </button>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($archived) { ?>
                                     <button class="dropdown-item text-info" type="submit" form="bulkActions" name="bulk_restore_certificates">
-                                        <i class="fas fa-fw fa-redo me-2"></i>Restore
+                                        <i class="fas fa-fw fa-redo me-2"></i><?= __('Restore') ?>
                                     </button>
                                     <?php if ($can_delete) { ?>
                                         <button class="dropdown-item text-danger text-bold confirm-link" type="submit" form="bulkActions" name="bulk_delete_certificates"
-                                            data-confirm-text="The certificates go for good, with their history. Services stop pointing at them.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The certificates go for good, with their history. Services stop pointing at them.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     <?php } ?>
                                 <?php } else { ?>
                                     <button class="dropdown-item text-danger confirm-link" type="submit" form="bulkActions" name="bulk_archive_certificates">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </button>
                                 <?php } ?>
                             </div>
@@ -254,8 +254,8 @@ $export_extra = [
         </nav>
         <?php if ($expire_query) { ?>
             <div class="small text-body-secondary mt-2">
-                <i class="fas fa-filter me-1"></i><?= $expire_days === 'expired' ? 'Expired' : 'Expiring in ' . intval($expire_days) . ' days' ?>
-                <a class="ms-2" href="<?= escapeHtml($filter_url(['expire_days' => ''])) ?>">Clear</a>
+                <i class="fas fa-filter me-1"></i><?= $expire_days === 'expired' ? __('Expired') : _n('Expiring in %d day', 'Expiring in %d days', intval($expire_days)) ?>
+                <a class="ms-2" href="<?= escapeHtml($filter_url(['expire_days' => ''])) ?>"><?= __('Clear') ?></a>
             </div>
         <?php } ?>
     </div>
@@ -270,39 +270,39 @@ $export_extra = [
                     <?php if ($can_edit) { ?>
                     <th class="checkbox-column border-end">
                         <div class="form-check">
-                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all on this page">
+                            <input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all on this page')) ?>">
                         </div>
                     </th>
                     <?php } ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=certificate_name&order=<?= $disp ?>">
-                            Certificate <?php if ($sort == 'certificate_name') { echo $order_icon; } ?>
+                            <?= __('Certificate') ?> <?php if ($sort == 'certificate_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=certificate_domain&order=<?= $disp ?>">
-                            Host <?php if ($sort == 'certificate_domain') { echo $order_icon; } ?>
+                            <?= __('Host') ?> <?php if ($sort == 'certificate_domain') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=certificate_issued_by&order=<?= $disp ?>">
-                            Issuer <?php if ($sort == 'certificate_issued_by') { echo $order_icon; } ?>
+                            <?= __('Issuer') ?> <?php if ($sort == 'certificate_issued_by') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=certificate_expire&order=<?= $disp ?>">
-                            Expires <?php if ($sort == 'certificate_expire') { echo $order_icon; } ?>
+                            <?= __('Expires') ?> <?php if ($sort == 'certificate_expire') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=certificate_checked_at&order=<?= $disp ?>">
-                            Last check <?php if ($sort == 'certificate_checked_at') { echo $order_icon; } ?>
+                            <?= __('Last check') ?> <?php if ($sort == 'certificate_checked_at') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php if (!$client_url) { ?>
                     <th>
                         <a class="text-reset text-decoration-none" href="?<?= $url_query_strings_sort ?>&sort=client_name&order=<?= $disp ?>">
-                            Client <?php if ($sort == 'client_name') { echo $order_icon; } ?>
+                            <?= __('Client') ?> <?php if ($sort == 'client_name') { echo $order_icon; } ?>
                         </a>
                     </th>
                     <?php } ?>
@@ -329,7 +329,7 @@ $export_extra = [
                         <?php if ($can_edit) { ?>
                         <td class="checkbox-column bg-light border-end">
                             <div class="form-check">
-                                <input class="form-check-input bulk-select" type="checkbox" name="certificate_ids[]" value="<?= $certificate_id ?>" aria-label="Select <?= $certificate_name ?>">
+                                <input class="form-check-input bulk-select" type="checkbox" name="certificate_ids[]" value="<?= $certificate_id ?>" aria-label="<?= __('Select %s', $certificate_name) ?>">
                             </div>
                         </td>
                         <?php } ?>
@@ -338,8 +338,8 @@ $export_extra = [
                                 <?= certificateTile() ?>
                                 <div class="min-w-0">
                                     <a class="fw-semibold text-body ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $quick_url ?>"><?= $certificate_name ?></a>
-                                    <?php if ($certificate_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="Starred"></i><?php } ?>
-                                    <?php if ($certificate_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1">Archived</span><?php } ?>
+                                    <?php if ($certificate_favorite) { ?><i class="fas fa-star text-warning small ms-1" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                                    <?php if ($certificate_archived_at) { ?><span class="badge rounded-pill text-bg-secondary fw-normal ms-1"><?= __('Archived') ?></span><?php } ?>
                                     <?php if ($certificate_description) { ?>
                                         <div class="small text-body-secondary text-truncate itflow-asset-desc" title="<?= $certificate_description ?>"><?= $certificate_description ?></div>
                                     <?php } ?>
@@ -350,18 +350,18 @@ $export_extra = [
                             <?php if ($host) { ?>
                                 <div class="d-flex align-items-center min-w-0">
                                     <span class="font-monospace small text-truncate"><?= escapeHtml($host['display']) ?></span>
-                                    <button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($host['display']) ?>"><i class="far fa-copy"></i></button>
+                                    <button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($host['display']) ?>"><i class="far fa-copy"></i></button>
                                 </div>
                             <?php } else { ?>
-                                <span class="small text-body-secondary">No host</span>
+                                <span class="small text-body-secondary"><?= __('No host') ?></span>
                             <?php } ?>
                             <?php if ($host && $names && !certificateCovers($host['host'], $names)) { ?>
                                 <div class="small text-warning-emphasis text-truncate" title="<?= escapeHtml(implode(', ', $names)) ?>">
-                                    <i class="fas fa-not-equal me-1"></i><?= count($names) === 1 ? 'Covers ' . escapeHtml($names[0]) : 'Covers ' . count($names) . ' other names' ?>
+                                    <i class="fas fa-not-equal me-1"></i><?= count($names) === 1 ? __('Covers %s', escapeHtml($names[0])) : __('Covers %d other names', count($names)) ?>
                                 </div>
                             <?php } elseif ($other_names) { ?>
                                 <div class="small text-body-secondary text-truncate" title="<?= escapeHtml(implode(', ', $names)) ?>">
-                                    <?= count($other_names) === 1 ? 'Also ' . escapeHtml($other_names[0]) : 'Also covers ' . count($other_names) . ' names' ?>
+                                    <?= count($other_names) === 1 ? __('Also %s', escapeHtml($other_names[0])) : __('Also covers %d names', count($other_names)) ?>
                                 </div>
                             <?php } ?>
                             <?php if (intval($row['certificate_domain_id']) && $row['domain_name'] !== null) { ?>
@@ -392,44 +392,44 @@ $export_extra = [
                         <?php } ?>
                         <td class="text-end">
                             <div class="dropdown dropstart">
-                                <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $quick_url ?>">
-                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i>Quick look
+                                        <i class="fas fa-fw fa-eye text-secondary me-2"></i><?= __('Quick look') ?>
                                     </a>
                                     <?php if ($host) { ?>
                                         <a class="dropdown-item" href="https://<?= escapeHtml($host['display']) ?>" target="_blank" rel="noopener noreferrer">
-                                            <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i>Open the site
+                                            <i class="fas fa-fw fa-external-link-alt text-secondary me-2"></i><?= __('Open the site') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_edit && !$certificate_archived_at) { ?>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/certificate/certificate_edit.php?id=<?= $certificate_id ?>">
-                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                            <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                         </a>
                                         <?php if ($host) { ?>
                                             <a class="dropdown-item" href="post.php?check_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i>Check now
+                                                <i class="fas fa-fw fa-sync-alt text-secondary me-2"></i><?= __('Check now') ?>
                                             </a>
                                         <?php } ?>
                                         <a class="dropdown-item" href="post.php?<?= $certificate_favorite ? 'unfavorite_certificate' : 'favorite_certificate' ?>=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                            <i class="<?= $certificate_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $certificate_favorite ? 'Unstar' : 'Star' ?>
+                                            <i class="<?= $certificate_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $certificate_favorite ? __('Unstar') : __('Star') ?>
                                         </a>
                                     <?php } ?>
                                     <?php if ($can_edit) { ?>
                                         <div class="dropdown-divider"></div>
                                         <?php if ($certificate_archived_at) { ?>
                                             <a class="dropdown-item" href="post.php?restore_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                                <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                             </a>
                                             <?php if ($can_delete) { ?>
                                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
                                                     data-confirm-text="<?= $certificate_name ?> goes for good, with its history. Services stop pointing at it.">
-                                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                                 </a>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <a class="dropdown-item text-danger confirm-link" href="post.php?archive_certificate=<?= $certificate_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                                <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                                <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                             </a>
                                         <?php } ?>
                                     <?php } ?>
@@ -446,13 +446,13 @@ $export_extra = [
     </form>
     <?php
     $empty_state = [
-        'thing' => 'certificates',
+        'thing' => __('certificates'),
         'icon' => 'fa-lock',
         'filtered' => $q || $issuer_query || $expire_query,
         'views' => ['show'],
         'view' => emptyStatePill($shows, $show, '', ['soon', 'expired', 'problems', 'unchecked']),
-        'text' => 'The certificates on their websites and services, and when each expires.',
-        'actions' => $can_edit ? [['label' => 'New Certificate', 'modal' => "modals/certificate/certificate_add.php?$client_url", 'size' => 'lg']] : [],
+        'text' => __('The certificates on their websites and services, and when each expires.'),
+        'actions' => $can_edit ? [['label' => __('New Certificate'), 'modal' => "modals/certificate/certificate_add.php?$client_url", 'size' => 'lg']] : [],
     ];
     require_once "../includes/filter_footer.php";
     ?>

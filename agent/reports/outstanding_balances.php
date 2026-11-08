@@ -13,7 +13,7 @@ reportEnforce('outstanding_balances');
 
 $client_id = reportClientId();
 $open = dashboardOpenInvoicesSql(reportClientSql('invoice_client_id', $client_id));
-$buckets = ['current' => 'Not due yet', '1-30' => '1–30 days', '31-60' => '31–60 days', '61-90' => '61–90 days', '90+' => 'Over 90 days'];
+$buckets = ['current' => __('Not due yet'), '1-30' => '1–30 days', '31-60' => '31–60 days', '61-90' => '61–90 days', '90+' => 'Over 90 days'];
 
 $invoices = [];
 $sql = mysqli_query($mysqli, "
@@ -71,55 +71,55 @@ $bucket_cell = function ($key) {
     };
 };
 
-$client_columns = ['client' => ['label' => 'Client', 'html' => function ($row) {
+$client_columns = ['client' => ['label' => __('Client'), 'html' => function ($row) {
     return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'invoices.php') ;
 }]];
 foreach ($buckets as $key => $label) {
     $client_columns[$key] = ['label' => $label, 'type' => 'money', 'html' => $bucket_cell($key)];
 }
 $client_columns += [
-    'total' => ['label' => 'Owed', 'type' => 'money', 'html' => function ($row) {
+    'total' => ['label' => __('Owed'), 'type' => 'money', 'html' => function ($row) {
         return '<a class="itflow-report-amount fw-semibold" href="/agent/invoices.php?client_id=' . $row['client_id'] . '&status=Unpaid">' . reportMoney($row['total']) . '</a>';
     }],
-    'count' => ['label' => 'Invoices', 'type' => 'count'],
-    'oldest_late' => ['label' => 'Oldest', 'type' => 'count', 'csv_label' => 'Oldest days late', 'title' => 'Days the oldest unpaid invoice is past due', 'html' => function ($row) {
-        return $row['oldest_late'] > 0 ? '<span class="' . ($row['oldest_late'] > 60 ? 'text-danger-emphasis fw-semibold' : '') . '">' . $row['oldest_late'] . ' day' . ($row['oldest_late'] === 1 ? '' : 's') . ' late</span>' : '<span class="text-body-secondary">Not due</span>';
+    'count' => ['label' => __('Invoices'), 'type' => 'count'],
+    'oldest_late' => ['label' => __('Oldest'), 'type' => 'count', 'csv_label' => __('Oldest days late'), 'title' => __('Days the oldest unpaid invoice is past due'), 'html' => function ($row) {
+        return $row['oldest_late'] > 0 ? '<span class="' . ($row['oldest_late'] > 60 ? 'text-danger-emphasis fw-semibold' : '') . '">' . $row['oldest_late'] . ' day' . ($row['oldest_late'] === 1 ? '' : 's') . ' late</span>' : '<span class="text-body-secondary">' . __('Not due') . '</span>';
     }],
-    'last_payment' => ['label' => 'Last paid', 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
-        return $row['last_payment'] ? '<span title="' . escapeHtml($row['last_payment']) . '">' . escapeHtml(timeAgo($row['last_payment'])) . '</span>' : '<span class="text-body-secondary">Never</span>';
+    'last_payment' => ['label' => __('Last paid'), 'type' => 'date', 'class' => 'text-nowrap', 'html' => function ($row) {
+        return $row['last_payment'] ? '<span title="' . escapeHtml($row['last_payment']) . '">' . escapeHtml(timeAgo($row['last_payment'])) . '</span>' : '<span class="text-body-secondary">' . __('Never') . '</span>';
     }],
 ];
 
 $invoice_columns = [
-    'invoice' => ['label' => 'Invoice', 'csv' => function ($row) { return $row['invoice_prefix'] . $row['invoice_number']; }, 'html' => function ($row) {
+    'invoice' => ['label' => __('Invoice'), 'csv' => function ($row) { return $row['invoice_prefix'] . $row['invoice_number']; }, 'html' => function ($row) {
         return '<a class="font-monospace" href="/agent/invoice.php?client_id=' . intval($row['invoice_client_id']) . '&invoice_id=' . intval($row['invoice_id']) . '">' . escapeHtml($row['invoice_prefix'] . $row['invoice_number']) . '</a>'
             . ($row['invoice_scope'] !== '' && $row['invoice_scope'] !== null ? '<div class="small text-body-secondary text-truncate" style="max-width: 18rem">' . escapeHtml($row['invoice_scope']) . '</div>' : '');
     }],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['invoice_client_id'], $row['client_name'], $row['client_abbreviation'], 'invoices.php');
     }],
-    'invoice_date' => ['label' => 'Date', 'type' => 'date', 'class' => 'text-nowrap'],
-    'invoice_due' => ['label' => 'Due', 'type' => 'date', 'class' => 'text-nowrap'],
-    'days_late' => ['label' => 'Late', 'type' => 'count', 'csv_label' => 'Days late', 'html' => function ($row) {
+    'invoice_date' => ['label' => __('Date'), 'type' => 'date', 'class' => 'text-nowrap'],
+    'invoice_due' => ['label' => __('Due'), 'type' => 'date', 'class' => 'text-nowrap'],
+    'days_late' => ['label' => __('Late'), 'type' => 'count', 'csv_label' => __('Days late'), 'html' => function ($row) {
         $late = intval($row['days_late']);
         if ($late <= 0) {
-            return '<span class="text-body-secondary">' . ($late === 0 ? 'Due today' : 'In ' . (-$late) . ' day' . ($late === -1 ? '' : 's')) . '</span>';
+            return '<span class="text-body-secondary">' . ($late === 0 ? __('Due today') : _n('In %d day', 'In %d days', -$late)) . '</span>';
         }
         $tone = $late > 60 ? 'danger' : ($late > 30 ? 'warning' : 'secondary');
         return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis border border-' . $tone . '-subtle fw-normal">' . $late . ' day' . ($late === 1 ? '' : 's') . '</span>';
     }],
-    'invoice_amount' => ['label' => 'Amount', 'type' => 'money', 'class' => 'text-body-secondary'],
-    'paid' => ['label' => 'Paid', 'type' => 'money', 'class' => 'text-body-secondary', 'html' => function ($row) {
+    'invoice_amount' => ['label' => __('Amount'), 'type' => 'money', 'class' => 'text-body-secondary'],
+    'paid' => ['label' => __('Paid'), 'type' => 'money', 'class' => 'text-body-secondary', 'html' => function ($row) {
         return $row['paid'] > 0.004 ? reportMoney($row['paid']) : '<span class="itflow-report-zero">–</span>';
     }],
-    'balance' => ['label' => 'Owed', 'type' => 'money', 'class' => 'fw-semibold'],
+    'balance' => ['label' => __('Owed'), 'type' => 'money', 'class' => 'fw-semibold'],
 ];
 
 if (reportExporting('invoices')) {
-    reportCsv('Unpaid Invoices', $invoice_columns, $invoices, ['invoice' => 'Total', 'balance' => $total]);
+    reportCsv('Unpaid Invoices', $invoice_columns, $invoices, ['invoice' => __('Total'), 'balance' => $total]);
 }
 if (reportExporting()) {
-    reportCsv('Receivables Aging', $client_columns, array_values($clients), ['client' => 'Total', 'total' => $total, 'count' => count($invoices)] + $totals);
+    reportCsv('Receivables Aging', $client_columns, array_values($clients), ['client' => __('Total'), 'total' => $total, 'count' => count($invoices)] + $totals);
 }
 
 require_once "includes/inc_report_layout.php";
@@ -135,25 +135,25 @@ usort($overdue, function ($a, $b) { return intval($b['days_late']) <=> intval($a
 
     <?php reportHeader('outstanding_balances', [
         'client' => $client_id,
-        'subtitle' => 'As of ' . date('M j, Y'),
-        'export' => ['clients' => 'By client', 'invoices' => 'Every unpaid invoice'],
+        'subtitle' => __('As of %s', formatDate('now', 'date')),
+        'export' => ['clients' => __('By client'), 'invoices' => __('Every unpaid invoice')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Owed to you', 'value' => reportMoney($total), 'url' => '/agent/invoices.php?status=Unpaid',
+        ['label' => __('Owed to you'), 'value' => reportMoney($total), 'url' => '/agent/invoices.php?status=Unpaid',
             'sub' => reportCount(count($invoices)) . ' <span class="text-body-tertiary">unpaid invoice' . (count($invoices) === 1 ? '' : 's') . '</span>'],
-        ['label' => 'Overdue', 'value' => reportMoney($overdue_total), 'tone' => $overdue_total > 0 ? 'danger' : '', 'url' => '/agent/invoices.php?status=Overdue',
-            'sub' => $total > 0 ? escapeHtml(reportPercent(reportShare($overdue_total, $total))) . ' <span class="text-body-tertiary">of what is owed</span>' : ''],
-        ['label' => 'Over 60 days late', 'value' => reportMoney($late_60), 'tone' => $late_60 > 0 ? 'danger' : '',
-            'sub' => $late_90 > 0 ? escapeHtml(reportMoney($late_90)) . ' <span class="text-body-tertiary">over 90</span>' : '<span class="text-body-tertiary">Nothing over 90 days</span>'],
-        ['label' => 'Clients owing', 'value' => reportCount(count($clients)),
-            'sub' => count(array_filter($clients, function ($c) { return $c['oldest_late'] > 0; })) . ' <span class="text-body-tertiary">with something overdue</span>'],
+        ['label' => __('Overdue'), 'value' => reportMoney($overdue_total), 'tone' => $overdue_total > 0 ? 'danger' : '', 'url' => '/agent/invoices.php?status=Overdue',
+            'sub' => $total > 0 ? escapeHtml(reportPercent(reportShare($overdue_total, $total))) . ' <span class="text-body-tertiary">' . __('of what is owed') . '</span>' : ''],
+        ['label' => __('Over 60 days late'), 'value' => reportMoney($late_60), 'tone' => $late_60 > 0 ? 'danger' : '',
+            'sub' => $late_90 > 0 ? escapeHtml(reportMoney($late_90)) . ' <span class="text-body-tertiary">' . __('over 90') . '</span>' : '<span class="text-body-tertiary">' . __('Nothing over 90 days') . '</span>'],
+        ['label' => __('Clients owing'), 'value' => reportCount(count($clients)),
+            'sub' => count(array_filter($clients, function ($c) { return $c['oldest_late'] > 0; })) . ' <span class="text-body-tertiary">' . __('with something overdue') . '</span>'],
     ]) ?>
 
     <?php if ($total > 0) { ?>
-        <?= reportSectionOpen('By how late', '') ?>
+        <?= reportSectionOpen(__('By how late'), '') ?>
             <div class="card-body">
-                <div class="itflow-dash-aging mb-3" role="img" aria-label="What is owed, by days past due">
+                <div class="itflow-dash-aging mb-3" role="img" aria-label="<?= escapeHtml(__('What is owed, by days past due')) ?>">
                     <?php foreach ($buckets as $key => $label) {
                         if ($totals[$key] > 0) { ?>
                             <span class="itflow-dash-age-<?= str_replace('+', 'plus', $key) ?>" style="width: <?= round($totals[$key] / $total * 100, 2) ?>%" title="<?= escapeHtml($label . ': ' . reportMoney($totals[$key])) ?>"></span>
@@ -173,21 +173,21 @@ usort($overdue, function ($a, $b) { return intval($b['days_late']) <=> intval($a
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Most owed first') ?>
+    <?= reportSectionOpen(__('By client'), __('Most owed first')) ?>
         <?= reportTable($client_columns, array_values($clients), [
-            'empty' => reportEmpty('Nothing is owed on unpaid invoices.'),
-            'totals' => ['client' => 'Total', 'total' => $total, 'count' => count($invoices)] + $totals,
+            'empty' => reportEmpty(__('Nothing is owed on unpaid invoices.')),
+            'totals' => ['client' => __('Total'), 'total' => $total, 'count' => count($invoices)] + $totals,
         ]) ?>
     </div>
 
-    <?= reportSectionOpen('Overdue invoices', $overdue ? 'Longest overdue first' : '', 'itflow-report-long') ?>
+    <?= reportSectionOpen(__('Overdue invoices'), $overdue ? __('Longest overdue first') : '', 'itflow-report-long') ?>
         <?= reportTable($invoice_columns, $overdue, [
-            'empty' => reportEmpty('No invoice is past its due date.'),
+            'empty' => reportEmpty(__('No invoice is past its due date.')),
             'limit' => 300, 'export_table' => 'invoices',
-            'totals' => ['invoice' => 'Total', 'balance' => array_sum(array_column($overdue, 'balance'))],
+            'totals' => ['invoice' => __('Total'), 'balance' => array_sum(array_column($overdue, 'balance'))],
         ]) ?>
         <div class="card-footer small text-body-secondary">
-            Unpaid invoices are the ones sent, viewed or part-paid; drafts and cancelled invoices are not owed. Days late count from the due date.
+            <?= __('Unpaid invoices are the ones sent, viewed or part-paid; drafts and cancelled invoices are not owed. Days late count from the due date.') ?>
         </div>
     </div>
 

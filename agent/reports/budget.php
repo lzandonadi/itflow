@@ -50,7 +50,7 @@ foreach ($budget as $cat => $months) {
     if (!isset($categories[$cat])) {
         // Budget against a category that is archived or gone - still show it so it can be cleared
         $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT category_id, category_name, category_color, category_archived_at FROM categories WHERE category_id = $cat"));
-        $categories[$cat] = $row ?: ['category_id' => $cat, 'category_name' => 'Deleted category', 'category_color' => '', 'category_archived_at' => date('Y-m-d')];
+        $categories[$cat] = $row ?: ['category_id' => $cat, 'category_name' => __('Deleted category'), 'category_color' => '', 'category_archived_at' => date('Y-m-d')];
     }
 }
 uasort($categories, function ($a, $b) {
@@ -93,14 +93,14 @@ $unbudgeted = array_filter($shown, function ($line) {
 });
 
 if (reportExporting()) {
-    $columns = ['name' => ['label' => 'Category']];
+    $columns = ['name' => ['label' => __('Category')]];
     for ($m = 1; $m <= 12; $m++) {
-        $columns["b$m"] = ['label' => date('M', mktime(0, 0, 0, $m, 1)) . ' budget', 'type' => 'money'];
-        $columns["a$m"] = ['label' => date('M', mktime(0, 0, 0, $m, 1)) . ' actual', 'type' => 'money'];
+        $columns["b$m"] = ['label' => __('%s budget', formatDate(mktime(0, 0, 0, $m, 1), 'month')), 'type' => 'money'];
+        $columns["a$m"] = ['label' => __('%s actual', formatDate(mktime(0, 0, 0, $m, 1), 'month')), 'type' => 'money'];
     }
     $columns['plan_total'] = ['label' => "$year budget", 'type' => 'money'];
     $columns['spent_total'] = ['label' => "$year actual", 'type' => 'money'];
-    $columns['left'] = ['label' => 'Remaining', 'type' => 'money'];
+    $columns['left'] = ['label' => __('Remaining'), 'type' => 'money'];
     $rows = [];
     foreach ($shown as $line) {
         $row = ['name' => $line['name'], 'plan_total' => $line['plan_total'], 'spent_total' => $line['spent_total'], 'left' => $line['plan_total'] - $line['spent_total']];
@@ -110,7 +110,7 @@ if (reportExporting()) {
         }
         $rows[] = $row;
     }
-    reportCsv("Budget vs Actual $year", $columns, $rows, ['name' => 'Total', 'plan_total' => $plan_total, 'spent_total' => $spent_total, 'left' => $plan_total - $spent_total]);
+    reportCsv("Budget vs Actual $year", $columns, $rows, ['name' => __('Total'), 'plan_total' => $plan_total, 'spent_total' => $spent_total, 'left' => $plan_total - $spent_total]);
 }
 
 // Month by month, all categories together
@@ -131,7 +131,7 @@ $money_input = function ($value) {
 
 $used_meter = function ($spent, $plan) {
     if ($plan <= 0) {
-        return $spent > 0 ? '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">No budget</span>' : '';
+        return $spent > 0 ? '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">' . __('No budget') . '</span>' : '';
     }
     $share = $spent / $plan * 100;
     $tone = $share > 100 ? 'bg-danger' : ($share > 90 ? 'bg-warning' : '');
@@ -145,7 +145,7 @@ $used_meter = function ($spent, $plan) {
 
     <?php reportHeader('budget', [
         'year' => [$year, $years],
-        'controls' => reportSegmentControl('view', $view, array_merge(['summary' => 'Summary', 'month' => 'By month'], $can_edit ? ['edit' => 'Edit budget'] : [])),
+        'controls' => reportSegmentControl('view', $view, array_merge(['summary' => __('Summary'), 'month' => __('By month')], $can_edit ? ['edit' => __('Edit budget')] : [])),
         'export' => $view !== 'edit',
     ]); ?>
 
@@ -157,11 +157,11 @@ $used_meter = function ($spent, $plan) {
 
             <div class="card itflow-report-section itflow-report-long">
                 <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                    <h3 class="card-title mb-0 me-auto">Plan for <?= $year ?></h3>
+                    <h3 class="card-title mb-0 me-auto"><?= __('Plan for %d', $year) ?></h3>
                     <?php if ($has_prev_budget) { ?>
                         <button type="submit" name="copy_budget" value="1" class="btn btn-outline-secondary btn-sm confirm-link"
-                                data-confirm-title="Copy <?= $year - 1 ?>'s budget?" data-confirm-text="Every amount in <?= $year ?> is replaced with <?= $year - 1 ?>'s, month for month." data-confirm-button="Copy it">
-                            <i class="fas fa-fw fa-copy me-1"></i>Copy <?= $year - 1 ?>
+                                data-confirm-title="<?= __('Copy %s\'s budget?', $year - 1) ?>" data-confirm-text="<?= __('Every amount in %1$s is replaced with %2$s\'s, month for month.', $year, $year - 1) ?>" data-confirm-button="<?= escapeHtml(__('Copy it')) ?>">
+                            <i class="fas fa-fw fa-copy me-1"></i><?= __('Copy %d', $year - 1) ?>
                         </button>
                     <?php } ?>
                 </div>
@@ -169,10 +169,10 @@ $used_meter = function ($spent, $plan) {
                     <table class="table table-sm align-middle mb-0 itflow-report-table itflow-report-grid itflow-report-budget-edit">
                         <thead class="table-light">
                         <tr>
-                            <th>Category</th>
-                            <th title="Type an amount and press Fill to put it in every month">Every month</th>
+                            <th><?= __('Category') ?></th>
+                            <th title="<?= escapeHtml(__('Type an amount and press Fill to put it in every month')) ?>"><?= __('Every month') ?></th>
                             <?php for ($m = 1; $m <= 12; $m++) { ?>
-                                <th class="text-end"><?= date('M', mktime(0, 0, 0, $m, 1)) ?></th>
+                                <th class="text-end"><?= formatDate(mktime(0, 0, 0, $m, 1), 'month') ?></th>
                             <?php } ?>
                             <th class="text-end"><?= $year ?></th>
                         </tr>
@@ -183,11 +183,11 @@ $used_meter = function ($spent, $plan) {
                                 continue;
                             } ?>
                             <tr data-budget-row>
-                                <td><?= escapeHtml($line['name']) ?><?php if ($line['archived']) { ?> <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">Archived</span><?php } ?></td>
+                                <td><?= escapeHtml($line['name']) ?><?php if ($line['archived']) { ?> <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal"><?= __('Archived') ?></span><?php } ?></td>
                                 <td>
                                     <div class="input-group input-group-sm flex-nowrap">
-                                        <input type="text" inputmode="decimal" class="form-control" data-budget-fill-value aria-label="Amount for every month of <?= escapeHtml($line['name']) ?>" placeholder="0.00">
-                                        <button type="button" class="btn btn-outline-secondary" data-budget-fill title="Put this amount in every month">Fill</button>
+                                        <input type="text" inputmode="decimal" class="form-control" data-budget-fill-value aria-label="<?= __('Amount for every month of %s', escapeHtml($line['name'])) ?>" placeholder="0.00">
+                                        <button type="button" class="btn btn-outline-secondary" data-budget-fill title="<?= escapeHtml(__('Put this amount in every month')) ?>"><?= __('Fill') ?></button>
                                     </div>
                                 </td>
                                 <?php for ($m = 1; $m <= 12; $m++) { ?>
@@ -199,7 +199,7 @@ $used_meter = function ($spent, $plan) {
                         </tbody>
                         <tfoot>
                         <tr class="fw-semibold">
-                            <td>Total</td>
+                            <td><?= __('Total') ?></td>
                             <td></td>
                             <?php for ($m = 1; $m <= 12; $m++) { ?>
                                 <td class="text-end" data-budget-month-total="<?= $m ?>"><?= reportMoney($plan_months[$m]) ?></td>
@@ -210,9 +210,9 @@ $used_meter = function ($spent, $plan) {
                     </table>
                 </div>
                 <div class="card-footer d-flex flex-wrap align-items-center gap-2">
-                    <button type="submit" name="save_budget" value="1" class="btn btn-primary"><i class="fas fa-check me-2"></i>Save budget</button>
-                    <a class="btn btn-light" href="<?= escapeHtml(reportUrl(['view' => null])) ?>">Cancel</a>
-                    <span class="small text-body-secondary ms-sm-2">Leave a month empty for no budget. Amounts are per month, before tax as you record expenses.</span>
+                    <button type="submit" name="save_budget" value="1" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= __('Save budget') ?></button>
+                    <a class="btn btn-light" href="<?= escapeHtml(reportUrl(['view' => null])) ?>"><?= __('Cancel') ?></a>
+                    <span class="small text-body-secondary ms-sm-2"><?= __('Leave a month empty for no budget. Amounts are per month, before tax as you record expenses.') ?></span>
                 </div>
             </div>
         </form>
@@ -222,15 +222,15 @@ $used_meter = function ($spent, $plan) {
         <?php
         $used = reportShare($spent_total, $plan_total);
         echo reportStats([
-            ['label' => $year === $current_year ? 'Budget this year' : "Budget $year", 'value' => reportMoney($plan_total),
-                'sub' => $plan_total > 0 ? escapeHtml(reportMoney($plan_total / 12)) . ' <span class="text-body-tertiary">a month on average</span>' : '<span class="text-body-tertiary">No budget set yet</span>'],
-            ['label' => 'Spent', 'value' => reportMoney($spent_total), 'url' => "/agent/expenses.php?canned_date=custom&dtf=$year-01-01&dtt=$year-12-31",
-                'sub' => $used !== null ? escapeHtml(reportPercent($used)) . ' <span class="text-body-tertiary">of the budget' . ($year === $current_year ? ', ' . round($year_elapsed * 100) . '% of the year gone' : '') . '</span>' : ''],
-            ['label' => $year === $current_year ? 'Against budget to date' : 'Against budget', 'value' => reportMoney(abs($plan_to_date - $spent_total)),
+            ['label' => $year === $current_year ? __('Budget this year') : __('Budget %d', $year), 'value' => reportMoney($plan_total),
+                'sub' => $plan_total > 0 ? escapeHtml(reportMoney($plan_total / 12)) . ' <span class="text-body-tertiary">' . __('a month on average') . '</span>' : '<span class="text-body-tertiary">' . __('No budget set yet') . '</span>'],
+            ['label' => __('Spent'), 'value' => reportMoney($spent_total), 'url' => "/agent/expenses.php?canned_date=custom&dtf=$year-01-01&dtt=$year-12-31",
+                'sub' => $used !== null ? escapeHtml(reportPercent($used)) . ' <span class="text-body-tertiary">' . ($year === $current_year ? __('of the budget, %d%% of the year gone', round($year_elapsed * 100)) : __('of the budget')) . '</span>' : ''],
+            ['label' => $year === $current_year ? __('Against budget to date') : __('Against budget'), 'value' => reportMoney(abs($plan_to_date - $spent_total)),
                 'tone' => $plan_total > 0 ? ($spent_total > $plan_to_date ? 'danger' : 'success') : '',
-                'sub' => $plan_total > 0 ? ($spent_total > $plan_to_date ? 'Over what the budget allows by now' : 'Under what the budget allows by now') : ''],
-            ['label' => 'Remaining this year', 'value' => reportMoney($plan_total - $spent_total), 'tone' => $plan_total - $spent_total < 0 ? 'danger' : '',
-                'sub' => count($over) ? '<span class="text-danger-emphasis fw-semibold">' . count($over) . ' categor' . (count($over) === 1 ? 'y' : 'ies') . ' over budget</span>' : '<span class="text-body-tertiary">No category over budget</span>'],
+                'sub' => $plan_total > 0 ? ($spent_total > $plan_to_date ? __('Over what the budget allows by now') : __('Under what the budget allows by now')) : ''],
+            ['label' => __('Remaining this year'), 'value' => reportMoney($plan_total - $spent_total), 'tone' => $plan_total - $spent_total < 0 ? 'danger' : '',
+                'sub' => count($over) ? '<span class="text-danger-emphasis fw-semibold">' . count($over) . ' categor' . (count($over) === 1 ? 'y' : 'ies') . ' over budget</span>' : '<span class="text-body-tertiary">' . __('No category over budget') . '</span>'],
         ]);
         ?>
 
@@ -238,42 +238,42 @@ $used_meter = function ($spent, $plan) {
             <div class="card">
                 <div class="card-body text-center py-5">
                     <i class="fas fa-bullseye fa-2x text-body-tertiary d-block mb-2"></i>
-                    <div class="fw-semibold">No budget for <?= $year ?> yet</div>
-                    <div class="small text-body-secondary mb-3">Set what you plan to spend each month by category, and this report compares it with what you actually spend.</div>
+                    <div class="fw-semibold"><?= __('No budget for %d yet', $year) ?></div>
+                    <div class="small text-body-secondary mb-3"><?= __('Set what you plan to spend each month by category, and this report compares it with what you actually spend.') ?></div>
                     <?php if ($can_edit) { ?>
-                        <a class="btn btn-primary" href="<?= escapeHtml(reportUrl(['view' => 'edit'])) ?>"><i class="fas fa-pen me-2"></i>Set the <?= $year ?> budget</a>
+                        <a class="btn btn-primary" href="<?= escapeHtml(reportUrl(['view' => 'edit'])) ?>"><i class="fas fa-pen me-2"></i><?= __('Set the %d budget', $year) ?></a>
                     <?php } ?>
                 </div>
             </div>
         <?php } ?>
 
-        <?= reportSectionOpen('Budget and spending by month', escapeHtml((string) $year)) ?>
+        <?= reportSectionOpen(__('Budget and spending by month'), escapeHtml((string) $year)) ?>
             <div class="card-body">
                 <?php
                 $months_shown = $year === $current_year ? intval(date('n')) : ($year > $current_year ? 0 : 12);
                 echo reportChart([
                     'type' => 'bar',
-                    'labels' => array_map(function ($m) { return date('M', mktime(0, 0, 0, $m, 1)); }, range(1, 12)),
+                    'labels' => array_map(function ($m) { return formatDate(mktime(0, 0, 0, $m, 1), 'month'); }, range(1, 12)),
                     'series' => [
-                        ['label' => 'Spent', 'data' => array_map(function ($m) use ($spent_months, $months_shown) { return $m <= $months_shown ? round($spent_months[$m], 2) : null; }, range(1, 12)), 'tone' => 'accent'],
-                        ['label' => 'Budget', 'data' => array_map(function ($m) use ($plan_months) { return round($plan_months[$m], 2); }, range(1, 12)), 'tone' => 'muted', 'type' => 'line', 'dashed' => true],
+                        ['label' => __('Spent'), 'data' => array_map(function ($m) use ($spent_months, $months_shown) { return $m <= $months_shown ? round($spent_months[$m], 2) : null; }, range(1, 12)), 'tone' => 'accent'],
+                        ['label' => __('Budget'), 'data' => array_map(function ($m) use ($plan_months) { return round($plan_months[$m], 2); }, range(1, 12)), 'tone' => 'muted', 'type' => 'line', 'dashed' => true],
                     ],
                     'format' => 'money',
-                ], '', 'Spending per month against the budget');
+                ], '', __('Spending per month against the budget'));
                 ?>
             </div>
         </div>
 
         <?php if ($view === 'month') { ?>
 
-            <?= reportSectionOpen('By month', 'Spent, with the budget under it - red where it went over', 'itflow-report-long') ?>
+            <?= reportSectionOpen(__('By month'), __('Spent, with the budget under it - red where it went over'), 'itflow-report-long') ?>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover align-middle mb-0 itflow-report-table itflow-report-grid">
                         <thead class="table-light">
                         <tr>
-                            <th>Category</th>
+                            <th><?= __('Category') ?></th>
                             <?php for ($m = 1; $m <= 12; $m++) { ?>
-                                <th class="text-end"><?= date('M', mktime(0, 0, 0, $m, 1)) ?></th>
+                                <th class="text-end"><?= formatDate(mktime(0, 0, 0, $m, 1), 'month') ?></th>
                             <?php } ?>
                             <th class="text-end"><?= $year ?></th>
                         </tr>
@@ -298,12 +298,12 @@ $used_meter = function ($spent, $plan) {
                             </tr>
                         <?php } ?>
                         <?php if (!$shown) { ?>
-                            <tr><td colspan="14" class="text-center text-body-secondary py-4">No budget and no spending in <?= $year ?>.</td></tr>
+                            <tr><td colspan="14" class="text-center text-body-secondary py-4"><?= __('No budget and no spending in %d.', $year) ?></td></tr>
                         <?php } ?>
                         </tbody>
                         <tfoot>
                         <tr class="fw-semibold">
-                            <td>Total</td>
+                            <td><?= __('Total') ?></td>
                             <?php for ($m = 1; $m <= 12; $m++) { ?>
                                 <td class="text-end">
                                     <div class="<?= $plan_months[$m] > 0 && $spent_months[$m] > $plan_months[$m] + 0.005 ? 'text-danger' : '' ?>"><?= reportGridAmount($spent_months[$m]) ?></div>
@@ -324,41 +324,41 @@ $used_meter = function ($spent, $plan) {
 
             <?php
             $columns = [
-                'name' => ['label' => 'Category', 'html' => function ($row) {
-                    return escapeHtml($row['name']) . ($row['archived'] ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">Archived</span>' : '');
+                'name' => ['label' => __('Category'), 'html' => function ($row) {
+                    return escapeHtml($row['name']) . ($row['archived'] ? ' <span class="badge bg-secondary-subtle text-secondary-emphasis fw-normal">' . __('Archived') . '</span>' : '');
                 }],
                 'plan_total' => ['label' => "Budget $year", 'type' => 'money', 'html' => function ($row) {
                     return $row['plan_total'] > 0 ? reportMoney($row['plan_total']) : '<span class="itflow-report-zero">–</span>';
                 }],
-                'plan_to_date' => ['label' => $year === $current_year ? 'Budget to date' : 'Budget', 'type' => 'money', 'title' => 'What the budget allows up to today', 'html' => function ($row) {
+                'plan_to_date' => ['label' => $year === $current_year ? __('Budget to date') : __('Budget'), 'type' => 'money', 'title' => __('What the budget allows up to today'), 'html' => function ($row) {
                     return $row['plan_total'] > 0 ? reportMoney($row['plan_to_date']) : '<span class="itflow-report-zero">–</span>';
                 }],
-                'spent_total' => ['label' => 'Spent', 'type' => 'money', 'html' => function ($row) use ($year) {
+                'spent_total' => ['label' => __('Spent'), 'type' => 'money', 'html' => function ($row) use ($year) {
                     if (abs($row['spent_total']) < 0.005) {
                         return '<span class="itflow-report-zero">–</span>';
                     }
                     return '<a class="itflow-report-amount" href="/agent/expenses.php?category=' . intval($row['cat']) . "&canned_date=custom&dtf=$year-01-01&dtt=$year-12-31\">" . reportMoney($row['spent_total']) . '</a>';
                 }],
-                'difference' => ['label' => 'Under / over', 'type' => 'money', 'title' => 'Budget to date less what was spent - red is over', 'html' => function ($row) {
+                'difference' => ['label' => __('Under / over'), 'type' => 'money', 'title' => __('Budget to date less what was spent - red is over'), 'html' => function ($row) {
                     if ($row['plan_total'] <= 0) {
                         return '<span class="itflow-report-zero">–</span>';
                     }
                     return '<span class="' . ($row['difference'] < 0 ? 'text-danger fw-semibold' : 'text-success-emphasis') . '">' . reportMoney($row['difference']) . '</span>';
                 }],
-                'remaining' => ['label' => 'Left this year', 'type' => 'money', 'html' => function ($row) {
+                'remaining' => ['label' => __('Left this year'), 'type' => 'money', 'html' => function ($row) {
                     if ($row['plan_total'] <= 0) {
                         return '<span class="itflow-report-zero">–</span>';
                     }
                     return '<span class="' . ($row['remaining'] < 0 ? 'text-danger' : '') . '">' . reportMoney($row['remaining']) . '</span>';
                 }],
-                'used' => ['label' => 'Used', 'type' => 'percent', 'class' => 'itflow-report-used', 'html' => function ($row) use ($used_meter) {
+                'used' => ['label' => __('Used'), 'type' => 'percent', 'class' => 'itflow-report-used', 'html' => function ($row) use ($used_meter) {
                     return $used_meter($row['spent_total'], $row['plan_total']);
                 }],
             ];
             if ($year !== $current_year) {
                 // A past year is all "to date", a future one has none yet
                 unset($columns['plan_to_date']);
-                $columns['difference']['title'] = 'The budget less what was spent - red is over';
+                $columns['difference']['title'] = __('The budget less what was spent - red is over');
             }
             $rows = [];
             foreach ($shown as $cat => $line) {
@@ -371,15 +371,15 @@ $used_meter = function ($spent, $plan) {
             }
             ?>
 
-            <?= reportSectionOpen('By category', $unbudgeted ? '<span class="text-warning-emphasis">' . count($unbudgeted) . ' categor' . (count($unbudgeted) === 1 ? 'y has' : 'ies have') . ' spending but no budget</span>' : '') ?>
+            <?= reportSectionOpen(__('By category'), $unbudgeted ? '<span class="text-warning-emphasis">' . _n('%d category has spending but no budget', '%d categories have spending but no budget', count($unbudgeted)) . '</span>' : '') ?>
                 <?= reportTable($columns, $rows, [
-                    'empty' => "No budget and no spending in $year.",
-                    'totals' => ['name' => 'Total', 'plan_total' => $plan_total, 'plan_to_date' => $plan_to_date, 'spent_total' => $spent_total, 'difference' => $plan_to_date - $spent_total, 'remaining' => $plan_total - $spent_total],
+                    'empty' => __('No budget and no spending in %d.', $year),
+                    'totals' => ['name' => __('Total'), 'plan_total' => $plan_total, 'plan_to_date' => $plan_to_date, 'spent_total' => $spent_total, 'difference' => $plan_to_date - $spent_total, 'remaining' => $plan_total - $spent_total],
                     'totals_html' => ['used' => $used_meter($spent_total, $plan_total), 'difference' => '<span class="' . ($plan_to_date - $spent_total < 0 ? 'text-danger' : 'text-success-emphasis') . '">' . reportMoney($plan_to_date - $spent_total) . '</span>'],
                 ]) ?>
                 <div class="card-footer small text-body-secondary">
-                    Spending is expenses with a vendor, by the date paid. <?= $year === $current_year ? 'Budget to date counts the months so far, and this month as far as today.' : '' ?>
-                    <?php if ($can_edit) { ?><a href="<?= escapeHtml(reportUrl(['view' => 'edit'])) ?>">Edit the <?= $year ?> budget</a><?php } ?>
+                    <?= __('Spending is expenses with a vendor, by the date paid.') ?> <?= $year === $current_year ? __('Budget to date counts the months so far, and this month as far as today.') : '' ?>
+                    <?php if ($can_edit) { ?><a href="<?= escapeHtml(reportUrl(['view' => 'edit'])) ?>"><?= __('Edit the %d budget', $year) ?></a><?php } ?>
                 </div>
             </div>
 

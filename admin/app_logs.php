@@ -18,7 +18,7 @@ $order = "DESC";
 require_once "includes/inc_all_admin.php";
 
 // Tab title - the file is named for the table, the page for what it holds
-$page_title = 'App Logs';
+$page_title = __('App Logs');
 
 // Only these sort - an unknown column would take the page down
 $sortable_columns = [
@@ -87,23 +87,23 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-clipboard-list me-2"></i>App Logs</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-clipboard-list me-2"></i><?= __('App Logs') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= $filters_url('modals/app_log/app_log_export.php') ?>">
-                    <i class="fas fa-fw fa-download"></i><span class="d-none d-lg-inline ms-2">Export</span>
+                    <i class="fas fa-fw fa-download"></i><span class="d-none d-lg-inline ms-2"><?= __('Export') ?></span>
                 </button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item text-danger ajax-modal" href="#" data-modal-url="<?= $filters_url('modals/app_log/app_log_clear.php') ?>" data-app-log-clear>
-                        <i class="fas fa-fw fa-trash-alt me-2"></i>Clear
+                        <i class="fas fa-fw fa-trash-alt me-2"></i><?= __('Clear') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="settings_logs.php">
-                        <i class="fas fa-fw fa-cog text-secondary me-2"></i>Keeping and forwarding
+                        <i class="fas fa-fw fa-cog text-secondary me-2"></i><?= __('Keeping and forwarding') ?>
                     </a>
                     <a class="dropdown-item" href="audit_logs.php">
-                        <i class="fas fa-fw fa-history text-secondary me-2"></i>Audit Logs
+                        <i class="fas fa-fw fa-history text-secondary me-2"></i><?= __('Audit Logs') ?>
                     </a>
                 </div>
             </div>
@@ -115,21 +115,21 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-12">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search the app logs" title="The category or what it says">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search the app logs')) ?>" title="<?= escapeHtml(__('The category or what it says')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="When" aria-label="When">
+                    <input type="text" id="dateFilter" class="form-control" autocomplete="off" title="<?= escapeHtml(__('When')) ?>" aria-label="<?= escapeHtml(__('When')) ?>">
                     <input type="hidden" name="canned_date" id="canned_date" value="<?= escapeHtml(is_string($_GET['canned_date'] ?? null) ? $_GET['canned_date'] : '') ?>">
                     <input type="hidden" name="dtf" id="dtf" value="<?= escapeHtml($dtf ?? '') ?>">
                     <input type="hidden" name="dtt" id="dtt" value="<?= escapeHtml($dtt ?? '') ?>">
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Category">
-                        <option value="">- Any category -</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Category')) ?>">
+                        <option value=""><?= __('- Any category -') ?></option>
                         <?php foreach ($categories as $category => $count) { ?>
-                            <option value="<?= escapeHtml($category) ?>" <?= $category_filter === (string) $category ? 'selected' : '' ?><?= selectOptionData(['icon' => appLogCategoryIcon($category), 'description' => number_format($count) . ' entr' . ($count === 1 ? 'y' : 'ies')]) ?>><?= escapeHtml($category) ?></option>
+                            <option value="<?= escapeHtml($category) ?>" <?= $category_filter === (string) $category ? 'selected' : '' ?><?= selectOptionData(['icon' => appLogCategoryIcon($category), 'description' => _n('%s entry', '%s entries', $count, number_format($count))]) ?>><?= escapeHtml($category) ?></option>
                         <?php } ?>
                         <?php if ($category_filter !== '' && !isset($categories[$category_filter])) { ?>
                             <option value="<?= escapeHtml($category_filter) ?>" selected><?= escapeHtml($category_filter) ?></option>
@@ -151,10 +151,10 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('app_log_created_at', 'When') ?></th>
-                <th><?= $sort_link('app_log_type', 'Level') ?></th>
-                <th><?= $sort_link('app_log_category', 'Category') ?></th>
-                <th>Details</th>
+                <th class="ps-3"><?= $sort_link('app_log_created_at', __('When')) ?></th>
+                <th><?= $sort_link('app_log_type', __('Level')) ?></th>
+                <th><?= $sort_link('app_log_category', __('Category')) ?></th>
+                <th><?= __('Details') ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -173,7 +173,7 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
                     <td><?= appLogLevelPill($row['app_log_type']) ?></td>
                     <td class="small text-nowrap">
                         <?php if ($category !== '') { ?>
-                            <a class="text-reset" href="<?= escapeHtml($category_url($category)) ?>" title="Just <?= escapeHtml($category) ?>"><i class="<?= appLogCategoryIcon($category) ?> fa-fw text-secondary me-1"></i><?= escapeHtml($category) ?></a>
+                            <a class="text-reset" href="<?= escapeHtml($category_url($category)) ?>" title="<?= escapeHtml(__('Just %s', $category)) ?>"><i class="<?= appLogCategoryIcon($category) ?> fa-fw text-secondary me-1"></i><?= escapeHtml($category) ?></a>
                         <?php } else { ?>
                             <span class="text-body-secondary">-</span>
                         <?php } ?>
@@ -182,7 +182,7 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
                         <div class="text-break" data-app-log-details><?= escapeHtml($short) ?></div>
                     </td>
                     <td class="text-end pe-3">
-                        <button type="button" class="btn btn-sm btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/app_log/app_log.php?id=<?= $app_log_id ?>" title="All of it" aria-label="All of it"><i class="fas fa-fw fa-search-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-light ajax-modal" data-modal-size="lg" data-modal-url="modals/app_log/app_log.php?id=<?= $app_log_id ?>" title="<?= escapeHtml(__('All of it')) ?>" aria-label="<?= escapeHtml(__('All of it')) ?>"><i class="fas fa-fw fa-search-plus"></i></button>
                     </td>
                 </tr>
             <?php } ?>
@@ -191,12 +191,12 @@ $filters_url = function ($modal) use ($dtf, $dtt, $view, $category_filter) {
     </div>
     <?php
     $empty_state = [
-        'thing' => 'app log entries',
+        'thing' => __('app log entries'),
         'icon' => 'fa-clipboard-list',
         'filtered' => $any_filter,
         'views' => ['view'],
         'view' => $view !== '' ? ['icon' => $views[$view]['icon'], 'title' => 'No ' . ($view === 'info' ? 'info entries' : strtolower($views[$view]['label'])) . ' yet', 'text' => escapeHtml($views[$view]['title']) . ' shows here.'] : null,
-        'text' => 'What ITFlow itself does - cron runs, mail, payment providers, the API - and the errors it runs into show here. ' . ($retention['app'] ? 'They are kept for ' . appLogRetentionText($retention['app']) . '.' : 'They are kept until they are cleared.'),
+        'text' => __('What ITFlow itself does - cron runs, mail, payment providers, the API - and the errors it runs into show here.') . ' ' . ($retention['app'] ? __('They are kept for %s.', mb_strtolower(appLogRetentionText($retention['app']))) : __('They are kept until they are cleared.')),
     ];
     require_once "../includes/filter_footer.php";
     ?>

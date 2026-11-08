@@ -26,7 +26,7 @@ $sql = mysqli_query($mysqli, "SELECT document_folder_id, COALESCE(folder_name, '
     WHERE $visible GROUP BY document_folder_id, folder_name ORDER BY folder_name = '', folder_name ASC");
 $all_count = 0;
 while ($row = mysqli_fetch_assoc($sql)) {
-    $folders[intval($row['document_folder_id'])] = ['name' => $row['folder_name'] !== '' ? $row['folder_name'] : 'Not in a folder', 'count' => intval($row['n'])];
+    $folders[intval($row['document_folder_id'])] = ['name' => $row['folder_name'] !== '' ? $row['folder_name'] : __('Not in a folder'), 'count' => intval($row['n'])];
     $all_count += intval($row['n']);
 }
 $folder = isset($_GET['folder']) && isset($folders[intval($_GET['folder'])]) ? intval($_GET['folder']) : null;
@@ -60,27 +60,27 @@ function documentsUrl(array $changes) {
 
 <div class="itflow-portal-page-head">
     <div>
-        <h1>Documents</h1>
-        <p>Guides and records we share with you</p>
+        <h1><?= __('Documents') ?></h1>
+        <p><?= __('Guides and records we share with you') ?></p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
         <form method="get" class="d-flex" role="search">
             <?php if ($folder !== null) { ?><input type="hidden" name="folder" value="<?= $folder ?>"><?php } ?>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="Search documents" aria-label="Search documents" maxlength="200">
+                <input type="search" class="form-control" name="q" value="<?= escapeHtml($q) ?>" placeholder="<?= escapeHtml(__('Search documents')) ?>" aria-label="<?= escapeHtml(__('Search documents')) ?>" maxlength="200">
             </div>
         </form>
         <div class="btn-group">
-            <a class="btn btn-primary" href="document_add.php"><i class="fas fa-plus me-2"></i>New document</a>
-            <a class="btn btn-outline-primary" href="document_add.php?upload=1"><i class="fas fa-upload me-2"></i>Upload a file</a>
+            <a class="btn btn-primary" href="document_add.php"><i class="fas fa-plus me-2"></i><?= __('New document') ?></a>
+            <a class="btn btn-outline-primary" href="document_add.php?upload=1"><i class="fas fa-upload me-2"></i><?= __('Upload a file') ?></a>
         </div>
     </div>
 </div>
 
 <?php if (count($folders) > 1) { ?>
-    <nav class="itflow-portal-tabs" aria-label="Folders">
-        <a class="<?= $folder === null ? 'active' : '' ?>" href="<?= escapeHtml(documentsUrl(['folder' => null, 'page' => null])) ?>"><i class="fas fa-list"></i>All <span class="badge rounded-pill"><?= $all_count ?></span></a>
+    <nav class="itflow-portal-tabs" aria-label="<?= escapeHtml(__('Folders')) ?>">
+        <a class="<?= $folder === null ? 'active' : '' ?>" href="<?= escapeHtml(documentsUrl(['folder' => null, 'page' => null])) ?>"><i class="fas fa-list"></i><?= __('All') ?> <span class="badge rounded-pill"><?= $all_count ?></span></a>
         <?php foreach ($folders as $id => $f) { ?>
             <a class="<?= $folder === $id ? 'active' : '' ?>" href="<?= escapeHtml(documentsUrl(['folder' => $id, 'page' => null])) ?>"><i class="fas <?= $id ? 'fa-folder' : 'fa-file' ?>"></i><?= escapeHtml($f['name']) ?> <span class="badge rounded-pill"><?= $f['count'] ?></span></a>
         <?php } ?>
@@ -90,10 +90,10 @@ function documentsUrl(array $changes) {
 <section class="itflow-portal-panel">
     <?php if (!$total) { ?>
         <?php if ($q !== '') { ?>
-            <?= emptyStateHtml(['thing' => 'documents', 'filtered' => true, 'match_text' => 'No document mentions &ldquo;' . escapeHtml($q) . '&rdquo;.', 'clear_url' => documentsUrl(['q' => null, 'page' => null])]) ?>
+            <?= emptyStateHtml(['thing' => __('documents'), 'filtered' => true, 'match_text' => __('No document mentions &ldquo;%s&rdquo;.', escapeHtml($q)), 'clear_url' => documentsUrl(['q' => null, 'page' => null])]) ?>
         <?php } else { ?>
-            <?= emptyStateHtml(['title' => 'No documents yet', 'text' => 'Guides and records we share with you show here - and you can add your own.', 'icon' => 'fa-folder-open', 'filtered' => false,
-                'actions' => [['label' => 'New document', 'href' => 'document_add.php'], ['label' => 'Upload a file', 'href' => 'document_add.php?upload=1', 'icon' => 'fa-upload']]]) ?>
+            <?= emptyStateHtml(['title' => __('No documents yet'), 'text' => __('Guides and records we share with you show here - and you can add your own.'), 'icon' => 'fa-folder-open', 'filtered' => false,
+                'actions' => [['label' => __('New document'), 'href' => 'document_add.php'], ['label' => __('Upload a file'), 'href' => 'document_add.php?upload=1', 'icon' => 'fa-upload']]]) ?>
         <?php } ?>
     <?php } else { ?>
         <ul class="itflow-portal-list">
@@ -110,7 +110,7 @@ function documentsUrl(array $changes) {
                             </span>
                         </span>
                         <span class="itflow-portal-ticket-side">
-                            <small title="<?= escapeHtml($updated) ?>">Updated <?= escapeHtml(date('M j, Y', strtotime($updated))) ?></small>
+                            <small title="<?= escapeHtml($updated) ?>"><?= __('Updated %s', escapeHtml(formatDate($updated, 'date'))) ?></small>
                         </span>
                     </a>
                 </li>
@@ -118,10 +118,10 @@ function documentsUrl(array $changes) {
         </ul>
         <?php if ($pages > 1) { ?>
             <div class="itflow-portal-pager">
-                <span><?= $offset + 1 ?>-<?= min($offset + $per_page, $total) ?> of <?= $total ?></span>
+                <span><?= __('%1$d-%2$d of %3$d', $offset + 1, min($offset + $per_page, $total), $total) ?></span>
                 <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="Previous page"><i class="fas fa-chevron-left"></i></a>
-                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page + 1])) ?>" aria-label="Next page"><i class="fas fa-chevron-right"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page <= 1 ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page - 1 > 1 ? $page - 1 : null])) ?>" aria-label="<?= escapeHtml(__('Previous page')) ?>"><i class="fas fa-chevron-left"></i></a>
+                    <a class="btn btn-sm btn-outline-secondary<?= $page >= $pages ? ' disabled' : '' ?>" href="<?= escapeHtml(documentsUrl(['page' => $page + 1])) ?>" aria-label="<?= escapeHtml(__('Next page')) ?>"><i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
         <?php } ?>

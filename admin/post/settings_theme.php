@@ -17,7 +17,7 @@ if (isset($_POST['edit_theme_settings'])) {
 
     $errors = [];
     if (!isset(settingsThemes()[$theme])) {
-        $errors['config_theme'] = 'Pick one of the colours.';
+        $errors['config_theme'] = __('Pick one of the colours.');
     }
     $favicon_problem = settingsImageProblem($_FILES['favicon'] ?? null, ['ico'], ['ico'], '.ico', 1048576);
     if ($favicon_problem !== '') {
@@ -31,7 +31,7 @@ if (isset($_POST['edit_theme_settings'])) {
     $also = [];
     if (!empty($_FILES['favicon']['tmp_name']) && ($_FILES['favicon']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK && is_uploaded_file($_FILES['favicon']['tmp_name'])) {
         if (move_uploaded_file($_FILES['favicon']['tmp_name'], dirname(__DIR__, 2) . '/uploads/favicon.ico')) {
-            $also[] = 'Browser tab icon changed';
+            $also[] = __('Browser tab icon changed');
         }
     }
 
@@ -51,7 +51,7 @@ if (isset($_GET['reset_favicon'])) {
 
     logAudit("Settings", "Edit", "$session_name put the ITFlow browser tab icon back");
 
-    flashAlert("The browser tab icon is ITFlow's own again");
+    flashAlert(__('The browser tab icon is ITFlow\'s own again'));
 
     redirect();
 

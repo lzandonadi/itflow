@@ -47,7 +47,7 @@ $gs_limit = agentUserLimitReached();
             <span class="itflow-gs-person-initials opacity-50" aria-hidden="true"><?= escapeHtml(personInitials($gs_invite['invite_name'])) ?></span>
             <div class="min-w-0 flex-grow-1">
                 <div class="fw-semibold text-truncate"><?= escapeHtml($gs_invite['invite_name']) ?>
-                    <span class="badge rounded-pill bg-<?= $gs_invite_state['tone'] ?>-subtle text-<?= $gs_invite_state['tone'] ?>-emphasis fw-normal ms-1" title="<?= escapeHtml($gs_invite_state['title']) ?>"><i class="fas fa-paper-plane me-1"></i><?= $gs_invite_state['label'] === 'Waiting' ? 'Invited' : 'Invite ran out' ?></span>
+                    <span class="badge rounded-pill bg-<?= $gs_invite_state['tone'] ?>-subtle text-<?= $gs_invite_state['tone'] ?>-emphasis fw-normal ms-1" title="<?= escapeHtml($gs_invite_state['title']) ?>"><i class="fas fa-paper-plane me-1"></i><?= userInviteState($gs_invite) === 'expired' ? __('Invite ran out') : __('Invited') ?></span>
                 </div>
                 <div class="small text-body-secondary text-truncate"><?= escapeHtml($gs_invite['invite_email']) ?></div>
             </div>
@@ -56,32 +56,32 @@ $gs_limit = agentUserLimitReached();
     <?php } ?>
 </ul>
 <?php if ($gs_invites) { ?>
-    <p class="small text-body-secondary mt-n2 mb-4" data-gs-invites-note><i class="fas fa-info-circle me-1"></i>Send an invite again, get its link or cancel it in <a href="users.php?show=invited">Admin &gt; Users, Invited</a>.</p>
+    <p class="small text-body-secondary mt-n2 mb-4" data-gs-invites-note><i class="fas fa-info-circle me-1"></i><?= __('Send an invite again, get its link or cancel it in %s.', '<a href="users.php?show=invited">' . __('Admin &gt; Users, Invited') . '</a>') ?></p>
 <?php } ?>
 
 <?php if ($gs_limit) { ?>
     <div class="alert alert-info mb-0" data-gs-team-limit><?= escapeHtml(agentUserLimitMessage()) ?></div>
 <?php } else { ?>
-    <h2 class="h6 fw-semibold">Add someone</h2>
+    <h2 class="h6 fw-semibold"><?= __('Add someone') ?></h2>
     <form action="post.php" method="post" autocomplete="off" data-gs-form>
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <div class="row g-3 mb-3">
             <div class="col-sm-6">
-                <?= settingsInput('team_name', '', ['icon' => 'fa-user', 'label' => 'Name', 'required' => true, 'maxlength' => 200, 'placeholder' => 'Alex Morgan', 'autocomplete' => 'off']) ?>
+                <?= settingsInput('team_name', '', ['icon' => 'fa-user', 'label' => 'Name', 'required' => true, 'maxlength' => 200, 'placeholder' => __('Alex Morgan'), 'autocomplete' => 'off']) ?>
             </div>
             <div class="col-sm-6">
                 <?= settingsInput('team_email', '', ['icon' => 'fa-envelope', 'type' => 'email', 'label' => 'Email', 'required' => true, 'maxlength' => 200, 'placeholder' => 'alex@example.com', 'autocomplete' => 'off']) ?>
             </div>
             <div class="col-12">
                 <?= settingsSelect('team_role', $gs_role_default, [], ['icon' => 'fa-id-badge', 'label' => 'Role', 'required' => true, 'options_html' => $gs_role_options,
-                    'help' => 'What they can see and change - roles are in Admin &gt; Roles. A role that isn\'t an admin one sees every client, until you limit them in Admin &gt; Users.']) ?>
+                    'help' => __('What they can see and change - roles are in Admin &gt; Roles. A role that isn\'t an admin one sees every client, until you limit them in Admin &gt; Users.')]) ?>
             </div>
         </div>
         <?php if ($gs_invite_ready) { ?>
-            <p class="small text-body-secondary" data-gs-team-mail="yes"><i class="fas fa-paper-plane me-1"></i>They are emailed an invite - a link to choose their own password and sign in, which works for <?= USER_INVITE_LINK_DAYS ?> days.</p>
+            <p class="small text-body-secondary" data-gs-team-mail="yes"><i class="fas fa-paper-plane me-1"></i><?= __('They are emailed an invite - a link to choose their own password and sign in, which works for %d days.', USER_INVITE_LINK_DAYS) ?></p>
         <?php } else { ?>
-            <p class="small text-body-secondary" data-gs-team-mail="no"><i class="fas fa-info-circle me-1"></i><?= emailReady() ? 'ITFlow makes their password' : 'Email isn\'t set up yet, so ITFlow makes their password' ?> and shows it to you once - for you to give them, and them to change.</p>
+            <p class="small text-body-secondary" data-gs-team-mail="no"><i class="fas fa-info-circle me-1"></i><?= emailReady() ? __('ITFlow makes their password') : __('Email isn\'t set up yet, so ITFlow makes their password') ?> and shows it to you once - for you to give them, and them to change.</p>
         <?php } ?>
-        <button type="submit" name="getting_started_team" value="1" class="btn btn-primary" data-gs-save><i class="fas <?= $gs_invite_ready ? 'fa-paper-plane' : 'fa-user-plus' ?> me-2"></i><?= $gs_invite_ready ? 'Invite them' : 'Add them' ?></button>
+        <button type="submit" name="getting_started_team" value="1" class="btn btn-primary" data-gs-save><i class="fas <?= $gs_invite_ready ? 'fa-paper-plane' : 'fa-user-plus' ?> me-2"></i><?= $gs_invite_ready ? __('Invite them') : __('Add them') ?></button>
     </form>
 <?php } ?>

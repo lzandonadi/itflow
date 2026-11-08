@@ -34,7 +34,7 @@ function billingTypes() {
             'number_setting' => 'config_quote_next_number',
         ],
         'recurring' => [
-            'label' => 'Recurring invoice', 'plural' => 'Recurring invoices', 'icon' => 'fa-redo-alt',
+            'label' => 'Recurring invoice', 'plural' => 'Recurring invoices', 'icon' => 'fa-redo-alt', // i18n-ignore - SQL, logs or history
             'table' => 'recurring_invoices', 'col' => 'recurring_invoice', 'items' => 'recurring_invoice_items', 'item_fk' => 'item_recurring_invoice_id',
             'history_fk' => 'history_recurring_invoice_id', 'page' => 'recurring_invoice.php', 'list' => 'recurring_invoices.php', 'param' => 'recurring_invoice_id',
             'number_setting' => 'config_recurring_invoice_next_number',
@@ -45,6 +45,14 @@ function billingTypes() {
 /** One kind's map, or null. */
 function billingType($type) {
     return billingTypes()[$type] ?? null;
+}
+
+/** A kind's name as people read it - billingTypes()'s label and plural stay English for logs. */
+function billingTypeLabel($type, $plural = false) {
+    $labels = $plural
+        ? ['invoice' => __('Invoices'), 'quote' => __('Quotes'), 'recurring' => __('Recurring invoices')]
+        : ['invoice' => __('Invoice'), 'quote' => __('Quote'), 'recurring' => __('Recurring invoice')];
+    return $labels[$type] ?? (string) $type;
 }
 
 /**
@@ -132,7 +140,7 @@ function billingItems($type, $id) {
  */
 function billingTaxes($since = null) {
     global $mysqli;
-    $since_sql = $since ? "OR tax_archived_at > '" . escapeSql($since) . "'" : '';
+    $since_sql = $since ? "OR tax_archived_at > '" . escapeSql($since) . "'" : ''; // i18n-ignore - SQL, logs or history
     $taxes = [];
     $sql = mysqli_query($mysqli, "SELECT tax_id, tax_name, tax_percent FROM taxes WHERE tax_archived_at IS NULL $since_sql ORDER BY tax_name ASC");
     while ($row = mysqli_fetch_assoc($sql)) {
@@ -330,7 +338,7 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
     $doc_id = intval($doc_id);
     $item_id = intval($item_id);
     if (!$t || !$doc_id) {
-        $error = 'That document no longer exists.';
+        $error = __('That document no longer exists.');
         return null;
     }
 
@@ -342,11 +350,11 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
     $product_id = intval($in['product_id'] ?? 0);
 
     if ($name === '') {
-        $error = 'A line needs a name.';
+        $error = __('A line needs a name.');
         return null;
     }
     if (mb_strlen($name) > 200) {
-        $error = 'That name is too long - keep it under 200 characters, and put the rest in the description.';
+        $error = __('That name is too long - keep it under 200 characters, and put the rest in the description.');
         return null;
     }
     // A recurring line can count its quantity from the client - see recurringSeatSources()
@@ -360,12 +368,12 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
             ]);
             $seat_minimum = billingNumberInput($in['seat_minimum'] ?? '0');
             if ($seat_minimum === null || $seat_minimum < 0) {
-                $error = 'The minimum has to be a number, zero or more.';
+                $error = __('The minimum has to be a number, zero or more.');
                 return null;
             }
             $seat_count = recurringSeatCount(getFieldById('recurring_invoices', $doc_id, 'recurring_invoice_client_id'), $seat_source, $seat_filter);
             if ($seat_count === null) {
-                $error = $seat_source === 'license' ? "Pick one of the client's licenses to count." : "Those can't be counted.";
+                $error = $seat_source === 'license' ? __("Pick one of the client's licenses to count.") : __("Those can't be counted.");
                 return null;
             }
             $quantity = max(floatval($seat_count), $seat_minimum);
@@ -382,16 +390,16 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
     }
 
     if ($quantity === null || $price === null) {
-        $error = 'The quantity and price have to be numbers.';
+        $error = __('The quantity and price have to be numbers.');
         return null;
     }
     if (abs($quantity) >= 1e9 || abs($price) >= 1e11) {
-        $error = 'That amount is too large.';
+        $error = __('That amount is too large.');
         return null;
     }
 
     if ($tax_id && !taxRow($tax_id)) {
-        $error = 'That tax no longer exists.';
+        $error = __('That tax no longer exists.');
         return null;
     }
     // Its tax on the whole line for now - billingRecalc() takes any discount off first
@@ -401,7 +409,7 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
     if ($item_id) {
         $old = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT item_quantity, item_product_id FROM {$t['items']} WHERE item_id = $item_id AND {$t['item_fk']} = $doc_id"));
         if (!$old) {
-            $error = 'That line no longer exists.';
+            $error = __('That line no longer exists.');
             return null;
         }
         $product_id = intval($old['item_product_id']);
@@ -416,7 +424,7 @@ function billingItemSave($type, $doc_id, array $in, $item_id = 0, &$error = '') 
         if ($stock_change > 0) {
             $available = productOnHand($product_id);
             if ($available < $stock_change) {
-                $error = 'Not enough ' . $name . ' in stock - ' . billingQuantity($available) . ' left.';
+                $error = __('Not enough %1$s in stock - %2$s left.', $name, billingQuantity($available));
                 return null;
             }
         }
@@ -479,7 +487,7 @@ function billingItemDelete($type, $doc_id, $item_id) {
     $product_id = intval($item['item_product_id']);
     if ($type === 'invoice' && $product_id && intval(getFieldById('products', $product_id, 'product_track_stock')) === 1 && floatval($item['item_quantity']) > 0) {
         productStockMove($product_id, floatval($item['item_quantity']), 'returned', [
-            'invoice_id' => $doc_id, 'item_id' => $item_id, 'note' => billingNumber('invoice', billingRow('invoice', $doc_id, false)) . ' - line taken off',
+            'invoice_id' => $doc_id, 'item_id' => $item_id, 'note' => billingNumber('invoice', billingRow('invoice', $doc_id, false)) . ' - line taken off', // i18n-ignore - SQL, logs or history
         ]);
     }
     // Assets made from the line stay, still bought on the invoice; an expense or trip billed on it is to bill again
@@ -623,7 +631,7 @@ function billingHistory($type, $id) {
     $id = intval($id);
     $rows = [];
     // A recurring invoice's entry for the lines a quote added carries the quote's id too - it is the recurring invoice's
-    $own = $type === 'quote' ? ' AND history_recurring_invoice_id = 0' : '';
+    $own = $type === 'quote' ? ' AND history_recurring_invoice_id = 0' : ''; // i18n-ignore - SQL, logs or history
     $sql = mysqli_query($mysqli, "SELECT history_status, history_description, history_created_at FROM history WHERE {$t['history_fk']} = $id$own ORDER BY history_id DESC LIMIT 200");
     while ($row = mysqli_fetch_assoc($sql)) {
         $rows[] = $row;
@@ -740,12 +748,31 @@ function invoiceState($row, $paid) {
     return ['state' => $state, 'balance' => $balance, 'paid' => round(floatval($paid), 2), 'days' => $days];
 }
 
+/*
+ * An invoice status as people read it, in the interface language - the stored
+ * value (Sent) stays what is saved, compared and posted. One that isn't
+ * ITFlow's own comes back as it is.
+ */
+function invoiceStatusLabel($status) {
+    $status = (string) $status;
+    return [
+        'Draft' => _x('Draft', 'invoice status'),
+        'Sent' => _x('Sent', 'invoice status'),
+        'Viewed' => _x('Viewed', 'invoice status'),
+        'Partial' => _x('Partial', 'invoice status'),
+        'Paid' => _x('Paid', 'invoice status'),
+        'Overdue' => _x('Overdue', 'invoice status'),
+        'Cancelled' => _x('Cancelled', 'invoice status'),
+        'Non-Billable' => _x('Non-Billable', 'invoice status'),
+    ][$status] ?? $status;
+}
+
 /** An invoice's status as a badge - its stored status, and Overdue when it is late. */
 function invoiceStatusBadge($status, $overdue = false) {
     $status = (string) $status;
-    $html = '<span class="badge rounded-pill text-bg-' . getInvoiceBadgeColor($status) . '">' . escapeHtml($status) . '</span>';
+    $html = '<span class="badge rounded-pill text-bg-' . getInvoiceBadgeColor($status) . '">' . escapeHtml(invoiceStatusLabel($status)) . '</span>';
     if ($overdue) {
-        $html .= ' <span class="badge rounded-pill text-bg-danger">Overdue</span>';
+        $html .= ' <span class="badge rounded-pill text-bg-danger">' . _x('Overdue', 'invoice status') . '</span>';
     }
     return $html;
 }
@@ -758,13 +785,13 @@ function invoiceDuePill($state) {
     $days = $state['days'];
     if ($days < 0) {
         $late = -$days;
-        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="Past its due date"><i class="fas fa-exclamation-circle me-1"></i>' . $late . ' ' . ($late === 1 ? 'day' : 'days') . ' overdue</span>';
+        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . __('Past its due date') . '"><i class="fas fa-exclamation-circle me-1"></i>' . _n('%d day overdue', '%d days overdue', $late) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-warning fw-normal"><i class="fas fa-clock me-1"></i>Due today</span>';
+        return '<span class="badge rounded-pill text-bg-warning fw-normal"><i class="fas fa-clock me-1"></i>' . __('Due today') . '</span>';
     }
     $class = $days <= 7 ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary-emphasis';
-    return '<span class="badge rounded-pill ' . $class . ' fw-normal"><i class="far fa-clock me-1"></i>Due in ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill ' . $class . ' fw-normal"><i class="far fa-clock me-1"></i>' . _n('Due in %d day', 'Due in %d days', $days) . '</span>';
 }
 
 /** May a payment be recorded against this invoice? */
@@ -815,8 +842,26 @@ function enforceBillingMoney($action) {
         : permissionRefusedText('module_financial', $rule[0], intval(lookupUserPermission('module_financial'))));
 }
 
+/*
+ * Which manual status changes an invoice allows from where it stands. The invoice page
+ * offers each button by these, and the handlers refuse by the same ones - a hand-made
+ * link or a stale tab must not do what the page would not offer.
+ */
 function invoiceCanPay($row, $state) {
     return in_array($row['invoice_status'], invoiceOpenStatuses(), true) && $state['balance'] > 0;
+}
+
+function invoiceCanCancel($status) {
+    return in_array((string) $status, ['Draft', 'Sent', 'Viewed', 'Partial'], true);
+}
+
+/** Only a sent invoice with nothing on it can be closed off as non-billable. */
+function invoiceCanMarkNonBillable($row) {
+    return in_array((string) $row['invoice_status'], ['Sent', 'Viewed'], true) && floatval($row['invoice_amount']) == 0;
+}
+
+function invoiceCanMarkSent($status) {
+    return (string) $status === 'Draft';
 }
 
 /** Does the client have a card on file with an active provider, to charge from the invoice? */
@@ -876,7 +921,7 @@ function invoiceTickets($invoice_id) {
  * number of hundredths of an hour, so the hours on a line are exact.
  */
 function billingTimeIncrements() {
-    return [6 => '6 minutes (a tenth of an hour)', 12 => '12 minutes', 15 => '15 minutes (a quarter hour)', 30 => '30 minutes', 60 => 'An hour'];
+    return [6 => __('6 minutes (a tenth of an hour)'), 12 => __('12 minutes'), 15 => __('15 minutes (a quarter hour)'), 30 => __('30 minutes'), 60 => __('An hour')];
 }
 
 /**
@@ -910,10 +955,13 @@ function billingTimeRules($fresh = false) {
 /** The rules in words - "to the nearest 15 minutes", "up to the next 6 minutes, at least 1 hour". */
 function billingTimeRulesText(?array $rules = null) {
     $rules = $rules ?? billingTimeRules();
-    $step = $rules['increment'] === 60 ? 'hour' : $rules['increment'] . ' minutes';
-    $text = $rules['rounding'] === 'up' ? "up to the next $step" : "to the nearest $step";
+    if ($rules['increment'] === 60) {
+        $text = $rules['rounding'] === 'up' ? __('up to the next hour') : __('to the nearest hour');
+    } else {
+        $text = $rules['rounding'] === 'up' ? __('up to the next %d minutes', $rules['increment']) : __('to the nearest %d minutes', $rules['increment']);
+    }
     if ($rules['minimum'] > 0) {
-        $text .= ', at least ' . billingDuration($rules['minimum'] * 60);
+        $text .= __(', at least %s', billingDuration($rules['minimum'] * 60));
     }
     return $text;
 }
@@ -1072,7 +1120,7 @@ function billingUnbilledTickets($client_id = 0, array $ticket_ids = [], $include
         $row['prepaid'] = round(floatval($row['prepaid']), 2);
         $row['hours'] = max(0.0, round($row['worked'] - $row['prepaid'], 2));
         $rate = function_exists('contractTicketRate') ? contractTicketRate($row)
-            : ['rate' => billingTimeRate(), 'source' => 'default', 'note' => 'the default rate'];
+            : ['rate' => billingTimeRate(), 'source' => 'default', 'note' => __('the default rate')];
         $row['rate'] = $rate['rate'];
         $row['rate_source'] = $rate['source'];
         $row['rate_note'] = $rate['note'];
@@ -1156,7 +1204,7 @@ function billingInvoiceCreate($client_id, $date, $category_id, $scope, $by) {
         invoice_status = 'Draft', invoice_url_key = '$url_key', invoice_client_id = $client_id");
     $invoice_id = intval(mysqli_insert_id($mysqli));
     if ($invoice_id) {
-        billingLog('invoice', $invoice_id, 'Draft', "Invoice created by $by");
+        billingLog('invoice', $invoice_id, 'Draft', "Invoice created by $by"); // i18n-ignore - SQL, logs or history
     }
     return $invoice_id;
 }
@@ -1186,7 +1234,7 @@ function billingTimeInvoice($client_id, array $hours, array $opts, &$error = '')
     $tickets = $hours ? billingUnbilledTickets($client_id, array_keys($hours), !empty($opts['include_open'])) : [];
     $add_lines = !isset($opts['lines']) || $opts['lines'];
     if (!$client_id || !$tickets) {
-        $error = 'Nothing to bill - those tickets are already on an invoice, or no longer billable.';
+        $error = __('Nothing to bill - those tickets are already on an invoice, or no longer billable.');
         return null;
     }
 
@@ -1196,7 +1244,7 @@ function billingTimeInvoice($client_id, array $hours, array $opts, &$error = '')
         $value = $hours[$ticket_id] ?? null;
         $h = ($value === null || $value === '') ? $ticket['hours'] : billingNumberInput($value);
         if ($h === null || $h < 0 || $h >= 10000) {
-            $error = 'The hours for ' . $ticket['ticket_prefix'] . $ticket['ticket_number'] . ' have to be a number, zero or more.';
+            $error = __('The hours for %s have to be a number, zero or more.', $ticket['ticket_prefix'] . $ticket['ticket_number']);
             return null;
         }
         $bill[$ticket_id] = round($h, 2);
@@ -1204,18 +1252,18 @@ function billingTimeInvoice($client_id, array $hours, array $opts, &$error = '')
     // One rate typed for them all, or each at its own
     $price = isset($opts['price']) && $opts['price'] !== '' && $opts['price'] !== null ? billingNumberInput($opts['price']) : false;
     if ($price === null || ($price !== false && abs($price) >= 1e9)) {
-        $error = 'The rate has to be a number.';
+        $error = __('The rate has to be a number.');
         return null;
     }
     $tax_id = taxChoice($opts['tax_id'] ?? 0, $client_id, 'time');
     if ($tax_id && !taxRow($tax_id)) {
-        $error = 'That tax no longer exists.';
+        $error = __('That tax no longer exists.');
         return null;
     }
     $item_name = trim((string) ($opts['item_name'] ?? ''));
     $item_name = $item_name !== '' ? $item_name : billingTimeRules()['item_name'];
     if (mb_strlen($item_name) > 200) {
-        $error = 'That line name is too long - keep it under 200 characters.';
+        $error = __('That line name is too long - keep it under 200 characters.');
         return null;
     }
 
@@ -1225,13 +1273,13 @@ function billingTimeInvoice($client_id, array $hours, array $opts, &$error = '')
     if ($invoice_id) {
         $invoice = billingRow('invoice', $invoice_id);
         if (!$invoice || intval($invoice['client_id']) !== $client_id || !billingCanEditItems('invoice', $invoice)) {
-            $error = "That invoice isn't one of the client's you can still add to.";
+            $error = __("That invoice isn't one of the client's you can still add to.");
             return null;
         }
     } else {
         $invoice_id = billingInvoiceCreate($client_id, $opts['date'] ?? '', $opts['category_id'] ?? 0, $opts['scope'] ?? '', $by);
         if (!$invoice_id) {
-            $error = "The invoice couldn't be made.";
+            $error = __("The invoice couldn't be made.");
             return null;
         }
         $new = true;
@@ -1251,7 +1299,7 @@ function billingTimeInvoice($client_id, array $hours, array $opts, &$error = '')
             mysqli_query($mysqli, "DELETE FROM history WHERE history_invoice_id = $invoice_id");
             mysqli_query($mysqli, "DELETE FROM invoices WHERE invoice_id = $invoice_id");
         }
-        $error = 'Nothing to bill - someone else billed those tickets just now.';
+        $error = __('Nothing to bill - someone else billed those tickets just now.');
         return null;
     }
 
@@ -1355,11 +1403,29 @@ function quoteExpired($row) {
         && !empty($row['quote_expire']) && strtotime((string) $row['quote_expire']) < strtotime(date('Y-m-d'));
 }
 
+/*
+ * A quote status as people read it, in the interface language - the stored
+ * value stays what is saved, compared and posted. One that isn't ITFlow's own
+ * comes back as it is.
+ */
+function quoteStatusLabel($status) {
+    $status = (string) $status;
+    return [
+        'Draft' => _x('Draft', 'quote status'),
+        'Sent' => _x('Sent', 'quote status'),
+        'Viewed' => _x('Viewed', 'quote status'),
+        'Accepted' => _x('Accepted', 'quote status'),
+        'Declined' => _x('Declined', 'quote status'),
+        'Invoiced' => _x('Invoiced', 'quote status'),
+        'Expired' => _x('Expired', 'quote status'),
+    ][$status] ?? $status;
+}
+
 /** A quote's status as a badge, and Expired when it ran out unanswered. */
 function quoteStatusBadge($row) {
-    $html = '<span class="badge rounded-pill text-bg-' . getQuoteBadgeColor($row['quote_status']) . '">' . escapeHtml($row['quote_status']) . '</span>';
+    $html = '<span class="badge rounded-pill text-bg-' . getQuoteBadgeColor($row['quote_status']) . '">' . escapeHtml(quoteStatusLabel($row['quote_status'])) . '</span>';
     if (quoteExpired($row)) {
-        $html .= ' <span class="badge rounded-pill text-bg-dark">Expired</span>';
+        $html .= ' <span class="badge rounded-pill text-bg-dark">' . _x('Expired', 'quote status') . '</span>';
     }
     return $html;
 }
@@ -1371,13 +1437,13 @@ function quoteExpiryPill($row) {
     }
     $days = intval(round((strtotime((string) $row['quote_expire']) - strtotime(date('Y-m-d'))) / 86400));
     if ($days < 0) {
-        return '<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis fw-normal">Expired ' . (-$days) . ' ' . (-$days === 1 ? 'day' : 'days') . ' ago</span>';
+        return '<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis fw-normal">' . _n('Expired %d day ago', 'Expired %d days ago', -$days) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-warning fw-normal">Expires today</span>';
+        return '<span class="badge rounded-pill text-bg-warning fw-normal">' . __('Expires today') . '</span>';
     }
     $class = $days <= 7 ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary-emphasis';
-    return '<span class="badge rounded-pill ' . $class . ' fw-normal">Expires in ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill ' . $class . ' fw-normal">' . _n('Expires in %d day', 'Expires in %d days', $days) . '</span>';
 }
 
 /*
@@ -1390,7 +1456,7 @@ function quoteExpiryPill($row) {
 
 /** How often a quote line is billed => label. '' is once. */
 function quoteFrequencies() {
-    return ['' => 'One time', 'month' => 'Monthly', 'quarter' => 'Quarterly', 'year' => 'Yearly'];
+    return ['' => __('One time'), 'month' => _x('Monthly', 'billing frequency'), 'quarter' => _x('Quarterly', 'billing frequency'), 'year' => _x('Yearly', 'billing frequency')];
 }
 
 /** A line's frequency, cleaned - '' for once. */
@@ -1407,7 +1473,7 @@ function quoteFrequency($value) {
  * invoice). Always has at least the one-time group.
  */
 function quoteLineGroups(array $items, $discount = 0) {
-    $labels = ['' => 'One-time', 'month' => 'Each month', 'quarter' => 'Each quarter', 'year' => 'Each year'];
+    $labels = ['' => __('One-time'), 'month' => __('Each month'), 'quarter' => __('Each quarter'), 'year' => __('Each year')];
     $blank = function ($frequency) use ($labels) {
         return ['frequency' => $frequency, 'label' => $labels[$frequency], 'items' => [], 'subtotal' => 0.0, 'tax' => 0.0, 'taxes' => [], 'discount' => 0.0, 'total' => 0.0];
     };
@@ -1467,13 +1533,13 @@ function quoteAmountText(array $groups, $currency) {
     foreach ($groups as $frequency => $group) {
         if ($frequency === '') {
             if ($group['items'] || count($groups) === 1) {
-                $parts[] = billingMoney($group['total'], $currency) . (count($groups) > 1 ? ' up front' : '');
+                $parts[] = count($groups) > 1 ? __('%s up front', billingMoney($group['total'], $currency)) : billingMoney($group['total'], $currency);
             }
         } else {
-            $parts[] = billingMoney($group['total'], $currency) . ' a ' . recurringInvoicePeriodWord($frequency);
+            $parts[] = ['month' => __('%s a month', billingMoney($group['total'], $currency)), 'quarter' => __('%s a quarter', billingMoney($group['total'], $currency)), 'year' => __('%s a year', billingMoney($group['total'], $currency))][recurringInvoicePeriodWord($frequency)];
         }
     }
-    return count($parts) > 1 ? implode(', ', array_slice($parts, 0, -1)) . ' and ' . end($parts) : (string) reset($parts);
+    return count($parts) > 1 ? __('%1$s and %2$s', implode(', ', array_slice($parts, 0, -1)), end($parts)) : (string) reset($parts);
 }
 
 /** A quote's groups, from the database - for the pages that only have its row. */
@@ -1535,14 +1601,14 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
     $error = '';
     $quote = billingRow('quote', $quote_id);
     if (!$quote) {
-        $error = 'That quote no longer exists.';
+        $error = __('That quote no longer exists.');
         return null;
     }
     $quote_id = intval($quote['quote_id']);
     $client_id = intval($quote['client_id']);
     $number = billingNumber('quote', $quote);
     if ($quote['quote_status'] !== 'Accepted') {
-        $error = $quote['quote_status'] === 'Invoiced' ? "$number is already invoiced." : "$number has to be accepted before it is invoiced.";
+        $error = $quote['quote_status'] === 'Invoiced' ? __('%s is already invoiced.', $number) : __('%s has to be accepted before it is invoiced.', $number);
         return null;
     }
     $by = (string) ($opts['by'] ?? 'ITFlow');
@@ -1554,7 +1620,7 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
     $date = $valid_date($opts['date'] ?? '') ?: date('Y-m-d');
     $first_period = !empty($opts['first_period']);
     if (!$groups['']['items'] && !quoteHasRecurring($groups) && floatval($groups['']['discount'] ?? 0) == 0) {
-        $error = "$number has nothing on it to invoice.";
+        $error = __('%s has nothing on it to invoice.', $number);
         return null;
     }
 
@@ -1569,7 +1635,7 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
         if ($to) {
             $existing = billingRow('recurring', $to);
             if (!$existing || intval($existing['client_id']) !== $client_id || $existing['recurring_invoice_frequency'] !== $frequency || $existing['recurring_invoice_archived_at']) {
-                $error = 'That recurring invoice is not one of ' . $quote['client_name'] . "'s billed " . strtolower(recurringInvoiceFrequencies()[$frequency]) . '.';
+                $error = __('That recurring invoice is not one of %1$s\'s billed %2$s.', $quote['client_name'], mb_strtolower(recurringInvoiceFrequencies()[$frequency]));
                 return null;
             }
             $plans[$frequency] = ['to' => $to, 'row' => $existing];
@@ -1590,7 +1656,7 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
     }
     $shortfall = productStockShortfall($invoice_lines);
     if ($shortfall !== '') {
-        $error = "$shortfall Add stock before invoicing $number.";
+        $error = $shortfall . ' ' . __('Add stock before invoicing %s.', $number);
         return null;
     }
 
@@ -1600,7 +1666,7 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
         mysqli_query($mysqli, "UPDATE quotes SET quote_status = 'Invoiced' WHERE quote_id = $quote_id AND quote_status = 'Accepted'");
         if (mysqli_affected_rows($mysqli) !== 1) {
             mysqli_rollback($mysqli);
-            $error = "$number was invoiced just now.";
+            $error = __('%s was invoiced just now.', $number);
             return null;
         }
         $currency = escapeSql($quote['quote_currency_code']);
@@ -1633,7 +1699,7 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
             billingRecalc('invoice', $invoice_id);
             $invoice_ref = billingNumber('invoice', billingRow('invoice', $invoice_id, false));
             $numbers[] = $invoice_ref;
-            billingLog('invoice', $invoice_id, 'Draft', "Made from quote $number by $by");
+            billingLog('invoice', $invoice_id, 'Draft', "Made from quote $number by $by"); // i18n-ignore - SQL, logs or history
             logAudit('Invoice', 'Create', escapeSql("$by made invoice $invoice_ref from quote $number"), $client_id, $invoice_id);
 
             // The ticket the quote was raised from is billed with it
@@ -1670,20 +1736,20 @@ function quoteConvert($quote_id, array $opts, &$error = '') {
                 billingCopyLines($group['items'], 'recurring', $recurring_id);
                 billingRecalc('recurring', $recurring_id);
                 $ref = billingNumber('recurring', billingRow('recurring', $recurring_id, false));
-                billingLog('recurring', $recurring_id, 'Active', "Made from quote $number by $by - first invoice on $start");
+                billingLog('recurring', $recurring_id, 'Active', "Made from quote $number by $by - first invoice on $start"); // i18n-ignore - SQL, logs or history
                 logAudit('Recurring Invoice', 'Create', escapeSql("$by made recurring invoice $ref from quote $number"), $client_id, $recurring_id);
             }
             $recurring[$recurring_id] = $ref;
             $numbers[] = $ref;
         }
 
-        billingLog('quote', $quote_id, 'Invoiced', 'Invoiced as ' . implode(', ', $numbers) . " by $by");
+        billingLog('quote', $quote_id, 'Invoiced', 'Invoiced as ' . implode(', ', $numbers) . " by $by"); // i18n-ignore - SQL, logs or history
         logAudit('Quote', 'Edit', escapeSql("$by invoiced quote $number as " . implode(', ', $numbers)), $client_id, $quote_id);
         mysqli_commit($mysqli);
     } catch (Throwable $e) {
         mysqli_rollback($mysqli);
         logApp('Quote', 'error', "Invoicing quote $number failed: " . $e->getMessage());
-        $error = "$number couldn't be invoiced - nothing was changed.";
+        $error = __("%s couldn't be invoiced - nothing was changed.", $number);
         return null;
     }
 
@@ -1728,7 +1794,7 @@ function billingQuoteAnswer($quote_id, $accept, array $by = []) {
     $quote_id = intval($quote_id);
     $quote = billingRow('quote', $quote_id, false);
     if (!$quote) {
-        return ['ok' => false, 'error' => 'This quote is no longer awaiting a response'];
+        return ['ok' => false, 'error' => __('This quote is no longer awaiting a response')];
     }
     if ($accept) {
         mysqli_query($mysqli, "UPDATE quotes SET quote_status = 'Accepted' WHERE quote_id = $quote_id AND quote_status IN ('Sent', 'Viewed') AND quote_expire >= CURDATE()");
@@ -1737,15 +1803,18 @@ function billingQuoteAnswer($quote_id, $accept, array $by = []) {
     }
     if (mysqli_affected_rows($mysqli) !== 1) {
         $expired = $accept ? mysqli_fetch_row(mysqli_query($mysqli, "SELECT quote_expire FROM quotes WHERE quote_id = $quote_id AND quote_status IN ('Sent', 'Viewed') AND quote_expire < CURDATE()")) : null;
-        return ['ok' => false, 'error' => $expired ? "This quote ran out on " . escapeHtml($expired[0]) . " - ask for an updated one" : "This quote is no longer awaiting a response"];
+        return ['ok' => false, 'error' => $expired ? __('This quote ran out on %s - ask for an updated one', escapeHtml(formatDate($expired[0], 'date'))) : __('This quote is no longer awaiting a response')];
     }
 
     $word = $accept ? 'Accepted' : 'Declined';
     $number = billingNumber('quote', $quote);
     $name = trim((string) ($by['name'] ?? ''));
     $note = trim((string) ($by['note'] ?? ''));
-    billingLog('quote', $quote_id, $word, $name !== '' ? "$word by $name in the client portal" . ($note !== '' ? "\nNote: $note" : '') : "$word by the client");
-    appNotify("Quote $word", escapeSql("Quote $number has been " . strtolower($word) . " by {$quote['client_name']}" . ($name !== '' ? " ($name, in the client portal)" : '')),
+    billingLog('quote', $quote_id, $word, $name !== '' ? "$word by $name in the client portal" . ($note !== '' ? "\nNote: $note" : '') : "$word by the client"); // i18n-ignore - SQL, logs or history
+    $notice = $accept
+        ? ($name !== '' ? __('Quote %1$s has been accepted by %2$s (%3$s, in the client portal)', $number, $quote['client_name'], $name) : __('Quote %1$s has been accepted by %2$s', $number, $quote['client_name']))
+        : ($name !== '' ? __('Quote %1$s has been declined by %2$s (%3$s, in the client portal)', $number, $quote['client_name'], $name) : __('Quote %1$s has been declined by %2$s', $number, $quote['client_name']));
+    appNotify("Quote $word", escapeSql($notice),
         "/agent/quote.php?quote_id=$quote_id", intval($quote['client_id']));
     triggerCustomAction($accept ? 'quote_accept' : 'quote_decline', $quote_id);
     if ($name !== '') {
@@ -1823,9 +1892,9 @@ function billingQuoteAddFiles($quote_id, array $files, array $by = []) {
         $file_id = intval(mysqli_insert_id($mysqli));
         mysqli_query($mysqli, "INSERT INTO quote_files SET quote_id = $quote_id, file_id = $file_id");
 
-        appNotify("Quote File", "$file_name was uploaded to quote $number_sql", "/agent/quote.php?quote_id=$quote_id", $client_id);
-        billingLog('quote', $quote_id, 'Upload', $name !== '' ? "$name uploaded file {$single_file['name']} in the client portal" : "Client uploaded file {$single_file['name']}");
-        logAudit("File", "Upload", ($name !== '' ? escapeSql($name) : 'Guest') . " uploaded file $file_name to quote $number_sql" . ($name !== '' ? ' in the client portal' : ''), $client_id);
+        appNotify("Quote File", escapeSql(__('%1$s was uploaded to quote %2$s', $file_name, $number_sql)), "/agent/quote.php?quote_id=$quote_id", $client_id); // i18n-ignore - SQL, logs or history
+        billingLog('quote', $quote_id, 'Upload', $name !== '' ? "$name uploaded file {$single_file['name']} in the client portal" : "Client uploaded file {$single_file['name']}"); // i18n-ignore - SQL, logs or history
+        logAudit("File", "Upload", ($name !== '' ? escapeSql($name) : 'Guest') . " uploaded file $file_name to quote $number_sql" . ($name !== '' ? ' in the client portal' : ''), $client_id); // i18n-ignore - SQL, logs or history
         $result['added'][] = (string) $single_file['name'];
     }
     return $result;
@@ -1852,7 +1921,7 @@ const RECURRING_INVOICE_GRACE_DAYS = 7;
 
 /** How often a recurring invoice runs => label. Each is also a MySQL interval unit. */
 function recurringInvoiceFrequencies() {
-    return ['month' => 'Monthly', 'quarter' => 'Quarterly', 'year' => 'Yearly'];
+    return ['month' => _x('Monthly', 'billing frequency'), 'quarter' => _x('Quarterly', 'billing frequency'), 'year' => _x('Yearly', 'billing frequency')];
 }
 
 /** How many months a run covers. */
@@ -1875,23 +1944,23 @@ function recurringInvoiceMonthly($amount, $frequency) {
  * twelfth. Takes the amount and frequency column names.
  */
 function recurringInvoiceMonthlySql($amount = 'recurring_invoice_amount', $frequency = 'recurring_invoice_frequency') {
-    return "(CASE $frequency WHEN 'year' THEN $amount / 12 WHEN 'quarter' THEN $amount / 3 ELSE $amount END)";
+    return "(CASE $frequency WHEN 'year' THEN $amount / 12 WHEN 'quarter' THEN $amount / 3 ELSE $amount END)"; // i18n-ignore - SQL, logs or history
 }
 
 /** "In 5 days", "Today", "3 days late" - for an active recurring invoice's next run. */
 function recurringInvoiceNextPill($row) {
     if (intval($row['recurring_invoice_status']) !== 1) {
-        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-pause me-1"></i>Paused</span>';
+        return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal"><i class="fas fa-pause me-1"></i>' . _x('Paused', 'recurring invoice') . '</span>';
     }
     $days = intval(round((strtotime((string) $row['recurring_invoice_next_date']) - strtotime(date('Y-m-d'))) / 86400));
     if ($days < 0) {
-        $title = -$days <= RECURRING_INVOICE_GRACE_DAYS ? 'Missed - the next nightly run bills it' : "Too far behind to bill by itself - use Invoice Now, or move it on";
-        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . $title . '"><i class="fas fa-exclamation-triangle me-1"></i>' . (-$days) . ' ' . (-$days === 1 ? 'day' : 'days') . ' late</span>';
+        $title = escapeHtml(-$days <= RECURRING_INVOICE_GRACE_DAYS ? __('Missed - the next nightly run bills it') : __('Too far behind to bill by itself - use Invoice Now, or move it on'));
+        return '<span class="badge rounded-pill text-bg-danger fw-normal" title="' . $title . '"><i class="fas fa-exclamation-triangle me-1"></i>' . _n('%d day late', '%d days late', -$days) . '</span>';
     }
     if ($days === 0) {
-        return '<span class="badge rounded-pill text-bg-info fw-normal">Today</span>';
+        return '<span class="badge rounded-pill text-bg-info fw-normal">' . __('Today') . '</span>';
     }
-    return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal">In ' . $days . ' ' . ($days === 1 ? 'day' : 'days') . '</span>';
+    return '<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-normal">' . _n('In %d day', 'In %d days', $days) . '</span>';
 }
 
 /**
@@ -1903,7 +1972,7 @@ function recurringInvoiceNextPill($row) {
 function recurringInvoiceStep($date, $frequency, $anchor_day = 0) {
     $d = new DateTime((string) $date);
     $day = intval($anchor_day) > 0 ? intval($anchor_day) : intval($d->format('j'));
-    $d->modify('first day of this month')->modify('+' . recurringInvoiceMonths($frequency) . ' months');
+    $d->modify('first day of this month')->modify('+' . recurringInvoiceMonths($frequency) . ' months'); // i18n-ignore - SQL, logs or history
     $d->setDate(intval($d->format('Y')), intval($d->format('n')), min($day, intval($d->format('t'))));
     return $d->format('Y-m-d');
 }
@@ -1977,9 +2046,9 @@ function recurringInvoiceTokens($text, array $period) {
 /** The places a line's quantity can come from. */
 function recurringSeatSources() {
     return [
-        'contacts' => ['label' => 'Users', 'unit' => 'user', 'icon' => 'fa-user'],
-        'assets' => ['label' => 'Devices', 'unit' => 'device', 'icon' => 'fa-desktop'],
-        'license' => ['label' => 'License seats', 'unit' => 'seat', 'icon' => 'fa-cube'],
+        'contacts' => ['label' => __('Users'), 'unit' => 'user', 'icon' => 'fa-user'],
+        'assets' => ['label' => __('Devices'), 'unit' => 'device', 'icon' => 'fa-desktop'],
+        'license' => ['label' => __('License seats'), 'unit' => 'seat', 'icon' => 'fa-cube'],
     ];
 }
 
@@ -2027,7 +2096,7 @@ function recurringSeatCount($client_id, $source, array $filter) {
     }
     if ($source === 'assets') {
         $skip = "'" . implode("', '", array_map('escapeSql', recurringSeatAssetSkipStatuses())) . "'";
-        $types_sql = !empty($filter['types']) ? "AND asset_type IN ('" . implode("', '", array_map('escapeSql', $filter['types'])) . "')" : '';
+        $types_sql = !empty($filter['types']) ? "AND asset_type IN ('" . implode("', '", array_map('escapeSql', $filter['types'])) . "')" : ''; // i18n-ignore - SQL, logs or history
         $tag_sql = $tag ? "AND asset_id IN (SELECT asset_tag_asset_id FROM asset_tags WHERE asset_tag_tag_id = $tag)" : '';
         return intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM assets WHERE asset_client_id = $client_id AND asset_archived_at IS NULL
             AND (asset_status IS NULL OR asset_status NOT IN ($skip)) $types_sql $tag_sql"))[0]);
@@ -2050,16 +2119,18 @@ function recurringSeatDescribe($source, array $filter) {
     $tag = intval($filter['tag'] ?? 0);
     $tag_name = $tag ? (string) getFieldById('tags', $tag, 'tag_name') : '';
     if ($source === 'contacts') {
-        return $tag_name !== '' ? "Contacts tagged $tag_name" : 'All contacts';
+        return $tag_name !== '' ? __('Contacts tagged %s', $tag_name) : __('All contacts');
     }
     if ($source === 'assets') {
         $types = $filter['types'] ?? [];
-        $what = $types ? (count($types) > 1 ? implode(', ', array_slice($types, 0, -1)) . ' and ' . end($types) : $types[0]) : 'All devices';
-        return $what . ($tag_name !== '' ? " tagged $tag_name" : '') . ' in use';
+        $types = array_map('assetTypeLabel', $types); // i18n-dynamic
+        $what = $types ? (count($types) > 1 ? __('%1$s and %2$s', implode(', ', array_slice($types, 0, -1)), end($types)) : $types[0]) : __('All devices');
+        return $tag_name !== '' ? __('%1$s tagged %2$s in use', $what, $tag_name) : __('%s in use', $what);
     }
     if ($source === 'license') {
         $name = (string) getFieldById('software', intval($filter['software_id'] ?? 0), 'software_name');
-        return ($name !== '' ? $name : 'A license that no longer exists') . (($filter['count'] ?? 'used') === 'total' ? ' - seats bought' : ' - seats in use');
+        $name = $name !== '' ? $name : __('A license that no longer exists');
+        return ($filter['count'] ?? 'used') === 'total' ? __('%s - seats bought', $name) : __('%s - seats in use', $name);
     }
     return '';
 }
@@ -2073,7 +2144,7 @@ function recurringSeatOptions($client_id) {
     global $mysqli;
     $client_id = intval($client_id);
     $skip = "'" . implode("', '", array_map('escapeSql', recurringSeatAssetSkipStatuses())) . "'";
-    $assets_in_use = "asset_client_id = $client_id AND asset_archived_at IS NULL AND (asset_status IS NULL OR asset_status NOT IN ($skip))";
+    $assets_in_use = "asset_client_id = $client_id AND asset_archived_at IS NULL AND (asset_status IS NULL OR asset_status NOT IN ($skip))"; // i18n-ignore - SQL, logs or history
     $options = [
         'contacts' => recurringSeatCount($client_id, 'contacts', []),
         'assets' => recurringSeatCount($client_id, 'assets', []),
@@ -2131,14 +2202,16 @@ function recurringSeatLines($recurring_invoice_id, $client_id = null) {
 /**
  * Bring a recurring invoice's lines up to date: each seat line's quantity
  * from what the client has now, and each line's tax from the tax's rate now.
- * Seat changes go in its history. What changed, in words.
+ * Seat changes go in its history. What changed, in words - in English for
+ * logs; $shown gets the same in the interface language.
  */
-function recurringInvoiceRefresh($recurring_invoice_id, $by = 'Cron') {
+function recurringInvoiceRefresh($recurring_invoice_id, $by = 'Cron', &$shown = []) {
     global $mysqli;
     $recurring_invoice_id = intval($recurring_invoice_id);
     $client_id = intval(getFieldById('recurring_invoices', $recurring_invoice_id, 'recurring_invoice_client_id'));
     $seats = recurringSeatLines($recurring_invoice_id, $client_id);
     $changes = [];
+    $shown = [];
 
     $sql = mysqli_query($mysqli, "SELECT item_id, item_name, item_quantity, item_price, item_subtotal FROM recurring_invoice_items WHERE item_recurring_invoice_id = $recurring_invoice_id");
     while ($item = mysqli_fetch_assoc($sql)) {
@@ -2146,7 +2219,10 @@ function recurringInvoiceRefresh($recurring_invoice_id, $by = 'Cron') {
         $quantity = floatval($item['item_quantity']);
         if (isset($seats[$item_id]) && $seats[$item_id]['seat_drift']) {
             $new_quantity = floatval($seats[$item_id]['seat_quantity']);
-            $changes[] = "{$item['item_name']}: " . billingQuantity($quantity) . ' to ' . billingQuantity($new_quantity) . ' (' . $seats[$item_id]['seat_label'] . ')';
+            $seat = $seats[$item_id];
+            $label_en = i18nEnglish(fn () => recurringSeatDescribe($seat['item_seat_source'], $seat['seat_filter']));
+            $changes[] = "{$item['item_name']}: " . billingQuantity($quantity) . ' to ' . billingQuantity($new_quantity) . " ($label_en)"; // i18n-ignore - SQL, logs or history
+            $shown[] = __('%1$s: %2$s to %3$s (%4$s)', $item['item_name'], billingQuantity($quantity), billingQuantity($new_quantity), $seat['seat_label']);
             $quantity = $new_quantity;
         }
         $subtotal = round($quantity * floatval($item['item_price']), 2);
@@ -2251,7 +2327,7 @@ function recurringInvoiceGenerate($recurring_invoice_id, $by = 'Cron', $early = 
     $invoice = billingRow('invoice', $invoice_id, false);
     $invoice_number = billingNumber('invoice', $invoice);
     $recurring_number = billingNumber('recurring', $row);
-    billingLog('invoice', $invoice_id, 'Draft', "Made from $recurring_number by $by, for {$period['{period}']}" . ($seat_changes ? ' - seats updated' : ''));
+    billingLog('invoice', $invoice_id, 'Draft', "Made from $recurring_number by $by, for {$period['{period}']}" . ($seat_changes ? ' - seats updated' : '')); // i18n-ignore - SQL, logs or history
     billingLog('recurring', $recurring_invoice_id, 'Invoiced', "$invoice_number made by $by, for {$period['{period}']} - next on $next");
 
     // Send it, when it sends itself - to the primary and billing contacts, on the billing email (functions/billing_email.php)
@@ -2269,14 +2345,14 @@ function recurringInvoiceGenerate($recurring_invoice_id, $by = 'Cron', $early = 
         }
         if ($sent_to) {
             mysqli_query($mysqli, "UPDATE invoices SET invoice_status = 'Sent' WHERE invoice_id = $invoice_id");
-            billingLog('invoice', $invoice_id, 'Sent', 'Emailed to ' . implode(', ', $sent_to) . ($attach ? ' with the PDF' : ''));
+            billingLog('invoice', $invoice_id, 'Sent', 'Emailed to ' . implode(', ', $sent_to) . ($attach ? ' with the PDF' : '')); // i18n-ignore - SQL, logs or history
         } else {
-            billingLog('invoice', $invoice_id, 'Draft', 'Nobody to email it to - no primary or billing contact with an email address');
+            billingLog('invoice', $invoice_id, 'Draft', 'Nobody to email it to - no primary or billing contact with an email address'); // i18n-ignore - SQL, logs or history
         }
     }
 
     $client_name = escapeSql($row['client_name']);
-    appNotify($sent_to ? 'Recurring Sent' : 'Recurring Generated', escapeSql("$invoice_number for {$row['client_name']} made from $recurring_number" . ($sent_to ? ' and emailed' : ' - a draft to check and send')),
+    appNotify($sent_to ? 'Recurring Sent' : 'Recurring Generated', escapeSql($sent_to ? __('%1$s for %2$s made from %3$s and emailed', $invoice_number, $row['client_name'], $recurring_number) : __('%1$s for %2$s made from %3$s - a draft to check and send', $invoice_number, $row['client_name'], $recurring_number)), // i18n-ignore - SQL, logs or history
         "/agent/invoice.php?invoice_id=$invoice_id", $client_id);
     logAudit('Invoice', 'Create', escapeSql("$by made invoice $invoice_number from recurring invoice $recurring_number for {$period['{period}']}"), $client_id, $invoice_id);
     triggerCustomAction('invoice_create', $invoice_id);
@@ -2302,18 +2378,32 @@ function recurringInvoiceGenerated($recurring_invoice_id, $limit = 12) {
 
 /* ---------------------------------------------------------------- Showing */
 
+/** A history row's status as people read it - the stored word stays English. */
+function billingHistoryStatusLabel($status) {
+    $status = (string) $status;
+    $own = [
+        'Active' => _x('Active', 'billing history'), 'Paused' => _x('Paused', 'billing history'), 'Rescheduled' => _x('Rescheduled', 'billing history'),
+        'Upload' => _x('Upload', 'billing history'), 'Invoiced' => _x('Invoiced', 'billing history'), 'Edit' => _x('Edit', 'billing history'),
+    ][$status] ?? null;
+    if ($own !== null) {
+        return $own;
+    }
+    $label = invoiceStatusLabel($status);
+    return $label !== $status ? $label : quoteStatusLabel($status);
+}
+
 /** A document's history as a timeline, newest first. */
 function billingHistoryHtml(array $rows) {
     if (!$rows) {
-        return '<div class="itflow-asset-empty py-4">Nothing has happened to it yet.</div>';
+        return '<div class="itflow-asset-empty py-4">' . __('Nothing has happened to it yet.') . '</div>';
     }
     $html = '<ul class="list-unstyled mb-0 p-3 itflow-billing-history">';
     foreach ($rows as $row) {
         // Older guest views put the browser's HTML into the description
         $description = trim(preg_replace('/[ \t]+/', ' ', strip_tags((string) $row['history_description'])));
         $html .= '<li><div>' . nl2br(escapeHtml($description)) . '</div>'
-            . '<div class="small text-body-secondary">' . escapeHtml($row['history_status'])
-            . ' &middot; <span title="' . escapeHtml($row['history_created_at']) . '">' . escapeHtml(timeAgo($row['history_created_at'])) . '</span></div></li>';
+            . '<div class="small text-body-secondary">' . escapeHtml(billingHistoryStatusLabel($row['history_status']))
+            . ' &middot; <span title="' . escapeHtml(formatDate($row['history_created_at'], 'datetime')) . '">' . escapeHtml(timeAgo($row['history_created_at'])) . '</span></div></li>';
     }
     return $html . '</ul>';
 }
@@ -2328,9 +2418,9 @@ function billingTile($type, $size = '') {
 function billingNotFound($type, $client_url = '') {
     $t = billingType($type);
     echo '<div class="itflow-asset-empty mt-5"><i class="fas ' . $t['icon'] . ' fa-3x mb-3 opacity-50"></i>'
-        . '<h1 class="h4">That ' . strtolower($t['label']) . " isn't here</h1>"
-        . '<p>It may have been deleted, or it belongs to a client you can\'t open.</p>'
-        . '<a class="btn btn-outline-secondary" href="' . $t['list'] . ($client_url ? '?' . rtrim($client_url, '&') : '') . '"><i class="fas fa-arrow-left me-2"></i>Back to ' . $t['plural'] . '</a></div>';
+        . '<h1 class="h4">' . ['invoice' => __("That invoice isn't here"), 'quote' => __("That quote isn't here"), 'recurring' => __("That recurring invoice isn't here")][$type] . '</h1>'
+        . '<p>' . __("It may have been deleted, or it belongs to a client you can't open.") . '</p>'
+        . '<a class="btn btn-outline-secondary" href="' . $t['list'] . ($client_url ? '?' . rtrim($client_url, '&') : '') . '"><i class="fas fa-arrow-left me-2"></i>' . ['invoice' => __('Back to invoices'), 'quote' => __('Back to quotes'), 'recurring' => __('Back to recurring invoices')][$type] . '</a></div>';
 }
 
 /* ---------------------------------------------------------------- Payments */
@@ -2404,21 +2494,21 @@ function billingGuestViewed($type, array $row, $who = '') {
 
     if ($who !== '') {
         $where = '';
-        $description = "Viewed in the client portal by $who";
-        $by = " ($who, in the client portal)";
+        $description = "Viewed in the client portal by $who"; // i18n-ignore - SQL, logs or history
+        $by = " ($who, in the client portal)"; // i18n-ignore - SQL, logs or history
     } else {
         $agent = (string) ($_SERVER['HTTP_USER_AGENT'] ?? '');
         $where = implode(' - ', array_filter([getIP(), trim(strip_tags(getOS($agent))), trim(strip_tags(getWebBrowser($agent)))], function ($part) {
             return $part !== '' && $part !== '-';
         }));
-        $description = 'Viewed by the client' . ($where !== '' ? " - $where" : '');
+        $description = 'Viewed by the client' . ($where !== '' ? " - $where" : ''); // i18n-ignore - SQL, logs or history
         $by = $where !== '' ? " - $where" : '';
     }
     billingLog($type, $id, $status === 'Sent' ? 'Viewed' : $status, $description);
 
     $matters = $type === 'invoice' ? !in_array($status, ['Paid', 'Cancelled', 'Non-Billable'], true) : in_array($status, ['Draft', 'Sent', 'Viewed'], true);
     if ($matters) {
-        appNotify($t['label'] . ' Viewed', escapeSql("$number has been viewed by {$row['client_name']}$by"), "/agent/{$t['page']}?{$t['param']}=$id", intval($row['client_id']));
+        appNotify($t['label'] . ' Viewed', escapeSql($who !== '' ? __('%1$s has been viewed by %2$s (%3$s, in the client portal)', $number, $row['client_name'], $who) : __('%1$s has been viewed by %2$s', $number, $row['client_name']) . $by), "/agent/{$t['page']}?{$t['param']}=$id", intval($row['client_id']));
     }
 }
 

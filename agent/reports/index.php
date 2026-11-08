@@ -17,25 +17,25 @@ $group_tones = ['finance' => 'success', 'billing' => 'primary', 'service' => 'in
 
     <div class="card">
         <div class="card-header bg-dark py-2 d-flex flex-wrap align-items-center gap-2">
-            <h3 class="card-title mt-2 me-auto"><i class="fas fa-fw fa-chart-bar me-2"></i>Reports</h3>
+            <h3 class="card-title mt-2 me-auto"><i class="fas fa-fw fa-chart-bar me-2"></i><?= __('Reports') ?></h3>
         </div>
         <div class="card-body py-3">
             <div class="row g-2 align-items-center">
                 <div class="col-md-6 col-lg-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                        <input type="search" class="form-control" placeholder="Find a report..." data-report-find aria-label="Find a report" autofocus>
+                        <input type="search" class="form-control" placeholder="<?= escapeHtml(__('Find a report...')) ?>" data-report-find aria-label="<?= escapeHtml(__('Find a report')) ?>" autofocus>
                     </div>
                 </div>
                 <div class="col">
-                    <span class="small text-body-secondary">Each report shows what your role can see - pick a period, narrow it to one client, print it or export it to CSV.</span>
+                    <span class="small text-body-secondary"><?= __('Each report shows what your role can see - pick a period, narrow it to one client, print it or export it to CSV.') ?></span>
                 </div>
             </div>
         </div>
     </div>
 
     <?php if (!$groups) { ?>
-        <div class="card"><div class="card-body"><?= reportEmpty('Your role does not include any reports yet - ask an administrator to give it read access to the area you need, such as Support or Financial.', 'fa-lock', 'secondary') ?></div></div>
+        <div class="card"><div class="card-body"><?= reportEmpty(__('Your role does not include any reports yet - ask an administrator to give it read access to the area you need, such as Support or Financial.'), 'fa-lock', 'secondary') ?></div></div>
     <?php } ?>
 
     <?php foreach ($groups as $group_key => $group) {
@@ -60,7 +60,7 @@ $group_tones = ['finance' => 'success', 'billing' => 'primary', 'service' => 'in
         </section>
     <?php } ?>
 
-    <div class="text-center text-body-secondary py-4" data-report-none hidden>No report matches that.</div>
+    <div class="text-center text-body-secondary py-4" data-report-none hidden><?= __('No report matches that.') ?></div>
 
 </div>
 

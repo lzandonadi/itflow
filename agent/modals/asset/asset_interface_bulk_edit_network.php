@@ -23,16 +23,16 @@ ob_start();
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
     <?php foreach ($interface_ids as $interface_id) { ?><input type="hidden" name="interface_ids[]" value="<?= $interface_id ?>"><?php } ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-network-wired me-2"></i>Network of <strong><?= $count ?></strong> interface<?= $count === 1 ? '' : 's' ?></h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-network-wired me-2"></i><?= _n('Network of %s interface', 'Network of %s interfaces', $count, '<strong>' . $count . '</strong>') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
 
     <div class="modal-body">
-        <label class="form-label">Network</label>
+        <label class="form-label"><?= __('Network') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-network-wired"></i></span>
             <select class="form-select select2" name="bulk_network">
-                <option value="0">- No network -</option>
+                <option value="0"><?= __('- No network -') ?></option>
                 <?php foreach ($networks as $network) { ?>
                     <option value="<?= intval($network['network_id']) ?>"<?= selectOptionNetwork($network) ?>><?= escapeHtml($network['network_name']) ?></option>
                 <?php } ?>
@@ -41,8 +41,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_asset_interface_network" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Set</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_asset_interface_network" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Set') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

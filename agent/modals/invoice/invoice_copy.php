@@ -13,7 +13,7 @@ enforceUserPermission('module_sales', 2);
 $doc_type = 'invoice';
 $doc = billingRow($doc_type, intval($_GET['id'] ?? 0));
 if (!$doc) {
-    exit(json_encode(['error' => 'That invoice no longer exists.']));
+    exit(json_encode(['error' => __('That invoice no longer exists.')]));
 }
 $client_id = intval($doc['client_id']);
 enforceClientAccess();
@@ -26,7 +26,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-copy me-2"></i>Copy Invoice <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($doc_number) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-copy me-2"></i><?= __('Copy Invoice') ?> <span class="fw-normal text-white-50 ms-1"><?= escapeHtml($doc_number) ?> &middot; <?= escapeHtml($doc['client_name']) ?></span></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -34,17 +34,17 @@ ob_start();
     <input type="hidden" name="invoice_id" value="<?= intval($doc['invoice_id']) ?>">
 
     <div class="modal-body">
-        <p class="text-body-secondary small">A new draft for <?= escapeHtml($doc['client_name']) ?> with the same <?= $lines ?> line<?= $lines === 1 ? '' : 's' ?>, scope, discount and notes - <?= escapeHtml(billingMoney($doc['invoice_amount'], $doc['invoice_currency_code'])) ?>.</p>
-        <label class="form-label">Invoice date <strong class="text-danger">*</strong></label>
+        <p class="text-body-secondary small"><?= _n('A new draft for %2$s with the same %1$d line, scope, discount and notes - %3$s.', 'A new draft for %2$s with the same %1$d lines, scope, discount and notes - %3$s.', $lines, $lines, escapeHtml($doc['client_name']), escapeHtml(billingMoney($doc['invoice_amount'], $doc['invoice_currency_code']))) ?></p>
+        <label class="form-label"><?= __('Invoice date') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
             <input type="date" class="form-control" name="date" max="2999-12-31" value="<?= date('Y-m-d') ?>" required>
         </div>
-        <div class="form-text"><?= $terms ? "Due $terms days after it" : 'Due on receipt' ?> - <?= escapeHtml($terms_from) ?> terms.</div>
+        <div class="form-text"><?= $terms ? _n('Due %1$d day after it - %2$s terms.', 'Due %1$d days after it - %2$s terms.', $terms, $terms, escapeHtml($terms_from)) : __('Due on receipt - %s terms.', escapeHtml($terms_from)) ?></div>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_invoice_copy" class="btn btn-primary text-bold"><i class="fas fa-copy me-2"></i>Copy</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_invoice_copy" class="btn btn-primary text-bold"><i class="fas fa-copy me-2"></i><?= __('Copy') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

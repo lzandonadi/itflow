@@ -25,27 +25,27 @@ if (!in_array($t_icon, $t_icons, true)) {
 
 <div data-tag-form>
     <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded border bg-body-tertiary">
-        <span class="small text-secondary">Looks like</span>
+        <span class="small text-secondary"><?= __('Looks like') ?></span>
         <span class="itflow-tag" style="--itflow-tag-color: <?= $t_color ?>; --itflow-tag-text: <?= tagTextColor($t_color) ?>" data-tag-preview>
-            <i class="fas fa-fw fa-<?= $t_icon ?>" aria-hidden="true" data-tag-preview-icon></i><span data-tag-preview-name><?= escapeHtml($t['tag_name'] ?? 'New tag') ?></span>
+            <i class="fas fa-fw fa-<?= $t_icon ?>" aria-hidden="true" data-tag-preview-icon></i><span data-tag-preview-name><?= escapeHtml($t['tag_name'] ?? __('New tag')) ?></span>
         </span>
         <?php if ($t) { ?>
             <span class="small text-secondary ms-auto text-end">
-                <?= ($tag_used ?? 0) ? 'On ' . number_format($tag_used) . ' ' . ($tag_used === 1 ? strtolower(tagEntityByType($type)['title']) : tagEntityByType($type)['plural']) : 'Nothing has it yet' ?><?= ($tag_lines ?? 0) ? ' &middot; counted on ' . $tag_lines . ' recurring invoice ' . ($tag_lines === 1 ? 'line' : 'lines') : '' ?>
+                <?= ($tag_used ?? 0) ? 'On ' . number_format($tag_used) . ' ' . ($tag_used === 1 ? strtolower(tagEntityByType($type)['title']) : tagEntityByType($type)['plural']) : __('Nothing has it yet') ?><?= ($tag_lines ?? 0) ? ' &middot; counted on ' . $tag_lines . ' recurring invoice ' . ($tag_lines === 1 ? 'line' : 'lines') : '' ?>
             </span>
         <?php } ?>
     </div>
 
     <div class="row">
         <div class="col-sm-7 mb-3">
-            <label class="form-label">Name <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="name" maxlength="200" placeholder="VIP, Managed, Retiring soon..." value="<?= escapeHtml($t['tag_name'] ?? '') ?>" required<?= $t ? '' : ' autofocus' ?> data-tag-name>
+                <input type="text" class="form-control" name="name" maxlength="200" placeholder="<?= escapeHtml(__('VIP, Managed, Retiring soon...')) ?>" value="<?= escapeHtml($t['tag_name'] ?? '') ?>" required<?= $t ? '' : ' autofocus' ?> data-tag-name>
             </div>
         </div>
         <div class="col-sm-5 mb-3">
-            <label class="form-label">For <strong class="text-danger">*</strong></label>
+            <label class="form-label"><?= __('For') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                 <select class="form-select" name="type"<?= $t_kind_locked ? ' disabled' : '' ?> required>
@@ -56,49 +56,49 @@ if (!in_array($t_icon, $t_icons, true)) {
                 </select>
             </div>
             <?php if ($t_kind_locked) { ?>
-                <small class="text-secondary">In use, so it stays <?= tagKindPhrase($type) ?></small>
+                <small class="text-secondary"><?= __('In use, so it stays %s', tagKindPhrase($type)) ?></small>
             <?php } ?>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Description</label>
+        <label class="form-label"><?= __('Description') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fa fa-fw fa-align-left"></i></span>
-            <input type="text" class="form-control" name="description" maxlength="255" placeholder="What it means, and when to use it" value="<?= escapeHtml($t['tag_description'] ?? '') ?>">
+            <input type="text" class="form-control" name="description" maxlength="255" placeholder="<?= escapeHtml(__('What it means, and when to use it')) ?>" value="<?= escapeHtml($t['tag_description'] ?? '') ?>">
         </div>
-        <small class="text-secondary">Shown on the tag and in the tag picker</small>
+        <small class="text-secondary"><?= __('Shown on the tag and in the tag picker') ?></small>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Color</label>
+        <label class="form-label"><?= __('Color') ?></label>
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <div class="d-flex flex-wrap gap-1" role="group" aria-label="Colors">
+            <div class="d-flex flex-wrap gap-1" role="group" aria-label="<?= escapeHtml(__('Colors')) ?>">
                 <?php foreach (TAG_COLORS as $swatch) { ?>
-                    <button type="button" class="itflow-tag-swatch<?= $swatch === $t_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-tag-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="Color <?= $swatch ?>" aria-pressed="<?= $swatch === $t_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
+                    <button type="button" class="itflow-tag-swatch<?= $swatch === $t_color ? ' active' : '' ?>" style="--itflow-tag-color: <?= $swatch ?>; --itflow-tag-text: <?= tagTextColor($swatch) ?>" data-tag-swatch="<?= $swatch ?>" title="<?= $swatch ?>" aria-label="<?= __('Color %s', $swatch) ?>" aria-pressed="<?= $swatch === $t_color ? 'true' : 'false' ?>"><i class="fas fa-check" aria-hidden="true"></i></button>
                 <?php } ?>
             </div>
-            <div class="input-group input-group-sm w-auto" title="Any other color">
+            <div class="input-group input-group-sm w-auto" title="<?= escapeHtml(__('Any other color')) ?>">
                 <span class="input-group-text"><i class="fa fa-fw fa-paint-brush"></i></span>
-                <input type="color" class="form-control form-control-color" name="color" value="<?= $t_color ?>" aria-label="Custom color" data-tag-color>
-                <input type="text" class="form-control font-monospace" style="width: 6rem" maxlength="7" value="<?= $t_color ?>" pattern="#?[0-9a-fA-F]{6}" aria-label="Color as hex" data-tag-color-hex>
+                <input type="color" class="form-control form-control-color" name="color" value="<?= $t_color ?>" aria-label="<?= escapeHtml(__('Custom color')) ?>" data-tag-color>
+                <input type="text" class="form-control font-monospace" style="width: 6rem" maxlength="7" value="<?= $t_color ?>" pattern="#?[0-9a-fA-F]{6}" aria-label="<?= escapeHtml(__('Color as hex')) ?>" data-tag-color-hex>
             </div>
         </div>
     </div>
 
     <div class="mb-1">
-        <label class="form-label">Icon</label>
+        <label class="form-label"><?= __('Icon') ?></label>
         <input type="hidden" name="icon" value="<?= $t_icon ?>" data-tag-icon>
         <div class="input-group mb-2">
             <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-            <input type="search" class="form-control" placeholder="Search icons - or type any Font Awesome icon's name" aria-label="Search icons" data-tag-icon-search>
+            <input type="search" class="form-control" placeholder="<?= escapeHtml(__('Search icons - or type any Font Awesome icon\'s name')) ?>" aria-label="<?= escapeHtml(__('Search icons')) ?>" data-tag-icon-search>
         </div>
-        <div class="itflow-tag-icons border rounded p-1" role="group" aria-label="Icons" data-tag-icons>
+        <div class="itflow-tag-icons border rounded p-1" role="group" aria-label="<?= escapeHtml(__('Icons')) ?>" data-tag-icons>
             <?php foreach ($t_icons as $icon) { ?>
                 <button type="button" class="btn btn-sm itflow-tag-icon<?= $icon === $t_icon ? ' active' : '' ?>" data-tag-icon-choice="<?= $icon ?>" title="<?= $icon ?>" aria-label="<?= $icon ?>" aria-pressed="<?= $icon === $t_icon ? 'true' : 'false' ?>"><i class="fas fa-fw fa-<?= $icon ?>" aria-hidden="true"></i></button>
             <?php } ?>
             <button type="button" class="btn btn-sm btn-outline-secondary itflow-tag-icon-custom" data-tag-icon-custom hidden><i class="fas fa-fw" aria-hidden="true"></i><span></span></button>
-            <div class="small text-secondary p-2" data-tag-icon-none hidden>No icon by that name here - type its whole name to use it</div>
+            <div class="small text-secondary p-2" data-tag-icon-none hidden><?= __('No icon by that name here - type its whole name to use it') ?></div>
         </div>
     </div>
 </div>

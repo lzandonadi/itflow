@@ -7,7 +7,7 @@ require_once "../includes/check_login.php";
 $settings_mail_path = '/admin/settings_mail.php?tab=oauth';
 
 if (!isset($session_is_admin) || !$session_is_admin) {
-    flashAlert("Admin access required.", 'error');
+    flashAlert(__('Admin access required.'), 'error');
     redirect($settings_mail_path);
 }
 
@@ -22,7 +22,7 @@ $session_state_expires = intval($_SESSION['mail_oauth_state_expires_at'] ?? 0);
 unset($_SESSION['mail_oauth_state'], $_SESSION['mail_oauth_state_expires_at']);
 
 if (!empty($error)) {
-    $msg = "Microsoft OAuth authorization failed: $error";
+    $msg = __('Microsoft OAuth authorization failed: %s', $error);
     if (!empty($error_description)) {
         $msg .= " ($error_description)";
     }
@@ -32,12 +32,12 @@ if (!empty($error)) {
 }
 
 if (empty($state) || empty($code) || empty($session_state) || !hash_equals($session_state, $state) || time() > $session_state_expires) {
-    flashAlert("Microsoft OAuth callback validation failed. Please try connecting again.", 'error');
+    flashAlert(__('Microsoft OAuth callback validation failed. Please try connecting again.'), 'error');
     redirect($settings_mail_path);
 }
 
 if (empty($config_mail_oauth_client_id) || empty($config_mail_oauth_client_secret) || empty($config_mail_oauth_tenant_id)) {
-    flashAlert("Microsoft OAuth settings are incomplete. Please fill Client ID, Client Secret, and Tenant ID.", 'error');
+    flashAlert(__('Microsoft OAuth settings are incomplete. Please fill Client ID, Client Secret, and Tenant ID.'), 'error');
     redirect($settings_mail_path);
 }
 
@@ -71,13 +71,13 @@ curl_close($ch);
 
 if ($raw_body === false || $http_code < 200 || $http_code >= 300) {
     $reason = !empty($curl_err) ? $curl_err : "HTTP $http_code";
-    flashAlert("Microsoft OAuth token exchange failed: $reason", 'error');
+    flashAlert(__('Microsoft OAuth token exchange failed: %s', $reason), 'error');
     redirect($settings_mail_path);
 }
 
 $json = json_decode($raw_body, true);
 if (!is_array($json) || empty($json['refresh_token']) || empty($json['access_token'])) {
-    flashAlert("Microsoft OAuth token exchange failed: refresh token or access token missing.", 'error');
+    flashAlert(__('Microsoft OAuth token exchange failed: refresh token or access token missing.'), 'error');
     redirect($settings_mail_path);
 }
 
@@ -98,5 +98,5 @@ mysqli_query($mysqli, "UPDATE settings SET
 ");
 
 logAudit("Settings", "Edit", "$session_name connected Microsoft 365 for mail");
-flashAlert("Microsoft 365 connected - ITFlow can now use the mailbox");
+flashAlert(__('Microsoft 365 connected - ITFlow can now use the mailbox'));
 redirect($settings_mail_path);

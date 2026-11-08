@@ -46,7 +46,7 @@ $show_where = [
 ][$show];
 
 // Tab title - the file is named for the table, the page for what it holds
-$page_title = 'Vendor Templates';
+$page_title = __('Vendor Templates');
 
 // Only these sort - an unknown column would take the page down
 $sortable_columns = [
@@ -122,28 +122,28 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-building me-2"></i>Vendor Templates</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-building me-2"></i><?= __('Vendor Templates') ?></h3>
         <div class="card-tools">
             <div class="btn-group">
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2">New Vendor Template</span></button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="More"></button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= $add_url ?>"><i class="fas fa-plus"></i><span class="d-none d-lg-inline ms-2"><?= __('New Vendor Template') ?></span></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-label="<?= escapeHtml(__('More')) ?>"></button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $clients_url ?>">
-                        <i class="fas fa-fw fa-users text-secondary me-2"></i>Add one to clients
+                        <i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Add one to clients') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $import_url ?>">
-                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i>Import
+                        <i class="fas fa-fw fa-file-upload text-secondary me-2"></i><?= __('Import') ?>
                     </a>
                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $export_url ?>">
-                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                        <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="/agent/reports/vendor_templates.php">
-                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i>How they are used
+                        <i class="fas fa-fw fa-chart-bar text-secondary me-2"></i><?= __('How they are used') ?>
                     </a>
                     <a class="dropdown-item" href="starter_content.php">
-                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i>Starter vendor templates
+                        <i class="fas fa-fw fa-seedling text-secondary me-2"></i><?= __('Starter vendor templates') ?>
                     </a>
                 </div>
             </div>
@@ -155,28 +155,28 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search vendor templates..." title="Name, what they are, support line, email, site, status page, portal, hours, SLA, account manager or notes">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search vendor templates...')) ?>" title="<?= escapeHtml(__('Name, what they are, support line, email, site, status page, portal, hours, SLA, account manager or notes')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs flex-nowrap overflow-auto mt-2">
-            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-building me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="Every client, or the clients with a tag, should have it"><i class="fas fa-fw fa-clipboard-check me-1"></i>Required <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
-            <a class="nav-link <?= $show === 'out' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('out')) ?>" title="Clients' vendors made from it that say something other than it does"><i class="fas fa-fw fa-not-equal me-1"></i>Out of step <span class="badge rounded-pill ms-1 <?= $show !== 'out' && intval($counts[3]) ? 'text-bg-warning' : '' ?>"><?= intval($counts[3]) ?></span></a>
-            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="Not offered for new vendors - the vendors made from them stay"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show === '' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('')) ?>"><i class="fas fa-fw fa-building me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show === 'required' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('required')) ?>" title="<?= escapeHtml(__('Every client, or the clients with a tag, should have it')) ?>"><i class="fas fa-fw fa-clipboard-check me-1"></i><?= __('Required') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[2]) ?></span></a>
+            <a class="nav-link <?= $show === 'out' ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('out')) ?>" title="<?= escapeHtml(__('Clients\' vendors made from it that say something other than it does')) ?>"><i class="fas fa-fw fa-not-equal me-1"></i><?= __('Out of step') ?> <span class="badge rounded-pill ms-1 <?= $show !== 'out' && intval($counts[3]) ? 'text-bg-warning' : '' ?>"><?= intval($counts[3]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="<?= escapeHtml($pill_url('archived')) ?>" title="<?= escapeHtml(__('Not offered for new vendors - the vendors made from them stay')) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('vendor_template_name', 'Template') ?></th>
-                <th class="d-none d-lg-table-cell">Support</th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', 'Used') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', 'Last used') ?></th>
-                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', 'Changed') ?></th>
+                <th class="ps-3"><?= $sort_link('vendor_template_name', __('Template')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('Support') ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('used_count', __('Used')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= $sort_link('changed_at', __('Changed')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -214,7 +214,7 @@ $csrf = $_SESSION['csrf_token'];
                                     <div class="small text-body-secondary d-flex flex-wrap column-gap-3">
                                         <?php if ($website !== '') { ?><a class="text-reset text-nowrap" href="<?= escapeHtml(vendorWebsiteUrl($row['vendor_template_website'])) ?>" target="_blank" rel="noopener noreferrer"><i class="fas fa-fw fa-globe me-1"></i><?= escapeHtml($website) ?></a><?php } ?>
                                         <?php if (trim((string) $row['vendor_template_email']) !== '') { ?><span class="text-nowrap"><i class="fas fa-fw fa-envelope me-1"></i><?= escapeHtml($row['vendor_template_email']) ?></span><?php } ?>
-                                        <?php if ($status_url !== '') { ?><a class="text-reset text-nowrap" href="<?= escapeHtml($status_url) ?>" target="_blank" rel="noopener noreferrer" title="<?= escapeHtml(vendorWebsiteLabel($row['vendor_template_status_page'])) ?>" data-template-status-page><i class="fas fa-fw fa-heartbeat me-1"></i>Status</a><?php } ?>
+                                        <?php if ($status_url !== '') { ?><a class="text-reset text-nowrap" href="<?= escapeHtml($status_url) ?>" target="_blank" rel="noopener noreferrer" title="<?= escapeHtml(vendorWebsiteLabel($row['vendor_template_status_page'])) ?>" data-template-status-page><i class="fas fa-fw fa-heartbeat me-1"></i><?= __('Status') ?></a><?php } ?>
                                     </div>
                                 <?php } ?>
                                 <?php if (isset($coverage[$template_id]) || (!$row['vendor_template_archived_at'] && isset($out_of_step[$template_id]))) { ?>
@@ -228,18 +228,18 @@ $csrf = $_SESSION['csrf_token'];
                                         <?php } ?>
                                         <?php if (!$row['vendor_template_archived_at'] && isset($out_of_step[$template_id])) { ?>
                                             <a class="badge rounded-pill fw-normal text-decoration-none bg-warning-subtle text-warning-emphasis border border-warning-subtle"
-                                                href="<?= $page_url ?>&amp;view=out#vendorTemplateVendors" title="Vendors made from it that say something other than it does" data-template-out-of-step="<?= $out_of_step[$template_id] ?>">
+                                                href="<?= $page_url ?>&amp;view=out#vendorTemplateVendors" title="<?= escapeHtml(__('Vendors made from it that say something other than it does')) ?>" data-template-out-of-step="<?= $out_of_step[$template_id] ?>">
                                                 <i class="fas fa-not-equal me-1"></i><?= $out_of_step[$template_id] ?> out of step
                                             </a>
                                         <?php } ?>
                                     </div>
                                 <?php } ?>
                                 <?php if ($row['vendor_template_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['vendor_template_archived_at'])) ?></div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['vendor_template_archived_at'], 'date')) ?></div>
                                 <?php } ?>
                                 <!-- On smaller screens its support line and use come along under the name -->
                                 <?php if ($support) { ?><div class="d-lg-none small text-body-secondary mt-1"><?= reset($support) ?></div><?php } ?>
-                                <div class="d-md-none small text-body-secondary"><?= $used_text !== '' ? escapeHtml($used_text) . ' · last ' . timeAgo($use['last']) : 'Not used yet' ?></div>
+                                <div class="d-md-none small text-body-secondary"><?= $used_text !== '' ? escapeHtml($used_text) . ' · last ' . timeAgo($use['last']) : __('Not used yet') ?></div>
                             </div>
                         </div>
                     </td>
@@ -254,7 +254,7 @@ $csrf = $_SESSION['csrf_token'];
                         <?php if ($used_text !== '') { ?>
                             <a class="text-reset" href="<?= $page_url ?>#vendorTemplateVendors"><?= escapeHtml($used_text) ?></a>
                         <?php } else { ?>
-                            <span class="text-body-secondary">Not yet</span>
+                            <span class="text-body-secondary"><?= __('Not yet') ?></span>
                         <?php } ?>
                     </td>
                     <td class="d-none d-md-table-cell small text-body-secondary text-nowrap"<?= $row['last_used'] ? ' title="' . escapeHtml($row['last_used']) . '"' : '' ?>><?= $row['last_used'] ? timeAgo($row['last_used']) : '-' ?></td>
@@ -264,38 +264,38 @@ $csrf = $_SESSION['csrf_token'];
                     </td>
                     <td class="text-end pe-3">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/vendor_template/vendor_template_edit.php?id=<?= $template_id ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <?php if (!$row['vendor_template_archived_at']) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-url="<?= $clients_url ?>?template_id=<?= $template_id ?>">
-                                        <i class="fas fa-fw fa-users text-secondary me-2"></i>Add to clients
+                                        <i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Add to clients') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/vendor_template/vendor_template_required.php?id=<?= $template_id ?>">
-                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i>Who should have it
+                                    <i class="fas fa-fw fa-clipboard-check text-secondary me-2"></i><?= __('Who should have it') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?copy_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A new template starting from this one">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                <a class="dropdown-item" href="post.php?copy_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new template starting from this one')) ?>">
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                 </a>
-                                <a class="dropdown-item" href="post.php?export_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="A file to import into another ITFlow - without account numbers or PINs">
-                                    <i class="fas fa-fw fa-file-download text-secondary me-2"></i>Export
+                                <a class="dropdown-item" href="post.php?export_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A file to import into another ITFlow - without account numbers or PINs')) ?>">
+                                    <i class="fas fa-fw fa-file-download text-secondary me-2"></i><?= __('Export') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['vendor_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="post.php?restore_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item text-danger" href="post.php?archive_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="Not offered for new vendors - the vendors made from it stay">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    <a class="dropdown-item text-danger" href="post.php?archive_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Not offered for new vendors - the vendors made from it stay')) ?>">
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_vendor_template=<?= $template_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-title="Delete <?= $name ?>?" data-confirm-text="The vendors made from it stay as they are." data-confirm-button="Delete">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('The vendors made from it stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -307,16 +307,16 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'vendor templates',
+        'thing' => __('vendor templates'),
         'icon' => 'fa-building',
         'filtered' => $q !== '',
         'archived' => $show_archived,
         'views' => ['show'],
-        'view' => ['required' => ['title' => 'No required templates', 'text' => 'Set one up from its page - <strong>Who should have it</strong> - to see which clients are missing a vendor from it.'],
-            'out' => ['title' => 'Every vendor is in step', 'text' => 'Every client\'s vendor made from a template says what the template says.']][$show] ?? null,
-        'text' => 'A vendor your clients use again and again - an ISP, a hardware maker, the software they run - set up once with its support line, hours and site, ready to add to any client. Agents start one from <strong>New Vendor</strong> on a client\'s Vendors.',
-        'actions' => [['label' => 'New Vendor Template', 'modal' => $add_url, 'size' => 'lg'], ['label' => 'Import', 'modal' => $import_url, 'icon' => 'fa-file-upload'],
-            ['label' => 'Starter vendor templates', 'href' => 'starter_content.php', 'icon' => 'fa-seedling']],
+        'view' => ['required' => ['title' => __('No required templates'), 'text' => __('Set one up from its page - <strong>Who should have it</strong> - to see which clients are missing a vendor from it.')],
+            'out' => ['title' => __('Every vendor is in step'), 'text' => __('Every client\'s vendor made from a template says what the template says.')]][$show] ?? null,
+        'text' => __('A vendor your clients use again and again - an ISP, a hardware maker, the software they run - set up once with its support line, hours and site, ready to add to any client. Agents start one from <strong>New Vendor</strong> on a client\'s Vendors.'),
+        'actions' => [['label' => __('New Vendor Template'), 'modal' => $add_url, 'size' => 'lg'], ['label' => __('Import'), 'modal' => $import_url, 'icon' => 'fa-file-upload'],
+            ['label' => __('Starter vendor templates'), 'href' => 'starter_content.php', 'icon' => 'fa-seedling']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

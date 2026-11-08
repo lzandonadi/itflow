@@ -24,20 +24,20 @@ while ($row = mysqli_fetch_row($sql)) {
 }
 
 $importance_styles = [
-    'High' => ['danger', 'fa-thermometer-full', 'The client cannot work without it'],
-    'Medium' => ['warning', 'fa-thermometer-half', 'It hurts, but there is a way round it'],
-    'Low' => ['secondary', 'fa-thermometer-quarter', 'An inconvenience'],
+    'High' => ['danger', 'fa-thermometer-full', __('The client cannot work without it')],
+    'Medium' => ['warning', 'fa-thermometer-half', __('It hurts, but there is a way round it')],
+    'Low' => ['secondary', 'fa-thermometer-quarter', __('An inconvenience')],
 ];
 
 ?>
 
 <?php if ($is_new && !$form_client_id) { ?>
     <div class="mb-3">
-        <label class="form-label">Client <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Client') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-user"></i></span>
             <select class="form-select select2" name="client_id" required>
-                <option value="">- Pick a client -</option>
+                <option value=""><?= __('- Pick a client -') ?></option>
                 <?php
                 $sql = mysqli_query($mysqli, "SELECT client_id, client_name, client_abbreviation FROM clients WHERE client_archived_at IS NULL " . clientScopeSql('clients.client_id') . " ORDER BY client_name ASC");
                 while ($row = mysqli_fetch_assoc($sql)) { ?>
@@ -52,17 +52,17 @@ $importance_styles = [
 
 <div class="row g-3 mb-3">
     <div class="col-md-7">
-        <label class="form-label">Name <strong class="text-danger">*</strong></label>
+        <label class="form-label"><?= __('Name') ?> <strong class="text-danger">*</strong></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-concierge-bell"></i></span>
-            <input type="text" class="form-control" name="name" placeholder="Email, Backup, Practice management, Phones..." maxlength="200" value="<?= escapeHtml($form['service_name'] ?? '') ?>" required autofocus>
+            <input type="text" class="form-control" name="name" placeholder="<?= escapeHtml(__('Email, Backup, Practice management, Phones...')) ?>" maxlength="200" value="<?= escapeHtml($form['service_name'] ?? '') ?>" required autofocus>
         </div>
     </div>
     <div class="col-md-5">
-        <label class="form-label">Category</label>
+        <label class="form-label"><?= __('Category') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
-            <input type="text" class="form-control" name="category" list="serviceCategorySuggestions" placeholder="Email, Backup, Network..." maxlength="50" value="<?= escapeHtml($form['service_category'] ?? '') ?>">
+            <input type="text" class="form-control" name="category" list="serviceCategorySuggestions" placeholder="<?= escapeHtml(__('Email, Backup, Network...')) ?>" maxlength="50" value="<?= escapeHtml($form['service_category'] ?? '') ?>">
         </div>
         <datalist id="serviceCategorySuggestions">
             <?php foreach ($category_suggestions as $suggestion) { ?>
@@ -73,19 +73,19 @@ $importance_styles = [
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Description</label>
+    <label class="form-label"><?= __('Description') ?></label>
     <div class="input-group">
         <span class="input-group-text"><i class="fas fa-fw fa-align-left"></i></span>
-        <input type="text" class="form-control" name="description" placeholder="Microsoft 365 mail for all staff, Veeam to the NAS and offsite..." maxlength="200" value="<?= escapeHtml($form['service_description'] ?? '') ?>">
+        <input type="text" class="form-control" name="description" placeholder="<?= escapeHtml(__('Microsoft 365 mail for all staff, Veeam to the NAS and offsite...')) ?>" maxlength="200" value="<?= escapeHtml($form['service_description'] ?? '') ?>">
     </div>
 </div>
 
 <div class="mb-3">
-    <?= tagFormFieldHtml('service', $is_new ? [] : tagIdsForRecord('service', $form['service_id']), 'Managed, Client-run, Business hours only') ?>
+    <?= tagFormFieldHtml('service', $is_new ? [] : tagIdsForRecord('service', $form['service_id']), __('Managed, Client-run, Business hours only')) ?>
 </div>
 
 <div class="mb-3">
-    <label class="form-label d-block">Importance <span class="text-body-secondary small fw-normal">- how bad is it when it is down?</span></label>
+    <label class="form-label d-block"><?= __('Importance') ?> <span class="text-body-secondary small fw-normal"><?= __('- how bad is it when it is down?') ?></span></label>
     <div class="btn-group w-100 itflow-service-importance" role="group">
         <?php foreach ($importance_styles as $importance => [$tone, $icon, $hint]) { ?>
             <input type="radio" class="btn-check" name="importance" id="serviceImportance<?= $importance ?>" value="<?= $importance ?>" <?= $form_importance === $importance ? 'checked' : '' ?> autocomplete="off">
@@ -98,38 +98,38 @@ $importance_styles = [
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Backup and recovery</label>
-    <textarea class="form-control" name="backup" rows="2" maxlength="500" placeholder="How it is backed up, where to, and how it comes back - and how long that takes"><?= escapeHtml($form['service_backup'] ?? '') ?></textarea>
+    <label class="form-label"><?= __('Backup and recovery') ?></label>
+    <textarea class="form-control" name="backup" rows="2" maxlength="500" placeholder="<?= escapeHtml(__('How it is backed up, where to, and how it comes back - and how long that takes')) ?>"><?= escapeHtml($form['service_backup'] ?? '') ?></textarea>
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Notes</label>
-    <textarea class="form-control" name="notes" rows="4" placeholder="How it fits together, the known quirks, what to check first when it breaks"><?= escapeHtml($form['service_notes'] ?? '') ?></textarea>
+    <label class="form-label"><?= __('Notes') ?></label>
+    <textarea class="form-control" name="notes" rows="4" placeholder="<?= escapeHtml(__('How it fits together, the known quirks, what to check first when it breaks')) ?>"><?= escapeHtml($form['service_notes'] ?? '') ?></textarea>
 </div>
 
 <div class="row g-3 <?= $is_new && $form_client_id ? 'mb-3' : 'mb-0' ?>">
     <div class="col-md-6">
-        <label class="form-label">Review it</label>
+        <label class="form-label"><?= __('Review it') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-redo"></i></span>
             <select class="form-select select2" name="review_interval" id="serviceReviewInterval">
                 <?php foreach (SERVICE_REVIEW_INTERVALS as $months => $label) { ?>
-                    <option value="<?= $months ?>" <?= $form_interval === $months ? 'selected' : '' ?> data-icon="far <?= $months ? 'fa-calendar-check' : 'fa-calendar' ?>"><?= $label ?></option>
+                    <option value="<?= $months ?>" <?= $form_interval === $months ? 'selected' : '' ?> data-icon="far <?= $months ? 'fa-calendar-check' : 'fa-calendar' ?>"><?= serviceReviewIntervalLabel($months) ?></option>
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">Check it still matches what is out there - a QBR is a good time.</div>
+        <div class="form-text"><?= __('Check it still matches what is out there - a QBR is a good time.') ?></div>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Next review</label>
+        <label class="form-label"><?= __('Next review') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-calendar-check"></i></span>
             <input type="date" class="form-control" name="review_due" id="serviceReviewDue" value="<?= escapeHtml($form['service_review_due'] ?? '') ?>">
         </div>
         <?php if (!empty($form['service_reviewed_at'])) { ?>
-            <div class="form-text">Last reviewed <?= escapeHtml(date('M j, Y', strtotime($form['service_reviewed_at']))) ?>.</div>
+            <div class="form-text"><?= escapeHtml(__('Last reviewed %s.', formatDate($form['service_reviewed_at'], 'date'))) ?></div>
         <?php } else { ?>
-            <div class="form-text">Leave it empty to follow the schedule.</div>
+            <div class="form-text"><?= __('Leave it empty to follow the schedule.') ?></div>
         <?php } ?>
     </div>
 </div>
@@ -146,16 +146,16 @@ $importance_styles = [
             $pickers[$type] = $candidates;
         }
     }
-    $picker_hints = ['asset' => 'The servers, firewalls, NAS it runs on', 'credential' => 'Admin consoles, portals', 'domain' => 'Its mail or web domains',
-        'certificate' => 'What keeps it on https', 'contact' => 'Who owns it at the client, who to tell', 'vendor' => 'Who to call when it breaks', 'document' => 'Runbooks, diagrams'];
+    $picker_hints = ['asset' => __('The servers, firewalls, NAS it runs on'), 'credential' => __('Admin consoles, portals'), 'domain' => __('Its mail or web domains'),
+        'certificate' => __('What keeps it on https'), 'contact' => __('Who owns it at the client, who to tell'), 'vendor' => __('Who to call when it breaks'), 'document' => __('Runbooks, diagrams')];
     if ($pickers) { ?>
         <div class="border-top pt-3">
-            <div class="small text-body-secondary fw-semibold text-uppercase mb-2">What it depends on</div>
+            <div class="small text-body-secondary fw-semibold text-uppercase mb-2"><?= __('What it depends on') ?></div>
             <div class="row g-3">
                 <?php foreach ($pickers as $type => $candidates) {
                     $entity = LINK_ENTITIES[$type]; ?>
                     <div class="col-md-6">
-                        <label class="form-label"><?= $type === 'credential' ? 'Logins' : ($type === 'contact' ? 'People' : $entity['plural']) ?></label>
+                        <label class="form-label"><?= $type === 'credential' ? __('Logins') : ($type === 'contact' ? __('People') : linkEntityPlural($type)) ?></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-fw <?= $entity['icon'] ?>"></i></span>
                             <select class="form-select select2" name="<?= $entity['table'] ?>[]" multiple data-placeholder="<?= escapeHtml($picker_hints[$type]) ?>">

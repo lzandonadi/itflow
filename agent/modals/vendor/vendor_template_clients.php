@@ -20,7 +20,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $templates[] = $row;
 }
 if (!$templates) {
-    echo json_encode(['error' => 'There are no vendor templates yet - an admin adds them under Admin > Vendor Templates.']);
+    echo json_encode(['error' => __('There are no vendor templates yet - an admin adds them under Admin > Vendor Templates.')]);
     exit;
 }
 
@@ -57,7 +57,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-puzzle-piece me-2"></i>Add a Vendor to Clients</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-puzzle-piece me-2"></i><?= __('Add a Vendor to Clients') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="/agent/post.php" method="post" autocomplete="off" data-vendor-template-clients>
@@ -65,7 +65,7 @@ ob_start();
 
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Template</label>
+            <label class="form-label"><?= __('Template') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-puzzle-piece"></i></span>
                 <select class="form-select select2" name="vendor_template_id" data-template-pick>
@@ -83,24 +83,24 @@ ob_start();
                 return isset($has[$option_id][intval($client['client_id'])]);
             })); ?>
             <div data-template-clients="<?= $option_id ?>" <?= $option_id === $template_id ? '' : 'hidden' ?>>
-                <label class="form-label">Clients</label>
+                <label class="form-label"><?= __('Clients') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-                    <select class="form-select select2" name="client_ids[]" multiple data-placeholder="Pick the clients that use them" <?= $option_id === $template_id ? '' : 'disabled' ?>>
+                    <select class="form-select select2" name="client_ids[]" multiple data-placeholder="<?= escapeHtml(__('Pick the clients that use them')) ?>" <?= $option_id === $template_id ? '' : 'disabled' ?>>
                         <?php foreach ($clients as $client) {
                             $client_option_id = intval($client['client_id']);
                             $client_has = isset($has[$option_id][$client_option_id]); ?>
-                            <option value="<?= $client_option_id ?>" <?= $client_has ? 'disabled' : ($option_id === $template_id && isset($picked[$client_option_id]) ? 'selected' : '') ?><?= selectOptionClient($client_option_id, $client['client_name'], $client['client_abbreviation'] ?? '') ?><?= $client_has ? selectOptionData(['description' => 'Already has it']) : '' ?>><?= escapeHtml($client['client_name']) ?></option>
+                            <option value="<?= $client_option_id ?>" <?= $client_has ? 'disabled' : ($option_id === $template_id && isset($picked[$client_option_id]) ? 'selected' : '') ?><?= selectOptionClient($client_option_id, $client['client_name'], $client['client_abbreviation'] ?? '') ?><?= $client_has ? selectOptionData(['description' => __('Already has it')]) : '' ?>><?= escapeHtml($client['client_name']) ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="form-text"><?= $already ? "$already client" . ($already === 1 ? ' has' : 's have') . ' it already. ' : '' ?>Each gets its own copy - add their account number and PIN after.</div>
+                <div class="form-text"><?= $already ? escapeHtml(_n('%d client has it already.', '%d clients have it already.', $already)) . ' ' : '' ?><?= __('Each gets its own copy - add their account number and PIN after.') ?></div>
             </div>
         <?php } ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_vendor_template_to_clients" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Add to clients</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_vendor_template_to_clients" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Add to clients') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

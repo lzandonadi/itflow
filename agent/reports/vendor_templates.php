@@ -36,7 +36,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
 }
 $client_ids = array_keys($client_rows) ?: [0];
 $in_clients = function ($column) use ($client_ids) {
-    return "$column IN (" . implode(',', $client_ids) . ")";
+    return "$column IN (" . implode(',', $client_ids) . ")"; // i18n-ignore - SQL
 };
 
 // Every current template, and archived ones a vendor was made from in the period
@@ -208,78 +208,78 @@ $zero = function ($value, $tone = '') {
     return $value ? '<span class="fw-semibold' . ($tone ? " text-$tone-emphasis" : '') . '">' . reportCount($value) . '</span>' : '<span class="itflow-report-zero">0</span>';
 };
 $columns = [
-    'template' => ['label' => 'Template', 'html' => function ($row) use ($admin) {
+    'template' => ['label' => __('Template'), 'html' => function ($row) use ($admin) {
         $name = escapeHtml($row['template']);
         return ($admin ? '<a href="/admin/vendor_template.php?vendor_template_id=' . $row['id'] . '">' . $name . '</a>' : $name)
-            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">Archived</span>' : '');
+            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">' . __('Archived') . '</span>' : '');
     }],
-    'scope' => ['label' => 'Required of', 'html' => function ($row) {
+    'scope' => ['label' => __('Required of'), 'html' => function ($row) {
         return $row['scope'] !== '' ? '<span class="small">' . escapeHtml($row['scope']) . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'made' => ['label' => 'Added', 'type' => 'count', 'title' => 'Client vendors made from it in the period'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'made' => ['label' => __('Added'), 'type' => 'count', 'title' => __('Client vendors made from it in the period')],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['made'], $row['prev'], 'up') . '</span>';
     }],
-    'clients' => ['label' => 'Clients', 'type' => 'count', 'class' => 'fw-semibold', 'title' => 'Clients with a current vendor from it'],
-    'vendors' => ['label' => 'Vendors', 'type' => 'count', 'screen' => false],
-    'out' => ['label' => 'Out of step', 'type' => 'count', 'title' => 'Their vendors that say something other than the template does', 'html' => function ($row) use ($admin, $zero) {
+    'clients' => ['label' => __('Clients'), 'type' => 'count', 'class' => 'fw-semibold', 'title' => __('Clients with a current vendor from it')],
+    'vendors' => ['label' => __('Vendors'), 'type' => 'count', 'screen' => false],
+    'out' => ['label' => __('Out of step'), 'type' => 'count', 'title' => __('Their vendors that say something other than the template does'), 'html' => function ($row) use ($admin, $zero) {
         if ($row['out'] && $admin) {
             return '<a class="fw-semibold text-warning-emphasis" href="/admin/vendor_template.php?vendor_template_id=' . $row['id'] . '&amp;view=out#vendorTemplateVendors">' . reportCount($row['out']) . '</a>';
         }
         return $zero($row['out'], 'warning');
     }],
-    'no_account' => ['label' => 'No account number', 'type' => 'count', 'title' => "Their vendors without the client's account number", 'html' => function ($row) use ($zero) {
+    'no_account' => ['label' => __('No account number'), 'type' => 'count', 'title' => __("Their vendors without the client's account number"), 'html' => function ($row) use ($zero) {
         return $zero($row['no_account'], 'warning');
     }],
-    'should' => ['label' => 'Should have one', 'type' => 'count', 'screen' => false],
-    'have' => ['label' => 'Have one', 'type' => 'count', 'screen' => false],
-    'coverage' => ['label' => 'Coverage', 'type' => 'percent', 'title' => 'Of the clients that should have it, how many do', 'html' => function ($row) {
+    'should' => ['label' => __('Should have one'), 'type' => 'count', 'screen' => false],
+    'have' => ['label' => __('Have one'), 'type' => 'count', 'screen' => false],
+    'coverage' => ['label' => __('Coverage'), 'type' => 'percent', 'title' => __('Of the clients that should have it, how many do'), 'html' => function ($row) {
         if ($row['coverage'] === null) {
             return '<span class="itflow-report-zero">–</span>';
         }
         $tone = $row['coverage'] >= 100 ? 'success' : ($row['coverage'] >= 75 ? 'warning' : 'danger');
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="progress itflow-report-meter" style="width: 4rem" role="presentation">'
             . '<div class="progress-bar bg-' . $tone . '" style="width: ' . round($row['coverage']) . '%"></div></div>'
-            . '<span class="small text-nowrap" title="' . $row['have'] . ' of ' . $row['should'] . ' clients">' . $row['have'] . ' of ' . $row['should'] . '</span></div>';
+            . '<span class="small text-nowrap" title="' . escapeHtml(_n('%1$d of %2$d client', '%1$d of %2$d clients', $row['should'], $row['have'], $row['should'])) . '">' . __('%1$d of %2$d', $row['have'], $row['should']) . '</span></div>';
     }],
 ];
 if ($sees_docs) {
-    $columns['licenses'] = ['label' => 'Licenses', 'type' => 'count', 'title' => 'Current licenses from their vendors'];
-    $columns['assets'] = ['label' => 'Assets', 'type' => 'count', 'title' => 'Current assets bought from their vendors'];
+    $columns['licenses'] = ['label' => __('Licenses'), 'type' => 'count', 'title' => __('Current licenses from their vendors')];
+    $columns['assets'] = ['label' => __('Assets'), 'type' => 'count', 'title' => __('Current assets bought from their vendors')];
 }
 if ($sees_cases) {
-    $columns['cases'] = ['label' => 'Cases', 'type' => 'count', 'title' => 'Tickets with their vendors on them, opened in the period'];
-    $columns['open'] = ['label' => 'Open cases', 'type' => 'count', 'title' => 'Tickets with their vendors on them, open now', 'html' => function ($row) use ($zero) {
+    $columns['cases'] = ['label' => __('Cases'), 'type' => 'count', 'title' => __('Tickets with their vendors on them, opened in the period')];
+    $columns['open'] = ['label' => __('Open cases'), 'type' => 'count', 'title' => __('Tickets with their vendors on them, open now'), 'html' => function ($row) use ($zero) {
         return $zero($row['open'], 'warning');
     }];
 }
 if ($sees_spend) {
-    $columns['spend'] = ['label' => 'Spent', 'type' => 'money', 'title' => 'Expenses with our own vendor from it in the period', 'html' => function ($row) {
-        return $row['spend'] === null ? '<span class="itflow-report-zero" title="Not one of our own vendors">–</span>' : ($row['spend'] ? reportMoney($row['spend']) : '<span class="itflow-report-zero">' . reportMoney(0) . '</span>');
+    $columns['spend'] = ['label' => __('Spent'), 'type' => 'money', 'title' => __('Expenses with our own vendor from it in the period'), 'html' => function ($row) {
+        return $row['spend'] === null ? '<span class="itflow-report-zero" title="' . escapeHtml(__('Not one of our own vendors')) . '">–</span>' : ($row['spend'] ? reportMoney($row['spend']) : '<span class="itflow-report-zero">' . reportMoney(0) . '</span>');
     }];
 }
 
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'vendors.php');
     }],
-    'vendors' => ['label' => 'Vendors', 'type' => 'count', 'title' => 'Current vendors made from a template'],
-    'should' => ['label' => 'Should have', 'type' => 'count'],
-    'have' => ['label' => 'Have', 'type' => 'count'],
-    'missing' => ['label' => 'Missing', 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
+    'vendors' => ['label' => __('Vendors'), 'type' => 'count', 'title' => __('Current vendors made from a template')],
+    'should' => ['label' => __('Should have'), 'type' => 'count'],
+    'have' => ['label' => __('Have'), 'type' => 'count'],
+    'missing' => ['label' => __('Missing'), 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
         return implode(', ', $row['missing']);
     }, 'html' => function ($row) {
-        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>None</span>' : '');
+        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>' . __('None') . '</span>' : '');
     }],
-    'out' => ['label' => 'Out of step', 'type' => 'count', 'title' => 'Its vendors that say something other than their template', 'html' => function ($row) use ($zero) {
+    'out' => ['label' => __('Out of step'), 'type' => 'count', 'title' => __('Its vendors that say something other than their template'), 'html' => function ($row) use ($zero) {
         return $zero($row['out'], 'warning');
     }],
-    'no_account' => ['label' => 'No account number', 'type' => 'count', 'html' => function ($row) use ($zero) {
+    'no_account' => ['label' => __('No account number'), 'type' => 'count', 'html' => function ($row) use ($zero) {
         return $zero($row['no_account'], 'warning');
     }],
 ];
 if ($sees_cases) {
-    $client_columns['open'] = ['label' => 'Open cases', 'type' => 'count', 'title' => 'Its tickets open now with a vendor from a template on them'];
+    $client_columns['open'] = ['label' => __('Open cases'), 'type' => 'count', 'title' => __('Its tickets open now with a vendor from a template on them')];
 }
 
 $sum = function ($key) use ($templates) {
@@ -291,13 +291,13 @@ $vendor_total = intval($sum('vendors'));
 $out_total = intval($sum('out'));
 $should_total = intval($sum('should'));
 $have_total = intval($sum('have'));
-$totals = ['template' => 'Total', 'made' => $made_total, 'vendors' => $vendor_total, 'out' => $out_total, 'no_account' => intval($sum('no_account')), 'should' => $should_total, 'have' => $have_total,
+$totals = ['template' => __('Total'), 'made' => $made_total, 'vendors' => $vendor_total, 'out' => $out_total, 'no_account' => intval($sum('no_account')), 'should' => $should_total, 'have' => $have_total,
     'clients' => count(array_filter($by_client, function ($c) { return $c['vendors'] > 0; })), 'licenses' => intval($sum('licenses')), 'assets' => intval($sum('assets')),
     'cases' => intval($sum('cases')), 'open' => intval($sum('open'))];
 if ($sees_spend) {
     $totals['spend'] = round($sum('spend'), 2);
 }
-$client_totals = ['client' => 'Total', 'vendors' => array_sum(array_column($by_client, 'vendors')), 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
+$client_totals = ['client' => __('Total'), 'vendors' => array_sum(array_column($by_client, 'vendors')), 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
     'out' => array_sum(array_column($by_client, 'out')), 'no_account' => array_sum(array_column($by_client, 'no_account')), 'open' => array_sum(array_column($by_client, 'open'))];
 
 if (reportExporting('clients')) {
@@ -314,17 +314,17 @@ $fully = count(array_filter($by_client, function ($c) { return $c['should'] && !
 $with_required = count(array_filter($by_client, function ($c) { return $c['should']; }));
 
 $stats = [
-    ['label' => 'Vendors added', 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', 'the period before') : '<span class="text-body-tertiary">from a template</span>'],
-    ['label' => 'In step', 'value_html' => $vendor_total ? reportRateHtml(reportShare($vendor_total - $out_total, $vendor_total, 1), 95, 80) : '-',
+    ['label' => __('Vendors added'), 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', __('the period before')) : '<span class="text-body-tertiary">' . __('from a template') . '</span>'],
+    ['label' => __('In step'), 'value_html' => $vendor_total ? reportRateHtml(reportShare($vendor_total - $out_total, $vendor_total, 1), 95, 80) : '-',
         'sub' => $vendor_total ? ($out_total ? '<span class="text-warning-emphasis">' . reportCount($out_total) . ' out of step</span> <span class="text-body-tertiary">of ' . reportCount($vendor_total) . ' vendors</span>'
-            : '<span class="text-body-tertiary">Every one of the ' . reportCount($vendor_total) . ' vendors</span>') : '<span class="text-body-tertiary">No vendors from a template yet</span>'],
-    ['label' => 'Have what they should', 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
-        'sub' => $should_total ? $fully . ' of ' . $with_required . ' <span class="text-body-tertiary">client' . ($with_required === 1 ? '' : 's') . ' have every one</span>' : '<span class="text-body-tertiary">No template is required of anyone</span>'],
+            : '<span class="text-body-tertiary">' . __('Every one of the %s vendors', reportCount($vendor_total)) . '</span>') : '<span class="text-body-tertiary">' . __('No vendors from a template yet') . '</span>'],
+    ['label' => __('Have what they should'), 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
+        'sub' => $should_total ? __('%1$d of %2$d', $fully, $with_required) . ' <span class="text-body-tertiary">' . _n('client has every one', 'clients have every one', $with_required) . '</span>' : '<span class="text-body-tertiary">' . __('No template is required of anyone') . '</span>'],
 ];
 if ($sees_spend) {
-    $stats[] = ['label' => 'Spent with them', 'value' => reportMoney($totals['spend']), 'sub' => '<span class="text-body-tertiary">our own vendors from a template</span>'];
+    $stats[] = ['label' => __('Spent with them'), 'value' => reportMoney($totals['spend']), 'sub' => '<span class="text-body-tertiary">' . __('our own vendors from a template') . '</span>'];
 } elseif ($sees_cases) {
-    $stats[] = ['label' => 'Open cases', 'value' => reportCount($totals['open']), 'tone' => $totals['open'] ? 'warning' : '', 'sub' => reportCount($totals['cases']) . ' <span class="text-body-tertiary">opened in the period</span>'];
+    $stats[] = ['label' => __('Open cases'), 'value' => reportCount($totals['open']), 'tone' => $totals['open'] ? 'warning' : '', 'sub' => reportCount($totals['cases']) . ' <span class="text-body-tertiary">' . __('opened in the period') . '</span>'];
 }
 
 ?>
@@ -335,35 +335,34 @@ if ($sees_spend) {
         'period' => $period,
         'years' => reportPastYears("SELECT DISTINCT YEAR(vendor_created_at) AS y FROM vendors WHERE vendor_template_id > 0"),
         'client' => $client_id,
-        'export' => ['' => 'By template', 'clients' => 'By client'],
+        'export' => ['' => __('By template'), 'clients' => __('By client')],
         'print_meta' => $client_id ? reportClientName($client_id) : '',
     ]); ?>
 
     <?= reportStats($stats) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Most used', 'Clients with a vendor from each') ?>
+        <?= reportSectionOpen(__('Most used'), __('Clients with a vendor from each')) ?>
             <div class="card-body">
                 <?= reportChart(['type' => 'bar', 'horizontal' => true, 'labels' => array_column($top, 'template'),
-                    'series' => [['label' => 'In step', 'tone' => 'accent', 'data' => array_column($top, 'in_step')], ['label' => 'Out of step', 'tone' => 'warning', 'data' => array_column($top, 'out')]],
-                    'stacked' => true, 'format' => 'count'], '', 'Vendors from each, in step and out of step') ?>
+                    'series' => [['label' => __('In step'), 'tone' => 'accent', 'data' => array_column($top, 'in_step')], ['label' => __('Out of step'), 'tone' => 'warning', 'data' => array_column($top, 'out')]],
+                    'stacked' => true, 'format' => 'count'], '', __('Vendors from each, in step and out of step')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By template', 'Most clients first', 'itflow-report-long') ?>
-        <?= reportTable($columns, $templates, ['empty' => 'There are no vendor templates yet.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By template'), __('Most clients first'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $templates, ['empty' => __('There are no vendor templates yet.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Added counts the client vendors made from each in the period; the rest count the current vendors from it, as they are now. Out of step is a vendor that says something other than its template
-            in the fields every client shares - not its account number, PIN or account manager. Coverage is how many of the clients a template is required of have a current vendor from it.
-            <?= $sees_docs ? 'Licenses and assets are the current ones naming a vendor from it.' : '' ?>
-            <?= $sees_cases ? 'Cases are the tickets with a vendor from it on them, opened in the period.' : '' ?>
-            <?= $sees_spend ? 'Spent is the expenses with our own vendor from it in the period, as Spend by Vendor counts them.' : '' ?>
+            <?= __('Added counts the client vendors made from each in the period; the rest count the current vendors from it, as they are now. Out of step is a vendor that says something other than its template in the fields every client shares - not its account number, PIN or account manager. Coverage is how many of the clients a template is required of have a current vendor from it.') ?>
+            <?= $sees_docs ? __('Licenses and assets are the current ones naming a vendor from it.') : '' ?>
+            <?= $sees_cases ? __('Cases are the tickets with a vendor from it on them, opened in the period.') : '' ?>
+            <?= $sees_spend ? __('Spent is the expenses with our own vendor from it in the period, as Spend by Vendor counts them.') : '' ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('By client', 'Most missing first') ?>
-        <?= reportTable($client_columns, $by_client, ['empty' => 'No client has a vendor from a template, or one it should have.', 'totals' => $client_totals]) ?>
+    <?= reportSectionOpen(__('By client'), __('Most missing first')) ?>
+        <?= reportTable($client_columns, $by_client, ['empty' => __('No client has a vendor from a template, or one it should have.'), 'totals' => $client_totals]) ?>
     </div>
 
 </div>

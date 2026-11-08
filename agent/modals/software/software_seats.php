@@ -13,7 +13,7 @@ enforceUserPermission('module_support', 2);
 $software_id = intval($_GET['id'] ?? 0);
 $row = softwareRow($software_id);
 if (!$row) {
-    echo json_encode(['error' => 'That license no longer exists.']);
+    echo json_encode(['error' => __('That license no longer exists.')]);
     exit;
 }
 $client_id = intval($row['software_client_id']);
@@ -45,7 +45,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-users me-2"></i>Seats on <strong><?= escapeHtml($row['software_name']) ?></strong></h5>
+    <h5 class="modal-title text-truncate"><i class="fas fa-fw fa-users me-2"></i><?= __('Seats on') ?> <strong><?= escapeHtml($row['software_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off" data-seats-form>
@@ -54,13 +54,13 @@ ob_start();
 
     <div class="modal-body">
         <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-            <span class="text-body-secondary small">Each device and user here takes a seat.<?= $seats_total ? '' : ' This license has no seat limit.' ?></span>
+            <span class="text-body-secondary small"><?= __('Each device and user here takes a seat.') ?><?= $seats_total ? '' : ' ' . __('This license has no seat limit.') ?></span>
             <span class="badge rounded-pill fs-6 fw-normal" data-seat-count></span>
         </div>
         <?php
         $pickers = [
-            'contacts' => ['label' => 'Users', 'icon' => 'fa-user', 'placeholder' => $contact_options ? 'Pick the people licensed to use it' : 'This client has no contacts yet'],
-            'assets' => ['label' => 'Devices', 'icon' => 'fa-desktop', 'placeholder' => $asset_options ? 'Pick the devices it is installed on' : 'This client has no assets yet'],
+            'contacts' => ['label' => __('Users'), 'icon' => 'fa-user', 'placeholder' => $contact_options ? __('Pick the people licensed to use it') : __('This client has no contacts yet')],
+            'assets' => ['label' => __('Devices'), 'icon' => 'fa-desktop', 'placeholder' => $asset_options ? __('Pick the devices it is installed on') : __('This client has no assets yet')],
         ];
         if (!$users_first) {
             $pickers = array_reverse($pickers, true);
@@ -88,8 +88,8 @@ ob_start();
         <?php } ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="set_software_seats" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Save</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="set_software_seats" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Save') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

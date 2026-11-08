@@ -24,8 +24,8 @@ $user_id = intval($session_user_id);
 
 // The views: your own, archived or not, and the shared ones offered now
 $views = [
-    '' => ['label' => 'Yours', 'icon' => 'fa-user', 'where' => "canned_response_user_id = $user_id", 'title' => 'Offered to you alone - first in the picker'],
-    'shared' => ['label' => 'Shared', 'icon' => 'fa-users', 'where' => "canned_response_user_id = 0 AND canned_response_archived_at IS NULL", 'title' => 'Offered to everyone - copy one to make it yours'],
+    '' => ['label' => __('Yours'), 'icon' => 'fa-user', 'where' => "canned_response_user_id = $user_id", 'title' => __('Offered to you alone - first in the picker')],
+    'shared' => ['label' => __('Shared'), 'icon' => 'fa-users', 'where' => "canned_response_user_id = 0 AND canned_response_archived_at IS NULL", 'title' => __('Offered to everyone - copy one to make it yours')],
 ];
 $show = (string) ($_GET['show'] ?? '');
 $show = isset($views[$show]) ? $show : '';
@@ -94,9 +94,9 @@ $csrf = $_SESSION['csrf_token'];
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-comment-dots me-2"></i>Canned Responses</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-comment-dots me-2"></i><?= __('Canned Responses') ?></h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($add_url) ?>"><i class="fas fa-plus me-2"></i>New Canned Response</button>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-size="lg" data-modal-url="<?= escapeHtml($add_url) ?>"><i class="fas fa-plus me-2"></i><?= __('New Canned Response') ?></button>
         </div>
     </div>
     <div class="card-header py-3">
@@ -105,14 +105,14 @@ $csrf = $_SESSION['csrf_token'];
             <div class="row g-2 align-items-center">
                 <div class="col-lg-5 col-md-6">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search canned responses..." title="Name or what it says">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search canned responses...')) ?>" title="<?= escapeHtml(__('Name or what it says')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="Offered on">
-                        <option value="">- Offered on any ticket -</option>
-                        <option value="every" <?= $category_filter === 'every' ? 'selected' : '' ?>>Every ticket</option>
+                    <select class="form-select select2" name="category" onchange="this.form.submit()" aria-label="<?= escapeHtml(__('Offered on')) ?>">
+                        <option value=""><?= __('- Offered on any ticket -') ?></option>
+                        <option value="every" <?= $category_filter === 'every' ? 'selected' : '' ?>><?= __('Every ticket') ?></option>
                         <?php foreach (categoryPicker('Ticket', $category_filter !== '' && $category_filter !== 'every' ? [intval($category_filter)] : []) as $category_id => $category_row) { ?>
                             <?= categoryOptionHtml($category_row, (string) intval($category_id) === $category_filter) ?>
                         <?php } ?>
@@ -130,10 +130,10 @@ $csrf = $_SESSION['csrf_token'];
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('canned_response_name', 'Response') ?></th>
-                <th class="d-none d-lg-table-cell">Offered on</th>
-                <th class="d-none d-md-table-cell" title="In your replies"><?= $sort_link('use_count', 'You used it') ?></th>
-                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', 'Last used') ?></th>
+                <th class="ps-3"><?= $sort_link('canned_response_name', __('Response')) ?></th>
+                <th class="d-none d-lg-table-cell"><?= __('Offered on') ?></th>
+                <th class="d-none d-md-table-cell" title="<?= escapeHtml(__('In your replies')) ?>"><?= $sort_link('use_count', __('You used it')) ?></th>
+                <th class="d-none d-md-table-cell"><?= $sort_link('last_used', __('Last used')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -149,7 +149,7 @@ $csrf = $_SESSION['csrf_token'];
                     ? '<span class="d-inline-flex flex-wrap gap-1">' . implode('', array_map(function ($category) {
                         return '<span class="badge rounded-pill text-bg-light border fw-normal">' . categoryChip($category) . '</span>';
                     }, $categories)) . '</span>'
-                    : '<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-globe text-secondary me-1"></i>Every ticket</span>';
+                    : __('<span class="badge rounded-pill text-bg-light border fw-normal"><i class="fas fa-fw fa-globe text-secondary me-1"></i>Every ticket</span>');
                 $preview = cannedResponsePreview($row['canned_response_body']);
                 $sets_up = cannedResponseSetsUpHtml($row);
                 $files = $response_files[$canned_response_id] ?? [];
@@ -160,7 +160,7 @@ $csrf = $_SESSION['csrf_token'];
                             <span class="itflow-asset-icon itflow-asset-tone-other d-none d-sm-inline-flex" aria-hidden="true"><i class="fas fa-fw fa-<?= $mine ? 'comment-dots' : 'users' ?>"></i></span>
                             <div class="min-w-0">
                                 <?php if ($mine) { ?>
-                                    <a class="ajax-modal fw-semibold text-body" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>" title="Edit <?= $name ?>"><?= $name ?></a>
+                                    <a class="ajax-modal fw-semibold text-body" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>" title="<?= __('Edit %s', $name) ?>"><?= $name ?></a>
                                 <?php } else { ?>
                                     <span class="fw-semibold"><?= $name ?></span>
                                 <?php } ?>
@@ -169,58 +169,58 @@ $csrf = $_SESSION['csrf_token'];
                                 <?php } ?>
                                 <?php if ($sets_up !== '' || $files) { ?>
                                     <div class="mt-1 d-flex flex-wrap gap-1">
-                                        <?php if ($sets_up !== '') { ?><span title="Set on the reply when it is picked"><?= $sets_up ?></span><?php } ?>
+                                        <?php if ($sets_up !== '') { ?><span title="<?= escapeHtml(__('Set on the reply when it is picked')) ?>"><?= $sets_up ?></span><?php } ?>
                                         <?php if ($files) { ?>
-                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="Goes out with the reply: <?= escapeHtml(implode(', ', array_column($files, 'canned_response_file_name'))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
+                                            <span class="badge rounded-pill text-bg-light border fw-normal" title="<?= __('Goes out with the reply: %s', escapeHtml(implode(', ', array_column($files, 'canned_response_file_name')))) ?>"><i class="fas fa-fw fa-paperclip text-secondary me-1"></i><?= count($files) ?> file<?= count($files) === 1 ? '' : 's' ?></span>
                                         <?php } ?>
                                     </div>
                                 <?php } ?>
                                 <?php if ($row['canned_response_archived_at']) { ?>
-                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($row['canned_response_archived_at'])) ?> - not offered</div>
+                                    <div class="small text-body-secondary"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($row['canned_response_archived_at'], 'date')) ?> - not offered</div>
                                 <?php } ?>
                                 <!-- On smaller screens where it is offered and its use come along under the name -->
                                 <div class="d-lg-none mt-1"><?= $offered_html ?></div>
-                                <div class="d-md-none small text-body-secondary mt-1"><?= $use_count ? 'You used it ' . $used_text . ' · last ' . timeAgo($row['last_used']) : 'Not used by you yet' ?></div>
+                                <div class="d-md-none small text-body-secondary mt-1"><?= $use_count ? __('You used it %1$s · last %2$s', $used_text, timeAgo($row['last_used'])) : __('Not used by you yet') ?></div>
                             </div>
                         </div>
                     </td>
                     <td class="d-none d-lg-table-cell"><?= $offered_html ?></td>
-                    <td class="d-none d-md-table-cell small text-nowrap"><?= $use_count ? $used_text : '<span class="text-body-secondary">Not yet</span>' ?></td>
+                    <td class="d-none d-md-table-cell small text-nowrap"><?= $use_count ? $used_text : __('<span class="text-body-secondary">Not yet</span>') ?></td>
                     <td class="d-none d-md-table-cell small text-body-secondary text-nowrap"<?= $row['last_used'] ? ' title="' . escapeHtml($row['last_used']) . '"' : '' ?>><?= $row['last_used'] ? timeAgo($row['last_used']) : '-' ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <?php if ($mine) { ?>
                                     <a class="dropdown-item ajax-modal" href="#" data-modal-size="lg" data-modal-url="<?= $edit_url ?>">
-                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                        <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                     </a>
-                                    <a class="dropdown-item" href="post.php?copy_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="A new one of yours starting from this one">
-                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy
+                                    <a class="dropdown-item" href="post.php?copy_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new one of yours starting from this one')) ?>">
+                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy') ?>
                                     </a>
                                     <?php if ($session_is_admin && !$row['canned_response_archived_at']) { ?>
                                         <a class="dropdown-item confirm-link" href="/admin/post.php?share_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>"
-                                            data-confirm-title="Share <?= $name ?> with everyone?" data-confirm-text="It moves to the shared ones in Admin > Canned Responses, and every agent is offered it." data-confirm-button="Share">
-                                            <i class="fas fa-fw fa-users text-secondary me-2"></i>Share with everyone
+                                            data-confirm-title="<?= __('Share %s with everyone?', $name) ?>" data-confirm-text="<?= escapeHtml(__('It moves to the shared ones in Admin > Canned Responses, and every agent is offered it.')) ?>" data-confirm-button="<?= escapeHtml(__('Share')) ?>">
+                                            <i class="fas fa-fw fa-users text-secondary me-2"></i><?= __('Share with everyone') ?>
                                         </a>
                                     <?php } ?>
                                     <div class="dropdown-divider"></div>
                                     <?php if ($row['canned_response_archived_at']) { ?>
                                         <a class="dropdown-item" href="post.php?restore_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>">
-                                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                            <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                         </a>
                                     <?php } else { ?>
-                                        <a class="dropdown-item text-danger" href="post.php?archive_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="Not offered on tickets">
-                                            <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <a class="dropdown-item text-danger" href="post.php?archive_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('Not offered on tickets')) ?>">
+                                            <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                         </a>
                                     <?php } ?>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_your_canned_response=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>"
-                                        data-confirm-title="Delete <?= $name ?>?" data-confirm-text="It goes for good, with its record of use. Replies it went into stay as they are." data-confirm-button="Delete">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        data-confirm-title="<?= __('Delete %s?', $name) ?>" data-confirm-text="<?= escapeHtml(__('It goes for good, with its record of use. Replies it went into stay as they are.')) ?>" data-confirm-button="<?= escapeHtml(__('Delete')) ?>">
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } else { ?>
-                                    <a class="dropdown-item" href="post.php?copy_canned_response_to_yours=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="A new one of yours starting from this one, to change as you like">
-                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i>Copy to yours
+                                    <a class="dropdown-item" href="post.php?copy_canned_response_to_yours=<?= $canned_response_id ?>&csrf_token=<?= $csrf ?>" title="<?= escapeHtml(__('A new one of yours starting from this one, to change as you like')) ?>">
+                                        <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Copy to yours') ?>
                                     </a>
                                 <?php } ?>
                             </div>
@@ -233,17 +233,17 @@ $csrf = $_SESSION['csrf_token'];
     </div>
     <?php
     $empty_state = [
-        'thing' => 'canned responses',
+        'thing' => __('canned responses'),
         'icon' => 'fa-comment-dots',
         'filtered' => $q !== '' || $category_filter !== '',
         'views' => ['show'],
-        'title' => 'No canned responses of your own yet',
-        'text' => 'Yours are offered to you alone, first in the picker above a reply. Make one here, copy a shared one, or write a reply on a ticket and save it from the picker with <strong>Save your reply as a canned response</strong>.',
-        'actions' => [['label' => 'New Canned Response', 'modal' => $add_url, 'size' => 'lg'], ['label' => 'See the shared ones', 'href' => $pill_url('shared'), 'icon' => 'fa-users']],
+        'title' => __('No canned responses of your own yet'),
+        'text' => __('Yours are offered to you alone, first in the picker above a reply. Make one here, copy a shared one, or write a reply on a ticket and save it from the picker with <strong>Save your reply as a canned response</strong>.'),
+        'actions' => [['label' => __('New Canned Response'), 'modal' => $add_url, 'size' => 'lg'], ['label' => __('See the shared ones'), 'href' => $pill_url('shared'), 'icon' => 'fa-users']],
         'view' => $yours ? [] : [
-            'title' => 'No shared canned responses',
+            'title' => __('No shared canned responses'),
             'icon' => 'fa-users',
-            'text' => 'An admin makes them in Admin > Canned Responses.',
+            'text' => __('An admin makes them in Admin > Canned Responses.'),
             'actions' => [],
         ],
     ];

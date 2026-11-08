@@ -58,7 +58,9 @@ function enforceAdminPermission() {
     global $session_is_admin;
     if (!isset($session_is_admin) || !$session_is_admin) {
         $role = permissionRoleName();
-        permissionRefuse("Only an admin can do that - your role" . ($role !== '' ? ", $role," : '') . " isn't an admin role.");
+        permissionRefuse($role !== ''
+            ? __("Only an admin can do that - your role, %s, isn't an admin role.", $role)
+            : __("Only an admin can do that - your role isn't an admin role."));
     }
     return true;
 }
@@ -84,18 +86,17 @@ function permissionRoleName() {
  * view Support, not change it." Plain text.
  */
 function permissionRefusedText($module, $level, $has = 0) {
-    $label = roleModuleInfo()[$module]['label'] ?? ucfirst(str_replace('module_', '', (string) $module));
+    $label = __(roleModuleInfo()[$module]['label'] ?? ucfirst(str_replace('module_', '', (string) $module))); // i18n-dynamic: roleModuleInfo()
     $role = permissionRoleName();
-    $who = 'Your role' . ($role !== '' ? ", $role," : '');
     $level = max(1, min(3, intval($level)));
     if ($has <= 0) {
-        $why = "$who can't open $label.";
+        $why = $role !== '' ? __("Your role, %1\$s, can't open %2\$s.", $role, $label) : __("Your role can't open %s.", $label);
     } elseif ($level === 2) {
-        $why = "$who can only view $label, not change it.";
+        $why = $role !== '' ? __('Your role, %1$s, can only view %2$s, not change it.', $role, $label) : __('Your role can only view %s, not change it.', $label);
     } else {
-        $why = "$who can't delete in $label - that takes Full access.";
+        $why = $role !== '' ? __("Your role, %1\$s, can't delete in %2\$s - that takes Full access.", $role, $label) : __("Your role can't delete in %s - that takes Full access.", $label);
     }
-    return "$why An admin can change what your role allows in Admin > Roles.";
+    return $why . ' ' . __('An admin can change what your role allows in Admin > Roles.');
 }
 
 /*
@@ -112,10 +113,10 @@ function permissionRefuse($message) {
         while (ob_get_level()) {
             ob_end_clean();
         }
-        echo json_encode(['content' => '<div class="modal-header bg-dark"><h5 class="modal-title"><i class="fas fa-fw fa-lock me-2"></i>Not for your role</h5>'
+        echo json_encode(['content' => '<div class="modal-header bg-dark"><h5 class="modal-title"><i class="fas fa-fw fa-lock me-2"></i>' . __('Not for your role') . '</h5>'
             . '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>'
             . '<div class="modal-body"><p class="mb-0">' . $html . '</p></div>'
-            . '<div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Close</button></div>']);
+            . '<div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>' . __('Close') . '</button></div>']);
         exit;
     }
 
@@ -137,8 +138,8 @@ function permissionRefuse($message) {
     // A page already under way - why, where the page would be, then the rest of the layout so its menus work
     echo '<div class="card my-3 mx-auto itflow-refused" style="max-width: 36rem;"><div class="card-body text-center py-5">'
         . '<span class="itflow-asset-icon itflow-asset-icon-lg itflow-asset-tone-other mb-3" aria-hidden="true"><i class="fas fa-lock"></i></span>'
-        . '<h2 class="h5">Not for your role</h2><p class="text-body-secondary">' . $html . '</p>'
-        . '<a class="btn btn-outline-secondary" href="' . escapeHtml(permissionBackUrl()) . '"><i class="fas fa-arrow-left me-2"></i>Back</a>'
+        . '<h2 class="h5">' . __('Not for your role') . '</h2><p class="text-body-secondary">' . $html . '</p>'
+        . '<a class="btn btn-outline-secondary" href="' . escapeHtml(permissionBackUrl()) . '"><i class="fas fa-arrow-left me-2"></i>' . __('Back') . '</a>'
         . '</div></div>';
     extract($GLOBALS, EXTR_SKIP);
     require $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php';
@@ -183,11 +184,11 @@ function clientScopeSql($column) {
     // restricted user keeps seeing it. This also matches the deny branch below, where 0
     // already passes NOT IN, and the old hand-rolled ticket override that did IN (0,...).
     if (!empty($client_access_array)) {
-        $sql .= " AND $column IN (0," . implode(',', array_map('intval', $client_access_array)) . ")";
+        $sql .= " AND $column IN (0," . implode(',', array_map('intval', $client_access_array)) . ")"; // i18n-ignore - SQL
     }
 
     if (!empty($client_deny_array)) {
-        $sql .= " AND $column NOT IN (" . implode(',', array_map('intval', $client_deny_array)) . ")";
+        $sql .= " AND $column NOT IN (" . implode(',', array_map('intval', $client_deny_array)) . ")"; // i18n-ignore - SQL
     }
 
     return $sql;
@@ -239,7 +240,7 @@ function enforceClientAccess($client_id = null) {
     $session_user_id = (int) $session_user_id;
 
     if (empty($client_id) || empty($session_user_id)) {
-        flashAlert('Access Denied.', 'error');
+        flashAlert(__('Access Denied.'), 'error');
         redirect('clients.php');
     }
 
@@ -253,7 +254,7 @@ function enforceClientAccess($client_id = null) {
     $deny_result = mysqli_query($mysqli, $deny_sql);
     if ($deny_result && mysqli_num_rows($deny_result) > 0) {
         logAudit('Client', 'Denied', "$session_name was denied permission from accessing client", $client_id, $client_id);
-        flashAlert('Access Denied - You do not have permission to access that client!', 'error');
+        flashAlert(__('Access Denied - You do not have permission to access that client!'), 'error');
         redirect('clients.php');
     }
 
@@ -293,6 +294,6 @@ function enforceClientAccess($client_id = null) {
         $client_id
     );
 
-    flashAlert('Access Denied - You do not have permission to access that client!', 'error');
+    flashAlert(__('Access Denied - You do not have permission to access that client!'), 'error');
     redirect('clients.php');
 }

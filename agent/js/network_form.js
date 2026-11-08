@@ -128,7 +128,7 @@
                 if (!data.ok) {
                     const line = document.createElement('span');
                     line.className = 'text-danger';
-                    line.textContent = cidr.indexOf('/') === -1 ? 'Add the prefix - /24 for 254 hosts, /16 for 65,534.' : 'Not a subnet yet.';
+                    line.textContent = cidr.indexOf('/') === -1 ? __('Add the prefix - /24 for 254 hosts, /16 for 65,534.') : __('Not a subnet yet.');
                     info.append(line);
                     suggest('gateway', gatewayInput, '');
                     suggest('range', rangeInput, '');
@@ -143,7 +143,7 @@
                 if (data.cidr !== cidr) {
                     const saved = document.createElement('div');
                     saved.className = 'text-body-secondary';
-                    saved.textContent = 'Saved as ' + data.cidr;
+                    saved.textContent = __('Saved as %s', data.cidr);
                     info.append(saved);
                 }
                 if (data.overlaps && data.overlaps.length) {
@@ -151,7 +151,7 @@
                     overlap.className = 'text-warning-emphasis';
                     const warn = document.createElement('i');
                     warn.className = 'fas fa-fw fa-clone me-1';
-                    overlap.append(warn, 'Overlaps ' + data.overlaps.join(', '));
+                    overlap.append(warn, __('Overlaps %s', data.overlaps.join(', ')));
                     info.append(overlap);
                 }
                 suggest('gateway', gatewayInput, data.gateway);

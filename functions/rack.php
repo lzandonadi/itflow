@@ -14,6 +14,21 @@
  * panel, a small switch) leaves the other face free for something else.
  */
 
+/** A rack item type (rackItemTypes(), stored in English) as people read it. */
+function rackItemTypeLabel($unit_type) {
+    $unit_type = (string) $unit_type;
+    return [
+        'Device' => _x('Device', 'rack item'),
+        'Patch Panel' => _x('Patch Panel', 'rack item'),
+        'Cable Management' => _x('Cable Management', 'rack item'),
+        'Shelf' => _x('Shelf', 'rack item'),
+        'PDU' => 'PDU',
+        'UPS' => 'UPS',
+        'KVM / Console' => _x('KVM / Console', 'rack item'),
+        'Blanking Panel' => _x('Blanking Panel', 'rack item'),
+    ][$unit_type] ?? $unit_type;
+}
+
 /** Unlinked rack items - things worth documenting that are not assets. */
 function rackItemTypes() {
     return [
@@ -49,7 +64,7 @@ function rackItemStyle($asset_type, $unit_type, $has_asset) {
         return [
             'icon' => 'fa-' . getAssetIcon($asset_type),
             'tone' => $tones[$asset_type] ?? 'device',
-            'label' => $asset_type !== '' ? $asset_type : 'Asset',
+            'label' => $asset_type !== '' ? assetTypeLabel($asset_type) : __('Asset'),
         ];
     }
 
@@ -58,7 +73,7 @@ function rackItemStyle($asset_type, $unit_type, $has_asset) {
     return [
         'icon' => $types[$unit_type]['icon'],
         'tone' => $types[$unit_type]['tone'],
-        'label' => $unit_type,
+        'label' => rackItemTypeLabel($unit_type),
     ];
 }
 
@@ -196,7 +211,7 @@ function rackUnitName($asset_name, $unit_device, $unit_type) {
     if ($unit_device !== '') {
         return $unit_device;
     }
-    return trim((string) $unit_type) !== '' ? (string) $unit_type : 'Unnamed item';
+    return trim((string) $unit_type) !== '' ? rackItemTypeLabel($unit_type) : __('Unnamed item');
 }
 
 /**

@@ -17,10 +17,21 @@
 
 /** What a method is for - payment_method_use. */
 const PAYMENT_METHOD_USES = [
-    0 => ['label' => 'Money in and out', 'short' => 'In and out', 'icon' => 'fa-exchange-alt', 'about' => 'Offered for payments, income, expenses and transfers'],
-    1 => ['label' => 'Money in - payments and income', 'short' => 'Money in', 'icon' => 'fa-arrow-down', 'about' => 'Offered for payments from clients and other income'],
-    2 => ['label' => 'Money out - expenses', 'short' => 'Money out', 'icon' => 'fa-arrow-up', 'about' => 'Offered for expenses, recurring expenses, reimbursements and mileage claims'],
+    0 => ['label' => 'Money in and out', 'short' => 'In and out', 'icon' => 'fa-exchange-alt', 'about' => 'Offered for payments, income, expenses and transfers'], // i18n-ignore - shown through __(), or the audit log
+    1 => ['label' => 'Money in - payments and income', 'short' => 'Money in', 'icon' => 'fa-arrow-down', 'about' => 'Offered for payments from clients and other income'], // i18n-ignore - shown through __(), or the audit log
+    2 => ['label' => 'Money out - expenses', 'short' => 'Money out', 'icon' => 'fa-arrow-up', 'about' => 'Offered for expenses, recurring expenses, reimbursements and mileage claims'], // i18n-ignore - shown through __(), or the audit log
 ];
+
+/** A use (PAYMENT_METHOD_USES) with its words in the interface language - the constant stays English for the audit log. */
+function paymentMethodUseLabel($use) {
+    $info = PAYMENT_METHOD_USES[intval($use)] ?? PAYMENT_METHOD_USES[0];
+    return [
+        'label' => __($info['label']), // i18n-dynamic - PAYMENT_METHOD_USES, entries in lang/pt_BR/catalogs.php
+        'short' => __($info['short']), // i18n-dynamic
+        'about' => __($info['about']), // i18n-dynamic
+        'icon' => $info['icon'],
+    ];
+}
 
 /** The name online card payments are recorded under. */
 const PAYMENT_METHOD_ONLINE = 'Stripe';
@@ -187,7 +198,7 @@ function paymentMethodDefaults() {
 }
 
 /* Which defaults a method is - ['in', 'out'], one of them, or none. */
-function paymentMethodDefaultFor($name, array $defaults = null) {
+function paymentMethodDefaultFor($name, ?array $defaults = null) {
     $defaults = $defaults ?? paymentMethodDefaults();
     $is = [];
     foreach ($defaults as $way => $default) {
@@ -225,11 +236,11 @@ function paymentMethodFromInput(array $in, $row = null) {
 function paymentMethodProblem(array $f, $id = 0) {
     global $mysqli;
     if ($f['name'] === '') {
-        return 'A payment method needs a name.';
+        return __('A payment method needs a name.');
     }
     $taken = mysqli_fetch_row(mysqli_query($mysqli, "SELECT payment_method_name FROM payment_methods WHERE payment_method_name = '" . escapeSql($f['name']) . "' AND payment_method_id <> " . intval($id) . " LIMIT 1"));
     if ($taken) {
-        return 'There is already a payment method called "' . $taken[0] . '".';
+        return __('There is already a payment method called "%s".', $taken[0]);
     }
     return '';
 }
@@ -302,11 +313,11 @@ function paymentMethodUpdate(array $row, array $f) {
     }
     $was_use = intval($row['payment_method_use']);
     if ($was_use !== $f['use']) {
-        $changes[] = 'for ' . strtolower(PAYMENT_METHOD_USES[$was_use]['short'] ?? 'in and out') . ' now ' . strtolower(PAYMENT_METHOD_USES[$f['use']]['short']);
+        $changes[] = 'for ' . strtolower(PAYMENT_METHOD_USES[$was_use]['short'] ?? 'in and out') . ' now ' . strtolower(PAYMENT_METHOD_USES[$f['use']]['short']); // i18n-ignore - shown through __(), or the audit log
         foreach (paymentMethodDefaultFor($f['name']) as $way) {
             if (($way === 'in' && $f['use'] === 2) || ($way === 'out' && $f['use'] === 1)) {
                 paymentMethodSetDefault($way, '');
-                $changes[] = 'no longer the default for ' . ($way === 'in' ? 'payments' : 'expenses');
+                $changes[] = 'no longer the default for ' . ($way === 'in' ? 'payments' : 'expenses'); // i18n-ignore - shown through __(), or the audit log
             }
         }
     }

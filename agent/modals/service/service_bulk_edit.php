@@ -25,7 +25,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-edit me-2"></i>Change <strong><?= $count ?></strong> service<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-edit me-2"></i><?= __('Change') ?> <strong><?= $count ?></strong> service<?= $count === 1 ? '' : 's' ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -35,22 +35,22 @@ ob_start();
 
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Importance</label>
+            <label class="form-label"><?= __('Importance') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-thermometer-half"></i></span>
                 <select class="form-select select2" name="importance">
-                    <option value="">- No change -</option>
+                    <option value=""><?= __('- No change -') ?></option>
                     <?php foreach (SERVICE_IMPORTANCE as $importance) { ?>
-                        <option value="<?= $importance ?>"><?= $importance ?></option>
+                        <option value="<?= $importance ?>"><?= serviceImportanceLabel($importance) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
         <div class="mb-3">
-            <label class="form-label">Category</label>
+            <label class="form-label"><?= __('Category') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-folder"></i></span>
-                <input type="text" class="form-control" name="category" list="serviceBulkCategories" maxlength="50" placeholder="- No change -">
+                <input type="text" class="form-control" name="category" list="serviceBulkCategories" maxlength="50" placeholder="<?= escapeHtml(__('- No change -')) ?>">
             </div>
             <datalist id="serviceBulkCategories">
                 <?php foreach ($categories as $category) { ?>
@@ -59,23 +59,23 @@ ob_start();
             </datalist>
         </div>
         <div class="mb-0">
-            <label class="form-label">Review</label>
+            <label class="form-label"><?= __('Review') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-redo"></i></span>
                 <select class="form-select select2" name="review_interval">
-                    <option value="">- No change -</option>
+                    <option value=""><?= __('- No change -') ?></option>
                     <?php foreach (SERVICE_REVIEW_INTERVALS as $months => $label) { ?>
-                        <option value="<?= $months ?>"><?= $label ?></option>
+                        <option value="<?= $months ?>"><?= serviceReviewIntervalLabel($months) ?></option>
                     <?php } ?>
                 </select>
             </div>
-            <div class="form-text">A schedule sets each one's next review that long after its last one - or from today if that has passed.</div>
+            <div class="form-text"><?= __('A schedule sets each one\'s next review that long after its last one - or from today if that has passed.') ?></div>
         </div>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_services" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Change</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_services" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Change') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

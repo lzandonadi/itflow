@@ -12,7 +12,7 @@ function taskForRequest($task_id, $level) {
     $task_id = intval($task_id);
     $task = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT task_id, task_name, task_ticket_id, task_completed_at FROM tasks WHERE task_id = $task_id LIMIT 1"));
     if (!$task || !intval($task['task_ticket_id'])) {
-        flashAlert('That task no longer exists.', 'error');
+        flashAlert(__('That task no longer exists.'), 'error');
         redirect();
     }
     return [$task, ticketForRequest($task['task_ticket_id'], $level)];
@@ -26,7 +26,7 @@ if (isset($_POST['add_task'])) {
     $ticket_id = intval($row['ticket_id']);
     $task_name = escapeSql(mb_substr(trim((string) ($_POST['name'] ?? '')), 0, 255));
     if ($task_name === '') {
-        flashAlert('A task needs a name.', 'error');
+        flashAlert(__('A task needs a name.'), 'error');
         redirect();
     }
 
@@ -38,7 +38,7 @@ if (isset($_POST['add_task'])) {
 
     logAudit("Task", "Create", "$session_name created task $task_name", $client_id, $task_id);
 
-    flashAlert("Task <strong>" . escapeHtml(stripslashes($task_name)) . "</strong> added");
+    flashAlert(__('Task <strong>%s</strong> added', escapeHtml(stripslashes($task_name))));
 
     redirect();
 
@@ -54,7 +54,7 @@ if (isset($_POST['edit_ticket_task'])) {
     $task_order = intval($_POST['order'] ?? 0);
     $task_completion_estimate = max(0, intval($_POST['completion_estimate'] ?? 0));
     if ($task_name === '') {
-        flashAlert('A task needs a name.', 'error');
+        flashAlert(__('A task needs a name.'), 'error');
         redirect();
     }
 
@@ -62,7 +62,7 @@ if (isset($_POST['edit_ticket_task'])) {
 
     logAudit("Task", "Edit", "$session_name edited task $task_name", $client_id, $task_id);
 
-    flashAlert("Task <strong>" . escapeHtml(stripslashes($task_name)) . "</strong> saved");
+    flashAlert(__('Task <strong>%s</strong> saved', escapeHtml(stripslashes($task_name))));
 
     redirect();
 
@@ -81,7 +81,7 @@ if (isset($_GET['delete_task'])) {
 
     logAudit("Task", "Delete", "$session_name deleted task $task_name", $client_id, $task_id);
 
-    flashAlert("Task <strong>" . escapeHtml($task['task_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Task <strong>%s</strong> deleted', escapeHtml($task['task_name'])), 'error');
 
     redirect();
 
@@ -105,11 +105,11 @@ if (isset($_GET['complete_task']) || isset($_GET['undo_complete_task'])) {
 
     // Audit trail only - task_completion_estimate is planning information, not labour.
     // Booking it as time worked double-counted against whatever the tech actually logged.
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . ($complete ? 'Completed Task' : 'Undo Completed Task') . " - $task_name', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql($complete ? __('Completed Task - %s', $task['task_name']) : __('Undo Completed Task - %s', $task['task_name'])) . "', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
 
     logAudit("Task", "Edit", "$session_name " . ($complete ? "completed task $task_name" : "marked task $task_name as incomplete"), $client_id, $task_id);
 
-    flashAlert("Task <strong>" . escapeHtml($task['task_name']) . "</strong> " . ($complete ? 'completed' : 'marked not done'), $complete ? 'success' : 'error');
+    flashAlert($complete ? __('Task <strong>%s</strong> completed', escapeHtml($task['task_name'])) : __('Task <strong>%s</strong> marked not done', escapeHtml($task['task_name'])), $complete ? 'success' : 'error');
 
     redirect();
 
@@ -130,7 +130,7 @@ if (isset($_POST['add_ticket_task_approver'])) {
     if ($type == 'specific') {
         $required_user_id = ticketAgentId($_POST['approval_required_user_id'] ?? 0);
         if (!$required_user_id) {
-            flashAlert('Pick the agent who has to approve it.', 'error');
+            flashAlert(__('Pick the agent who has to approve it.'), 'error');
             redirect();
         }
     }
@@ -155,7 +155,7 @@ if (isset($_POST['add_ticket_task_approver'])) {
     // Logging
     logAudit("Task", "Edit", "$session_name added task approver for $task_name", $client_id, $task_id);
 
-    flashAlert("Approver added to task <strong>" . stripslashes($task_name) . "</strong>");
+    flashAlert(__('Approver added to task <strong>%s</strong>', escapeHtml(stripslashes($task_name))));
     redirect();
 }
 
@@ -170,7 +170,7 @@ if (isset($_GET['approve_ticket_task'])) {
     $approval_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT approval_created_by, approval_required_user_id, approval_scope, approval_type
         FROM task_approvals WHERE approval_id = $approval_id AND approval_task_id = $task_id AND approval_scope = 'internal'"));
     if (!$approval_row) {
-        flashAlert('That approval request no longer exists.', 'error');
+        flashAlert(__('That approval request no longer exists.'), 'error');
         redirect();
     }
 
@@ -182,12 +182,12 @@ if (isset($_GET['approve_ticket_task'])) {
 
     // Validate approver (deny)
     if ($required_user > 0 && $required_user !== $session_user_id) {
-        flashAlert('This approval is for another agent.', 'error');
+        flashAlert(__('This approval is for another agent.'), 'error');
         redirect();
         exit;
     }
     if ($required_user == 0 && $type == 'any' && $created_by == $session_user_id) {
-        flashAlert('You asked for this approval - someone else has to give it.', 'error');
+        flashAlert(__('You asked for this approval - someone else has to give it.'), 'error');
         redirect();
         exit;
     }
@@ -202,7 +202,7 @@ if (isset($_GET['approve_ticket_task'])) {
     // Logging
     logAudit("Task", "Edit", "$session_name approved task $task_name (approval $approval_id)", 0, $task_id);
 
-    flashAlert("Task <strong>" . stripslashes($task_name) . "</strong> approved");
+    flashAlert(__('Task <strong>%s</strong> approved', escapeHtml(stripslashes($task_name))));
     redirect();
 
 }
@@ -214,7 +214,7 @@ if (isset($_GET['delete_ticket_task_approver'])) {
     $approval_id = intval($_GET['delete_ticket_task_approver']);
     $approval = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT approval_task_id FROM task_approvals WHERE approval_id = $approval_id"));
     if (!$approval) {
-        flashAlert('That approval request was already removed.', 'error');
+        flashAlert(__('That approval request was already removed.'), 'error');
         redirect();
     }
     [$task, $row] = taskForRequest($approval['approval_task_id'], 3);
@@ -223,7 +223,7 @@ if (isset($_GET['delete_ticket_task_approver'])) {
 
     logAudit("Task", "Delete", "$session_name deleted the approval request on task " . escapeSql($task['task_name']), $client_id, intval($task['task_id']));
 
-    flashAlert("Approval request deleted", 'error');
+    flashAlert(__('Approval request deleted'), 'error');
 
     redirect();
 
@@ -243,11 +243,11 @@ if (isset($_GET['complete_all_tasks']) || isset($_GET['undo_complete_all_tasks']
         mysqli_query($mysqli, "UPDATE tasks SET task_completed_at = NULL, task_completed_by = NULL WHERE task_ticket_id = $ticket_id AND task_completed_at IS NOT NULL");
     }
 
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . ($complete ? 'Marked all tasks complete' : 'Marked all tasks incomplete') . "', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql($complete ? __('Marked all tasks complete') : __('Marked all tasks incomplete')) . "', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
 
     logAudit("Ticket", "Edit", "$session_name marked all tasks " . ($complete ? 'complete' : 'as incomplete') . " for ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
 
-    flashAlert($complete ? "All tasks marked complete" : "All tasks marked not done", $complete ? 'success' : 'error');
+    flashAlert($complete ? __('All tasks marked complete') : __('All tasks marked not done'), $complete ? 'success' : 'error');
 
     redirect();
 

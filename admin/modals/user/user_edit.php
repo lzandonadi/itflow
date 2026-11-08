@@ -20,10 +20,10 @@ ob_start();
 </div>
 <?php if ($user_id === intval($session_user_id)) { ?>
     <div class="modal-body">
-        <p class="mb-0">That's you - change your own details, password and MFA from <a href="/agent/user/user_details.php">your account</a>, so you can't lock yourself out from here.</p>
+        <p class="mb-0"><?= __('That\'s you - change your own details, password and MFA from') ?> <a href="/agent/user/user_details.php"><?= __('your account') ?></a><?= __(', so you can\'t lock yourself out from here.') ?></p>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Close</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Close') ?></button>
     </div>
 <?php } else { ?>
     <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -34,8 +34,8 @@ ob_start();
             <?php require 'user_form.php'; ?>
         </div>
         <div class="modal-footer">
-            <button type="submit" name="edit_user" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save</button>
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+            <button type="submit" name="edit_user" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save') ?></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
         </div>
     </form>
 <?php } ?>

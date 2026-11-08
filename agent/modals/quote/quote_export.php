@@ -26,7 +26,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i>Export Quotes</h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-download me-2"></i><?= __('Export Quotes') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -41,26 +41,26 @@ ob_start();
         <?php exportTabsFiltersOpen(); ?>
 
         <div class="mb-3">
-            <label>Search</label>
+            <label><?= __('Search') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-search"></i></span>
-                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="Number, scope, client, amount">
+                <input type="text" class="form-control" name="q" value="<?= stripslashes(escapeHtml($q_filter)) ?>" placeholder="<?= escapeHtml(__('Number, scope, client, amount')) ?>">
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Category</label>
+            <label><?= __('Category') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fa fa-fw fa-list"></i></span>
                 <select class="form-select select2" name="category">
-                    <option value="">- Any category -</option>
+                    <option value=""><?= __('- Any category -') ?></option>
                     <?= categoryFilterOptionsHtml('Income', $category_filter, "SELECT DISTINCT quote_category_id FROM quotes") ?>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            <label>Dated From</label>
+            <label><?= __('Dated From') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtf" value="<?= $date_from_filter ?>" max="2999-12-31">
@@ -68,7 +68,7 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Dated To</label>
+            <label><?= __('Dated To') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-calendar"></i></span>
                 <input type="date" class="form-control" name="dtt" value="<?= $date_to_filter ?>" max="2999-12-31">

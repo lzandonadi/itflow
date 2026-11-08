@@ -31,7 +31,7 @@ $gs_client_count = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*
             <li class="small text-body-secondary ps-1"><a href="/agent/clients.php">and <?= $gs_client_count - 3 ?> more</a></li>
         <?php } ?>
     </ul>
-    <h2 class="h6 fw-semibold">Add another</h2>
+    <h2 class="h6 fw-semibold"><?= __('Add another') ?></h2>
 <?php } ?>
 
 <form action="/agent/post.php" method="post" autocomplete="off" data-gs-form data-gs-client-form>
@@ -42,44 +42,44 @@ $gs_client_count = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*
     <?php } ?>
     <div class="row g-3 mb-3">
         <div class="col-sm-7">
-            <?= settingsInput('name', '', ['id' => 'gsClientName', 'icon' => 'fa-user-friends', 'label' => 'Client', 'required' => true, 'maxlength' => 200, 'placeholder' => 'Name or company']) ?>
+            <?= settingsInput('name', '', ['id' => 'gsClientName', 'icon' => 'fa-user-friends', 'label' => 'Client', 'required' => true, 'maxlength' => 200, 'placeholder' => __('Name or company')]) ?>
         </div>
         <div class="col-sm-5">
             <?= settingsInput('website', '', ['id' => 'gsClientWebsite', 'icon' => 'fa-globe', 'label' => 'Website', 'maxlength' => 200, 'placeholder' => 'example.com']) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('contact', '', ['id' => 'gsClientContact', 'icon' => 'fa-user', 'label' => 'Who you talk to', 'maxlength' => 200, 'placeholder' => 'Their name']) ?>
+            <?= settingsInput('contact', '', ['id' => 'gsClientContact', 'icon' => 'fa-user', 'label' => __('Who you talk to'), 'maxlength' => 200, 'placeholder' => __('Their name')]) ?>
         </div>
         <div class="col-sm-6">
-            <?= settingsInput('contact_email', '', ['id' => 'gsClientEmail', 'icon' => 'fa-envelope', 'type' => 'email', 'label' => 'Their email', 'maxlength' => 200, 'placeholder' => 'name@example.com']) ?>
+            <?= settingsInput('contact_email', '', ['id' => 'gsClientEmail', 'icon' => 'fa-envelope', 'type' => 'email', 'label' => __('Their email'), 'maxlength' => 200, 'placeholder' => 'name@example.com']) ?>
         </div>
     </div>
-    <p class="small text-body-secondary">The website's domain and certificate are added too, to watch for renewals. The rest - their address, phones, rate and SLAs - is on the client once it's made, and Clients &gt; Import brings in a whole list from a CSV.</p>
+    <p class="small text-body-secondary"><?= __("The website's domain and certificate are added too, to watch for renewals. The rest - their address, phones, rate and SLAs - is on the client once it's made, and Clients &gt; Import brings in a whole list from a CSV.") ?></p>
     <div class="d-flex flex-wrap align-items-center gap-3">
-        <button type="submit" name="add_client" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-plus me-2"></i>Add the client</button>
+        <button type="submit" name="add_client" value="1" class="btn btn-primary" data-gs-save><i class="fas fa-plus me-2"></i><?= __('Add the client') ?></button>
         <?php if (clientOnboardingReady()) { ?>
-            <a href="<?= clientOnboardingUrl() ?>" class="small" data-gs-onboard><i class="fas fa-route me-1"></i>Or onboard them step by step - their sites, people, agreement and more</a>
+            <a href="<?= clientOnboardingUrl() ?>" class="small" data-gs-onboard><i class="fas fa-route me-1"></i><?= __('Or onboard them step by step - their sites, people, agreement and more') ?></a>
         <?php } ?>
     </div>
 </form>
 
-<div class="itflow-gs-or" aria-hidden="true"><span>or</span></div>
+<div class="itflow-gs-or" aria-hidden="true"><span><?= __('or') ?></span></div>
 
 <div class="d-flex flex-wrap align-items-center gap-3" data-gs-demo="<?= count($gs_demo['loaded']) ?>">
     <div class="min-w-0 flex-grow-1">
-        <div class="fw-semibold">Look around with the demo data first</div>
+        <div class="fw-semibold"><?= __('Look around with the demo data first') ?></div>
         <div class="small text-body-secondary">
             <?php if ($gs_demo['loaded']) { ?>
                 <?= count($gs_demo['loaded']) ?> of the <?= $gs_demo['total'] ?> demo clients are here. Remove them all in Maintenance &gt; Starter Content once you're done.
             <?php } else { ?>
-                <?= $gs_demo['total'] ?> made-up clients, each with contacts, assets, tickets and a year of invoices. They come out again in one go from Maintenance &gt; Starter Content.
+                <?= __('%d made-up clients, each with contacts, assets, tickets and a year of invoices. They come out again in one go from Maintenance &gt; Starter Content.', $gs_demo['total']) ?>
             <?php } ?>
         </div>
     </div>
     <?php if (count($gs_demo['loaded']) < $gs_demo['total']) { ?>
         <form action="post.php" method="post" class="m-0">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-            <button type="submit" name="load_demo_data" value="1" class="btn btn-outline-secondary" data-gs-demo-load><i class="fas fa-flask me-2"></i>Load the demo data</button>
+            <button type="submit" name="load_demo_data" value="1" class="btn btn-outline-secondary" data-gs-demo-load><i class="fas fa-flask me-2"></i><?= __('Load the demo data') ?></button>
         </form>
     <?php } ?>
 </div>

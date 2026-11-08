@@ -30,9 +30,9 @@ if (isset($_POST['check_ai_provider']) || isset($_POST['add_ai_provider']) || is
 
     if ($provider_id && !$before) {
         if ($checking) {
-            $answer(false, ['name' => 'That provider no longer exists - close this and look again.']);
+            $answer(false, ['name' => __('That provider no longer exists - close this and look again.')]);
         }
-        flashAlert('That AI provider no longer exists.', 'error');
+        flashAlert(__('That AI provider no longer exists.'), 'error');
         redirect('ai_providers.php');
     }
 
@@ -41,7 +41,7 @@ if (isset($_POST['check_ai_provider']) || isset($_POST['add_ai_provider']) || is
     // Its first model, for everything - adding one while there is nothing for everything yet
     $first_model = !$before && !getAiModel('General') ? trim((string) ($_POST['first_model'] ?? '')) : '';
     if ($first_model !== '' && (mb_strlen($first_model) > 200 || (preg_match('/\s/', $first_model) && !in_array($after['ai_provider_kind'], ['azure', 'custom'], true)))) {
-        $errors['first_model'] = "That isn't a model's name - " . aiProviderKind($after['ai_provider_kind'])['example'] . ', say.';
+        $errors['first_model'] = __("That isn't a model's name - %s, say.", aiProviderKind($after['ai_provider_kind'])['example']);
     }
 
     // New or changed - does it answer? Once it has, not asked again for ten minutes
@@ -75,7 +75,7 @@ if (isset($_POST['check_ai_provider']) || isset($_POST['add_ai_provider']) || is
 
     // Only reached without the window's script - say the first thing wrong
     if ($errors) {
-        flashAlert('Not saved - ' . escapeHtml(reset($errors)), 'error');
+        flashAlert(__('Not saved - %s', escapeHtml(reset($errors))), 'error');
         redirect();
     }
 
@@ -88,21 +88,22 @@ if (isset($_POST['check_ai_provider']) || isset($_POST['add_ai_provider']) || is
         if ($first_model !== '') {
             $model_id = aiModelWrite(['ai_model_ai_provider_id' => $provider_id, 'ai_model_name' => $first_model, 'ai_model_use_case' => 'General', 'ai_model_temperature' => null, 'ai_model_prompt' => '']);
             logAudit("AI Model", "Create", "$session_name added AI model " . escapeSql("$first_model on $name, for General"), 0, $model_id);
-            flashAlert('<strong>' . escapeHtml($name) . '</strong> added, with <strong>' . escapeHtml($first_model) . '</strong> for everything - AI is ready to use');
+            flashAlert(__('<strong>%1$s</strong> added, with <strong>%2$s</strong> for everything - AI is ready to use', escapeHtml($name), escapeHtml($first_model)));
         } else {
-            flashAlert('<strong>' . escapeHtml($name) . '</strong> added - now add the model to use on it');
+            flashAlert(__('<strong>%s</strong> added - now add the model to use on it', escapeHtml($name)));
         }
         redirect('ai_providers.php');
     }
 
-    $lines = aiProviderChangeLines($before, $after);
+    $lines = i18nEnglish(fn () => aiProviderChangeLines($before, $after));
+    $shown = aiProviderChangeLines($before, $after);
     if (!$lines) {
-        flashAlert('Nothing changed on <strong>' . escapeHtml($name) . '</strong>', 'info');
+        flashAlert(__('Nothing changed on <strong>%s</strong>', escapeHtml($name)), 'info');
         redirect();
     }
     aiProviderWrite($after, $provider_id);
     logAudit("AI Provider", "Edit", "$session_name changed AI provider " . escapeSql("$name: " . implode('; ', $lines)), 0, $provider_id);
-    flashAlert('<strong>' . escapeHtml($name) . '</strong> saved - ' . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes'));
+    flashAlert(__('<strong>%1$s</strong> saved - %2$s', escapeHtml($name), escapeHtml(count($shown) === 1 ? $shown[0] : _n('%d change', '%d changes', count($shown)))));
     redirect();
 
 }
@@ -115,7 +116,7 @@ if (isset($_POST['ai_provider_models'])) {
     header('Content-Type: application/json; charset=utf-8');
     $row = aiProviderRow($_POST['ai_provider_models']);
     if (!$row) {
-        echo json_encode(['ok' => false, 'models' => [], 'error' => 'That provider no longer exists.', 'listed' => false, 'example' => '']);
+        echo json_encode(['ok' => false, 'models' => [], 'error' => __('That provider no longer exists.'), 'listed' => false, 'example' => '']);
         exit;
     }
     // Asked once in ten minutes per provider - its models don't change from one window to the next
@@ -142,16 +143,16 @@ if (isset($_GET['test_ai_provider'])) {
 
     $row = aiProviderRow($_GET['test_ai_provider']);
     if (!$row) {
-        flashAlert('That AI provider no longer exists.', 'error');
+        flashAlert(__('That AI provider no longer exists.'), 'error');
         redirect('ai_providers.php');
     }
     $name = escapeHtml($row['ai_provider_name']);
     $test = aiProviderTest($row['ai_provider_kind'], $row['ai_provider_api_url'], $row['ai_provider_api_key']);
     if (!$test['ok']) {
         logApp('AI', 'warning', "Test of AI provider {$row['ai_provider_name']} - {$test['error']}");
-        flashAlert("<strong>$name</strong> didn't answer as it should - " . escapeHtml($test['error']), 'error');
+        flashAlert(__('<strong>%1$s</strong> didn\'t answer as it should - %2$s', $name, escapeHtml($test['error'])), 'error');
     } elseif (!$test['listed']) {
-        flashAlert("<strong>$name</strong> doesn't list its models, so it can't be tested on its own - use Try it on one of its models", 'info');
+        flashAlert(__('<strong>%s</strong> doesn\'t list its models, so it can\'t be tested on its own - use Try it on one of its models', $name), 'info');
     } else {
         $count = count($test['models']);
         $ours = [];
@@ -174,7 +175,7 @@ if (isset($_GET['delete_ai_provider'])) {
 
     $row = aiProviderRow($_GET['delete_ai_provider']);
     if (!$row) {
-        flashAlert('That AI provider no longer exists.', 'error');
+        flashAlert(__('That AI provider no longer exists.'), 'error');
         redirect('ai_providers.php');
     }
     $provider_id = intval($row['ai_provider_id']);

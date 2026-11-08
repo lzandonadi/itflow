@@ -39,7 +39,7 @@
         if (button) {
             button.querySelector('i').className = 'fas fa-eye';
             button.setAttribute('aria-pressed', 'false');
-            button.title = 'Show password';
+            button.title = __('Show password');
         }
     }
 
@@ -62,7 +62,7 @@
             box.querySelector('.itflow-credential-pw-mask').hidden = true;
             button.querySelector('i').className = 'fas fa-eye-slash';
             button.setAttribute('aria-pressed', 'true');
-            button.title = 'Hide password';
+            button.title = __('Hide password');
             clearTimeout(box.itflowHide);
             box.itflowHide = setTimeout(function () {
                 hidePassword(box);
@@ -92,7 +92,7 @@
         button.classList.remove('is-live', 'is-ending');
         button.querySelector('.itflow-credential-otp-code').textContent = '2FA';
         button.querySelector('.itflow-credential-otp-time').textContent = '';
-        button.title = 'Show the 2FA code';
+        button.title = __('Show the 2FA code');
     }
 
     // 2FA: the first click fetches the code and counts it down, following on to
@@ -120,13 +120,13 @@
                 } catch (err) {}
                 if (!/^[0-9]{6,8}$/.test(code)) {
                     resetOtp(button);
-                    codeEl.textContent = 'No code';
+                    codeEl.textContent = __('No code');
                     return;
                 }
                 button.dataset.code = code;
                 codeEl.textContent = code.length === 6 ? code.slice(0, 3) + ' ' + code.slice(3) : code;
                 button.classList.add('is-live');
-                button.title = 'Click to copy the code';
+                button.title = __('Click to copy the code');
             });
         }
 

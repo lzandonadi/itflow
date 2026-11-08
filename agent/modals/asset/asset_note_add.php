@@ -18,7 +18,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class='fa fa-fw fa-sticky-note me-2'></i>Creating note: <strong><?= $asset_name ?></strong></h5>
+    <h5 class="modal-title"><i class='fa fa-fw fa-sticky-note me-2'></i><?= __('Creating note:') ?> <strong><?= $asset_name ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -29,7 +29,7 @@ ob_start();
     <div class="modal-body">
 
         <div class="mb-3">
-            <label>Type</label>
+            <label><?= __('Type') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-comment"></i></span>
                 <select class="form-select select2" name="type">
@@ -40,14 +40,14 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <textarea class="form-control" rows="6" name="note" placeholder="Notes, eg what was done, parts replaced, config changed, etc"></textarea>
+            <textarea class="form-control" rows="6" name="note" placeholder="<?= escapeHtml(__('Notes, eg what was done, parts replaced, config changed, etc')) ?>"></textarea>
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="add_asset_note" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_asset_note" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

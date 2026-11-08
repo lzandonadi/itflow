@@ -17,7 +17,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-user-tie me-2"></i>Set the manager of <strong><?= $count ?></strong> project<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-user-tie me-2"></i><?= _n('Set the manager of <strong>%d</strong> project', 'Set the manager of <strong>%d</strong> projects', $count) ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -26,11 +26,11 @@ ob_start();
     <?php foreach ($project_ids as $project_id) { ?><input type="hidden" name="project_ids[]" value="<?= $project_id ?>"><?php } ?>
 
     <div class="modal-body">
-        <label class="form-label">Manager</label>
+        <label class="form-label"><?= __('Manager') ?></label>
         <div class="input-group">
             <span class="input-group-text"><i class="fas fa-fw fa-user-tie"></i></span>
             <select class="form-select select2" name="project_manager">
-                <option value="0" data-icon="fas fa-user-slash">No manager</option>
+                <option value="0" data-icon="fas fa-user-slash"><?= __('No manager') ?></option>
                 <?php
                 $sql = mysqli_query($mysqli, "SELECT user_id, user_name, user_avatar FROM users WHERE user_type = 1 AND user_status = 1 AND user_archived_at IS NULL
                     ORDER BY user_id = " . intval($session_user_id) . " DESC, user_name ASC");
@@ -40,12 +40,12 @@ ob_start();
                 <?php } ?>
             </select>
         </div>
-        <div class="form-text">Open projects only - completed and archived ones keep theirs. The new manager gets a notification.</div>
+        <div class="form-text"><?= __('Open projects only - completed and archived ones keep theirs. The new manager gets a notification.') ?></div>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_project_manager" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Set manager</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_project_manager" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Set manager') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

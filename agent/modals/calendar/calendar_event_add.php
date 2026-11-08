@@ -19,7 +19,7 @@ if (!$form_client_id && intval($_GET['contact_id'] ?? 0)) {
 if ($form_client_id) {
     $client_id = $form_client_id;
     if (!hasClientAccess($client_id)) {
-        echo json_encode(['error' => 'You do not have access to that client.']);
+        echo json_encode(['error' => __('You do not have access to that client.')]);
         exit;
     }
     enforceCalendarEvent(['event_client_id' => $client_id], 'edit');
@@ -57,7 +57,7 @@ $form_attendees = [
 $form_invited = false;
 
 if (!calendarList()) {
-    echo json_encode(['error' => 'There is no calendar to put it on yet - ' . (calendarCanManage() ? 'add one first.' : 'ask an admin to add one.')]);
+    echo json_encode(['error' => calendarCanManage() ? __('There is no calendar to put it on yet - add one first.') : __('There is no calendar to put it on yet - ask an admin to add one.')]);
     exit;
 }
 
@@ -65,7 +65,7 @@ ob_start();
 
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="far fa-fw fa-calendar-plus me-2"></i>New Event<?php if ($form_client_id) { ?> <small class="ms-1 opacity-75"><?= escapeHtml((string) getFieldById('clients', $form_client_id, 'client_name')) ?></small><?php } ?></h5>
+    <h5 class="modal-title"><i class="far fa-fw fa-calendar-plus me-2"></i><?= __('New Event') ?><?php if ($form_client_id) { ?> <small class="ms-1 opacity-75"><?= escapeHtml((string) getFieldById('clients', $form_client_id, 'client_name')) ?></small><?php } ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -75,8 +75,8 @@ ob_start();
         <?php require 'calendar_event_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_event" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Add event</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_event" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Add event') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

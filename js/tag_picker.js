@@ -126,7 +126,7 @@
         panel.appendChild(head);
 
         if (this.bulk) {
-            panel.appendChild(make('div', 'itflow-tag-panel-note', this.ids.length + ' selected - ticked tags go on all of them, unticked come off'));
+            panel.appendChild(make('div', 'itflow-tag-panel-note', __('%d selected - ticked tags go on all of them, unticked come off', this.ids.length)));
         }
 
         var search = make('div', 'itflow-select-search');
@@ -135,7 +135,7 @@
         input.type = 'text';
         input.autocomplete = 'off';
         input.spellcheck = false;
-        input.setAttribute('aria-label', 'Search tags');
+        input.setAttribute('aria-label', __('Search tags'));
         input.addEventListener('input', function () {
             self.query = input.value;
             self.draw(false);
@@ -186,7 +186,7 @@
         this.sheet = sheetMedia.matches;
         this.panel.classList.toggle('is-sheet', this.sheet);
         this.input.placeholder = 'Loading...';
-        this.list.appendChild(make('div', 'itflow-select-empty', 'Loading tags...'));
+        this.list.appendChild(make('div', 'itflow-select-empty', __('Loading tags...')));
 
         var host = this.anchor.closest('.modal, .offcanvas') || document.body;
         if (this.sheet) {
@@ -207,18 +207,18 @@
                 return;
             }
             if (!data || !data.tags) {
-                self.fail('Could not load the tags.');
+                self.fail(__('Could not load the tags.'));
                 self.close(false);
                 return;
             }
             self.data = data;
-            self.input.placeholder = data.create ? 'Search or make a tag' : 'Search tags';
+            self.input.placeholder = data.create ? __('Search or make a tag') : __('Search tags');
             self.draw(false);
             if (finePointer.matches) {
                 self.input.focus({ preventScroll: true });
             }
         }, function () {
-            self.fail('Could not load the tags.');
+            self.fail(__('Could not load the tags.'));
             self.close(false);
         });
     };
@@ -339,22 +339,22 @@
             plus.appendChild(make('i', 'fas fa-plus'));
             create.appendChild(plus);
             var createText = make('span', 'itflow-select-text');
-            createText.appendChild(make('span', 'itflow-select-label', 'Make tag "' + typed + '"'));
+            createText.appendChild(make('span', 'itflow-select-label', __('Make tag "%s"', typed)));
             create.appendChild(createText);
             list.appendChild(create);
             this.rows.push({ node: create, create: typed });
         }
 
         if (!this.rows.length) {
-            list.appendChild(make('div', 'itflow-select-empty', typed ? 'No tags match' : 'No tags yet' + (data.create ? ' - type a name to make one' : '')));
+            list.appendChild(make('div', 'itflow-select-empty', typed ? __('No tags match') : (data.create ? __('No tags yet - type a name to make one') : __('No tags yet'))));
         }
 
         // Footer: how many the record has, and where tags are managed
         this.footer.textContent = '';
         var chosen = data.tags.filter(function (tag) { return tag.chosen >= data.records; }).length;
-        this.footer.appendChild(make('span', 'me-auto', chosen ? chosen + ' tagged' : 'No tags'));
+        this.footer.appendChild(make('span', 'me-auto', chosen ? __('%d tagged', chosen) : __('No tags')));
         if (data.manage) {
-            var manage = make('a', 'btn btn-sm btn-link', 'Manage tags');
+            var manage = make('a', 'btn btn-sm btn-link', __('Manage tags'));
             manage.href = data.manage;
             this.footer.appendChild(manage);
         }
@@ -490,7 +490,7 @@
                     self.draw(true);
                 }
             }
-            self.fail('The tag change was not saved - try again.');
+            self.fail(__('The tag change was not saved - try again.'));
         }
     };
 

@@ -20,11 +20,11 @@ if ($form_client_id) {
 ob_start();
 
 if (!$form_contract) { ?>
-    <div class="modal-body text-center text-secondary py-5">That contract is gone - it may have been deleted.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That contract is gone - it may have been deleted.') ?></div>
 <?php } else { ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-file-contract me-2"></i>Contract: <strong><?= escapeHtml($form_contract['contract_name']) ?></strong></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-file-contract me-2"></i><?= __('Contract:') ?> <strong><?= escapeHtml($form_contract['contract_name']) ?></strong></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -34,8 +34,8 @@ if (!$form_contract) { ?>
         <?php require __DIR__ . '/contract_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_contract" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save changes</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_contract" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save changes') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

@@ -17,7 +17,7 @@ function locationForRequest($location_id) {
     global $client_id;
     $row = locationRow($location_id);
     if (!$row) {
-        flashAlert('That location no longer exists.', 'error');
+        flashAlert(__('That location no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['location_client_id']);
@@ -50,7 +50,7 @@ if (isset($_POST['add_location'])) {
 
     $set = locationFormSet($_POST, $client_id);
     if ($set === null) {
-        flashAlert('A location needs a name.', 'error');
+        flashAlert(__('A location needs a name.'), 'error');
         redirect();
     }
 
@@ -70,7 +70,7 @@ if (isset($_POST['add_location'])) {
     $name = trim($_POST['name']);
     logAudit("Location", "Create", "$session_name created location " . escapeSql($name), $client_id, $location_id);
 
-    flashAlert("Location <strong>$name</strong> created");
+    flashAlert(__('Location <strong>%s</strong> created', $name));
 
     redirect();
 
@@ -87,7 +87,7 @@ if (isset($_POST['edit_location'])) {
 
     $set = locationFormSet($_POST, $client_id);
     if ($set === null) {
-        flashAlert('A location needs a name.', 'error');
+        flashAlert(__('A location needs a name.'), 'error');
         redirect();
     }
 
@@ -114,7 +114,7 @@ if (isset($_POST['edit_location'])) {
     $name = trim($_POST['name']);
     logAudit("Location", "Edit", "$session_name edited location " . escapeSql($name), $client_id, $location_id);
 
-    flashAlert("Location <strong>$name</strong> updated");
+    flashAlert(__('Location <strong>%s</strong> updated', $name));
 
     redirect();
 
@@ -130,7 +130,7 @@ if (isset($_GET['make_location_primary'])) {
     $location_id = intval($row['location_id']);
 
     if ($row['location_archived_at']) {
-        flashAlert('Restore the location before making it primary.', 'error');
+        flashAlert(__('Restore the location before making it primary.'), 'error');
         redirect();
     }
 
@@ -138,7 +138,7 @@ if (isset($_GET['make_location_primary'])) {
 
     logAudit("Location", "Edit", "$session_name made " . escapeSql($row['location_name']) . " the primary location", $client_id, $location_id);
 
-    flashAlert("<strong>{$row['location_name']}</strong> is now the primary location");
+    flashAlert(__('<strong>%s</strong> is now the primary location', $row['location_name']));
 
     redirect();
 
@@ -151,14 +151,14 @@ if (isset($_POST['set_location_records'])) {
     $row = locationForRequest($_POST['location_id'] ?? 0);
     $kind = (string) ($_POST['kind'] ?? '');
     if (!isset(LOCATION_KINDS[$kind])) {
-        flashAlert('Nothing to move.', 'error');
+        flashAlert(__('Nothing to move.'), 'error');
         redirect();
     }
 
     enforceUserPermission(LOCATION_KINDS[$kind]['module'], 2);
 
     if ($row['location_archived_at']) {
-        flashAlert('Restore the location before moving anything to it.', 'error');
+        flashAlert(__('Restore the location before moving anything to it.'), 'error');
         redirect();
     }
 
@@ -166,11 +166,11 @@ if (isset($_POST['set_location_records'])) {
     $k = LOCATION_KINDS[$kind];
 
     if (!$moved) {
-        flashAlert("Nothing new to move to <strong>{$row['location_name']}</strong>.", 'warning');
+        flashAlert(__('Nothing new to move to <strong>%s</strong>.', $row['location_name']), 'warning');
     } elseif (count($moved) === 1) {
-        flashAlert(ucfirst($k['label']) . " <strong>{$moved[0]}</strong> moved to <strong>{$row['location_name']}</strong>");
+        flashAlert(locationKindText($kind, 'moved_one', "<strong>{$moved[0]}</strong>", "<strong>{$row['location_name']}</strong>"));
     } else {
-        flashAlert("Moved <strong>" . count($moved) . "</strong> " . strtolower($k['plural']) . " to <strong>{$row['location_name']}</strong>");
+        flashAlert(locationKindText($kind, 'moved', '<strong>' . count($moved) . '</strong>', "<strong>{$row['location_name']}</strong>"));
     }
 
     redirect();
@@ -191,7 +191,7 @@ if (isset($_GET['unset_location_record'])) {
 
     $name = locationUnassign($row, $kind, intval($_GET['unset_location_record']));
     if ($name !== '') {
-        flashAlert(ucfirst(LOCATION_KINDS[$kind]['label']) . " <strong>$name</strong> is no longer at <strong>{$row['location_name']}</strong>", 'error');
+        flashAlert(locationKindText($kind, 'gone', "<strong>$name</strong>", "<strong>{$row['location_name']}</strong>"), 'error');
     }
 
     redirect();
@@ -209,7 +209,7 @@ if (isset($_GET['archive_location'])) {
 
     // The client header and overview show the primary location - another one has to take over first
     if (intval($row['location_primary'])) {
-        flashAlert("<strong>{$row['location_name']}</strong> is the primary location - make another location primary first.", 'error');
+        flashAlert(__('<strong>%s</strong> is the primary location - make another location primary first.', $row['location_name']), 'error');
         redirect();
     }
 
@@ -217,7 +217,7 @@ if (isset($_GET['archive_location'])) {
 
     logAudit("Location", "Archive", "$session_name archived location " . escapeSql($row['location_name']), $client_id, $location_id);
 
-    flashAlert("Location <strong>{$row['location_name']}</strong> archived", 'error');
+    flashAlert(__('Location <strong>%s</strong> archived', $row['location_name']), 'error');
 
     redirect();
 
@@ -236,7 +236,7 @@ if (isset($_GET['restore_location'])) {
 
     logAudit("Location", "Restore", "$session_name restored location " . escapeSql($row['location_name']), $client_id, $location_id);
 
-    flashAlert("Location <strong>{$row['location_name']}</strong> restored");
+    flashAlert(__('Location <strong>%s</strong> restored', $row['location_name']));
 
     redirect();
 
@@ -251,7 +251,7 @@ if (isset($_GET['delete_location'])) {
     $row = locationForRequest($_GET['delete_location']);
 
     if (intval($row['location_primary'])) {
-        flashAlert("<strong>{$row['location_name']}</strong> is the primary location - make another location primary first.", 'error');
+        flashAlert(__('<strong>%s</strong> is the primary location - make another location primary first.', $row['location_name']), 'error');
         redirect();
     }
 
@@ -259,7 +259,7 @@ if (isset($_GET['delete_location'])) {
 
     logAudit("Location", "Delete", "$session_name deleted location " . escapeSql($row['location_name']), $client_id);
 
-    flashAlert("Location <strong>{$row['location_name']}</strong> deleted", 'error');
+    flashAlert(__('Location <strong>%s</strong> deleted', $row['location_name']), 'error');
 
     // From its own page, back to the client's archived locations - that page is gone
     if (strpos($_SERVER['HTTP_REFERER'] ?? '', '/location.php') !== false) {
@@ -293,7 +293,7 @@ if (isset($_POST['bulk_archive_locations'])) {
         $count++;
     }
 
-    flashAlert("Archived <strong>$count</strong> location" . ($count === 1 ? '' : 's') . ($skipped ? ' - kept <strong>' . implode(', ', $skipped) . '</strong>, the primary location' : ''), 'error');
+    flashAlert(_n('Archived <strong>%d</strong> location', 'Archived <strong>%d</strong> locations', $count) . ($skipped ? ' - ' . __('kept <strong>%s</strong>, the primary location', implode(', ', $skipped)) : ''), 'error');
 
     redirect();
 
@@ -318,7 +318,7 @@ if (isset($_POST['bulk_restore_locations'])) {
         $count++;
     }
 
-    flashAlert("Restored <strong>$count</strong> location" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Restored <strong>%d</strong> location', 'Restored <strong>%d</strong> locations', $count));
 
     redirect();
 
@@ -343,7 +343,7 @@ if (isset($_POST['bulk_delete_locations'])) {
         $count++;
     }
 
-    flashAlert("Deleted <strong>$count</strong> location" . ($count === 1 ? '' : 's'), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> location', 'Deleted <strong>%d</strong> locations', $count), 'error');
 
     redirect();
 
@@ -364,7 +364,7 @@ if (isExportRequest('export_locations')) {
     // Archived Filter
     $archived = (isset($_POST['archived']) && $_POST['archived'] == 1);
     if ($archived) {
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary[__('Archived')] = __('Archived only');
     }
 
     if (!empty($_POST['client_id'])) {
@@ -372,7 +372,7 @@ if (isExportRequest('export_locations')) {
         $client_query = "AND location_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
 
@@ -386,7 +386,7 @@ if (isExportRequest('export_locations')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND (location_client_id = $filter_client_id)";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
 
         $archive_query = $archived ? "(client_archived_at IS NOT NULL OR location_archived_at IS NOT NULL)" : "(client_archived_at IS NULL AND location_archived_at IS NULL)";
@@ -403,13 +403,13 @@ if (isExportRequest('export_locations')) {
         while ($tag_row = mysqli_fetch_assoc($sql_tags)) {
             $tag_names[] = $tag_row['tag_name'];
         }
-        $filter_summary['Tags'] = implode(', ', $tag_names);
+        $filter_summary[__('Tags')] = implode(', ', $tag_names);
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     $sql = mysqli_query(
@@ -433,13 +433,13 @@ if (isExportRequest('export_locations')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'locations');
+    guardExportHasRows($num_rows, __('locations'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('locations', $format, $file_name_prepend . 'Locations', 'Locations', summarizeExportFilters($filter_summary));
+        $export = beginExport('locations', $format, $file_name_prepend . 'Locations', __('Locations'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             addExportRow($export, $row);
@@ -465,17 +465,17 @@ if (isset($_POST["import_locations_csv"])) {
     enforceClientAccess();
 
     if (empty($_FILES["file"]["tmp_name"])) {
-        flashAlert("Please select a file to upload.", 'error');
+        flashAlert(__('Please select a file to upload.'), 'error');
         redirect();
     }
 
     $file_extension = strtolower(pathinfo((string) $_FILES['file']['name'], PATHINFO_EXTENSION));
     if ($file_extension !== 'csv') {
-        flashAlert("Bad file extension", 'error');
+        flashAlert(__('Bad file extension'), 'error');
         redirect();
     }
     if ($_FILES["file"]["size"] < 1) {
-        flashAlert("Bad file size (empty?)", 'error');
+        flashAlert(__('Bad file size (empty?)'), 'error');
         redirect();
     }
 
@@ -483,7 +483,7 @@ if (isset($_POST["import_locations_csv"])) {
     $header = fgetcsv($file, 1000, ",");
     if (!is_array($header) || count($header) != 8) {
         fclose($file);
-        flashAlert("Bad column count - use the template: Name, Description, Address, City, State, Postal Code, Phone, Hours.", 'error');
+        flashAlert(__('Bad column count - use the template: Name, Description, Address, City, State, Postal Code, Phone, Hours.'), 'error');
         redirect();
     }
 
@@ -524,7 +524,7 @@ if (isset($_POST["import_locations_csv"])) {
 
     logAudit("Location", "Import", "$session_name imported $row_count location(s). $duplicate_count duplicate(s) found and not imported", $client_id);
 
-    flashAlert("$row_count Location(s) imported, $duplicate_count duplicate(s) detected and not imported");
+    flashAlert(__('%s Location(s) imported, %s duplicate(s) detected and not imported', $row_count, $duplicate_count));
 
     redirect();
 
@@ -541,7 +541,7 @@ if (isset($_GET['download_locations_csv_template'])) {
     $f = fopen('php://memory', 'w');
 
     //set column headers
-    $fields = array('Name', 'Description', 'Address', 'City', 'State', 'Postal Code', 'Phone', 'Hours');
+    $fields = array('Name', 'Description', 'Address', 'City', 'State', 'Postal Code', 'Phone', 'Hours'); // i18n-ignore - CSV headings stay English, so files import in any language
     fputcsv($f, $fields, $delimiter, $enclosure, $escape);
 
     //move back to beginning of file

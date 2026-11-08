@@ -164,78 +164,78 @@ usort($by_client, function ($a, $b) {
 });
 
 $columns = [
-    'template' => ['label' => 'Template', 'html' => function ($row) use ($admin) {
+    'template' => ['label' => __('Template'), 'html' => function ($row) use ($admin) {
         $name = escapeHtml($row['template']);
         return ($admin ? '<a href="/admin/software_template.php?software_template_id=' . $row['id'] . '">' . $name . '</a>' : $name)
-            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">Archived</span>' : '');
+            . ($row['archived'] ? ' <span class="badge text-bg-light border fw-normal">' . __('Archived') . '</span>' : '');
     }],
-    'scope' => ['label' => 'Required of', 'html' => function ($row) {
+    'scope' => ['label' => __('Required of'), 'html' => function ($row) {
         return $row['scope'] !== '' ? '<span class="small">' . escapeHtml($row['scope']) . '</span>' : '<span class="itflow-report-zero">–</span>';
     }],
-    'made' => ['label' => 'Made', 'type' => 'count', 'title' => 'Licenses made from it in the period'],
-    'change' => ['label' => 'Change', 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
+    'made' => ['label' => __('Made'), 'type' => 'count', 'title' => __('Licenses made from it in the period')],
+    'change' => ['label' => __('Change'), 'type' => 'percent', 'csv' => false, 'html' => function ($row) {
         return $row['change'] === null ? '<span class="itflow-report-zero">–</span>' : '<span class="small">' . reportChangeHtml($row['made'], $row['prev'], 'up') . '</span>';
     }],
-    'licenses' => ['label' => 'Licenses', 'type' => 'count', 'class' => 'fw-semibold', 'title' => 'Current licenses from it'],
-    'clients' => ['label' => 'Clients', 'type' => 'count', 'title' => 'Clients with one'],
-    'seats' => ['label' => 'Seats bought', 'type' => 'count', 'screen' => false],
-    'used' => ['label' => 'Seats in use', 'type' => 'count', 'title' => 'Devices and users on them, of the seats bought', 'html' => function ($row) {
+    'licenses' => ['label' => __('Licenses'), 'type' => 'count', 'class' => 'fw-semibold', 'title' => __('Current licenses from it')],
+    'clients' => ['label' => __('Clients'), 'type' => 'count', 'title' => __('Clients with one')],
+    'seats' => ['label' => __('Seats bought'), 'type' => 'count', 'screen' => false],
+    'used' => ['label' => __('Seats in use'), 'type' => 'count', 'title' => __('Devices and users on them, of the seats bought'), 'html' => function ($row) {
         return $row['licenses'] ? '<span class="text-nowrap">' . reportCount($row['used']) . ($row['seats'] ? ' <span class="text-body-secondary">of ' . reportCount($row['seats']) . '</span>' : '') . '</span>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'over' => ['label' => 'Over', 'type' => 'count', 'title' => 'Seats in use beyond the ones bought - a true-up to bill', 'html' => function ($row) {
+    'over' => ['label' => __('Over'), 'type' => 'count', 'title' => __('Seats in use beyond the ones bought - a true-up to bill'), 'html' => function ($row) {
         return $row['over'] ? '<span class="fw-semibold text-danger-emphasis">' . reportCount($row['over']) . '</span>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'spare' => ['label' => 'Spare', 'type' => 'count', 'screen' => false],
-    'renewing' => ['label' => 'Renewing', 'type' => 'count', 'title' => 'In the next 30 days', 'html' => function ($row) {
+    'spare' => ['label' => __('Spare'), 'type' => 'count', 'screen' => false],
+    'renewing' => ['label' => __('Renewing'), 'type' => 'count', 'title' => __('In the next 30 days'), 'html' => function ($row) {
         return $row['renewing'] ? '<span class="fw-semibold text-warning-emphasis">' . $row['renewing'] . '</span>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'expired' => ['label' => 'Expired', 'type' => 'count', 'title' => 'Past their renewal date', 'html' => function ($row) {
+    'expired' => ['label' => __('Expired'), 'type' => 'count', 'title' => __('Past their renewal date'), 'html' => function ($row) {
         return $row['expired'] ? '<span class="fw-semibold text-danger-emphasis">' . $row['expired'] . '</span>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'should' => ['label' => 'Should have one', 'type' => 'count', 'screen' => false],
-    'have' => ['label' => 'Have one', 'type' => 'count', 'screen' => false],
-    'coverage' => ['label' => 'Coverage', 'type' => 'percent', 'title' => 'Of the clients that should have one, how many do', 'html' => function ($row) {
+    'should' => ['label' => __('Should have one'), 'type' => 'count', 'screen' => false],
+    'have' => ['label' => __('Have one'), 'type' => 'count', 'screen' => false],
+    'coverage' => ['label' => __('Coverage'), 'type' => 'percent', 'title' => __('Of the clients that should have one, how many do'), 'html' => function ($row) {
         if ($row['coverage'] === null) {
             return '<span class="itflow-report-zero">–</span>';
         }
         $tone = $row['coverage'] >= 100 ? 'success' : ($row['coverage'] >= 75 ? 'warning' : 'danger');
         return '<div class="d-flex align-items-center justify-content-end gap-2"><div class="progress itflow-report-meter" style="width: 4rem" role="presentation">'
             . '<div class="progress-bar bg-' . $tone . '" style="width: ' . round($row['coverage']) . '%"></div></div>'
-            . '<span class="small text-nowrap" title="' . $row['have'] . ' of ' . $row['should'] . ' clients">' . $row['have'] . ' of ' . $row['should'] . '</span></div>';
+            . '<span class="small text-nowrap" title="' . escapeHtml(_n('%1$d of %2$d client', '%1$d of %2$d clients', $row['should'], $row['have'], $row['should'])) . '">' . __('%1$d of %2$d', $row['have'], $row['should']) . '</span></div>';
     }],
 ];
 if ($sees_billing) {
-    $columns['billed'] = ['label' => 'Billed', 'type' => 'count', 'title' => "Licenses from it on their client's recurring invoice - when it is sold as a product", 'html' => function ($row) {
+    $columns['billed'] = ['label' => __('Billed'), 'type' => 'count', 'title' => __("Licenses from it on their client's recurring invoice - when it is sold as a product"), 'html' => function ($row) {
         if ($row['billed'] === null) {
-            return '<span class="itflow-report-zero" title="Not sold as a product">–</span>';
+            return '<span class="itflow-report-zero" title="' . escapeHtml(__('Not sold as a product')) . '">–</span>';
         }
         return '<span class="text-nowrap">' . $row['billed'] . ' <span class="text-body-secondary">of ' . $row['licenses'] . '</span></span>'
             . ($row['unbilled'] ? '<div class="small text-warning-emphasis">' . $row['unbilled'] . ' not billed</div>' : '');
     }];
-    $columns['unbilled'] = ['label' => 'Not billed', 'type' => 'count', 'screen' => false];
-    $columns['monthly'] = ['label' => 'A month', 'type' => 'money', 'title' => "What the lines billing them come to a month, on recurring invoices that are on"];
+    $columns['unbilled'] = ['label' => __('Not billed'), 'type' => 'count', 'screen' => false];
+    $columns['monthly'] = ['label' => __('A month'), 'type' => 'money', 'title' => __('What the lines billing them come to a month, on recurring invoices that are on')];
 }
 
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr'], 'software.php');
     }],
-    'licenses' => ['label' => 'Licenses', 'type' => 'count', 'title' => 'Current licenses from a template'],
-    'should' => ['label' => 'Should have', 'type' => 'count'],
-    'have' => ['label' => 'Have', 'type' => 'count'],
-    'missing' => ['label' => 'Missing', 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
+    'licenses' => ['label' => __('Licenses'), 'type' => 'count', 'title' => __('Current licenses from a template')],
+    'should' => ['label' => __('Should have'), 'type' => 'count'],
+    'have' => ['label' => __('Have'), 'type' => 'count'],
+    'missing' => ['label' => __('Missing'), 'sort' => false, 'class' => 'itflow-report-text', 'csv' => function ($row) {
         return implode(', ', $row['missing']);
     }, 'html' => function ($row) {
-        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>None</span>' : '');
+        return $row['missing'] ? '<span class="small text-warning-emphasis">' . escapeHtml(implode(', ', $row['missing'])) . '</span>' : ($row['should'] ? '<span class="small text-success"><i class="fas fa-check me-1"></i>' . __('None') . '</span>' : '');
     }],
-    'over' => ['label' => 'Over seats', 'type' => 'count', 'title' => 'Licenses with more on them than seats bought', 'html' => function ($row) {
+    'over' => ['label' => __('Over seats'), 'type' => 'count', 'title' => __('Licenses with more on them than seats bought'), 'html' => function ($row) {
         return $row['over'] ? '<a class="fw-semibold text-danger-emphasis" href="/agent/software.php?client_id=' . $row['client_id'] . '&amp;status=over">' . $row['over'] . '</a>' : '<span class="itflow-report-zero">0</span>';
     }],
-    'renewing' => ['label' => 'Renewing', 'type' => 'count', 'title' => 'In the next 30 days'],
-    'expired' => ['label' => 'Expired', 'type' => 'count'],
+    'renewing' => ['label' => __('Renewing'), 'type' => 'count', 'title' => __('In the next 30 days')],
+    'expired' => ['label' => __('Expired'), 'type' => 'count'],
 ];
 if ($sees_billing) {
-    $client_columns['unbilled'] = ['label' => 'Not billed', 'type' => 'count', 'title' => 'Licenses from a template sold as a product, not on their recurring invoice', 'html' => function ($row) {
+    $client_columns['unbilled'] = ['label' => __('Not billed'), 'type' => 'count', 'title' => __('Licenses from a template sold as a product, not on their recurring invoice'), 'html' => function ($row) {
         return $row['unbilled'] ? '<span class="fw-semibold text-warning-emphasis">' . $row['unbilled'] . '</span>' : '<span class="itflow-report-zero">0</span>';
     }];
 }
@@ -247,12 +247,12 @@ $made_total = intval($sum('made'));
 $previous = intval($sum('prev'));
 $should_total = intval($sum('should'));
 $have_total = intval($sum('have'));
-$totals = ['template' => 'Total', 'made' => $made_total, 'licenses' => intval($sum('licenses')), 'seats' => intval($sum('seats')), 'used' => intval($sum('used')), 'over' => intval($sum('over')),
+$totals = ['template' => __('Total'), 'made' => $made_total, 'licenses' => intval($sum('licenses')), 'seats' => intval($sum('seats')), 'used' => intval($sum('used')), 'over' => intval($sum('over')),
     'spare' => intval($sum('spare')), 'renewing' => intval($sum('renewing')), 'expired' => intval($sum('expired')), 'should' => $should_total, 'have' => $have_total];
 if ($sees_billing) {
     $totals += ['billed' => intval($sum('billed')), 'unbilled' => intval($sum('unbilled')), 'monthly' => round($sum('monthly'), 2)];
 }
-$client_totals = ['client' => 'Total', 'licenses' => array_sum(array_column($by_client, 'licenses')), 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
+$client_totals = ['client' => __('Total'), 'licenses' => array_sum(array_column($by_client, 'licenses')), 'should' => array_sum(array_column($by_client, 'should')), 'have' => array_sum(array_column($by_client, 'have')),
     'over' => array_sum(array_column($by_client, 'over')), 'renewing' => array_sum(array_column($by_client, 'renewing')), 'expired' => array_sum(array_column($by_client, 'expired')),
     'unbilled' => array_sum(array_column($by_client, 'unbilled'))];
 
@@ -271,19 +271,19 @@ $with_required = count(array_filter($by_client, function ($c) { return $c['shoul
 $over_licenses = array_sum(array_column($by_client, 'over'));
 
 $stats = [
-    ['label' => 'Licenses made', 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', 'the period before') : ''],
-    ['label' => 'Seats in use', 'value' => reportCount($totals['used']), 'tone' => $totals['over'] ? 'danger' : '',
-        'sub' => ($totals['seats'] ? 'of ' . reportCount($totals['seats']) . ' <span class="text-body-tertiary">bought</span>' : '<span class="text-body-tertiary">No seats bought</span>')
+    ['label' => __('Licenses made'), 'value' => reportCount($made_total), 'sub' => $previous || $made_total ? reportChangeHtml($made_total, $previous, 'up', __('the period before')) : ''],
+    ['label' => __('Seats in use'), 'value' => reportCount($totals['used']), 'tone' => $totals['over'] ? 'danger' : '',
+        'sub' => ($totals['seats'] ? 'of ' . reportCount($totals['seats']) . ' <span class="text-body-tertiary">' . __('bought') . '</span>' : '<span class="text-body-tertiary">' . __('No seats bought') . '</span>')
             . ($totals['over'] ? ' · <span class="text-danger-emphasis">' . reportCount($totals['over']) . ' over</span> <span class="text-body-tertiary">on ' . $over_licenses . ' license' . ($over_licenses === 1 ? '' : 's') . '</span>' : '')],
-    ['label' => 'Have what they should', 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
-        'sub' => $should_total ? $fully . ' of ' . $with_required . ' <span class="text-body-tertiary">client' . ($with_required === 1 ? '' : 's') . ' have every one</span>' : '<span class="text-body-tertiary">No template is required of anyone</span>'],
+    ['label' => __('Have what they should'), 'value_html' => $should_total ? reportRateHtml(reportShare($have_total, $should_total, 1), 100, 75) : '-',
+        'sub' => $should_total ? __('%1$d of %2$d', $fully, $with_required) . ' <span class="text-body-tertiary">' . _n('client has every one', 'clients have every one', $with_required) . '</span>' : '<span class="text-body-tertiary">' . __('No template is required of anyone') . '</span>'],
 ];
 if ($sees_billing) {
-    $stats[] = ['label' => 'Billed a month', 'value' => reportMoney($totals['monthly']), 'tone' => $totals['unbilled'] ? 'warning' : '',
-        'sub' => $totals['unbilled'] ? '<span class="text-warning-emphasis">' . $totals['unbilled'] . ' not billed</span> <span class="text-body-tertiary">of the licenses sold as a product</span>' : '<span class="text-body-tertiary">Every license sold as a product is billed</span>'];
+    $stats[] = ['label' => __('Billed a month'), 'value' => reportMoney($totals['monthly']), 'tone' => $totals['unbilled'] ? 'warning' : '',
+        'sub' => $totals['unbilled'] ? '<span class="text-warning-emphasis">' . $totals['unbilled'] . ' not billed</span> <span class="text-body-tertiary">' . __('of the licenses sold as a product') . '</span>' : '<span class="text-body-tertiary">' . __('Every license sold as a product is billed') . '</span>'];
 } else {
-    $stats[] = ['label' => 'Renewing soon', 'value' => reportCount($totals['renewing']), 'tone' => $totals['expired'] ? 'danger' : ($totals['renewing'] ? 'warning' : ''),
-        'sub' => $totals['expired'] ? '<span class="text-danger-emphasis">' . $totals['expired'] . ' expired</span>' : '<span class="text-body-tertiary">in the next 30 days</span>'];
+    $stats[] = ['label' => __('Renewing soon'), 'value' => reportCount($totals['renewing']), 'tone' => $totals['expired'] ? 'danger' : ($totals['renewing'] ? 'warning' : ''),
+        'sub' => $totals['expired'] ? '<span class="text-danger-emphasis">' . $totals['expired'] . ' expired</span>' : '<span class="text-body-tertiary">' . __('in the next 30 days') . '</span>'];
 }
 
 ?>
@@ -294,32 +294,31 @@ if ($sees_billing) {
         'period' => $period,
         'years' => reportPastYears("SELECT DISTINCT YEAR(software_created_at) AS y FROM software WHERE software_template_id > 0"),
         'client' => $client_id,
-        'export' => ['' => 'By template', 'clients' => 'By client'],
+        'export' => ['' => __('By template'), 'clients' => __('By client')],
         'print_meta' => $client_id ? reportClientName($client_id) : '',
     ]); ?>
 
     <?= reportStats($stats) ?>
 
     <?php if ($top) { ?>
-        <?= reportSectionOpen('Most used', 'Current licenses from each') ?>
+        <?= reportSectionOpen(__('Most used'), __('Current licenses from each')) ?>
             <div class="card-body">
                 <?= reportChart(['type' => 'bar', 'horizontal' => true, 'labels' => array_column($top, 'template'),
-                    'series' => [['label' => 'Licenses', 'tone' => 'accent', 'data' => array_column($top, 'licenses')]], 'format' => 'count'], '', 'Current licenses from each') ?>
+                    'series' => [['label' => __('Licenses'), 'tone' => 'accent', 'data' => array_column($top, 'licenses')]], 'format' => 'count'], '', __('Current licenses from each')) ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By template', 'Most used first', 'itflow-report-long') ?>
-        <?= reportTable($columns, $templates, ['empty' => 'There are no license templates yet.', 'totals' => $totals]) ?>
+    <?= reportSectionOpen(__('By template'), __('Most used first'), 'itflow-report-long') ?>
+        <?= reportTable($columns, $templates, ['empty' => __('There are no license templates yet.'), 'totals' => $totals]) ?>
         <div class="card-footer small text-body-secondary">
-            Made counts the licenses made from each in the period; the rest count the current licenses from it, as they are now. Coverage is how many of the clients a template is required of
-            have a current license from it.<?= $sees_billing ? ' Billed counts the licenses on a line of their client\'s recurring invoice - counting their seats, or for the product typed in by hand - and a month is what those lines come to, on recurring invoices that are on.' : '' ?>
-            Use is counted from the update that brought license templates' record of use in.
+            <?= __('Made counts the licenses made from each in the period; the rest count the current licenses from it, as they are now. Coverage is how many of the clients a template is required of have a current license from it.') ?><?= $sees_billing ? ' ' . __('Billed counts the licenses on a line of their client\'s recurring invoice - counting their seats, or for the product typed in by hand - and a month is what those lines come to, on recurring invoices that are on.') : '' ?>
+            <?= __('Use is counted from the update that brought license templates\' record of use in.') ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('By client', 'Most missing first') ?>
-        <?= reportTable($client_columns, $by_client, ['empty' => 'No client has a license from a template, or one it should have.', 'totals' => $client_totals]) ?>
+    <?= reportSectionOpen(__('By client'), __('Most missing first')) ?>
+        <?= reportTable($client_columns, $by_client, ['empty' => __('No client has a license from a template, or one it should have.'), 'totals' => $client_totals]) ?>
     </div>
 
 </div>

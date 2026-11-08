@@ -49,56 +49,56 @@ $waiting_html = function ($days) {
 $rate_html = function ($row) {
     // A client's tickets at more than one rate - a contract's after-hours rate, or work either side of a contract's start
     if (count($row['rates'] ?? []) > 1) {
-        return '<span class="small" title="Each ticket bills at its own rate">Varies</span>';
+        return '<span class="small" title="' . escapeHtml(__('Each ticket bills at its own rate')) . '">' . __('Varies') . '</span>';
     }
     if ($row['rate'] <= 0) {
-        return '<span class="text-warning-emphasis small" title="Give the client\'s contract an hourly rate, or set a default in Admin > Settings > Defaults">No rate</span>';
+        return '<span class="text-warning-emphasis small" title="' . escapeHtml(__('Give the client\'s contract an hourly rate, or set a default in Admin > Settings > Defaults')) . '">' . __('No rate') . '</span>';
     }
     $source = $row['rate_source'] ?? '';
-    return reportMoney($row['rate']) . ($row['default_rate'] ? ' <span class="small text-body-tertiary" title="No contract in force sets a rate - this is the default hourly rate">default</span>'
+    return reportMoney($row['rate']) . ($row['default_rate'] ? ' <span class="small text-body-tertiary" title="' . escapeHtml(__('No contract in force sets a rate - this is the default hourly rate')) . '">' . __('default') . '</span>'
         : (in_array($source, ['contract', 'after_hours', 'default_after_hours'], true) ? ' <span class="small text-body-tertiary" title="' . escapeHtml(ucfirst((string) $row['rate_note'])) . '">' . ($source === 'contract' ? 'contract' : 'after hours') . '</span>' : ''));
 };
 
 $client_columns = [
-    'client' => ['label' => 'Client', 'html' => function ($row) {
+    'client' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['client_id'], $row['client'], $row['abbr']);
     }],
-    'tickets' => ['label' => 'Tickets', 'type' => 'count', 'html' => function ($row) {
+    'tickets' => ['label' => __('Tickets'), 'type' => 'count', 'html' => function ($row) {
         return '<a class="itflow-report-amount" href="/agent/unbilled_time.php?client_id=' . $row['client_id'] . '">' . reportCount($row['tickets']) . '</a>'
-            . ($row['no_time'] ? ' <span class="small text-warning-emphasis" title="Tickets with too little time logged to bill">(' . $row['no_time'] . ' with no time)</span>' : '');
+            . ($row['no_time'] ? ' <span class="small text-warning-emphasis" title="' . escapeHtml(__('Tickets with too little time logged to bill')) . '">(' . $row['no_time'] . ' with no time)</span>' : '');
     }],
-    'seconds' => ['label' => 'Time logged', 'type' => 'hours', 'decimals' => 2],
-    'billable_hours' => ['label' => 'To bill', 'type' => 'decimal', 'decimals' => 2, 'title' => 'Hours rounded ' . billingTimeRulesText($time_rules) . ', ticket by ticket'],
-    'rate' => ['label' => 'Rate', 'type' => 'money', 'html' => $rate_html],
-    'value' => ['label' => 'Value', 'type' => 'money', 'class' => 'fw-semibold'],
-    'oldest' => ['label' => 'Oldest waiting', 'type' => 'count', 'csv_label' => 'Oldest days waiting', 'html' => function ($row) use ($waiting_html) {
+    'seconds' => ['label' => __('Time logged'), 'type' => 'hours', 'decimals' => 2],
+    'billable_hours' => ['label' => __('To bill'), 'type' => 'decimal', 'decimals' => 2, 'title' => __('Hours rounded %s, ticket by ticket', billingTimeRulesText($time_rules))],
+    'rate' => ['label' => __('Rate'), 'type' => 'money', 'html' => $rate_html],
+    'value' => ['label' => __('Value'), 'type' => 'money', 'class' => 'fw-semibold'],
+    'oldest' => ['label' => __('Oldest waiting'), 'type' => 'count', 'csv_label' => __('Oldest days waiting'), 'html' => function ($row) use ($waiting_html) {
         return $waiting_html($row['oldest']);
     }],
 ];
 $ticket_columns = [
-    'ticket' => ['label' => 'Ticket', 'csv' => function ($row) { return ticketReference($row) . ' ' . $row['ticket_subject']; }, 'html' => function ($row) {
+    'ticket' => ['label' => __('Ticket'), 'csv' => function ($row) { return ticketReference($row) . ' ' . $row['ticket_subject']; }, 'html' => function ($row) {
         return reportTicketLink($row);
     }, 'class' => 'itflow-report-text'],
-    'client_name' => ['label' => 'Client', 'html' => function ($row) {
+    'client_name' => ['label' => __('Client'), 'html' => function ($row) {
         return reportClientCell($row['ticket_client_id'], $row['client_name'], $row['client_abbreviation']);
     }],
-    'user_name' => ['label' => 'Agent', 'html' => function ($row) {
+    'user_name' => ['label' => __('Agent'), 'html' => function ($row) {
         return reportAgentCell($row['ticket_assigned_to'], $row['user_name'] ?? '', $row['user_avatar'] ?? '');
     }],
-    'resolved' => ['label' => 'Done', 'type' => 'date', 'class' => 'text-nowrap', 'csv' => function ($row) {
+    'resolved' => ['label' => __('Done'), 'type' => 'date', 'class' => 'text-nowrap', 'csv' => function ($row) {
         return substr($row['ticket_resolved_at'] ?: $row['ticket_closed_at'], 0, 10);
     }, 'html' => function ($row) {
-        return escapeHtml(date('M j, Y', strtotime($row['ticket_resolved_at'] ?: $row['ticket_closed_at'])));
+        return escapeHtml(formatDate($row['ticket_resolved_at'] ?: $row['ticket_closed_at'], 'date'));
     }],
-    'waiting' => ['label' => 'Waiting', 'type' => 'count', 'csv_label' => 'Days waiting', 'html' => function ($row) use ($waiting_html) {
+    'waiting' => ['label' => __('Waiting'), 'type' => 'count', 'csv_label' => __('Days waiting'), 'html' => function ($row) use ($waiting_html) {
         return $waiting_html($row['waiting']);
     }],
-    'seconds' => ['label' => 'Time logged', 'type' => 'hours', 'decimals' => 2, 'html' => function ($row) {
-        return $row['seconds'] <= 0 ? '<span class="text-warning-emphasis" title="No time logged on this ticket">None</span>' : reportHours($row['seconds'], 2);
+    'seconds' => ['label' => __('Time logged'), 'type' => 'hours', 'decimals' => 2, 'html' => function ($row) {
+        return $row['seconds'] <= 0 ? '<span class="text-warning-emphasis" title="' . escapeHtml(__('No time logged on this ticket')) . '">' . __('None') . '</span>' : reportHours($row['seconds'], 2);
     }],
-    'billable_hours' => ['label' => 'To bill', 'type' => 'decimal', 'decimals' => 2],
-    'rate' => ['label' => 'Rate', 'type' => 'money', 'html' => $rate_html],
-    'value' => ['label' => 'Value', 'type' => 'money', 'class' => 'fw-semibold'],
+    'billable_hours' => ['label' => __('To bill'), 'type' => 'decimal', 'decimals' => 2],
+    'rate' => ['label' => __('Rate'), 'type' => 'money', 'html' => $rate_html],
+    'value' => ['label' => __('Value'), 'type' => 'money', 'class' => 'fw-semibold'],
 ];
 foreach ($tickets as &$ticket) {
     $ticket['resolved'] = $ticket['ticket_resolved_at'] ?: $ticket['ticket_closed_at'];
@@ -109,10 +109,10 @@ $totals = ['tickets' => count($tickets), 'seconds' => array_sum(array_column($ti
     'billable_hours' => array_sum(array_column($tickets, 'billable_hours')), 'value' => array_sum(array_column($tickets, 'value'))];
 
 if (reportExporting('tickets')) {
-    reportCsv('Unbilled Tickets', $ticket_columns, $tickets, ['ticket' => 'Total'] + $totals);
+    reportCsv('Unbilled Tickets', $ticket_columns, $tickets, ['ticket' => __('Total')] + $totals);
 }
 if (reportExporting()) {
-    reportCsv('Unbilled Work by Client', $client_columns, $clients, ['client' => 'Total'] + $totals);
+    reportCsv('Unbilled Work by Client', $client_columns, $clients, ['client' => __('Total')] + $totals);
 }
 
 require_once "includes/inc_report_layout.php";
@@ -127,42 +127,42 @@ $over_30 = array_filter($tickets, function ($t) { return $t['waiting'] > 30; });
 
     <?php reportHeader('tickets_unbilled', [
         'client' => $client_id,
-        'subtitle' => 'As of ' . date('M j, Y'),
-        'export' => ['clients' => 'By client', 'tickets' => 'Every ticket'],
+        'subtitle' => __('As of %s', formatDate('now', 'date')),
+        'export' => ['clients' => __('By client'), 'tickets' => __('Every ticket')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'Not invoiced yet', 'value' => reportMoney($totals['value']), 'tone' => $totals['value'] > 0 ? 'warning' : '',
-            'sub' => '<span class="text-body-tertiary">At each client\'s rate</span>'],
-        ['label' => 'Tickets', 'value' => reportCount(count($tickets)), 'url' => '/agent/unbilled_time.php' . ($client_id ? "?client_id=$client_id" : ''),
-            'sub' => reportCount(count($clients)) . ' <span class="text-body-tertiary">client' . (count($clients) === 1 ? '' : 's') . '</span>'],
-        ['label' => 'Hours to bill', 'value' => number_format($totals['billable_hours'], 2), 'sub' => escapeHtml(reportHours($totals['seconds'], 2)) . ' <span class="text-body-tertiary">logged</span>', 'title' => 'Each ticket\'s time rounded ' . billingTimeRulesText($time_rules)],
-        ['label' => 'Waiting over 30 days', 'value' => reportCount(count($over_30)), 'tone' => $over_30 ? 'danger' : 'success',
-            'sub' => $over_30 ? escapeHtml(reportMoney(array_sum(array_column($over_30, 'value')))) . ' <span class="text-body-tertiary">of it</span>' : '<span class="text-body-tertiary">Nothing left that long</span>'],
+        ['label' => __('Not invoiced yet'), 'value' => reportMoney($totals['value']), 'tone' => $totals['value'] > 0 ? 'warning' : '',
+            'sub' => '<span class="text-body-tertiary">' . __('At each client\'s rate') . '</span>'],
+        ['label' => __('Tickets'), 'value' => reportCount(count($tickets)), 'url' => '/agent/unbilled_time.php' . ($client_id ? "?client_id=$client_id" : ''),
+            'sub' => reportCount(count($clients)) . ' <span class="text-body-tertiary">' . _n('client', 'clients', count($clients)) . '</span>'],
+        ['label' => __('Hours to bill'), 'value' => number_format($totals['billable_hours'], 2), 'sub' => escapeHtml(reportHours($totals['seconds'], 2)) . ' <span class="text-body-tertiary">' . __('logged') . '</span>', 'title' => __('Each ticket\'s time rounded %s', billingTimeRulesText($time_rules))],
+        ['label' => __('Waiting over 30 days'), 'value' => reportCount(count($over_30)), 'tone' => $over_30 ? 'danger' : 'success',
+            'sub' => $over_30 ? escapeHtml(reportMoney(array_sum(array_column($over_30, 'value')))) . ' <span class="text-body-tertiary">' . __('of it') . '</span>' : '<span class="text-body-tertiary">' . __('Nothing left that long') . '</span>'],
     ]) ?>
 
     <?php if ($no_time || $no_rate) { ?>
         <div class="alert alert-warning d-flex gap-2 align-items-start">
             <i class="fas fa-exclamation-triangle mt-1"></i>
             <div>
-                <?php if ($no_time) { ?><div><?= $no_time ?> billable ticket<?= $no_time === 1 ? ' has' : 's have' ?> too little time logged to bill, so <?= $no_time === 1 ? 'it adds' : 'they add' ?> nothing here - log the time, type the hours in <a href="/agent/unbilled_time.php">Unbilled Time</a>, or mark <?= $no_time === 1 ? 'it' : 'them' ?> not billable there.</div><?php } ?>
-                <?php if ($no_rate) { ?><div><?= $no_rate ?> ticket<?= $no_rate === 1 ? ' is' : 's are' ?> for a client with no hourly rate - set one on the client, or a default hourly rate in Admin > Settings.</div><?php } ?>
+                <?php if ($no_time) { ?><div><?= _n('%1$d billable ticket has too little time logged to bill, so it adds nothing here - log the time, type the hours in %2$s, or mark it not billable there.', '%1$d billable tickets have too little time logged to bill, so they add nothing here - log the time, type the hours in %2$s, or mark them not billable there.', $no_time, $no_time, '<a href="/agent/unbilled_time.php">' . __('Unbilled Time') . '</a>') ?></div><?php } ?>
+                <?php if ($no_rate) { ?><div><?= _n('%d ticket is for a client with no hourly rate - set one on the client, or a default hourly rate in Admin > Settings.', '%d tickets are for a client with no hourly rate - set one on the client, or a default hourly rate in Admin > Settings.', $no_rate) ?></div><?php } ?>
             </div>
         </div>
     <?php } ?>
 
-    <?= reportSectionOpen('By client', 'Most to bill first') ?>
+    <?= reportSectionOpen(__('By client'), __('Most to bill first')) ?>
         <?= reportTable($client_columns, $clients, [
-            'empty' => reportEmpty('You are all caught up - every billable ticket that is done has been invoiced.'),
-            'totals' => ['client' => 'Total'] + $totals,
+            'empty' => reportEmpty(__('You are all caught up - every billable ticket that is done has been invoiced.')),
+            'totals' => ['client' => __('Total')] + $totals,
         ]) ?>
     </div>
 
     <?php if ($tickets) { ?>
-        <?= reportSectionOpen('Every ticket', 'Longest waiting first', 'itflow-report-long') ?>
-            <?= reportTable($ticket_columns, $tickets, ['limit' => 300, 'export_table' => 'tickets', 'totals' => ['ticket' => 'Total'] + $totals]) ?>
+        <?= reportSectionOpen(__('Every ticket'), __('Longest waiting first'), 'itflow-report-long') ?>
+            <?= reportTable($ticket_columns, $tickets, ['limit' => 300, 'export_table' => 'tickets', 'totals' => ['ticket' => __('Total')] + $totals]) ?>
             <div class="card-footer small text-body-secondary">
-                Billable tickets that are resolved or closed and on no invoice. Bill them in <a href="/agent/unbilled_time.php<?= $client_id ? "?client_id=$client_id" : '' ?>">Unbilled Time</a> - the hours and rates here are what it fills in.
+                <?= __('Billable tickets that are resolved or closed and on no invoice. Bill them in %s - the hours and rates here are what it fills in.', '<a href="/agent/unbilled_time.php' . ($client_id ? "?client_id=$client_id" : '') . '">' . __('Unbilled Time') . '</a>') ?>
             </div>
         </div>
     <?php } ?>

@@ -45,12 +45,13 @@ function ticketMergeInto($child, $parent, $comment, $move_replies = false) {
     if (empty($child['ticket_first_response_at'])) {
         setTicketFirstResponse($ticket_id);
     }
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket $child_reference merged into <a href=\"$parent_url\">$parent_reference</a>. Comment: $comment', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
+    // The arguments come escaped for SQL; the translated text is escaped as well, keeping its HTML (escapeSql() would strip it), then filled
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . vsprintf(mysqli_real_escape_string($mysqli, __('Ticket %1$s merged into <a href="%2$s">%3$s</a>. Comment: %4$s')), [$child_reference, $parent_url, $parent_reference, $comment]) . "', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
     mysqli_query($mysqli, "UPDATE tickets SET ticket_status = " . TICKET_STATUS_CLOSED . ", ticket_resolved_at = COALESCE(ticket_resolved_at, NOW()), ticket_closed_at = NOW(), ticket_closed_by = $session_user_id WHERE ticket_id = $ticket_id");
     syncTicketSlaClock($ticket_id);
     setTicketResolutionSlaMet($ticket_id);
 
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket $child_reference was merged into this ticket with comment: $comment.<br><br><b>$child_subject</b><br>$child_details', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $parent_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . vsprintf(mysqli_real_escape_string($mysqli, __('Ticket %1$s was merged into this ticket with comment: %2$s.<br><br><b>%3$s</b><br>%4$s')), [$child_reference, $comment, $child_subject, $child_details]) . "', ticket_reply_time_worked = '00:00:00', ticket_reply_type = 'Internal', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $parent_id");
     mysqli_query($mysqli, "UPDATE tickets SET ticket_updated_at = NOW() WHERE ticket_id = $parent_id");
 
     // Its tags go with it - not archived ones, which aren't put on more tickets
@@ -68,7 +69,7 @@ function ticketMergeInto($child, $parent, $comment, $move_replies = false) {
 function ticketMergeTarget($ticket_id) {
     $parent = ticketRow($ticket_id);
     if (!$parent || !empty($parent['ticket_closed_at']) || (intval($parent['ticket_client_id']) && !hasClientAccess($parent['ticket_client_id']))) {
-        flashAlert('Pick an open ticket you can reach to merge into.', 'error');
+        flashAlert(__('Pick an open ticket you can reach to merge into.'), 'error');
         redirect();
     }
     return $parent;
@@ -82,14 +83,14 @@ if (isset($_POST['add_ticket'])) {
 
     $client_id = intval($_POST['client_id'] ?? 0);
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('Pick the client this ticket is for.', 'error');
+        flashAlert(__('Pick the client this ticket is for.'), 'error');
         redirect();
     }
     enforceClientAccess();
 
     $subject_input = trim((string) ($_POST['subject'] ?? ''));
     if ($subject_input === '') {
-        flashAlert('A ticket needs a subject.', 'error');
+        flashAlert(__('A ticket needs a subject.'), 'error');
         redirect();
     }
     $subject = escapeSql(mb_substr($subject_input, 0, 500));
@@ -174,7 +175,7 @@ if (isset($_POST['add_ticket'])) {
 
     // E-mail the client and the watchers
     if (intval($config_ticket_client_general_notifications) === 1) {
-        ticketMailCreated($ticket_id, 'Ticket Created', $emailable_attachments['send']);
+        ticketMailCreated($ticket_id, __('Ticket Created'), $emailable_attachments['send']);
         ticketMailColleaguesNew($ticket_id);
     }
 
@@ -183,13 +184,13 @@ if (isset($_POST['add_ticket'])) {
 
     if ($assigned_to) {
         $row = ticketRow($ticket_id);
-        ticketNotifyAgent($assigned_to, $row, "Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " has been assigned to you by $session_name");
+        ticketNotifyAgent($assigned_to, $row, __('Ticket %1$s - Subject: %2$s has been assigned to you by %3$s', ticketReference($row), $row['ticket_subject'], stripslashes($session_name)));
         ticketMailAssigned($assigned_to, [$ticket_id], stripslashes($session_name));
     }
 
     logAudit("Ticket", "Create", "$session_name created ticket $ticket_prefix$ticket_number - $subject", $client_id, $ticket_id);
 
-    flashAlert("Ticket <strong>" . escapeHtml($config_ticket_prefix . $ticket_number) . "</strong> created");
+    flashAlert(__('Ticket <strong>%s</strong> created', escapeHtml($config_ticket_prefix . $ticket_number)));
 
     // Tell the agent about anything too large for the mail queue to carry
     if (!empty($emailable_attachments['skipped'])) {
@@ -197,7 +198,7 @@ if (isset($_POST['add_ticket'])) {
         foreach ($emailable_attachments['skipped'] as $skipped_attachment) {
             $skipped_names[] = escapeHtml($skipped_attachment['name']);
         }
-        flashAlert("Stored on the ticket but too large to email: <strong>" . implode(', ', $skipped_names) . "</strong>", 'error');
+        flashAlert(__('Stored on the ticket but too large to email: <strong>%s</strong>', implode(', ', $skipped_names)), 'error');
     }
 
     redirect("ticket.php?client_id=$client_id&ticket_id=$ticket_id");
@@ -214,7 +215,7 @@ if (isset($_POST['edit_ticket_fill_ins'])) {
     $reference = escapeSql(ticketReference($row));
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed - a closed ticket stays as it was.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed - a closed ticket stays as it was.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
@@ -244,7 +245,7 @@ if (isset($_POST['edit_ticket_fill_ins'])) {
         logAudit("Ticket", "Edit", "$session_name answered the fill-ins on ticket $reference", intval($row['ticket_client_id']), $ticket_id);
     }
 
-    flashAlert($changed ? "Fill-ins on <strong>" . escapeHtml(ticketReference($row)) . "</strong> saved" : "Nothing changed");
+    flashAlert($changed ? __('Fill-ins on <strong>%s</strong> saved', escapeHtml(ticketReference($row))) : __('Nothing changed'));
 
     redirect();
 
@@ -259,13 +260,13 @@ if (isset($_POST['edit_ticket'])) {
     $reference = escapeSql(ticketReference($row));
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed - a closed ticket stays as it was.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed - a closed ticket stays as it was.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
     $subject_input = trim((string) ($_POST['subject'] ?? ''));
     if ($subject_input === '') {
-        flashAlert('A ticket needs a subject.', 'error');
+        flashAlert(__('A ticket needs a subject.'), 'error');
         redirect();
     }
     $subject = escapeSql(mb_substr($subject_input, 0, 500));
@@ -340,20 +341,20 @@ if (isset($_POST['edit_ticket'])) {
     if (intval($row['ticket_assigned_to']) !== $assigned_to) {
         if ($assigned_to) {
             logTicketHistory($ticket_id, "$session_name assigned the ticket to " . escapeSql(getFieldById('users', $assigned_to, 'user_name')));
-            ticketNotifyAgent($assigned_to, $row, "Ticket " . ticketReference($row) . " - Subject: " . $subject_input . " has been assigned to you by $session_name");
+            ticketNotifyAgent($assigned_to, $row, __('Ticket %1$s - Subject: %2$s has been assigned to you by %3$s', ticketReference($row), $subject_input, stripslashes($session_name)));
             ticketMailAssigned($assigned_to, [$ticket_id], stripslashes($session_name));
         } else {
             logTicketHistory($ticket_id, "$session_name unassigned the ticket");
         }
     }
     if (intval($row['ticket_contact_id']) !== $contact_id) {
-        $contact_name = $contact_id ? escapeSql(getFieldById('contacts', $contact_id, 'contact_name')) : 'No one';
-        logTicketHistory($ticket_id, "$session_name changed the contact from " . ($row['contact_name'] ? escapeSql($row['contact_name']) : 'No one') . " to $contact_name");
+        $contact_name = $contact_id ? escapeSql(getFieldById('contacts', $contact_id, 'contact_name')) : 'No one'; // i18n-ignore: history
+        logTicketHistory($ticket_id, "$session_name changed the contact from " . ($row['contact_name'] ? escapeSql($row['contact_name']) : 'No one') . " to $contact_name"); // i18n-ignore: history
     }
 
     // Let the contact know about it, when asked
     if ($notify && $contact_id && empty($row['ticket_closed_at'])) {
-        ticketMailCreated($ticket_id, 'Ticket Created -', [], false);
+        ticketMailCreated($ticket_id, __('Ticket Created -'), [], false);
     }
 
     // Custom action/notif handler
@@ -361,7 +362,7 @@ if (isset($_POST['edit_ticket'])) {
 
     logAudit("Ticket", "Edit", "$session_name edited ticket $reference", $client_id, $ticket_id);
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> updated");
+    flashAlert(__('Ticket <strong>%s</strong> updated', escapeHtml(ticketReference($row))));
 
     redirect();
 
@@ -380,12 +381,12 @@ if (isset($_POST['edit_ticket_sla'])) {
     if ($sla_id) {
         $sla = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT sla_name FROM slas WHERE sla_id = $sla_id AND (sla_archived_at IS NULL OR sla_id = " . intval($row['ticket_sla_id']) . ")"));
         if (!$sla) {
-            flashAlert('That SLA plan is not available.', 'error');
+            flashAlert(__('That SLA plan is not available.'), 'error');
             redirect();
         }
         $sla_name = $sla['sla_name'];
     }
-    $original_sla_name = intval($row['ticket_sla_id']) ? (string) getFieldById('slas', $row['ticket_sla_id'], 'sla_name') : 'None';
+    $original_sla_name = intval($row['ticket_sla_id']) ? (string) getFieldById('slas', $row['ticket_sla_id'], 'sla_name') : 'None'; // i18n-ignore: history and audit log
 
     // Pin the ticket to the chosen SLA and recompute its targets
     applyTicketSla($ticket_id, $sla_id);
@@ -396,7 +397,7 @@ if (isset($_POST['edit_ticket_sla'])) {
 
     triggerCustomAction('ticket_update', $ticket_id);
 
-    flashAlert("SLA updated from <strong>" . escapeHtml($original_sla_name) . "</strong> to <strong>" . escapeHtml($sla_name) . "</strong>");
+    flashAlert(__('SLA updated from <strong>%1$s</strong> to <strong>%2$s</strong>', escapeHtml(intval($row['ticket_sla_id']) ? $original_sla_name : _x('None', 'SLA')), escapeHtml($sla_id ? $sla_name : _x('None', 'SLA'))));
 
     redirect();
 
@@ -411,14 +412,14 @@ if (isset($_POST['edit_ticket_contact'])) {
     $contact_id = ticketClientOwnedId('contact', $_POST['contact'] ?? 0, $client_id);
     $notify = intval($_POST['contact_notify'] ?? 0);
 
-    $original_contact_name = $row['contact_name'] ? $row['contact_name'] : 'No one';
-    $contact_name = $contact_id ? (string) getFieldById('contacts', $contact_id, 'contact_name') : 'No one';
+    $original_contact_name = $row['contact_name'] ? $row['contact_name'] : 'No one'; // i18n-ignore: history and audit log
+    $contact_name = $contact_id ? (string) getFieldById('contacts', $contact_id, 'contact_name') : 'No one'; // i18n-ignore: history and audit log
 
     mysqli_query($mysqli, "UPDATE tickets SET ticket_contact_id = $contact_id WHERE ticket_id = $ticket_id");
 
     // Let the new contact know about it, when asked
     if ($notify && $contact_id && empty($row['ticket_closed_at'])) {
-        ticketMailCreated($ticket_id, 'Ticket Created -', [], false);
+        ticketMailCreated($ticket_id, __('Ticket Created -'), [], false);
     }
 
     triggerCustomAction('ticket_update', $ticket_id);
@@ -427,7 +428,7 @@ if (isset($_POST['edit_ticket_contact'])) {
 
     logAudit("Ticket", "Edit", "$session_name changed the contact from " . escapeSql($original_contact_name) . " to " . escapeSql($contact_name) . " for ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
 
-    flashAlert("Contact changed from <strong>" . escapeHtml($original_contact_name) . "</strong> to <strong>" . escapeHtml($contact_name) . "</strong>");
+    flashAlert(__('Contact changed from <strong>%1$s</strong> to <strong>%2$s</strong>', escapeHtml($row['contact_name'] ?: __('No one')), escapeHtml($contact_id ? $contact_name : __('No one'))));
 
     redirect();
 
@@ -448,11 +449,11 @@ if (isset($_POST['edit_ticket_project'])) {
     if ($project_id) {
         logTicketHistory($ticket_id, "$session_name added the ticket to project " . escapeSql($project_name));
         logAudit("Ticket", "Edit", "$session_name set ticket $reference project to " . escapeSql($project_name), $client_id, $ticket_id);
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is now part of project <strong>" . escapeHtml($project_name) . "</strong>");
+        flashAlert(__('Ticket <strong>%1$s</strong> is now part of project <strong>%2$s</strong>', escapeHtml(ticketReference($row)), escapeHtml($project_name)));
     } else {
         logTicketHistory($ticket_id, "$session_name took the ticket out of its project");
         logAudit("Ticket", "Edit", "$session_name took ticket $reference out of its project", $client_id, $ticket_id);
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is no longer part of a project");
+        flashAlert(__('Ticket <strong>%s</strong> is no longer part of a project', escapeHtml(ticketReference($row))));
     }
 
     redirect();
@@ -481,7 +482,7 @@ if (isset($_POST['add_ticket_watcher'])) {
     }
 
     $count = count($added);
-    flashAlert($count ? "Added <strong>$count</strong> watcher" . ($count === 1 ? '' : 's') : 'No new watchers - those addresses are watching already, or are not email addresses', $count ? 'success' : 'error');
+    flashAlert($count ? _n('Added <strong>%d</strong> watcher', 'Added <strong>%d</strong> watchers', $count) : __('No new watchers - those addresses are watching already, or are not email addresses'), $count ? 'success' : 'error');
 
     redirect();
 
@@ -494,7 +495,7 @@ if (isset($_GET['delete_ticket_watcher'])) {
     $watcher_id = intval($_GET['delete_ticket_watcher']);
     $watcher = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT watcher_email, watcher_ticket_id FROM ticket_watchers WHERE watcher_id = $watcher_id"));
     if (!$watcher) {
-        flashAlert('That watcher was already removed.', 'error');
+        flashAlert(__('That watcher was already removed.'), 'error');
         redirect();
     }
     $row = ticketForRequest($watcher['watcher_ticket_id'], 2);
@@ -507,7 +508,7 @@ if (isset($_GET['delete_ticket_watcher'])) {
 
     logAudit("Ticket", "Edit", "$session_name removed $watcher_email as a watcher for ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
 
-    flashAlert("Removed ticket watcher <strong>" . escapeHtml($watcher['watcher_email']) . "</strong>", 'error');
+    flashAlert(__('Removed ticket watcher <strong>%s</strong>', escapeHtml($watcher['watcher_email'])), 'error');
 
     redirect();
 
@@ -528,9 +529,9 @@ if (isset($_GET['delete_ticket_additional_asset'])) {
     if (mysqli_affected_rows($mysqli)) {
         logTicketHistory($ticket_id, "$session_name removed additional asset " . escapeSql($asset_name));
         logAudit("Ticket", "Edit", "$session_name removed asset " . escapeSql($asset_name) . " from ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_id);
-        flashAlert("Removed asset <strong>" . escapeHtml($asset_name) . "</strong> from the ticket", 'error');
+        flashAlert(__('Removed asset <strong>%s</strong> from the ticket', escapeHtml($asset_name)), 'error');
     } else {
-        flashAlert("That asset isn't on this ticket any more.", 'error');
+        flashAlert(__("That asset isn't on this ticket any more."), 'error');
     }
 
     redirect();
@@ -562,7 +563,7 @@ if (isset($_POST['edit_ticket_asset'])) {
     }
     logAudit("Ticket", "Edit", "$session_name " . ($asset_id ? "changed asset to " . escapeSql($asset_name) : "removed the asset") . " for ticket $reference", $client_id, $ticket_id);
 
-    flashAlert($asset_id ? "Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> asset set to <strong>" . escapeHtml($asset_name) . "</strong>" : "Removed the asset from ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong>");
+    flashAlert($asset_id ? __('Ticket <strong>%1$s</strong> asset set to <strong>%2$s</strong>', escapeHtml(ticketReference($row)), escapeHtml($asset_name)) : __('Removed the asset from ticket <strong>%s</strong>', escapeHtml(ticketReference($row))));
 
     redirect();
 
@@ -595,13 +596,13 @@ if (isset($_POST['edit_ticket_vendor'])) {
             logTicketHistory($ticket_id, "$session_name set the vendor to " . escapeSql($vendor_name));
         }
         logAudit("Ticket", "Edit", "$session_name set vendor to " . escapeSql($vendor_name) . " for ticket $reference", $client_id, $ticket_id);
-        flashAlert("Set vendor to <strong>" . escapeHtml($vendor_name) . "</strong> for ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong>");
+        flashAlert(__('Set vendor to <strong>%1$s</strong> for ticket <strong>%2$s</strong>', escapeHtml($vendor_name), escapeHtml(ticketReference($row))));
     } else {
         if (intval($row['ticket_vendor_id'])) {
             logTicketHistory($ticket_id, "$session_name removed the vendor");
         }
         logAudit("Ticket", "Edit", "$session_name removed the vendor from ticket $reference", $client_id, $ticket_id);
-        flashAlert("Removed the vendor from ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong>");
+        flashAlert(__('Removed the vendor from ticket <strong>%s</strong>', escapeHtml(ticketReference($row))));
     }
 
     redirect();
@@ -618,7 +619,7 @@ if (isset($_GET['delete_ticket'])) {
     $reference = escapeSql(ticketReference($row));
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed - closed tickets are kept, not deleted.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed - closed tickets are kept, not deleted.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
@@ -626,7 +627,7 @@ if (isset($_GET['delete_ticket'])) {
 
     logAudit("Ticket", "Delete", "$session_name deleted $reference - " . escapeSql($row['ticket_subject']) . " along with all replies", $client_id);
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> along with all replies deleted", 'error');
+    flashAlert(__('Ticket <strong>%s</strong> along with all replies deleted', escapeHtml(ticketReference($row))), 'error');
 
     triggerCustomAction('ticket_delete', $ticket_id);
 
@@ -652,7 +653,7 @@ if (isset($_POST['bulk_delete_tickets'])) {
 
     logAudit("Ticket", "Bulk Delete", "$session_name deleted $count ticket(s)");
 
-    flashAlert("Deleted <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . ($kept ? ", kept <strong>$kept</strong> closed - closed tickets are not deleted" : ''), 'error');
+    flashAlert(_n('Deleted <strong>%d</strong> ticket', 'Deleted <strong>%d</strong> tickets', $count) . ($kept ? _n(', kept <strong>%d</strong> closed - closed tickets are not deleted', ', kept <strong>%d</strong> closed - closed tickets are not deleted', $kept) : ''), 'error');
 
     redirect();
 
@@ -664,10 +665,10 @@ if (isset($_POST['bulk_assign_ticket'])) {
 
     $assign_to = ticketAgentId($_POST['assign_to'] ?? 0);
     if (intval($_POST['assign_to'] ?? 0) && !$assign_to) {
-        flashAlert('Pick an active agent.', 'error');
+        flashAlert(__('Pick an active agent.'), 'error');
         redirect();
     }
-    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No One';
+    $agent_name = $assign_to ? (string) getFieldById('users', $assign_to, 'user_name') : 'No One'; // i18n-ignore: history and audit log
     $agent_name_sql = escapeSql($agent_name);
 
     $count = $skipped = 0;
@@ -682,7 +683,7 @@ if (isset($_POST['bulk_assign_ticket'])) {
         if ($ticket_status === TICKET_STATUS_NEW && $assign_to) {
             $ticket_status = TICKET_STATUS_OPEN;
         }
-        $reply = $assign_to ? "Ticket re-assigned to $agent_name_sql." : "Ticket unassigned, pending re-assignment.";
+        $reply = escapeSql($assign_to ? __('Ticket re-assigned to %s.', $agent_name) : __('Ticket unassigned, pending re-assignment.'));
 
         mysqli_query($mysqli, "UPDATE tickets SET ticket_assigned_to = $assign_to, ticket_status = $ticket_status WHERE ticket_id = $ticket_id");
         syncTicketSlaClock($ticket_id);
@@ -701,12 +702,12 @@ if (isset($_POST['bulk_assign_ticket'])) {
 
     // One notification and one email for the lot
     if ($count && $assign_to && $assign_to != $session_user_id) {
-        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '$count ticket" . ($count === 1 ? ' has' : 's have') . " been assigned to you by $session_name', notification_action = '/agent/tickets.php?assigned=$assign_to', notification_user_id = $assign_to");
+        mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = '" . escapeSql(_n('%1$d ticket has been assigned to you by %2$s', '%1$d tickets have been assigned to you by %2$s', $count, $count, stripslashes($session_name))) . "', notification_action = '/agent/tickets.php?assigned=$assign_to', notification_user_id = $assign_to");
 
         ticketMailAssigned($assign_to, $assigned_ids, stripslashes($session_name));
     }
 
-    flashAlert("Assigned <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " to <strong>" . escapeHtml($agent_name) . "</strong>" . ($skipped ? ", <strong>$skipped</strong> closed left as they were" : ''));
+    flashAlert(_n('Assigned <strong>%1$d</strong> ticket to <strong>%2$s</strong>', 'Assigned <strong>%1$d</strong> tickets to <strong>%2$s</strong>', $count, $count, escapeHtml($agent_name)) . ($skipped ? _n(', <strong>%d</strong> closed left as they were', ', <strong>%d</strong> closed left as they were', $skipped) : ''));
 
     redirect();
 
@@ -718,7 +719,7 @@ if (isset($_POST['bulk_edit_ticket_priority'])) {
 
     $priority = $_POST['bulk_priority'] ?? '';
     if (!in_array($priority, TICKET_PRIORITIES, true)) {
-        flashAlert('That is not a priority.', 'error');
+        flashAlert(__('That is not a priority.'), 'error');
         redirect();
     }
 
@@ -731,7 +732,7 @@ if (isset($_POST['bulk_edit_ticket_priority'])) {
 
     logAudit("Ticket", "Bulk Edit", "$session_name set the priority of $count ticket(s) to $priority");
 
-    flashAlert("Priority set to <strong>$priority</strong> on <strong>$count</strong> ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Priority set to <strong>%1$s</strong> on <strong>%2$d</strong> ticket', 'Priority set to <strong>%1$s</strong> on <strong>%2$d</strong> tickets', $count, escapeHtml(ticketPriorityLabel($priority)), $count));
 
     redirect();
 
@@ -742,11 +743,11 @@ if (isset($_POST['bulk_edit_ticket_category'])) {
     validateCSRFToken();
 
     $category_id = ticketCategoryId($_POST['bulk_category'] ?? 0);
-    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized';
+    $category_name = $category_id ? (string) getFieldById('categories', $category_id, 'category_name') : 'Not categorized'; // i18n-ignore: history and audit log
 
     $count = 0;
     foreach (ticketsForBulk(2) as $ticket_id => $row) {
-        $previous = intval($row['ticket_category']) ? (string) getFieldById('categories', intval($row['ticket_category']), 'category_name') : 'Not categorized';
+        $previous = intval($row['ticket_category']) ? (string) getFieldById('categories', intval($row['ticket_category']), 'category_name') : 'Not categorized'; // i18n-ignore: history and audit log
 
         mysqli_query($mysqli, "UPDATE tickets SET ticket_category = $category_id WHERE ticket_id = $ticket_id");
 
@@ -761,7 +762,7 @@ if (isset($_POST['bulk_edit_ticket_category'])) {
 
     logAudit("Ticket", "Bulk Edit", "$session_name set the category of $count ticket(s) to " . escapeSql($category_name));
 
-    flashAlert("Category set to <strong>" . escapeHtml($category_name) . "</strong> on <strong>$count</strong> ticket" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Category set to <strong>%1$s</strong> on <strong>%2$d</strong> ticket', 'Category set to <strong>%1$s</strong> on <strong>%2$d</strong> tickets', $count, escapeHtml($category_name), $count));
 
     redirect();
 
@@ -791,9 +792,9 @@ if (isset($_POST['bulk_merge_tickets'])) {
         $count++;
     }
 
-    flashAlert("<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " merged into <strong>" . escapeHtml(ticketReference($parent)) . "</strong>"
-        . ($skipped ? ", <strong>$skipped</strong> left - closed already, or the ticket itself" : '')
-        . ($other_client ? ", <strong>$other_client</strong> left - another client's" : ''), $count ? 'success' : 'error');
+    flashAlert(_n('<strong>%1$d</strong> ticket merged into <strong>%2$s</strong>', '<strong>%1$d</strong> tickets merged into <strong>%2$s</strong>', $count, $count, escapeHtml(ticketReference($parent)))
+        . ($skipped ? _n(', <strong>%d</strong> left - closed already, or the ticket itself', ', <strong>%d</strong> left - closed already, or the ticket itself', $skipped) : '')
+        . ($other_client ? _n(", <strong>%d</strong> left - another client's", ", <strong>%d</strong> left - another client's", $other_client) : ''), $count ? 'success' : 'error');
 
     redirect();
 
@@ -837,9 +838,9 @@ if (isset($_POST['bulk_resolve_tickets'])) {
         $count++;
     }
 
-    flashAlert("Resolved <strong>$count</strong> ticket" . ($count === 1 ? '' : 's')
-        . ($skipped_tasks ? ", <strong>$skipped_tasks</strong> not resolved - they have open tasks" : '')
-        . ($skipped_done ? ", <strong>$skipped_done</strong> resolved or closed already" : ''), $skipped_tasks ? 'warning' : 'success');
+    flashAlert(_n('Resolved <strong>%d</strong> ticket', 'Resolved <strong>%d</strong> tickets', $count)
+        . ($skipped_tasks ? _n(', <strong>%d</strong> not resolved - it has open tasks', ', <strong>%d</strong> not resolved - they have open tasks', $skipped_tasks) : '')
+        . ($skipped_done ? _n(', <strong>%d</strong> resolved or closed already', ', <strong>%d</strong> resolved or closed already', $skipped_done) : ''), $skipped_tasks ? 'warning' : 'success');
 
     redirect();
 
@@ -890,6 +891,10 @@ if (isset($_POST['bulk_ticket_reply'])) {
 
         mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $ticket_status, ticket_updated_at = NOW() WHERE ticket_id = $ticket_id");
         syncTicketSlaClock($ticket_id);
+        // Moving out of Resolved reopens it - the resolved date and the resolution SLA with it
+        if ($original_status === TICKET_STATUS_RESOLVED && $ticket_status !== TICKET_STATUS_RESOLVED) {
+            ticketUnresolve($ticket_id);
+        }
 
         if ($ticket_status !== $original_status && $ticket_status !== TICKET_STATUS_RESOLVED) {
             logTicketHistory($ticket_id, "$session_name set the status to " . escapeSql(getTicketStatusName($ticket_status)));
@@ -916,14 +921,14 @@ if (isset($_POST['bulk_ticket_reply'])) {
         }
 
         // Tell the agent it is assigned to, and whoever opened it
-        ticketNotifyAgent($row['ticket_assigned_to'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that is assigned to you");
+        ticketNotifyAgent($row['ticket_assigned_to'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that is assigned to you', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         if (intval($row['ticket_created_by']) !== intval($row['ticket_assigned_to'])) {
-            ticketNotifyAgent($row['ticket_created_by'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that you opened");
+            ticketNotifyAgent($row['ticket_created_by'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that you opened', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
         $count++;
     }
 
-    flashAlert("Updated <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . ($skipped ? ", <strong>$skipped</strong> closed left as they were" : ''));
+    flashAlert(_n('Updated <strong>%d</strong> ticket', 'Updated <strong>%d</strong> tickets', $count) . ($skipped ? _n(', <strong>%d</strong> closed left as they were', ', <strong>%d</strong> closed left as they were', $skipped) : ''));
 
     redirect();
 
@@ -953,8 +958,10 @@ if (isset($_POST['bulk_add_ticket_project'])) {
     }
 
     // The project is named once a ticket went into it - one that fits none of them may be a client this agent can't see
-    flashAlert(($project_input ? "<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " added to " . ($count ? "project <strong>" . escapeHtml($project_name) . "</strong>" : 'the project') : "<strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " taken out of their project")
-        . ($skipped ? ", <strong>$skipped</strong> skipped - the project is another client's" : ''));
+    flashAlert(($project_input
+            ? ($count ? _n('<strong>%1$d</strong> ticket added to project <strong>%2$s</strong>', '<strong>%1$d</strong> tickets added to project <strong>%2$s</strong>', $count, $count, escapeHtml($project_name)) : __('<strong>0</strong> tickets added to the project'))
+            : _n('<strong>%d</strong> ticket taken out of its project', '<strong>%d</strong> tickets taken out of their project', $count))
+        . ($skipped ? _n(", <strong>%d</strong> skipped - the project is another client's", ", <strong>%d</strong> skipped - the project is another client's", $skipped) : ''));
 
     redirect();
 
@@ -1042,7 +1049,7 @@ if (isset($_POST['bulk_add_asset_ticket'])) {
 
     logAudit("Ticket", "Bulk Create", "$session_name created $count ticket(s) for the assets picked");
 
-    flashAlert("Created <strong>$count</strong> ticket" . ($count === 1 ? '' : 's') . " for the assets picked");
+    flashAlert(_n('Created <strong>%d</strong> ticket for the assets picked', 'Created <strong>%d</strong> tickets for the assets picked', $count));
 
     redirect();
 
@@ -1058,7 +1065,7 @@ if (isset($_POST['add_ticket_reply'])) {
     $subject = escapeSql($row['ticket_subject']);
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed - start a new ticket instead.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed - start a new ticket instead.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
@@ -1071,7 +1078,7 @@ if (isset($_POST['add_ticket_reply'])) {
         $ticket_status = $original_ticket_status;
     }
     if ($ticket_status === TICKET_STATUS_RESOLVED && $original_ticket_status !== TICKET_STATUS_RESOLVED && ticketOpenTaskCount($ticket_id)) {
-        flashAlert('Finish the open tasks before resolving this ticket.', 'error');
+        flashAlert(__('Finish the open tasks before resolving this ticket.'), 'error');
         $ticket_status = $original_ticket_status;
     }
 
@@ -1098,6 +1105,11 @@ if (isset($_POST['add_ticket_reply'])) {
     // Update Ticket Status & updated at (in case status didn't change)
     mysqli_query($mysqli, "UPDATE tickets SET ticket_status = $ticket_status, ticket_updated_at = NOW() WHERE ticket_id = $ticket_id");
     syncTicketSlaClock($ticket_id);
+
+    // Moving out of Resolved reopens it - the resolved date and the resolution SLA with it
+    if ($original_ticket_status === TICKET_STATUS_RESOLVED && $ticket_status !== TICKET_STATUS_RESOLVED) {
+        ticketUnresolve($ticket_id);
+    }
 
     // Resolve the ticket, if it is actually moving into Resolved - replying on an
     // already-resolved ticket must not restamp resolved_at or re-log the resolve
@@ -1147,10 +1159,10 @@ if (isset($_POST['add_ticket_reply'])) {
 
         // Tell the agent it is assigned to, and whoever opened it - unless it mentions them, which told them already
         if (!isset($told[intval($row['ticket_assigned_to'])])) {
-            ticketNotifyAgent($row['ticket_assigned_to'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that is assigned to you");
+            ticketNotifyAgent($row['ticket_assigned_to'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that is assigned to you', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
         if (intval($row['ticket_created_by']) !== intval($row['ticket_assigned_to']) && !isset($told[intval($row['ticket_created_by'])])) {
-            ticketNotifyAgent($row['ticket_created_by'], $row, "$session_name updated Ticket " . ticketReference($row) . " - Subject: " . $row['ticket_subject'] . " that you opened");
+            ticketNotifyAgent($row['ticket_created_by'], $row, __('%1$s updated Ticket %2$s - Subject: %3$s that you opened', stripslashes($session_name), ticketReference($row), $row['ticket_subject']));
         }
 
         // Handle first response
@@ -1162,14 +1174,14 @@ if (isset($_POST['add_ticket_reply'])) {
 
         $reference_html = "<strong>" . escapeHtml(ticketReference($row)) . "</strong>";
         if ($ticket_reply_type === 'Internal') {
-            flashAlert("Internal note added to ticket $reference_html" . ($told ? " - <strong>" . escapeHtml(ticketMentionNames($told)) . "</strong> " . (count($told) === 1 ? 'was' : 'were') . " told" : ''));
+            flashAlert($told ? _n('Internal note added to ticket %1$s - <strong>%2$s</strong> was told', 'Internal note added to ticket %1$s - <strong>%2$s</strong> were told', count($told), $reference_html, escapeHtml(ticketMentionNames($told))) : __('Internal note added to ticket %s', $reference_html));
         } elseif (!$send_email) {
-            flashAlert("Public note added to ticket $reference_html - not emailed");
+            flashAlert(__('Public note added to ticket %s - not emailed', $reference_html));
         } elseif ($emailed_to) {
-            flashAlert("Reply added to ticket $reference_html and emailed to <strong>$emailed_to</strong> " . ($emailed_to === 1 ? 'person' : 'people'));
+            flashAlert(_n('Reply added to ticket %1$s and emailed to <strong>%2$d</strong> person', 'Reply added to ticket %1$s and emailed to <strong>%2$d</strong> people', intval($emailed_to), $reference_html, intval($emailed_to)));
         } else {
             // They chose to email it - say plainly that it didn't go
-            flashAlert("Reply added to ticket $reference_html but not emailed - " . (emailReady() ? 'there\'s no contact or watcher with an email address to send it to' : 'mail isn\'t set up'), 'warning');
+            flashAlert(emailReady() ? __("Reply added to ticket %s but not emailed - there's no contact or watcher with an email address to send it to", $reference_html) : __("Reply added to ticket %s but not emailed - mail isn't set up", $reference_html), 'warning');
         }
 
     } else {
@@ -1177,7 +1189,7 @@ if (isset($_POST['add_ticket_reply'])) {
         // so it attaches to the ticket itself
         $emailable_attachments = filterEmailableAttachments(array_merge(saveTicketAttachments($ticket_id, null),
             cannedResponseAttachFiles((array) ($_POST['canned_response_file_ids'] ?? []), $ticket_id, null, $session_user_id)));
-        flashAlert("Ticket updated");
+        flashAlert(__('Ticket updated'));
     }
 
     // Tell the agent about anything too large for the mail queue to carry, rather
@@ -1187,7 +1199,7 @@ if (isset($_POST['add_ticket_reply'])) {
         foreach ($emailable_attachments['skipped'] as $skipped_attachment) {
             $skipped_names[] = escapeHtml($skipped_attachment['name']);
         }
-        flashAlert("Stored on the ticket but too large to email: <strong>" . implode(', ', $skipped_names) . "</strong>", 'error');
+        flashAlert(__('Stored on the ticket but too large to email: <strong>%s</strong>', implode(', ', $skipped_names)), 'error');
     }
 
     /*
@@ -1212,7 +1224,7 @@ if (isset($_GET['delete_ticket_attachment'])) {
     $attachment_id = intval($_GET['delete_ticket_attachment']);
     $attachment = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_attachment_name, ticket_attachment_reference_name, ticket_attachment_ticket_id FROM ticket_attachments WHERE ticket_attachment_id = $attachment_id LIMIT 1"));
     if (!$attachment) {
-        flashAlert('That attachment no longer exists.', 'error');
+        flashAlert(__('That attachment no longer exists.'), 'error');
         redirect();
     }
 
@@ -1232,7 +1244,7 @@ if (isset($_GET['delete_ticket_attachment'])) {
 
     logAudit("Ticket", "Delete", "$session_name deleted ticket attachment $attachment_name", $client_id, $ticket_id);
 
-    flashAlert("Attachment <strong>" . escapeHtml($attachment['ticket_attachment_name']) . "</strong> deleted", 'error');
+    flashAlert(__('Attachment <strong>%s</strong> deleted', escapeHtml($attachment['ticket_attachment_name'])), 'error');
 
     redirect();
 
@@ -1244,7 +1256,7 @@ function ticketReplyForRequest($ticket_reply_id, $level) {
     $ticket_reply_id = intval($ticket_reply_id);
     $reply = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT ticket_reply_id, ticket_reply_type, ticket_reply_ticket_id FROM ticket_replies WHERE ticket_reply_id = $ticket_reply_id LIMIT 1"));
     if (!$reply) {
-        flashAlert('That reply no longer exists.', 'error');
+        flashAlert(__('That reply no longer exists.'), 'error');
         redirect();
     }
     return [$reply, ticketForRequest($reply['ticket_reply_ticket_id'], $level)];
@@ -1259,7 +1271,7 @@ if (isset($_POST['edit_ticket_reply'])) {
 
     // What the client wrote stays as they wrote it
     if ($reply['ticket_reply_type'] === 'Client') {
-        flashAlert("A client's reply can't be edited - redact it instead.", 'error');
+        flashAlert(__("A client's reply can't be edited - redact it instead."), 'error');
         redirect();
     }
 
@@ -1280,7 +1292,7 @@ if (isset($_POST['edit_ticket_reply'])) {
 
     logAudit("Ticket", "Reply", "$session_name edited a reply on ticket " . escapeSql(ticketReference($row)), $client_id, intval($row['ticket_id']));
 
-    flashAlert("Ticket reply updated" . ($told ? " - <strong>" . escapeHtml(ticketMentionNames($told)) . "</strong> " . (count($told) === 1 ? 'was' : 'were') . " told" : ''));
+    flashAlert($told ? _n('Ticket reply updated - <strong>%s</strong> was told', 'Ticket reply updated - <strong>%s</strong> were told', count($told), escapeHtml(ticketMentionNames($told))) : __('Ticket reply updated'));
 
     redirect();
 
@@ -1301,7 +1313,7 @@ if (isset($_POST['redact_ticket_reply'])) {
 
     logAudit("Ticket", "Reply", "$session_name redacted a reply on ticket " . escapeSql(ticketReference($row)), $client_id, intval($row['ticket_id']));
 
-    flashAlert("Ticket reply redacted");
+    flashAlert(__('Ticket reply redacted'));
 
     redirect();
 
@@ -1318,7 +1330,7 @@ if (isset($_GET['archive_ticket_reply'])) {
 
     logAudit("Ticket Reply", "Archive", "$session_name archived a reply on ticket " . escapeSql(ticketReference($row)), $client_id, $ticket_reply_id);
 
-    flashAlert("Ticket reply archived", 'error');
+    flashAlert(__('Ticket reply archived'), 'error');
 
     redirect();
 
@@ -1333,22 +1345,22 @@ if (isset($_POST['merge_ticket'])) {
     $parent = ticketMergeTarget($_POST['merge_into_ticket_id'] ?? 0);
 
     if (intval($row['ticket_id']) === intval($parent['ticket_id'])) {
-        flashAlert("A ticket can't be merged into itself.", 'error');
+        flashAlert(__("A ticket can't be merged into itself."), 'error');
         redirect();
     }
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed already.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed already.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
     // Another client's ticket would show them this conversation
     if (intval($row['ticket_client_id']) !== intval($parent['ticket_client_id'])) {
-        flashAlert("A ticket merges into one of the same client's - move it to that client first.", 'error');
+        flashAlert(__("A ticket merges into one of the same client's - move it to that client first."), 'error');
         redirect();
     }
 
     ticketMergeInto($row, $parent, escapeSql($_POST['merge_comment'] ?? ''), intval($_POST['merge_move_replies'] ?? 0) === 1);
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> merged into <strong>" . escapeHtml(ticketReference($parent)) . "</strong>");
+    flashAlert(__('Ticket <strong>%1$s</strong> merged into <strong>%2$s</strong>', escapeHtml(ticketReference($row)), escapeHtml(ticketReference($parent))));
 
     redirect(ticketUrl($parent['ticket_id'], $parent['ticket_client_id']));
 
@@ -1365,7 +1377,7 @@ if (isset($_POST['change_client_ticket'])) {
 
     $client_id = intval($_POST['new_client_id'] ?? 0);
     if (!$client_id || !getFieldById('clients', $client_id, 'client_name')) {
-        flashAlert('Pick the client to move it to.', 'error');
+        flashAlert(__('Pick the client to move it to.'), 'error');
         redirect();
     }
     enforceClientAccess();
@@ -1394,7 +1406,7 @@ if (isset($_POST['change_client_ticket'])) {
 
     triggerCustomAction('ticket_update', $ticket_id);
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> moved to <strong>" . escapeHtml($new_client_name) . "</strong>");
+    flashAlert(__('Ticket <strong>%1$s</strong> moved to <strong>%2$s</strong>', escapeHtml(ticketReference($row)), escapeHtml($new_client_name)));
 
     redirect(ticketUrl($ticket_id, $client_id));
 
@@ -1408,11 +1420,11 @@ if (isset($_GET['assign_ticket_to_me'])) {
     $row = ticketForRequest($_GET['assign_ticket_to_me'], 2);
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
     if (intval($row['ticket_assigned_to']) === intval($session_user_id)) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is yours already.");
+        flashAlert(__('Ticket <strong>%s</strong> is yours already.', escapeHtml(ticketReference($row))));
         redirect();
     }
 
@@ -1432,12 +1444,12 @@ if (isset($_GET['resolve_ticket'])) {
     $ticket_id = intval($row['ticket_id']);
 
     if (!ticketIsOpen($row)) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is resolved or closed already.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is resolved or closed already.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
     $open_tasks = ticketOpenTaskCount($ticket_id);
     if ($open_tasks) {
-        flashAlert("Finish the <strong>$open_tasks</strong> open task" . ($open_tasks === 1 ? '' : 's') . " before resolving this ticket.", 'error');
+        flashAlert(_n('Finish the <strong>%d</strong> open task before resolving this ticket.', 'Finish the <strong>%d</strong> open tasks before resolving this ticket.', intval($open_tasks)), 'error');
         redirect();
     }
 
@@ -1448,7 +1460,7 @@ if (isset($_GET['resolve_ticket'])) {
         ticketMailResolved($ticket_id);
     }
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> resolved");
+    flashAlert(__('Ticket <strong>%s</strong> resolved', escapeHtml(ticketReference($row))));
 
     redirect();
 
@@ -1463,7 +1475,7 @@ if (isset($_GET['close_ticket'])) {
     $reference = escapeSql(ticketReference($row));
 
     if (!empty($row['ticket_closed_at'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed already.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is closed already.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
@@ -1471,7 +1483,7 @@ if (isset($_GET['close_ticket'])) {
     syncTicketSlaClock($ticket_id);
     setTicketResolutionSlaMet($ticket_id);
 
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket closed.', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . escapeSql(__('Ticket closed.')) . "', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
 
     logTicketHistory($ticket_id, "$session_name closed the ticket");
 
@@ -1484,7 +1496,7 @@ if (isset($_GET['close_ticket'])) {
         ticketMailClosed($ticket_id);
     }
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> closed - for more work on it, start a new ticket");
+    flashAlert(__('Ticket <strong>%s</strong> closed - for more work on it, start a new ticket', escapeHtml(ticketReference($row))));
 
     redirect();
 
@@ -1499,13 +1511,13 @@ if (isset($_GET['reopen_ticket'])) {
 
     // Only a resolved ticket comes back - a closed one is final
     if (!empty($row['ticket_closed_at']) || empty($row['ticket_resolved_at'])) {
-        flashAlert(!empty($row['ticket_closed_at']) ? "Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is closed - closed tickets can't be reopened. Start a new one instead." : "Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is open already.", 'error');
+        flashAlert(!empty($row['ticket_closed_at']) ? __("Ticket <strong>%s</strong> is closed - closed tickets can't be reopened. Start a new one instead.", escapeHtml(ticketReference($row))) : __('Ticket <strong>%s</strong> is open already.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
     ticketReopen($row);
 
-    flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> reopened");
+    flashAlert(__('Ticket <strong>%s</strong> reopened', escapeHtml(ticketReference($row))));
 
     redirect();
 
@@ -1526,7 +1538,7 @@ if (isset($_POST['add_invoice_from_ticket'])) {
     $ticket_id = intval($row['ticket_id']);
 
     if (!$client_id) {
-        flashAlert('Move the ticket to a client before invoicing it.', 'error');
+        flashAlert(__('Move the ticket to a client before invoicing it.'), 'error');
         redirect();
     }
 
@@ -1547,8 +1559,7 @@ if (isset($_POST['add_invoice_from_ticket'])) {
         redirect();
     }
 
-    flashAlert('<strong>' . escapeHtml(ticketReference($row)) . '</strong> billed on <strong>' . escapeHtml($result['number']) . '</strong> - ' . billingQuantity($result['hours']) . ' h'
-        . ($result['lines'] ? '' : ', with no charge'));
+    flashAlert($result['lines'] ? __('<strong>%1$s</strong> billed on <strong>%2$s</strong> - %3$s h', escapeHtml(ticketReference($row)), escapeHtml($result['number']), billingQuantity($result['hours'])) : __('<strong>%1$s</strong> billed on <strong>%2$s</strong> - %3$s h, with no charge', escapeHtml(ticketReference($row)), escapeHtml($result['number']), billingQuantity($result['hours'])));
 
     redirect("invoice.php?invoice_id={$result['invoice_id']}");
 
@@ -1565,7 +1576,7 @@ if (isset($_POST['add_quote_from_ticket'])) {
     $reference = escapeSql(ticketReference($row));
 
     if (!$client_id) {
-        flashAlert('Move the ticket to a client before quoting it.', 'error');
+        flashAlert(__('Move the ticket to a client before quoting it.'), 'error');
         redirect();
     }
 
@@ -1597,7 +1608,7 @@ if (isset($_POST['add_quote_from_ticket'])) {
     billingRecalc('quote', $quote_id);
 
     // Add internal note to ticket, and link to quote in database
-    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Created quote <a href=\"quote.php?quote_id=$quote_id\">$config_quote_prefix$quote_number</a> for this ticket.', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '" . mysqli_real_escape_string($mysqli, __('Created quote <a href="%1$s">%2$s</a> for this ticket.', "quote.php?quote_id=$quote_id", escapeHtml(stripslashes($config_quote_prefix) . $quote_number))) . "', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:00:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
     mysqli_query($mysqli, "UPDATE tickets SET ticket_quote_id = $quote_id WHERE ticket_id = $ticket_id LIMIT 1");
 
     mysqli_query($mysqli, "INSERT INTO history SET history_status = 'Draft', history_description = 'Quote created from Ticket $reference', history_quote_id = $quote_id");
@@ -1605,7 +1616,7 @@ if (isset($_POST['add_quote_from_ticket'])) {
 
     triggerCustomAction('quote_create', $quote_id);
 
-    flashAlert("Quote <strong>" . escapeHtml($config_quote_prefix . $quote_number) . "</strong> created");
+    flashAlert(__('Quote <strong>%s</strong> created', escapeHtml($config_quote_prefix . $quote_number)));
     redirect("quote.php?quote_id=$quote_id");
 
 }
@@ -1627,7 +1638,7 @@ if (isExportRequest('export_tickets')) {
         $client_query = "AND ticket_client_id = $client_id";
         $client_name = getFieldById('clients', $client_id, 'client_name');
         $file_name_prepend = "$client_name-";
-        $filter_summary['Client'] = $client_name;
+        $filter_summary[__('Client')] = $client_name;
 
         enforceClientAccess();
     } else {
@@ -1639,7 +1650,7 @@ if (isExportRequest('export_tickets')) {
         if (!empty($_POST['client'])) {
             $filter_client_id = intval($_POST['client']);
             $client_query = "AND ticket_client_id = $filter_client_id";
-            $filter_summary['Client'] = exportClientName($filter_client_id);
+            $filter_summary[__('Client')] = exportClientName($filter_client_id);
         }
     }
 
@@ -1649,21 +1660,21 @@ if (isExportRequest('export_tickets')) {
         $ticket_status_snippet = "ticket_status IN ($status_ids)";
 
         $status_names = [];
-        $sql_statuses = mysqli_query($mysqli, "SELECT ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_name ASC");
+        $sql_statuses = mysqli_query($mysqli, "SELECT ticket_status_id, ticket_status_name FROM ticket_statuses WHERE ticket_status_id IN ($status_ids) ORDER BY ticket_status_name ASC");
         while ($status_row = mysqli_fetch_assoc($sql_statuses)) {
-            $status_names[] = $status_row['ticket_status_name'];
+            $status_names[] = ticketStatusLabel($status_row['ticket_status_id'], $status_row['ticket_status_name']);
         }
-        $filter_summary['Status'] = implode(', ', $status_names);
+        $filter_summary[__('Status')] = implode(', ', $status_names);
     } elseif (!empty($_POST['resolution']) && $_POST['resolution'] == 'Closed') {
         $ticket_status_snippet = "ticket_resolved_at IS NOT NULL";
-        $filter_summary['Status'] = 'Closed';
+        $filter_summary[__('Status')] = _x('Closed', 'tickets view');
     } elseif (!empty($_POST['resolution']) && $_POST['resolution'] == 'All') {
         $ticket_status_snippet = "1 = 1";
-        $filter_summary['Status'] = 'Open and closed';
+        $filter_summary[__('Status')] = __('Open and closed');
     } else {
         // Default - open tickets
         $ticket_status_snippet = "ticket_resolved_at IS NULL";
-        $filter_summary['Status'] = 'Open';
+        $filter_summary[__('Status')] = _x('Open', 'tickets view');
     }
 
     // Billing Filter - same values the tickets page offers
@@ -1671,13 +1682,13 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['billing'])) {
         if ($_POST['billing'] == 'unbilled') {
             $ticket_billable_snippet = "AND ticket_billable = 1 AND ticket_invoice_id = 0";
-            $filter_summary['Billing'] = 'Billable, not invoiced';
+            $filter_summary[__('Billing')] = __('Billable, not invoiced');
         } elseif ($_POST['billing'] == 'invoiced') {
             $ticket_billable_snippet = "AND ticket_invoice_id > 0";
-            $filter_summary['Billing'] = 'Invoiced';
+            $filter_summary[__('Billing')] = __('Invoiced');
         } elseif ($_POST['billing'] == 'nonbillable') {
             $ticket_billable_snippet = "AND ticket_billable = 0";
-            $filter_summary['Billing'] = 'Not billable';
+            $filter_summary[__('Billing')] = __('Not billable');
         }
     }
 
@@ -1685,7 +1696,7 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['category'])) {
         $filter_category_id = intval($_POST['category']);
         $category_query = "AND (ticket_category = $filter_category_id)";
-        $filter_summary['Category'] = getFieldById('categories', $filter_category_id, 'category_name');
+        $filter_summary[__('Category')] = getFieldById('categories', $filter_category_id, 'category_name');
     } else {
         // Default - any
         $category_query = '';
@@ -1695,11 +1706,11 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['assigned'])) {
         if ($_POST['assigned'] == 'unassigned') {
             $ticket_assigned_query = 'AND ticket_assigned_to = 0';
-            $filter_summary['Assigned'] = 'Unassigned';
+            $filter_summary[__('Assigned')] = __('Unassigned');
         } else {
             $filter_user_id = intval($_POST['assigned']);
             $ticket_assigned_query = "AND ticket_assigned_to = $filter_user_id";
-            $filter_summary['Assigned'] = getFieldById('users', $filter_user_id, 'user_name');
+            $filter_summary[__('Assigned')] = getFieldById('users', $filter_user_id, 'user_name');
         }
     } else {
         // Default - any
@@ -1712,20 +1723,20 @@ if (isExportRequest('export_tickets')) {
         $sla_filter = $_POST['sla'];
         if ($sla_filter == 'breached') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND (ticket_response_sla_alert_stage = 2 OR ticket_resolution_sla_alert_stage = 2 OR ticket_response_sla_met = 0 OR ticket_resolution_sla_met = 0)';
-            $filter_summary['SLA'] = 'SLA breached';
+            $filter_summary[__('SLA')] = __('SLA breached');
         } elseif ($sla_filter == 'at_risk') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND COALESCE(ticket_status_pauses_sla, 0) = 0 AND (ticket_response_sla_alert_stage = 1 OR ticket_resolution_sla_alert_stage = 1)';
-            $filter_summary['SLA'] = 'SLA at risk';
+            $filter_summary[__('SLA')] = __('SLA at risk');
         } elseif ($sla_filter == 'paused') {
             // Mirrors agent/tickets.php - finished tickets have a verdict, not a pause
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND ticket_status_pauses_sla = 1 AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL';
-            $filter_summary['SLA'] = 'SLA paused';
+            $filter_summary[__('SLA')] = __('SLA paused');
         } elseif ($sla_filter == 'met') {
             $ticket_sla_query = 'AND ticket_sla_id > 0 AND ticket_response_sla_met = 1 AND (ticket_resolution_sla_met = 1 OR ticket_resolution_due_at IS NULL)';
-            $filter_summary['SLA'] = 'SLA met';
+            $filter_summary[__('SLA')] = __('SLA met');
         } elseif ($sla_filter == 'none') {
             $ticket_sla_query = 'AND ticket_sla_id = 0';
-            $filter_summary['SLA'] = 'No SLA';
+            $filter_summary[__('SLA')] = __('No SLA');
         }
     }
 
@@ -1733,7 +1744,7 @@ if (isExportRequest('export_tickets')) {
     if (!empty($_POST['project']) && $_POST['project'] > '0') {
         $filter_project_id = intval($_POST['project']);
         $ticket_project_snippet = "AND ticket_project_id = $filter_project_id";
-        $filter_summary['Project'] = exportRecordName('projects', $filter_project_id, 'project_name', 'project_client_id');
+        $filter_summary[__('Project')] = exportRecordName('projects', $filter_project_id, 'project_name', 'project_client_id');
     } else {
         // Default - any, including tickets without a project
         $ticket_project_snippet = '';
@@ -1747,13 +1758,13 @@ if (isExportRequest('export_tickets')) {
     $dtt = escapeSql(!empty($_POST['dtt']) ? $_POST['dtt'] : '2099-12-31');
     $date_range = formatExportDateRange($dtf, $dtt);
     if ($date_range) {
-        $filter_summary['Opened'] = $date_range;
+        $filter_summary[__('Opened')] = $date_range;
     }
 
     // Search Filter
     $q = escapeSql($_POST['q'] ?? '');
     if (!empty($q)) {
-        $filter_summary['Search'] = $_POST['q'];
+        $filter_summary[__('Search')] = $_POST['q'];
     }
 
     // Tags - a ticket with any of them
@@ -1790,13 +1801,13 @@ if (isExportRequest('export_tickets')) {
 
     $num_rows = mysqli_num_rows($sql);
 
-    guardExportHasRows($num_rows, 'tickets');
+    guardExportHasRows($num_rows, __('tickets'));
 
     if ($num_rows > 0) {
 
         guardExportPdfRowCount($format, $num_rows);
 
-        $export = beginExport('tickets', $format, $file_name_prepend . 'Tickets', 'Tickets', summarizeExportFilters($filter_summary));
+        $export = beginExport('tickets', $format, $file_name_prepend . 'Tickets', __('Tickets'), summarizeExportFilters($filter_summary));
 
         while ($row = mysqli_fetch_assoc($sql)) {
             // Per-ticket prefix where the row carries one, config default otherwise
@@ -1825,19 +1836,19 @@ if (isset($_POST['edit_ticket_schedule'])) {
     $schedule = ticketScheduleValue($_POST['scheduled_date_time'] ?? '');
 
     if ($schedule === '') {
-        flashAlert('Pick the date and time for the work.', 'error');
+        flashAlert(__('Pick the date and time for the work.'), 'error');
         redirect();
     }
     if (!ticketIsOpen($row)) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> is resolved or closed - reopen it to schedule work.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> is resolved or closed - reopen it to schedule work.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
     $result = ticketSetSchedule($row, $schedule, intval($_POST['onsite'] ?? 0) ? 1 : 0);
 
-    flashAlert("Ticket scheduled for " . escapeHtml($result['when_text']));
+    flashAlert(__('Ticket scheduled for %s', escapeHtml($result['when_text'])));
     if ($result['conflicts']) {
-        flashAlert("The same agent has other work within two hours of it: <br>" . implode(", <br>", array_map('escapeHtml', $result['conflicts'])), 'warning');
+        flashAlert(__('The same agent has other work within two hours of it: <br>%s', implode(", <br>", array_map('escapeHtml', $result['conflicts']))), 'warning');
     }
 
     redirect();
@@ -1851,13 +1862,13 @@ if (isset($_GET['cancel_ticket_schedule'])) {
     $row = ticketForRequest($_GET['cancel_ticket_schedule'], 2);
 
     if (empty($row['ticket_schedule'])) {
-        flashAlert("Ticket <strong>" . escapeHtml(ticketReference($row)) . "</strong> has no work scheduled.", 'error');
+        flashAlert(__('Ticket <strong>%s</strong> has no work scheduled.', escapeHtml(ticketReference($row))), 'error');
         redirect();
     }
 
     ticketCancelSchedule($row);
 
-    flashAlert("Ticket schedule cancelled", 'error');
+    flashAlert(__('Ticket schedule cancelled'), 'error');
 
     redirect();
 

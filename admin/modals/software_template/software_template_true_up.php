@@ -18,10 +18,10 @@ ob_start();
 
 if (!$template) { ?>
     <div class="modal-header bg-dark">
-        <h5 class="modal-title"><i class="fa fa-fw fa-balance-scale me-2"></i>True up seats</h5>
+        <h5 class="modal-title"><i class="fa fa-fw fa-balance-scale me-2"></i><?= __('True up seats') ?></h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
     </div>
-    <div class="modal-body text-center text-secondary py-5">That license template no longer exists.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That license template no longer exists.') ?></div>
 <?php } else {
     $software_template_id = intval($template['software_template_id']);
     $all = softwareTemplateLicenses($software_template_id);
@@ -32,7 +32,7 @@ if (!$template) { ?>
     ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-balance-scale me-2"></i>True up seats <small class="ms-1 opacity-75"><?= escapeHtml($template['software_template_name']) ?></small></h5>
+    <h5 class="modal-title text-truncate"><i class="fa fa-fw fa-balance-scale me-2"></i><?= __('True up seats') ?> <small class="ms-1 opacity-75"><?= escapeHtml($template['software_template_name']) ?></small></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -41,13 +41,13 @@ if (!$template) { ?>
 
     <div class="modal-body">
         <?php if (!$licenses) { ?>
-            <div class="text-center text-secondary py-4"><i class="fas fa-check text-success me-1"></i>Every license made from it has the seats it is using.</div>
+            <div class="text-center text-secondary py-4"><i class="fas fa-check text-success me-1"></i><?= __('Every license made from it has the seats it is using.') ?></div>
         <?php } else { ?>
-            <p class="small text-secondary">Each starts on the seats in use. Untick a license to leave it as it is, or type the seats it should have - blank for no limit.</p>
+            <p class="small text-secondary"><?= __('Each starts on the seats in use. Untick a license to leave it as it is, or type the seats it should have - blank for no limit.') ?></p>
             <div class="table-responsive border rounded">
                 <table class="table table-sm align-middle mb-0">
                     <thead class="table-light text-nowrap">
-                        <tr><th class="ps-2" style="width: 2rem;"></th><th>Client</th><th class="text-end">In use</th><th class="text-end">Seats now</th><th class="pe-2" style="width: 9rem;">Seats</th></tr>
+                        <tr><th class="ps-2" style="width: 2rem;"></th><th><?= __('Client') ?></th><th class="text-end"><?= __('In use') ?></th><th class="text-end"><?= __('Seats now') ?></th><th class="pe-2" style="width: 9rem;"><?= __('Seats') ?></th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($licenses as $software_id => $row) {
@@ -57,17 +57,17 @@ if (!$template) { ?>
                         $to = $seats['total'] > 0 ? (string) $seats['used'] : $now;
                         ?>
                         <tr data-true-up-id="<?= $software_id ?>">
-                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="True up <?= escapeHtml($row['client_name']) ?>" <?= $to !== $now ? 'checked' : '' ?> data-true-up-tick></td>
+                            <td class="ps-2"><input class="form-check-input" type="checkbox" name="software_ids[]" value="<?= $software_id ?>" aria-label="<?= __('True up %s', escapeHtml($row['client_name'])) ?>" <?= $to !== $now ? 'checked' : '' ?> data-true-up-tick></td>
                             <td class="min-w-0">
                                 <div class="fw-semibold text-truncate"><?= escapeHtml($row['client_name']) ?></div>
                                 <?php if ($row['software_name'] !== $template['software_template_name']) { ?><div class="small text-secondary text-truncate"><?= escapeHtml($row['software_name']) ?></div><?php } ?>
                             </td>
                             <td class="text-end"><?= $seats['used'] ?></td>
-                            <td class="text-end text-nowrap"><?= $seats['total'] > 0 ? $seats['total'] . ($seats['state'] === 'over' ? ' <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal">' . $seats['over'] . ' over</span>' : '') : '<span class="text-secondary">No limit</span>' ?></td>
+                            <td class="text-end text-nowrap"><?= $seats['total'] > 0 ? $seats['total'] . ($seats['state'] === 'over' ? ' <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis fw-normal">' . $seats['over'] . ' over</span>' : '') : __('<span class="text-secondary">No limit</span>') ?></td>
                             <td class="pe-2">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
-                                    <input type="number" class="form-control" name="seats[<?= $software_id ?>]" min="0" max="1000000" step="1" placeholder="No limit" value="<?= escapeHtml($to) ?>" data-now="<?= escapeHtml($now) ?>" data-true-up-seats>
+                                    <input type="number" class="form-control" name="seats[<?= $software_id ?>]" min="0" max="1000000" step="1" placeholder="<?= escapeHtml(__('No limit')) ?>" value="<?= escapeHtml($to) ?>" data-now="<?= escapeHtml($now) ?>" data-true-up-seats>
                                 </div>
                             </td>
                         </tr>
@@ -75,14 +75,14 @@ if (!$template) { ?>
                     </tbody>
                 </table>
             </div>
-            <div class="small text-secondary mt-3">A recurring invoice line counting a license's seats bought follows on its next run.</div>
+            <div class="small text-secondary mt-3"><?= __('A recurring invoice line counting a license\'s seats bought follows on its next run.') ?></div>
         <?php } ?>
     </div>
     <div class="modal-footer">
         <?php if ($licenses) { ?>
-            <button type="submit" name="true_up_software_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>True up</button>
+            <button type="submit" name="true_up_software_template" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('True up') ?></button>
         <?php } ?>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $licenses ? 'Cancel' : 'Close' ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fa fa-times me-2"></i><?= $licenses ? __('Cancel') : __('Close') ?></button>
     </div>
 </form>
 

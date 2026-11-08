@@ -27,7 +27,18 @@ const VENDOR_USES = [
 ];
 
 /** What each domain column makes the vendor - shown beside the domain. */
-const VENDOR_DOMAIN_ROLES = ['domain_registrar' => 'Registrar', 'domain_webhost' => 'Web host', 'domain_dnshost' => 'DNS', 'domain_mailhost' => 'Mail'];
+const VENDOR_DOMAIN_ROLES = ['domain_registrar' => 'Registrar', 'domain_webhost' => 'Web host', 'domain_dnshost' => 'DNS', 'domain_mailhost' => 'Mail']; // i18n-ignore - shown through __()
+
+/** A VENDOR_DOMAIN_ROLES role in the interface language. */
+function vendorDomainRoleLabel($column) {
+    switch ($column) {
+        case 'domain_registrar': return __('Registrar');
+        case 'domain_webhost': return __('Web host');
+        case 'domain_dnshost': return _x('DNS', 'domain role');
+        case 'domain_mailhost': return _x('Mail', 'domain role');
+    }
+    return '';
+}
 
 /** The module a vendor belongs to - a client's are the client module's, ours the financial module's. */
 function vendorModule($client_id) {
@@ -101,7 +112,7 @@ function selectOptionVendor($name, $description = '') {
 function vendorLink($vendor_id, $name, $options = []) {
     $vendor_id = intval($vendor_id);
     $name = html_entity_decode((string) $name, ENT_QUOTES, 'UTF-8');
-    $label = escapeHtml($name !== '' ? $name : 'Unnamed vendor');
+    $label = escapeHtml($name !== '' ? $name : __('Unnamed vendor'));
     $archived = !empty($options['archived']);
     $class = trim('text-truncate ' . ($options['class'] ?? '') . ($archived ? ' text-decoration-line-through text-body-secondary' : ''));
     $title = $archived ? ' title="Archived vendor"' : '';
@@ -364,17 +375,17 @@ function vendorDeleteBlocker($vendor_id) {
     $reasons = [];
     $expenses = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM expenses WHERE expense_vendor_id = $vendor_id"))[0]);
     if ($expenses) {
-        $reasons[] = $expenses === 1 ? '1 expense' : "$expenses expenses";
+        $reasons[] = _n('%d expense', '%d expenses', $expenses);
     }
     $recurring = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM recurring_expenses WHERE recurring_expense_vendor_id = $vendor_id"))[0]);
     if ($recurring) {
-        $reasons[] = $recurring === 1 ? '1 recurring expense' : "$recurring recurring expenses";
+        $reasons[] = _n('%d recurring expense', '%d recurring expenses', $recurring);
     }
     $providers = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM payment_providers WHERE payment_provider_expense_vendor = $vendor_id"))[0]);
     if ($providers) {
-        $reasons[] = 'a payment provider\'s fees';
+        $reasons[] = __('a payment provider\'s fees');
     }
-    return $reasons ? 'it has ' . implode(' and ', $reasons) . ' booked to it - archive it instead' : '';
+    return $reasons ? __('it has %s booked to it - archive it instead', implode(' ' . __('and') . ' ', $reasons)) : '';
 }
 
 /**

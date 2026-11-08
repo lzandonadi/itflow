@@ -96,7 +96,7 @@
 
         if (item.kind === 'document') {
             var requested = current;
-            doc.innerHTML = '<p class="text-secondary mb-0">Loading...</p>';
+            doc.innerHTML = '<p class="text-secondary mb-0">' + __('Loading...') + '</p>';
             doc.classList.remove('d-none');
             fetch(item.preview, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
@@ -105,14 +105,14 @@
                         return;
                     }
                     // HTMLPurifier output - the same the document page renders
-                    doc.innerHTML = data.content || '<p class="text-secondary mb-0">This document is empty.</p>';
+                    doc.innerHTML = data.content || '<p class="text-secondary mb-0">' + __('This document is empty.') + '</p>';
                     if (typeof prettyContent === 'function') {
                         prettyContent();
                     }
                 })
                 .catch(function () {
                     if (requested === current) {
-                        doc.innerHTML = '<p class="text-danger mb-0">Could not load this document.</p>';
+                        doc.innerHTML = '<p class="text-danger mb-0">' + __('Could not load this document.') + '</p>';
                     }
                 });
         } else if (item.kind === 'image') {

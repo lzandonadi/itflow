@@ -70,17 +70,17 @@ if (isset($_POST['add_user'])) {
             redirect();
         }
 
-        logAudit("User", "Invite", "$session_name invited " . escapeSql("$name ($email) as {$role['role_name']}") . ($saved['again'] ? ' again' : '') . ($mail ? '' : ' - a link to pass on'));
+        logAudit("User", "Invite", "$session_name invited " . escapeSql("$name ($email) as {$role['role_name']}") . ($saved['again'] ? ' again' : '') . ($mail ? '' : ' - a link to pass on')); // i18n-ignore - SQL or the audit log
 
         $notes = [];
         if ($saved['again']) {
-            $notes[] = 'the invite they had is changed to this, and its link no longer works';
+            $notes[] = __('the invite they had is changed to this, and its link no longer works');
         }
         if ($saved['avatar_error'] !== '') {
-            $notes[] = $saved['avatar_error'] . ' The invite went without one';
+            $notes[] = $saved['avatar_error'] . ' ' . __('The invite went without one');
         }
         if ($mail) {
-            flashAlert("Invited <strong>$name</strong> - an email with a link to join is on the way to <strong>$email</strong>. It works for " . USER_INVITE_LINK_DAYS . " days" . ($notes ? ' - ' . implode('; ', $notes) : ''), $saved['avatar_error'] !== '' ? 'warning' : 'success');
+            flashAlert(__('Invited <strong>%1$s</strong> - an email with a link to join is on the way to <strong>%2$s</strong>. It works for %3$d days', $name, $email, USER_INVITE_LINK_DAYS) . ($notes ? ' - ' . implode('; ', $notes) : ''), $saved['avatar_error'] !== '' ? 'warning' : 'success');
         } else {
             userInviteShowLink($invite_id, $sent['url']);
         }
@@ -106,17 +106,17 @@ if (isset($_POST['add_user'])) {
     $notes = [];
     $avatar_error = '';
     if (!empty($_FILES['avatar']['tmp_name']) && !userSaveAvatar($user_id, $_FILES['avatar'], $avatar_error)) {
-        $notes[] = $avatar_error . ' The user was created without one';
+        $notes[] = $avatar_error . ' ' . __('The user was created without one');
     }
 
     // Set up here, the invite waiting for them is done with
     if ($open && userInviteCancel($open['invite_id'])) {
-        $notes[] = 'the invite waiting for them is cancelled';
+        $notes[] = __('the invite waiting for them is cancelled');
     }
 
     logAudit("User", "Create", "$session_name created user " . escapeSql($name), 0, $user_id);
 
-    flashAlert("User <strong>$name</strong> created - give them their password yourself" . ($notes ? ' - ' . implode('; ', $notes) : ''), $avatar_error ? 'warning' : 'success');
+    flashAlert(__('User <strong>%s</strong> created - give them their password yourself', $name) . ($notes ? ' - ' . implode('; ', $notes) : ''), $avatar_error ? 'warning' : 'success');
 
     redirect();
 
@@ -131,7 +131,7 @@ if (isset($_GET['resend_user_invite']) || isset($_GET['link_user_invite']) || is
     $what = isset($_GET['resend_user_invite']) ? 'resend' : (isset($_GET['link_user_invite']) ? 'link' : 'cancel');
     $invite = userInviteRow($_GET[$what . '_user_invite'] ?? 0);
     if (!$invite || !in_array(userInviteState($invite), ['pending', 'expired'], true)) {
-        flashAlert("That invite isn't waiting any more - it may have been accepted or cancelled", 'error');
+        flashAlert(__("That invite isn't waiting any more - it may have been accepted or cancelled"), 'error');
         redirect();
     }
     $invite_id = intval($invite['invite_id']);
@@ -140,7 +140,7 @@ if (isset($_GET['resend_user_invite']) || isset($_GET['link_user_invite']) || is
     if ($what === 'cancel') {
         userInviteCancel($invite_id);
         logAudit("User", "Cancel", "$session_name cancelled the invite to $who");
-        flashAlert("Cancelled the invite to <strong>" . escapeHtml($invite['invite_email']) . "</strong> - its link no longer works");
+        flashAlert(__('Cancelled the invite to <strong>%s</strong> - its link no longer works', escapeHtml($invite['invite_email'])));
         redirect();
     }
 
@@ -150,7 +150,7 @@ if (isset($_GET['resend_user_invite']) || isset($_GET['link_user_invite']) || is
         redirect();
     }
     if ($what === 'resend' && !userInviteMailReady()) {
-        flashAlert("Mail isn't set up, so the invite can't be emailed - get its link and send it to them yourself", 'error');
+        flashAlert(__("Mail isn't set up, so the invite can't be emailed - get its link and send it to them yourself"), 'error');
         redirect();
     }
     $send_error = '';
@@ -162,7 +162,7 @@ if (isset($_GET['resend_user_invite']) || isset($_GET['link_user_invite']) || is
 
     if ($what === 'resend') {
         logAudit("User", "Invite", "$session_name sent the invite to $who again");
-        flashAlert("Sent the invite to <strong>" . escapeHtml($invite['invite_email']) . "</strong> again - it works for " . USER_INVITE_LINK_DAYS . " days, and the link in the last one no longer works");
+        flashAlert(__('Sent the invite to <strong>%1$s</strong> again - it works for %2$d days, and the link in the last one no longer works', escapeHtml($invite['invite_email']), USER_INVITE_LINK_DAYS));
     } else {
         logAudit("User", "Invite", "$session_name got a new invite link for $who, to pass on");
         userInviteShowLink($invite_id, $sent['url']);
@@ -191,7 +191,7 @@ if (isset($_POST['edit_user'])) {
     }
     [$name, $email] = $identity;
     if (intval($row['role_is_admin']) && !intval($role['role_is_admin'])) {
-        userGuardLastAdmin($row, 'a role without admin');
+        userGuardLastAdmin($row, __('a role without admin'));
     }
 
     mysqli_query($mysqli, "UPDATE users SET user_name = '" . escapeSql($name) . "', user_email = '" . escapeSql($email) . "', user_role_id = " . intval($role['role_id']) . " WHERE user_id = $user_id");
@@ -203,34 +203,40 @@ if (isset($_POST['edit_user'])) {
         userSetClientAccess($user_id, $_POST['client_permission'] ?? []);
     }
 
-    $changes = [];
+    $changes = []; // the audit log, in English
+    $shown = []; // the note on screen
     if ($new_password !== '') {
         userSetPassword($user_id, $new_password);
         $changes[] = 'password changed';
-        userNotifyChange($name, $email, 'an administrator set a new password');
+        $shown[] = __('password changed');
+        userNotifyChange($name, $email, __('an administrator set a new password'));
     }
     if (!empty($_POST['reset_mfa']) && trim((string) $row['user_token']) !== '') {
         userResetMfa($user_id);
-        $changes[] = 'MFA reset';
-        userNotifyChange($name, $email, 'an administrator turned off multi-factor authentication' . ($force_mfa ? ' - you will set it up again at your next sign in' : ''));
+        $changes[] = 'MFA reset'; // i18n-ignore - the audit log
+        $shown[] = __('MFA reset');
+        userNotifyChange($name, $email, $force_mfa ? __('an administrator turned off multi-factor authentication - you will set it up again at your next sign in') : __('an administrator turned off multi-factor authentication'));
     }
     if (strcasecmp($email, $row['user_email']) !== 0) {
         $changes[] = 'email changed';
-        userNotifyChange($name, $row['user_email'], 'its email address is now ' . $email);
+        $shown[] = __('email changed');
+        userNotifyChange($name, $row['user_email'], __('its email address is now %s', $email));
     }
     $avatar_error = '';
     if (!empty($_POST['remove_avatar'])) {
         userRemoveAvatar($user_id);
         $changes[] = 'avatar removed';
+        $shown[] = __('avatar removed');
     } elseif (!empty($_FILES['avatar']['tmp_name'])) {
         if (userSaveAvatar($user_id, $_FILES['avatar'], $avatar_error)) {
             $changes[] = 'avatar updated';
+            $shown[] = __('avatar updated');
         }
     }
 
     logAudit("User", "Edit", "$session_name edited user " . escapeSql($name) . ($changes ? ' - ' . escapeSql(implode(', ', $changes)) : ''), 0, $user_id);
 
-    flashAlert("User <strong>$name</strong> saved" . ($changes ? ' - ' . implode(', ', $changes) : '') . ($avatar_error ? ". $avatar_error" : ''), $avatar_error ? 'warning' : 'success');
+    flashAlert(__('User <strong>%s</strong> saved', $name) . ($shown ? ' - ' . implode(', ', $shown) : '') . ($avatar_error ? ". $avatar_error" : ''), $avatar_error ? 'warning' : 'success');
 
     redirect();
 
@@ -253,7 +259,7 @@ if (isset($_GET['activate_user'])) {
 
     logAudit("User", "Activate", "$session_name activated user " . escapeSql($row['user_name']), 0, $user_id);
 
-    flashAlert("User <strong>" . $row['user_name'] . "</strong> can sign in again");
+    flashAlert(__('User <strong>%s</strong> can sign in again', $row['user_name']));
 
     redirect();
 
@@ -272,7 +278,7 @@ if (isset($_GET['disable_user'])) {
 
     logAudit("User", "Disable", "$session_name disabled user " . escapeSql($row['user_name']), 0, $user_id);
 
-    flashAlert("User <strong>" . $row['user_name'] . "</strong> disabled - they are signed out, and their open tickets are unassigned", 'error');
+    flashAlert(__('User <strong>%s</strong> disabled - they are signed out, and their open tickets are unassigned', $row['user_name']), 'error');
 
     redirect();
 
@@ -289,7 +295,7 @@ if (isset($_GET['revoke_remember_me'])) {
 
     logAudit("User", "Edit", "$session_name revoked all remember me tokens for user " . escapeSql($row['user_name']), 0, $user_id);
 
-    flashAlert("Remembered browsers forgotten for <strong>" . $row['user_name'] . "</strong> - every browser asks for their MFA code again");
+    flashAlert(__('Remembered browsers forgotten for <strong>%s</strong> - every browser asks for their MFA code again', $row['user_name']));
 
     redirect();
 
@@ -303,11 +309,11 @@ if (isset($_GET['reset_user_mfa'])) {
     $user_id = intval($row['user_id']);
 
     userResetMfa($user_id);
-    userNotifyChange($row['user_name'], $row['user_email'], 'an administrator turned off multi-factor authentication' . (intval($row['user_config_force_mfa']) ? ' - you will set it up again at your next sign in' : ''));
+    userNotifyChange($row['user_name'], $row['user_email'], intval($row['user_config_force_mfa']) ? __('an administrator turned off multi-factor authentication - you will set it up again at your next sign in') : __('an administrator turned off multi-factor authentication'));
 
     logAudit("User", "Edit", "$session_name reset MFA for user " . escapeSql($row['user_name']), 0, $user_id);
 
-    flashAlert("MFA reset for <strong>" . $row['user_name'] . "</strong>" . (intval($row['user_config_force_mfa']) ? ' - they set it up again at their next sign in' : ' - they sign in with their password alone until they turn it on'));
+    flashAlert(intval($row['user_config_force_mfa']) ? __('MFA reset for <strong>%s</strong> - they set it up again at their next sign in', $row['user_name']) : __('MFA reset for <strong>%s</strong> - they sign in with their password alone until they turn it on', $row['user_name']));
 
     redirect();
 
@@ -336,7 +342,7 @@ if (isset($_POST['archive_user'])) {
 
     logAudit("User", "Archive", "$session_name archived user " . escapeSql($row['user_name']), 0, $user_id);
 
-    flashAlert("User <strong>" . $row['user_name'] . "</strong> archived" . ($to_user_id ? ' - their open tickets went to ' . getFieldById('users', $to_user_id, 'user_name') : ''), 'error');
+    flashAlert($to_user_id ? __('User <strong>%1$s</strong> archived - their open tickets went to %2$s', $row['user_name'], getFieldById('users', $to_user_id, 'user_name')) : __('User <strong>%s</strong> archived', $row['user_name']), 'error');
 
     redirect();
 
@@ -374,7 +380,7 @@ if (isset($_POST['restore_user'])) {
 
     logAudit("User", "Restore", "$session_name restored user " . escapeSql($name), 0, $user_id);
 
-    flashAlert("User <strong>$name</strong> restored - give them their new password");
+    flashAlert(__('User <strong>%s</strong> restored - give them their new password', $name));
 
     redirect();
 
@@ -403,7 +409,7 @@ if (isset($_POST['bulk_role_users'])) {
         $count++;
     }
 
-    flashAlert("<strong>$count</strong> user" . ($count === 1 ? '' : 's') . " now " . ($count === 1 ? 'has' : 'have') . " the <strong>" . $role['role_name'] . "</strong> role" . ($kept ? ' - ' . implode(', ', $kept) . ' kept theirs, as the only admin' : ''), $kept ? 'warning' : 'success');
+    flashAlert(_n('<strong>%1$d</strong> user now has the <strong>%2$s</strong> role', '<strong>%1$d</strong> users now have the <strong>%2$s</strong> role', $count, $count, $role['role_name']) . ($kept ? ' - ' . __('%s kept theirs, as the only admin', implode(', ', $kept)) : ''), $kept ? 'warning' : 'success');
 
     redirect();
 
@@ -421,7 +427,7 @@ if (isset($_POST['bulk_require_mfa_users']) || isset($_POST['bulk_unrequire_mfa_
         $count++;
     }
 
-    flashAlert(($force ? "MFA required for" : "MFA no longer required for") . " <strong>$count</strong> user" . ($count === 1 ? '' : 's') . ($force ? ' - anyone without it sets it up at their next sign in' : ''));
+    flashAlert($force ? _n('MFA required for <strong>%d</strong> user - anyone without it sets it up at their next sign in', 'MFA required for <strong>%d</strong> users - anyone without it sets it up at their next sign in', $count) : _n('MFA no longer required for <strong>%d</strong> user', 'MFA no longer required for <strong>%d</strong> users', $count));
 
     redirect();
 
@@ -438,7 +444,7 @@ if (isset($_POST['bulk_revoke_remember_users'])) {
         $count++;
     }
 
-    flashAlert("Remembered browsers forgotten for <strong>$count</strong> user" . ($count === 1 ? '' : 's'));
+    flashAlert(_n('Remembered browsers forgotten for <strong>%d</strong> user', 'Remembered browsers forgotten for <strong>%d</strong> users', $count));
 
     redirect();
 
@@ -471,7 +477,7 @@ if (isset($_POST['bulk_disable_users']) || isset($_POST['bulk_activate_users']))
         $count++;
     }
 
-    $why = $activate ? 'the agent user limit is reached' : 'the only admin';
+    $why = $activate ? __('the agent user limit is reached') : __('the only admin');
     flashAlert(($activate ? 'Activated' : 'Disabled') . " <strong>$count</strong> user" . ($count === 1 ? '' : 's') . ($kept ? ' - not ' . implode(', ', $kept) . " ($why)" : ''), $kept ? 'warning' : ($activate ? 'success' : 'error'));
 
     redirect();
@@ -491,7 +497,7 @@ if (isExportRequest('export_users')) {
 
     if (isset($_POST['archived']) && $_POST['archived'] == 1) {
         $archive_query = "user_archived_at IS NOT NULL";
-        $filter_summary['Archived'] = 'Archived only';
+        $filter_summary['Archived'] = __('Archived only');
     } else {
         $archive_query = "user_archived_at IS NULL";
     }
@@ -504,7 +510,7 @@ if (isExportRequest('export_users')) {
     $role_query = '';
     $role = userRoles()[intval($_POST['role'] ?? 0)] ?? null;
     if ($role) {
-        $role_query = 'AND user_role_id = ' . intval($role['role_id']);
+        $role_query = 'AND user_role_id = ' . intval($role['role_id']); // i18n-ignore - SQL or the audit log
         $filter_summary['Role'] = $role['role_name'];
     }
 
@@ -534,7 +540,7 @@ if (isExportRequest('export_users')) {
 
         foreach ($rows as $user_id => $row) {
             $row['user_status_display'] = USER_STATUSES[intval($row['user_status'])][0] ?? 'Disabled';
-            $row['user_mfa_display'] = trim((string) $row['user_token']) !== '' ? 'On' : (intval($row['user_config_force_mfa']) ? 'Required, not set up' : 'Off');
+            $row['user_mfa_display'] = trim((string) $row['user_token']) !== '' ? 'On' : (intval($row['user_config_force_mfa']) ? __('Required, not set up') : 'Off');
             $row['user_last_login'] = $logins[$user_id]['log_created_at'] ?? 'Never';
             $row['user_client_access'] = userClientAccessText($access[$user_id], intval($row['role_is_admin']));
             addExportRow($export, $row);
@@ -558,7 +564,7 @@ if (isset($_POST['ir_reset_user_password'])) {
     // Confirm logged-in user password, for security
     $user_row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT user_password FROM users WHERE user_id = $session_user_id"));
     if (!password_verify((string) ($_POST['admin_password'] ?? ''), $user_row['user_password'])) {
-        flashAlert("Incorrect password - nothing was reset.", 'error');
+        flashAlert(__('Incorrect password - nothing was reset.'), 'error');
         redirect();
     }
 
@@ -579,12 +585,12 @@ if (isset($_POST['ir_reset_user_password'])) {
     header('Cache-Control: no-store');
     ?>
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="<?= i18nHtmlLang() ?>">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex">
-        <title>Incident response - new agent passwords</title>
+        <title><?= __('Incident response - new agent passwords') ?></title>
         <link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css">
         <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     </head>
@@ -593,13 +599,13 @@ if (isset($_POST['ir_reset_user_password'])) {
         <div class="alert alert-danger d-flex gap-3">
             <i class="fas fa-skull-crossbones fa-2x"></i>
             <div>
-                <div class="fw-semibold">New passwords for <?= count($reset) ?> agent<?= count($reset) === 1 ? '' : 's' ?> - shown once</div>
-                <div class="small">Give each one to its agent out of band (a phone call, not email), and have them change it. Their remembered browsers were forgotten, so MFA is asked for again. Leave this page and the passwords are gone.</div>
+                <div class="fw-semibold"><?= _n('New passwords for %d agent - shown once', 'New passwords for %d agents - shown once', count($reset)) ?></div>
+                <div class="small"><?= __('Give each one to its agent out of band (a phone call, not email), and have them change it. Their remembered browsers were forgotten, so MFA is asked for again. Leave this page and the passwords are gone.') ?></div>
             </div>
         </div>
         <div class="card">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light"><tr><th>Agent</th><th>Email</th><th>New password</th></tr></thead>
+                <thead class="table-light"><tr><th><?= __('Agent') ?></th><th><?= __('Email') ?></th><th><?= __('New password') ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($reset as $row) { ?>
                     <tr>
@@ -609,14 +615,14 @@ if (isset($_POST['ir_reset_user_password'])) {
                     </tr>
                 <?php } ?>
                 <?php if (!$reset) { ?>
-                    <tr><td colspan="3" class="text-body-secondary">There are no other agents.</td></tr>
+                    <tr><td colspan="3" class="text-body-secondary"><?= __('There are no other agents.') ?></td></tr>
                 <?php } ?>
                 </tbody>
             </table>
         </div>
         <div class="mt-3 d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print me-2"></i>Print</button>
-            <a class="btn btn-primary" href="/admin/users.php"><i class="fas fa-arrow-left me-2"></i>Back to Users</a>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print me-2"></i><?= __('Print') ?></button>
+            <a class="btn btn-primary" href="/admin/users.php"><i class="fas fa-arrow-left me-2"></i><?= __('Back to Users') ?></a>
         </div>
     </div>
     </body>

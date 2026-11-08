@@ -11,7 +11,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i>Create Tickets for <strong><?= $count ?></strong> asset<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-life-ring me-2"></i><?= _n('Create Tickets for %s asset', 'Create Tickets for %s assets', $count, '<strong>' . $count . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -23,15 +23,15 @@ ob_start();
 
         <?php
         $ticket_template_field = 'bulk_ticket_template_id';
-        $ticket_template_hint = "Picking one fills in the tickets - change anything before they are made. <span class=\"font-monospace\">[Asset]</span>, <span class=\"font-monospace\">[Contact]</span> and the like are filled in for each; with <span class=\"font-monospace\">[Asset]</span> in the subject, the asset's name isn't put in front. What the template asks for is answered once, for them all.";
+        $ticket_template_hint = __('Picking one fills in the tickets - change anything before they are made. %1$s, %2$s and the like are filled in for each; with %1$s in the subject, the asset\'s name isn\'t put in front. What the template asks for is answered once, for them all.', '<span class="font-monospace">[Asset]</span>', '<span class="font-monospace">[Contact]</span>');
         require_once '../../includes/inc_ticket_template_select.php';
         ?>
 
         <div class="mb-3">
-            <label>Subject <strong class="text-danger">*</strong></label>
+            <label><?= __('Subject') ?> <strong class="text-danger">*</strong></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                <input type="text" class="form-control" name="bulk_subject" data-template-field="subject" placeholder="Asset Name will be prepended to Subject" maxlength="500" required>
+                <input type="text" class="form-control" name="bulk_subject" data-template-field="subject" placeholder="<?= escapeHtml(__('Asset Name will be prepended to Subject')) ?>" maxlength="500" required>
             </div>
         </div>
 
@@ -43,14 +43,14 @@ ob_start();
 
             <div class="col">
                 <div class="mb-3">
-                    <label>Priority <strong class="text-danger">*</strong></label>
+                    <label><?= __('Priority') ?> <strong class="text-danger">*</strong></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-thermometer-half"></i></span>
                         <select class="form-select select2" name="bulk_priority" data-template-field="priority" required>
-                            <option data-color="var(--bs-info)">Low</option>
-                            <option selected data-color="var(--bs-warning)">Medium</option>
-                            <option data-color="var(--bs-danger)">High</option>
-                            <option data-color="var(--bs-emphasis-color)">Urgent</option>
+                            <option value="Low" data-color="var(--bs-info)"><?= escapeHtml(ticketPriorityLabel('Low')) ?></option>
+                            <option value="Medium" selected data-color="var(--bs-warning)"><?= escapeHtml(ticketPriorityLabel('Medium')) ?></option>
+                            <option value="High" data-color="var(--bs-danger)"><?= escapeHtml(ticketPriorityLabel('High')) ?></option>
+                            <option value="Urgent" data-color="var(--bs-emphasis-color)"><?= escapeHtml(ticketPriorityLabel('Urgent')) ?></option>
                         </select>
                     </div>
                 </div>
@@ -58,11 +58,11 @@ ob_start();
 
             <div class="col">
                 <div class="mb-3">
-                    <label>Category</label>
+                    <label><?= __('Category') ?></label>
                     <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
                         <select class="form-select select2" name="bulk_category" data-template-field="category">
-                            <option value="0">- Not Categorized -</option>
+                            <option value="0"><?= __('- Not Categorized -') ?></option>
                             <?= categoryOptionsHtml('Ticket') ?>
                         </select>
                         <?= categoryAddButtonHtml('Ticket', 'btn btn-secondary') ?>
@@ -73,11 +73,11 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Assign to</label>
+            <label><?= __('Assign to') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                 <select class="form-select select2" name="bulk_assigned_to" data-template-field="assigned">
-                    <option value="0">Not Assigned</option>
+                    <option value="0"><?= __('Not Assigned') ?></option>
                     <?php
 
                     $sql = mysqli_query(
@@ -95,11 +95,11 @@ ob_start();
         </div>
 
         <div class="mb-3">
-            <label>Project</label>
+            <label><?= __('Project') ?></label>
             <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-fw fa-project-diagram"></i></span>
                 <select class="form-select select2" name="bulk_project">
-                    <option value="0">- None -</option>
+                    <option value="0"><?= __('- None -') ?></option>
                     <?php
 
                     // Open projects of the ticked assets' clients, and internal ones - the only ones their tickets can go on
@@ -113,7 +113,7 @@ ob_start();
                     while ($row = mysqli_fetch_assoc($sql_projects)) {
                         $project_id_select = intval($row['project_id']);
                         $project_name_select = escapeHtml($row['project_name']); ?>
-                        <option value="<?= $project_id_select ?>" data-icon="fas fa-project-diagram" data-description="<?= escapeHtml(projectReference($row) . ' - ' . ($row['client_name'] ?? 'internal')) ?>"><?= $project_name_select ?></option>
+                        <option value="<?= $project_id_select ?>" data-icon="fas fa-project-diagram" data-description="<?= escapeHtml(projectReference($row) . ' - ' . ($row['client_name'] ?? __('internal'))) ?>"><?= $project_name_select ?></option>
 
                     <?php } ?>
                 </select>
@@ -124,7 +124,7 @@ ob_start();
         <div class="mb-3">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" name="bulk_billable" data-template-field="billable" <?php if ($config_ticket_default_billable == 1) { echo "checked"; } ?> value="1" id="billableSwitch">
-                <label class="form-check-label" for="billableSwitch">Billable</label>
+                <label class="form-check-label" for="billableSwitch"><?= __('Billable') ?></label>
             </div>
         </div>
         <?php } ?>
@@ -132,8 +132,8 @@ ob_start();
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_add_asset_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create Tickets</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_add_asset_ticket" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create Tickets') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

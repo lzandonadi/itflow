@@ -53,7 +53,8 @@ function contractHoursText($hours) {
 /** Hours in words - "12.5 hours", "1 hour". */
 function contractHoursWords($hours) {
     $hours = round(floatval($hours), 2);
-    return rtrim(rtrim(number_format($hours, 2, '.', ''), '0'), '.') . ($hours == 1 ? ' hour' : ' hours');
+    $number = rtrim(rtrim(number_format($hours, 2, '.', ''), '0'), '.');
+    return $hours == 1 ? __('%s hour', $number) : __('%s hours', $number);
 }
 
 /*
@@ -191,7 +192,7 @@ function contractHoursEnsureMonthly(array $row, $today = null) {
     $from = max($month . '-01', $start !== '' ? $start : $month . '-01');
     $to = date('Y-m-t', strtotime($today));
     $to = $end !== '' && $end < $to ? $end : $to;
-    $note = 'Included in ' . date('F Y', strtotime($today));
+    $note = __('Included in %s', formatDate($today, 'month_year'));
     mysqli_query($mysqli, "INSERT IGNORE INTO contract_blocks SET contract_block_contract_id = " . intval($row['contract_id']) . ", contract_block_hours = " . sprintf('%.2f', $hours) . ",
         contract_block_bought = '$from', contract_block_expires = '$to', contract_block_month = '$month', contract_block_note = '" . escapeSql($note) . "'");
     if (mysqli_affected_rows($mysqli) === 1) {
@@ -385,8 +386,8 @@ function contractHoursDraw($client_id, array $ticket_ids = [], $by = 'ITFlow', $
         // The hours ran out part way through a ticket - the rest is to bill
         if ($result['overage']) {
             $count = count($result['overage']);
-            appNotify("Contract", escapeSql(getFieldById('clients', $client_id, 'client_name') . " ran out of prepaid hours - " . contractHoursText(array_sum($result['overage']))
-                . " on $count ticket" . ($count === 1 ? '' : 's') . " left to bill"), "/agent/unbilled_time.php?client_id=$client_id", $client_id);
+            appNotify("Contract", escapeSql(_n('%1$s ran out of prepaid hours - %2$s on %3$d ticket left to bill', '%1$s ran out of prepaid hours - %2$s on %3$d tickets left to bill', $count,
+                getFieldById('clients', $client_id, 'client_name'), contractHoursText(array_sum($result['overage'])), $count)), "/agent/unbilled_time.php?client_id=$client_id", $client_id);
         }
         return $result;
     } finally {
@@ -490,26 +491,26 @@ function contractHoursAlertCheck($contract_id) {
 function contractHoursAlertSend(array $row, array $hours) {
     global $config_base_url;
     $client_id = intval($row['contract_client_id']);
-    $left = $hours['left'] > 0 ? contractHoursWords($hours['left']) . ' left' : 'no hours left';
-    appNotify("Contract", escapeSql("{$row['client_name']} has $left on {$row['contract_name']}"), contractAgentPath($row), $client_id, intval($row['contract_id']));
+    $left = $hours['left'] > 0 ? __('%s left', contractHoursWords($hours['left'])) : __('no hours left');
+    appNotify("Contract", escapeSql(__('%1$s has %2$s on %3$s', $row['client_name'], $left, $row['contract_name'])), contractAgentPath($row), $client_id, intval($row['contract_id']));
     if (empty($row['owner_email'])) {
         return;
     }
-    emailQueue([['email' => $row['owner_email'], 'name' => $row['owner_name'], 'footnote' => 'You look after this contract in ITFlow.']],
-        "Prepaid hours running low: {$row['contract_name']} - {$row['client_name']}", [
-            'kind' => 'Contract', 'tone' => 'warning',
-            'title' => "{$row['client_name']} has $left",
+    emailQueue([['email' => $row['owner_email'], 'name' => $row['owner_name'], 'footnote' => __('You look after this contract in ITFlow.')]],
+        __('Prepaid hours running low: %1$s - %2$s', $row['contract_name'], $row['client_name']), [
+            'kind' => __('Contract'), 'tone' => 'warning',
+            'title' => __('%1$s has %2$s', $row['client_name'], $left),
             'intro' => [$hours['left'] > 0
-                ? "The prepaid hours on {$row['contract_name']} are down to " . contractHoursWords($hours['left']) . ", under the " . contractHoursWords($row['contract_hours_alert']) . " you set to be told at. Time beyond them goes to Unbilled Time to bill as usual - a good time to offer the client more."
-                : "The prepaid hours on {$row['contract_name']} are used up. Time beyond them goes to Unbilled Time to bill as usual - a good time to offer the client more."],
+                ? __('The prepaid hours on %1$s are down to %2$s, under the %3$s you set to be told at. Time beyond them goes to Unbilled Time to bill as usual - a good time to offer the client more.', $row['contract_name'], contractHoursWords($hours['left']), contractHoursWords($row['contract_hours_alert']))
+                : __('The prepaid hours on %s are used up. Time beyond them goes to Unbilled Time to bill as usual - a good time to offer the client more.', $row['contract_name'])],
             'summary' => array_filter([
-                'Client' => (string) $row['client_name'],
-                'Prepaid' => contractHoursWords($hours['bought']),
-                'Used' => contractHoursWords($hours['used']),
-                'Left' => contractHoursWords($hours['left']),
-                'Next to run out' => $hours['next_expiry'] !== '' ? contractHoursWords($hours['next_expiry_hours']) . ' on ' . date('M j, Y', strtotime($hours['next_expiry'])) : '',
+                __('Client') => (string) $row['client_name'],
+                __('Prepaid') => contractHoursWords($hours['bought']),
+                __('Used') => contractHoursWords($hours['used']),
+                _x('Left', 'hours') => contractHoursWords($hours['left']),
+                __('Next to run out') => $hours['next_expiry'] !== '' ? __('%1$s on %2$s', contractHoursWords($hours['next_expiry_hours']), formatDate($hours['next_expiry'], 'date')) : '',
             ]),
-            'button' => ['label' => 'Open the contract', 'url' => "https://$config_base_url" . contractAgentPath($row)],
+            'button' => ['label' => __('Open the contract'), 'url' => "https://$config_base_url" . contractAgentPath($row)],
         ]);
 }
 
@@ -536,19 +537,19 @@ function contractHoursFromInput(array $in) {
         'category_id' => max(0, intval($in['category'] ?? 0)),
     ];
     if ($hours === null || $f['hours'] <= 0 || $f['hours'] >= 10000) {
-        return [$f, 'Give the hours - more than none, under 10,000.'];
+        return [$f, __('Give the hours - more than none, under 10,000.')];
     }
     if (trim((string) ($in['price'] ?? '')) !== '' && ($price === null || $price < 0 || $price >= 1e9)) {
-        return [$f, 'The price is an amount, such as 2,400.00 - or leave it empty.'];
+        return [$f, __('The price is an amount, such as 2,400.00 - or leave it empty.')];
     }
     if ($f['bought'] === false || $f['bought'] === '') {
-        return [$f, 'Give the day they were bought.'];
+        return [$f, __('Give the day they were bought.')];
     }
     if ($f['expires'] === false || ($f['expires'] !== '' && $f['expires'] < $f['bought'])) {
-        return [$f, 'The day they run out is a day after they were bought - or leave it empty for never.'];
+        return [$f, __('The day they run out is a day after they were bought - or leave it empty for never.')];
     }
     if ($f['invoice'] && !$f['price']) {
-        return [$f, 'Give a price to invoice them.'];
+        return [$f, __('Give a price to invoice them.')];
     }
     return [$f, ''];
 }
@@ -564,10 +565,9 @@ function contractHoursAdd(array $row, array $f, $user_id, $by) {
     $invoice_id = 0;
     $number = '';
     if ($f['invoice']) {
-        $invoice_id = billingInvoiceCreate(intval($row['contract_client_id']), date('Y-m-d'), $f['category_id'] ?? 0, 'Prepaid hours - ' . $row['contract_name'], $by);
+        $invoice_id = billingInvoiceCreate(intval($row['contract_client_id']), date('Y-m-d'), $f['category_id'] ?? 0, __('Prepaid hours - %s', $row['contract_name']), $by);
         if ($invoice_id) {
-            billingItemSave('invoice', $invoice_id, ['name' => 'Prepaid support hours', 'description' => contractHoursWords($f['hours']) . ' for ' . $row['contract_name']
-                . ($f['expires'] !== '' ? ', good until ' . date('M j, Y', strtotime($f['expires'])) : ''), 'qty' => 1, 'price' => $f['price'], 'tax_id' => taxChoice(TAX_USUAL, intval($row['contract_client_id']), 'time')]);
+            billingItemSave('invoice', $invoice_id, ['name' => __('Prepaid support hours'), 'description' => ($f['expires'] !== '' ? __('%1$s for %2$s, good until %3$s', contractHoursWords($f['hours']), $row['contract_name'], formatDate($f['expires'], 'date')) : __('%1$s for %2$s', contractHoursWords($f['hours']), $row['contract_name'])), 'qty' => 1, 'price' => $f['price'], 'tax_id' => taxChoice(TAX_USUAL, intval($row['contract_client_id']), 'time')]);
             billingRecalc('invoice', $invoice_id);
             $number = billingNumber('invoice', billingRow('invoice', $invoice_id, false));
         }

@@ -9,7 +9,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i>Import Assets</h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-desktop me-2"></i><?= __('Import Assets') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -17,18 +17,18 @@ ob_start();
     <input type="hidden" name="client_id" value="<?= $client_id ?>">
 
     <div class="modal-body">
-        <p><strong>Format csv file with headings & data:</strong><br>Name, Description, Type, Make, Model, Serial, OS, Purchase Date, Assigned To, Location, Physical Location, Notes</p>
-        <p class="small text-body-secondary mb-0">After those, any of an asset's details can follow, headed as the asset export heads them - <span class="font-monospace">Ports</span>, <span class="font-monospace">SFP Ports</span>, <span class="font-monospace">RAM (GB)</span>, <span class="font-monospace">Capacity (VA)</span> and so on. Each is kept where the row's type has it, and Ports and SFP Ports add its interfaces.</p>
+        <p><strong><?= __('Format csv file with headings & data:') ?></strong><br><?= __('Name, Description, Type, Make, Model, Serial, OS, Purchase Date, Assigned To, Location, Physical Location, Notes') ?></p>
+        <p class="small text-body-secondary mb-0"><?= __('After those, any of an asset\'s details can follow, headed as the asset export heads them -') ?> <span class="font-monospace"><?= __('Ports') ?></span>, <span class="font-monospace">SFP Ports</span>, <span class="font-monospace">RAM (GB)</span>, <span class="font-monospace"><?= __('Capacity (VA)') ?></span> <?= __('and so on. Each is kept where the row\'s type has it, and Ports and SFP Ports add its interfaces.') ?></p> <?php // i18n-ignore - CSV headings stay English ?>
         <hr>
         <div class="mb-3 my-4">
             <input type="file" class="form-control" name="file" accept=".csv" required>
         </div>
         <hr>
-        <div>Download <a href="post.php?download_assets_csv_template=<?= $client_id ?>">sample csv template</a></div>
-        <small class="text-muted">Note: Purchase date must be in the format YYYY-MM-DD. Spreadsheet tools may automatically reformat dates.</small>
+        <div><?= __('Download') ?> <a href="post.php?download_assets_csv_template=<?= $client_id ?>"><?= __('sample csv template') ?></a></div>
+        <small class="text-muted"><?= __('Note: Purchase date must be in the format YYYY-MM-DD. Spreadsheet tools may automatically reformat dates.') ?></small>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="import_assets_csv" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i>Import</button>
+        <button type="submit" name="import_assets_csv" class="btn btn-primary text-bold"><i class="fa fa-check me-2"></i><?= __('Import') ?></button>
     </div>
 </form>
 

@@ -50,7 +50,7 @@ while ($row = mysqli_fetch_assoc($sql)) {
     $row['value'] = round(max($on_hand, 0) * floatval($row['product_cost']), 2);
     $row['tracked'] = intval($row['product_track_stock']) === 1 && !$row['product_archived_at'];
     $row['needs_reorder'] = $row['tracked'] && $on_hand <= max(floatval($row['product_reorder_level']), 0);
-    $row['status'] = !$row['tracked'] ? 'Not tracked' : ($on_hand <= 0 ? 'Out' : ($row['needs_reorder'] ? 'Reorder' : 'In stock'));
+    $row['status'] = !$row['tracked'] ? __('Not tracked') : ($on_hand <= 0 ? 'Out' : ($row['needs_reorder'] ? 'Reorder' : __('In stock')));
     if ($row['tracked']) {
         $value_now += $row['value'];
         $units_now += max($on_hand, 0);
@@ -78,38 +78,38 @@ $sql = mysqli_query($mysqli, "SELECT stock_id, stock_created_at, stock_type, sto
     WHERE $range_sql
     ORDER BY stock_created_at DESC, stock_id DESC");
 while ($row = mysqli_fetch_assoc($sql)) {
-    $row['type_label'] = productStockTypes()[$row['stock_type']]['label'] ?? $row['stock_type'];
+    $row['type_label'] = i18nEnglish(function () use ($row) { return productStockTypes()[$row['stock_type']]['label'] ?? $row['stock_type']; }); // the CSV keeps English; the screen shows its own label
     $row['invoice_open'] = $row['invoice_number'] !== null && hasClientAccess(intval($row['invoice_client_id']));
     $moves[] = $row;
 }
 
 $product_columns = [
-    'product_name' => ['label' => 'Product', 'html' => function ($row) {
+    'product_name' => ['label' => __('Product'), 'html' => function ($row) {
         return '<a class="fw-semibold" href="/agent/product.php?product_id=' . intval($row['product_id']) . '#stock">' . escapeHtml($row['product_name']) . '</a>'
             . ($row['product_code'] || $row['vendor_name'] ? '<div class="small text-body-secondary">' . escapeHtml(implode(' · ', array_filter([$row['product_code'], $row['vendor_name']]))) . '</div>' : '');
     }],
-    'product_code' => ['label' => 'Code', 'screen' => false],
-    'vendor_name' => ['label' => 'Vendor', 'screen' => false],
-    'product_location' => ['label' => 'Location', 'class' => 'small'],
-    'on_hand' => ['label' => 'On shelf', 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
+    'product_code' => ['label' => __('Code'), 'screen' => false],
+    'vendor_name' => ['label' => __('Vendor'), 'screen' => false],
+    'product_location' => ['label' => __('Location'), 'class' => 'small'],
+    'on_hand' => ['label' => __('On shelf'), 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
         $tone = $row['status'] === 'Out' ? 'text-danger-emphasis fw-semibold' : ($row['status'] === 'Reorder' ? 'text-warning-emphasis fw-semibold' : '');
         return '<span class="' . $tone . '">' . escapeHtml(billingQuantity($row['on_hand'])) . '</span>';
     }],
-    'product_reorder_level' => ['label' => 'Reorder at', 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
+    'product_reorder_level' => ['label' => __('Reorder at'), 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
         return floatval($row['product_reorder_level']) > 0 ? escapeHtml(billingQuantity($row['product_reorder_level'])) : '<span class="text-body-secondary">-</span>';
     }],
-    'value' => ['label' => 'Value', 'type' => 'money', 'title' => 'On the shelf, at its cost today'],
-    'received' => ['label' => 'In', 'type' => 'decimal', 'decimals' => 2, 'title' => 'Received in the period', 'html' => function ($row) {
+    'value' => ['label' => __('Value'), 'type' => 'money', 'title' => __('On the shelf, at its cost today')],
+    'received' => ['label' => __('In'), 'type' => 'decimal', 'decimals' => 2, 'title' => __('Received in the period'), 'html' => function ($row) {
         return floatval($row['received']) ? escapeHtml(billingQuantity($row['received'])) : '<span class="text-body-secondary">-</span>';
     }],
-    'sold' => ['label' => 'Sold', 'type' => 'decimal', 'decimals' => 2, 'title' => 'Invoiced in the period, less what came back', 'html' => function ($row) {
+    'sold' => ['label' => __('Sold'), 'type' => 'decimal', 'decimals' => 2, 'title' => __('Invoiced in the period, less what came back'), 'html' => function ($row) {
         return floatval($row['sold']) ? escapeHtml(billingQuantity($row['sold'])) : '<span class="text-body-secondary">-</span>';
     }],
-    'written_off' => ['label' => 'Written off', 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
+    'written_off' => ['label' => __('Written off'), 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
         return floatval($row['written_off']) ? escapeHtml(billingQuantity($row['written_off'])) : '<span class="text-body-secondary">-</span>';
     }],
-    'sold_value' => ['label' => 'Cost of sales', 'type' => 'money', 'title' => 'What what was sold cost you'],
-    'status' => ['label' => 'Status', 'html' => function ($row) {
+    'sold_value' => ['label' => __('Cost of sales'), 'type' => 'money', 'title' => __('What what was sold cost you')],
+    'status' => ['label' => __('Status'), 'html' => function ($row) {
         $tones = ['Out' => 'danger', 'Reorder' => 'warning', 'In stock' => 'success', 'Not tracked' => 'secondary'];
         $tone = $tones[$row['status']] ?? 'secondary';
         return '<span class="badge rounded-pill bg-' . $tone . '-subtle text-' . $tone . '-emphasis fw-normal">' . escapeHtml($row['status'])
@@ -117,22 +117,22 @@ $product_columns = [
     }],
 ];
 $move_columns = [
-    'stock_created_at' => ['label' => 'When', 'type' => 'date', 'class' => 'small text-nowrap', 'html' => function ($row) {
-        return '<span title="' . escapeHtml($row['stock_created_at']) . '">' . escapeHtml(date('M j, Y', strtotime($row['stock_created_at']))) . '</span>';
+    'stock_created_at' => ['label' => __('When'), 'type' => 'date', 'class' => 'small text-nowrap', 'html' => function ($row) {
+        return '<span title="' . escapeHtml($row['stock_created_at']) . '">' . escapeHtml(formatDate($row['stock_created_at'], 'date')) . '</span>';
     }],
-    'product_name' => ['label' => 'Product', 'html' => function ($row) {
+    'product_name' => ['label' => __('Product'), 'html' => function ($row) {
         return '<a href="/agent/product.php?product_id=' . intval($row['product_id']) . '#stock">' . escapeHtml($row['product_name']) . '</a>';
     }],
-    'type_label' => ['label' => 'What', 'html' => function ($row) {
+    'type_label' => ['label' => __('What'), 'html' => function ($row) {
         $type = productStockTypes()[$row['stock_type']] ?? productStockTypes()['adjusted'];
         return '<span class="badge rounded-pill bg-' . $type['tone'] . '-subtle text-' . $type['tone'] . '-emphasis fw-normal">' . escapeHtml($type['label']) . '</span>';
     }],
-    'stock_qty' => ['label' => 'Qty', 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
+    'stock_qty' => ['label' => __('Qty'), 'type' => 'decimal', 'decimals' => 2, 'html' => function ($row) {
         return '<span class="fw-semibold ' . (floatval($row['stock_qty']) < 0 ? 'text-danger-emphasis' : 'text-success-emphasis') . '">' . escapeHtml(productStockQty($row['stock_qty'])) . '</span>';
     }],
-    'unit_cost' => ['label' => 'Unit cost', 'type' => 'money'],
-    'value' => ['label' => 'Value', 'type' => 'money', 'title' => 'The quantity at the unit cost'],
-    'reference' => ['label' => 'For', 'class' => 'small', 'csv' => function ($row) {
+    'unit_cost' => ['label' => __('Unit cost'), 'type' => 'money'],
+    'value' => ['label' => __('Value'), 'type' => 'money', 'title' => __('The quantity at the unit cost')],
+    'reference' => ['label' => __('For'), 'class' => 'small', 'csv' => function ($row) {
         return trim(implode(' - ', array_filter([$row['invoice_open'] ? $row['invoice_prefix'] . $row['invoice_number'] . ' ' . $row['client_name'] : '',
             $row['expense_description'] !== null ? $row['expense_date'] . ' ' . $row['expense_description'] : '', (string) $row['stock_note']])));
     }, 'html' => function ($row) {
@@ -148,14 +148,14 @@ $move_columns = [
         }
         return implode('<br>', $html) ?: '<span class="text-body-secondary">-</span>';
     }],
-    'user_name' => ['label' => 'By', 'class' => 'small text-nowrap'],
+    'user_name' => ['label' => __('By'), 'class' => 'small text-nowrap'],
 ];
 
 if (reportExporting('moves')) {
     reportCsv('Stock Moves ' . $period['start'] . ' to ' . $period['end'], $move_columns, $moves);
 }
 if (reportExporting()) {
-    reportCsv('Inventory ' . $period['start'] . ' to ' . $period['end'], $product_columns, $products, ['product_name' => 'Total', 'value' => round($value_now, 2),
+    reportCsv('Inventory ' . $period['start'] . ' to ' . $period['end'], $product_columns, $products, ['product_name' => __('Total'), 'value' => round($value_now, 2),
         'received' => $in_units, 'sold' => $out_units, 'sold_value' => round($out_value, 2)]);
 }
 
@@ -166,9 +166,9 @@ $bucket_sql = function ($types, $sign) use ($buckets, $range_sql, $value_sql) {
         WHERE stock_type IN ($types) AND $range_sql GROUP BY b";
 };
 $series = [
-    ['label' => 'Received', 'tone' => 'success', 'data' => reportSeries($bucket_sql("'received'", ''), $buckets['keys'])],
-    ['label' => 'Cost of sales', 'tone' => 'accent', 'data' => reportSeries($bucket_sql("'sold', 'returned'", '-'), $buckets['keys'])],
-    ['label' => 'Written off', 'tone' => 'danger', 'data' => reportSeries($bucket_sql("'written_off'", '-'), $buckets['keys'])],
+    ['label' => __('Received'), 'tone' => 'success', 'data' => reportSeries($bucket_sql("'received'", ''), $buckets['keys'])],
+    ['label' => __('Cost of sales'), 'tone' => 'accent', 'data' => reportSeries($bucket_sql("'sold', 'returned'", '-'), $buckets['keys'])],
+    ['label' => __('Written off'), 'tone' => 'danger', 'data' => reportSeries($bucket_sql("'written_off'", '-'), $buckets['keys'])],
 ];
 
 require_once "includes/inc_report_layout.php";
@@ -179,41 +179,41 @@ require_once "includes/inc_report_layout.php";
 
     <?php reportHeader('inventory', [
         'period' => $period,
-        'export' => ['products' => 'Products', 'moves' => 'Stock moves'],
+        'export' => ['products' => 'Products', 'moves' => __('Stock moves')],
     ]); ?>
 
     <?= reportStats([
-        ['label' => 'On the shelf', 'value' => reportMoney($value_now), 'title' => 'At each product\'s cost today',
-            'sub' => escapeHtml(billingQuantity($units_now)) . ' <span class="text-body-tertiary">units</span>'],
-        ['label' => 'Received', 'value' => reportMoney($in_value), 'tone' => $in_value > 0 ? 'success' : '',
-            'sub' => escapeHtml(billingQuantity($in_units)) . ' <span class="text-body-tertiary">units in the period</span>'],
-        ['label' => 'Cost of sales', 'value' => reportMoney($out_value), 'title' => 'What the stock invoiced in the period cost you, less what came back',
-            'sub' => escapeHtml(billingQuantity($out_units)) . ' <span class="text-body-tertiary">units sold</span>' . ($off_value > 0 ? ' &middot; <span class="text-danger-emphasis">' . escapeHtml(reportMoney($off_value)) . ' written off</span>' : '')],
-        ['label' => 'To reorder', 'value' => reportCount($reorder), 'tone' => $reorder ? 'warning' : '', 'url' => '/agent/products.php?type=reorder',
-            'sub' => $reorder ? '<span class="text-body-tertiary">at or under their reorder level</span>' : '<span class="text-body-tertiary">nothing low</span>'],
+        ['label' => __('On the shelf'), 'value' => reportMoney($value_now), 'title' => __('At each product\'s cost today'),
+            'sub' => escapeHtml(billingQuantity($units_now)) . ' <span class="text-body-tertiary">' . __('units') . '</span>'],
+        ['label' => __('Received'), 'value' => reportMoney($in_value), 'tone' => $in_value > 0 ? 'success' : '',
+            'sub' => escapeHtml(billingQuantity($in_units)) . ' <span class="text-body-tertiary">' . __('units in the period') . '</span>'],
+        ['label' => __('Cost of sales'), 'value' => reportMoney($out_value), 'title' => __('What the stock invoiced in the period cost you, less what came back'),
+            'sub' => escapeHtml(billingQuantity($out_units)) . ' <span class="text-body-tertiary">' . __('units sold') . '</span>' . ($off_value > 0 ? ' &middot; <span class="text-danger-emphasis">' . escapeHtml(reportMoney($off_value)) . ' written off</span>' : '')],
+        ['label' => __('To reorder'), 'value' => reportCount($reorder), 'tone' => $reorder ? 'warning' : '', 'url' => '/agent/products.php?type=reorder',
+            'sub' => $reorder ? '<span class="text-body-tertiary">' . __('at or under their reorder level') . '</span>' : '<span class="text-body-tertiary">' . __('nothing low') . '</span>'],
     ]) ?>
 
-    <?= reportSectionOpen('In and out, at cost', escapeHtml($period['range'])) ?>
+    <?= reportSectionOpen(__('In and out, at cost'), escapeHtml($period['range'])) ?>
         <div class="card-body">
-            <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $series, 'format' => 'money'], '', 'Stock received, sold and written off over the period, at cost') ?>
+            <?= reportChart(['type' => 'bar', 'labels' => $buckets['labels'], 'series' => $series, 'format' => 'money'], '', __('Stock received, sold and written off over the period, at cost')) ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('Products', count($products) . ' tracked or moved') ?>
+    <?= reportSectionOpen(__('Products'), __('%d tracked or moved', count($products))) ?>
         <?= reportTable($product_columns, $products, [
-            'empty' => reportEmpty('No product tracks its stock. Turn on Track stock on a product to see it here.', 'fa-warehouse', 'secondary'),
+            'empty' => reportEmpty(__('No product tracks its stock. Turn on Track stock on a product to see it here.'), 'fa-warehouse', 'secondary'),
             'export_table' => 'products',
-            'totals' => ['product_name' => 'Total', 'value' => round($value_now, 2), 'received' => $in_units, 'sold' => $out_units, 'sold_value' => round($out_value, 2)],
+            'totals' => ['product_name' => __('Total'), 'value' => round($value_now, 2), 'received' => $in_units, 'sold' => $out_units, 'sold_value' => round($out_value, 2)],
             'totals_html' => ['received' => escapeHtml(billingQuantity($in_units)), 'sold' => escapeHtml(billingQuantity($out_units))],
         ]) ?>
         <div class="card-footer small text-body-secondary">
-            Value is what is on the shelf at each product's cost today. In, sold and written off are for the period; cost of sales is at the cost each sale was made at.
+            <?= __('Value is what is on the shelf at each product\'s cost today. In, sold and written off are for the period; cost of sales is at the cost each sale was made at.') ?>
         </div>
     </div>
 
-    <?= reportSectionOpen('Stock moves', escapeHtml($period['range'])) ?>
+    <?= reportSectionOpen(__('Stock moves'), escapeHtml($period['range'])) ?>
         <?= reportTable($move_columns, $moves, [
-            'empty' => reportEmpty('Nothing came in or went out in this period.', 'fa-warehouse', 'secondary'),
+            'empty' => reportEmpty(__('Nothing came in or went out in this period.'), 'fa-warehouse', 'secondary'),
             'limit' => 300, 'export_table' => 'moves', 'sortable' => true,
         ]) ?>
     </div>

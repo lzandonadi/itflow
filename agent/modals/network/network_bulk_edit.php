@@ -28,7 +28,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-edit me-2"></i>Change <strong><?= $count ?></strong> network<?= $count === 1 ? '' : 's' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-edit me-2"></i><?= _n('Change %s network', 'Change %s networks', $count, '<strong>' . $count . '</strong>') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 
@@ -38,25 +38,25 @@ ob_start();
 
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Type</label>
+            <label class="form-label"><?= __('Type') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-fw fa-shapes"></i></span>
                 <select class="form-select select2" name="type">
-                    <option value="">- No change -</option>
-                    <?php foreach (NETWORK_TYPES as $type => [$icon, $tone, $hint]) { ?>
-                        <option value="<?= $type ?>" data-icon="fas <?= $icon ?>" data-color="<?= networkToneColor($tone) ?>" data-description="<?= escapeHtml($hint) ?>"><?= $type ?></option>
+                    <option value=""><?= __('- No change -') ?></option>
+                    <?php foreach (networkTypes() as $type => [$icon, $tone, $hint]) { ?>
+                        <option value="<?= $type ?>" data-icon="fas <?= $icon ?>" data-color="<?= networkToneColor($tone) ?>" data-description="<?= escapeHtml($hint) ?>"><?= escapeHtml(networkTypeName($type)) ?></option>
                     <?php } ?>
                 </select>
             </div>
         </div>
         <?php if ($client_id) { ?>
             <div class="mb-0">
-                <label class="form-label">Site</label>
+                <label class="form-label"><?= __('Site') ?></label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-fw fa-map-marker-alt"></i></span>
                     <select class="form-select select2" name="location_id">
-                        <option value="">- No change -</option>
-                        <option value="0" data-icon="fas fa-times">No site</option>
+                        <option value=""><?= __('- No change -') ?></option>
+                        <option value="0" data-icon="fas fa-times"><?= __('No site') ?></option>
                         <?php foreach ($locations as $location) { ?>
                             <option value="<?= intval($location['location_id']) ?>" data-icon="fas fa-<?= intval($location['location_primary']) ? 'building' : 'map-marker-alt' ?>"><?= escapeHtml($location['location_name']) ?></option>
                         <?php } ?>
@@ -64,13 +64,13 @@ ob_start();
                 </div>
             </div>
         <?php } else { ?>
-            <div class="form-text">To move networks to a site, open the client's networks - sites are per client.</div>
+            <div class="form-text"><?= __('To move networks to a site, open the client\'s networks - sites are per client.') ?></div>
         <?php } ?>
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="bulk_edit_networks" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Change</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="bulk_edit_networks" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Change') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

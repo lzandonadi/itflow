@@ -21,10 +21,10 @@
 /* The groups the pages are shown in, in order. */
 function settingsGroups() {
     return [
-        'company' => 'Your company',
+        'company' => __('Your company'),
         'work' => 'Work',
-        'email' => 'Email and notifications',
-        'access' => 'Sign-in and access',
+        'email' => __('Email and notifications'),
+        'access' => __('Sign-in and access'),
         'system' => 'System',
     ];
 }
@@ -35,38 +35,38 @@ function settingsGroups() {
  */
 function settingsPages() {
     return [
-        'company' => ['group' => 'company', 'title' => 'Company details', 'icon' => 'fa-briefcase', 'url' => 'settings_company.php',
-            'about' => 'Your company as it shows on invoices, quotes and emails - its name, address, contact details and logo.'],
-        'localization' => ['group' => 'company', 'title' => 'Localization', 'icon' => 'fa-globe', 'url' => 'settings_localization.php',
-            'about' => 'The language dates and numbers are written in, the currency you bill in, and your timezone.'],
-        'theme' => ['group' => 'company', 'title' => 'Theme', 'icon' => 'fa-paint-brush', 'url' => 'settings_theme.php',
-            'about' => 'The colour of the top bar, links, buttons and highlights, and the icon on the browser tab.'],
-        'default' => ['group' => 'work', 'title' => 'Defaults', 'icon' => 'fa-cogs', 'url' => 'settings_default.php',
-            'about' => 'Where ITFlow opens, what a client is billed on without a contract, and what new payments, expenses and transfers start with.'],
-        'ticket' => ['group' => 'work', 'title' => 'Tickets', 'icon' => 'fa-life-ring', 'url' => 'settings_ticket.php', 'module' => 'ticketing',
-            'about' => 'How tickets are numbered, made from email, timed, billed and closed.'],
-        'project' => ['group' => 'work', 'title' => 'Projects', 'icon' => 'fa-project-diagram', 'url' => 'settings_project.php', 'module' => 'ticketing',
-            'about' => 'How projects are numbered.'],
-        'quote' => ['group' => 'work', 'title' => 'Quotes', 'icon' => 'fa-comment-dollar', 'url' => 'settings_quote.php', 'module' => 'accounting',
-            'about' => 'How quotes are numbered, what goes at the foot of them, and who hears when one is answered.'],
-        'invoice' => ['group' => 'work', 'title' => 'Invoices and billing', 'icon' => 'fa-file-invoice', 'url' => 'settings_invoice.php', 'module' => 'accounting',
-            'about' => 'Invoice numbering, late fees, reminders and statements, and how time, expenses and trips are billed.'],
-        'mail' => ['group' => 'email', 'title' => 'Mail', 'icon' => 'fa-envelope', 'url' => 'settings_mail.php',
-            'about' => 'The mailboxes ITFlow sends from and reads tickets from, the names emails come from, and tests.'],
-        'notification' => ['group' => 'email', 'title' => 'Notifications', 'icon' => 'fa-bell', 'url' => 'settings_notification.php',
-            'about' => 'Which alerts ITFlow raises, and which emails clients get.'],
-        'security' => ['group' => 'access', 'title' => 'Security', 'icon' => 'fa-shield-alt', 'url' => 'settings_security.php',
-            'about' => 'The sign-in page, two-step sign-in, failed sign-ins and shared links.'],
-        'client_portal' => ['group' => 'access', 'title' => 'Client portal', 'icon' => 'fa-user-shield', 'url' => 'settings_client_portal.php', 'module' => 'portal',
-            'about' => 'How your clients\' contacts sign in to the portal, and the announcements they see there.'],
-        'identity' => ['group' => 'access', 'title' => 'Single sign-on', 'icon' => 'fa-fingerprint', 'url' => 'identity_providers.php', 'module' => 'portal',
-            'about' => 'Contacts signing in to the client portal with their Microsoft 365 account.'],
-        'module' => ['group' => 'system', 'title' => 'Modules', 'icon' => 'fa-cube', 'url' => 'settings_module.php',
-            'about' => 'The parts of ITFlow in use - IT documentation, ticketing, invoicing and the client portal - and white-labelling.'],
-        'logs' => ['group' => 'system', 'title' => 'Logs', 'icon' => 'fa-scroll', 'url' => 'settings_logs.php',
-            'about' => 'How long the audit log and app logs are kept, and sending them on to a syslog server or SIEM.'],
-        'telemetry' => ['group' => 'system', 'title' => 'Telemetry', 'icon' => 'fa-satellite-dish', 'url' => 'settings_telemetry.php',
-            'about' => 'Whether ITFlow tells the ITFlow project, each night, how it is being used.'],
+        'company' => ['group' => 'company', 'title' => __('Company details'), 'icon' => 'fa-briefcase', 'url' => 'settings_company.php',
+            'about' => __('Your company as it shows on invoices, quotes and emails - its name, address, contact details and logo.')],
+        'localization' => ['group' => 'company', 'title' => __('Localization'), 'icon' => 'fa-globe', 'url' => 'settings_localization.php',
+            'about' => __('The language ITFlow is shown in, how numbers and money are written, the currency you bill in, and your timezone.')],
+        'theme' => ['group' => 'company', 'title' => __('Theme'), 'icon' => 'fa-paint-brush', 'url' => 'settings_theme.php',
+            'about' => __('The colour of the top bar, links, buttons and highlights, and the icon on the browser tab.')],
+        'default' => ['group' => 'work', 'title' => __('Defaults'), 'icon' => 'fa-cogs', 'url' => 'settings_default.php',
+            'about' => __('Where ITFlow opens, what a client is billed on without a contract, and what new payments, expenses and transfers start with.')],
+        'ticket' => ['group' => 'work', 'title' => __('Tickets'), 'icon' => 'fa-life-ring', 'url' => 'settings_ticket.php', 'module' => 'ticketing',
+            'about' => __('How tickets are numbered, made from email, timed, billed and closed.')],
+        'project' => ['group' => 'work', 'title' => __('Projects'), 'icon' => 'fa-project-diagram', 'url' => 'settings_project.php', 'module' => 'ticketing',
+            'about' => __('How projects are numbered.')],
+        'quote' => ['group' => 'work', 'title' => __('Quotes'), 'icon' => 'fa-comment-dollar', 'url' => 'settings_quote.php', 'module' => 'accounting',
+            'about' => __('How quotes are numbered, what goes at the foot of them, and who hears when one is answered.')],
+        'invoice' => ['group' => 'work', 'title' => __('Invoices and billing'), 'icon' => 'fa-file-invoice', 'url' => 'settings_invoice.php', 'module' => 'accounting',
+            'about' => __('Invoice numbering, late fees, reminders and statements, and how time, expenses and trips are billed.')],
+        'mail' => ['group' => 'email', 'title' => __('Mail'), 'icon' => 'fa-envelope', 'url' => 'settings_mail.php',
+            'about' => __('The mailboxes ITFlow sends from and reads tickets from, the names emails come from, and tests.')],
+        'notification' => ['group' => 'email', 'title' => __('Notifications'), 'icon' => 'fa-bell', 'url' => 'settings_notification.php',
+            'about' => __('Which alerts ITFlow raises, and which emails clients get.')],
+        'security' => ['group' => 'access', 'title' => __('Security'), 'icon' => 'fa-shield-alt', 'url' => 'settings_security.php',
+            'about' => __('The sign-in page, two-step sign-in, failed sign-ins and shared links.')],
+        'client_portal' => ['group' => 'access', 'title' => __('Client portal'), 'icon' => 'fa-user-shield', 'url' => 'settings_client_portal.php', 'module' => 'portal',
+            'about' => __('How your clients\' contacts sign in to the portal, and the announcements they see there.')],
+        'identity' => ['group' => 'access', 'title' => __('Single sign-on'), 'icon' => 'fa-fingerprint', 'url' => 'identity_providers.php', 'module' => 'portal',
+            'about' => __('Contacts signing in to the client portal with their Microsoft 365 account.')],
+        'module' => ['group' => 'system', 'title' => __('Modules'), 'icon' => 'fa-cube', 'url' => 'settings_module.php',
+            'about' => __('The parts of ITFlow in use - IT documentation, ticketing, invoicing and the client portal - and white-labelling.')],
+        'logs' => ['group' => 'system', 'title' => __('Logs'), 'icon' => 'fa-scroll', 'url' => 'settings_logs.php',
+            'about' => __('How long the audit log and app logs are kept, and sending them on to a syslog server or SIEM.')],
+        'telemetry' => ['group' => 'system', 'title' => __('Telemetry'), 'icon' => 'fa-satellite-dish', 'url' => 'settings_telemetry.php',
+            'about' => __('Whether ITFlow tells the ITFlow project, each night, how it is being used.')],
     ];
 }
 
@@ -86,7 +86,7 @@ function settingsPageAvailable(array $page) {
 
 /* The theme colours there are - each has its .theme-<name> block in css/itflow_custom.css. */
 function settingsThemes() {
-    return ['lightblue' => 'Light blue', 'blue' => 'Blue', 'navy' => 'Navy', 'indigo' => 'Indigo', 'purple' => 'Purple', 'fuchsia' => 'Fuchsia', 'pink' => 'Pink',
+    return ['lightblue' => __('Light blue'), 'blue' => 'Blue', 'navy' => 'Navy', 'indigo' => 'Indigo', 'purple' => 'Purple', 'fuchsia' => 'Fuchsia', 'pink' => 'Pink',
         'maroon' => 'Maroon', 'red' => 'Red', 'orange' => 'Orange', 'yellow' => 'Yellow', 'olive' => 'Olive', 'green' => 'Green', 'teal' => 'Teal', 'cyan' => 'Cyan',
         'gray' => 'Gray', 'black' => 'Black'];
 }
@@ -99,188 +99,193 @@ function settingsThemes() {
  * A field on a tab of its page names the tab.
  */
 function settingsFields() {
-    static $fields = null;
-    if ($fields !== null) {
-        return $fields;
+    // Kept per language - the audit log reads the English ones (i18nEnglish())
+    static $cache = [];
+    $locale = i18nLocale();
+    if (isset($cache[$locale])) {
+        return $cache[$locale];
     }
     $on_off = ['kind' => 'switch'];
     $fields = [
         // Company details
-        'company_name' => ['page' => 'company', 'section' => 'Your company', 'label' => 'Company name', 'words' => 'business organisation organization'],
-        'company_tax_id' => ['page' => 'company', 'section' => 'Your company', 'label' => 'Tax ID', 'words' => 'vat ein abn gst tax number'],
-        'company_address' => ['page' => 'company', 'section' => 'Address', 'label' => 'Street address', 'words' => 'address street'],
-        'company_city' => ['page' => 'company', 'section' => 'Address', 'label' => 'City', 'words' => 'town'],
-        'company_state' => ['page' => 'company', 'section' => 'Address', 'label' => 'State / province', 'words' => 'state province county region'],
-        'company_zip' => ['page' => 'company', 'section' => 'Address', 'label' => 'Postal code', 'words' => 'zip postcode'],
-        'company_country' => ['page' => 'company', 'section' => 'Address', 'label' => 'Country', 'words' => 'nation'],
-        'company_phone_country_code' => ['page' => 'company', 'section' => 'Contact', 'label' => 'Phone country code', 'search' => false],
-        'company_phone' => ['page' => 'company', 'section' => 'Contact', 'label' => 'Phone', 'words' => 'telephone number call'],
-        'company_email' => ['page' => 'company', 'section' => 'Contact', 'label' => 'Email', 'words' => 'email address contact'],
-        'company_website' => ['page' => 'company', 'section' => 'Contact', 'label' => 'Website', 'words' => 'web site url domain'],
-        'company_logo' => ['page' => 'company', 'section' => 'Logo', 'label' => 'Logo', 'kind' => 'file', 'words' => 'logo image picture branding invoice'],
-        'config_internal_client_id' => ['page' => 'company', 'section' => 'Your own client record', 'label' => 'Your company\'s client record', 'kind' => 'client',
-            'words' => 'internal client own company msp internal tickets'],
+        'company_name' => ['page' => 'company', 'section' => __('Your company'), 'label' => __('Company name'), 'words' => __('business organisation organization')],
+        'company_tax_id' => ['page' => 'company', 'section' => __('Your company'), 'label' => __('Tax ID'), 'words' => __('vat ein abn gst tax number')],
+        'company_address' => ['page' => 'company', 'section' => __('Address'), 'label' => __('Street address'), 'words' => 'address street'],
+        'company_city' => ['page' => 'company', 'section' => __('Address'), 'label' => __('City'), 'words' => 'town'],
+        'company_state' => ['page' => 'company', 'section' => __('Address'), 'label' => __('State / province'), 'words' => __('state province county region')],
+        'company_zip' => ['page' => 'company', 'section' => __('Address'), 'label' => __('Postal code'), 'words' => 'zip postcode'],
+        'company_country' => ['page' => 'company', 'section' => __('Address'), 'label' => __('Country'), 'words' => 'nation'],
+        'company_phone_country_code' => ['page' => 'company', 'section' => __('Contact'), 'label' => __('Phone country code'), 'search' => false],
+        'company_phone' => ['page' => 'company', 'section' => __('Contact'), 'label' => __('Phone'), 'words' => __('telephone number call')],
+        'company_email' => ['page' => 'company', 'section' => __('Contact'), 'label' => __('Email'), 'words' => __('email address contact')],
+        'company_website' => ['page' => 'company', 'section' => __('Contact'), 'label' => __('Website'), 'words' => __('web site url domain')],
+        'company_logo' => ['page' => 'company', 'section' => __('Logo'), 'label' => __('Logo'), 'kind' => 'file', 'words' => __('logo image picture branding invoice')],
+        'config_internal_client_id' => ['page' => 'company', 'section' => __('Your own client record'), 'label' => __('Your company\'s client record'), 'kind' => 'client',
+            'words' => __('internal client own company msp internal tickets')],
 
         // Localization
-        'company_locale' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Language', 'kind' => 'select', 'options' => 'locales',
-            'words' => 'locale language number date format'],
-        'company_currency' => ['page' => 'localization', 'section' => 'Language and currency', 'label' => 'Currency', 'kind' => 'select', 'options' => 'currencies',
-            'words' => 'currency money usd eur gbp'],
-        'config_timezone' => ['page' => 'localization', 'section' => 'Timezone', 'label' => 'Timezone', 'words' => 'time zone clock utc'],
+        'config_language' => ['page' => 'localization', 'section' => __('Language and currency'), 'label' => __('Interface language'), 'kind' => 'select', 'options' => 'interface_languages',
+            'words' => __('language idioma translation portuguese english interface')],
+        'company_locale' => ['page' => 'localization', 'section' => __('Language and currency'), 'label' => __('Number and currency format'), 'kind' => 'select', 'options' => 'locales',
+            'words' => __('locale number money currency format region')],
+        'company_currency' => ['page' => 'localization', 'section' => __('Language and currency'), 'label' => __('Currency'), 'kind' => 'select', 'options' => 'currencies',
+            'words' => __('currency money usd eur gbp')],
+        'config_timezone' => ['page' => 'localization', 'section' => __('Timezone'), 'label' => __('Timezone'), 'words' => __('time zone clock utc')],
 
         // Theme
-        'config_theme' => ['page' => 'theme', 'section' => 'Colour', 'label' => 'Theme colour', 'kind' => 'select', 'options' => 'themes',
-            'words' => 'theme color colour accent top bar branding'],
-        'favicon' => ['page' => 'theme', 'section' => 'Browser tab icon', 'label' => 'Browser tab icon', 'kind' => 'file', 'words' => 'favicon ico icon tab'],
+        'config_theme' => ['page' => 'theme', 'section' => __('Colour'), 'label' => __('Theme colour'), 'kind' => 'select', 'options' => 'themes',
+            'words' => __('theme color colour accent top bar branding')],
+        'favicon' => ['page' => 'theme', 'section' => __('Browser tab icon'), 'label' => __('Browser tab icon'), 'kind' => 'file', 'words' => __('favicon ico icon tab')],
 
         // Defaults
-        'config_start_page' => ['page' => 'default', 'section' => 'Opening ITFlow', 'label' => 'Start page', 'kind' => 'select', 'options' => 'start_pages',
-            'words' => 'home dashboard landing start page'],
-        'config_default_calendar' => ['page' => 'default', 'section' => 'Opening ITFlow', 'label' => 'Calendar', 'kind' => 'calendar', 'words' => 'default calendar events'],
-        'config_default_net_terms' => ['page' => 'default', 'section' => 'Rates and terms', 'label' => 'Net terms', 'kind' => 'select', 'options' => 'net_terms',
-            'words' => 'payment terms due days net 30 client contract'],
-        'config_default_hourly_rate' => ['page' => 'default', 'section' => 'Rates and terms', 'label' => 'Hourly rate', 'words' => 'rate per hour labour labor billing client contract'],
-        'config_default_after_hours_rate' => ['page' => 'default', 'section' => 'Rates and terms', 'label' => 'After-hours rate', 'words' => 'after hours rate evening weekend overtime out of hours billing contract'],
-        'config_default_payment_account' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Payments go into', 'kind' => 'account', 'words' => 'payment account bank deposit'],
-        'config_default_payment_method' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Payment method', 'words' => 'payment method check card cash'],
-        'config_default_expense_account' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Expenses come out of', 'kind' => 'account', 'words' => 'expense account'],
-        'config_default_expense_payment_method' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Expense payment method', 'words' => 'expense payment method'],
-        'config_default_transfer_from_account' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Transfers from', 'kind' => 'account', 'words' => 'transfer account'],
-        'config_default_transfer_to_account' => ['page' => 'default', 'section' => 'Accounts', 'label' => 'Transfers to', 'kind' => 'account', 'words' => 'transfer account'],
+        'config_start_page' => ['page' => 'default', 'section' => __('Opening ITFlow'), 'label' => __('Start page'), 'kind' => 'select', 'options' => 'start_pages',
+            'words' => __('home dashboard landing start page')],
+        'config_default_calendar' => ['page' => 'default', 'section' => __('Opening ITFlow'), 'label' => __('Calendar'), 'kind' => 'calendar', 'words' => __('default calendar events')],
+        'config_default_net_terms' => ['page' => 'default', 'section' => __('Rates and terms'), 'label' => __('Net terms'), 'kind' => 'select', 'options' => 'net_terms',
+            'words' => __('payment terms due days net 30 client contract')],
+        'config_default_hourly_rate' => ['page' => 'default', 'section' => __('Rates and terms'), 'label' => __('Hourly rate'), 'words' => __('rate per hour labour labor billing client contract')],
+        'config_default_after_hours_rate' => ['page' => 'default', 'section' => __('Rates and terms'), 'label' => __('After-hours rate'), 'words' => __('after hours rate evening weekend overtime out of hours billing contract')],
+        'config_default_payment_account' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Payments go into'), 'kind' => 'account', 'words' => __('payment account bank deposit')],
+        'config_default_payment_method' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Payment method'), 'words' => __('payment method check card cash')],
+        'config_default_expense_account' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Expenses come out of'), 'kind' => 'account', 'words' => 'expense account'],
+        'config_default_expense_payment_method' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Expense payment method'), 'words' => __('expense payment method')],
+        'config_default_transfer_from_account' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Transfers from'), 'kind' => 'account', 'words' => 'transfer account'],
+        'config_default_transfer_to_account' => ['page' => 'default', 'section' => __('Accounts'), 'label' => __('Transfers to'), 'kind' => 'account', 'words' => 'transfer account'],
 
         // Tickets
-        'config_ticket_prefix' => ['page' => 'ticket', 'section' => 'Numbering', 'label' => 'Ticket prefix', 'words' => 'ticket number tck prefix'],
-        'config_ticket_next_number' => ['page' => 'ticket', 'section' => 'Numbering', 'label' => 'Next ticket number', 'words' => 'ticket number counter'],
-        'config_ticket_email_parse' => ['page' => 'ticket', 'section' => 'Email to ticket', 'label' => 'Turn emails into tickets', 'words' => 'email to ticket parser parse inbound imap mailbox'] + $on_off,
-        'config_ticket_email_parse_unknown_senders' => ['page' => 'ticket', 'section' => 'Email to ticket', 'label' => 'From unknown senders too', 'words' => 'unknown senders domains anyone email'] + $on_off,
-        'config_ticket_default_billable' => ['page' => 'ticket', 'section' => 'Time and billing', 'label' => 'New tickets are billable', 'words' => 'billable default bill'] + $on_off,
-        'config_ticket_timer_autostart' => ['page' => 'ticket', 'section' => 'Time and billing', 'label' => 'Start the timer on opening a ticket', 'words' => 'timer autostart time tracking'] + $on_off,
-        'config_ticket_autoclose_hours' => ['page' => 'ticket', 'section' => 'Closing', 'label' => 'Close resolved tickets after', 'words' => 'auto close autoclose resolved hours'],
-        'config_ticket_new_ticket_notification_email' => ['page' => 'ticket', 'section' => 'New tickets', 'label' => 'Email new tickets to', 'words' => 'new ticket notification email distribution list alert'],
-        'config_ticket_ai_triage' => ['page' => 'ticket', 'section' => 'New tickets', 'label' => 'Triage new tickets with AI', 'kind' => 'select', 'options' => 'ai_triage',
-            'words' => 'ai artificial intelligence triage category priority automatic sort'],
-        'config_ticket_default_view' => ['page' => 'ticket', 'section' => 'The tickets page', 'label' => 'Tickets open as', 'kind' => 'select', 'options' => [0 => 'A list', 1 => 'A compact list', 2 => 'A board (kanban)'],
-            'words' => 'default view list compact kanban board'],
-        'config_ticket_ordering' => ['page' => 'ticket', 'section' => 'The tickets page', 'label' => 'Order tickets by hand on the board', 'words' => 'kanban ordering drag order'] + $on_off,
-        'config_ticket_moving_columns' => ['page' => 'ticket', 'section' => 'The tickets page', 'label' => 'Rearrange the board\'s columns', 'words' => 'kanban columns move'] + $on_off,
+        'config_ticket_prefix' => ['page' => 'ticket', 'section' => __('Numbering'), 'label' => __('Ticket prefix'), 'words' => __('ticket number tck prefix')],
+        'config_ticket_next_number' => ['page' => 'ticket', 'section' => __('Numbering'), 'label' => __('Next ticket number'), 'words' => __('ticket number counter')],
+        'config_ticket_email_parse' => ['page' => 'ticket', 'section' => __('Email to ticket'), 'label' => __('Turn emails into tickets'), 'words' => __('email to ticket parser parse inbound imap mailbox')] + $on_off,
+        'config_ticket_email_parse_unknown_senders' => ['page' => 'ticket', 'section' => __('Email to ticket'), 'label' => __('From unknown senders too'), 'words' => __('unknown senders domains anyone email')] + $on_off,
+        'config_ticket_default_billable' => ['page' => 'ticket', 'section' => __('Time and billing'), 'label' => __('New tickets are billable'), 'words' => __('billable default bill')] + $on_off,
+        'config_ticket_timer_autostart' => ['page' => 'ticket', 'section' => __('Time and billing'), 'label' => __('Start the timer on opening a ticket'), 'words' => __('timer autostart time tracking')] + $on_off,
+        'config_ticket_autoclose_hours' => ['page' => 'ticket', 'section' => __('Closing'), 'label' => __('Close resolved tickets after'), 'words' => __('auto close autoclose resolved hours')],
+        'config_ticket_new_ticket_notification_email' => ['page' => 'ticket', 'section' => __('New tickets'), 'label' => __('Email new tickets to'), 'words' => __('new ticket notification email distribution list alert')],
+        'config_ticket_ai_triage' => ['page' => 'ticket', 'section' => __('New tickets'), 'label' => __('Triage new tickets with AI'), 'kind' => 'select', 'options' => 'ai_triage',
+            'words' => __('ai artificial intelligence triage category priority automatic sort')],
+        'config_ticket_default_view' => ['page' => 'ticket', 'section' => __('The tickets page'), 'label' => __('Tickets open as'), 'kind' => 'select', 'options' => [0 => __('A list'), 1 => __('A compact list'), 2 => __('A board (kanban)')],
+            'words' => __('default view list compact kanban board')],
+        'config_ticket_ordering' => ['page' => 'ticket', 'section' => __('The tickets page'), 'label' => __('Order tickets by hand on the board'), 'words' => __('kanban ordering drag order')] + $on_off,
+        'config_ticket_moving_columns' => ['page' => 'ticket', 'section' => __('The tickets page'), 'label' => __('Rearrange the board\'s columns'), 'words' => __('kanban columns move')] + $on_off,
 
         // Projects
-        'config_project_prefix' => ['page' => 'project', 'section' => 'Numbering', 'label' => 'Project prefix', 'words' => 'project number prj prefix'],
-        'config_project_next_number' => ['page' => 'project', 'section' => 'Numbering', 'label' => 'Next project number', 'words' => 'project number counter'],
+        'config_project_prefix' => ['page' => 'project', 'section' => __('Numbering'), 'label' => __('Project prefix'), 'words' => __('project number prj prefix')],
+        'config_project_next_number' => ['page' => 'project', 'section' => __('Numbering'), 'label' => __('Next project number'), 'words' => __('project number counter')],
 
         // Quotes
-        'config_quote_prefix' => ['page' => 'quote', 'section' => 'Numbering', 'label' => 'Quote prefix', 'words' => 'quote number quo prefix estimate'],
-        'config_quote_next_number' => ['page' => 'quote', 'section' => 'Numbering', 'label' => 'Next quote number', 'words' => 'quote number counter'],
-        'config_quote_footer' => ['page' => 'quote', 'section' => 'Footer', 'label' => 'Quote footer', 'kind' => 'long', 'words' => 'quote footer terms text'],
-        'config_quote_notification_email' => ['page' => 'quote', 'section' => 'Answers', 'label' => 'Email quote answers to', 'words' => 'accepted declined notification email'],
+        'config_quote_prefix' => ['page' => 'quote', 'section' => __('Numbering'), 'label' => __('Quote prefix'), 'words' => __('quote number quo prefix estimate')],
+        'config_quote_next_number' => ['page' => 'quote', 'section' => __('Numbering'), 'label' => __('Next quote number'), 'words' => __('quote number counter')],
+        'config_quote_footer' => ['page' => 'quote', 'section' => __('Footer'), 'label' => __('Quote footer'), 'kind' => 'long', 'words' => __('quote footer terms text')],
+        'config_quote_notification_email' => ['page' => 'quote', 'section' => __('Answers'), 'label' => __('Email quote answers to'), 'words' => __('accepted declined notification email')],
 
         // Invoices and billing
-        'config_invoice_prefix' => ['page' => 'invoice', 'section' => 'Numbering', 'label' => 'Invoice prefix', 'words' => 'invoice number inv prefix'],
-        'config_invoice_next_number' => ['page' => 'invoice', 'section' => 'Numbering', 'label' => 'Next invoice number', 'words' => 'invoice number counter'],
-        'config_recurring_invoice_prefix' => ['page' => 'invoice', 'section' => 'Numbering', 'label' => 'Recurring invoice prefix', 'words' => 'recurring invoice number rec prefix'],
-        'config_recurring_invoice_next_number' => ['page' => 'invoice', 'section' => 'Numbering', 'label' => 'Next recurring invoice number', 'words' => 'recurring invoice number'],
-        'config_invoice_footer' => ['page' => 'invoice', 'section' => 'On the invoice', 'label' => 'Invoice footer', 'kind' => 'long', 'words' => 'invoice footer terms bank details text'],
-        'config_invoice_show_tax_id' => ['page' => 'invoice', 'section' => 'On the invoice', 'label' => 'Show your tax ID', 'words' => 'tax id vat number on invoice'] + $on_off,
-        'config_invoice_late_fee_enable' => ['page' => 'invoice', 'section' => 'Late fees', 'label' => 'Late fees', 'words' => 'late fee overdue charge penalty'] + $on_off,
-        'config_invoice_late_fee_percent' => ['page' => 'invoice', 'section' => 'Late fees', 'label' => 'Late fee %', 'words' => 'late fee percent'],
-        'config_invoice_paid_notification_email' => ['page' => 'invoice', 'section' => 'Paid online', 'label' => 'Email invoices paid online to', 'words' => 'paid notification email stripe payment'],
-        'config_send_invoice_reminders' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Email payment reminders', 'words' => 'overdue reminder dunning past due'] + $on_off,
-        'reminder_before' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Remind before it is due', 'words' => 'reminder days before due'],
-        'reminder_after' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Remind after it is due', 'words' => 'reminder days late overdue'],
-        'reminder_repeat' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Then remind every', 'words' => 'reminder repeat'],
-        'config_invoice_reminder_days' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Reminder days', 'search' => false],
-        'config_invoice_reminder_repeat' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Reminders repeat every (days)', 'search' => false],
-        'config_statement_monthly' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Monthly statements', 'words' => 'statement balance monthly'] + $on_off,
-        'config_statement_day' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Statement day', 'words' => 'statement day of the month'],
-        'config_billing_email_attach_pdf' => ['page' => 'invoice', 'section' => 'Reminders and statements', 'label' => 'Attach the PDF to billing emails', 'words' => 'pdf attachment attach'] + $on_off,
-        'config_time_increment' => ['page' => 'invoice', 'section' => 'Billing time', 'label' => 'Round time to', 'kind' => 'select',
-            'options' => [6 => '6 minutes', 12 => '12 minutes', 15 => '15 minutes', 30 => '30 minutes', 60 => 'an hour'], 'words' => 'time rounding increment minutes billable time'],
-        'config_time_rounding' => ['page' => 'invoice', 'section' => 'Billing time', 'label' => 'Rounding', 'kind' => 'select', 'options' => ['nearest' => 'to the nearest', 'up' => 'always up'],
-            'words' => 'round up nearest'],
-        'config_time_minimum' => ['page' => 'invoice', 'section' => 'Billing time', 'label' => 'Least a ticket bills', 'kind' => 'select',
-            'options' => [0 => 'no minimum', 15 => '15 minutes', 30 => '30 minutes', 60 => '1 hour', 120 => '2 hours'], 'words' => 'minimum time billable'],
-        'config_time_item_name' => ['page' => 'invoice', 'section' => 'Billing time', 'label' => 'Invoice line for time', 'words' => 'support hourly line item name'],
-        'config_expense_markup' => ['page' => 'invoice', 'section' => 'Billable expenses', 'label' => 'Expense markup', 'words' => 'markup billable expenses percent'],
-        'config_mileage_unit' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Distance in', 'kind' => 'select', 'options' => ['mi' => 'miles', 'km' => 'kilometers'],
-            'words' => 'miles kilometres km mileage unit'],
-        'config_mileage_rate' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Paid back a mile', 'words' => 'mileage reimbursement rate irs'],
-        'config_mileage_category_id' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Mileage goes under', 'kind' => 'category', 'words' => 'mileage category travel expense'],
-        'config_trip_charge' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Trip charge', 'words' => 'trip charge travel fee call out'],
-        'config_trip_bill_rate' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Trips billed a mile', 'words' => 'trip billing rate mile'],
-        'config_trip_included' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'The trip charge covers the first', 'words' => 'trip included distance'],
-        'config_trip_item_name' => ['page' => 'invoice', 'section' => 'Trips and mileage', 'label' => 'Invoice line for trips', 'words' => 'trip travel line item name'],
+        'config_invoice_prefix' => ['page' => 'invoice', 'section' => __('Numbering'), 'label' => __('Invoice prefix'), 'words' => __('invoice number inv prefix')],
+        'config_invoice_next_number' => ['page' => 'invoice', 'section' => __('Numbering'), 'label' => __('Next invoice number'), 'words' => __('invoice number counter')],
+        'config_recurring_invoice_prefix' => ['page' => 'invoice', 'section' => __('Numbering'), 'label' => __('Recurring invoice prefix'), 'words' => __('recurring invoice number rec prefix')],
+        'config_recurring_invoice_next_number' => ['page' => 'invoice', 'section' => __('Numbering'), 'label' => __('Next recurring invoice number'), 'words' => __('recurring invoice number')],
+        'config_invoice_footer' => ['page' => 'invoice', 'section' => __('On the invoice'), 'label' => __('Invoice footer'), 'kind' => 'long', 'words' => __('invoice footer terms bank details text')],
+        'config_invoice_show_tax_id' => ['page' => 'invoice', 'section' => __('On the invoice'), 'label' => __('Show your tax ID'), 'words' => __('tax id vat number on invoice')] + $on_off,
+        'config_invoice_late_fee_enable' => ['page' => 'invoice', 'section' => __('Late fees'), 'label' => __('Late fees'), 'words' => __('late fee overdue charge penalty')] + $on_off,
+        'config_invoice_late_fee_percent' => ['page' => 'invoice', 'section' => __('Late fees'), 'label' => __('Late fee %'), 'words' => __('late fee percent')],
+        'config_invoice_paid_notification_email' => ['page' => 'invoice', 'section' => __('Paid online'), 'label' => __('Email invoices paid online to'), 'words' => __('paid notification email stripe payment')],
+        'config_send_invoice_reminders' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Email payment reminders'), 'words' => __('overdue reminder dunning past due')] + $on_off,
+        'reminder_before' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Remind before it is due'), 'words' => __('reminder days before due')],
+        'reminder_after' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Remind after it is due'), 'words' => __('reminder days late overdue')],
+        'reminder_repeat' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Then remind every'), 'words' => 'reminder repeat'],
+        'config_invoice_reminder_days' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Reminder days'), 'search' => false],
+        'config_invoice_reminder_repeat' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Reminders repeat every (days)'), 'search' => false],
+        'config_statement_monthly' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Monthly statements'), 'words' => __('statement balance monthly')] + $on_off,
+        'config_statement_day' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Statement day'), 'words' => __('statement day of the month')],
+        'config_billing_email_attach_pdf' => ['page' => 'invoice', 'section' => __('Reminders and statements'), 'label' => __('Attach the PDF to billing emails'), 'words' => __('pdf attachment attach')] + $on_off,
+        'config_time_increment' => ['page' => 'invoice', 'section' => __('Billing time'), 'label' => __('Round time to'), 'kind' => 'select',
+            'options' => [6 => '6 minutes', 12 => '12 minutes', 15 => '15 minutes', 30 => '30 minutes', 60 => 'an hour'], 'words' => __('time rounding increment minutes billable time')],
+        'config_time_rounding' => ['page' => 'invoice', 'section' => __('Billing time'), 'label' => __('Rounding'), 'kind' => 'select', 'options' => ['nearest' => __('to the nearest'), 'up' => 'always up'],
+            'words' => __('round up nearest')],
+        'config_time_minimum' => ['page' => 'invoice', 'section' => __('Billing time'), 'label' => __('Least a ticket bills'), 'kind' => 'select',
+            'options' => [0 => 'no minimum', 15 => '15 minutes', 30 => '30 minutes', 60 => '1 hour', 120 => '2 hours'], 'words' => __('minimum time billable')],
+        'config_time_item_name' => ['page' => 'invoice', 'section' => __('Billing time'), 'label' => __('Invoice line for time'), 'words' => __('support hourly line item name')],
+        'config_expense_markup' => ['page' => 'invoice', 'section' => __('Billable expenses'), 'label' => __('Expense markup'), 'words' => __('markup billable expenses percent')],
+        'config_mileage_unit' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Distance in'), 'kind' => 'select', 'options' => ['mi' => 'miles', 'km' => 'kilometers'],
+            'words' => __('miles kilometres km mileage unit')],
+        'config_mileage_rate' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Paid back a mile'), 'words' => __('mileage reimbursement rate irs')],
+        'config_mileage_category_id' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Mileage goes under'), 'kind' => 'category', 'words' => __('mileage category travel expense')],
+        'config_trip_charge' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Trip charge'), 'words' => __('trip charge travel fee call out')],
+        'config_trip_bill_rate' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Trips billed a mile'), 'words' => __('trip billing rate mile')],
+        'config_trip_included' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('The trip charge covers the first'), 'words' => __('trip included distance')],
+        'config_trip_item_name' => ['page' => 'invoice', 'section' => __('Trips and mileage'), 'label' => __('Invoice line for trips'), 'words' => __('trip travel line item name')],
 
         // Mail - the section is the tab it is on
-        'config_smtp_provider' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'Sending provider', 'kind' => 'select', 'options' => 'mail_providers',
-            'words' => 'smtp outbound send email server provider google workspace microsoft 365 office'],
-        'config_smtp_host' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'SMTP host', 'words' => 'smtp server host'],
-        'config_smtp_port' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'SMTP port', 'words' => 'smtp port 587 465 25'],
-        'config_smtp_encryption' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'SMTP encryption', 'kind' => 'select', 'options' => 'mail_encryption',
-            'words' => 'smtp tls ssl starttls secure'],
-        'config_smtp_username' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'SMTP username', 'words' => 'smtp user login sign in'],
-        'config_smtp_password' => ['page' => 'mail', 'tab' => 'sending', 'section' => 'Sending', 'label' => 'SMTP password', 'kind' => 'secret', 'words' => 'smtp password app password'],
-        'config_imap_provider' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'Receiving provider', 'kind' => 'select', 'options' => 'mail_providers',
-            'words' => 'imap inbound receive mailbox email to ticket inbox'],
-        'config_imap_host' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'IMAP host', 'words' => 'imap server host'],
-        'config_imap_port' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'IMAP port', 'words' => 'imap port 993 143'],
-        'config_imap_encryption' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'IMAP encryption', 'kind' => 'select', 'options' => 'mail_encryption',
-            'words' => 'imap tls ssl starttls secure'],
-        'config_imap_username' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'IMAP username', 'words' => 'imap user login mailbox address'],
-        'config_imap_password' => ['page' => 'mail', 'tab' => 'receiving', 'section' => 'Receiving', 'label' => 'IMAP password', 'kind' => 'secret', 'words' => 'imap password app password'],
-        'config_mail_oauth_client_id' => ['page' => 'mail', 'tab' => 'oauth', 'section' => 'OAuth', 'label' => 'OAuth client ID', 'words' => 'oauth microsoft 365 google workspace app registration entra'],
-        'config_mail_oauth_client_secret' => ['page' => 'mail', 'tab' => 'oauth', 'section' => 'OAuth', 'label' => 'OAuth client secret', 'kind' => 'secret', 'words' => 'oauth secret'],
-        'config_mail_oauth_tenant_id' => ['page' => 'mail', 'tab' => 'oauth', 'section' => 'OAuth', 'label' => 'Tenant ID', 'words' => 'oauth microsoft 365 entra tenant directory'],
-        'config_mail_oauth_refresh_token' => ['page' => 'mail', 'tab' => 'oauth', 'section' => 'OAuth', 'label' => 'Refresh token', 'kind' => 'secret', 'words' => 'oauth token connect consent'],
-        'config_mail_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'System emails come from', 'words' => 'from address sender noreply'],
-        'config_mail_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'System emails\' sender name', 'words' => 'from name sender'],
-        'config_invoice_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Invoices come from', 'words' => 'billing from address sender'],
-        'config_invoice_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Invoices\' sender name', 'words' => 'billing from name sender'],
-        'config_quote_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Quotes come from', 'words' => 'sales from address sender'],
-        'config_quote_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Quotes\' sender name', 'words' => 'sales from name sender'],
-        'config_ticket_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Ticket emails come from', 'words' => 'support from address sender'],
-        'config_ticket_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => 'From addresses', 'label' => 'Ticket emails\' sender name', 'words' => 'support from name sender'],
-        'test_email' => ['page' => 'mail', 'tab' => 'tests', 'section' => 'Tests', 'label' => 'Send a test email', 'words' => 'test email check smtp working'],
+        'config_smtp_provider' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('Sending provider'), 'kind' => 'select', 'options' => 'mail_providers',
+            'words' => __('smtp outbound send email server provider google workspace microsoft 365 office')],
+        'config_smtp_host' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('SMTP host'), 'words' => __('smtp server host')],
+        'config_smtp_port' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('SMTP port'), 'words' => 'smtp port 587 465 25'],
+        'config_smtp_encryption' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('SMTP encryption'), 'kind' => 'select', 'options' => 'mail_encryption',
+            'words' => __('smtp tls ssl starttls secure')],
+        'config_smtp_username' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('SMTP username'), 'words' => __('smtp user login sign in')],
+        'config_smtp_password' => ['page' => 'mail', 'tab' => 'sending', 'section' => __('Sending'), 'label' => __('SMTP password'), 'kind' => 'secret', 'words' => __('smtp password app password')],
+        'config_imap_provider' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('Receiving provider'), 'kind' => 'select', 'options' => 'mail_providers',
+            'words' => __('imap inbound receive mailbox email to ticket inbox')],
+        'config_imap_host' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('IMAP host'), 'words' => __('imap server host')],
+        'config_imap_port' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('IMAP port'), 'words' => 'imap port 993 143'],
+        'config_imap_encryption' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('IMAP encryption'), 'kind' => 'select', 'options' => 'mail_encryption',
+            'words' => __('imap tls ssl starttls secure')],
+        'config_imap_username' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('IMAP username'), 'words' => __('imap user login mailbox address')],
+        'config_imap_password' => ['page' => 'mail', 'tab' => 'receiving', 'section' => __('Receiving'), 'label' => __('IMAP password'), 'kind' => 'secret', 'words' => __('imap password app password')],
+        'config_mail_oauth_client_id' => ['page' => 'mail', 'tab' => 'oauth', 'section' => __('OAuth'), 'label' => __('OAuth client ID'), 'words' => __('oauth microsoft 365 google workspace app registration entra')],
+        'config_mail_oauth_client_secret' => ['page' => 'mail', 'tab' => 'oauth', 'section' => __('OAuth'), 'label' => __('OAuth client secret'), 'kind' => 'secret', 'words' => 'oauth secret'],
+        'config_mail_oauth_tenant_id' => ['page' => 'mail', 'tab' => 'oauth', 'section' => __('OAuth'), 'label' => __('Tenant ID'), 'words' => __('oauth microsoft 365 entra tenant directory')],
+        'config_mail_oauth_refresh_token' => ['page' => 'mail', 'tab' => 'oauth', 'section' => __('OAuth'), 'label' => __('Refresh token'), 'kind' => 'secret', 'words' => __('oauth token connect consent')],
+        'config_mail_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('System emails come from'), 'words' => __('from address sender noreply')],
+        'config_mail_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('System emails\' sender name'), 'words' => __('from name sender')],
+        'config_invoice_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Invoices come from'), 'words' => __('billing from address sender')],
+        'config_invoice_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Invoices\' sender name'), 'words' => __('billing from name sender')],
+        'config_quote_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Quotes come from'), 'words' => __('sales from address sender')],
+        'config_quote_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Quotes\' sender name'), 'words' => __('sales from name sender')],
+        'config_ticket_from_email' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Ticket emails come from'), 'words' => __('support from address sender')],
+        'config_ticket_from_name' => ['page' => 'mail', 'tab' => 'from', 'section' => __('From addresses'), 'label' => __('Ticket emails\' sender name'), 'words' => __('support from name sender')],
+        'test_email' => ['page' => 'mail', 'tab' => 'tests', 'section' => __('Tests'), 'label' => __('Send a test email'), 'words' => __('test email check smtp working')],
 
         // Notifications
-        'config_enable_alert_domain_expire' => ['page' => 'notification', 'section' => 'Alerts for your team', 'label' => 'Domains about to expire', 'words' => 'domain expiry expiration alert'] + $on_off,
-        'config_recurring_auto_send_invoice' => ['page' => 'notification', 'section' => 'Emails to clients', 'label' => 'Email the invoices recurring invoices make', 'words' => 'recurring invoice auto send email'] + $on_off,
-        'config_ticket_client_general_notifications' => ['page' => 'notification', 'section' => 'Emails to clients', 'label' => 'Email clients about their tickets', 'words' => 'ticket notification client email opened closed'] + $on_off,
+        'config_enable_alert_domain_expire' => ['page' => 'notification', 'section' => __('Alerts for your team'), 'label' => __('Domains about to expire'), 'words' => __('domain expiry expiration alert')] + $on_off,
+        'config_recurring_auto_send_invoice' => ['page' => 'notification', 'section' => __('Emails to clients'), 'label' => __('Email the invoices recurring invoices make'), 'words' => __('recurring invoice auto send email')] + $on_off,
+        'config_ticket_client_general_notifications' => ['page' => 'notification', 'section' => __('Emails to clients'), 'label' => __('Email clients about their tickets'), 'words' => __('ticket notification client email opened closed')] + $on_off,
 
         // Security
-        'config_login_message' => ['page' => 'security', 'section' => 'The sign-in page', 'label' => 'Sign-in page message', 'kind' => 'long', 'words' => 'login message banner notice'],
-        'config_login_key_required' => ['page' => 'security', 'section' => 'The sign-in page', 'label' => 'Require a login key', 'words' => 'login key secret url hide sign in'] + $on_off,
-        'config_login_key_secret' => ['page' => 'security', 'section' => 'The sign-in page', 'label' => 'Login key', 'quiet' => true, 'words' => 'login key secret url address'],
-        'config_login_remember_me_expire' => ['page' => 'security', 'section' => 'Two-step sign-in', 'label' => 'Remember a browser for', 'words' => '2fa mfa remember me days trusted device'],
-        'config_login_alert_failures' => ['page' => 'security', 'section' => 'Failed sign-ins', 'label' => 'Tell admins', 'kind' => 'select', 'options' => 'sign_in_alerts', 'words' => 'failed login brute force lockout alert'],
-        'config_share_max_hours' => ['page' => 'security', 'section' => 'Shared links', 'label' => 'Longest a shared link can last', 'kind' => 'select', 'options' => 'share_max', 'words' => 'share link expiry guest'],
-        'config_share_require_protection' => ['page' => 'security', 'section' => 'Shared links', 'label' => 'Shared passwords need a passphrase or code', 'words' => 'share passphrase code protect'] + $on_off,
+        'config_login_message' => ['page' => 'security', 'section' => __('The sign-in page'), 'label' => __('Sign-in page message'), 'kind' => 'long', 'words' => __('login message banner notice')],
+        'config_login_key_required' => ['page' => 'security', 'section' => __('The sign-in page'), 'label' => __('Require a login key'), 'words' => __('login key secret url hide sign in')] + $on_off,
+        'config_login_key_secret' => ['page' => 'security', 'section' => __('The sign-in page'), 'label' => __('Login key'), 'quiet' => true, 'words' => __('login key secret url address')],
+        'config_login_remember_me_expire' => ['page' => 'security', 'section' => __('Two-step sign-in'), 'label' => __('Remember a browser for'), 'words' => __('2fa mfa remember me days trusted device')],
+        'config_login_alert_failures' => ['page' => 'security', 'section' => __('Failed sign-ins'), 'label' => __('Tell admins'), 'kind' => 'select', 'options' => 'sign_in_alerts', 'words' => __('failed login brute force lockout alert')],
+        'config_share_max_hours' => ['page' => 'security', 'section' => __('Shared links'), 'label' => __('Longest a shared link can last'), 'kind' => 'select', 'options' => 'share_max', 'words' => __('share link expiry guest')],
+        'config_share_require_protection' => ['page' => 'security', 'section' => __('Shared links'), 'label' => __('Shared passwords need a passphrase or code'), 'words' => __('share passphrase code protect')] + $on_off,
 
         // Client portal
-        'config_client_portal_require_mfa' => ['page' => 'client_portal', 'section' => 'Signing in', 'label' => 'Require two-step sign-in', 'words' => 'portal mfa 2fa two factor contacts'] + $on_off,
-        'config_client_portal_signup' => ['page' => 'client_portal', 'section' => 'Signing up', 'label' => 'Let people sign up', 'words' => 'portal sign up register registration self create account domain'] + $on_off,
+        'config_client_portal_require_mfa' => ['page' => 'client_portal', 'section' => __('Signing in'), 'label' => __('Require two-step sign-in'), 'words' => __('portal mfa 2fa two factor contacts')] + $on_off,
+        'config_client_portal_signup' => ['page' => 'client_portal', 'section' => __('Signing up'), 'label' => __('Let people sign up'), 'words' => __('portal sign up register registration self create account domain')] + $on_off,
+        'config_client_portal_footer_text' => ['page' => 'client_portal', 'section' => __('Footer'), 'label' => __('Footer text'), 'words' => __('portal footer text tagline slogan powered by')],
 
         // Single sign-on
-        'config_azure_client_id' => ['page' => 'identity', 'section' => 'Microsoft Entra', 'label' => 'Application (client) ID', 'words' => 'sso entra azure microsoft 365 single sign-on portal'],
-        'config_azure_client_secret' => ['page' => 'identity', 'section' => 'Microsoft Entra', 'label' => 'Client secret', 'kind' => 'secret', 'words' => 'sso entra azure secret'],
+        'config_azure_client_id' => ['page' => 'identity', 'section' => __('Microsoft Entra'), 'label' => __('Application (client) ID'), 'words' => __('sso entra azure microsoft 365 single sign-on portal')],
+        'config_azure_client_secret' => ['page' => 'identity', 'section' => __('Microsoft Entra'), 'label' => __('Client secret'), 'kind' => 'secret', 'words' => __('sso entra azure secret')],
 
         // Modules
-        'config_module_enable_itdoc' => ['page' => 'module', 'section' => 'Modules', 'label' => 'IT documentation', 'words' => 'module itdoc documentation assets credentials'] + $on_off,
-        'config_module_enable_ticketing' => ['page' => 'module', 'section' => 'Modules', 'label' => 'Ticketing', 'words' => 'module tickets support'] + $on_off,
-        'config_module_enable_accounting' => ['page' => 'module', 'section' => 'Modules', 'label' => 'Invoicing and accounting', 'words' => 'module accounting invoices billing financial'] + $on_off,
-        'config_client_portal_enable' => ['page' => 'module', 'section' => 'Modules', 'label' => 'Client portal', 'words' => 'module portal clients'] + $on_off,
-        'config_whitelabel_key' => ['page' => 'module', 'section' => 'White-label', 'label' => 'White-label key', 'kind' => 'secret', 'words' => 'whitelabel white label powered by banner'],
-        'config_whitelabel_enabled' => ['page' => 'module', 'section' => 'White-label', 'label' => 'White-label', 'search' => false] + $on_off,
+        'config_module_enable_itdoc' => ['page' => 'module', 'section' => __('Modules'), 'label' => __('IT documentation'), 'words' => __('module itdoc documentation assets credentials')] + $on_off,
+        'config_module_enable_ticketing' => ['page' => 'module', 'section' => __('Modules'), 'label' => __('Ticketing'), 'words' => __('module tickets support')] + $on_off,
+        'config_module_enable_accounting' => ['page' => 'module', 'section' => __('Modules'), 'label' => __('Invoicing and accounting'), 'words' => __('module accounting invoices billing financial')] + $on_off,
+        'config_client_portal_enable' => ['page' => 'module', 'section' => __('Modules'), 'label' => __('Client portal'), 'words' => __('module portal clients')] + $on_off,
+        'config_whitelabel_key' => ['page' => 'module', 'section' => __('White-label'), 'label' => __('White-label key'), 'kind' => 'secret', 'words' => __('whitelabel white label powered by banner')],
+        'config_whitelabel_enabled' => ['page' => 'module', 'section' => __('White-label'), 'label' => 'White-label', 'search' => false] + $on_off,
 
         // Logs
-        'config_log_retention' => ['page' => 'logs', 'section' => 'Keeping logs', 'label' => 'Keep the audit log for', 'words' => 'audit log retention days keep'],
-        'config_app_log_retention' => ['page' => 'logs', 'section' => 'Keeping logs', 'label' => 'Keep the app logs for', 'words' => 'app log retention days'],
-        'config_log_forward_enabled' => ['page' => 'logs', 'section' => 'Sending logs on', 'label' => 'Send log entries to a syslog server', 'words' => 'syslog siem graylog splunk wazuh sentinel forward'] + $on_off,
-        'config_log_forward_host' => ['page' => 'logs', 'section' => 'Sending logs on', 'label' => 'Syslog server', 'words' => 'syslog host'],
+        'config_log_retention' => ['page' => 'logs', 'section' => __('Keeping logs'), 'label' => __('Keep the audit log for'), 'words' => __('audit log retention days keep')],
+        'config_app_log_retention' => ['page' => 'logs', 'section' => __('Keeping logs'), 'label' => __('Keep the app logs for'), 'words' => __('app log retention days')],
+        'config_log_forward_enabled' => ['page' => 'logs', 'section' => __('Sending logs on'), 'label' => __('Send log entries to a syslog server'), 'words' => __('syslog siem graylog splunk wazuh sentinel forward')] + $on_off,
+        'config_log_forward_host' => ['page' => 'logs', 'section' => __('Sending logs on'), 'label' => __('Syslog server'), 'words' => 'syslog host'],
 
         // Telemetry
-        'config_telemetry' => ['page' => 'telemetry', 'section' => 'Nightly report', 'label' => 'Send the ITFlow project a nightly report', 'words' => 'telemetry statistics usage data privacy'] + $on_off,
+        'config_telemetry' => ['page' => 'telemetry', 'section' => __('Nightly report'), 'label' => __('Send the ITFlow project a nightly report'), 'words' => __('telemetry statistics usage data privacy')] + $on_off,
     ];
-    return $fields;
+    return $cache[$locale] = $fields;
 }
 
 /* What Find a setting searches - every page and setting, with where it is. */
@@ -288,7 +293,7 @@ function settingsSearchIndex() {
     $pages = settingsPages();
     $index = [];
     foreach ($pages as $key => $page) {
-        $index[] = ['label' => $page['title'], 'where' => 'Settings', 'url' => $page['url'], 'icon' => $page['icon'], 'words' => strtolower($page['about']), 'page' => true];
+        $index[] = ['label' => __($page['title']), 'where' => __('Settings'), 'url' => $page['url'], 'icon' => $page['icon'], 'words' => mb_strtolower(__($page['about'])), 'page' => true]; // i18n-dynamic: settingsPages()
     }
     foreach (settingsFields() as $name => $field) {
         if (($field['search'] ?? true) === false || !isset($pages[$field['page']])) {
@@ -296,7 +301,7 @@ function settingsSearchIndex() {
         }
         $page = $pages[$field['page']];
         $url = $page['url'] . (isset($field['tab']) ? '?tab=' . $field['tab'] : '') . '#setting=' . $name;
-        $index[] = ['label' => $field['label'], 'where' => $page['title'] . ' › ' . $field['section'], 'url' => $url, 'icon' => $page['icon'], 'words' => strtolower($field['words'] ?? '')];
+        $index[] = ['label' => __($field['label']), 'where' => __($page['title']) . ' › ' . __($field['section']), 'url' => $url, 'icon' => $page['icon'], 'words' => mb_strtolower($field['words'] ?? '')]; // i18n-dynamic: settingsFields()
     }
     return $index;
 }
@@ -354,7 +359,7 @@ function settingsSearch($raw_query, $limit = 3) {
     });
     $items = [];
     foreach (array_slice($scored, 0, $limit) as [, , $entry]) {
-        $items[] = ['title' => $entry['label'], 'subtitle' => $entry['where'] === 'Settings' ? 'Settings page' : 'Settings › ' . $entry['where'], 'url' => '/admin/' . $entry['url']];
+        $items[] = ['title' => $entry['label'], 'subtitle' => $entry['where'] === 'Settings' ? __('Settings page') : 'Settings › ' . $entry['where'], 'url' => '/admin/' . $entry['url']];
     }
     return $items;
 }
@@ -380,9 +385,9 @@ function settingsPageStart($page_key, $actions_html = '') {
     <div class="itflow-settings-head" data-settings-page="<?= escapeHtml($page_key) ?>">
         <div class="itflow-settings-head-icon"><i class="fas fa-fw <?= escapeHtml($page['icon']) ?>"></i></div>
         <div class="flex-grow-1 min-w-0">
-            <a href="settings.php" class="small text-body-secondary text-decoration-none"><i class="fas fa-sliders-h me-1"></i>Settings</a>
-            <h1 class="h4 mb-1"><?= escapeHtml($page['title']) ?></h1>
-            <p class="text-body-secondary mb-0"><?= escapeHtml($page['about']) ?></p>
+            <a href="settings.php" class="small text-body-secondary text-decoration-none"><i class="fas fa-sliders-h me-1"></i><?= escapeHtml(__('Settings')) ?></a>
+            <h1 class="h4 mb-1"><?= escapeHtml(__($page['title'])) /* i18n-dynamic: settingsPages() */ ?></h1>
+            <p class="text-body-secondary mb-0"><?= escapeHtml(__($page['about'])) /* i18n-dynamic: settingsPages() */ ?></p>
         </div>
         <?php if ($actions_html !== '') { ?>
             <div class="flex-shrink-0"><?= $actions_html ?></div>
@@ -434,9 +439,9 @@ function settingsError($name) {
     return (string) ($settings_kept['errors'][$name] ?? '');
 }
 
-/* A field's label - from settingsFields(), unless given. */
+/* A field's label as shown - from settingsFields(), unless given - in the interface language. The audit log names fields by the registry's English (settingsChangeLines()). */
 function settingsLabel($name, $label = null) {
-    return $label ?? (settingsFields()[$name]['label'] ?? $name);
+    return __($label ?? (settingsFields()[$name]['label'] ?? $name)); // i18n-dynamic: settingsFields() or the page's own label
 }
 
 /*
@@ -550,10 +555,10 @@ function settingsSwitch($name, $saved, array $options = []) {
 function settingsSaveBar($button_name, $label = 'Save', $extra_html = '') {
     ob_start(); ?>
     <div class="itflow-settings-savebar" data-settings-savebar>
-        <span class="itflow-settings-savebar-note text-body-secondary small me-auto" data-settings-dirty-note><i class="fas fa-circle text-warning me-2"></i>Unsaved changes</span>
+        <span class="itflow-settings-savebar-note text-body-secondary small me-auto" data-settings-dirty-note><i class="fas fa-circle text-warning me-2"></i><?= escapeHtml(__('Unsaved changes')) ?></span>
         <?= $extra_html ?>
-        <button type="reset" class="btn btn-link text-decoration-none" data-settings-undo>Undo changes</button>
-        <button type="submit" name="<?= escapeHtml($button_name) ?>" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= escapeHtml($label) ?></button>
+        <button type="reset" class="btn btn-link text-decoration-none" data-settings-undo><?= escapeHtml(__('Undo changes')) ?></button>
+        <button type="submit" name="<?= escapeHtml($button_name) ?>" class="btn btn-primary"><i class="fas fa-check me-2"></i><?= escapeHtml(__($label)) /* i18n-dynamic: 'Save' or the page's own */ ?></button>
     </div>
     <?php return ob_get_clean();
 }
@@ -563,7 +568,7 @@ function settingsSaveBar($button_name, $label = 'Save', $extra_html = '') {
  * Connect, Save and send a test: Save, put first and out of sight.
  */
 function settingsEnterSaves($button_name) {
-    return '<button type="submit" name="' . escapeHtml($button_name) . '" class="visually-hidden" tabindex="-1" aria-hidden="true">Save</button>';
+    return '<button type="submit" name="' . escapeHtml($button_name) . '" class="visually-hidden" tabindex="-1" aria-hidden="true">' . __('Save') . '</button>';
 }
 
 /*
@@ -645,6 +650,8 @@ function settingsLogValue($name, $value) {
             $options = settingsMailProviders();
         } elseif ($options === 'mail_encryption') {
             $options = settingsMailEncryption();
+        } elseif ($options === 'interface_languages') {
+            $options = i18nLanguages();
         } elseif ($options === 'ai_triage') {
             $options = [0 => 'off', 1 => 'suggest', 2 => 'fill in'];
         } elseif (is_string($options)) {
@@ -720,20 +727,23 @@ function settingsWrite($table, array $before, array $after) {
 /* Save a page's settings in one table, log what changed and say so - the changed ones, by name. */
 function settingsSave($page_key, array $before, array $after, $table = 'settings', array $also_changed = []) {
     $changed = settingsWrite($table, $before, $after);
-    settingsSaid($page_key, array_merge(settingsChangeLines($before, $changed), $also_changed));
+    // The audit log gets the change in English, the note on screen in the interface language
+    settingsSaid($page_key, array_merge(i18nEnglish(fn () => settingsChangeLines($before, $changed)), $also_changed), array_merge(settingsChangeLines($before, $changed), $also_changed));
     return $changed;
 }
 
 /* Log and say what a save changed - or that it changed nothing. */
-function settingsSaid($page_key, array $lines) {
+function settingsSaid($page_key, array $lines, ?array $shown = null) {
     global $session_name;
-    $title = settingsPages()[$page_key]['title'] ?? 'Settings';
+    $title = i18nEnglish(fn () => settingsPages()[$page_key]['title'] ?? 'Settings'); // English for the audit log; shown through __()
     if (!$lines) {
-        flashAlert("Nothing changed on " . escapeHtml($title), 'info');
+        flashAlert(escapeHtml(__('Nothing changed on %s', __($title))), 'info'); // i18n-dynamic: settingsPages()
         return;
     }
     logAudit("Settings", "Edit", escapeSql("$session_name changed $title: " . implode('; ', $lines)));
-    flashAlert("<strong>" . escapeHtml($title) . "</strong> saved - " . escapeHtml(count($lines) === 1 ? $lines[0] : count($lines) . ' changes'));
+    // The audit log stays in English; the note on screen is in the interface language
+    $shown = $shown ?? $lines;
+    flashAlert(__('%1$s saved - %2$s', "<strong>" . escapeHtml(__($title)) . "</strong>", escapeHtml(count($shown) === 1 ? $shown[0] : _n('%d change', '%d changes', count($shown))))); // i18n-dynamic: settingsPages()
 }
 
 /*
@@ -751,7 +761,7 @@ function settingsRefuse($page_key, array $errors, $url = null) {
         $values[$name] = (string) $value;
     }
     $_SESSION['settings_kept'] = ['page' => $page_key, 'values' => $values, 'errors' => $errors, 'at' => time()];
-    flashAlert('Not saved - ' . (count($errors) === 1 ? 'one thing' : count($errors) . ' things') . ' to put right', 'error');
+    flashAlert(escapeHtml(_n('Not saved - one thing to put right', 'Not saved - %d things to put right', count($errors))), 'error');
     redirect($url);
 }
 
@@ -765,17 +775,17 @@ function settingsImageProblem($file, array $extensions, array $types, $kinds, $m
         return '';
     }
     if (in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) || ($file['size'] ?? 0) > $max_bytes) {
-        return 'That file is too large - up to ' . round($max_bytes / 1048576) . ' MB.';
+        return __('That file is too large - up to %s MB.', round($max_bytes / 1048576));
     }
     if (!checkFileUpload($file, $extensions)) {
-        return "That isn't a $kinds file.";
+        return __("That isn't a %s file.", $kinds);
     }
     if ($types === ['ico']) {
         $head = (string) @file_get_contents($file['tmp_name'], false, null, 0, 4);
-        return $head === "\x00\x00\x01\x00" ? '' : "That isn't a $kinds file.";
+        return $head === "\x00\x00\x01\x00" ? '' : __("That isn't a %s file.", $kinds);
     }
     $image = @getimagesize($file['tmp_name']);
-    return $image && in_array($image[2], $types, true) ? '' : "That isn't a $kinds picture.";
+    return $image && in_array($image[2], $types, true) ? '' : __("That isn't a %s picture.", $kinds);
 }
 
 /* What a numbered record's prefix and number are kept in - the next one's setting names, and the table. */
@@ -814,19 +824,19 @@ function settingsNumberingCheck($kind, array $post, array $saved = []) {
     $number = ctype_digit($number_text) ? intval($number_text) : -1;
     $errors = [];
     if ($prefix === '') {
-        $errors[$numbering['prefix']] = 'Every ' . $numbering['what'] . ' number starts with one - TCK-, INV- or the like.';
+        $errors[$numbering['prefix']] = __('Every %s number starts with one - TCK-, INV- or the like.', __($numbering['what'])); // i18n-dynamic - ticket, project, quote, invoice, recurring invoice
     } elseif ($kind === 'ticket' && !preg_match('/^[A-Za-z-]+$/', $prefix)) {
-        $errors[$numbering['prefix']] = 'Only letters and hyphens - replies by email find their ticket by it.';
+        $errors[$numbering['prefix']] = __('Only letters and hyphens - replies by email find their ticket by it.');
     } elseif (preg_match('/\s/', $prefix)) {
-        $errors[$numbering['prefix']] = 'No spaces in it.';
+        $errors[$numbering['prefix']] = __('No spaces in it.');
     }
     if ($number < 1 || $number > 2000000000) {
-        $errors[$numbering['number']] = 'A whole number, 1 or more.';
+        $errors[$numbering['number']] = __('A whole number, 1 or more.');
     } elseif (!isset($errors[$numbering['prefix']])
         && !($saved && $prefix === (string) $saved[$numbering['prefix']] && $number === intval($saved[$numbering['number']]))) {
         $in_use = settingsNumberInUse($kind, $prefix);
         if ($number <= $in_use) {
-            $errors[$numbering['number']] = $prefix . $in_use . ' is already in use - the next one has to be ' . ($in_use + 1) . ' or more.';
+            $errors[$numbering['number']] = __('%1$s is already in use - the next one has to be %2$d or more.', $prefix . $in_use, $in_use + 1);
         }
     }
     return [$prefix, $number, $errors];
@@ -854,7 +864,7 @@ function settingsMailServerCheck($server, array $before, array $post) {
     $after[$p . 'provider'] = $provider;
 
     if (!in_array($provider, ['', $standard, 'google_oauth', 'microsoft_oauth'], true)) {
-        $errors[$p . 'provider'] = 'Pick one of these.';
+        $errors[$p . 'provider'] = __('Pick one of these.');
 
     } elseif ($provider === $standard) {
         $host = trim((string) ($post[$p . 'host'] ?? ''));
@@ -863,24 +873,24 @@ function settingsMailServerCheck($server, array $before, array $post) {
         $password = (string) ($post[$p . 'password'] ?? '');
 
         if ($host === '') {
-            $errors[$p . 'host'] = "The server's name - $example, or the like.";
+            $errors[$p . 'host'] = __("The server's name - %s, or the like.", $example);
         } elseif (mb_strlen($host) > 200 || !(preg_match('/^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$/', $host) || filter_var(trim($host, '[]'), FILTER_VALIDATE_IP))) {
-            $errors[$p . 'host'] = "Only the server's name or IP address - $example. The port and encryption have their own fields.";
+            $errors[$p . 'host'] = __("Only the server's name or IP address - %s. The port and encryption have their own fields.", $example);
         }
         if (!ctype_digit($port) || intval($port) < 1 || intval($port) > 65535) {
-            $errors[$p . 'port'] = "A port number - $ports.";
+            $errors[$p . 'port'] = __('A port number - %s.', $ports);
         }
         if (!in_array($encryption, ['', 'tls', 'ssl'], true) && $encryption !== (string) $before[$p . 'encryption']) {
-            $errors[$p . 'encryption'] = 'Pick one of these.';
+            $errors[$p . 'encryption'] = __('Pick one of these.');
         }
         if (mb_strlen($password) > 200) {
-            $errors[$p . 'password'] = 'Up to 200 characters.';
+            $errors[$p . 'password'] = __('Up to 200 characters.');
         }
         $password = $username === '' ? '' : ($password !== '' ? $password : (string) $before[$p . 'password']);
         if ($server === 'imap' && $username === '') {
-            $errors[$p . 'username'] = 'The mailbox to read - usually its address.';
+            $errors[$p . 'username'] = __('The mailbox to read - usually its address.');
         } elseif ($username !== '' && $password === '' && !isset($errors[$p . 'password'])) {
-            $errors[$p . 'password'] = $server === 'smtp' ? 'And its password - or no username, if the server takes email without signing in.' : 'And its password.';
+            $errors[$p . 'password'] = $server === 'smtp' ? __('And its password - or no username, if the server takes email without signing in.') : __('And its password.');
         }
         $after[$p . 'host'] = $host;
         $after[$p . 'port'] = intval($port);
@@ -890,7 +900,7 @@ function settingsMailServerCheck($server, array $before, array $post) {
 
     } elseif ($provider !== '') {
         if ($server === 'imap' && $username === '') {
-            $errors[$p . 'username'] = 'The mailbox to read - its address.';
+            $errors[$p . 'username'] = __('The mailbox to read - its address.');
         }
         $after[$p . 'host'] = '';
         $after[$p . 'port'] = null;
@@ -903,7 +913,7 @@ function settingsMailServerCheck($server, array $before, array $post) {
 
 /* What is wrong with an email address that may be left empty - '' when nothing is. */
 function settingsEmailProblem($email) {
-    return $email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL) ? 'That is not an email address.' : '';
+    return $email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL) ? __('That is not an email address.') : '';
 }
 
 /*
@@ -917,18 +927,18 @@ function settingsNumberingFields($kind, $prefix, $number) {
     $number_shown = (string) settingsValue($numbering['number'], $number);
     ob_start(); ?>
     <div class="row g-3">
-        <div class="col-sm-5"><?= settingsInput($numbering['prefix'], $prefix, ['icon' => 'fa-barcode', 'required' => true, 'maxlength' => 200, 'label' => 'Prefix',
-            'pattern' => $kind === 'ticket' ? '[A-Za-z\\-]+' : '[^\s]+', 'title' => $kind === 'ticket' ? 'Only letters and hyphens' : 'No spaces']) ?></div>
-        <div class="col-sm-7"><?= settingsInput($numbering['number'], $number, ['icon' => 'fa-hashtag', 'type' => 'number', 'required' => true, 'min' => 1, 'label' => 'Next number']) ?></div>
+        <div class="col-sm-5"><?= settingsInput($numbering['prefix'], $prefix, ['icon' => 'fa-barcode', 'required' => true, 'maxlength' => 200, 'label' => __('Prefix'),
+            'pattern' => $kind === 'ticket' ? '[A-Za-z\\-]+' : '[^\s]+', 'title' => $kind === 'ticket' ? __('Only letters and hyphens') : __('No spaces')]) ?></div>
+        <div class="col-sm-7"><?= settingsInput($numbering['number'], $number, ['icon' => 'fa-hashtag', 'type' => 'number', 'required' => true, 'min' => 1, 'label' => __('Next number')]) ?></div>
     </div>
     <div class="itflow-settings-sample itflow-settings-next mt-3" data-settings-next="<?= $numbering['prefix'] ?>,<?= $numbering['number'] ?>"
         data-settings-in-use-prefix="<?= escapeHtml((string) $prefix) ?>" data-settings-in-use-number="<?= $in_use ?>">
-        <span class="text-body-secondary">The next <?= escapeHtml($numbering['what']) ?> is</span>
+        <span class="text-body-secondary"><?= escapeHtml(__('The next %s is', __($numbering['what']))) /* i18n-dynamic */ ?></span>
         <span data-settings-next-number><?= escapeHtml($prefix_shown . $number_shown) ?></span>
         <?php if ($in_use) { ?>
-            <span class="text-body-secondary fw-normal" data-settings-in-use>- <?= escapeHtml($prefix . $in_use) ?> is the last one made</span>
+            <span class="text-body-secondary fw-normal" data-settings-in-use>- <?= escapeHtml(__('%s is the last one made', $prefix . $in_use)) ?></span>
             <div class="text-danger small fw-normal mt-1" data-settings-clash<?= $prefix_shown !== (string) $prefix || intval($number_shown) > $in_use || settingsError($numbering['number']) !== '' ? ' hidden' : '' ?>>
-                <i class="fas fa-exclamation-triangle me-1"></i>That one is already in use - the next one has to be <?= $in_use + 1 ?> or more.
+                <i class="fas fa-exclamation-triangle me-1"></i><?= __('That one is already in use - the next one has to be %d or more.', $in_use + 1) ?>
             </div>
         <?php } ?>
     </div>
@@ -937,8 +947,8 @@ function settingsNumberingFields($kind, $prefix, $number) {
 
 /* The pages ITFlow can open on, as page => name - any other page of /agent/ can be typed. */
 function settingsStartPages() {
-    return ['dashboard.php' => 'Dashboard', 'clients.php' => 'Clients', 'tickets.php' => 'Tickets', 'calendar.php' => 'Calendar', 'projects.php' => 'Projects',
-        'invoices.php' => 'Invoices', 'quotes.php' => 'Quotes', 'assets.php' => 'Assets'];
+    return ['dashboard.php' => __('Dashboard'), 'clients.php' => __('Clients'), 'tickets.php' => __('Tickets'), 'calendar.php' => __('Calendar'), 'projects.php' => __('Projects'),
+        'invoices.php' => __('Invoices'), 'quotes.php' => __('Quotes'), 'assets.php' => __('Assets')];
 }
 
 /*
@@ -948,17 +958,17 @@ function settingsStartPages() {
  */
 function settingsStartPageProblem($page) {
     if (!preg_match('#^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*\.php(\?[A-Za-z0-9_=&%.+-]*)?$#', $page)) {
-        return 'A page of ITFlow, as it is after /agent/ in its address - dashboard.php, or tickets.php?status=Open.';
+        return __('A page of ITFlow, as it is after /agent/ in its address - dashboard.php, or tickets.php?status=Open.');
     }
     if (!is_file(dirname(__DIR__) . '/agent/' . strtok($page, '?'))) {
-        return 'There is no such page.';
+        return __('There is no such page.');
     }
     return '';
 }
 
 /* How mail is sent or read, as the audit log names it - off, a server ITFlow signs in to, or Google or Microsoft by OAuth. */
 function settingsMailProviders() {
-    return ['' => 'off', 'standard_smtp' => 'SMTP server', 'standard_imap' => 'IMAP server', 'google_oauth' => 'Google Workspace', 'microsoft_oauth' => 'Microsoft 365'];
+    return ['' => 'off', 'standard_smtp' => __('SMTP server'), 'standard_imap' => __('IMAP server'), 'google_oauth' => __('Google Workspace'), 'microsoft_oauth' => 'Microsoft 365'];
 }
 
 /* A mail server's encryption, as the audit log names it - tls is STARTTLS, ssl is a connection encrypted from the start. */
@@ -968,7 +978,7 @@ function settingsMailEncryption() {
 
 /* The net terms a contract or the default can be, as days => name. */
 function settingsNetTerms() {
-    return [0 => 'On receipt', 7 => '7 days', 10 => '10 days', 15 => '15 days', 30 => '30 days', 45 => '45 days', 60 => '60 days', 90 => '90 days'];
+    return [0 => __('On receipt'), 7 => '7 days', 10 => '10 days', 15 => '15 days', 30 => '30 days', 45 => '45 days', 60 => '60 days', 90 => '90 days'];
 }
 
 /* The countries, currencies and languages ITFlow offers (includes/settings_localization_array.php), wherever this is called from. */

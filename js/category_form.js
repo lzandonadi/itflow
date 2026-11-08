@@ -77,7 +77,7 @@
         // Redraw the preview from the fields
         function draw() {
             const value = color.value;
-            const label = name.value.trim() || 'New category';
+            const label = name.value.trim() || __('New category');
             if (badge) {
                 const pill = preview.querySelector('.badge');
                 pill.textContent = label;
@@ -144,7 +144,7 @@
             if (usable) {
                 custom.dataset.icon = term;
                 custom.querySelector('i').className = 'fas fa-fw fa-' + term + ' me-1';
-                custom.querySelector('span').textContent = 'Use ' + term;
+                custom.querySelector('span').textContent = __('Use %s', term);
                 custom.classList.toggle('active', icon.value === term);
             }
             none.hidden = shown > 0 || usable;
@@ -234,7 +234,7 @@
                 })
                 .then(function (result) {
                     if (!result.ok) {
-                        throw new Error(result.error || 'It was not saved');
+                        throw new Error(result.error || __('It was not saved'));
                     }
                     // Picked in the picker - an option already there for it is used as it is
                     let option = Array.prototype.find.call(picker.options, function (o) {
@@ -265,7 +265,7 @@
                 .catch(function (err) {
                     button.disabled = false;
                     if (error) {
-                        error.textContent = err.message.indexOf('HTTP ') === 0 ? 'It could not be saved - reload the page and try again.' : err.message;
+                        error.textContent = err.message.indexOf('HTTP ') === 0 ? __('It could not be saved - reload the page and try again.') : err.message;
                         error.hidden = false;
                     }
                 });

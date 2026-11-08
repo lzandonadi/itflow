@@ -52,9 +52,9 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
 
 <div class="card">
     <div class="card-header bg-dark py-2">
-        <h3 class="card-title mt-2"><i class="fas fa-fw fa-cubes me-2"></i>Project Templates</h3>
+        <h3 class="card-title mt-2"><i class="fas fa-fw fa-cubes me-2"></i><?= __('Project Templates') ?></h3>
         <div class="card-tools">
-            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/project_template/project_template_add.php"><i class="fas fa-plus me-2"></i>New Project Template</button>
+            <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/project_template/project_template_add.php"><i class="fas fa-plus me-2"></i><?= __('New Project Template') ?></button>
         </div>
     </div>
     <div class="card-header py-3">
@@ -63,25 +63,25 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
             <div class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <div class="input-group">
-                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="Search project templates...">
-                        <button class="btn btn-dark" title="Search"><i class="fa fa-search"></i></button>
+                        <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(escapeHtml($q)); } ?>" placeholder="<?= escapeHtml(__('Search project templates...')) ?>">
+                        <button class="btn btn-dark" title="<?= escapeHtml(__('Search')) ?>"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </div>
         </form>
         <nav class="nav nav-pills itflow-asset-tabs mt-2">
-            <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-cubes me-1"></i>Active <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
-            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>"><i class="fas fa-fw fa-archive me-1"></i>Archived <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? '' : 'active' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '']))) ?>"><i class="fas fa-fw fa-cubes me-1"></i><?= __('Active') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[0]) ?></span></a>
+            <a class="nav-link <?= $show_archived ? 'active' : '' ?>" href="?<?= escapeHtml(http_build_query(array_filter(['q' => $_GET['q'] ?? '', 'show' => 'archived']))) ?>"><i class="fas fa-fw fa-archive me-1"></i><?= __('Archived') ?> <span class="badge rounded-pill ms-1"><?= intval($counts[1]) ?></span></a>
         </nav>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light text-nowrap <?php if ($num_rows[0] == 0) { echo "d-none"; } ?>">
             <tr>
-                <th class="ps-3"><?= $sort_link('project_template_name', 'Template') ?></th>
-                <th class="text-center"><?= $sort_link('ticket_count', 'Tickets') ?></th>
-                <th class="text-center"><?= $sort_link('task_count', 'Tasks') ?></th>
-                <th><?= $sort_link('project_template_updated_at', 'Updated') ?></th>
+                <th class="ps-3"><?= $sort_link('project_template_name', __('Template')) ?></th>
+                <th class="text-center"><?= $sort_link('ticket_count', __('Tickets')) ?></th>
+                <th class="text-center"><?= $sort_link('task_count', __('Tasks')) ?></th>
+                <th><?= $sort_link('project_template_updated_at', __('Updated')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -107,27 +107,27 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
                     <td class="small text-body-secondary text-nowrap" title="<?= escapeHtml($updated) ?>"><?= timeAgo($updated) ?></td>
                     <td class="text-end">
                         <div class="dropdown dropstart">
-                            <button class="btn btn-sm btn-light" title="More actions" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                            <button class="btn btn-sm btn-light" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/project_template/project_template_edit.php?project_template_id=<?= $project_template_id ?>">
-                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit
+                                    <i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?>
                                 </a>
                                 <a class="dropdown-item" href="post.php?duplicate_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i>Duplicate
+                                    <i class="fas fa-fw fa-copy text-secondary me-2"></i><?= __('Duplicate') ?>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <?php if ($row['project_template_archived_at']) { ?>
                                     <a class="dropdown-item" href="post.php?restore_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i>Restore
+                                        <i class="fas fa-fw fa-box-open text-secondary me-2"></i><?= __('Restore') ?>
                                     </a>
                                 <?php } else { ?>
                                     <a class="dropdown-item text-danger" href="post.php?archive_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
-                                        <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                        <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                     </a>
                                 <?php } ?>
                                 <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_project_template=<?= $project_template_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>"
-                                    data-confirm-text="The template goes for good. Its ticket templates stay, and so do projects started from it.">
-                                    <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                    data-confirm-text="<?= escapeHtml(__('The template goes for good. Its ticket templates stay, and so do projects started from it.')) ?>">
+                                    <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                 </a>
                             </div>
                         </div>
@@ -139,13 +139,13 @@ $sort_link = function ($column, $label) use ($url_query_strings_sort, $sort, $di
     </div>
     <?php
     $empty_state = [
-        'thing' => 'project templates',
+        'thing' => __('project templates'),
         'icon' => 'fa-cubes',
         'filtered' => $q !== '',
         'archived' => $show_archived,
         'views' => ['show'],
-        'text' => 'A client onboarding plan is a good first one: one ticket template per step, each with its checklist of tasks.',
-        'actions' => [['label' => 'New Project Template', 'modal' => 'modals/project_template/project_template_add.php']],
+        'text' => __('A client onboarding plan is a good first one: one ticket template per step, each with its checklist of tasks.'),
+        'actions' => [['label' => __('New Project Template'), 'modal' => 'modals/project_template/project_template_add.php']],
     ];
     require_once "../includes/filter_footer.php";
     ?>

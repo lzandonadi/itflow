@@ -29,18 +29,18 @@ if (isset($_POST['edit_company'])) {
 
     $errors = [];
     if ($after['company_name'] === '') {
-        $errors['company_name'] = 'Your company\'s name - it goes on every invoice and email.';
+        $errors['company_name'] = __('Your company\'s name - it goes on every invoice and email.');
     }
     if ($after['company_country'] !== '' && !in_array($after['company_country'], $localization['countries'], true)) {
-        $errors['company_country'] = 'Pick the country from the list.';
+        $errors['company_country'] = __('Pick the country from the list.');
     }
     if ($after['company_email'] !== '' && !filter_var($after['company_email'], FILTER_VALIDATE_EMAIL)) {
-        $errors['company_email'] = 'That is not an email address.';
+        $errors['company_email'] = __('That is not an email address.');
     }
     if ($after['company_website'] !== '' && !preg_match('/^[^\s\/]+\.[^\s\/]+(\/\S*)?$/', $after['company_website'])) {
-        $errors['company_website'] = 'A website looks like company.com.';
+        $errors['company_website'] = __('A website looks like company.com.');
     }
-    $logo_problem = settingsImageProblem($_FILES['company_logo'] ?? null, ['jpg', 'jpeg', 'png'], [IMAGETYPE_JPEG, IMAGETYPE_PNG], 'PNG or JPG');
+    $logo_problem = settingsImageProblem($_FILES['company_logo'] ?? null, ['jpg', 'jpeg', 'png'], [IMAGETYPE_JPEG, IMAGETYPE_PNG], __('PNG or JPG'));
     if ($logo_problem !== '') {
         $errors['company_logo'] = $logo_problem;
     }
@@ -50,7 +50,7 @@ if (isset($_POST['edit_company'])) {
     // sidebar pointing at a client that no longer exists. 0 clears the designation.
     $internal_client_id = intval($_POST['config_internal_client_id'] ?? 0);
     if ($internal_client_id !== 0 && !mysqli_num_rows(mysqli_query($mysqli, "SELECT client_id FROM clients WHERE client_id = $internal_client_id LIMIT 1"))) {
-        $errors['config_internal_client_id'] = 'That client isn\'t there any more - pick another.';
+        $errors['config_internal_client_id'] = __('That client isn\'t there any more - pick another.');
     }
 
     if ($errors) {
@@ -89,7 +89,7 @@ if (isset($_GET['remove_company_logo'])) {
 
     logAudit("Settings", "Edit", "$session_name took the company logo off");
 
-    flashAlert("The logo is taken off");
+    flashAlert(__('The logo is taken off'));
 
     redirect();
 

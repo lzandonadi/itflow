@@ -39,7 +39,7 @@
             if (!items.length) {
                 const none = document.createElement('div');
                 none.className = 'text-body-secondary';
-                none.textContent = 'Nothing else booked';
+                none.textContent = __('Nothing else booked');
                 list.appendChild(none);
             }
             items.forEach(function (item) {

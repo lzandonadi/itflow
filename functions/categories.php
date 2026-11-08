@@ -44,97 +44,97 @@ function categoryKinds() {
     };
     return [
         'Expense' => [
-            'label' => 'Expense', 'one' => 'expense category', 'many' => 'expense categories', 'icon' => 'fa-shopping-cart',
-            'about' => 'What money goes out on. Every expense, recurring expense and budget line has one, and the expense reports add up by them.',
+            'label' => __('Expense'), 'one' => __('expense category'), 'many' => __('expense categories'), 'icon' => 'fa-shopping-cart',
+            'about' => __('What money goes out on. Every expense, recurring expense and budget line has one, and the expense reports add up by them.'),
             'by' => 'id', 'ordered' => false, 'max' => 200, 'modules' => ['module_financial'],
             'uses' => [
-                $use('expenses', 'expense_category_id', 'expense', 'expenses', '/agent/expenses.php?category={id}', 'expense_archived_at', 'expense_updated_at'),
-                $use('recurring_expenses', 'recurring_expense_category_id', 'recurring expense', 'recurring expenses', '/agent/recurring_expenses.php?category={id}&status=all', 'recurring_expense_archived_at', 'recurring_expense_updated_at'),
-                $use('budget', 'budget_category_id', 'budget month', 'budget months', '/agent/reports/budget.php', null, 'budget_updated_at'),
-                $use('expense_import_rules', 'import_rule_category_id', 'import rule', 'import rules', null, null, 'import_rule_updated_at'),
-                $use('payment_providers', 'payment_provider_expense_category', 'payment provider\'s fees', 'payment providers\' fees', '/admin/payment_providers.php', null, 'payment_provider_updated_at'),
-                $use('settings', 'config_mileage_category_id', 'mileage setting', 'mileage settings', '/admin/settings_invoice.php#mileage'),
+                $use('expenses', 'expense_category_id', __('expense'), __('expenses'), '/agent/expenses.php?category={id}', 'expense_archived_at', 'expense_updated_at'),
+                $use('recurring_expenses', 'recurring_expense_category_id', __('recurring expense'), __('recurring expenses'), '/agent/recurring_expenses.php?category={id}&status=all', 'recurring_expense_archived_at', 'recurring_expense_updated_at'),
+                $use('budget', 'budget_category_id', __('budget month'), __('budget months'), '/agent/reports/budget.php', null, 'budget_updated_at'),
+                $use('expense_import_rules', 'import_rule_category_id', __('import rule'), __('import rules'), null, null, 'import_rule_updated_at'),
+                $use('payment_providers', 'payment_provider_expense_category', __('payment provider\'s fees'), __('payment providers\' fees'), '/admin/payment_providers.php', null, 'payment_provider_updated_at'),
+                $use('settings', 'config_mileage_category_id', __('mileage setting'), __('mileage settings'), '/admin/settings_invoice.php#mileage'),
             ],
         ],
         'Income' => [
-            'label' => 'Income', 'one' => 'income category', 'many' => 'income categories', 'icon' => 'fa-hand-holding-usd',
-            'about' => 'What money comes in for. Invoices, quotes, recurring invoices, products and other income each have one, and the income reports add up by them.',
+            'label' => __('Income'), 'one' => __('income category'), 'many' => __('income categories'), 'icon' => 'fa-hand-holding-usd',
+            'about' => __('What money comes in for. Invoices, quotes, recurring invoices, products and other income each have one, and the income reports add up by them.'),
             'by' => 'id', 'ordered' => false, 'max' => 200, 'modules' => ['module_sales', 'module_financial'],
             'uses' => [
-                $use('invoices', 'invoice_category_id', 'invoice', 'invoices', '/agent/invoices.php?category={id}', 'invoice_archived_at', 'invoice_updated_at'),
-                $use('quotes', 'quote_category_id', 'quote', 'quotes', '/agent/quotes.php?category={id}', 'quote_archived_at', 'quote_updated_at'),
-                $use('recurring_invoices', 'recurring_invoice_category_id', 'recurring invoice', 'recurring invoices', '/agent/recurring_invoices.php?category={id}&status=all', 'recurring_invoice_archived_at', 'recurring_invoice_updated_at'),
-                $use('revenues', 'revenue_category_id', 'other income entry', 'other income entries', '/agent/income.php?category={id}&show=other', 'revenue_archived_at', 'revenue_updated_at'),
-                $use('products', 'product_category_id', 'product', 'products', '/agent/products.php?category={id}', 'product_archived_at', 'product_updated_at'),
-                $use('income_import_rules', 'import_rule_category_id', 'import rule', 'import rules', null, null, 'import_rule_updated_at'),
+                $use('invoices', 'invoice_category_id', __('invoice'), __('invoices'), '/agent/invoices.php?category={id}', 'invoice_archived_at', 'invoice_updated_at'),
+                $use('quotes', 'quote_category_id', __('quote'), __('quotes'), '/agent/quotes.php?category={id}', 'quote_archived_at', 'quote_updated_at'),
+                $use('recurring_invoices', 'recurring_invoice_category_id', __('recurring invoice'), __('recurring invoices'), '/agent/recurring_invoices.php?category={id}&status=all', 'recurring_invoice_archived_at', 'recurring_invoice_updated_at'),
+                $use('revenues', 'revenue_category_id', __('other income entry'), __('other income entries'), '/agent/income.php?category={id}&show=other', 'revenue_archived_at', 'revenue_updated_at'),
+                $use('products', 'product_category_id', __('product'), __('products'), '/agent/products.php?category={id}', 'product_archived_at', 'product_updated_at'),
+                $use('income_import_rules', 'import_rule_category_id', __('import rule'), __('import rules'), null, null, 'import_rule_updated_at'),
             ],
         ],
         'Referral' => [
-            'label' => 'Referral', 'one' => 'referral', 'many' => 'referrals', 'icon' => 'fa-share-alt',
-            'about' => 'How a client found you - picked on the client, and a filter on the clients list.',
+            'label' => __('Referral'), 'one' => __('referral'), 'many' => __('referrals'), 'icon' => 'fa-share-alt',
+            'about' => __('How a client found you - picked on the client, and a filter on the clients list.'),
             'by' => 'name', 'ordered' => false, 'max' => 200, 'modules' => ['module_client'],
             'uses' => [
-                $use('clients', 'client_referral', 'client', 'clients', '/agent/clients.php?referral={name}', 'client_archived_at', 'client_updated_at'),
+                $use('clients', 'client_referral', __('client'), __('clients'), '/agent/clients.php?referral={name}', 'client_archived_at', 'client_updated_at'),
             ],
         ],
         'Ticket' => [
-            'label' => 'Ticket', 'one' => 'ticket category', 'many' => 'ticket categories', 'icon' => 'fa-life-ring',
-            'about' => 'What a ticket is about. Tickets and recurring tickets have one, canned responses are offered by them, and the ticket reports add up by them.',
+            'label' => __('Ticket'), 'one' => __('ticket category'), 'many' => __('ticket categories'), 'icon' => 'fa-life-ring',
+            'about' => __('What a ticket is about. Tickets and recurring tickets have one, canned responses are offered by them, and the ticket reports add up by them.'),
             'by' => 'id', 'ordered' => false, 'max' => 200, 'modules' => ['module_support'],
             'uses' => [
-                $use('tickets', 'ticket_category', 'ticket', 'tickets', '/agent/tickets.php?category={id}&show=all', 'ticket_archived_at', 'ticket_updated_at', true),
-                $use('recurring_tickets', 'recurring_ticket_category', 'recurring ticket', 'recurring tickets', '/agent/recurring_tickets.php?category={id}', null, 'recurring_ticket_updated_at', true),
-                $use('canned_response_categories', 'category_id', 'canned response', 'canned responses', '/admin/canned_responses.php?category={id}', 'canned_response_archived_at', null, false,
-                    ['owner' => 'canned_response_id', 'records' => 'canned_responses', 'join' => 'JOIN canned_responses USING (canned_response_id)']),
+                $use('tickets', 'ticket_category', __('ticket'), __('tickets'), '/agent/tickets.php?category={id}&show=all', 'ticket_archived_at', 'ticket_updated_at', true),
+                $use('recurring_tickets', 'recurring_ticket_category', __('recurring ticket'), __('recurring tickets'), '/agent/recurring_tickets.php?category={id}', null, 'recurring_ticket_updated_at', true),
+                $use('canned_response_categories', 'category_id', __('canned response'), __('canned responses'), '/admin/canned_responses.php?category={id}', 'canned_response_archived_at', null, false,
+                    ['owner' => 'canned_response_id', 'records' => 'canned_responses', 'join' => 'JOIN canned_responses USING (canned_response_id)']), // i18n-ignore - SQL
             ],
         ],
         'network_interface' => [
-            'label' => 'Network Interface', 'one' => 'interface type', 'many' => 'interface types', 'icon' => 'fa-ethernet',
-            'about' => 'The kinds of port on an asset - Ethernet, SFP+, WiFi - picked on each of its interfaces.',
+            'label' => __('Network Interface'), 'one' => __('interface type'), 'many' => __('interface types'), 'icon' => 'fa-ethernet',
+            'about' => __('The kinds of port on an asset - Ethernet, SFP+, WiFi - picked on each of its interfaces.'),
             'by' => 'name', 'ordered' => true, 'max' => 50, 'modules' => ['module_support'],
             'uses' => [
-                $use('asset_interfaces', 'interface_type', 'interface', 'interfaces', null, 'interface_archived_at', 'interface_updated_at'),
+                $use('asset_interfaces', 'interface_type', __('interface'), __('interfaces'), null, 'interface_archived_at', 'interface_updated_at'),
             ],
         ],
         'asset_status' => [
-            'label' => 'Asset Status', 'one' => 'asset status', 'many' => 'asset statuses', 'icon' => 'fa-heartbeat',
-            'about' => 'Where an asset stands - deployed, out for repair, retired. Its colour is the status badge\'s; without one the built-in statuses keep theirs.',
+            'label' => __('Asset Status'), 'one' => __('asset status'), 'many' => __('asset statuses'), 'icon' => 'fa-heartbeat',
+            'about' => __('Where an asset stands - deployed, out for repair, retired. Its colour is the status badge\'s; without one the built-in statuses keep theirs.'),
             'by' => 'name', 'ordered' => true, 'max' => 200, 'modules' => ['module_support'],
             'uses' => [
-                $use('assets', 'asset_status', 'asset', 'assets', '/agent/assets.php?status={name}', 'asset_archived_at', 'asset_updated_at'),
+                $use('assets', 'asset_status', __('asset'), __('assets'), '/agent/assets.php?status={name}', 'asset_archived_at', 'asset_updated_at'),
             ],
         ],
         'software_type' => [
-            'label' => 'Software Type', 'one' => 'software type', 'many' => 'software types', 'icon' => 'fa-cube',
-            'about' => 'What kind of software a license is for - SaaS, security, operating system. Its icon is the license\'s.',
+            'label' => __('Software Type'), 'one' => __('software type'), 'many' => __('software types'), 'icon' => 'fa-cube',
+            'about' => __('What kind of software a license is for - SaaS, security, operating system. Its icon is the license\'s.'),
             'by' => 'name', 'ordered' => true, 'max' => 200, 'modules' => ['module_support'],
             'uses' => [
-                $use('software', 'software_type', 'license', 'licenses', '/agent/software.php?software_type={name}', 'software_archived_at', 'software_updated_at'),
-                $use('software_templates', 'software_template_type', 'license template', 'license templates', '/admin/software_templates.php', 'software_template_archived_at', 'software_template_updated_at'),
+                $use('software', 'software_type', __('license'), __('licenses'), '/agent/software.php?software_type={name}', 'software_archived_at', 'software_updated_at'),
+                $use('software_templates', 'software_template_type', __('license template'), __('license templates'), '/admin/software_templates.php', 'software_template_archived_at', 'software_template_updated_at'),
             ],
         ],
         'rack_type' => [
-            'label' => 'Rack Type', 'one' => 'rack type', 'many' => 'rack types', 'icon' => 'fa-server',
-            'about' => 'The kinds of rack - open frame, enclosed cabinet, wall mount - picked on each rack.',
+            'label' => __('Rack Type'), 'one' => __('rack type'), 'many' => __('rack types'), 'icon' => 'fa-server',
+            'about' => __('The kinds of rack - open frame, enclosed cabinet, wall mount - picked on each rack.'),
             'by' => 'name', 'ordered' => true, 'max' => 50, 'modules' => ['module_support'],
             'uses' => [
-                $use('racks', 'rack_type', 'rack', 'racks', '/agent/racks.php?type={name}', 'rack_archived_at', 'rack_updated_at'),
+                $use('racks', 'rack_type', __('rack'), __('racks'), '/agent/racks.php?type={name}', 'rack_archived_at', 'rack_updated_at'),
             ],
         ],
         'contact_note_type' => [
-            'label' => 'Contact Note Type', 'one' => 'contact note type', 'many' => 'contact note types', 'icon' => 'fa-address-book',
-            'about' => 'What a note on a contact records - a call, an email, a meeting. Its icon marks the note.',
+            'label' => __('Contact Note Type'), 'one' => __('contact note type'), 'many' => __('contact note types'), 'icon' => 'fa-address-book',
+            'about' => __('What a note on a contact records - a call, an email, a meeting. Its icon marks the note.'),
             'by' => 'name', 'ordered' => true, 'max' => 200, 'modules' => ['module_client'],
             'uses' => [
-                $use('contact_notes', 'contact_note_type', 'contact note', 'contact notes', null, 'contact_note_archived_at', 'contact_note_updated_at'),
+                $use('contact_notes', 'contact_note_type', __('contact note'), __('contact notes'), null, 'contact_note_archived_at', 'contact_note_updated_at'),
             ],
         ],
         'asset_note_type' => [
-            'label' => 'Asset Note Type', 'one' => 'asset note type', 'many' => 'asset note types', 'icon' => 'fa-desktop',
-            'about' => 'What a note on an asset records - maintenance, a repair, an upgrade. Its icon marks the note.',
+            'label' => __('Asset Note Type'), 'one' => __('asset note type'), 'many' => __('asset note types'), 'icon' => 'fa-desktop',
+            'about' => __('What a note on an asset records - maintenance, a repair, an upgrade. Its icon marks the note.'),
             'by' => 'name', 'ordered' => true, 'max' => 200, 'modules' => ['module_support'],
             'uses' => [
-                $use('asset_notes', 'asset_note_type', 'asset note', 'asset notes', null, 'asset_note_archived_at', 'asset_note_updated_at'),
+                $use('asset_notes', 'asset_note_type', __('asset note'), __('asset notes'), null, 'asset_note_archived_at', 'asset_note_updated_at'),
             ],
         ],
     ];
@@ -149,7 +149,10 @@ function categoryKind($kind) {
 
 /* "an asset status", "a ticket category" - for messages. */
 function categoryKindPhrase($kind) {
-    $one = categoryKind($kind)['one'] ?? 'category';
+    $one = categoryKind($kind)['one'] ?? __('category');
+    if (i18nLocale() !== 'en_US') {
+        return $one;
+    }
     return (in_array($one[0], ['a', 'e', 'i', 'o', 'u'], true) ? 'an ' : 'a ') . $one;
 }
 
@@ -282,7 +285,7 @@ function categoryUsage($kind) {
 
     $usage = [];
     foreach ($config['uses'] as $index => $use) {
-        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0';
+        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0'; // i18n-ignore - SQL
         $sql = mysqli_query($mysqli, "SELECT {$use['column']}, COUNT(*), $archived FROM {$use['table']} {$use['join']}
             WHERE {$use['column']} IS NOT NULL AND {$use['column']} <> " . ($config['by'] === 'name' || $use['text'] ? "''" : '0') . "
             GROUP BY {$use['column']}");
@@ -324,7 +327,7 @@ function categoryLooseNames($kind) {
     $loose = [];
     $spelling = [];
     foreach ($config['uses'] as $index => $use) {
-        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0';
+        $archived = $use['archived'] ? "SUM({$use['archived']} IS NOT NULL)" : '0'; // i18n-ignore - SQL
         $sql = mysqli_query($mysqli, "SELECT {$use['column']}, COUNT(*), $archived FROM {$use['table']} {$use['join']}
             WHERE {$use['column']} IS NOT NULL AND TRIM({$use['column']}) <> '' GROUP BY {$use['column']} ORDER BY COUNT(*) DESC");
         while ($row = mysqli_fetch_row($sql)) {
@@ -397,7 +400,7 @@ function categoryUsageText(array $row, array $used) {
     }
     if (count($parts) > 1) {
         $last = array_pop($parts);
-        return implode(', ', $parts) . ' and ' . $last;
+        return __('%1$s and %2$s', implode(', ', $parts), $last);
     }
     return $parts[0] ?? '';
 }
@@ -414,16 +417,16 @@ function categoryFromInput(array $in, $existing = null) {
     $kind = $existing ? (string) $existing['category_type'] : (string) ($in['type'] ?? '');
     $config = categoryKind($kind);
     if (!$config) {
-        return [null, 'Pick what the category is for'];
+        return [null, __('Pick what the category is for')];
     }
     // Stored without markup (escapeSql() strips it), so checked without it
     $name = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($in['name'] ?? ''))));
     $description = trim(mb_substr(preg_replace('/\s+/u', ' ', strip_tags((string) ($in['description'] ?? ''))), 0, 255));
     if ($name === '') {
-        return [null, ucfirst(categoryKindPhrase($kind)) . ' needs a name'];
+        return [null, __('%s needs a name', ucfirst(categoryKindPhrase($kind)))];
     }
     if (mb_strlen($name) > $config['max']) {
-        return [null, 'Keep the name to ' . $config['max'] . ' characters - that is all ' . $config['uses'][0]['many'] . ' hold'];
+        return [null, __('Keep the name to %1$d characters - that is all %2$s hold', $config['max'], $config['uses'][0]['many'])];
     }
     // A category already sharing its name with another (made before names were unique) can still be saved under it
     $kept_name = $existing && categoryNameKey($existing['category_name']) === categoryNameKey($name);
@@ -431,8 +434,7 @@ function categoryFromInput(array $in, $existing = null) {
     $same = $kept_name ? null : mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT category_name, category_archived_at FROM categories
         WHERE category_type = '" . escapeSql($kind) . "' AND category_name = '" . escapeSql($name) . "' $exclude LIMIT 1"));
     if ($same) {
-        return [null, 'There is already ' . ($same['category_archived_at'] ? 'an archived ' . $config['one'] : categoryKindPhrase($kind)) . ' called ' . $same['category_name']
-            . ($same['category_archived_at'] ? ' - restore it instead' : '')];
+        return [null, $same['category_archived_at'] ? __('There is already an archived %1$s called %2$s - restore it instead', $config['one'], $same['category_name']) : __('There is already %1$s called %2$s', categoryKindPhrase($kind), $same['category_name'])];
     }
     $color = trim((string) ($in['color'] ?? ''));
     $color = $color === '' ? '' : categoryColor($color);
@@ -530,7 +532,7 @@ function categoryDeleteBlocker(array $row, array $used) {
             WHERE category_type = '" . escapeSql($config['kind']) . "' AND category_name = '" . escapeSql($row['category_name']) . "' AND category_id != " . intval($row['category_id']) . " LIMIT 1"))) {
         return '';
     }
-    return 'In use on ' . categoryUsageText($row, $used) . ' - merge it into another, or archive it';
+    return __('In use on %s - merge it into another, or archive it', categoryUsageText($row, $used));
 }
 
 /* Delete a category, if nothing uses it (categoryDeleteBlocker()). Whether it went; $error says why not. */
@@ -538,7 +540,7 @@ function categoryDelete($category_id, &$error = '') {
     global $mysqli;
     $row = categoryRow($category_id);
     if (!$row) {
-        $error = 'That category is gone';
+        $error = __('That category is gone');
         return false;
     }
     $error = categoryDeleteBlocker($row, categoryUsageFor($row['category_id']));
@@ -580,13 +582,13 @@ function categoryMerge(array $from_ids, $into_id) {
         $names = array_filter($from, function ($name) use ($into) {
             return categoryNameKey($name) !== categoryNameKey($into['category_name']);
         });
-        $moved = $names ? categoryMoveRecords($config, "IN ('" . implode("', '", array_map('escapeSql', $names)) . "')", "'" . escapeSql($into['category_name']) . "'") : 0;
+        $moved = $names ? categoryMoveRecords($config, "IN ('" . implode("', '", array_map('escapeSql', $names)) . "')", "'" . escapeSql($into['category_name']) . "'") : 0; // i18n-ignore - SQL
     } else {
         // An id held as text (tickets) is matched as text - comparing it to a number can fail on a value that isn't one
         $moved = 0;
         foreach ($config['uses'] as $use) {
             $list = $use['text'] ? "'" . implode("', '", array_keys($from)) . "'" : implode(', ', array_keys($from));
-            $moved += categoryMoveRecords(['uses' => [$use]], "IN ($list)", $use['text'] ? "'$into_id'" : $into_id);
+            $moved += categoryMoveRecords(['uses' => [$use]], "IN ($list)", $use['text'] ? "'$into_id'" : $into_id); // i18n-ignore - SQL
         }
         if ($config['kind'] === 'Expense') {
             categoryFoldBudget($into_id);
@@ -743,7 +745,7 @@ function categoryAddButtonHtml($kind, $class = 'btn btn-outline-secondary') {
     if (empty($session_is_admin) || !$config) {
         return '';
     }
-    return '<button type="button" class="' . escapeHtml($class) . ' ajax-modal" title="New ' . escapeHtml($config['one']) . '" aria-label="New ' . escapeHtml($config['one']) . '"'
+    return '<button type="button" class="' . escapeHtml($class) . ' ajax-modal" title="' . escapeHtml(__('New %s', $config['one'])) . '" aria-label="' . escapeHtml(__('New %s', $config['one'])) . '"'
         . ' data-modal-url="/admin/modals/category/category_add.php?category=' . urlencode($config['kind']) . '&amp;inline=1" data-category-add><i class="fas fa-fw fa-plus"></i></button>';
 }
 
@@ -766,7 +768,7 @@ function categoryEnsure($kind, $name) {
         return $row['category_name'];
     }
     $category_id = categoryCreate(['type' => $config['kind'], 'name' => $name, 'description' => '', 'color' => categoryNextColor($config['kind']), 'icon' => '']);
-    logAudit("Category", "Create", ($session_name ?? 'ITFlow') . " created " . $config['one'] . " " . escapeSql($name), 0, $category_id);
+    logAudit("Category", "Create", ($session_name ?? 'ITFlow') . " created " . i18nEnglish(fn () => categoryKind($config['kind'])['one']) . " " . escapeSql($name), 0, $category_id);
     return $name;
 }
 

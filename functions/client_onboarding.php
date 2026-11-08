@@ -23,21 +23,66 @@
 
 /** The steps, in order - key => nav label, title, icon and what it is for. */
 const CLIENT_ONBOARDING_STEPS = [
-    'company' => ['label' => 'Company', 'title' => 'The company', 'icon' => 'fa-building',
-        'about' => 'Who they are - the name you know them by, what they do, their website and how they found you.'],
+    'company' => ['label' => 'Company', 'title' => 'The company', 'icon' => 'fa-building', // i18n-ignore - shown through __()
+        'about' => 'Who they are - the name you know them by, what they do, their website and how they found you.'], // i18n-ignore - shown through __()
     'locations' => ['label' => 'Locations', 'title' => 'Locations', 'icon' => 'fa-map-marker-alt',
-        'about' => 'Where they work - their main office first, then any other sites you look after.'],
+        'about' => 'Where they work - their main office first, then any other sites you look after.'], // i18n-ignore - shown through __()
     'people' => ['label' => 'People', 'title' => 'People', 'icon' => 'fa-users',
-        'about' => 'Who you deal with - the primary contact, who gets the invoices and who to call about technical things - and client portal access for them.'],
+        'about' => 'Who you deal with - the primary contact, who gets the invoices and who to call about technical things - and client portal access for them.'], // i18n-ignore - shown through __()
     'agreement' => ['label' => 'Agreement', 'title' => 'Agreement', 'icon' => 'fa-file-contract',
-        'about' => 'The contract you look after them on, from one of your templates - its rates, net terms and SLAs are theirs while it is in force. Send it to them to sign, if you like.'],
+        'about' => 'The contract you look after them on, from one of your templates - its rates, net terms and SLAs are theirs while it is in force. Send it to them to sign, if you like.'], // i18n-ignore - shown through __()
     'billing' => ['label' => 'Billing', 'title' => 'Billing', 'icon' => 'fa-file-invoice-dollar',
-        'about' => 'Who gets the invoices, their tax, and the recurring invoice that bills the agreement.'],
-    'it' => ['label' => 'IT basics', 'title' => 'IT basics', 'icon' => 'fa-network-wired',
-        'about' => 'Their domains, to watch for renewals, and the vendors and licenses most of your clients have - from your templates.'],
+        'about' => 'Who gets the invoices, their tax, and the recurring invoice that bills the agreement.'], // i18n-ignore - shown through __()
+    'it' => ['label' => 'IT basics', 'title' => 'IT basics', 'icon' => 'fa-network-wired', // i18n-ignore - shown through __()
+        'about' => 'Their domains, to watch for renewals, and the vendors and licenses most of your clients have - from your templates.'], // i18n-ignore - shown through __()
     'kickoff' => ['label' => 'Kickoff', 'title' => 'Kickoff', 'icon' => 'fa-flag',
-        'about' => 'The onboarding project - its tickets raised from a project template, for your team to work through.'],
+        'about' => 'The onboarding project - its tickets raised from a project template, for your team to work through.'], // i18n-ignore - shown through __()
 ];
+
+/** A step of CLIENT_ONBOARDING_STEPS with its label, title and what it is for in the interface language. */
+function clientOnboardingStepInfo($key) {
+    $step = CLIENT_ONBOARDING_STEPS[$key];
+    switch ($key) {
+        case 'company':
+            $text = [_x('Company', 'onboarding step'), __('The company'), __('Who they are - the name you know them by, what they do, their website and how they found you.')];
+            break;
+        case 'locations':
+            $text = [_x('Locations', 'onboarding step'), _x('Locations', 'onboarding step'), __('Where they work - their main office first, then any other sites you look after.')];
+            break;
+        case 'people':
+            $text = [_x('People', 'onboarding step'), _x('People', 'onboarding step'), __('Who you deal with - the primary contact, who gets the invoices and who to call about technical things - and client portal access for them.')];
+            break;
+        case 'agreement':
+            $text = [_x('Agreement', 'onboarding step'), _x('Agreement', 'onboarding step'), __('The contract you look after them on, from one of your templates - its rates, net terms and SLAs are theirs while it is in force. Send it to them to sign, if you like.')];
+            break;
+        case 'billing':
+            $text = [_x('Billing', 'onboarding step'), _x('Billing', 'onboarding step'), __('Who gets the invoices, their tax, and the recurring invoice that bills the agreement.')];
+            break;
+        case 'it':
+            $text = [_x('IT basics', 'onboarding step'), _x('IT basics', 'onboarding step'), __('Their domains, to watch for renewals, and the vendors and licenses most of your clients have - from your templates.')];
+            break;
+        default:
+            $text = [_x('Kickoff', 'onboarding step'), _x('Kickoff', 'onboarding step'), __('The onboarding project - its tickets raised from a project template, for your team to work through.')];
+    }
+    return ['label' => $text[0], 'title' => $text[1], 'about' => $text[2]] + $step;
+}
+
+/**
+ * What adding a person on the People step says: who, whether they are the
+ * primary contact and how the portal invite went ($invited true, false for
+ * not sent, null for none). $name is already escaped.
+ */
+function clientOnboardingPersonMessage($name, $primary, $invited) {
+    if ($invited) {
+        return $primary ? __('<strong>%s</strong> added as the primary contact and emailed a link to the client portal - add someone else, or carry on', $name)
+            : __('<strong>%s</strong> added and emailed a link to the client portal - add someone else, or carry on', $name);
+    }
+    if ($invited === false) {
+        return $primary ? __('<strong>%s</strong> added as the primary contact - with portal access, but the email with their link could not be sent - add someone else, or carry on', $name)
+            : __('<strong>%s</strong> added - with portal access, but the email with their link could not be sent - add someone else, or carry on', $name);
+    }
+    return $primary ? __('<strong>%s</strong> added as the primary contact - add someone else, or carry on', $name) : __('<strong>%s</strong> added - add someone else, or carry on', $name);
+}
 
 /** Has the 3.5.2 update run? Until it has, nothing here is shown or done. */
 function clientOnboardingReady() {
@@ -149,9 +194,6 @@ function clientOnboardingSteps($client_id, $row = null) {
         $result = mysqli_query($mysqli, $sql);
         return $result ? intval(mysqli_fetch_row($result)[0] ?? 0) : 0;
     };
-    $plural = function ($n, $one, $many = null) {
-        return $n . ' ' . ($n === 1 ? $one : ($many ?? $one . 's'));
-    };
 
     $steps = [];
     foreach (clientOnboardingStepKeys() as $key) {
@@ -163,8 +205,9 @@ function clientOnboardingSteps($client_id, $row = null) {
         switch ($key) {
             case 'company':
                 $done = $client && intval($client['client_lead']) === 0;
-                $status = !$client ? 'Not added yet' : (intval($client['client_lead']) ? 'A lead - saving makes them a client'
-                    : (trim((string) $client['client_type']) !== '' ? $client['client_type'] . ', a' : 'A') . ' client since ' . date('M j, Y', strtotime($client['client_created_at'])));
+                $since = $client ? formatDate($client['client_created_at'], 'date') : '';
+                $status = !$client ? __('Not added yet') : (intval($client['client_lead']) ? __('A lead - saving makes them a client')
+                    : (trim((string) $client['client_type']) !== '' ? __('%1$s, a client since %2$s', $client['client_type'], $since) : __('A client since %s', $since)));
                 break;
             case 'locations':
                 $n = $count("SELECT COUNT(*) FROM locations WHERE location_client_id = $client_id AND location_archived_at IS NULL");
@@ -173,23 +216,28 @@ function clientOnboardingSteps($client_id, $row = null) {
                 $done = $done || $n > 0;
                 $where = $primary ? trim(implode(', ', array_filter([trim((string) $primary['location_address']), trim((string) $primary['location_city'])]))) : '';
                 $where = $where !== '' ? $where : ($primary ? $primary['location_name'] : '');
-                $status = $n ? $plural($n, 'location') . ($primary ? ' - ' . ($n > 1 ? "the primary at $where" : $where) : '') : 'None yet';
+                $status = !$n ? __('None yet') : (!$primary ? _n('%d location', '%d locations', $n)
+                    : ($n > 1 ? __('%1$d locations - the primary at %2$s', $n, $where) : __('1 location - %s', $where)));
                 break;
             case 'people':
                 $n = $count("SELECT COUNT(*) FROM contacts WHERE contact_client_id = $client_id AND contact_archived_at IS NULL");
                 $primary = $n ? (string) (mysqli_fetch_row(mysqli_query($mysqli, "SELECT contact_name FROM contacts WHERE contact_client_id = $client_id AND contact_archived_at IS NULL AND contact_primary = 1 LIMIT 1"))[0] ?? '') : '';
                 $done = $done || $n > 0;
-                $status = $n ? $plural($n, 'person', 'people') . ($primary !== '' ? " - $primary is the primary contact" : ' - no primary contact yet') : 'None yet';
+                $status = !$n ? __('None yet') : ($primary !== '' ? _n('%1$d person - %2$s is the primary contact', '%1$d people - %2$s is the primary contact', $n, $n, $primary)
+                    : _n('%d person - no primary contact yet', '%d people - no primary contact yet', $n));
                 break;
             case 'agreement':
                 $contract = clientOnboardingContract($client_id, $row);
                 $done = $done || ($contract !== null);
                 if ($contract) {
                     $pending = contractSignaturesReady() && contractSignaturePendingFor(intval($contract['contract_id']));
-                    $status = $contract['contract_name'] . ' - ' . ($contract['contract_status'] === 'Draft' ? ($pending ? 'a draft, out to sign' : 'a draft')
-                        : strtolower($contract['contract_status']) . (!empty($contract['contract_start_date']) ? ' from ' . date('M j, Y', strtotime($contract['contract_start_date'])) : ''));
+                    $contract_state = $contract['contract_status'] === 'Draft' ? ($pending ? __('a draft, out to sign') : __('a draft'))
+                        : mb_strtolower(_x($contract['contract_status'], 'contract status')); // i18n-dynamic: contract statuses, translated in 7.1
+                    $status = !empty($contract['contract_start_date']) && $contract['contract_status'] !== 'Draft'
+                        ? __('%1$s - %2$s from %3$s', $contract['contract_name'], $contract_state, formatDate($contract['contract_start_date'], 'date'))
+                        : __('%1$s - %2$s', $contract['contract_name'], $contract_state);
                 } else {
-                    $status = 'No contract - billed on the defaults';
+                    $status = __('No contract - billed on the defaults');
                 }
                 break;
             case 'billing':
@@ -198,16 +246,20 @@ function clientOnboardingSteps($client_id, $row = null) {
                     FROM recurring_invoices WHERE recurring_invoice_client_id = $client_id AND recurring_invoice_archived_at IS NULL
                     ORDER BY recurring_invoice_id = " . intval($row['onboarding_recurring_invoice_id'] ?? 0) . " DESC, recurring_invoice_status DESC, recurring_invoice_id DESC LIMIT 1"));
                 $done = $done || $recurring !== null;
-                $status = $recurring ? $recurring['recurring_invoice_prefix'] . $recurring['recurring_invoice_number'] . ' bills ' . billingMoney($recurring['recurring_invoice_amount'], $recurring['recurring_invoice_currency_code'])
-                    . ' ' . strtolower(recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? '') . (intval($recurring['recurring_invoice_status']) ? '' : ' - paused')
-                    : ($done ? 'Billing details saved - no recurring invoice' : 'No recurring invoice');
+                if ($recurring) {
+                    $bills = [$recurring['recurring_invoice_prefix'] . $recurring['recurring_invoice_number'], billingMoney($recurring['recurring_invoice_amount'], $recurring['recurring_invoice_currency_code']),
+                        mb_strtolower(recurringInvoiceFrequencies()[$recurring['recurring_invoice_frequency']] ?? '')];
+                    $status = intval($recurring['recurring_invoice_status']) ? __('%1$s bills %2$s %3$s', ...$bills) : __('%1$s bills %2$s %3$s - paused', ...$bills);
+                } else {
+                    $status = $done ? __('Billing details saved - no recurring invoice') : __('No recurring invoice');
+                }
                 break;
             case 'it':
                 $domains = $count("SELECT COUNT(*) FROM domains WHERE domain_client_id = $client_id AND domain_archived_at IS NULL");
                 $vendors = $count("SELECT COUNT(*) FROM vendors WHERE vendor_client_id = $client_id AND vendor_archived_at IS NULL");
                 $licenses = $count("SELECT COUNT(*) FROM software WHERE software_client_id = $client_id AND software_archived_at IS NULL");
                 $done = $done || $vendors + $licenses > 0;
-                $status = $domains + $vendors + $licenses ? implode(', ', array_filter([$domains ? $plural($domains, 'domain') : '', $vendors ? $plural($vendors, 'vendor') : '', $licenses ? $plural($licenses, 'license') : ''])) : 'Nothing yet';
+                $status = $domains + $vendors + $licenses ? implode(', ', array_filter([$domains ? _n('%d domain', '%d domains', $domains) : '', $vendors ? _n('%d vendor', '%d vendors', $vendors) : '', $licenses ? _n('%d license', '%d licenses', $licenses) : ''])) : __('Nothing yet');
                 break;
             case 'kickoff':
                 $project = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT project_id, project_prefix, project_number, project_name,
@@ -215,10 +267,10 @@ function clientOnboardingSteps($client_id, $row = null) {
                     FROM projects WHERE project_client_id = $client_id AND project_archived_at IS NULL
                     ORDER BY project_id = " . intval($row['onboarding_project_id'] ?? 0) . " DESC, project_id DESC LIMIT 1"));
                 $done = $done || $project !== null;
-                $status = $project ? $project['project_prefix'] . $project['project_number'] . ' ' . $project['project_name'] . ' - ' . $plural(intval($project['tickets']), 'ticket') : 'No project yet';
+                $status = $project ? _n('%1$s %2$s - %3$d ticket', '%1$s %2$s - %3$d tickets', intval($project['tickets']), $project['project_prefix'] . $project['project_number'], $project['project_name'], intval($project['tickets'])) : __('No project yet');
                 break;
         }
-        $steps[$key] = CLIENT_ONBOARDING_STEPS[$key] + ['done' => $done, 'skipped' => !$done && in_array($key, $skipped, true), 'saved' => in_array($key, $saved, true), 'status' => $status];
+        $steps[$key] = clientOnboardingStepInfo($key) + ['done' => $done, 'skipped' => !$done && in_array($key, $skipped, true), 'saved' => in_array($key, $saved, true), 'status' => $status];
     }
     return $steps;
 }

@@ -53,7 +53,7 @@ function projectForRequest($project_id, $level) {
     enforceUserPermission('module_support', $level);
     $row = projectRow($project_id);
     if (!$row) {
-        flashAlert('That project no longer exists.', 'error');
+        flashAlert(__('That project no longer exists.'), 'error');
         redirect();
     }
     $client_id = intval($row['project_client_id']);
@@ -73,7 +73,7 @@ function projectForModal($project_id, $level = 2, $open_only = false) {
     enforceUserPermission('module_support', $level);
     $row = projectRow($project_id);
     if (!$row) {
-        echo json_encode(['error' => 'That project no longer exists.']);
+        echo json_encode(['error' => __('That project no longer exists.')]);
         exit;
     }
     $client_id = intval($row['project_client_id']);
@@ -81,7 +81,7 @@ function projectForModal($project_id, $level = 2, $open_only = false) {
         enforceClientAccess();
     }
     if ($open_only && !projectIsOpen($row)) {
-        echo json_encode(['error' => 'Project ' . projectReference($row) . ' is ' . (!empty($row['project_archived_at']) ? 'archived' : 'completed') . ' - reopen it first.']);
+        echo json_encode(['error' => !empty($row['project_archived_at']) ? __('Project %s is archived - reopen it first.', projectReference($row)) : __('Project %s is completed - reopen it first.', projectReference($row))]);
         exit;
     }
     return $row;
@@ -139,13 +139,13 @@ function projectState($row) {
 function projectStatePill($row) {
     switch (projectState($row)) {
         case 'archived':
-            return '<span class="badge rounded-pill text-bg-secondary fw-normal">Archived</span>';
+            return '<span class="badge rounded-pill text-bg-secondary fw-normal">' . escapeHtml(_x('Archived', 'project state')) . '</span>';
         case 'completed':
-            return '<span class="badge rounded-pill text-bg-success fw-normal"><i class="fas fa-check me-1"></i>Completed</span>';
+            return '<span class="badge rounded-pill text-bg-success fw-normal"><i class="fas fa-check me-1"></i>' . escapeHtml(_x('Completed', 'project state')) . '</span>';
         case 'upcoming':
-            return '<span class="badge rounded-pill text-bg-info fw-normal" title="Starts ' . escapeHtml(date('M j, Y', strtotime($row['project_start']))) . '"><i class="far fa-calendar me-1"></i>Not started</span>';
+            return '<span class="badge rounded-pill text-bg-info fw-normal" title="' . escapeHtml(__('Starts %s', formatDate($row['project_start']))) . '"><i class="far fa-calendar me-1"></i>' . escapeHtml(_x('Not started', 'project state')) . '</span>';
     }
-    return '<span class="badge rounded-pill text-bg-primary fw-normal">Active</span>';
+    return '<span class="badge rounded-pill text-bg-primary fw-normal">' . escapeHtml(_x('Active', 'project state')) . '</span>';
 }
 
 /** Whole days from today to a date: negative is past. */
@@ -159,15 +159,15 @@ function projectDaysFromToday($date) {
 function projectDaysText($days) {
     $days = intval($days);
     if ($days === 0) {
-        return 'today';
+        return __('today');
     }
     if ($days === 1) {
-        return 'tomorrow';
+        return __('tomorrow');
     }
     if ($days === -1) {
-        return 'yesterday';
+        return __('yesterday');
     }
-    return $days > 0 ? "in $days days" : abs($days) . ' days ago';
+    return $days > 0 ? __('in %d days', $days) : __('%d days ago', abs($days));
 }
 
 /**
@@ -197,16 +197,16 @@ function projectDuePill($row) {
     switch ($due['key']) {
         case 'overdue':
             $late = abs($due['days']);
-            return '<span class="badge rounded-pill text-bg-danger" title="Due ' . escapeHtml(date('M j, Y', strtotime($due['date']))) . '"><i class="far fa-calendar-times me-1"></i>' . $late . ' day' . ($late === 1 ? '' : 's') . ' overdue</span>';
+            return '<span class="badge rounded-pill text-bg-danger" title="' . escapeHtml(__('Due %s', formatDate($due['date']))) . '"><i class="far fa-calendar-times me-1"></i>' . escapeHtml(_n('%d day overdue', '%d days overdue', $late)) . '</span>';
         case 'soon':
-            return '<span class="badge rounded-pill text-bg-warning" title="Due ' . escapeHtml(date('M j, Y', strtotime($due['date']))) . '"><i class="far fa-calendar me-1"></i>Due ' . projectDaysText($due['days']) . '</span>';
+            return '<span class="badge rounded-pill text-bg-warning" title="' . escapeHtml(__('Due %s', formatDate($due['date']))) . '"><i class="far fa-calendar me-1"></i>' . escapeHtml(__('Due %s', projectDaysText($due['days']))) . '</span>';
         case 'later':
-            return '<span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal" title="Due ' . projectDaysText($due['days']) . '"><i class="far fa-calendar me-1"></i>Due ' . escapeHtml(date('M j', strtotime($due['date']))) . '</span>';
+            return '<span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal" title="' . escapeHtml(__('Due %s', projectDaysText($due['days']))) . '"><i class="far fa-calendar me-1"></i>' . escapeHtml(__('Due %s', formatDate($due['date'], 'date_short'))) . '</span>';
         case 'done':
-            $when = escapeHtml(date('M j, Y', strtotime($due['date'])));
+            $when = formatDate($due['date']);
             return $due['late']
-                ? '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="Completed ' . $when . ', ' . $due['days_late'] . ' day' . ($due['days_late'] === 1 ? '' : 's') . ' after its due date"><i class="fas fa-check me-1"></i>Done ' . $when . ' (late)</span>'
-                : '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="Completed ' . $when . '"><i class="fas fa-check me-1"></i>Done ' . $when . '</span>';
+                ? '<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-normal" title="' . escapeHtml(_n('Completed %2$s, %1$d day after its due date', 'Completed %2$s, %1$d days after its due date', $due['days_late'], $due['days_late'], $when)) . '"><i class="fas fa-check me-1"></i>' . escapeHtml(__('Done %s (late)', $when)) . '</span>'
+                : '<span class="badge rounded-pill bg-success-subtle text-success-emphasis fw-normal" title="' . escapeHtml(__('Completed %s', $when)) . '"><i class="fas fa-check me-1"></i>' . escapeHtml(__('Done %s', $when)) . '</span>';
     }
     return '';
 }
@@ -263,22 +263,22 @@ function projectViews($with_budget = true) {
     $has_tickets = "EXISTS (SELECT 1 FROM tickets rt WHERE rt.ticket_project_id = projects.project_id AND rt.ticket_archived_at IS NULL)";
     $has_open = "EXISTS (SELECT 1 FROM tickets rt WHERE rt.ticket_project_id = projects.project_id AND rt.ticket_archived_at IS NULL AND rt.ticket_resolved_at IS NULL AND rt.ticket_closed_at IS NULL)";
     $views = [
-        '' => ['label' => 'Active', 'icon' => 'fa-project-diagram', 'where' => $open, 'title' => 'Not completed or archived'],
-        'mine' => ['label' => 'Mine', 'icon' => 'fa-user-tie', 'where' => "$open AND projects.project_manager = " . intval($session_user_id), 'title' => 'Active projects you manage'],
-        'overdue' => ['label' => 'Overdue', 'icon' => 'fa-calendar-times', 'where' => "$open AND projects.project_due < CURDATE()",
-            'title' => 'Past their due date', 'alarm' => 'danger'],
-        'soon' => ['label' => 'Due soon', 'icon' => 'fa-calendar-day', 'where' => "$open AND projects.project_due BETWEEN CURDATE() AND CURDATE() + INTERVAL " . PROJECT_SOON_DAYS . " DAY",
-            'title' => 'Due in the next ' . PROJECT_SOON_DAYS . ' days', 'alarm' => 'warning'],
-        'stalled' => ['label' => 'Stalled', 'icon' => 'fa-hourglass-half', 'where' => "$open AND $started AND (NOT $has_tickets OR $has_open)
+        '' => ['label' => _x('Active', 'projects view'), 'icon' => 'fa-project-diagram', 'where' => $open, 'title' => __('Not completed or archived')],
+        'mine' => ['label' => _x('Mine', 'projects view'), 'icon' => 'fa-user-tie', 'where' => "$open AND projects.project_manager = " . intval($session_user_id), 'title' => __('Active projects you manage')],
+        'overdue' => ['label' => _x('Overdue', 'projects view'), 'icon' => 'fa-calendar-times', 'where' => "$open AND projects.project_due < CURDATE()",
+            'title' => __('Past their due date'), 'alarm' => 'danger'],
+        'soon' => ['label' => _x('Due soon', 'projects view'), 'icon' => 'fa-calendar-day', 'where' => "$open AND projects.project_due BETWEEN CURDATE() AND CURDATE() + INTERVAL " . PROJECT_SOON_DAYS . " DAY",
+            'title' => __('Due in the next %d days', PROJECT_SOON_DAYS), 'alarm' => 'warning'],
+        'stalled' => ['label' => _x('Stalled', 'projects view'), 'icon' => 'fa-hourglass-half', 'where' => "$open AND $started AND (NOT $has_tickets OR $has_open)
             AND COALESCE(" . projectLastActivitySql() . ", projects.project_created_at) < NOW() - INTERVAL " . PROJECT_STALLED_DAYS . " DAY",
-            'title' => 'Started, and none of their tickets has moved in ' . PROJECT_STALLED_DAYS . ' days', 'alarm' => 'warning'],
-        'over_budget' => ['label' => 'Over budget', 'icon' => 'fa-hourglass-end', 'where' => "$open AND projects.project_budget_hours > 0 AND " . projectSecondsSql() . " > projects.project_budget_hours * 3600",
-            'title' => 'More time logged than the hours budgeted', 'alarm' => 'danger'],
-        'ready' => ['label' => 'Ready to close', 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open",
-            'title' => 'Every ticket resolved or closed - mark them complete', 'alarm' => 'success'],
-        'completed' => ['label' => 'Completed', 'icon' => 'fa-check', 'where' => 'projects.project_completed_at IS NOT NULL AND projects.project_archived_at IS NULL'],
-        'archived' => ['label' => 'Archived', 'icon' => 'fa-archive', 'where' => 'projects.project_archived_at IS NOT NULL'],
-        'all' => ['label' => 'All', 'where' => ''],
+            'title' => __('Started, and none of their tickets has moved in %d days', PROJECT_STALLED_DAYS), 'alarm' => 'warning'],
+        'over_budget' => ['label' => _x('Over budget', 'projects view'), 'icon' => 'fa-hourglass-end', 'where' => "$open AND projects.project_budget_hours > 0 AND " . projectSecondsSql() . " > projects.project_budget_hours * 3600",
+            'title' => __('More time logged than the hours budgeted'), 'alarm' => 'danger'],
+        'ready' => ['label' => _x('Ready to close', 'projects view'), 'icon' => 'fa-flag-checkered', 'where' => "$open AND $has_tickets AND NOT $has_open", // i18n-ignore - SQL
+            'title' => __('Every ticket resolved or closed - mark them complete'), 'alarm' => 'success'],
+        'completed' => ['label' => _x('Completed', 'projects view'), 'icon' => 'fa-check', 'where' => 'projects.project_completed_at IS NOT NULL AND projects.project_archived_at IS NULL'],
+        'archived' => ['label' => _x('Archived', 'projects view'), 'icon' => 'fa-archive', 'where' => 'projects.project_archived_at IS NOT NULL'],
+        'all' => ['label' => _x('All', 'projects view'), 'where' => ''],
     ];
     if (!$with_budget) {
         unset($views['over_budget']);
@@ -354,24 +354,24 @@ function projectFlags($row, $stats) {
     $due = projectDueState($row);
     if ($due['key'] === 'overdue') {
         $late = abs($due['days']);
-        $flags[] = ['key' => 'overdue', 'tone' => 'danger', 'text' => "$late day" . ($late === 1 ? '' : 's') . ' past its due date'];
+        $flags[] = ['key' => 'overdue', 'tone' => 'danger', 'text' => _n('%d day past its due date', '%d days past its due date', $late)];
     }
     $budget = floatval($row['project_budget_hours'] ?? 0);
     if ($budget > 0 && $stats['seconds'] > $budget * 3600) {
-        $flags[] = ['key' => 'over_budget', 'tone' => 'danger', 'text' => projectHoursText($stats['seconds'] - $budget * 3600) . ' over its ' . projectHoursText($budget * 3600) . ' budget'];
+        $flags[] = ['key' => 'over_budget', 'tone' => 'danger', 'text' => __('%1$s over its %2$s budget', projectHoursText($stats['seconds'] - $budget * 3600), projectHoursText($budget * 3600))];
     }
     if ($stats['tickets'] && !$stats['open']) {
-        $flags[] = ['key' => 'ready', 'tone' => 'success', 'text' => 'Every ticket is resolved or closed - ready to mark complete'];
+        $flags[] = ['key' => 'ready', 'tone' => 'success', 'text' => __('Every ticket is resolved or closed - ready to mark complete')];
     }
     $started = empty($row['project_start']) || $row['project_start'] <= date('Y-m-d');
     $last = $stats['last_activity'] ?: $row['project_created_at'];
     if ($started && $stats['open'] && strtotime($last) < time() - PROJECT_STALLED_DAYS * 86400) {
-        $flags[] = ['key' => 'stalled', 'tone' => 'warning', 'text' => 'No ticket has moved since ' . date('M j', strtotime($last))];
+        $flags[] = ['key' => 'stalled', 'tone' => 'warning', 'text' => __('No ticket has moved since %s', formatDate($last, 'date_short'))];
     } elseif ($started && !$stats['tickets'] && strtotime($row['project_created_at']) < time() - PROJECT_STALLED_DAYS * 86400) {
-        $flags[] = ['key' => 'stalled', 'tone' => 'warning', 'text' => 'No tickets yet, ' . PROJECT_STALLED_DAYS . '+ days in'];
+        $flags[] = ['key' => 'stalled', 'tone' => 'warning', 'text' => __('No tickets yet, %d+ days in', PROJECT_STALLED_DAYS)];
     }
     if ($due['key'] === 'soon') {
-        $flags[] = ['key' => 'soon', 'tone' => 'warning', 'text' => 'Due ' . projectDaysText($due['days'])];
+        $flags[] = ['key' => 'soon', 'tone' => 'warning', 'text' => __('Due %s', projectDaysText($due['days']))];
     }
     return $flags;
 }
@@ -379,15 +379,15 @@ function projectFlags($row, $stats) {
 /** How far along it is - a bar of tickets done, and tasks under it. */
 function projectProgressHtml($stats, $compact = false) {
     if (!$stats['tickets']) {
-        return '<span class="small text-body-secondary">No tickets yet</span>';
+        return '<span class="small text-body-secondary">' . escapeHtml(__('No tickets yet')) . '</span>';
     }
     $percent = round($stats['done'] / $stats['tickets'] * 100);
     $tone = $stats['done'] === $stats['tickets'] ? 'bg-success' : 'bg-primary';
-    $html = '<div class="itflow-project-progress" title="' . "{$stats['done']} of {$stats['tickets']} tickets resolved or closed" . '">'
+    $html = '<div class="itflow-project-progress" title="' . escapeHtml(__('%1$d of %2$d tickets resolved or closed', $stats['done'], $stats['tickets'])) . '">'
         . '<div class="progress" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar ' . $tone . '" style="width: ' . $percent . '%"></div></div>'
-        . '<span class="small text-nowrap">' . $stats['done'] . '/' . $stats['tickets'] . ($compact ? '' : ' <span class="text-body-secondary">tickets</span>') . '</span></div>';
+        . '<span class="small text-nowrap">' . $stats['done'] . '/' . $stats['tickets'] . ($compact ? '' : ' <span class="text-body-secondary">' . escapeHtml(__('tickets')) . '</span>') . '</span></div>';
     if ($stats['tasks']) {
-        $html .= '<div class="small text-body-secondary text-nowrap mt-1" title="Tasks done on its tickets"><i class="fas fa-tasks me-1"></i>' . $stats['tasks_done'] . '/' . $stats['tasks'] . ' tasks</div>';
+        $html .= '<div class="small text-body-secondary text-nowrap mt-1" title="' . escapeHtml(__('Tasks done on its tickets')) . '"><i class="fas fa-tasks me-1"></i>' . escapeHtml(__('%1$d/%2$d tasks', $stats['tasks_done'], $stats['tasks'])) . '</div>';
     }
     return $html;
 }
@@ -402,7 +402,7 @@ function projectTimeHtml($row, $stats) {
     $used = $stats['seconds'] / ($budget * 3600);
     $percent = min(100, round($used * 100));
     $tone = $used > 1 ? 'bg-danger' : ($used >= .8 ? 'bg-warning' : 'bg-info');
-    return '<div class="itflow-project-progress" title="' . $worked . ' logged of ' . projectHoursText($budget * 3600) . ' budgeted (' . round($used * 100) . '%)">'
+    return '<div class="itflow-project-progress" title="' . escapeHtml(__('%1$s logged of %2$s budgeted (%3$d%%)', $worked, projectHoursText($budget * 3600), round($used * 100))) . '">'
         . '<div class="progress" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar ' . $tone . '" style="width: ' . $percent . '%"></div></div>'
         . '<span class="small text-nowrap ' . ($used > 1 ? 'text-danger-emphasis fw-semibold' : '') . '">' . $worked . ' <span class="text-body-secondary">/ ' . projectHoursText($budget * 3600) . '</span></span></div>';
 }
@@ -548,10 +548,10 @@ function projectAddTicket($project, $ticket) {
     $ticket_client_id = intval($ticket['ticket_client_id']);
     $project_client_id = intval($project['project_client_id']);
     if ($ticket_client_id && !hasClientAccess($ticket_client_id)) {
-        return 'not yours to reach';
+        return __('not yours to reach');
     }
     if ($project_client_id && $ticket_client_id !== $project_client_id) {
-        return "another client's";
+        return __("another client's");
     }
     if (intval($ticket['ticket_project_id']) === intval($project['project_id'])) {
         return '';
@@ -574,11 +574,11 @@ function projectComplete($row) {
     global $mysqli, $session_name;
     $project_id = intval($row['project_id']);
     if (!projectIsOpen($row)) {
-        return 'it is not open';
+        return __('it is not open');
     }
     $open = intval(mysqli_fetch_row(mysqli_query($mysqli, "SELECT COUNT(*) FROM tickets WHERE ticket_project_id = $project_id AND ticket_archived_at IS NULL AND ticket_resolved_at IS NULL AND ticket_closed_at IS NULL"))[0]);
     if ($open) {
-        return "$open of its tickets " . ($open === 1 ? 'is' : 'are') . ' still open';
+        return _n('%d of its tickets is still open', '%d of its tickets are still open', $open);
     }
     mysqli_query($mysqli, "UPDATE projects SET project_completed_at = NOW() WHERE project_id = $project_id");
     logAudit("Project", "Close", "$session_name completed project " . escapeSql(projectReference($row) . ' - ' . $row['project_name']), intval($row['project_client_id']), $project_id);
@@ -629,7 +629,7 @@ function projectNotifyManager($row, $manager_id) {
         return;
     }
     $client_id = intval($row['project_client_id']);
-    $text = escapeSql("$session_name made you the manager of project " . projectReference($row) . ' - ' . $row['project_name']);
+    $text = escapeSql(__('%1$s made you the manager of project %2$s', $session_name, projectReference($row) . ' - ' . $row['project_name']));
     $action = escapeSql('/agent/' . projectUrl($row['project_id'], $client_id));
     mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Project', notification = '$text', notification_action = '$action', notification_client_id = $client_id, notification_user_id = $manager_id");
 }

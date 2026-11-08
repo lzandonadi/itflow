@@ -32,7 +32,7 @@ $network = networkRow($network_id);
 
 if (!$network || ($client_url && intval($network['network_client_id']) !== intval($client_id))) {
 
-    echo "<center><h1 class='text-secondary mt-5'>Nothing to see here</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> Go Back</a></center>";
+    echo "<center><h1 class='text-secondary mt-5'>" . __('Nothing to see here') . "</h1><a class='btn btn-lg btn-secondary mt-3' href='javascript:history.back()'><i class='fa fa-fw fa-arrow-left'></i> " . __('Go Back') . "</a></center>";
 
 } else {
 
@@ -83,9 +83,9 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
     $history = auditLogHistory('Network', $network_id);
 
     $network_tabs = [
-        'addresses' => ['label' => 'Address plan', 'icon' => 'fa-list-ol', 'count' => $usage['used']],
-        'devices' => ['label' => 'Devices', 'icon' => 'fa-desktop', 'count' => $usage['devices']],
-        'history' => ['label' => 'History', 'icon' => 'fa-history', 'count' => $history['count']],
+        'addresses' => ['label' => __('Address plan'), 'icon' => 'fa-list-ol', 'count' => $usage['used']],
+        'devices' => ['label' => __('Devices'), 'icon' => 'fa-desktop', 'count' => $usage['devices']],
+        'history' => ['label' => __('History'), 'icon' => 'fa-history', 'count' => $history['count']],
     ];
 
     ?>
@@ -95,7 +95,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
             <a href="client_overview.php?client_id=<?= $client_id ?>"><?= escapeHtml($network['client_name']) ?></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="networks.php?client_id=<?= $client_id ?>">Networks</a>
+            <a href="networks.php?client_id=<?= $client_id ?>"><?= __('Networks') ?></a>
         </li>
         <li class="breadcrumb-item active"><?= $network_name ?></li>
     </ol>
@@ -108,13 +108,13 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
             <div class="flex-grow-1 min-w-0">
                 <h1 class="h4 fw-semibold mb-1 d-flex flex-wrap align-items-center gap-2">
                     <span><?= $network_name ?></span>
-                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning fs-6" title="Starred"></i><?php } ?>
-                    <?php if ($is_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6">Archived</span><?php } ?>
+                    <?php if ($is_favorite) { ?><i class="fas fa-star text-warning fs-6" title="<?= escapeHtml(__('Starred')) ?>"></i><?php } ?>
+                    <?php if ($is_archived) { ?><span class="badge rounded-pill text-bg-secondary fw-normal fs-6"><?= __('Archived') ?></span><?php } ?>
                     <span class="fs-6 fw-normal"><?= $can_edit ? quickPick('network_type', $network_id, $type, networkTypeLabel($type)) : networkTypeLabel($type) ?></span>
-                    <?php if ($network['network_vlan']) { ?><span class="itflow-net-vlan fs-6">VLAN <?= intval($network['network_vlan']) ?></span><?php } ?>
+                    <?php if ($network['network_vlan']) { ?><span class="itflow-net-vlan fs-6"><?= __('VLAN') ?> <?= intval($network['network_vlan']) ?></span><?php } ?>
                 </h1>
                 <div class="text-body-secondary small d-flex flex-wrap align-items-center column-gap-3 row-gap-1">
-                    <span class="font-monospace text-body fw-semibold"><?= escapeHtml($network['network']) ?><button type="button" class="itflow-copy clipboardjs" title="Copy subnet" data-clipboard-text="<?= escapeHtml($network['network']) ?>"><i class="far fa-copy"></i></button></span>
+                    <span class="font-monospace text-body fw-semibold"><?= escapeHtml($network['network']) ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy subnet')) ?>" data-clipboard-text="<?= escapeHtml($network['network']) ?>"><i class="far fa-copy"></i></button></span>
                     <?php if ($info) { ?><span><?= escapeHtml(networkSizeText($info)) ?></span><?php } ?>
                     <?php if ($network['location_name']) { ?>
                         <a class="text-reset ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=<?= intval($network['network_location_id']) ?>"><i class="fas fa-fw fa-map-marker-alt me-1"></i><?= escapeHtml($network['location_name']) ?></a>
@@ -130,21 +130,21 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                 <?php if ($can_edit) { ?>
                     <?php if ($plan['next_free']) { ?>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary clipboardjs" data-clipboard-text="<?= escapeHtml($plan['next_free']) ?>" title="The first address nothing has, outside the DHCP range - copy it">
-                                <i class="fas fa-magic me-2"></i>Next free <span class="font-monospace ms-1"><?= escapeHtml($plan['next_free']) ?></span>
+                            <button type="button" class="btn btn-outline-secondary clipboardjs" data-clipboard-text="<?= escapeHtml($plan['next_free']) ?>" title="<?= escapeHtml(__('The first address nothing has, outside the DHCP range - copy it')) ?>">
+                                <i class="fas fa-magic me-2"></i><?= __('Next free') ?> <span class="font-monospace ms-1"><?= escapeHtml($plan['next_free']) ?></span>
                             </button>
-                            <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $plan['next_free']])) ?>" title="Document it"><i class="fas fa-plus"></i></button>
+                            <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $plan['next_free']])) ?>" title="<?= escapeHtml(__('Document it')) ?>"><i class="fas fa-plus"></i></button>
                         </div>
                     <?php } ?>
                     <button type="button" class="btn btn-primary ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['next' => 1])) ?>">
-                        <i class="fas fa-plus me-2"></i>Document an address
+                        <i class="fas fa-plus me-2"></i><?= __('Document an address') ?>
                     </button>
                     <button type="button" class="btn btn-outline-secondary ajax-modal" data-modal-size="lg" data-modal-url="modals/network/network_edit.php?id=<?= $network_id ?>">
-                        <i class="fas fa-edit me-2"></i>Edit
+                        <i class="fas fa-edit me-2"></i><?= __('Edit') ?>
                     </button>
                 <?php } ?>
                 <div class="dropdown dropstart">
-                    <button class="btn btn-outline-secondary" title="More actions" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-secondary" title="<?= escapeHtml(__('More actions')) ?>" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-fw fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu">
@@ -154,42 +154,42 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="network_id" value="<?= $network_id ?>">
                                     <button type="submit" name="document_network_interfaces" class="dropdown-item confirm-link"
-                                        data-confirm-title="Document <?= $undocumented ?> device address<?= $undocumented === 1 ? '' : 'es' ?>?" data-confirm-button="Document them"
-                                        data-confirm-text="Each address a device has here, and is not documented yet, is added as a fixed address named for the device, with its MAC.">
-                                        <i class="fas fa-fw fa-clipboard-list text-secondary me-2"></i>Document device addresses (<?= $undocumented ?>)
+                                        data-confirm-title="<?= _n('Document %d device address?', 'Document %d device addresses?', $undocumented) ?>" data-confirm-button="<?= escapeHtml(__('Document them')) ?>"
+                                        data-confirm-text="<?= escapeHtml(__('Each address a device has here, and is not documented yet, is added as a fixed address named for the device, with its MAC.')) ?>">
+                                        <i class="fas fa-fw fa-clipboard-list text-secondary me-2"></i><?= __('Document device addresses (%d)', $undocumented) ?>
                                     </button>
                                 </form>
                             <?php } ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/network/network_ip_import.php?network_id=<?= $network_id ?>">
-                                <i class="fas fa-fw fa-upload text-secondary me-2"></i>Import addresses
+                                <i class="fas fa-fw fa-upload text-secondary me-2"></i><?= __('Import addresses') ?>
                             </a>
                         <?php } ?>
                         <?php if ($usage['documented']) { ?>
                             <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/network/network_ip_export.php?network_id=<?= $network_id ?>">
-                                <i class="fas fa-fw fa-download text-secondary me-2"></i>Export addresses
+                                <i class="fas fa-fw fa-download text-secondary me-2"></i><?= __('Export addresses') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_edit) { ?>
                             <a class="dropdown-item" href="post.php?<?= $is_favorite ? 'unfavorite_network' : 'favorite_network' ?>=<?= $network_id ?>&csrf_token=<?= $csrf ?>">
-                                <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? 'Unstar' : 'Star' ?>
+                                <i class="<?= $is_favorite ? 'far' : 'fas' ?> fa-fw fa-star text-secondary me-2"></i><?= $is_favorite ? __('Unstar') : __('Star') ?>
                             </a>
                         <?php } ?>
                         <?php if ($can_restore) { ?>
                             <div class="dropdown-divider"></div>
                             <?php if ($is_archived) { ?>
                                 <a class="dropdown-item" href="post.php?restore_network=<?= $network_id ?>&csrf_token=<?= $csrf ?>">
-                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i>Restore
+                                    <i class="fas fa-fw fa-redo text-secondary me-2"></i><?= __('Restore') ?>
                                 </a>
                                 <?php if ($can_delete) { ?>
                                     <a class="dropdown-item text-danger text-bold confirm-link" href="post.php?delete_network=<?= $network_id ?>&csrf_token=<?= $csrf ?>"
                                         data-confirm-text="<?= $network_name ?> and the addresses documented on it go for good. The devices on it are left with no network.">
-                                        <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                        <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                     </a>
                                 <?php } ?>
                             <?php } else { ?>
                                 <a class="dropdown-item text-danger confirm-link" href="post.php?archive_network=<?= $network_id ?>&csrf_token=<?= $csrf ?>"
-                                    data-confirm-text="<?= $network_name ?> moves to Archived, off the lists and pickers, until restored. The devices on it keep it.">
-                                    <i class="fas fa-fw fa-archive me-2"></i>Archive
+                                    data-confirm-text="<?= escapeHtml(__('%s moves to Archived, off the lists and pickers, until restored. The devices on it keep it.', $network_name)) ?>">
+                                    <i class="fas fa-fw fa-archive me-2"></i><?= __('Archive') ?>
                                 </a>
                             <?php } ?>
                         <?php } ?>
@@ -202,7 +202,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
     <?php if (!$info) { ?>
         <div class="alert alert-warning d-flex gap-3 mb-3">
             <i class="fas fa-exclamation-triangle mt-1"></i>
-            <div><strong><?= escapeHtml($network['network']) ?></strong> is not a subnet, so its addresses cannot be checked - <?= $can_edit ? '<a class="ajax-modal alert-link" href="#" data-modal-size="lg" data-modal-url="modals/network/network_edit.php?id=' . $network_id . '">write it as an address and prefix</a>' : 'it wants an address and prefix' ?>, like 192.168.1.0/24.</div>
+            <div><?= __('%1$s is not a subnet, so its addresses cannot be checked - %2$s, like 192.168.1.0/24.', '<strong>' . escapeHtml($network['network']) . '</strong>', $can_edit ? '<a class="ajax-modal alert-link" href="#" data-modal-size="lg" data-modal-url="modals/network/network_edit.php?id=' . $network_id . '">' . __('write it as an address and prefix') . '</a>' : __('it wants an address and prefix')) ?></div>
         </div>
     <?php } ?>
 
@@ -210,14 +210,14 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
         <div class="alert alert-info d-flex gap-3 mb-3">
             <i class="fas fa-clone mt-1"></i>
             <div class="min-w-0">
-                <div class="fw-semibold">Overlaps <?= count($overlaps) === 1 ? 'another network' : count($overlaps) . ' other networks' ?> at <?= escapeHtml($network['client_name']) ?></div>
+                <div class="fw-semibold"><?= count($overlaps) === 1 ? __('Overlaps another network at %s', escapeHtml($network['client_name'])) : __('Overlaps %1$d other networks at %2$s', count($overlaps), escapeHtml($network['client_name'])) ?></div>
                 <div class="small">
                     <?php foreach ($overlaps as $i => $overlap) { ?>
                         <?= $i ? ' · ' : '' ?><?= networkLink($overlap['network_id'], $overlap['network_name'], $client_id, ['type' => networkType($overlap)]) ?>
                         <span class="font-monospace"><?= escapeHtml($overlap['network']) ?></span><?= $overlap['location_name'] ? ' at ' . escapeHtml($overlap['location_name']) : '' ?>
                     <?php } ?>
                 </div>
-                <div class="small text-body-secondary">The same range at another site is fine; at the same site, one of them is probably out of date.</div>
+                <div class="small text-body-secondary"><?= __('The same range at another site is fine; at the same site, one of them is probably out of date.') ?></div>
             </div>
         </div>
     <?php } ?>
@@ -226,13 +226,13 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
         <div class="alert alert-warning d-flex gap-3 mb-3 itflow-service-alert">
             <i class="fas fa-exclamation-triangle mt-1"></i>
             <div class="min-w-0">
-                <div class="fw-semibold mb-1"><?= $plan['problems'] ?> thing<?= $plan['problems'] === 1 ? '' : 's' ?> to check in the address plan</div>
+                <div class="fw-semibold mb-1"><?= _n('%d thing to check in the address plan', '%d things to check in the address plan', $plan['problems']) ?></div>
                 <ul class="mb-0 ps-3 small">
                     <?php foreach (array_slice($flagged, 0, 4) as $row) { ?>
                         <li><span class="font-monospace"><?= escapeHtml($row['ip']) ?></span> - <?= escapeHtml($row['flags'][0][1]) ?></li>
                     <?php } ?>
                     <?php foreach (array_slice($plan['outside'], 0, max(0, 4 - count($flagged))) as $row) { ?>
-                        <li><?= escapeHtml($row['asset_name'] . ' ' . $row['interface_name']) ?> has <span class="font-monospace"><?= escapeHtml($row['interface_ip']) ?></span>, which <?= escapeHtml($row['problem']) ?></li>
+                        <li><?= __('%1$s has %2$s, which %3$s', escapeHtml($row['asset_name'] . ' ' . $row['interface_name']), '<span class="font-monospace">' . escapeHtml($row['interface_ip']) . '</span>', escapeHtml($row['problem'])) ?></li>
                     <?php } ?>
                     <?php if ($plan['problems'] > 4) { ?><li class="list-unstyled text-body-secondary">and <?= $plan['problems'] - 4 ?> more below</li><?php } ?>
                 </ul>
@@ -247,57 +247,57 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-network-wired text-secondary me-2"></i>Network</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-network-wired text-secondary me-2"></i><?= __('Network') ?></h3>
                 </div>
                 <div class="card-body">
                     <div class="mb-3"><?= networkUsageBar($usage) ?>
                         <div class="small text-body-secondary d-flex flex-wrap column-gap-3 mt-1">
-                            <span><i class="fas fa-fw fa-desktop me-1"></i><?= $usage['devices'] ?> device<?= $usage['devices'] === 1 ? '' : 's' ?></span>
+                            <span><i class="fas fa-fw fa-desktop me-1"></i><?= _n('%d device', '%d devices', $usage['devices']) ?></span>
                             <span><i class="fas fa-fw fa-list-ol me-1"></i><?= $usage['documented'] ?> documented</span>
-                            <?php if ($plan['free'] !== null) { ?><span title="Free addresses outside the DHCP range"><i class="fas fa-fw fa-circle-notch me-1"></i><?= number_format($plan['free']) ?> free</span><?php } ?>
+                            <?php if ($plan['free'] !== null) { ?><span title="<?= escapeHtml(__('Free addresses outside the DHCP range')) ?>"><i class="fas fa-fw fa-circle-notch me-1"></i><?= number_format($plan['free']) ?> free</span><?php } ?>
                         </div>
                     </div>
                     <dl class="itflow-asset-dl mb-0">
                         <?php if ($info) { ?>
-                            <dt>Addresses</dt>
+                            <dt><?= __('Addresses') ?></dt>
                             <dd class="font-monospace small"><?= escapeHtml($info['first_host']) ?> - <?= escapeHtml($info['last_host']) ?></dd>
                             <?php if ($info['family'] === 4) { ?>
-                                <dt>Mask</dt><dd class="font-monospace small"><?= escapeHtml($info['mask']) ?> <span class="text-body-secondary">/<?= $info['prefix'] ?></span></dd>
+                                <dt><?= __('Mask') ?></dt><dd class="font-monospace small"><?= escapeHtml($info['mask']) ?> <span class="text-body-secondary">/<?= $info['prefix'] ?></span></dd>
                             <?php } ?>
                         <?php } ?>
-                        <dt>Gateway</dt>
-                        <dd><?= $network['network_gateway'] ? '<span class="font-monospace">' . escapeHtml($network['network_gateway']) . '</span><button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="' . escapeHtml($network['network_gateway']) . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">-</span>' ?></dd>
-                        <dt>DNS</dt>
+                        <dt><?= __('Gateway') ?></dt>
+                        <dd><?= $network['network_gateway'] ? '<span class="font-monospace">' . escapeHtml($network['network_gateway']) . '</span><button type="button" class="itflow-copy clipboardjs" title="' . escapeHtml(__('Copy')) . '" data-clipboard-text="' . escapeHtml($network['network_gateway']) . '"><i class="far fa-copy"></i></button>' : '<span class="text-body-secondary">-</span>' ?></dd>
+                        <dt><?= __('DNS') ?></dt>
                         <dd><?php if ($dns) {
-                            foreach ($dns as $server) { ?><div class="font-monospace"><?= escapeHtml($server) ?><button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($server) ?>"><i class="far fa-copy"></i></button></div><?php }
+                            foreach ($dns as $server) { ?><div class="font-monospace"><?= escapeHtml($server) ?><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($server) ?>"><i class="far fa-copy"></i></button></div><?php }
                         } else { ?><span class="text-body-secondary">-</span><?php } ?></dd>
-                        <dt>DHCP</dt>
+                        <dt><?= __('DHCP') ?></dt>
                         <dd>
                             <?php if ($network['network_dhcp_range']) { ?>
                                 <span class="<?= $plan['pool'] ? 'font-monospace' : '' ?>"><?= escapeHtml($plan['pool'] ? networkRangeText(intToIpv4($plan['pool'][0]), intToIpv4($plan['pool'][1])) : $network['network_dhcp_range']) ?></span>
                                 <?php if ($plan['pool']) { ?><div class="small text-body-secondary"><?= number_format($plan['pool'][1] - $plan['pool'][0] + 1) ?> addresses</div><?php } ?>
                             <?php } else { ?>
-                                <span class="text-body-secondary">None written down</span>
+                                <span class="text-body-secondary"><?= __('None written down') ?></span>
                             <?php } ?>
                         </dd>
-                        <?php if ($network['network_vlan']) { ?><dt>VLAN</dt><dd><?= intval($network['network_vlan']) ?></dd><?php } ?>
-                        <dt>Site</dt>
-                        <dd><?= $network['location_name'] ? '<a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=' . intval($network['network_location_id']) . '"><i class="fas fa-fw fa-map-marker-alt text-secondary me-1"></i>' . escapeHtml($network['location_name']) . '</a>' : '<span class="text-body-secondary">Not set</span>' ?></dd>
+                        <?php if ($network['network_vlan']) { ?><dt><?= __('VLAN') ?></dt><dd><?= intval($network['network_vlan']) ?></dd><?php } ?>
+                        <dt><?= __('Site') ?></dt>
+                        <dd><?= $network['location_name'] ? '<a class="ajax-modal" href="#" data-modal-size="lg" data-modal-url="modals/location/location.php?id=' . intval($network['network_location_id']) . '"><i class="fas fa-fw fa-map-marker-alt text-secondary me-1"></i>' . escapeHtml($network['location_name']) . '</a>' : '<span class="text-body-secondary">' . __('Not set') . '</span>' ?></dd>
                         <?php if ($network['vendor_name']) { ?>
-                            <dt><?= $type === 'WAN' ? 'Provider' : 'Vendor' ?></dt>
+                            <dt><?= $type === 'WAN' ? __('Provider') : __('Vendor') ?></dt>
                             <dd class="min-w-0">
                                 <?= vendorLink($network['network_vendor_id'], $network['vendor_name'], ['archived' => !empty($network['vendor_archived_at'])]) ?>
                                 <div class="small d-flex flex-wrap column-gap-3">
                                     <?php $phone = contactPhoneLink($network['vendor_phone'], $network['vendor_phone_country_code'], $network['vendor_extension']);
                                     if ($phone) { ?><span><i class="fas fa-fw fa-phone text-secondary me-1"></i><?= $phone ?></span><?php } ?>
-                                    <?php if ($network['vendor_account_number']) { ?><span title="Account number"><i class="fas fa-fw fa-fingerprint text-secondary me-1"></i><span class="font-monospace"><?= escapeHtml($network['vendor_account_number']) ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy account number" data-clipboard-text="<?= escapeHtml($network['vendor_account_number']) ?>"><i class="far fa-copy"></i></button></span><?php } ?>
+                                    <?php if ($network['vendor_account_number']) { ?><span title="<?= escapeHtml(__('Account number')) ?>"><i class="fas fa-fw fa-fingerprint text-secondary me-1"></i><span class="font-monospace"><?= escapeHtml($network['vendor_account_number']) ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy account number')) ?>" data-clipboard-text="<?= escapeHtml($network['vendor_account_number']) ?>"><i class="far fa-copy"></i></button></span><?php } ?>
                                 </div>
                                 <?php if ($network['vendor_hours']) { ?><div class="small text-body-secondary"><i class="fas fa-fw fa-clock me-1"></i><?= escapeHtml($network['vendor_hours']) ?></div><?php } ?>
                             </dd>
                         <?php } ?>
-                        <dt>Added</dt><dd title="<?= escapeHtml($network['network_created_at']) ?>"><?= timeAgo($network['network_created_at']) ?></dd>
+                        <dt><?= __('Added') ?></dt><dd title="<?= escapeHtml($network['network_created_at']) ?>"><?= timeAgo($network['network_created_at']) ?></dd>
                         <?php if ($network['network_updated_at']) { ?>
-                            <dt>Updated</dt><dd title="<?= escapeHtml($network['network_updated_at']) ?>"><?= timeAgo($network['network_updated_at']) ?></dd>
+                            <dt><?= __('Updated') ?></dt><dd title="<?= escapeHtml($network['network_updated_at']) ?>"><?= timeAgo($network['network_updated_at']) ?></dd>
                         <?php } ?>
                     </dl>
                 </div>
@@ -305,9 +305,9 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i>Notes</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-fw fa-pen text-secondary me-2"></i><?= __('Notes') ?></h3>
                 </div>
-                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-service-notes" rows="7" placeholder="Firewall rules, what it can reach, the switch ports it is on, the DHCP server - saves when you click away"
+                <textarea class="form-control border-0 rounded-0 rounded-bottom itflow-service-notes" rows="7" placeholder="<?= escapeHtml(__('Firewall rules, what it can reach, the switch ports it is on, the DHCP server - saves when you click away')) ?>"
                     data-network-id="<?= $network_id ?>" data-csrf="<?= escapeHtml($csrf) ?>" <?= $can_edit ? '' : 'readonly' ?>><?= escapeHtml($network['network_notes']) ?></textarea>
             </div>
 
@@ -335,30 +335,30 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                         <div class="itflow-asset-pane-bar flex-wrap">
                             <div class="input-group input-group-sm itflow-net-plan-search">
                                 <span class="input-group-text"><i class="fas fa-fw fa-search"></i></span>
-                                <input type="search" class="form-control" id="networkPlanFilter" placeholder="Find an address, hostname, MAC or device" value="<?= escapeHtml(trim((string) ($_GET['q'] ?? ''))) ?>">
+                                <input type="search" class="form-control" id="networkPlanFilter" placeholder="<?= escapeHtml(__('Find an address, hostname, MAC or device')) ?>" value="<?= escapeHtml(trim((string) ($_GET['q'] ?? ''))) ?>">
                             </div>
                             <?php if ($plan['free'] !== null) { ?>
                                 <div class="form-check form-switch small mb-0">
                                     <input class="form-check-input" type="checkbox" id="networkPlanFree" checked>
-                                    <label class="form-check-label" for="networkPlanFree">Free addresses</label>
+                                    <label class="form-check-label" for="networkPlanFree"><?= __('Free addresses') ?></label>
                                 </div>
                             <?php } ?>
                             <?php if ($can_edit) { ?>
                                 <div class="dropdown ms-auto" id="bulkActionButton" hidden>
                                     <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-fw fa-layer-group me-1"></i>Selected (<span id="selectedCount">0</span>)
+                                        <i class="fas fa-fw fa-layer-group me-1"></i><?= __('Selected (%s)', '<span id="selectedCount">0</span>') ?>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <h6 class="dropdown-header">Make them</h6>
-                                        <?php foreach (NETWORK_IP_TYPES as $ip_type => [$icon, $tone, $hint, $label]) { ?>
+                                        <h6 class="dropdown-header"><?= __('Make them') ?></h6>
+                                        <?php foreach (networkIpTypes() as $ip_type => [$icon, $tone, $hint, $label]) { ?>
                                             <button class="dropdown-item" type="submit" form="networkIpBulk" name="bulk_ip_type" value="<?= $ip_type ?>" title="<?= escapeHtml($hint) ?>">
                                                 <i class="fas fa-fw <?= $icon ?> text-secondary me-2"></i><?= $label ?>
                                             </button>
                                         <?php } ?>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item text-danger confirm-link" type="submit" form="networkIpBulk" name="bulk_delete_network_ips"
-                                            data-confirm-text="The addresses are no longer documented. The devices that have them keep them.">
-                                            <i class="fas fa-fw fa-trash me-2"></i>Delete
+                                            data-confirm-text="<?= escapeHtml(__('The addresses are no longer documented. The devices that have them keep them.')) ?>">
+                                            <i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?>
                                         </button>
                                     </div>
                                 </div>
@@ -372,9 +372,9 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                     <table class="table table-sm table-hover align-middle mb-0 itflow-net-plan">
                                         <thead class="table-light text-nowrap">
                                         <tr>
-                                            <?php if ($can_edit) { ?><th class="checkbox-column"><div class="form-check"><input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="Select all documented"></div></th><?php } ?>
-                                            <th>Address</th>
-                                            <th>What has it</th>
+                                            <?php if ($can_edit) { ?><th class="checkbox-column"><div class="form-check"><input class="form-check-input" id="selectAllCheckbox" type="checkbox" onclick="checkAll(this)" title="<?= escapeHtml(__('Select all documented')) ?>"></div></th><?php } ?>
+                                            <th><?= __('Address') ?></th>
+                                            <th><?= __('What has it') ?></th>
                                             <th></th>
                                         </tr>
                                         </thead>
@@ -387,7 +387,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                                     <td class="small text-body-secondary"><i class="fas fa-fw fa-circle-notch me-1"></i><?= number_format($row['count']) ?> free</td>
                                                     <td class="text-end">
                                                         <?php if ($can_edit) { ?>
-                                                            <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['start']])) ?>" title="Document <?= escapeHtml($row['start']) ?>">Use</button>
+                                                            <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['start']])) ?>" title="<?= __('Document %s', escapeHtml($row['start'])) ?>"><?= __('Use') ?></button>
                                                         <?php } ?>
                                                     </td>
                                                 </tr>
@@ -395,7 +395,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                                 <tr class="itflow-net-pool">
                                                     <?php if ($can_edit) { ?><td></td><?php } ?>
                                                     <td class="font-monospace small text-nowrap"><?= escapeHtml(networkRangeText($row['start'], $row['end'])) ?></td>
-                                                    <td colspan="2" class="small"><i class="fas fa-fw fa-random me-1"></i><strong>DHCP range</strong> - <?= number_format($row['count']) ?> addresses handed out as needed<?= $row['used'] ? ', ' . $row['used'] . ' of them below' : '' ?></td>
+                                                    <td colspan="2" class="small"><i class="fas fa-fw fa-random me-1"></i><?= $row['used'] ? __('<strong>DHCP range</strong> - %1$s addresses handed out as needed, %2$s of them below', number_format($row['count']), $row['used']) : __('<strong>DHCP range</strong> - %s addresses handed out as needed', number_format($row['count'])) ?></td>
                                                 </tr>
                                             <?php } else {
                                                 $first_doc = $row['documented'][0] ?? null;
@@ -407,36 +407,36 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                                     <?php if ($can_edit) { ?>
                                                         <td class="checkbox-column">
                                                             <?php if ($first_doc) { ?>
-                                                                <div class="form-check"><input class="form-check-input bulk-select" type="checkbox" name="network_ip_ids[]" value="<?= intval($first_doc['ip_id']) ?>" aria-label="Select <?= escapeHtml($row['ip']) ?>"></div>
+                                                                <div class="form-check"><input class="form-check-input bulk-select" type="checkbox" name="network_ip_ids[]" value="<?= intval($first_doc['ip_id']) ?>" aria-label="<?= __('Select %s', escapeHtml($row['ip'])) ?>"></div>
                                                             <?php } ?>
                                                         </td>
                                                     <?php } ?>
                                                     <td class="text-nowrap itflow-net-plan-ip">
-                                                        <span class="font-monospace fw-semibold"><?= escapeHtml($row['ip']) ?></span><button type="button" class="itflow-copy clipboardjs" title="Copy" data-clipboard-text="<?= escapeHtml($row['ip']) ?>"><i class="far fa-copy"></i></button>
-                                                        <?php if ($row['gateway']) { ?><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal ms-1">Gateway</span><?php } ?>
+                                                        <span class="font-monospace fw-semibold"><?= escapeHtml($row['ip']) ?></span><button type="button" class="itflow-copy clipboardjs" title="<?= escapeHtml(__('Copy')) ?>" data-clipboard-text="<?= escapeHtml($row['ip']) ?>"><i class="far fa-copy"></i></button>
+                                                        <?php if ($row['gateway']) { ?><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fw-normal ms-1"><?= __('Gateway') ?></span><?php } ?>
                                                     </td>
                                                     <td class="min-w-0">
                                                         <?php foreach ($row['documented'] as $doc) { ?>
                                                             <div class="d-flex flex-wrap align-items-center column-gap-2">
                                                                 <?= networkIpTypePill($doc['ip_type']) ?>
                                                                 <?php if ($can_edit) { ?>
-                                                                    <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="modals/network/network_ip_edit.php?id=<?= intval($doc['ip_id']) ?>"><?= escapeHtml($doc['ip_hostname'] ?: 'No hostname') ?></a>
+                                                                    <a class="fw-semibold text-body ajax-modal" href="#" data-modal-url="modals/network/network_ip_edit.php?id=<?= intval($doc['ip_id']) ?>"><?= escapeHtml($doc['ip_hostname'] ?: __('No hostname')) ?></a>
                                                                 <?php } else { ?>
-                                                                    <span class="fw-semibold"><?= escapeHtml($doc['ip_hostname'] ?: 'No hostname') ?></span>
+                                                                    <span class="fw-semibold"><?= escapeHtml($doc['ip_hostname'] ?: __('No hostname')) ?></span>
                                                                 <?php } ?>
                                                                 <?php if ($doc['ip_description']) { ?><span class="small text-body-secondary text-truncate"><?= escapeHtml($doc['ip_description']) ?></span><?php } ?>
-                                                                <?php if ($doc['ip_mac']) { ?><span class="small font-monospace text-body-secondary" title="MAC"><?= escapeHtml($doc['ip_mac']) ?></span><?php } ?>
+                                                                <?php if ($doc['ip_mac']) { ?><span class="small font-monospace text-body-secondary" title="<?= escapeHtml(__('MAC')) ?>"><?= escapeHtml($doc['ip_mac']) ?></span><?php } ?>
                                                             </div>
                                                         <?php } ?>
                                                         <?php foreach ($row['interfaces'] as $interface) { ?>
                                                             <div class="d-flex flex-wrap align-items-center column-gap-2 small">
                                                                 <?= interfaceAssetRef($interface['asset_id'], $interface['asset_name'], $interface['asset_type']) ?>
                                                                 <span class="text-body-secondary"><i class="fas fa-ethernet fa-fw opacity-75"></i><?= escapeHtml($interface['interface_name']) ?></span>
-                                                                <?php if ($interface['interface_mac'] && !$row['documented']) { ?><span class="font-monospace text-body-secondary" title="MAC"><?= escapeHtml($interface['interface_mac']) ?></span><?php } ?>
+                                                                <?php if ($interface['interface_mac'] && !$row['documented']) { ?><span class="font-monospace text-body-secondary" title="<?= escapeHtml(__('MAC')) ?>"><?= escapeHtml($interface['interface_mac']) ?></span><?php } ?>
                                                             </div>
                                                         <?php } ?>
                                                         <?php if (!$row['documented'] && !$row['interfaces'] && $row['gateway']) { ?>
-                                                            <span class="small text-body-secondary">The gateway - the router or firewall</span>
+                                                            <span class="small text-body-secondary"><?= __('The gateway - the router or firewall') ?></span>
                                                         <?php } ?>
                                                         <?php foreach ($row['flags'] as [$tone, $text]) { ?>
                                                             <div class="small text-<?= $tone ?>-emphasis"><i class="fas fa-fw fa-exclamation-<?= $tone === 'danger' ? 'circle' : 'triangle' ?> me-1"></i><?= escapeHtml($text) ?></div>
@@ -446,20 +446,20 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                                         <?php if ($can_edit) {
                                                             if ($first_doc) { ?>
                                                                 <div class="dropdown dropstart">
-                                                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" title="More actions"><i class="fas fa-fw fa-ellipsis-v"></i></button>
+                                                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" title="<?= escapeHtml(__('More actions')) ?>"><i class="fas fa-fw fa-ellipsis-v"></i></button>
                                                                     <div class="dropdown-menu">
-                                                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/network/network_ip_edit.php?id=<?= intval($first_doc['ip_id']) ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i>Edit</a>
+                                                                        <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/network/network_ip_edit.php?id=<?= intval($first_doc['ip_id']) ?>"><i class="fas fa-fw fa-edit text-secondary me-2"></i><?= __('Edit') ?></a>
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item text-danger confirm-link" href="post.php?delete_network_ip=<?= intval($first_doc['ip_id']) ?>&csrf_token=<?= $csrf ?>"
-                                                                            data-confirm-text="<?= escapeHtml($row['ip']) ?> is no longer documented<?= $row['interfaces'] ? ' - the device that has it keeps it' : '' ?>."><i class="fas fa-fw fa-trash me-2"></i>Delete</a>
+                                                                            data-confirm-text="<?= escapeHtml($row['interfaces'] ? __('%s is no longer documented - the device that has it keeps it.', $row['ip']) : __('%s is no longer documented.', $row['ip'])) ?>"><i class="fas fa-fw fa-trash me-2"></i><?= __('Delete') ?></a>
                                                                     </div>
                                                                 </div>
                                                             <?php } elseif ($row['interfaces']) {
                                                                 $interface = $row['interfaces'][0]; ?>
-                                                                <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" title="Document it - from the device"
-                                                                    data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['ip'], 'hostname' => $interface['asset_name'], 'mac' => $interface['interface_mac'], 'description' => $interface['interface_name']])) ?>">Document</button>
+                                                                <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" title="<?= escapeHtml(__('Document it - from the device')) ?>"
+                                                                    data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['ip'], 'hostname' => $interface['asset_name'], 'mac' => $interface['interface_mac'], 'description' => $interface['interface_name']])) ?>"><?= __('Document') ?></button>
                                                             <?php } elseif ($row['gateway']) { ?>
-                                                                <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['ip'], 'description' => 'Gateway'])) ?>">Document</button>
+                                                                <button type="button" class="btn btn-sm btn-link py-0 ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['ip' => $row['ip'], 'description' => __('Gateway')])) ?>"><?= __('Document') ?></button>
                                                             <?php }
                                                         } ?>
                                                     </td>
@@ -470,17 +470,17 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                     </table>
                                 </div>
                             </form>
-                            <div class="itflow-asset-empty d-none" id="networkPlanNone">Nothing on this network matches.</div>
+                            <div class="itflow-asset-empty d-none" id="networkPlanNone"><?= __('Nothing on this network matches.') ?></div>
                         <?php } else { ?>
                             <div class="itflow-asset-empty">
-                                Nothing documented and no device on it yet.
-                                <?php if ($can_edit) { ?><div class="mt-2"><button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['next' => 1])) ?>"><i class="fas fa-plus me-2"></i>Document an address</button></div><?php } ?>
+                                <?= __('Nothing documented and no device on it yet.') ?>
+                                <?php if ($can_edit) { ?><div class="mt-2"><button type="button" class="btn btn-sm btn-primary ajax-modal" data-modal-url="<?= escapeHtml($ip_add_url(['next' => 1])) ?>"><i class="fas fa-plus me-2"></i><?= __('Document an address') ?></button></div><?php } ?>
                             </div>
                         <?php } ?>
 
                         <?php if ($plan['dhcp'] || $plan['unaddressed'] || $plan['outside']) { ?>
                             <div class="border-top px-3 py-2 small itflow-net-unplaced">
-                                <?php foreach (['outside' => ['Outside the subnet', 'fa-exclamation-triangle text-warning'], 'dhcp' => ['On DHCP', 'fa-random text-info'], 'unaddressed' => ['No address', 'fa-minus text-body-secondary']] as $group => [$label, $icon]) {
+                                <?php foreach (['outside' => [__('Outside the subnet'), 'fa-exclamation-triangle text-warning'], 'dhcp' => [__('On DHCP'), 'fa-random text-info'], 'unaddressed' => [__('No address'), 'fa-minus text-body-secondary']] as $group => [$label, $icon]) {
                                     if (!$plan[$group]) {
                                         continue;
                                     } ?>
@@ -506,14 +506,14 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                             </div>
                         <?php } ?>
                         <?php if ($info && ($info['family'] === 6 || $info['prefix'] < 20)) { ?>
-                            <div class="border-top px-3 py-2 small text-body-secondary"><i class="fas fa-fw fa-info-circle me-1"></i>Free addresses are shown for IPv4 networks up to a /20 - this one lists what is in use.</div>
+                            <div class="border-top px-3 py-2 small text-body-secondary"><i class="fas fa-fw fa-info-circle me-1"></i><?= __('Free addresses are shown for IPv4 networks up to a /20 - this one lists what is in use.') ?></div>
                         <?php } ?>
                     </div>
 
                     <!-- History, from the audit log -->
                     <div class="tab-pane fade" id="network-pane-history" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">Changes to the network - newest first.</span>
+                            <span class="text-body-secondary small"><?= __('Changes to the network - newest first.') ?></span>
                         </div>
                         <?= auditLogHistoryHtml($history, ['client_id' => $client_id]) ?>
                     </div>
@@ -521,18 +521,18 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                     <!-- The interfaces of devices set to this network -->
                     <div class="tab-pane fade" id="network-pane-devices" role="tabpanel">
                         <div class="itflow-asset-pane-bar">
-                            <span class="text-body-secondary small">The ports and network cards of devices set to this network - set from the device's Interfaces tab.</span>
+                            <span class="text-body-secondary small"><?= __('The ports and network cards of devices set to this network - set from the device\'s Interfaces tab.') ?></span>
                         </div>
                         <?php if ($interfaces) { ?>
                             <div class="table-responsive">
                                 <table class="table table-sm table-hover align-middle mb-0">
                                     <thead class="table-light text-nowrap">
                                     <tr>
-                                        <th>Device</th>
-                                        <th>Interface</th>
-                                        <th>Address</th>
-                                        <th class="d-none d-md-table-cell">MAC</th>
-                                        <th class="d-none d-lg-table-cell">Connected to</th>
+                                        <th><?= __('Device') ?></th>
+                                        <th><?= __('Interface') ?></th>
+                                        <th><?= __('Address') ?></th>
+                                        <th class="d-none d-md-table-cell"><?= __('MAC') ?></th>
+                                        <th class="d-none d-lg-table-cell"><?= __('Connected to') ?></th>
                                         <th></th>
                                     </tr>
                                     </thead>
@@ -545,14 +545,14 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                             <td class="min-w-0"><?= interfaceAssetRef($interface['asset_id'], $interface['asset_name'], $interface['asset_type']) ?></td>
                                             <td>
                                                 <span class="fw-semibold"><?= escapeHtml($interface['interface_name']) ?></span>
-                                                <?php if (intval($interface['interface_primary'])) { ?><span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal ms-1">Primary</span><?php } ?>
+                                                <?php if (intval($interface['interface_primary'])) { ?><span class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal ms-1"><?= __('Primary') ?></span><?php } ?>
                                                 <?php if ($interface['interface_description'] || $interface['interface_vlans']) { ?>
                                                     <div class="small text-body-secondary"><?= escapeHtml(implode(' · ', array_filter([$interface['interface_description'], $interface['interface_vlans'] ? 'VLAN ' . $interface['interface_vlans'] : '']))) ?></div>
                                                 <?php } ?>
                                             </td>
                                             <td class="text-nowrap">
                                                 <?= interfaceIpHtml($interface['interface_ip']) ?>
-                                                <?php if ($outside) { ?><div class="small text-warning-emphasis"><i class="fas fa-exclamation-triangle me-1"></i>Outside <?= escapeHtml($info['cidr']) ?></div><?php } ?>
+                                                <?php if ($outside) { ?><div class="small text-warning-emphasis"><i class="fas fa-exclamation-triangle me-1"></i><?= __('Outside %s', escapeHtml($info['cidr'])) ?></div><?php } ?>
                                             </td>
                                             <td class="d-none d-md-table-cell font-monospace small"><?= escapeHtml($interface['interface_mac']) ?></td>
                                             <td class="d-none d-lg-table-cell small">
@@ -565,7 +565,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                             </td>
                                             <td class="text-end">
                                                 <?php if ($can_edit) { ?>
-                                                    <button type="button" class="btn btn-sm btn-light ajax-modal" title="Edit interface" data-modal-size="lg" data-modal-url="modals/asset/asset_interface_edit.php?id=<?= intval($interface['interface_id']) ?>"><i class="fas fa-fw fa-edit"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light ajax-modal" title="<?= escapeHtml(__('Edit interface')) ?>" data-modal-size="lg" data-modal-url="modals/asset/asset_interface_edit.php?id=<?= intval($interface['interface_id']) ?>"><i class="fas fa-fw fa-edit"></i></button>
                                                 <?php } ?>
                                             </td>
                                         </tr>
@@ -574,7 +574,7 @@ if (!$network || ($client_url && intval($network['network_client_id']) !== intva
                                 </table>
                             </div>
                         <?php } else { ?>
-                            <div class="itflow-asset-empty">No device is set to this network - pick it on a device's interface.</div>
+                            <div class="itflow-asset-empty"><?= __('No device is set to this network - pick it on a device\'s interface.') ?></div>
                         <?php } ?>
                     </div>
 

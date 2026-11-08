@@ -12,7 +12,7 @@ $category = categoryRow(intval($_GET['id'] ?? 0));
 ob_start();
 
 if (!$category) { ?>
-    <div class="modal-body text-center text-secondary py-5">That category is gone - it may have been merged into another, or deleted.</div>
+    <div class="modal-body text-center text-secondary py-5"><?= __('That category is gone - it may have been merged into another, or deleted.') ?></div>
 <?php } else {
     $category_id = intval($category['category_id']);
     $kind = (string) $category['category_type'];
@@ -29,16 +29,16 @@ if (!$category) { ?>
 
     <div class="modal-body">
         <?php if ($category['category_archived_at']) { ?>
-            <div class="alert alert-secondary small py-2"><i class="fas fa-fw fa-archive me-1"></i>Archived <?= date('M j, Y', strtotime($category['category_archived_at'])) ?> - it stays on its records, but isn't offered for new ones.</div>
+            <div class="alert alert-secondary small py-2"><i class="fas fa-fw fa-archive me-1"></i><?= _x('Archived %s', 'archived on', formatDate($category['category_archived_at'], 'date')) ?> - it stays on its records, but isn't offered for new ones.</div>
         <?php } ?>
         <?php if (!$kind_config) { ?>
-            <div class="alert alert-warning small py-2">This is a "<?= escapeHtml($kind) ?>" category - nothing in ITFlow uses that kind any more.</div>
+            <div class="alert alert-warning small py-2"><?= __('This is a "%s" category - nothing in ITFlow uses that kind any more.', escapeHtml($kind)) ?></div>
         <?php } ?>
         <?php require __DIR__ . '/category_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="edit_category" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Save changes</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="edit_category" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Save changes') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

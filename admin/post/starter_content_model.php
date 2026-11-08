@@ -1,7 +1,8 @@
 <?php
 defined('FROM_POST_HANDLER') || defined('FROM_STARTER_CONTENT') || die("Direct file access is not allowed");
 
-/*
+/* i18n-ignore-file - the starter content is data, in English like the rest of a new install (a pt-BR pack is its own change)
+ *
  * ITFlow - Starter content library
  *
  * A catalog of opinionated defaults for a typical MSP, loaded on demand from

@@ -14,14 +14,14 @@ if (isset($_POST['add_custom_link']) || isset($_POST['edit_custom_link'])) {
 
     $row = isset($_POST['edit_custom_link']) ? customLinkRow($_POST['custom_link_id'] ?? 0) : null;
     if (isset($_POST['edit_custom_link']) && !$row) {
-        flashAlert("That link is gone - it may have been deleted.", 'error');
+        flashAlert(__('That link is gone - it may have been deleted.'), 'error');
         redirect();
     }
 
     $fields = customLinkFromInput($_POST);
     $problem = customLinkProblem($fields);
     if ($problem !== '') {
-        flashAlert(escapeHtml($problem) . ' The link was not saved.', 'error');
+        flashAlert(__('%s The link was not saved.', escapeHtml($problem)), 'error');
         redirect();
     }
 
@@ -34,11 +34,11 @@ if (isset($_POST['add_custom_link']) || isset($_POST['edit_custom_link'])) {
         if ($changes) {
             logAudit("Custom Link", "Edit", "$session_name changed custom link " . escapeSql($row['custom_link_name']) . ": " . escapeSql(implode('; ', $changes)), 0, $custom_link_id);
         }
-        flashAlert("Link <strong>" . escapeHtml($fields['name']) . "</strong> saved");
+        flashAlert(__('Link <strong>%s</strong> saved', escapeHtml($fields['name'])));
     } else {
         $custom_link_id = customLinkCreate($fields);
         logAudit("Custom Link", "Create", "$session_name added custom link $name to the $where -> " . escapeSql($fields['uri']), 0, $custom_link_id);
-        flashAlert("Link <strong>" . escapeHtml($fields['name']) . "</strong> added to the " . escapeHtml(customLinkLocations()[$fields['location']]['label']));
+        flashAlert(__('Link <strong>%1$s</strong> added to the %2$s', escapeHtml($fields['name']), escapeHtml(customLinkLocations()[$fields['location']]['label'])));
     }
 
     redirect();
@@ -53,7 +53,7 @@ if (isset($_GET['copy_custom_link'])) {
     if ($row) {
         $custom_link_id = customLinkCopy($row);
         logAudit("Custom Link", "Create", "$session_name copied custom link " . escapeSql($row['custom_link_name']), 0, $custom_link_id);
-        flashAlert("Link <strong>" . escapeHtml($row['custom_link_name']) . "</strong> copied - change the copy, or move it to another menu");
+        flashAlert(__('Link <strong>%s</strong> copied - change the copy, or move it to another menu', escapeHtml($row['custom_link_name'])));
     }
 
     redirect();
@@ -75,7 +75,7 @@ if (isset($_GET['archive_custom_link']) || isset($_GET['restore_custom_link'])) 
             mysqli_query($mysqli, "UPDATE custom_links SET custom_link_archived_at = NULL, custom_link_order = " . customLinkNextOrder($row['custom_link_location']) . " WHERE custom_link_id = $custom_link_id");
         }
         logAudit("Custom Link", $archive ? "Archive" : "Restore", "$session_name " . ($archive ? 'archived' : 'restored') . " custom link " . escapeSql($row['custom_link_name']), 0, $custom_link_id);
-        flashAlert("Link <strong>" . escapeHtml($row['custom_link_name']) . "</strong> " . ($archive ? 'archived - it no longer shows in its menu' : 'restored'));
+        flashAlert(($archive ? __('Link <strong>%s</strong> archived - it no longer shows in its menu', escapeHtml($row['custom_link_name'])) : __('Link <strong>%s</strong> restored', escapeHtml($row['custom_link_name']))));
     }
 
     redirect();
@@ -91,7 +91,7 @@ if (isset($_GET['delete_custom_link'])) {
         $custom_link_id = intval($row['custom_link_id']);
         mysqli_query($mysqli, "DELETE FROM custom_links WHERE custom_link_id = $custom_link_id");
         logAudit("Custom Link", "Delete", "$session_name deleted custom link " . escapeSql($row['custom_link_name']) . " -> " . escapeSql($row['custom_link_uri']), 0, $custom_link_id);
-        flashAlert("Link <strong>" . escapeHtml($row['custom_link_name']) . "</strong> deleted", 'error');
+        flashAlert(__('Link <strong>%s</strong> deleted', escapeHtml($row['custom_link_name'])), 'error');
     }
 
     redirect();
@@ -125,13 +125,13 @@ if (isset($_POST['reorder_custom_links'])) {
     // Dragged into order on Admin > Custom Links - answers with JSON, as the page saves it in the background
     header('Content-Type: application/json');
     if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => 'The page is out of date - reload it']);
+        echo json_encode(['ok' => false, 'error' => __('The page is out of date - reload it')]);
         exit;
     }
 
     $location = intval($_POST['location'] ?? 0);
     if (!isset(customLinkLocations()[$location])) {
-        echo json_encode(['ok' => false, 'error' => 'No such menu']);
+        echo json_encode(['ok' => false, 'error' => __('No such menu')]);
         exit;
     }
 
@@ -141,7 +141,7 @@ if (isset($_POST['reorder_custom_links'])) {
     $new_order = array_values(array_diff($current, $ids));
     array_splice($new_order, min(max(0, intval($_POST['offset'] ?? 0)), count($new_order)), 0, $ids);
     if (customLinkReorder($location, $new_order)) {
-        logAudit("Custom Link", "Edit", "$session_name reordered the custom links in the " . escapeSql(customLinkLocations()[$location]['label']));
+        logAudit("Custom Link", "Edit", "$session_name reordered the custom links in the " . escapeSql(i18nEnglish(fn () => customLinkLocations()[$location]['label'])));
     }
 
     echo json_encode(['ok' => true]);

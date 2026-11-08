@@ -11,7 +11,7 @@ $copy_of = isset($_GET['copy']) ? roleRow(intval($_GET['copy'])) : null;
 $role = null;
 if ($copy_of) {
     $role = $copy_of;
-    $role['role_name'] = 'Copy of ' . $copy_of['role_name'];
+    $role['role_name'] = __('Copy of %s', $copy_of['role_name']);
     // A copy isn't built in
     $role['role_description'] = preg_replace('/^Built-in - /', '', (string) $copy_of['role_description']);
 }
@@ -22,7 +22,7 @@ ob_start();
 ?>
 
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fas fa-fw fa-user-shield me-2"></i><?= $copy_of ? 'Copy ' . escapeHtml($copy_of['role_name']) : 'New Role' ?></h5>
+    <h5 class="modal-title"><i class="fas fa-fw fa-user-shield me-2"></i><?= $copy_of ? escapeHtml(__('Copy %s', $copy_of['role_name'])) : __('New Role') ?></h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
@@ -30,13 +30,13 @@ ob_start();
 
     <div class="modal-body">
         <?php if ($copy_of) { ?>
-            <div class="alert alert-secondary small py-2"><i class="fas fa-fw fa-copy me-1"></i>A new role, starting from <?= escapeHtml($copy_of['role_name']) ?>'s access - its agents keep theirs.</div>
+            <div class="alert alert-secondary small py-2"><i class="fas fa-fw fa-copy me-1"></i><?= escapeHtml(__("A new role, starting from %s's access - its agents keep theirs.", $copy_of['role_name'])) ?></div>
         <?php } ?>
         <?php require __DIR__ . '/role_form.php'; ?>
     </div>
     <div class="modal-footer">
-        <button type="submit" name="add_role" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i>Create role</button>
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+        <button type="submit" name="add_role" class="btn btn-primary text-bold"><i class="fas fa-check me-2"></i><?= __('Create role') ?></button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i><?= __('Cancel') ?></button>
     </div>
 </form>
 

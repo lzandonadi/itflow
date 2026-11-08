@@ -135,13 +135,13 @@ function assetWarranty($warranty_expire, $soon_days = 90) {
     $date = $expires->format('Y-m-d');
 
     if ($days < 0) {
-        return ['tone' => 'danger', 'short' => 'Expired', 'text' => 'Expired ' . timeAgo($date), 'days' => $days, 'date' => $date];
+        return ['tone' => 'danger', 'short' => __('Expired'), 'badge' => __('Warranty expired'), 'text' => __('Expired %s', timeAgo($date)), 'days' => $days, 'date' => $date];
     }
     if ($days <= $soon_days) {
-        $left = $days === 0 ? 'today' : ($days === 1 ? '1 day left' : "$days days left");
-        return ['tone' => 'warning', 'short' => $left, 'text' => $days === 0 ? 'Expires today' : "Expires in $days day" . ($days === 1 ? '' : 's'), 'days' => $days, 'date' => $date];
+        $left = $days === 0 ? __('today') : _n('%d day left', '%d days left', $days);
+        return ['tone' => 'warning', 'short' => $left, 'badge' => $days === 0 ? __('Warranty today') : _n('Warranty %d day left', 'Warranty %d days left', $days), 'text' => $days === 0 ? __('Expires today') : _n('Expires in %d day', 'Expires in %d days', $days), 'days' => $days, 'date' => $date];
     }
-    return ['tone' => 'success', 'short' => 'Covered', 'text' => "Until $date", 'days' => $days, 'date' => $date];
+    return ['tone' => 'success', 'short' => __('Covered'), 'badge' => __('Warranty covered'), 'text' => __('Until %s', formatDate($date, 'date')), 'days' => $days, 'date' => $date];
 }
 
 /** "3 yrs 2 mos" since a date, or '' without one. For purchase / install dates. */
@@ -160,13 +160,13 @@ function assetAge($date) {
     }
     $parts = [];
     if ($diff->y) {
-        $parts[] = $diff->y . ' yr' . ($diff->y === 1 ? '' : 's');
+        $parts[] = _n('%d yr', '%d yrs', $diff->y);
     }
     if ($diff->m) {
-        $parts[] = $diff->m . ' mo' . ($diff->m === 1 ? '' : 's');
+        $parts[] = _n('%d mo', '%d mos', $diff->m);
     }
     if (!$parts) {
-        return $diff->d <= 1 ? 'new' : $diff->d . ' days';
+        return $diff->d <= 1 ? __('new') : _n('%d day', '%d days', $diff->d);
     }
     return implode(' ', $parts);
 }
@@ -177,7 +177,7 @@ function assetAge($date) {
  */
 function assetLinks($uri, $uri_2, $uri_client) {
     $links = [];
-    foreach ([['Open', $uri], ['Open 2', $uri_2], ['Client link', $uri_client]] as [$label, $url]) {
+    foreach ([[__('Open'), $uri], [__('Open 2'), $uri_2], [__('Client link'), $uri_client]] as [$label, $url]) {
         $url = trim((string) $url);
         if ($url !== '') {
             $links[] = [$label, $url];
@@ -274,17 +274,17 @@ function assetQuickHtml($field, $row, $style = 'list') {
     $empty = "$pill itflow-asset-pill-empty";
 
     if ($field === 'asset_status') {
-        return assetStatusPill($row['asset_status'] ?? '') ?: "<span class=\"$empty\">No status</span>";
+        return assetStatusPill($row['asset_status'] ?? '') ?: "<span class=\"$empty\">" . __('No status') . '</span>';
     }
 
     if ($field === 'asset_location') {
         if (!intval($row['asset_location_id'] ?? 0) || (string) ($row['location_name'] ?? '') === '') {
             return $style === 'detail'
-                ? '<span class="text-body-secondary">No location</span>'
-                : "<span class=\"$empty\"><i class=\"fas fa-map-marker-alt\"></i>No location</span>";
+                ? '<span class="text-body-secondary">' . __('No location') . '</span>'
+                : "<span class=\"$empty\"><i class=\"fas fa-map-marker-alt\"></i>" . __('No location') . '</span>';
         }
         $archived = !empty($row['location_archived_at']);
-        $name = '<span class="text-truncate' . ($archived ? ' text-decoration-line-through' : '') . '"' . ($archived ? ' title="Archived location"' : '') . '>' . escapeHtml($row['location_name']) . '</span>';
+        $name = '<span class="text-truncate' . ($archived ? ' text-decoration-line-through' : '') . '"' . ($archived ? ' title="' . escapeHtml(__('Archived location')) . '"' : '') . '>' . escapeHtml($row['location_name']) . '</span>';
         return $style === 'detail'
             ? '<span class="d-inline-flex align-items-center gap-2 min-w-0' . ($archived ? ' text-danger' : '') . "\">$name</span>"
             : "<span class=\"$pill " . ($archived ? 'text-danger-emphasis bg-danger-subtle' : 'text-body-emphasis bg-body-secondary') . "\"><i class=\"fas fa-map-marker-alt text-body-secondary\"></i>$name</span>";
@@ -293,12 +293,12 @@ function assetQuickHtml($field, $row, $style = 'list') {
     if ($field === 'asset_contact') {
         if (!intval($row['asset_contact_id'] ?? 0) || (string) ($row['contact_name'] ?? '') === '') {
             return $style === 'detail'
-                ? '<span class="text-body-secondary">Nobody</span>'
-                : "<span class=\"$empty\"><i class=\"fas fa-user-slash\"></i>Nobody</span>";
+                ? '<span class="text-body-secondary">' . __('Nobody') . '</span>'
+                : "<span class=\"$empty\"><i class=\"fas fa-user-slash\"></i>" . __('Nobody') . '</span>';
         }
         $archived = !empty($row['contact_archived_at']);
         $avatar = contactAvatar($client_id, $row['asset_contact_id'], $row['contact_name'], $row['contact_photo'] ?? '', 'xs');
-        $name = '<span class="text-truncate' . ($archived ? ' text-decoration-line-through' : '') . '"' . ($archived ? ' title="Archived contact"' : '') . '>' . escapeHtml($row['contact_name']) . '</span>';
+        $name = '<span class="text-truncate' . ($archived ? ' text-decoration-line-through' : '') . '"' . ($archived ? ' title="' . escapeHtml(__('Archived contact')) . '"' : '') . '>' . escapeHtml($row['contact_name']) . '</span>';
         return $style === 'detail'
             ? "<span class=\"d-inline-flex align-items-center gap-2 min-w-0\">$avatar$name</span>"
             : "<span class=\"$pill itflow-asset-pill-person " . ($archived ? 'text-body-secondary' : 'text-body-emphasis') . " bg-body-secondary\">$avatar$name</span>";
@@ -321,7 +321,7 @@ function assetContactDetails($row) {
 
     $html = '';
     if ($email) {
-        $html .= "<div class=\"small text-truncate\"><a href=\"mailto:$email\">$email</a><button type=\"button\" class=\"itflow-copy clipboardjs\" title=\"Copy email\" data-clipboard-text=\"$email\"><i class=\"far fa-copy\"></i></button></div>";
+        $html .= "<div class=\"small text-truncate\"><a href=\"mailto:$email\">$email</a><button type=\"button\" class=\"itflow-copy clipboardjs\" title=\"" . escapeHtml(__('Copy email')) . "\" data-clipboard-text=\"$email\"><i class=\"far fa-copy\"></i></button></div>";
     }
     if ($phone) {
         $html .= "<div class=\"small\"><i class=\"fas fa-fw fa-phone text-secondary me-1\"></i>$phone" . ($extension ? " x$extension" : '') . '</div>';
@@ -329,7 +329,7 @@ function assetContactDetails($row) {
     if ($mobile) {
         $html .= "<div class=\"small\"><i class=\"fas fa-fw fa-mobile-alt text-secondary me-1\"></i>$mobile</div>";
     }
-    $html .= "<div class=\"small\"><a href=\"contact.php?client_id=$client_id&contact_id=$contact_id\">Open contact<i class=\"fas fa-arrow-right ms-1\"></i></a></div>";
+    $html .= "<div class=\"small\"><a href=\"contact.php?client_id=$client_id&contact_id=$contact_id\">" . __('Open contact') . "<i class=\"fas fa-arrow-right ms-1\"></i></a></div>";
 
     return $html;
 }
@@ -343,7 +343,7 @@ function assetQuickOptions($field, $client_id) {
     $client_id = intval($client_id);
 
     if ($field === 'asset_status') {
-        $options = [['value' => '', 'label' => 'No status', 'icon' => 'fas fa-minus', 'none' => true]];
+        $options = [['value' => '', 'label' => __('No status'), 'icon' => 'fas fa-minus', 'none' => true]];
         $sql = mysqli_query($mysqli, "SELECT category_name, category_color FROM categories
             WHERE category_type = 'asset_status' AND category_archived_at IS NULL
             ORDER BY category_order ASC, category_name ASC");
@@ -358,20 +358,20 @@ function assetQuickOptions($field, $client_id) {
     }
 
     if ($field === 'asset_location') {
-        $options = [['value' => '0', 'label' => 'No location', 'icon' => 'fas fa-ban', 'none' => true]];
+        $options = [['value' => '0', 'label' => __('No location'), 'icon' => 'fas fa-ban', 'none' => true]];
         $sql = mysqli_query($mysqli, "SELECT location_id, location_name, location_primary, location_city, location_state FROM locations
             WHERE location_client_id = $client_id AND location_archived_at IS NULL
             ORDER BY location_primary DESC, location_name ASC");
         while ($row = mysqli_fetch_assoc($sql)) {
             $place = implode(', ', array_filter([trim((string) $row['location_city']), trim((string) $row['location_state'])]));
-            $description = implode(' · ', array_filter([intval($row['location_primary']) ? 'Primary' : '', $place]));
+            $description = implode(' · ', array_filter([intval($row['location_primary']) ? __('Primary') : '', $place]));
             $options[] = ['value' => (string) intval($row['location_id']), 'label' => $row['location_name'], 'icon' => 'fas fa-map-marker-alt', 'description' => $description];
         }
         return $options;
     }
 
     if ($field === 'asset_contact') {
-        $options = [['value' => '0', 'label' => 'Nobody', 'icon' => 'fas fa-user-slash', 'none' => true]];
+        $options = [['value' => '0', 'label' => __('Nobody'), 'icon' => 'fas fa-user-slash', 'none' => true]];
         $sql = mysqli_query($mysqli, "SELECT contact_id, contact_name, contact_title, contact_photo FROM contacts
             WHERE contact_client_id = $client_id AND contact_archived_at IS NULL
             ORDER BY contact_name ASC");
@@ -396,7 +396,7 @@ function assetQuickSet($asset_id, $field, $value) {
     $asset_id = intval($asset_id);
     $row = assetQuickRow($asset_id);
     if (!$row) {
-        return [false, 'That asset no longer exists.'];
+        return [false, __('That asset no longer exists.')];
     }
     $client_id = intval($row['asset_client_id']);
     $asset_name = escapeSql($row['asset_name']);
@@ -404,20 +404,20 @@ function assetQuickSet($asset_id, $field, $value) {
 
     if ($field === 'asset_status') {
         if ($value !== '' && !isset(assetStatusColors()[$value])) {
-            return [false, 'Pick one of the asset statuses.'];
+            return [false, __('Pick one of the asset statuses.')];
         }
         if ($value === (string) $row['asset_status']) {
             return [true, ''];
         }
         $status = escapeSql($value);
         mysqli_query($mysqli, "UPDATE assets SET asset_status = '$status' WHERE asset_id = $asset_id");
-        $what = $value === '' ? "cleared the status on $asset_name" : "set status to $status on $asset_name";
-        $message = $value === '' ? 'Status cleared' : "Status set to $value";
+        $what = $value === '' ? "cleared the status on $asset_name" : "set status to $status on $asset_name"; // i18n-ignore - the audit log
+        $message = $value === '' ? __('Status cleared') : __('Status set to %s', $value);
 
     } elseif ($field === 'asset_location') {
         $location_id = assetClientOwnedId('location', $value, $client_id);
         if (intval($value) && !$location_id) {
-            return [false, 'That location is not one of this client\'s.'];
+            return [false, __('That location is not one of this client\'s.')];
         }
         if ($location_id === intval($row['asset_location_id'])) {
             return [true, ''];
@@ -425,13 +425,13 @@ function assetQuickSet($asset_id, $field, $value) {
         $location_name = $location_id ? (string) mysqli_fetch_row(mysqli_query($mysqli, "SELECT location_name FROM locations WHERE location_id = $location_id"))[0] : '';
         $status = escapeSql($row['asset_status']);
         mysqli_query($mysqli, "UPDATE assets SET asset_location_id = $location_id WHERE asset_id = $asset_id");
-        $what = $location_id ? "assigned asset $asset_name to location " . escapeSql($location_name) : "removed asset $asset_name from its location";
-        $message = $location_id ? "Moved to $location_name" : 'Location removed';
+        $what = $location_id ? "assigned asset $asset_name to location " . escapeSql($location_name) : "removed asset $asset_name from its location"; // i18n-ignore - the audit log
+        $message = $location_id ? __('Moved to %s', $location_name) : __('Location removed');
 
     } elseif ($field === 'asset_contact') {
         $contact_id = assetClientOwnedId('contact', $value, $client_id);
         if (intval($value) && !$contact_id) {
-            return [false, 'That contact is not one of this client\'s.'];
+            return [false, __('That contact is not one of this client\'s.')];
         }
         if ($contact_id === intval($row['asset_contact_id'])) {
             return [true, ''];
@@ -440,10 +440,10 @@ function assetQuickSet($asset_id, $field, $value) {
         $status = escapeSql($row['asset_status']);
         mysqli_query($mysqli, "UPDATE assets SET asset_contact_id = $contact_id WHERE asset_id = $asset_id");
         $what = $contact_id ? "assigned asset $asset_name to contact " . escapeSql($contact_name) : "unassigned asset $asset_name";
-        $message = $contact_id ? "Assigned to $contact_name" : 'Unassigned';
+        $message = $contact_id ? __('Assigned to %s', $contact_name) : __('Unassigned');
 
     } else {
-        return [false, 'Unknown field.'];
+        return [false, __('Unknown field.')];
     }
 
     logAudit("Asset", "Edit", "$session_name $what", $client_id, $asset_id);

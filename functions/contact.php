@@ -46,7 +46,7 @@ function contactLink($client_id, $contact_id, $name, $photo = '', $options = [])
     $client_id = intval($client_id);
     $contact_id = intval($contact_id);
     $name = html_entity_decode((string) $name, ENT_QUOTES, 'UTF-8');
-    $label = escapeHtml($name !== '' ? $name : 'Unnamed contact');
+    $label = escapeHtml($name !== '' ? $name : __('Unnamed contact'));
     $archived = !empty($options['archived']);
     $class = trim('text-truncate ' . ($options['class'] ?? '') . ($archived ? ' text-decoration-line-through text-body-secondary' : ''));
     $title = $archived ? ' title="Archived contact"' : '';
@@ -82,6 +82,14 @@ function contactPortalAccess($contact_user_id, $auth_method) {
     return $auth_method === 'azure' ? 'Microsoft' : 'Password';
 }
 
+/** contactPortalAccess() as shown - Microsoft, or Password (and a code, with $mfa). */
+function contactPortalAccessLabel($access, $mfa = false) {
+    if ($access === 'Microsoft') {
+        return 'Microsoft';
+    }
+    return $mfa ? __('Password and a code') : __('Password');
+}
+
 /**
  * Their flags as pills: Primary (or Important when not primary - a primary
  * contact is always important), Billing, Technical, and Portal when they can
@@ -90,20 +98,20 @@ function contactPortalAccess($contact_user_id, $auth_method) {
 function contactFlagPills($row, $with_portal = true) {
     $pills = [];
     if (!empty($row['contact_primary'])) {
-        $pills[] = ['Primary', 'text-bg-success', 'The client\'s main contact'];
+        $pills[] = [__('Primary'), 'text-bg-success', __('The client\'s main contact')];
     } elseif (!empty($row['contact_important'])) {
-        $pills[] = ['Important', 'bg-warning-subtle text-warning-emphasis', 'Pinned to the top of the list'];
+        $pills[] = [__('Important'), 'bg-warning-subtle text-warning-emphasis', __('Pinned to the top of the list')];
     }
     if (!empty($row['contact_billing'])) {
-        $pills[] = ['Billing', 'bg-secondary-subtle text-secondary-emphasis', 'Receives invoices'];
+        $pills[] = [__('Billing'), 'bg-secondary-subtle text-secondary-emphasis', __('Receives invoices')];
     }
     if (!empty($row['contact_technical'])) {
-        $pills[] = ['Technical', 'bg-secondary-subtle text-secondary-emphasis', 'Technical contact'];
+        $pills[] = [__('Technical'), 'bg-secondary-subtle text-secondary-emphasis', __('Technical contact')];
     }
     if ($with_portal) {
         $portal = contactPortalAccess($row['contact_user_id'] ?? 0, $row['user_auth_method'] ?? '');
         if ($portal) {
-            $pills[] = ['Portal', 'bg-info-subtle text-info-emphasis', "Client portal login ($portal)"];
+            $pills[] = [__('Portal'), 'bg-info-subtle text-info-emphasis', __('Client portal login (%s)', contactPortalAccessLabel($portal))];
         }
     }
     $html = '';
@@ -158,13 +166,13 @@ function contactQuickSetLocation($contact_id, $value) {
 
     $row = contactQuickRow($contact_id);
     if (!$row) {
-        return [false, 'That contact no longer exists.'];
+        return [false, __('That contact no longer exists.')];
     }
     $contact_id = intval($row['contact_id']);
     $client_id = intval($row['contact_client_id']);
     $location_id = assetClientOwnedId('location', $value, $client_id);
     if (intval($value) && !$location_id) {
-        return [false, 'That location is not one of this client\'s.'];
+        return [false, __('That location is not one of this client\'s.')];
     }
     if ($location_id === intval($row['contact_location_id'])) {
         return [true, ''];
@@ -177,7 +185,7 @@ function contactQuickSetLocation($contact_id, $value) {
         ? "$session_name set the location of contact $contact_name to " . escapeSql($location_name)
         : "$session_name removed the location of contact $contact_name", $client_id, $contact_id);
 
-    return [true, $location_id ? "Moved to $location_name" : 'Location removed'];
+    return [true, $location_id ? __('Moved to %s', $location_name) : __('Location removed')];
 }
 
 /** What quick_pick.js redraws after a change. */
@@ -187,4 +195,20 @@ function contactQuickRecord($contact_id) {
         'current' => (string) intval($row['contact_location_id']),
         'html' => ['list' => contactLocationHtml($row, 'list'), 'detail' => contactLocationHtml($row, 'detail')],
     ];
+}
+
+/**
+ * What saving a contact says: $action 'created' or 'updated', and how the
+ * portal invite went ($invited true, false for not sent, null for none).
+ */
+function contactSavedMessage($action, $name, $invited) {
+    $name = '<strong>' . $name . '</strong>';
+    if ($invited === false) {
+        $why = portalMailReady() ? __('their email address is not valid') : __('outgoing mail is not set up');
+        return $action === 'created' ? __('Contact %1$s created - the portal invite was not sent, as %2$s', $name, $why) : __('Contact %1$s updated - the portal invite was not sent, as %2$s', $name, $why);
+    }
+    if ($invited) {
+        return $action === 'created' ? __('Contact %s created and invited to the client portal', $name) : __('Contact %s updated and invited to the client portal', $name);
+    }
+    return $action === 'created' ? __('Contact %s created', $name) : __('Contact %s updated', $name);
 }
