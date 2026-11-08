@@ -519,7 +519,7 @@ $setup_title = ['restore' => 'Restore a backup', 'restored' => 'Backup restored'
 
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
+<html <?= i18nHtmlAttributes() ?> data-bs-theme="light" data-lte-color-mode="off">
 
 <head>
     <meta charset="utf-8">
@@ -545,6 +545,9 @@ $setup_title = ['restore' => 'Restore a backup', 'restored' => 'Backup restored'
         <link rel="stylesheet" href="/libs/intl-tel-input/css/intlTelInput.min.css">
     <?php } ?>
     <link rel="stylesheet" href="/css/itflow_custom.css">
+
+    <!-- __() for the front end - js/itflow_select.js and js/app.js call it; without it the pickers' list can't open -->
+    <script src="/js/i18n.js"></script>
 </head>
 
 <body class="itflow-setup bg-body-tertiary">
