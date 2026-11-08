@@ -47,6 +47,7 @@ Autopay that has no saved card - set up before version 2.2.3, when autopay was a
 
 ### Bug Fixes
 
+- Setup: the pickers on the setup pages open again - the Country list on the company step showed no countries to choose from, so a new install could not get past it.
 - Client portal: the New ticket button no longer breaks onto two lines on screens around 992px wide, and between 992 and 1199px the account button shows only the contact's initials, so a long name can't push the top menu under the logo - the name is at the top of the account menu.
 - Payments: Add Payment, the bulk payment and editing a payment now refuse an amount of zero or less, or more than what is owed - the invoice's balance, everything the client owes for a bulk payment, or for an edit the balance plus what that payment already covers. The limit used to come from the payment form itself, so an old or altered form could pay an invoice beyond its total, and a bulk payment above what was owed dropped the excess without a word. Each payment is now recorded in its invoice's currency.
 - Invoices: Cancel, Non-Billable, Mark Sent and Add Payment are now refused when the invoice is no longer in a status that allows them - for instance a paid invoice cancelled from an old link or a tab opened before someone else changed it, which used to put its products back in stock, or a payment added to a cancelled invoice. The invoice page already offered each action only where it applies; the server now checks the same rules, and a refused action changes nothing and says why.
