@@ -19,7 +19,6 @@ return [
     'Forgot password?' => 'Esqueceu a senha?',
     'Create an account' => 'Criar uma conta',
     'Login with Microsoft Entra' => 'Entrar com Microsoft Entra',
-    'Powered by ITFlow' => 'Desenvolvido com ITFlow',
     '%s logo' => 'Logotipo de %s',
     'Remember this browser for %d day' => ['Lembrar este navegador por %d dia', 'Lembrar este navegador por %d dias'],
     'Incorrect username or password.' => 'Usuário ou senha incorretos.',

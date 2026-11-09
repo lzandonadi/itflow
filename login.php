@@ -884,12 +884,6 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     </div>
 </div>
 
-<?php
-if (!$config_whitelabel_enabled) {
-    echo '<small class="text-muted">' . __('Powered by ITFlow') . '</small>';
-}
-?>
-
 <script src="libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="libs/adminlte/js/adminlte.min.js"></script>
 <script src="js/login_prevent_resubmit.js"></script>
