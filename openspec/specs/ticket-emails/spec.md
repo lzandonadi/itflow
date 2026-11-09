@@ -47,7 +47,7 @@ O sistema SHALL, no e-mail de confirmação de um chamado criado por e-mail, inf
 
 #### Scenario: Confirmação em português
 - **WHEN** o idioma da interface é português e um chamado é criado por e-mail
-- **THEN** o título é "Recebemos o seu e-mail" e o texto é "Obrigado por entrar em contato. Um ticket de suporte (TCK-11) foi aberto para a sua solicitação. Você será notificado por e-mail quando houver uma resposta."
+- **THEN** o título é "Recebemos o seu e-mail" e o texto é "Obrigado por entrar em contato. Um chamado de suporte (TCK-11) foi aberto para a sua solicitação. Você será notificado por e-mail quando houver uma resposta."
 
 #### Scenario: Remetente escreveu um texto qualquer
 - **WHEN** o e-mail recebido tem corpo livre

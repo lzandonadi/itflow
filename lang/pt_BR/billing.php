@@ -15,7 +15,7 @@ return [
     'What is it for?' => 'Para que é?',
     'Three new laptops for the new starters - set up, joined to the domain and given Microsoft 365' => 'Três notebooks novos para os novos colaboradores - configurados, no domínio e com Microsoft 365',
     'Use %1$s - %2$s' => 'Usar %1$s - %2$s',
-    'Use what ITFlow knows of %s' => 'Usar o que o ITFlow sabe de %s',
+    'Use what ITFlow knows of %s' => 'Usar o que a Central do Cliente sabe de %s',
     'its people, sites and devices, to size per-user and per-device lines' => 'pessoas, locais e dispositivos, para dimensionar linhas por usuário e por dispositivo',
     'how many people it has, to size per-user and per-device lines' => 'quantas pessoas tem, para dimensionar linhas por usuário e por dispositivo',
     'Lines come from your catalog of %d where one fits, at its prices' => 'As linhas vêm do seu catálogo de %d itens quando algum serve, com os preços dele',

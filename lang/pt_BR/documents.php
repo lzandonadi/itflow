@@ -102,7 +102,7 @@ return [
     'Draft it with AI' => 'Rascunhar com IA',
     'What it is for - a disaster recovery plan for the main office' => 'Para que serve - um plano de recuperação de desastres para o escritório principal',
     'Draft' => 'Rascunhar',
-    'Use what ITFlow knows about %s - their sites, people, servers, networks and software, never a password or key' => 'Usar o que o ITFlow sabe sobre %s - locais, pessoas, servidores, redes e software, nunca uma senha ou chave',
+    'Use what ITFlow knows about %s - their sites, people, servers, networks and software, never a password or key' => 'Usar o que a Central do Cliente sabe sobre %s - locais, pessoas, servidores, redes e software, nunca uma senha ou chave',
     'them' => 'o cliente',
     'Drafting' => 'Rascunhando',
     'AI is writing it - this can take a minute.' => 'A IA está escrevendo - isso pode levar um minuto.',

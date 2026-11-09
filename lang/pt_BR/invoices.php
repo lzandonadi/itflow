@@ -117,7 +117,7 @@ return [
     'Reports group income by it.' => 'Os relatórios agrupam as receitas por ela.',
     'Bill %2$s for the same %1$d line - %3$s - again and again. The first one is made a period after %4$s\'s date, %5$s; change that and the lines on the recurring invoice after.' => ['Fature %2$s pela mesma %1$d linha - %3$s - de novo e de novo. A primeira é gerada um período depois da data de %4$s, %5$s; mude isso e as linhas na fatura recorrente depois.', 'Fature %2$s pelas mesmas %1$d linhas - %3$s - de novo e de novo. A primeira é gerada um período depois da data de %4$s, %5$s; mude isso e as linhas na fatura recorrente depois.'],
     '%1$s - first on %2$s' => '%1$s - a primeira em %2$s',
-    'For an invoice that went out some other way than ITFlow\'s email. It stops being a draft - it counts as owed from now, and the client can open and pay it from its link.' => 'Para uma fatura que saiu de outra forma que não o e-mail do ITFlow. Ela deixa de ser rascunho - passa a contar como devida a partir de agora, e o cliente pode abri-la e pagá-la pelo link.',
+    'For an invoice that went out some other way than ITFlow\'s email. It stops being a draft - it counts as owed from now, and the client can open and pay it from its link.' => 'Para uma fatura que saiu de outra forma que não o e-mail da Central do Cliente. Ela deixa de ser rascunho - passa a contar como devida a partir de agora, e o cliente pode abri-la e pagá-la pelo link.',
     'How was it sent?' => 'Como foi enviada?',
     'Tracking number, who it went to, anything worth keeping' => 'Código de rastreio, para quem foi, o que valer guardar',
     'sent method::Sent by Snail Mail' => 'Enviada pelo correio',

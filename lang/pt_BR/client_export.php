@@ -98,7 +98,7 @@ return [
     '%s worked' => '%s trabalhadas',
     'The documentation PDF could not be made: %s' => 'Não foi possível gerar o PDF de documentação: %s',
     'Client data export' => 'Exportação de dados do cliente',
-    'Exported %1$s by %2$s from ITFlow %3$s' => 'Exportado em %1$s por %2$s do ITFlow %3$s',
+    'Exported %1$s by %2$s from ITFlow %3$s' => 'Exportado em %1$s por %2$s da Central do Cliente %3$s',
     'This export includes passwords and 2FA secrets.' => 'Esta exportação inclui senhas e segredos 2FA.',
     'Keep it encrypted, share the password separately, and delete copies once they are no longer needed.' => 'Mantenha-a criptografada, envie a senha separadamente e apague as cópias quando não forem mais necessárias.',
     'What is in this export' => 'O que há nesta exportação',

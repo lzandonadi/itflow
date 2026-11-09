@@ -22,7 +22,7 @@ return [
     'Optional - a word of your own: what it covers, what happens next' => 'Opcional - uma palavra sua: o que cobre, o que acontece depois',
     'This quote is %s, so sending it will not change its status.' => 'Este orçamento está %s, então enviá-lo não muda o status.',
     'quote::Mark Sent' => 'Marcar como enviado',
-    'For a quote that went out some other way than ITFlow\'s email. It stops being a draft, and the client can open it from its link.' => 'Para um orçamento que saiu por outro meio que não o e-mail do ITFlow. Ele deixa de ser rascunho e o cliente pode abri-lo pelo link.',
+    'For a quote that went out some other way than ITFlow\'s email. It stops being a draft, and the client can open it from its link.' => 'Para um orçamento que saiu por outro meio que não o e-mail da Central do Cliente. Ele deixa de ser rascunho e o cliente pode abri-lo pelo link.',
     'quote sent method::Sent by Snail Mail' => 'Enviado pelo correio',
     'quote sent method::Sent by Email Client' => 'Enviado pelo programa de e-mail',
     'quote sent method::Hand Delivered' => 'Entregue em mãos',

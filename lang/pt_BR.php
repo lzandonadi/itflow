@@ -30,11 +30,11 @@ return [
 
     // Admin > Settings > Localization
     'Localization' => 'Localização',
-    'The language ITFlow is shown in, how numbers and money are written, the currency you bill in, and your timezone.' => 'O idioma em que o ITFlow é exibido, como números e valores são escritos, a moeda em que você cobra e o seu fuso horário.',
+    'The language ITFlow is shown in, how numbers and money are written, the currency you bill in, and your timezone.' => 'O idioma em que a Central do Cliente é exibido, como números e valores são escritos, a moeda em que você cobra e o seu fuso horário.',
     'Language and currency' => 'Idioma e moeda',
-    'The language ITFlow is shown in, how numbers and money are written - on screen, on invoices and in emails - and the currency new clients, invoices and quotes start in.' => 'O idioma em que o ITFlow é exibido, como números e valores são escritos - na tela, nas faturas e nos e-mails - e a moeda com que novos clientes, faturas e orçamentos começam.',
+    'The language ITFlow is shown in, how numbers and money are written - on screen, on invoices and in emails - and the currency new clients, invoices and quotes start in.' => 'O idioma em que a Central do Cliente é exibido, como números e valores são escritos - na tela, nas faturas e nos e-mails - e a moeda com que novos clientes, faturas e orçamentos começam.',
     'Interface language' => 'Idioma da interface',
-    'For everyone - agents, the client portal and the emails ITFlow sends. What is already saved stays in the language it was written in.' => 'Para todos - técnicos, portal do cliente e os e-mails que o ITFlow envia. O que já está salvo continua no idioma em que foi escrito.',
+    'For everyone - agents, the client portal and the emails ITFlow sends. What is already saved stays in the language it was written in.' => 'Para todos - técnicos, portal do cliente e os e-mails que a Central do Cliente envia. O que já está salvo continua no idioma em que foi escrito.',
     'Number and currency format' => 'Formato de números e moeda',
     '- Format -' => '- Formato -',
     'Currency' => 'Moeda',
@@ -42,7 +42,7 @@ return [
     'What is already entered keeps the currency it was entered in - nothing is converted.' => 'O que já foi lançado mantém a moeda em que foi lançado - nada é convertido.',
     'Timezone' => 'Fuso horário',
     '- Timezone -' => '- Fuso horário -',
-    'The clock ITFlow keeps - when tickets are due, when cron runs the nightly jobs, and the times on everything.' => 'O relógio do ITFlow - quando os chamados vencem, quando o cron roda as tarefas noturnas e o horário de tudo.',
+    'The clock ITFlow keeps - when tickets are due, when cron runs the nightly jobs, and the times on everything.' => 'O relógio da Central do Cliente - quando os chamados vencem, quando o cron roda as tarefas noturnas e o horário de tudo.',
     'Looks like' => 'Fica assim',
     'Pick the language from the list.' => 'Escolha o idioma na lista.',
     'Pick the format from the list.' => 'Escolha o formato na lista.',
@@ -123,7 +123,7 @@ return [
     "That part of the portal isn't open to you" => 'Essa parte do portal não está liberada para você',
     '403 Forbidden' => '403 Acesso negado',
     'CSRF token verification failed. Your session may have expired.' => 'Falha na verificação do token CSRF. Sua sessão pode ter expirado.',
-    '<a href="/">Return to ITFlow</a> and try again.' => '<a href="/">Volte ao ITFlow</a> e tente de novo.',
+    '<a href="/">Return to ITFlow</a> and try again.' => '<a href="/">Volte à Central do Cliente</a> e tente de novo.',
 
     // Role modules, as named in the refusals above and in Admin > Roles (functions/roles.php roleModuleInfo())
     'Support' => 'Suporte',

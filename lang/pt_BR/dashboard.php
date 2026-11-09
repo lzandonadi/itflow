@@ -12,7 +12,7 @@ return [
     'Every client\'s, with each entry\'s quick look and export' => 'De todos os clientes, com a visualização rápida e a exportação de cada registro',
     'What was done, who did it, the IP address or the browser' => 'O que foi feito, quem fez, o endereço IP ou o navegador',
     'Cron, the API, the email parser' => 'O cron, a API, o leitor de e-mails',
-    'ITFlow itself' => 'O próprio ITFlow',
+    'ITFlow itself' => 'A própria Central do Cliente',
     '- Any action -' => '- Qualquer ação -',
     '- Any type -' => '- Qualquer tipo -',
     'Admin &gt; Audit Logs' => 'Admin &gt; Logs de auditoria',
